@@ -31,4 +31,5 @@ if tree.nil?
   puts "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}"
 else
   puts "#{tree}"
+# p tree
 end

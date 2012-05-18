@@ -1,7 +1,7 @@
 grammar Downcase
 
   rule text
-    ( quoted_text / sms / comment / unquoted_text )* <Text>
+    ( sms / quoted_text / comment / unquoted_text )* <Text>
   end
 
   rule comment
@@ -13,7 +13,7 @@ grammar Downcase
   end
 
   rule sms
-    '!' [sS] [mM] [sS] '$' [^\n]+ <SMS>
+    '!' [sS] [mM] [sS] '$' <SMS>
   end
 
   rule unquoted_text
