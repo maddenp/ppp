@@ -5,14 +5,6 @@ require 'treetop'
 require 'downcase.rb'
 require 'downcase.tt'
 
-def clean(tree)
-  unless tree.elements.nil?
-    tree.elements.delete_if { |e| e.class==Treetop::Runtime::SyntaxNode }
-    tree.elements.each { |e| clean e }
-  end
-  tree
-end
-
 infile=ARGV[0]
 if infile
   unless File.readable?(infile)
@@ -25,11 +17,10 @@ else
 end
 
 p=DowncaseParser.new
-tree=clean(p.parse(s))
+tree=p.parse(s)
 
 if tree.nil?
   puts "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}"
 else
   puts "#{tree}"
-# p tree
 end

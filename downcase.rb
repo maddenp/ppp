@@ -1,9 +1,3 @@
-class Treetop::Runtime::SyntaxNode
-  def to_s
-    text_value
-  end
-end
-
 module Downcase
 
   class Text < Treetop::Runtime::SyntaxNode
@@ -12,21 +6,15 @@ module Downcase
     end
   end
 
-  class Comment < Treetop::Runtime::SyntaxNode
-  end
-
-  class QuotedText < Treetop::Runtime::SyntaxNode
-  end
-
-  class SMS < Treetop::Runtime::SyntaxNode
+  class Downcase < Treetop::Runtime::SyntaxNode
     def to_s
       text_value.downcase
     end
   end
 
-  class UnquotedText < Treetop::Runtime::SyntaxNode
+  class Verbatim < Treetop::Runtime::SyntaxNode
     def to_s
-      text_value.downcase
+      text_value
     end
   end
 

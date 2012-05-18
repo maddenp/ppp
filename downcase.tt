@@ -1,23 +1,23 @@
 grammar Downcase
 
   rule text
-    ( sms / quoted_text / comment / unquoted_text )* <Text>
+    ( sms / quoted / comment / unquoted )* <Text>
   end
 
   rule comment
-    '!' [^\n]* <Comment>
+    '!' [^\n]* <Verbatim>
   end
 
-  rule quoted_text
-    ( '"' [^"]* '"' / "'" [^']* "'" )+ <QuotedText>
+  rule quoted
+    ( '"' [^"]* '"' / "'" [^']* "'" )+ <Verbatim>
   end
 
   rule sms
-    '!' [sS] [mM] [sS] '$' <SMS>
+    '!' [sS] [mM] [sS] '$' <Downcase>
   end
 
-  rule unquoted_text
-    [^'"!]+ <UnquotedText>
+  rule unquoted
+    [^'"!]+ <Downcase>
   end
 
 end
