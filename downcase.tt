@@ -1,0 +1,23 @@
+grammar Downcase
+
+  rule text
+    ( quoted_text / sms / comment / unquoted_text )* <Text>
+  end
+
+  rule comment
+    '!' [^\n]* <Comment>
+  end
+
+  rule quoted_text
+    ( '"' [^"]* '"' / "'" [^']* "'" )+ <QuotedText>
+  end
+
+  rule sms
+    '!' [sS] [mM] [sS] '$' [^\n]+ <SMS>
+  end
+
+  rule unquoted_text
+    [^'"!]+ <UnquotedText>
+  end
+
+end

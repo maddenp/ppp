@@ -1,0 +1,3 @@
+#!/bin/sh
+export GEM_PATH=$PWD/gems
+java -jar jruby.jar -S gems/gems/treetop-1.4.10/bin/tt $*
