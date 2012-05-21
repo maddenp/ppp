@@ -10,7 +10,6 @@ require 'normalize_nodes.rb'
 require 'normalize_parser.rb'
 
 def clean(s)
-  s.gsub!(/\t/,' ')    # tabs to spaces
   s.gsub!(/\s+$/,'')   # remove trailing whitespace
   s.gsub!(/^\s+&/,'&') # left-justify continuation lines
   s.gsub!(/&$\n&?/,'') # join continuation lines
