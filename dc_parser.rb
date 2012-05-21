@@ -99,7 +99,7 @@ module Downcase
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(Verbatim,input, i0...index, s0)
+      r0 = instantiate_node(Delete,input, i0...index, s0)
       r0.extend(Comment0)
     else
       @index = i0

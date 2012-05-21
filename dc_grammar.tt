@@ -5,7 +5,7 @@ grammar Downcase
   end
 
   rule comment
-    '!' [^\n]* <Verbatim>
+    '!' [^\n]* <Delete>
   end
 
   rule quoted
