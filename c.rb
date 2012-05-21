@@ -6,8 +6,8 @@ $: << '.'
 
 require 'rubygems'
 require 'treetop'
-require 'dc_nodes.rb'
-require 'dc_parser.rb'
+require 'normalize_nodes.rb'
+require 'normalize_parser.rb'
 
 def clean(s)
   s.gsub!(/\t/,' ')    # tabs to spaces
@@ -25,7 +25,7 @@ def fail(msg)
 end
 
 def normalize(s)
-  p=DowncaseParser.new
+  p=NormalizeParser.new
   clean(s)
   s=parse(p,s)
   clean(s)

@@ -1,4 +1,4 @@
-module Downcase
+module Normalize
 
   class Text < Treetop::Runtime::SyntaxNode
     def to_s

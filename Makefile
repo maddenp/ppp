@@ -1,2 +1,2 @@
-dc_parser.rb: dc_grammar.tt dc_nodes.rb
+normalize_parser.rb: normalize_grammar.tt normalize_nodes.rb
 	tt -o $@ $<

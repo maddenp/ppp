@@ -1,4 +1,4 @@
-grammar Downcase
+grammar Normalize
 
   rule text
     ( directive / quoted / comment / unquoted )* <Text>
