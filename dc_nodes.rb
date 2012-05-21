@@ -14,7 +14,7 @@ module Downcase
 
   class Normalize < Treetop::Runtime::SyntaxNode
     def to_s
-      text_value.downcase.squeeze(' ')
+      text_value.downcase.gsub(/  */,'')
     end
   end
 
