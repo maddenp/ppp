@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 
-ENV['GEM_PATH']=Dir.pwd+'/gems'
-
 $: << '.'
+
+ENV['GEM_PATH']=Dir.pwd+'/gems'
 
 require 'rubygems'
 require 'treetop'
 require 'dc_nodes.rb'
-require 'dc_parser.rb'
+require 'dc_grammar.tt'
 
 infile=ARGV[0]
 if infile

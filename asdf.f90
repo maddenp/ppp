@@ -1,5 +1,5 @@
 PROGRAM asdf
-  !SMS$ignore begin
+  !SMS$ignore begin "CAPS"
   ! comment 1
   print *,'heLLo "x" worLd'
 !sMs$ignore end
