@@ -22,7 +22,7 @@ module Downcase
     s0, i0 = [], index
     loop do
       i1 = index
-      r2 = _nt_sms
+      r2 = _nt_directive
       if r2
         r1 = r2
       else
@@ -107,6 +107,24 @@ module Downcase
     end
 
     node_cache[:comment][start_index] = r0
+
+    r0
+  end
+
+  def _nt_directive
+    start_index = index
+    if node_cache[:directive].has_key?(index)
+      cached = node_cache[:directive][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    r0 = _nt_sms
+
+    node_cache[:directive][start_index] = r0
 
     r0
   end

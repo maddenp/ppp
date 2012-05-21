@@ -1,11 +1,15 @@
 grammar Downcase
 
   rule text
-    ( sms / quoted / comment / unquoted )* <Text>
+    ( directive / quoted / comment / unquoted )* <Text>
   end
 
   rule comment
     '!' [^\n]* <Delete>
+  end
+
+  rule directive
+    sms
   end
 
   rule quoted
