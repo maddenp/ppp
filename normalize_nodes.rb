@@ -14,7 +14,7 @@ module Normalize
 
   class Normalize < Treetop::Runtime::SyntaxNode
     def to_s
-      text_value.downcase.gsub(/  */,'')
+      text_value.downcase.gsub(/  */,'').gsub(/;/,"\n")
     end
   end
 

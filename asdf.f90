@@ -14,4 +14,7 @@ worLd"
    worLd"
   PRINT *,"heLLo ""x"" &
     & worLd"
+  print *,'hello' ; print *,'world'
+  print *,'hello' ; &
+    print *,'world'
 end prOGRam ASDF
