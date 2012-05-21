@@ -17,11 +17,11 @@ grammar Downcase
   end
 
   rule sms
-    '!' [sS] [mM] [sS] '$' <Downcase>
+    '!' [sS] [mM] [sS] '$' <Normalize>
   end
 
   rule unquoted
-    [^'"!]+ <Downcase>
+    [^'"!]+ <Normalize>
   end
 
 end

@@ -12,7 +12,7 @@ module Downcase
     end
   end
 
-  class Downcase < Treetop::Runtime::SyntaxNode
+  class Normalize < Treetop::Runtime::SyntaxNode
     def to_s
       text_value.downcase
     end

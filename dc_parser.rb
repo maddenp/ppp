@@ -326,7 +326,7 @@ module Downcase
       end
     end
     if s0.last
-      r0 = instantiate_node(Downcase,input, i0...index, s0)
+      r0 = instantiate_node(Normalize,input, i0...index, s0)
       r0.extend(Sms0)
     else
       @index = i0
@@ -367,7 +367,7 @@ module Downcase
       @index = i0
       r0 = nil
     else
-      r0 = instantiate_node(Downcase,input, i0...index, s0)
+      r0 = instantiate_node(Normalize,input, i0...index, s0)
     end
 
     node_cache[:unquoted][start_index] = r0

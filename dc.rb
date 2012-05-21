@@ -9,6 +9,34 @@ require 'treetop'
 require 'dc_nodes.rb'
 require 'dc_parser.rb'
 
+def clean(s)
+  s.gsub!(/\t/,' ')    # tabs to spaces
+  s.gsub!(/\s+$/,'')   # remove trailing whitespace
+  s.gsub!(/^\s+&/,'&') # left-justify continuation lines
+  s.gsub!(/&$\n&?/,'') # join continuation lines
+  s.gsub!(/^\s+/,'')   # remove leading whitespace
+  s.gsub!(/\n\n/,"\n") # remove empty lines
+  s
+end
+
+def fail(msg)
+  puts msg
+  exit 1
+end
+
+def normalize(s)
+  p=DowncaseParser.new
+  clean(s)
+  s=parse(p,s)
+  clean(s)
+end
+
+def parse(p,s)
+  tree=p.parse(s)
+  fail "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}" if tree.nil?
+  tree.to_s
+end
+
 infile=ARGV[0]
 if infile
   unless File.readable?(infile)
@@ -20,11 +48,4 @@ else
   s=STDIN.read
 end
 
-p=DowncaseParser.new
-tree=p.parse(s)
-
-if tree.nil?
-  puts "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}"
-else
-  puts "#{tree}"
-end
+puts normalize(s)
