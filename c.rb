@@ -24,25 +24,17 @@ def fail(msg)
 end
 
 def normalize(s)
-  p=NormalizeParser.new
-  clean(s)
-  s=parse(p,s)
-  clean(s)
-end
-
-def parse(p,s)
-  tree=p.parse(s)
+  tree=NormalizeParser.new.parse(clean(s))
   fail "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}" if tree.nil?
-  tree.to_s
+  clean(tree.to_s)
 end
 
-infile=ARGV[0]
-if infile
-  unless File.readable?(infile)
-    puts "Cannot read input file: #{infile}"
-    exit 1
+source=ARGV[0]
+if source
+  unless File.readable?(source)
+    fail "Cannot read input file: #{source}"
   end
-  s=File.open(infile,'rb').read
+  s=File.open(source,'rb').read
 else
   s=STDIN.read
 end
