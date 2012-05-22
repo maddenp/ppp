@@ -31,9 +31,7 @@ end
 
 source=ARGV[0]
 if source
-  unless File.readable?(source)
-    fail "Cannot read input file: #{source}"
-  end
+  fail "Cannot read input file: #{source}" unless File.readable?(source)
   s=File.open(source,'rb').read
 else
   s=STDIN.read
