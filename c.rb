@@ -10,17 +10,47 @@ require 'normalize_nodes.rb'
 require 'normalize_parser.rb'
 
 def clean(s)
-  s.gsub!(/\s*!.*$/,'') # remove comment-only lines
+  s.gsub!(/\s*!.*$/,'') # remove comment lines
   s.gsub!(/\s+$/,'')    # remove trailing whitespace
   s.gsub!(/^\s+/,'')    # left-justify line
   s.gsub!(/&$\n&?/,'')  # join continuation lines
-  s.gsub!(/\n\n/,"\n")  # remove empty lines
+  s.gsub!(/\n\n/,"\n")  # remove blank lines
   s
 end
 
 def fail(msg)
-  puts msg
+  puts "\n#{msg}\n\n"
   exit 1
+end
+
+def assemble(s,seen)
+  a=''
+  msg="While processing includes, "
+  r=Regexp.new('\s*include\s*(\'[^\']+\'|\"[^\"]+\").*',true)
+  s.split("\n").each do |line|
+    m=r.match(line)
+    if m
+      incfile=m[1][1..-2]
+      if seen.include?(incfile)
+        msg+="file #{seen.last} included #{incfile} recursively "
+        msg+=incchain(seen,incfile)
+        fail(msg)
+      end
+      unless File.readable?(incfile)
+        msg+="could not read file #{incfile} "
+        msg+=incchain(seen,incfile)
+        fail(msg)
+      end
+      a+=assemble(File.open(incfile,'rb').read,seen+[incfile])
+    else
+      a+="#{line}\n"
+    end
+  end
+  a
+end
+
+def incchain(seen,incfile)
+  '( '+(seen+[incfile]).join(' < ')+' )'
 end
 
 def normalize(s)
@@ -29,12 +59,13 @@ def normalize(s)
   clean(tree.to_s)
 end
 
-source=ARGV[0]
-if source
-  fail "Cannot read input file: #{source}" unless File.readable?(source)
-  s=File.open(source,'rb').read
-else
-  s=STDIN.read
+def usage
+  "usage: #{File.basename(__FILE__)} source"
 end
 
-puts normalize(s)
+srcfile=ARGV[0]
+fail(usage) unless srcfile
+fail("Cannot read file: #{srcfile}") unless File.readable?(srcfile)
+s=File.open(srcfile,'rb').read
+
+puts normalize(assemble(s,[srcfile]))
