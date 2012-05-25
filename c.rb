@@ -10,11 +10,11 @@ require 'normalize_nodes.rb'
 require 'normalize_parser.rb'
 
 def clean(s)
-  s.gsub!(/\s*!.*$/,'') # remove comment lines
-  s.gsub!(/\s+$/,'')    # remove trailing whitespace
-  s.gsub!(/^\s+/,'')    # left-justify line
-  s.gsub!(/&$\n&?/,'')  # join continuation lines
-  s.gsub!(/\n\n/,"\n")  # remove blank lines
+  s.gsub!(/^\s*!.*$/,'') # remove comment lines
+  s.gsub!(/\s+$/,'')     # remove trailing whitespace
+  s.gsub!(/^\s+/,'')     # left-justify line
+  s.gsub!(/&$\n&?/,'')   # join continuation lines
+  s.gsub!(/\n\n/,"\n")   # remove blank lines
   s
 end
 
