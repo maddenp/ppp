@@ -80,7 +80,7 @@ end
 
 def usage
   f=File.basename(__FILE__)
-  "usage: #{f} [-I dir[:dir]...] source"
+  "usage: #{f} [-I dir[:dir:...]] source"
 end
 
 srcfile=ARGV.pop
