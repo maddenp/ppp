@@ -23,25 +23,44 @@ def fail(msg)
   exit 1
 end
 
-def assemble(s,seen)
+def assemble(s,incdirs,seen)
+  current=seen.last
   a=''
-  msg="While processing includes, "
   r=Regexp.new('\s*include\s*(\'[^\']+\'|\"[^\"]+\").*',true)
   s.split("\n").each do |line|
     m=r.match(line)
     if m
       incfile=m[1][1..-2]
+      if incfile[0]=='/' or incfile[0]=='.'
+        incfile=File.expand_path(File.join(File.dirname(current),incfile))
+        unless File.exist?(incfile)
+          fail "Could not find included file #{incfile}"
+        end
+      else
+        found=false
+        incdirs.each do |d|
+          maybe=File.expand_path(File.join(d,incfile))
+          if File.exist?(maybe)
+            found=true
+            incfile=maybe
+            break
+          end
+        end
+        unless found
+          fail "Could not find included file #{incfile} on search path"
+        end
+      end
       if seen.include?(incfile)
-        msg+="file #{seen.last} included #{incfile} recursively "
+        msg="File #{current} includes #{incfile} recursively:\n"
         msg+=incchain(seen,incfile)
         fail(msg)
       end
       unless File.readable?(incfile)
-        msg+="could not read file #{incfile} "
+        msg="Could not read file #{incfile} "
         msg+=incchain(seen,incfile)
         fail(msg)
       end
-      a+=assemble(File.open(incfile,'rb').read,seen+[incfile])
+      a+=assemble(File.open(incfile,'rb').read,incdirs,seen+[incfile])
     else
       a+="#{line}\n"
     end
@@ -50,7 +69,7 @@ def assemble(s,seen)
 end
 
 def incchain(seen,incfile)
-  '( '+(seen+[incfile]).join(' < ')+' )'
+  "\n  "+(seen+[incfile]).join(" includes\n  ")
 end
 
 def normalize(s)
@@ -60,12 +79,33 @@ def normalize(s)
 end
 
 def usage
-  "usage: #{File.basename(__FILE__)} source"
+  f=File.basename(__FILE__)
+  "usage: #{f} [-I dir[:dir]...] source"
 end
 
-srcfile=ARGV[0]
+srcfile=ARGV.pop
 fail(usage) unless srcfile
+srcfile=File.expand_path(srcfile)
 fail("Cannot read file: #{srcfile}") unless File.readable?(srcfile)
-s=File.open(srcfile,'rb').read
 
-puts normalize(assemble(s,[srcfile]))
+incdirs=['.']
+ARGV.reverse!
+while opt=ARGV.pop
+  case opt
+  when '-I'
+    dirlist=ARGV.pop
+    fail(usage) unless dirlist
+    dirlist.split(':').each do |d|
+      fail("No such directory: #{d}") unless File.directory?(d)
+      incdirs << d
+    end
+  else
+    fail(usage)
+  end
+end
+
+s=File.open(srcfile,'rb').read
+s=assemble(s,incdirs,[srcfile])
+s=normalize(s)
+
+puts s

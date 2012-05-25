@@ -1,4 +1,4 @@
-  include'in"c.f90'
+  include 'inc.f90'
 PROGRAM asdf
   !SMS$ignore begin "CAPS"
   ! comment 1
