@@ -4,7 +4,7 @@ load    'ppp'
 require 'fileutils'
 
 def compile(f)
-  fc="gfortran -pedantic -std=f95"
+  fc="gfortran -pedantic-errors -std=f95"
   b=stem(f)
   cmd="#{fc} -o #{b} #{f}"
   stat,out=docmd(cmd)
