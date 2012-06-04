@@ -37,7 +37,7 @@ def stem(f)
 end
 
 def tests
-  Dir.glob("tests/*").find_all { |e| e=~/t#{'.'*4}\.f90/ }
+  Dir.glob("tests/*").sort.find_all { |e| e=~/t#{'.'*4}\.f90/ }
 end
 
 def translate(f)
