@@ -14,6 +14,7 @@ require 'normalize_parser.rb'
 class PPP
 
   def initialize(args)
+    @debug=false
     srcfile=args.pop
     fail(usage) unless srcfile
     srcfile=File.expand_path(srcfile)
@@ -35,10 +36,10 @@ class PPP
     end
     s=File.open(srcfile,'rb').read
     s=assemble(s,incdirs,[srcfile])
-    puts "normalized:\n\n"
+    puts "normalized:\n\n" if @debug
     s=normalize(s)
-    puts s
-    puts "\nparsed:\n\n"
+    puts s if @debug
+    puts "\nparsed:\n\n" if @debug
     s=parse(s)
     puts s
   end
@@ -117,7 +118,7 @@ class PPP
   def parse(s)
     # FortranParser.new.parse(s).to_s
     tree=FortranParser.new.parse(s)
-    p tree
+    p tree if @debug
     tree.to_s
   end
 

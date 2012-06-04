@@ -1,19 +1,49 @@
 #!/usr/bin/env ruby
 
-require 'test/unit'
+load 'ppp'
+
 require 'fileutils'
+require 'test/unit'
 
 class Unit < Test::Unit::TestCase
 
-  def setup
+  def compile(test)
+    bin=test.chomp(File.extname(test))
+    cmd="#{@fc} -o #{bin} #{test}"
+    stat,out=docmd(cmd)
+    puts out unless stat
+    assert(stat,"Failed: #{cmd}")
+    bin
   end
 
-# def test_
-#   assert(
-#   assert_equal(
-# end
+  def exe
+    cmd="./a.out"
+    stat,out=docmd(cmd)
+  end
+
+  def docmd(cmd)
+    out=IO.popen(cmd+' 2>&1') { |x| x.readlines.reduce('') { |s,e| s+=e } }
+    [($?.exitstatus==0)?(true):(false),out]
+  end
+  
+  def setup
+    @fc="gfortran -pedantic -std=f95"
+    @tests=Dir.glob("tests/*").find_all { |e| e=~/t#{'.'*4}\.f(90)?/ }
+  end
 
   def teardown
+    items=[]
+    @tests.each { |e| items << e.chomp(File.extname(e)) }
+    FileUtils.rm_f(items)
+  end
+
+  def test_parser
+    @tests.each do |t|
+      bin=compile(t)
+#     out1=exe
+    end
   end
 
 end
+
+# Run-time generation of test_* methods possible? Otherwise, just one test...
