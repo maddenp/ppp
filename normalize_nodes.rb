@@ -15,15 +15,17 @@ module Normalize
   class Normalize < Treetop::Runtime::SyntaxNode
     def to_s
       t=text_value
-      # Basic transformations: Per [3.1.1], lowercase is optional, so use
-      # uppercase internally; Convert tabs to spaces for convenience; Per
-      # [3.3.1], multiple spaces are treated as one, so squeeze to single
-      # space for convenience; Split semicolon-delimited lines [3.3.1.2].
+      # Basic transformations: Per [std:f90:3.1.1], lowercase is optional, so
+      # use uppercase internally; Convert tabs to spaces for convenience; Per
+      # [std:f90:3.3.1], multiple spaces are treated as one, so squeeze to
+      # single space for convenience; Split semicolon-delimited lines
+      # [std:f90:3.3.1.2].
       t=t.upcase
       t=t.gsub(/\t/,' ')
-      t=t.gsub(/  */,' ')
+#     t=t.gsub(/  */,' ')
+      t=t.gsub(/  */,'')
       t=t.gsub(/;/,"\n")
-      # Remove optional spaces from keywords [3.3.1].
+      # Remove optional spaces from keywords [std:f90:3.3.1].
       t=t.gsub(/BLOCK DATA/,'BLOCKDATA')
       t=t.gsub(/DOUBLE PRECISION/,'DOUBLEPRECISION')
       t=t.gsub(/ELSE IF/,'ELSEIF')

@@ -1,8 +1,9 @@
-PROG=normalize_parser.rb
-DEPS=normalize_grammar.tt normalize_nodes.rb
+BINS=$(addsuffix _parser.rb,fortran normalize)
 
-$(PROG): $(DEPS)
+all: $(BINS)
+
+%_parser.rb: %_grammar.tt %_nodes.rb
 	tt -o $@ $<
 
 clean:
-	$(RM) $(PROG)
+	$(RM) $(BINS)

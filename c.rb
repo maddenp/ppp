@@ -6,6 +6,8 @@ $: << '.'
 
 require 'rubygems'
 require 'treetop'
+require 'fortran_nodes.rb'
+require 'fortran_parser.rb'
 require 'normalize_nodes.rb'
 require 'normalize_parser.rb'
 
@@ -78,6 +80,13 @@ def normalize(s)
   clean(tree.to_s)
 end
 
+def parse(s)
+# FortranParser.new.parse(s).to_s
+  tree=FortranParser.new.parse(s)
+  p tree
+  tree.to_s
+end
+
 def usage
   f=File.basename(__FILE__)
   "usage: #{f} [-I dir[:dir:...]] source"
@@ -106,6 +115,9 @@ end
 
 s=File.open(srcfile,'rb').read
 s=assemble(s,incdirs,[srcfile])
+puts "normalized:\n\n"
 s=normalize(s)
-
+puts s
+puts "\nparsed:\n\n"
+s=parse(s)
 puts s
