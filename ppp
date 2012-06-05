@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 
-ENV['GEM_PATH']=Dir.pwd+'/gems'
+pppbase=File.dirname(File.expand_path($0))
 
-$: << '.'
+ENV['GEM_PATH']=File.join(pppbase,'gems')
+
+$: << pppbase
 
 require 'rubygems'
 require 'treetop'
@@ -30,6 +32,8 @@ class PPP
           fail("No such directory: #{d}") unless File.directory?(d)
           incdirs << d
         end
+      when 'normalize'
+        @normalize=true
       else
         fail(usage)
       end
@@ -38,9 +42,11 @@ class PPP
     s=assemble(s,incdirs,[srcfile])
     puts "normalized:\n\n" if @debug
     s=normalize(s)
-    puts s if @debug
-    puts "\nparsed:\n\n" if @debug
-    s=parse(s)
+    unless @normalize
+      puts s if @debug
+      puts "\nparsed:\n\n" if @debug
+      s=parse(s)
+    end
     puts s
   end
 
