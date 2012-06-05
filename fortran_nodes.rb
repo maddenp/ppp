@@ -6,21 +6,10 @@ module Fortran
     end
   end
 
-  class Program_Start_1 < Treetop::Runtime::SyntaxNode
-    def to_s
-      "program #{elements[1].text_value.downcase}\n"
-    end
-  end
-
-  class Program_Start_2 < Treetop::Runtime::SyntaxNode
-    def to_s
-      ""
-    end
-  end
-
   class Program_End_1 < Treetop::Runtime::SyntaxNode
     def to_s
-      "end program #{elements[1].text_value.downcase}\n"
+      program_name=elements[1].text_value.downcase
+      "end program #{program_name}\n"
     end
   end
 
@@ -33,6 +22,19 @@ module Fortran
   class Program_End_3 < Treetop::Runtime::SyntaxNode
     def to_s
       "end\n"
+    end
+  end
+
+  class Program_Start_1 < Treetop::Runtime::SyntaxNode
+    def to_s
+      program_name=elements[1].text_value.downcase
+      "program #{program_name}\n"
+    end
+  end
+
+  class Program_Start_2 < Treetop::Runtime::SyntaxNode
+    def to_s
+      ""
     end
   end
 

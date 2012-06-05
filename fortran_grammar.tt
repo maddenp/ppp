@@ -45,18 +45,6 @@ grammar Fortran
     program_start program_end <Program>
   end
 
-  rule program_start
-    program_start_1 / program_start_2
-  end
-
-  rule program_start_1
-    "PROGRAM" name "\n" <Program_Start_1>
-  end
-
-  rule program_start_2
-    "" <Program_Start_2>
-  end
-
   rule program_end
     program_end_1 / program_end_2 / program_end_3
   end
@@ -71,6 +59,18 @@ grammar Fortran
 
   rule program_end_3
     "END" <Program_End_3>
+  end
+
+  rule program_start
+    program_start_1 / program_start_2
+  end
+
+  rule program_start_1
+    "PROGRAM" name "\n" <Program_Start_1>
+  end
+
+  rule program_start_2
+    "" <Program_Start_2>
   end
 
 end
