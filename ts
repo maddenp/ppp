@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-load    'ppp'
 require 'fileutils'
 
 def compile(f)
@@ -48,6 +47,8 @@ def translate(f)
   t
 end
 
+exe('make')
+load 'ppp'
 tests.each do |s|
   print '.'
   bin_c=compile(s)
