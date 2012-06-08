@@ -1,0 +1,4 @@
+#!/bin/sh
+cd ..
+tar czf /tmp/ppp.tgz ppp
+jetput /tmp/ppp.tgz
