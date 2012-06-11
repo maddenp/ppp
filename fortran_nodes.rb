@@ -1,5 +1,3 @@
-require 'ostruct'
-
 module Fortran
 
   class ASTNode < Treetop::Runtime::SyntaxNode
