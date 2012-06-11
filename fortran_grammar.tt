@@ -36,31 +36,31 @@ grammar Fortran
   end
 
   rule program_end
-    program_end_1 / program_end_2 / program_end_3
+    program_end_0 / program_end_1 / program_end_2
+  end
+
+  rule program_end_0
+    "ENDPROGRAM" name <Program_End_0>
   end
 
   rule program_end_1
-    "ENDPROGRAM" name <Program_End_1>
+    "ENDPROGRAM" <Program_End_1>
   end
 
   rule program_end_2
-    "ENDPROGRAM" <Program_End_2>
-  end
-
-  rule program_end_3
-    "END" <Program_End_3>
+    "END" <Program_End_2>
   end
 
   rule program_start
-    program_start_1 / program_start_2
+    program_start_0 / program_start_1
+  end
+
+  rule program_start_0
+    "PROGRAM" name "\n" <Program_Start_0>
   end
 
   rule program_start_1
-    "PROGRAM" name "\n" <Program_Start_1>
-  end
-
-  rule program_start_2
-    "" <Program_Start_2>
+    "" <Program_Start_1>
   end
 
   rule special_character

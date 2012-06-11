@@ -14,16 +14,16 @@ module Fortran
     def program_name() '' end
   end
 
-  class Program_End_1 < Program_End
+  class Program_End_0 < Program_End
     def program_name() elements[1].text_value.downcase end
     def to_s() "end program #{program_name}\n" end
   end
 
-  class Program_End_2 < Program_End
+  class Program_End_1 < Program_End
     def to_s() "end program\n" end
   end
 
-  class Program_End_3 < Program_End
+  class Program_End_2 < Program_End
     def to_s() "end\n" end
   end
 
@@ -31,12 +31,12 @@ module Fortran
     def program_name() '' end
   end
 
-  class Program_Start_1 < Program_Start
+  class Program_Start_0 < Program_Start
     def program_name() elements[1].text_value.downcase end
     def to_s() "program #{program_name}\n" end
   end
 
-  class Program_Start_2 < Program_Start
+  class Program_Start_1 < Program_Start
     def to_s() "" end
   end
 
