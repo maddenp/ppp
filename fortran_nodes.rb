@@ -1,7 +1,11 @@
+require 'ostruct'
+
 module Fortran
 
   class ASTNode < Treetop::Runtime::SyntaxNode
-    def to_s() "### undefined to_s, please fix ###" end
+    def get(k) (@attrs.nil?)?(nil):(@attrs[k]) end
+    def set(k,v) (@attrs.nil?)?(@attrs={k=>v}):(@attrs[k]=v) end
+    def to_s() "### #{this.class} has no to_s, please fix ###" end
   end
 
   class Program < ASTNode
@@ -23,7 +27,6 @@ module Fortran
   class Program_End_3 < Program_End
     def to_s() "end\n" end
   end
-
 
   class Program_Start < ASTNode
   end
