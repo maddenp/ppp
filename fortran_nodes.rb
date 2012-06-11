@@ -11,6 +11,7 @@ module Fortran
   end
 
   class Program_End < ASTNode
+    def program_name() '' end
   end
 
   class Program_End_1 < Program_End
@@ -27,6 +28,7 @@ module Fortran
   end
 
   class Program_Start < ASTNode
+    def program_name() '' end
   end
 
   class Program_Start_1 < Program_Start
