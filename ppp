@@ -50,11 +50,6 @@ class PPP
     puts s
   end
 
-  def comment_line
-    # TODO regexp needs alternation list of recognized directives (e.g. 'omp')
-    Regexp.new('^\s*!(?!sms)',true)
-  end
-
   def clean(s)
     s.gsub!(comment_line,'') # remove comment lines
     s.gsub!(/\s+$/,'')       # remove trailing whitespace
@@ -62,6 +57,11 @@ class PPP
     s.gsub!(/&$\n&?/,'')     # join continuation lines
     s.gsub!(/\n\n/,"\n")     # remove blank lines
     s
+  end
+
+  def comment_line
+    # TODO regexp needs alternation list of recognized directives (e.g. 'omp')
+    Regexp.new("^\s*!(?!sms).*",true)
   end
 
   def fail(msg)
@@ -119,7 +119,10 @@ class PPP
   end
 
   def normalize(s)
-    tree=NormalizeParser.new.parse(clean(s))
+    s=clean(s)
+    s=s.gsub(/!sms\$insert */i,'')
+    s=s.gsub(/!sms\$remove +begin.*?!sms\$remove +end/im,'')
+    tree=NormalizeParser.new.parse(s)
     if tree.nil?
       fail "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}"
     end
