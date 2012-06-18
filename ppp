@@ -50,12 +50,17 @@ class PPP
     puts s
   end
 
+  def comment_line
+    # TODO regexp needs alternation list of recognized directives (e.g. 'omp')
+    Regexp.new('^\s*!(?!sms)',true)
+  end
+
   def clean(s)
-    s.gsub!(/^\s*!.*$/,'') # remove comment lines
-    s.gsub!(/\s+$/,'')     # remove trailing whitespace
-    s.gsub!(/^\s+/,'')     # left-justify line
-    s.gsub!(/&$\n&?/,'')   # join continuation lines
-    s.gsub!(/\n\n/,"\n")   # remove blank lines
+    s.gsub!(comment_line,'') # remove comment lines
+    s.gsub!(/\s+$/,'')       # remove trailing whitespace
+    s.gsub!(/^\s+/,'')       # left-justify line
+    s.gsub!(/&$\n&?/,'')     # join continuation lines
+    s.gsub!(/\n\n/,"\n")     # remove blank lines
     s
   end
 
@@ -122,7 +127,6 @@ class PPP
   end
 
   def parse(s)
-    # FortranParser.new.parse(s).to_s
     tree=FortranParser.new.parse(s)
     p tree if @debug
     tree.to_s
