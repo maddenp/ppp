@@ -7,7 +7,7 @@ def compile(f)
   b=stem(f)
   cmd="#{fc} -o #{b} #{f}"
   stat,out=docmd(cmd)
-  fail(cmd,out) unless stat
+  fail(out,cmd) unless stat
   b
 end
 
@@ -19,11 +19,11 @@ end
 def exe(bin)
   cmd=bin
   stat,out=docmd(cmd)
-  fail(cmd,out) unless stat
+  fail(out,cmd) unless stat
   out
 end
 
-def fail(cmd=nil,msg=nil)
+def fail(msg=nil,cmd=nil)
   puts
   puts "Command: #{cmd}" if cmd
   puts msg if msg
@@ -36,27 +36,30 @@ def stem(f)
 end
 
 def tests
-  Dir.glob("tests/*").sort.find_all { |e| e=~/t#{'.'*4}\.f90/ }
+  Dir.glob("tests/*").sort
 end
 
-def translate(f)
-  t="#{stem(f)}_ppp#{File.extname(f)}"
-  cmd="./ppp #{f} > #{t}"
+def translate(test)
+  base=File.basename(test)
+  src=Dir.glob(["#{test}/#{base}.f","#{test}/#{base}.f90"])
+  fail "Remove either #{src[0]} or #{src[1]}" if src.size > 1
+  src=src.first
+  dst="#{stem(src)}_ppp#{File.extname(src)}"
+  cmd="./ppp #{src} > #{dst}"
   stat,out=docmd(cmd)
-  fail(cmd,out) unless stat
-  t
+  fail(out,cmd) unless stat
+  dst
 end
 
 exe('make')
 load 'ppp'
-tests.each do |s|
+tests.each do |test|
   print '.'
-  bin_c=compile(s)
-  out_c=exe(bin_c)
-  t=translate(s)
-  bin_e=compile(t)
-  out_e=exe(bin_e)
-  fail unless out_c==out_e
-  FileUtils.rm_f([bin_c,bin_e,out_c,out_e,t])
+  translation=translate(test)
+  bin=compile(translation)
+  stdout=exe(bin)
+  control=File.open(File.join(test,'control'),"rb").read
+  fail unless stdout==control
+  FileUtils.rm_f([translation,bin])
 end
 puts "\nOK"
