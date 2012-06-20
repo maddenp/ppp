@@ -23,7 +23,7 @@ grammar Fortran
 
   rule letter
     # [std:f90:3.1.1]
-    [A-Z]
+    [a-z]
   end
 
   rule name
@@ -40,15 +40,15 @@ grammar Fortran
   end
 
   rule program_end_0
-    "ENDPROGRAM" name <Program_End_0>
+    "endprogram" name <Program_End_0>
   end
 
   rule program_end_1
-    "ENDPROGRAM" <Program_End_1>
+    "endprogram" <Program_End_1>
   end
 
   rule program_end_2
-    "END" <Program_End_2>
+    "end" <Program_End_2>
   end
 
   rule program_start
@@ -56,7 +56,7 @@ grammar Fortran
   end
 
   rule program_start_0
-    "PROGRAM" name "\n" <Program_Start_0>
+    "program" name "\n" <Program_Start_0>
   end
 
   rule program_start_1

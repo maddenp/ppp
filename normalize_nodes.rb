@@ -20,7 +20,7 @@ module Normalize
       # [std:f90:3.3.1], multiple spaces are treated as one, so squeeze to
       # single space for convenience; Split semicolon-delimited lines
       # [std:f90:3.3.1.2].
-      t=t.upcase
+      t=t.downcase
       t=t.gsub(/\t/,' ')
 #     t=t.gsub(/  */,' ')
       t=t.gsub(/  */,'')
