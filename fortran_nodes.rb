@@ -1,6 +1,7 @@
 module Fortran
 
   class ASTNode < Treetop::Runtime::SyntaxNode
+    def initialize(a='',b=(0..0),c=[]) super(a,b,c) end
     def get(k) (@attrs.nil?)?(nil):(@attrs[k]) end
     def set(k,v) (@attrs.nil?)?(@attrs={k=>v}):(@attrs[k]=v) end
     def to_s() "### #{this.class} has no to_s, please fix ###" end

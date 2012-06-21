@@ -13,6 +13,8 @@ require 'fortran_parser.rb'
 require 'normalize_nodes.rb'
 require 'normalize_parser.rb'
 
+include Fortran
+
 class PPP
 
   def initialize(args)
