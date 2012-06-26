@@ -21,6 +21,14 @@ grammar Fortran
     [0-9]
   end
 
+  rule kw_end
+    "end" <Keyword>
+  end
+
+  rule kw_program
+    "program" <Keyword>
+  end
+
   rule letter
     # 3.1.1
     [a-z]
@@ -35,25 +43,10 @@ grammar Fortran
     # R304
     letter alphanumeric_character*
   end
-    
+
   rule end_program_stmt
     # R1103
-    end_program_stmt_0 / end_program_stmt_1 / end_program_stmt_2
-  end
-
-  rule end_program_stmt_0
-    # R1103
-    "endprogram" name <End_Program_Stmt_0>
-  end
-
-  rule end_program_stmt_1
-    # R1103
-    "endprogram" <End_Program_Stmt_1>
-  end
-
-  rule end_program_stmt_2
-    # R1103
-    "end" <End_Program_Stmt_2>
+    kw_end kw_program? name? <End_Program_Stmt>
   end
 
   rule program_stmt
