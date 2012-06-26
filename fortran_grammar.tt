@@ -1,75 +1,83 @@
 grammar Fortran
 
 #
-  rule main
-    program
+  rule start
+    main_program
   end
 #
 
   rule alphanumeric_character
-    # [std:f90:3.1/R302]
+    # R302
     letter / digit / underscore
   end
 
   rule character
-    # [std:f90:3.1/R301]
+    # R301
     alphanumeric_character / special_character
   end
 
   rule digit
-    # [std:f90:3.1.2]
+    # 3.1.2
     [0-9]
   end
 
   rule letter
-    # [std:f90:3.1.1]
+    # 3.1.1
     [a-z]
   end
 
+  rule main_program
+    # R1101
+    program_stmt program_end <Program>
+  end
+
   rule name
-    # [std:f90:3.2.2/R304]
+    # R304
     letter alphanumeric_character*
   end
     
-  rule program
-    program_start program_end <Program>
-  end
-
   rule program_end
+    # R1103
     program_end_0 / program_end_1 / program_end_2
   end
 
   rule program_end_0
+    # R1103
     "endprogram" name <Program_End_0>
   end
 
   rule program_end_1
+    # R1103
     "endprogram" <Program_End_1>
   end
 
   rule program_end_2
+    # R1103
     "end" <Program_End_2>
   end
 
-  rule program_start
-    program_start_0 / program_start_1
+  rule program_stmt
+    # R1102
+    program_stmt_0 / program_stmt_1
   end
 
-  rule program_start_0
-    "program" name "\n" <Program_Start_0>
+  rule program_stmt_0
+    # R1102
+    "program" name "\n" <Program_Stmt_0>
   end
 
-  rule program_start_1
-    "" <Program_Start_1>
+  rule program_stmt_1
+    # R1102
+    "" <Program_Stmt_1>
   end
 
   rule special_character
-    # [std:f90:3.1.4]
+    # 3.1.4
     [ =+-*/();.':!"%&;<>?$]
   end
 
   rule underscore
-    # [std:f90:3.1.3/R303]
+    # R303
     '_'
   end
 

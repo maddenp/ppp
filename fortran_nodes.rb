@@ -28,16 +28,16 @@ module Fortran
     def to_s() "end\n" end
   end
 
-  class Program_Start < ASTNode
+  class Program_Stmt < ASTNode
     def program_name() '' end
   end
 
-  class Program_Start_0 < Program_Start
+  class Program_Stmt_0 < Program_Stmt
     def program_name() elements[1].text_value.downcase end
     def to_s() "program #{program_name}\n" end
   end
 
-  class Program_Start_1 < Program_Start
+  class Program_Stmt_1 < Program_Stmt
     def to_s() "" end
   end
 
