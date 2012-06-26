@@ -28,7 +28,7 @@ grammar Fortran
 
   rule main_program
     # R1101
-    program_stmt end_program_stmt <Program>
+    program_stmt end_program_stmt <Main_Program>
   end
 
   rule name

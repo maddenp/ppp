@@ -7,7 +7,7 @@ module Fortran
     def to_s() "### #{this.class} has no to_s, please fix ###" end
   end
 
-  class Program < ASTNode
+  class Main_Program < ASTNode
     def to_s() elements.join end
   end
 
