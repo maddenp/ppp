@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 
+# TODO normalize specifier strings like STATUS='KEEP' et al (see e.g. 9.3.5)?
+# TODO treat 'H' edit descriptor's suffix verbatim (e.g. '100 format (5Hhello)')?
+# TODO need to recognize other directives (e.g. omp)
+
 pppbase=File.dirname(File.expand_path($0))
 
 ENV['GEM_PATH']=File.join(pppbase,'gems')
@@ -36,6 +40,8 @@ class PPP
         end
       when 'normalize'
         @normalize=true
+      when 'debug'
+        @debug=true
       else
         fail(usage)
       end
@@ -62,7 +68,6 @@ class PPP
   end
 
   def comment_line
-    # TODO regexp needs alternation list of recognized directives (e.g. 'omp')
     Regexp.new("^\s*!(?!sms).*",true)
   end
 
@@ -122,8 +127,8 @@ class PPP
 
   def normalize(s)
     s=clean(s)
-    s=s.gsub(/!sms\$insert */i,'')
-    s=s.gsub(/!sms\$remove +begin.*?!sms\$remove +end/im,'')
+    s=s.gsub(/!sms\$insert */i,'')                           # process inserts
+    s=s.gsub(/!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
     tree=NormalizeParser.new.parse(s)
     if tree.nil?
       fail "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}"
