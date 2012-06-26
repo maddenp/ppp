@@ -28,7 +28,7 @@ grammar Fortran
 
   rule main_program
     # R1101
-    program_stmt program_end <Program>
+    program_stmt end_program_stmt <Program>
   end
 
   rule name
@@ -36,24 +36,24 @@ grammar Fortran
     letter alphanumeric_character*
   end
     
-  rule program_end
+  rule end_program_stmt
     # R1103
-    program_end_0 / program_end_1 / program_end_2
+    end_program_stmt_0 / end_program_stmt_1 / end_program_stmt_2
   end
 
-  rule program_end_0
+  rule end_program_stmt_0
     # R1103
-    "endprogram" name <Program_End_0>
+    "endprogram" name <End_Program_Stmt_0>
   end
 
-  rule program_end_1
+  rule end_program_stmt_1
     # R1103
-    "endprogram" <Program_End_1>
+    "endprogram" <End_Program_Stmt_1>
   end
 
-  rule program_end_2
+  rule end_program_stmt_2
     # R1103
-    "end" <Program_End_2>
+    "end" <End_Program_Stmt_2>
   end
 
   rule program_stmt
@@ -79,6 +79,20 @@ grammar Fortran
   rule underscore
     # R303
     '_'
+  end
+
+### in progress ###
+
+  rule specification_part
+    ""
+  end
+
+  rule execution_part
+    ""
+  end
+
+  rule internal_subprogram_part
+    ""
   end
 
 end

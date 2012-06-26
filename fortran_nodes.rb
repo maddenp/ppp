@@ -11,20 +11,20 @@ module Fortran
     def to_s() elements.join end
   end
 
-  class Program_End < ASTNode
+  class End_Program_Stmt < ASTNode
     def program_name() '' end
   end
 
-  class Program_End_0 < Program_End
+  class End_Program_Stmt_0 < End_Program_Stmt
     def program_name() elements[1].text_value.downcase end
     def to_s() "end program #{program_name}\n" end
   end
 
-  class Program_End_1 < Program_End
+  class End_Program_Stmt_1 < End_Program_Stmt
     def to_s() "end program\n" end
   end
 
-  class Program_End_2 < Program_End
+  class End_Program_Stmt_2 < End_Program_Stmt
     def to_s() "end\n" end
   end
 
