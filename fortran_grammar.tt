@@ -21,12 +21,17 @@ grammar Fortran
     [0-9]
   end
 
+  rule end_program_stmt
+    # R1103
+    kw_end kw_program? name? newline? <End_Program_Stmt>
+  end
+
   rule kw_end
-    "end" <Keyword>
+    "end" <Terminal>
   end
 
   rule kw_program
-    "program" <Keyword>
+    "program" <Terminal>
   end
 
   rule letter
@@ -36,32 +41,21 @@ grammar Fortran
 
   rule main_program
     # R1101
-    program_stmt end_program_stmt <Main_Program>
+    program_stmt? end_program_stmt <Main_Program>
   end
 
   rule name
     # R304
-    letter alphanumeric_character*
+    letter alphanumeric_character* <Name>
   end
 
-  rule end_program_stmt
-    # R1103
-    kw_end kw_program? name? <End_Program_Stmt>
+  rule newline
+    "\n" <Terminal>
   end
 
   rule program_stmt
     # R1102
-    program_stmt_0 / program_stmt_1
-  end
-
-  rule program_stmt_0
-    # R1102
-    "program" name "\n" <Program_Stmt_0>
-  end
-
-  rule program_stmt_1
-    # R1102
-    "" <Program_Stmt_1>
+    kw_program name newline <Program_Stmt>
   end
 
   rule special_character
