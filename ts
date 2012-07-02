@@ -59,7 +59,14 @@ tests.each do |test|
   bin=compile(translation)
   stdout=exe(bin)
   control=File.open(File.join(test,'control'),"rb").read
-  fail unless stdout==control
+  unless stdout==control
+    msg="#{test} output expected:\n--\n"
+    msg+=control
+    msg+="--\n#{test} output actual:\n--"
+    msg+=stdout
+    msg+="\n--"
+    fail msg
+  end
   FileUtils.rm_f([translation,bin])
 end
 puts "\nOK"

@@ -11,9 +11,17 @@ grammar Fortran
     letter / digit / underscore
   end
 
+  rule asterisk
+    "*" <Verbatim>
+  end
+
   rule character
     # R301
     alphanumeric_character / special_character
+  end
+
+  rule comma
+    "," <Verbatim>
   end
 
   rule digit
@@ -21,17 +29,49 @@ grammar Fortran
     [0-9]
   end
 
+  rule digit_string
+    # R402
+    digit+ <Verbatim>
+  end
+
   rule end_program_stmt
     # R1103
     kw_end kw_program? name? newline? <End_Program_Stmt>
   end
 
+  rule execution_part
+    print_stmt
+  end
+
+  rule format
+    # R913 -- INCOMPLETE!
+    asterisk
+  end
+
+  rule int_literal_constant
+    # R404
+    digit_string ( underscore kind_param )? <Verbatim>
+  end
+
+  rule internal_subprogram_part
+    ""
+  end
+
+  rule kind_param
+    # R405 -- INCOMPLETE!
+    digit_string
+  end
+
   rule kw_end
-    "end" <Terminal>
+    "end" <Verbatim>
+  end
+
+  rule kw_print
+    "print" <Verbatim>
   end
 
   rule kw_program
-    "program" <Terminal>
+    "program" <Verbatim>
   end
 
   rule letter
@@ -39,9 +79,18 @@ grammar Fortran
     [a-z]
   end
 
+  rule literal_constant
+    # R306
+    int_literal_constant
+  end
+
   rule main_program
     # R1101
-    program_stmt? end_program_stmt <Main_Program>
+    program_stmt? execution_part? end_program_stmt <Main_Program>
+  end
+
+  rule minus
+    "-" <Verbatim>
   end
 
   rule name
@@ -50,7 +99,28 @@ grammar Fortran
   end
 
   rule newline
-    "\n" <Terminal>
+    "\n" <Verbatim>
+  end
+
+#  rule output_item
+#    # R915
+#  rule
+
+#  rule output_item_list
+#  rule
+
+  rule plus
+    "+" <Verbatim>
+  end
+
+#  rule print_stmt
+#    # R911
+#    print format ( comma output_item_list )? <Print_Stmt>
+#  end
+
+  rule print_stmt
+    # R911
+    kw_print asterisk newline <Print_Stmt>
   end
 
   rule program_stmt
@@ -58,28 +128,33 @@ grammar Fortran
     kw_program name newline <Program_Stmt>
   end
 
+  rule signed_digit_string
+    # R401
+    sign? digit_string <Verbatim>
+  end
+
+  rule signed_int_literal_constant
+    # R403
+    sign? int_literal_constant <Verbatim>
+  end
+
   rule special_character
     # 3.1.4
     [ =+-*/();.':!"%&;<>?$]
   end
 
-  rule underscore
-    # R303
-    '_'
-  end
-
-### in progress ###
-
   rule specification_part
     ""
   end
 
-  rule execution_part
-    ""
+  rule sign
+    # R406
+    plus / minus
   end
 
-  rule internal_subprogram_part
-    ""
+  rule underscore
+    # R303
+    '_'
   end
 
 end
