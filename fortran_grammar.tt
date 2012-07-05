@@ -6,13 +6,19 @@ grammar Fortran
   end
 #
 
+  rule add_op
+    # R710
+    plus / minus
+  end
+
+  rule add_operand
+    # R706
+    ( add_operand mult_op)? mult_operand <Verbatim>
+  end
+
   rule alphanumeric_character
     # R302
     letter / digit / underscore
-  end
-
-  rule asterisk
-    "*" <Verbatim>
   end
 
   rule character
@@ -22,6 +28,21 @@ grammar Fortran
 
   rule comma
     "," <Verbatim>
+  end
+
+  rule concat_op
+    # R712
+    "//" <Verbatim>
+  end
+
+  rule constant
+    # R305 -- INCOMPLETE!
+    literal_constant
+  end
+
+  rule defined_unary_op
+    # R704
+    dot letter ( letter )+ dot <Verbatim>
   end
 
   rule digit
@@ -34,18 +55,42 @@ grammar Fortran
     digit+ <Verbatim>
   end
 
+  rule dot
+    "." <Verbatim>
+  end
+
+  rule _end
+    "end" <Verbatim>
+  end
+
   rule end_program_stmt
     # R1103
-    kw_end kw_program? name? newline? <End_Program_Stmt>
+    _end program? name? newline? <End_Program_Stmt>
+  end
+
+  rule equiv_op
+    # R722
+    ".eqv." <Verbatim> / ".neqv." <Verbatim>
+  end
+
+  rule equiv_operand
+    # R715
+    ( not_op )? level_4_expr <Verbatim>
   end
 
   rule execution_part
     print_stmt
   end
 
+  rule expr
+    # R723 -- INCOMPLETE!
+ #   level_5_expr
+    primary
+  end
+
   rule format
     # R913 -- INCOMPLETE!
-    asterisk
+    star
   end
 
   rule int_literal_constant
@@ -62,25 +107,42 @@ grammar Fortran
     digit_string
   end
 
-  rule kw_end
-    "end" <Verbatim>
-  end
-
-  rule kw_print
-    "print" <Verbatim>
-  end
-
-  rule kw_program
-    "program" <Verbatim>
-  end
-
   rule letter
     # 3.1.1
     [a-z]
   end
 
+  rule level_1_expr
+    # R703
+    ( defined_unary_op )? primary <Verbatim>
+  end
+
+  rule level_2_prefix
+    level_2_expr? add_op <Verbatim>
+  end
+
+  rule level_2_expr
+    # R707
+    level_2_prefix? add_operand <Verbatim>
+  end
+
+  rule level_3_expr
+    # R711
+    ( level_3_expr concat_op )? level_2_expr <Verbatim>
+  end
+
+  rule level_4_expr
+    # R713
+    ( level_3_expr rel_op )? level_3_expr <Verbatim>
+  end
+  
+  rule level_5_expr
+    # R718
+    ( level_5_expr equiv_op)? equiv_operand
+  end
+
   rule literal_constant
-    # R306
+    # R306 -- INCOMPLETE!
     int_literal_constant
   end
 
@@ -93,6 +155,16 @@ grammar Fortran
     "-" <Verbatim>
   end
 
+  rule mult_op
+    # R709
+    star / slash
+  end
+
+  rule mult_operand
+    # R705
+    level_1_expr ( power_op mult_operand )? <Verbatim>
+  end
+
   rule name
     # R304
     letter alphanumeric_character* <Name>
@@ -102,30 +174,84 @@ grammar Fortran
     "\n" <Verbatim>
   end
 
-#  rule output_item
-#    # R915
-#  rule
+  rule not_op
+    # R719
+    ".not." <Verbatim>
+  end
 
-#  rule output_item_list
-#  rule
+  rule output_item
+    # R915 -- INCOMPLETE!
+    expr
+  end
+
+  rule output_item_list
+    ( comma output_item )+ <Verbatim>
+  end
 
   rule plus
     "+" <Verbatim>
   end
 
-#  rule print_stmt
-#    # R911
-#    print format ( comma output_item_list )? <Print_Stmt>
-#  end
+  rule power_op
+    # R708
+    "**" <Verbatim>
+  end
+
+  rule primary
+    # R701 -- INCOMPLETE!
+    constant
+  end
+
+  rule print
+    "print" <Verbatim>
+  end
 
   rule print_stmt
     # R911
-    kw_print asterisk newline <Print_Stmt>
+    print format output_item_list newline <Print_Stmt> / print format newline <Print_Stmt>
+  end
+
+  rule program
+    "program" <Verbatim>
   end
 
   rule program_stmt
     # R1102
-    kw_program name newline <Program_Stmt>
+    program name newline <Program_Stmt>
+  end
+
+  rule rel_op_eq
+    ".eq." <Verbatim> / "==" <Verbatim>
+  end
+
+  rule rel_op_ge
+    ".ge." <Verbatim> / ">=" <Verbatim>
+  end
+
+  rule rel_op_gt
+    ".gt." <Verbatim> / ">" <Verbatim>
+  end
+
+  rule rel_op_le
+    ".le." <Verbatim> / "<=" <Verbatim>
+  end
+
+  rule rel_op_lt
+    ".lt." <Verbatim> / "<" <Verbatim>
+  end
+
+  rule rel_op_ne
+    ".ne." <Verbatim> / "/=" <Verbatim>
+  end
+
+  rule rel_op
+    # R714
+    rel_op_eq / rel_op_ne / rel_op_lt / rel_op_le / rel_op_gt / rel_op_ge
+  end
+
+  rule sign
+    # R406
+    plus / minus
   end
 
   rule signed_digit_string
@@ -138,6 +264,10 @@ grammar Fortran
     sign? int_literal_constant <Verbatim>
   end
 
+  rule slash
+    "/" <Verbatim>
+  end
+
   rule special_character
     # 3.1.4
     [ =+-*/();.':!"%&;<>?$]
@@ -147,9 +277,8 @@ grammar Fortran
     ""
   end
 
-  rule sign
-    # R406
-    plus / minus
+  rule star
+    "*" <Verbatim>
   end
 
   rule underscore
