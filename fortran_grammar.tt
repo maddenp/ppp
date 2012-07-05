@@ -1,10 +1,15 @@
+# NOTE: Grammar rule numbers from the Fortran 90 standard document are given
+#       wherever possible. Grammar rule names used here match those from the
+#       standard document, with underscores replacing hyphens. Some left-
+#       recursive rules given by the standard have been translated to right-
+#       recursive for PEG compatability, and the original (implied) rules given
+#       in comments.
+
 grammar Fortran
 
-#
   rule start
     main_program
   end
-#
 
   rule add_op
     # R710
@@ -13,7 +18,7 @@ grammar Fortran
 
   rule add_operand
     # R706
-    # LEFT-RECURSIVE RULE IMPLIED BY STANDARD:
+    # Left-recursive rule implied by standard:
     # ( add_operand mult_op)? mult_operand
     mult_operand ( mult_op add_operand )? <Verbatim>
   end
@@ -38,8 +43,8 @@ grammar Fortran
   end
 
   rule constant
-    # R305 -- INCOMPLETE!
-    literal_constant
+    # R305
+    literal_constant / named_constant
   end
 
   rule defined_binary_op
@@ -95,7 +100,7 @@ grammar Fortran
 
   rule expr
     # R723
-    # LEFT-RECURSIVE RULE IMPLIED BY STANDARD:
+    # Left-recursive rule implied by standard:
     # ( expr defined_binary_op )? level_5_expr
     level_5_expr ( defined_binary_op expr )? <Verbatim>
   end
@@ -115,8 +120,8 @@ grammar Fortran
   end
 
   rule kind_param
-    # R405 -- INCOMPLETE!
-    digit_string
+    # R405
+    digit_string / scalar_int_constant_name
   end
 
   rule letter
@@ -131,28 +136,28 @@ grammar Fortran
 
   rule level_2_expr
     # R707
-    # LEFT-RECURSIVE RULE IMPLIED BY STANDARD:
+    # Left-recursive rule implied by standard:
     # ( level_2_expr? add_op )? add_operand
     add_op? add_operand level_2_expr? <Verbatim>
   end
 
   rule level_3_expr
     # R711
-    # LEFT-RECURSIVE RULE IMPLIED BY STANDARD:
+    # Left-recursive rule implied by standard:
     # ( level_3_expr concat_op )? level_2_expr
     level_2_expr ( concat_op level_3_expr )? <Verbatim>
   end
 
   rule level_4_expr
     # R713
-    # LEFT-RECURSIVE RULE IMPLIED BY STANDARD:
+    # Left-recursive rule implied by standard:
     # ( level_3_expr rel_op )? level_3_expr
     level_3_expr ( rel_op level_3_expr )? <Verbatim>
   end
   
   rule level_5_expr
     # R718
-    # LEFT-RECURSIVE RULE IMPLIED BY STANDARD:
+    # Left-recursive rule implied by standard:
     # ( level_5_expr equiv_op)? equiv_operand
     equiv_operand ( equiv_op level_5_expr )? <Verbatim>
   end
@@ -184,6 +189,11 @@ grammar Fortran
   rule name
     # R304
     letter alphanumeric_character* <Name>
+  end
+
+  rule named_constant
+    # R307
+    name
   end
 
   rule newline
@@ -265,6 +275,13 @@ grammar Fortran
     rel_op_eq / rel_op_ne / rel_op_lt / rel_op_le / rel_op_gt / rel_op_ge
   end
 
+  rule scalar_int_constant_name
+    # This rule is not given by the standard. Assumption: It is a named-constant
+    # whose value is a scalar-int-expr. If error checking were required, a
+    # type-and-rank check could be performed here.
+    named_constant
+  end
+
   rule sign
     # R406
     plus / minus
@@ -303,3 +320,5 @@ grammar Fortran
   end
 
 end
+
+# paul.a.madden@noaa.gov

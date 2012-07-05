@@ -69,3 +69,5 @@ tests.each do |test|
   FileUtils.rm_f([translation,bin])
 end
 puts "\nOK (#{tests.size} tests)"
+
+# paul.a.madden@noaa.gov
