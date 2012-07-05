@@ -79,6 +79,10 @@ grammar Fortran
   end
 
   rule execution_part
+    execution_stmt+ <Execution_Part>
+  end
+
+  rule execution_stmt
     print_stmt
   end
 

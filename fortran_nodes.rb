@@ -27,6 +27,10 @@ module Fortran
     def to_s() blockend(stmt(join)) end
   end
 
+  class Execution_Part < ASTNode
+    def to_s() cat end
+  end
+
   class Main_Program < ASTNode
     def to_s() cat end
   end
