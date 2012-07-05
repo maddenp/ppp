@@ -13,8 +13,8 @@ grammar Fortran
 
   rule add_operand
     # R706
-    # LEFT RECURSIVE RULE IMPLIED BY STANDARD:
-    # ( add_operand mult_op)? mult_operand <Verbatim>
+    # LEFT-RECURSIVE RULE IMPLIED BY STANDARD:
+    # ( add_operand mult_op)? mult_operand
     mult_operand ( mult_op add_operand )? <Verbatim>
   end
 
@@ -90,7 +90,7 @@ grammar Fortran
 
   rule expr
     # R723 -- INCOMPLETE!
-    level_2_expr
+    level_3_expr
   end
 
   rule format
@@ -124,14 +124,16 @@ grammar Fortran
 
   rule level_2_expr
     # R707
-    # LEFT RECURSIVE RULE IMPLIED BY STANDARD:
+    # LEFT-RECURSIVE RULE IMPLIED BY STANDARD:
     # ( level_2_expr? add_op )? add_operand
     add_op? add_operand level_2_expr? <Verbatim>
   end
 
   rule level_3_expr
     # R711
-    ( level_3_expr concat_op )? level_2_expr <Verbatim>
+    # LEFT-RECURSIVE RULE IMPLIED BY STANDARD:
+    # ( level_3_expr concat_op )? level_2_expr
+    level_2_expr ( concat_op level_3_expr )? <Verbatim>
   end
 
   rule level_4_expr
