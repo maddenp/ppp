@@ -68,6 +68,9 @@ module Fortran
   class Execution_Part < ASTNode
   end
 
+  class Execution_Part_Construct < ASTNode
+  end
+
   class Main_Program < ASTNode
   end
 

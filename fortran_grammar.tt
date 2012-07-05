@@ -1,16 +1,22 @@
 # NOTES: Grammar rule numbers or section numbers from the Fortran 90 standard
-# document are given wherever possible. Grammar rule names used here match those
-# from the standard document, with underscores replacing hyphens. Some left-
+# document are given when possible. Grammar rule names used here match those
+# from the standard document, with underscores in place of hyphens. Some left-
 # recursive rules given by the standard have been translated to right-recursive
-# for PEG compatability, and the original (implied) rules given in comments. The
+# for PEG compatability; the original (implied) rules are given in comments. The
 # 'start' rule must go first; other rules are in alphabetical order. Any rule
 # name that conflicts with a Treetop grammar token is prepended with an
-# underscore (e.g. '_end').
+# underscore (e.g. '_end'). Constraints described in the standard document are
+# given in comments.
 
 grammar Fortran
 
   rule start
     main_program
+  end
+
+  rule action_stmt
+    # R216 -- INCOMPLETE!
+    print_stmt
   end
 
   rule add_op
@@ -49,14 +55,24 @@ grammar Fortran
     literal_constant / named_constant
   end
 
+  rule default_char_expr
+    # R727
+    expr
+    # Constraint: must be of type default character
+  end
+
   rule defined_binary_op
     # R724
     dot letter letter+ dot <Verbatim>
+    # Constraint: Must not contain more than 31 letters and must not be the same
+    # as any intrinsic-operator or logical-literal-constant.
   end
 
   rule defined_unary_op
     # R704
     dot letter letter+ dot <Verbatim>
+    # Constraint: Must not contain more than 31 letters and must not be the same
+    # as any intrinsic-operator or logical-literal-constant.
   end
 
   rule digit
@@ -79,7 +95,10 @@ grammar Fortran
 
   rule end_program_stmt
     # R1103
-    _end program? name? newline? <End_Program_Stmt>
+    _end program? program_name? newline? <End_Program_Stmt>
+    # Constraint: The program-name may be included in the end-program-stmt only
+    # if the optional program-stmt is used and, if included, must be identical
+    # to the program-name specified in the program-stmt.
   end
 
   rule equiv_op
@@ -92,12 +111,21 @@ grammar Fortran
     not_op? level_4_expr <Verbatim>
   end
 
-  rule execution_part
-    execution_stmt+ <Execution_Part>
+  rule executable_construct
+    # R215 -- INCOMPLETE!
+    action_stmt
   end
 
-  rule execution_stmt
-    print_stmt
+  rule execution_part
+    # R208 -- INCOMPLETE!
+    executable_construct execution_part_construct <Execution_Part>
+    # Constraint: An execution-part must not contain an end-function-stmt,
+    # end-program-stmt, or end-subroutine-stmt.
+  end
+
+  rule execution_part_construct
+    # R209 -- INCOMPLETE!
+    ( executable_construct )* <Execution_Part_Construct>
   end
 
   rule expr
@@ -109,7 +137,9 @@ grammar Fortran
 
   rule format
     # R913 -- INCOMPLETE!
-    star
+    default_char_expr / star
+    # Constraint: The label must be the label of a FORMAT statement that appears
+    # in the same scoping unit as the statement containing the format specifier.
   end
 
   rule int_literal_constant
@@ -124,6 +154,9 @@ grammar Fortran
   rule kind_param
     # R405
     digit_string / scalar_int_constant_name
+    # Constraint: The value of kind-param must be nonnegative. The value of
+    # kind-param must specify a representation method that exists on the
+    # processor.
   end
 
   rule letter
@@ -170,8 +203,10 @@ grammar Fortran
   end
 
   rule main_program
-    # R1101
+    # R1101 -- INCOMPLETE!
     program_stmt? execution_part? end_program_stmt <Main_Program>
+    # Constraint: In a main-program, the execution-part must not contain a
+    # RETURN statement or an ENTRY statement.
   end
 
   rule minus
@@ -191,6 +226,7 @@ grammar Fortran
   rule name
     # R304
     letter alphanumeric_character* <Name>
+    # Constraint: The maximum length of a name is 31 characters.
   end
 
   rule named_constant
@@ -213,7 +249,10 @@ grammar Fortran
   end
 
   rule output_item_list
+    # 9.4.2
     comma output_item+ <Verbatim>
+    # Constraint: In an output-item-list, an io-implied-do-object must be an
+    # output-item.
   end
 
   rule plus
@@ -228,6 +267,8 @@ grammar Fortran
   rule primary
     # R701 -- INCOMPLETE!
     constant
+    # Constraint: subobject must be a subobject whose parent is a constant. A
+    # variable that is a primary must not be an assumed-size array.
   end
 
   rule print
@@ -243,9 +284,14 @@ grammar Fortran
     "program" <Verbatim>
   end
 
+  rule program_name
+    # 11.1
+    name
+  end
+
   rule program_stmt
     # R1102
-    program name newline <Program_Stmt>
+    program program_name newline <Program_Stmt>
   end
 
   rule rel_op_eq
@@ -278,6 +324,7 @@ grammar Fortran
   end
 
   rule scalar_int_constant_name
+    # 4.3.1.1
     # This rule is not given by the standard. Assumption: It is a named-constant
     # whose value is a scalar-int-expr. If error checking were required, a
     # type-and-rank check could be performed here.
