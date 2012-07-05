@@ -88,8 +88,7 @@ grammar Fortran
 
   rule expr
     # R723 -- INCOMPLETE!
- #   level_5_expr
-    primary
+    level_1_expr
   end
 
   rule format
