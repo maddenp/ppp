@@ -35,7 +35,11 @@ module Fortran
     end
 
     def join()
-      elements.map { |e| e.to_s }.join(' ')
+      elements.map { |e| e.to_s }.join(' ').strip
+    end
+
+    def label()
+      (e0.empty?)?(''):("#{e0} ")
     end
 
     def method_missing(m)
@@ -60,6 +64,8 @@ module Fortran
 
   end
 
+  # TODO auto-gen empty classes?
+
   class End_Program_Stmt < ASTNode
     def name() e2 end
     def to_s() blockend(stmt(join)) end
@@ -79,7 +85,7 @@ module Fortran
   end
 
   class Print_Stmt < ASTNode
-    def to_s() stmt("#{e0} #{e1}#{e2}") end
+    def to_s() stmt(label+"#{e1} #{e2}#{e3}") end
   end
 
   class Program_Stmt < ASTNode
