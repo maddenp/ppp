@@ -90,7 +90,7 @@ grammar Fortran
 
   rule expr
     # R723 -- INCOMPLETE!
-    level_3_expr
+    level_4_expr
   end
 
   rule format
@@ -138,7 +138,9 @@ grammar Fortran
 
   rule level_4_expr
     # R713
-    ( level_3_expr rel_op )? level_3_expr <Verbatim>
+    # LEFT-RECURSIVE RULE IMPLIED BY STANDARD:
+    # ( level_3_expr rel_op )? level_3_expr
+    level_3_expr ( rel_op level_3_expr )? <Verbatim>
   end
   
   rule level_5_expr
