@@ -17,7 +17,7 @@ module Fortran
     def join() elements.map { |e| e.to_s }.join(' ') end
     def method_missing(m) (m=~/e(\d+)/)?(elements[$~[1].to_i]):('') end
     def set(k,v) (@attrs.nil?)?(@attrs={k=>v}):(@attrs[k]=v) end
-    def stmt(s) indent(s) end
+    def stmt(s) indent(s.chomp)+"\n" end
     def to_s() "!!! #{this.class} has no to_s, please fix" end
     def verbatim() text_value end
   end
@@ -36,7 +36,7 @@ module Fortran
   end
 
   class Print_Stmt < ASTNode
-    def to_s() stmt(join) end
+    def to_s() stmt("#{e0} #{e1}#{e2}") end
   end
 
   class Program_Stmt < ASTNode
