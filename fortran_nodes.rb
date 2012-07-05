@@ -1,7 +1,5 @@
 module Fortran
 
-  # TODO ASTNode's to_s() should do elements.join as default?
-
   class Treetop::Runtime::SyntaxNode
     def to_s() '' end
   end
@@ -53,7 +51,7 @@ module Fortran
     end
 
     def to_s()
-      "!!! #{this.class} has no to_s, please fix"
+      cat
     end
 
     def verbatim()
@@ -68,11 +66,9 @@ module Fortran
   end
 
   class Execution_Part < ASTNode
-    def to_s() cat end
   end
 
   class Main_Program < ASTNode
-    def to_s() cat end
   end
 
   class Name < ASTNode

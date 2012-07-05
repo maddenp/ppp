@@ -1,9 +1,11 @@
-# NOTE: Grammar rule numbers from the Fortran 90 standard document are given
-#       wherever possible. Grammar rule names used here match those from the
-#       standard document, with underscores replacing hyphens. Some left-
-#       recursive rules given by the standard have been translated to right-
-#       recursive for PEG compatability, and the original (implied) rules given
-#       in comments.
+# NOTES: Grammar rule numbers or section numbers from the Fortran 90 standard
+# document are given wherever possible. Grammar rule names used here match those
+# from the standard document, with underscores replacing hyphens. Some left-
+# recursive rules given by the standard have been translated to right-recursive
+# for PEG compatability, and the original (implied) rules given in comments. The
+# 'start' rule must go first; other rules are in alphabetical order. Any rule
+# name that conflicts with a Treetop grammar token is prepended with an
+# underscore (e.g. '_end').
 
 grammar Fortran
 
