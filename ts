@@ -69,4 +69,4 @@ tests.each do |test|
   end
   FileUtils.rm_f([translation,bin])
 end
-puts "\nOK"
+puts "\nOK (#{tests.size} tests)"
