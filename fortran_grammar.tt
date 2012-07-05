@@ -117,7 +117,7 @@ grammar Fortran
   end
 
   rule execution_part
-    # R208 -- INCOMPLETE!
+    # R208
     executable_construct execution_part_construct <Execution_Part>
     # Constraint: An execution-part must not contain an end-function-stmt,
     # end-program-stmt, or end-subroutine-stmt.
@@ -135,6 +135,7 @@ grammar Fortran
     level_5_expr ( defined_binary_op expr )? <Verbatim>
   end
 
+#PM#
   rule format
     # R913 -- INCOMPLETE!
     default_char_expr / star
