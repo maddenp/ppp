@@ -40,8 +40,7 @@ def tests
 end
 
 def translate(test)
-  base=File.basename(test)
-  src=Dir.glob(["#{test}/#{base}.f","#{test}/#{base}.f90"])
+  src=Dir.glob(["#{test}/t.f","#{test}/t.f90"])
   fail "Remove either #{src[0]} or #{src[1]}" if src.size > 1
   src=src.first
   dst="#{stem(src)}_ppp#{File.extname(src)}"

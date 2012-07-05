@@ -1,3 +1,3 @@
-program t0007
+program t
   print *,3
-end program t0007
+end program t
