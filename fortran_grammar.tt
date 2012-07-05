@@ -13,7 +13,9 @@ grammar Fortran
 
   rule add_operand
     # R706
-    ( add_operand mult_op)? mult_operand <Verbatim>
+    # LEFT RECURSIVE RULE IMPLIED BY STANDARD:
+    # ( add_operand mult_op)? mult_operand <Verbatim>
+    mult_operand ( mult_op add_operand )? <Verbatim>
   end
 
   rule alphanumeric_character
@@ -88,7 +90,7 @@ grammar Fortran
 
   rule expr
     # R723 -- INCOMPLETE!
-    level_1_expr
+    level_2_expr
   end
 
   rule format
@@ -120,13 +122,11 @@ grammar Fortran
     ( defined_unary_op )? primary <Verbatim>
   end
 
-  rule level_2_prefix
-    level_2_expr? add_op <Verbatim>
-  end
-
   rule level_2_expr
     # R707
-    level_2_prefix? add_operand <Verbatim>
+    # LEFT RECURSIVE RULE IMPLIED BY STANDARD:
+    # ( level_2_expr? add_op )? add_operand
+    add_op? add_operand level_2_expr? <Verbatim>
   end
 
   rule level_3_expr
