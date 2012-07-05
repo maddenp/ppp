@@ -1,12 +1,12 @@
 program t0009
-  print *,1234
+  print *,3
 !sms$remove begin
-  print *,5678
+  print *,7
 !sms$remove end
-  print *,1234
+  print *,3
 !sms$remove begin
-  print *,5678
-  print *,5678
+  print *,7
+  print *,7
 !sms$remove end
-  print *,1234
+  print *,3
 end program t0009
