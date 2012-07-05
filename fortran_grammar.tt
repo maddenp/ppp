@@ -42,9 +42,14 @@ grammar Fortran
     literal_constant
   end
 
+  rule defined_binary_op
+    # R724
+    dot letter letter+ dot <Verbatim>
+  end
+
   rule defined_unary_op
     # R704
-    dot letter ( letter )+ dot <Verbatim>
+    dot letter letter+ dot <Verbatim>
   end
 
   rule digit
@@ -77,7 +82,7 @@ grammar Fortran
 
   rule equiv_operand
     # R715
-    ( not_op )? level_4_expr <Verbatim>
+    not_op? level_4_expr <Verbatim>
   end
 
   rule execution_part
@@ -89,8 +94,10 @@ grammar Fortran
   end
 
   rule expr
-    # R723 -- INCOMPLETE!
-    level_5_expr
+    # R723
+    # LEFT-RECURSIVE RULE IMPLIED BY STANDARD:
+    # ( expr defined_binary_op )? level_5_expr
+    level_5_expr ( defined_binary_op expr )? <Verbatim>
   end
 
   rule format
@@ -119,7 +126,7 @@ grammar Fortran
 
   rule level_1_expr
     # R703
-    ( defined_unary_op )? primary <Verbatim>
+    defined_unary_op? primary <Verbatim>
   end
 
   rule level_2_expr
@@ -194,7 +201,7 @@ grammar Fortran
   end
 
   rule output_item_list
-    ( comma output_item )+ <Verbatim>
+    comma output_item+ <Verbatim>
   end
 
   rule plus
