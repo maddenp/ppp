@@ -77,6 +77,9 @@ module Fortran
   class Execution_Part_Construct < ASTNode
   end
 
+  class Format_Stmt < ASTNode
+  end
+
   class Main_Program < ASTNode
   end
 

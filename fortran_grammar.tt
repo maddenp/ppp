@@ -3,10 +3,9 @@
 # from the standard document, with underscores in place of hyphens. Some left-
 # recursive rules given by the standard have been translated to right-recursive
 # for PEG compatability; the original (implied) rules are given in comments. The
-# 'start' rule must go first; other rules are in alphabetical order. Any rule
-# name that conflicts with a Treetop grammar token is prepended with an
-# underscore (e.g. '_end'). Constraints described in the standard document are
-# given in comments.
+# "start" rule must go first; other rules are in alphabetical order. Constraints
+# described in the standard document are given in comments. Rule names for
+# literal terminals not defined in the standard are prefixed with "t_".
 
 grammar Fortran
 
@@ -18,7 +17,7 @@ grammar Fortran
 
   rule action_stmt
 
-    # R216 -- INCOMPLETE!
+    # R216 -- INCOMPLETE
     #
     # Provide label handling in rules for individual statements.
 
@@ -30,7 +29,7 @@ grammar Fortran
 
     # R710
 
-    plus / minus
+    t_plus / t_minus
 
   end
 
@@ -49,7 +48,7 @@ grammar Fortran
 
     # R302
 
-    letter / digit / underscore
+    letter / digit / t_underscore
 
   end
 
@@ -60,13 +59,6 @@ grammar Fortran
     alphanumeric_character / special_character
 
   end
-
-  rule comma
-
-    "," <Verbatim>
-
-  end
-
 
   rule concat_op
 
@@ -101,7 +93,7 @@ grammar Fortran
     # Constraint: Must not contain more than 31 letters and must not be the same
     # as any intrinsic-operator or logical-literal-constant.
 
-    dot letter letter+ dot <Verbatim>
+    t_dot letter letter+ t_dot <Verbatim>
 
   end
 
@@ -112,7 +104,7 @@ grammar Fortran
     # Constraint: Must not contain more than 31 letters and must not be the same
     # as any intrinsic-operator or logical-literal-constant.
 
-    dot letter letter+ dot <Verbatim>
+    t_dot letter letter+ t_dot <Verbatim>
 
   end
 
@@ -132,18 +124,6 @@ grammar Fortran
 
   end
 
-  rule dot
-
-    "." <Verbatim>
-
-  end
-
-  rule _end
-
-    "end" <Verbatim>
-
-  end
-
   rule end_program_stmt
 
     # R1103
@@ -152,7 +132,7 @@ grammar Fortran
     # if the optional program-stmt is used and, if included, must be identical
     # to the program-name specified in the program-stmt.
 
-    label? _end program? program_name? newline? <End_Program_Stmt>
+    label? t_end t_program? program_name? t_newline? <End_Program_Stmt>
 
   end
 
@@ -174,7 +154,7 @@ grammar Fortran
 
   rule executable_construct
 
-    # R215 -- INCOMPLETE!
+    # R215 -- INCOMPLETE
 
     action_stmt
 
@@ -193,7 +173,7 @@ grammar Fortran
 
   rule execution_part_construct
 
-    # R209 -- INCOMPLETE!
+    # R209 -- INCOMPLETE
 
     ( executable_construct )* <Execution_Part_Construct>
 
@@ -220,15 +200,37 @@ grammar Fortran
     # statement label of a FORMAT statement that appears in the same scoping
     # unit as the format.
     
-    default_char_expr / label / star / scalar_default_int_variable
+    default_char_expr / label / t_star / scalar_default_int_variable
   
+  end
+
+  rule format_specification
+
+    # R1002
+    #
+    # A vast simplification is made here under the assumption that it is only
+    # necessary to pass a format-specification through verbatim, not to analyze
+    # its contents.
+
+    &( label t_format ) t_paren_l .* t_paren_r <Verbatim>
+
+  end
+
+  rule format_stmt
+
+    # R1001
+    #
+    # Constraint: The format-stmt must be labeled.
+
+    label t_format format_specification <Format_Stmt>
+
   end
 
   rule int_literal_constant
 
     # R404
 
-    digit_string ( underscore kind_param )? <Verbatim>
+    digit_string ( t_underscore kind_param )? <Verbatim>
 
   end
 
@@ -326,7 +328,7 @@ grammar Fortran
 
   rule literal_constant
 
-    # R306 -- INCOMPLETE!
+    # R306 -- INCOMPLETE
 
     int_literal_constant
 
@@ -334,7 +336,7 @@ grammar Fortran
 
   rule main_program
 
-    # R1101 -- INCOMPLETE!
+    # R1101 -- INCOMPLETE
     #
     # Constraint: In a main-program, the execution-part must not contain a
     # RETURN statement or an ENTRY statement.
@@ -343,17 +345,11 @@ grammar Fortran
 
   end
 
-  rule minus
-
-    "-" <Verbatim>
-
-  end
-
   rule mult_op
 
     # R709
 
-    star / slash
+    t_star / t_slash
 
   end
 
@@ -383,12 +379,6 @@ grammar Fortran
 
   end
 
-  rule newline
-
-    "\n" <Verbatim>
-
-  end
-
   rule not_op
 
     # R719
@@ -399,7 +389,7 @@ grammar Fortran
 
   rule output_item
 
-    # R915 -- INCOMPLETE!
+    # R915 -- INCOMPLETE
 
     expr
 
@@ -412,13 +402,7 @@ grammar Fortran
     # Constraint: In an output-item-list, an io-implied-do-object must be an
     # output-item.
 
-    comma output_item+ <Verbatim>
-
-  end
-
-  rule plus
-
-    "+" <Verbatim>
+    t_comma output_item+ <Verbatim>
 
   end
 
@@ -432,7 +416,7 @@ grammar Fortran
 
   rule primary
 
-    # R701 -- INCOMPLETE!
+    # R701 -- INCOMPLETE
     #
     # Constraint: subobject must be a subobject whose parent is a constant. A
     # variable that is a primary must not be an assumed-size array.
@@ -441,23 +425,11 @@ grammar Fortran
 
   end
 
-  rule print
-
-    "print" <Verbatim>
-
-  end
-
   rule print_stmt
 
     # R911
 
-    label? print format output_item_list? newline <Print_Stmt>
-
-  end
-
-  rule program
-
-    "program" <Verbatim>
+    label? t_print format output_item_list? t_newline <Print_Stmt>
 
   end
 
@@ -473,7 +445,7 @@ grammar Fortran
 
     # R1102
 
-    label? program program_name newline <Program_Stmt>
+    label? t_program program_name t_newline <Program_Stmt>
 
   end
 
@@ -557,7 +529,7 @@ grammar Fortran
 
     # R406
 
-    plus / minus
+    t_plus / t_minus
 
   end
 
@@ -577,12 +549,6 @@ grammar Fortran
 
   end
 
-  rule slash
-
-    "/" <Verbatim>
-
-  end
-
   rule special_character
 
     # 3.1.4
@@ -597,23 +563,95 @@ grammar Fortran
 
   end
 
-  rule star
+  rule t_comma
+
+    "," <Verbatim>
+
+  end
+
+  rule t_dot
+
+    "." <Verbatim>
+
+  end
+
+  rule t_end
+
+    "end" <Verbatim>
+
+  end
+
+  rule t_format
+
+    "format" <Verbatim>
+
+  end
+
+  rule t_minus
+
+    "-" <Verbatim>
+
+  end
+
+  rule t_newline
+
+    "\n" <Verbatim>
+
+  end
+
+  rule t_paren_l
+
+    "("
+
+  end
+
+  rule t_paren_r
+
+    ")"
+
+  end
+
+  rule t_plus
+
+    "+" <Verbatim>
+
+  end
+
+  rule t_print
+
+    "print" <Verbatim>
+
+  end
+
+  rule t_program
+
+    "program" <Verbatim>
+
+  end
+
+  rule t_slash
+
+    "/" <Verbatim>
+
+  end
+
+  rule t_star
 
     "*" <Verbatim>
 
   end
 
-  rule underscore
+  rule t_underscore
 
     # R303
 
-    '_'
+    "_"
 
   end
 
   rule variable
 
-    # R601 -- INCOMPLETE!
+    # R601 -- INCOMPLETE
     #
     # Constraint: scalar-variable-name must not have the PARAMETER attribute.
     # array-variable-name must be the name of a data object that is an array.
