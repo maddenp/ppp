@@ -52,6 +52,17 @@ grammar Fortran
 
   end
 
+  rule char_literal_constant
+
+    # R420
+    #
+    # Constraint: The value of kind-param must specify a representation method
+    # that exists on the processor.
+
+    ( kind_param t_underscore )? t_apostrophe (!t_apostrophe rep_char)* t_apostrophe <Verbatim> / ( kind_param t_underscore )? t_quotemark (!t_quotemark rep_char)* t_quotemark <Verbatim>
+
+  end
+
   rule character
 
     # R301
@@ -338,7 +349,7 @@ grammar Fortran
 
     # R306 -- INCOMPLETE
 
-    int_literal_constant
+    int_literal_constant / char_literal_constant
 
   end
 
@@ -509,9 +520,24 @@ grammar Fortran
 
   end
 
+  rule rep_char
+
+    # 4.3.2.1 (processor-dependent)
+    #
+    # Constraint: For the type character with kind kind-param, and for type
+    # default character otherwise, a representable character, rep-char, is:
+    # (1) Any character in the processor-dependent character set in fixed source
+    # form. A processor may restrict the occurrence of some of all of the
+    # control characters. (2) Any graphic character in the processor-dependent
+    # character set in free source form.
+
+    character
+
+  end
+
   rule scalar_default_int_variable
 
-    # Used widely (not explicitly defined)
+    # Wide use (not explicitly defined)
     #
     # Constraint (assumed): scalar-default-int-variable must be a scalar, and
     # must be of type default INTEGER.    
@@ -582,6 +608,12 @@ grammar Fortran
 
   end
 
+  rule t_apostrophe
+
+    "'" <Verbatim>
+
+  end
+
   rule t_comma
 
     "," <Verbatim>
@@ -648,6 +680,11 @@ grammar Fortran
 
   end
 
+  rule t_quotemark
+
+    "\"" <Verbatim>
+
+  end
   rule t_slash
 
     "/" <Verbatim>
