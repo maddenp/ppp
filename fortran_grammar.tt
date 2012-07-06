@@ -175,7 +175,7 @@ grammar Fortran
 
     # R209 -- INCOMPLETE
 
-    ( executable_construct )* <Execution_Part_Construct>
+    ( executable_construct / format_stmt )* <Execution_Part_Construct>
 
   end
 
@@ -212,7 +212,7 @@ grammar Fortran
     # necessary to pass a format-specification through verbatim, not to analyze
     # its contents.
 
-    &( label t_format ) t_paren_l .* t_paren_r <Verbatim>
+    t_paren_l [^\)]+ t_paren_r <Verbatim>
 
   end
 
@@ -222,7 +222,7 @@ grammar Fortran
     #
     # Constraint: The format-stmt must be labeled.
 
-    label t_format format_specification <Format_Stmt>
+    label t_format format_specification t_newline <Format_Stmt>
 
   end
 
@@ -553,7 +553,7 @@ grammar Fortran
 
     # 3.1.4
 
-    [ =+-*/();.':!"%&;<>?$]
+    [\ \=\+\-\*\/\(\)\;\.\'\:\!\"\%\&\;\<\>\?\$]
 
   end
 
@@ -601,13 +601,13 @@ grammar Fortran
 
   rule t_paren_l
 
-    "("
+    "(" <Verbatim>
 
   end
 
   rule t_paren_r
 
-    ")"
+    ")" <Verbatim>
 
   end
 

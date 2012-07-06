@@ -78,6 +78,7 @@ module Fortran
   end
 
   class Format_Stmt < ASTNode
+    def to_s() stmt(join) end
   end
 
   class Main_Program < ASTNode
