@@ -97,6 +97,9 @@ module Fortran
     def to_s() blockbegin(stmt(join)) end
   end
 
+  class Specification_Part < ASTNode
+  end
+
   class Verbatim < ASTNode
     def to_s() verbatim end
   end

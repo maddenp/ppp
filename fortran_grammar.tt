@@ -76,6 +76,14 @@ grammar Fortran
 
   end
 
+  rule declaration_construct
+
+    # R207 -- INCOMPLETE
+
+    format_stmt
+
+  end
+
   rule default_char_expr
 
     # R727
@@ -341,7 +349,7 @@ grammar Fortran
     # Constraint: In a main-program, the execution-part must not contain a
     # RETURN statement or an ENTRY statement.
 
-    program_stmt? execution_part? end_program_stmt <Main_Program>
+    program_stmt? specification_part? execution_part? end_program_stmt <Main_Program>
 
   end
 
@@ -453,7 +461,7 @@ grammar Fortran
 
     # R202 -- INCOMPLETE
 
-    main_program
+    main_program # / external_subprogram / module / block_data
 
   end
 
@@ -567,7 +575,10 @@ grammar Fortran
 
   rule specification_part
 
-    ""
+    # R204 -- INCOMPLETE
+
+    #use_stmt* implicit_part? declaration_construct* <Specification_Part> 
+    declaration_construct* <Specification_Part> 
 
   end
 
