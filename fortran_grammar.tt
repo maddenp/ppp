@@ -231,7 +231,7 @@ grammar Fortran
     # necessary to pass a format-specification through verbatim, not to analyze
     # its contents.
 
-    t_paren_l [^\)]+ t_paren_r <Verbatim>
+    t_paren_l (!t_paren_r character)+ t_paren_r <Verbatim>
 
   end
 
