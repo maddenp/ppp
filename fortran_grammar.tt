@@ -11,7 +11,7 @@ grammar Fortran
 
   rule start
 
-    main_program
+    program_unit
 
   end
 
@@ -216,7 +216,7 @@ grammar Fortran
 
   end
 
-  rule format_stmt
+ rule format_stmt
 
     # R1001
     #
@@ -446,6 +446,14 @@ grammar Fortran
     # R1102
 
     label? t_program program_name t_newline <Program_Stmt>
+
+  end
+
+  rule program_unit
+
+    # R202 -- INCOMPLETE
+
+    main_program
 
   end
 
