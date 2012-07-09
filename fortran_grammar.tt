@@ -219,6 +219,22 @@ grammar Fortran
 
   end
 
+  rule exponent
+
+    # R416
+
+    signed_digit_string
+
+  end
+
+  rule exponent_letter
+
+    # R415
+
+    [ed] <Verbatim>
+
+  end
+
   rule expr
 
     # R723
@@ -394,52 +410,6 @@ grammar Fortran
 
   end
 
-#PM#
-  rule signed_real_literal_constant
-
-    # R412
-
-    sign? real_literal_constant <Verbatim>
-
-  end
-
-  rule real_literal_constant
-
-    # R413
-    #
-    # Constraint: If both kind-param and exponent-letter are present,
-    # exponent-letter bust be E. The value of kind-param must specify an
-    # approximation method that exists on the processor.
-
-    significand ( exponent_letter exponent )? ( t_underscore kind_param )? <Verbatim> / digit_string exponent_letter exponent ( t_underscore kind_param )? <Verbatim>
-
-  end
-
-  rule significand
-
-    # R414
-
-    digit_string t_dot digit_string? <Verbatim> / t_dot digit_string <Verbatim>
-
-  end
-
-  rule exponent_letter
-
-    # R415
-
-    [ed] <Verbatim>
-
-  end
-
-  rule exponent
-
-    # R416
-
-    signed_digit_string
-
-  end
-#PM#
-
   rule logical_literal_constant
 
     # R421
@@ -593,6 +563,18 @@ grammar Fortran
 
   end
 
+  rule real_literal_constant
+
+    # R413
+    #
+    # Constraint: If both kind-param and exponent-letter are present,
+    # exponent-letter bust be E. The value of kind-param must specify an
+    # approximation method that exists on the processor.
+
+    significand ( exponent_letter exponent )? ( t_underscore kind_param )? <Verbatim> / digit_string exponent_letter exponent ( t_underscore kind_param )? <Verbatim>
+
+  end
+
   rule rel_op_eq
 
     ".eq." <Verbatim> / "==" <Verbatim>
@@ -705,6 +687,22 @@ grammar Fortran
     # R403
 
     sign? int_literal_constant <Verbatim>
+
+  end
+
+  rule signed_real_literal_constant
+
+    # R412
+
+    sign? real_literal_constant <Verbatim>
+
+  end
+
+  rule significand
+
+    # R414
+
+    digit_string t_dot digit_string? <Verbatim> / t_dot digit_string <Verbatim>
 
   end
 
