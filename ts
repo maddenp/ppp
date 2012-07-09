@@ -2,15 +2,6 @@
 
 require 'fileutils'
 
-def compile(f)
-  fc="gfortran -pedantic-errors -std=f95"
-  b=stem(f)
-  cmd="#{fc} -o #{b} #{f}"
-  stat,out=docmd(cmd)
-  fail(out,cmd) unless stat
-  b
-end
-
 def docmd(cmd)
   out=IO.popen(cmd+' 2>&1') { |x| x.readlines.reduce('') { |s,e| s+=e } }
   [($?.exitstatus==0)?(true):(false),out]
@@ -31,42 +22,26 @@ def fail(msg=nil,cmd=nil)
   exit(1)
 end
 
-def stem(f)
-  f.chomp(File.extname(f))
-end
-
 def tests
-  Dir.glob("tests/*").sort
-end
-
-def translate(test)
-  src=Dir.glob(["#{test}/t.f","#{test}/t.f90"])
-  fail "Remove either #{src[0]} or #{src[1]}" if src.size > 1
-  src=src.first
-  dst="#{stem(src)}_ppp#{File.extname(src)}"
-  cmd="./ppp #{src} > #{dst}"
-  stat,out=docmd(cmd)
-  fail(out,cmd) unless stat
-  dst
+  Dir.glob("tests/t*").sort
 end
 
 exe('make')
 load 'ppp'
 tests.each do |test|
   print '.'
-  translation=translate(test)
-  bin=compile(translation)
-  stdout=exe(bin)
+  exe("make -C #{test} bin")
+  stdout=exe(File.join(test,'a.out'))
   control=File.open(File.join(test,'control'),"rb").read
   unless stdout==control
-    msg="#{test} output expected:\n--\n"
+    msg="#{test} output expected:\n--begin--\n"
     msg+=control
-    msg+="--\n#{test} output actual:\n--"
+    msg+="-- end --\n#{test} output actual:\n--begin--\n"
     msg+=stdout
-    msg+="\n--"
+    msg+="-- end --"
     fail msg
   end
-  FileUtils.rm_f([translation,bin])
+  exe("make -C #{test} clean")
 end
 puts "\nOK (#{tests.size} tests)"
 

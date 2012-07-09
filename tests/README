@@ -1,0 +1,5 @@
+
+Some tests (e.g. those containing sms$insert or sms$remove directives) require
+ppp translation in order to produce the expected control output: "make control"
+should not be used for these tests.
+
