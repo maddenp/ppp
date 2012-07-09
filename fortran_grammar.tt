@@ -65,8 +65,8 @@ grammar Fortran
     # R838
     #
     # Constraint: The label must be the statement label of a branch target
-    # statement of format-stmt that appears in the same scoping unit as the
-    # assign-stmt. scalar-int-variable must be named and of type default
+    # statement of format_stmt that appears in the same scoping unit as the
+    # assign_stmt. scalar_int_variable must be named and of type default
     # integer.
 
     label? t_assign label t_to scalar_int_variable t_newline <Assign_Stmt>
@@ -98,7 +98,7 @@ grammar Fortran
 
     # R420
     #
-    # Constraint: The value of kind-param must specify a representation method
+    # Constraint: The value of kind_param must specify a representation method
     # that exists on the processor.
 
     ( kind_param t_underscore )? t_apostrophe (!t_apostrophe rep_char)* t_apostrophe <Verbatim> / ( kind_param t_underscore )? t_quotemark (!t_quotemark rep_char)* t_quotemark <Verbatim>
@@ -149,7 +149,7 @@ grammar Fortran
 
     # R727
     #
-    # Constraint: must be of type default character
+    # Note: Assumed constraint: must be of type default character
 
     expr
 
@@ -160,7 +160,7 @@ grammar Fortran
     # R724
     #
     # Constraint: Must not contain more than 31 letters and must not be the same
-    # as any intrinsic-operator or logical-literal-constant.
+    # as any intrinsic_operator or logical_literal_constant.
 
     t_dot t_letter t_letter+ t_dot <Verbatim>
 
@@ -171,7 +171,7 @@ grammar Fortran
     # R704
     #
     # Constraint: Must not contain more than 31 letters and must not be the same
-    # as any intrinsic-operator or logical-literal-constant.
+    # as any intrinsic_operator or logical_literal_constant.
 
     !( intrinsic_operator / logical_literal_constant ) t_dot t_letter t_letter+ t_dot <Verbatim>
 
@@ -189,9 +189,9 @@ grammar Fortran
 
     # R1103
     #
-    # Constraint: The program-name may be included in the end-program-stmt only
-    # if the optional program-stmt is used and, if included, must be identical
-    # to the program-name specified in the program-stmt.
+    # Constraint: The program_name may be included in the end_program_stmt only
+    # if the optional program_stmt is used and, if included, must be identical
+    # to the program_name specified in the program_stmt.
 
     label? t_end t_program? program_name? t_newline? <End_Program_Stmt>
 
@@ -225,8 +225,8 @@ grammar Fortran
 
     # R208
     #
-    # Constraint: An execution-part must not contain an end-function-stmt,
-    # end-program-stmt, or end-subroutine-stmt.
+    # Constraint: An execution_part must not contain an end_function_stmt,
+    # end_program_stmt, or end_subroutine_stmt.
 
     executable_construct execution_part_construct <Execution_Part>
 
@@ -273,7 +273,7 @@ grammar Fortran
     #
     # Constraint: The label must be the label of a FORMAT statement that appears
     # in the same scoping unit as the statement containing the format specifier.
-    # The scalar-default-int-variable must have been assigned (8.2.4) the
+    # The scalar_default_int_variable must have been assigned (8.2.4) the
     # statement label of a FORMAT statement that appears in the same scoping
     # unit as the format.
     
@@ -297,7 +297,7 @@ grammar Fortran
 
     # R1001
     #
-    # Constraint: The format-stmt must be labeled.
+    # Constraint: The format_stmt must be labeled.
 
     label t_format format_specification t_newline <Format_Stmt>
 
@@ -353,8 +353,8 @@ grammar Fortran
 
     # R405
     #
-    # Constraint: The value of kind-param must be nonnegative. The value of
-    # kind-param must specify a representation method that exists on the
+    # Constraint: The value of kind_param must be nonnegative. The value of
+    # kind_param must specify a representation method that exists on the
     # processor.
 
     digit_string / scalar_int_constant_name
@@ -443,7 +443,7 @@ grammar Fortran
 
     # R421
     #
-    # Constraint: The value of kind-param must specify a representation that
+    # Constraint: The value of kind_param must specify a representation that
     # exists on the processor.
 
     ( t_true / t_false ) ( t_underscore kind_param )? <Verbatim>
@@ -454,7 +454,7 @@ grammar Fortran
 
     # R1101 -- INCOMPLETE
     #
-    # Constraint: In a main-program, the execution-part must not contain a
+    # Constraint: In a main_program, the execution_part must not contain a
     # RETURN statement or an ENTRY statement.
 
     program_stmt? specification_part? execution_part? end_program_stmt <Main_Program>
@@ -534,8 +534,8 @@ grammar Fortran
 
     # 9.4.2
     #
-    # Constraint: In an output-item-list, an io-implied-do-object must be an
-    # output-item.
+    # Constraint: In an output_item_list, an io_implied_do_object must be an
+    # output_item.
 
     ( t_comma output_item )+ <Verbatim>
 
@@ -596,8 +596,8 @@ grammar Fortran
 
     # R413
     #
-    # Constraint: If both kind-param and exponent-letter are present,
-    # exponent-letter bust be E. The value of kind-param must specify an
+    # Constraint: If both kind_param and exponent_letter are present,
+    # exponent_letter bust be E. The value of kind_param must specify an
     # approximation method that exists on the processor.
 
     significand ( exponent_letter exponent )? ( t_underscore kind_param )? <Verbatim> / digit_string exponent_letter exponent ( t_underscore kind_param )? <Verbatim>
@@ -660,8 +660,8 @@ grammar Fortran
 
     # 4.3.2.1 (processor-dependent)
     #
-    # Constraint: For the type character with kind kind-param, and for type
-    # default character otherwise, a representable character, rep-char, is:
+    # Constraint: For the type character with kind kind_param, and for type
+    # default character otherwise, a representable character, rep_char, is:
     # (1) Any character in the processor-dependent character set in fixed source
     # form. A processor may restrict the occurrence of some of all of the
     # control characters. (2) Any graphic character in the processor-dependent
@@ -675,8 +675,8 @@ grammar Fortran
 
     # Wide use (not explicitly defined)
     #
-    # Constraint (assumed): scalar-default-int-variable must be a scalar, and
-    # must be of type default INTEGER.    
+    # Note: Assumed constraint: scalar_default_int_variable must be a scalar,
+    # and must be of type default INTEGER.    
 
     variable
 
@@ -686,8 +686,8 @@ grammar Fortran
 
     # 4.3.1.1 (not explicitly defined)
     #
-    # Constraint (assumed): scalar-int-constant-name must be a scalar, and must
-    # be of type INTEGER.
+    # Note: Assumed constraint: scalar_int_constant_name must be a scalar, and
+    # must be of type INTEGER.
 
     named_constant
 
@@ -697,8 +697,8 @@ grammar Fortran
 
     # Wide use (not explicitly defined)
     #
-    # Constraint (assumed): scalar-int-variable must be a scalar, and must be of
-    # type INTEGER.    
+    # Note: Assumed constraint: scalar_int_variable must be a scalar, and must
+    # be of type INTEGER.    
 
     variable
 
@@ -708,7 +708,7 @@ grammar Fortran
 
     # Section 6 (not explicitly defined)
     #
-    # Note: Assumed constraint: scalar-variable-name must be a scalar.
+    # Note: Assumed constraint: scalar_variable_name must be a scalar.
 
     variable_name
 
@@ -932,9 +932,9 @@ grammar Fortran
 
     # R601 -- INCOMPLETE
     #
-    # Constraint: scalar-variable-name must not have the PARAMETER attribute.
-    # array-variable-name must be the name of a data object that is an array.
-    # array-variable-name must not have the PARAMETER attribute. subobject
+    # Constraint: scalar_variable_name must not have the PARAMETER attribute.
+    # array_variable_name must be the name of a data object that is an array.
+    # array_variable_name must not have the PARAMETER attribute. subobject
     # must not be a subobject designator (for example, a substring) whose
     # parent is a constant.
 
@@ -946,7 +946,8 @@ grammar Fortran
 
     # Wide use (not explicitly defined)
     #
-    # Constraint (assumed): variable-name must not have the PARAMETER attribute.
+    # Note: Assumed constraint: variable_name must not have the PARAMETER
+    # attribute.
 
     name
 
@@ -973,11 +974,11 @@ grammar Fortran
 
     # R531
     #
-    # Constraint: In a variable that is a data-stmt-object, any subscript,
+    # Constraint: In a variable that is a data_stmt_object, any subscript,
     # section subscript, substring starting point, and substring ending point
     # must be an initialization expression. A variable whose name or
-    # designator is included in a data-stmt-object-list or a
-    # data-i-do-object-list must not be: a dummy argument, made accessible by
+    # designator is included in a data_stmt_object_list or a
+    # data_i_do_object_list must not be: a dummy argument, made accessible by
     # use assocation or host association, in a named common block unless the
     # DATA statement is in a block data program unit, in a blank common block,
     # a function name, a function result name, an automatic object, a pointer,
@@ -1011,7 +1012,7 @@ grammar Fortran
 
     # R533
     #
-    # Constraint: If a data-stmt-constant is a structure-constructor, each
+    # Constraint: If a data_stmt_constant is a structure_constructor, each
     # component must be an initialization expression.
 
     scalar_constant / signed_int_literal_constant / signed_real_literal_constant / structure_constructor / boz_literal_constant
@@ -1035,9 +1036,9 @@ grammar Fortran
 
     # R535
     #
-    # Constraint: A scalar-int-expr of a data-implied-do must involve as
+    # Constraint: A scalar_int_expr of a data_implied_do must involve as
     # primaries only constants or DO variables of the containing
-    # data-implied-dos, and each operation must be intrinsic.
+    # data_implied_dos, and each operation must be intrinsic.
 
     t_paren_l data_i_do_object_list t_comma data_i_do_variable t_equal scalar_int_expr t_comma scalar_int_expr ( t_comma scalar_int_expr )* t_paren_r <Verbatim>
 
@@ -1047,11 +1048,11 @@ grammar Fortran
 
   # R536
   #
-  # Constraint: The array-element must not have a constant parent. The
-  # scalar-structure_component must not have a constant parent. In an
-  # array-element or a scalar-structure-component that is a data-i-do-object,
+  # Constraint: The array_element must not have a constant parent. The
+  # scalar_structure_component must not have a constant parent. In an
+  # array_element or a scalar_structure_component that is a data_i_do_object,
   # any subscript must be an expression whose primaries are either constant or
-  # DO variables of the containing data-implied-dos, and each operation must be
+  # DO variables of the containing data_implied_dos, and each operation must be
   # intrinsic.
 
   array_element / scalar_structure_component / data_implied_do
