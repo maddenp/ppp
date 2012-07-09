@@ -44,6 +44,14 @@ grammar Fortran
 
   end
 
+  rule and_op
+
+    # R720
+
+    ".and." <Verbatim>
+
+  end
+
   rule alphanumeric_character
 
     # R302
@@ -123,7 +131,7 @@ grammar Fortran
     # Constraint: Must not contain more than 31 letters and must not be the same
     # as any intrinsic-operator or logical-literal-constant.
 
-    t_dot letter letter+ t_dot <Verbatim>
+    !( intrinsic_operator / logical_literal_constant ) t_dot letter letter+ t_dot <Verbatim>
 
   end
 
@@ -259,6 +267,14 @@ grammar Fortran
 
   end
 
+  rule intrinsic_operator
+
+    # R310
+
+    power_op / mult_op / add_op / concat_op / rel_op / not_op / and_op / or_op / equiv_op
+
+  end
+
   rule kind_param
 
     # R405
@@ -348,8 +364,19 @@ grammar Fortran
   rule literal_constant
 
     # R306 -- INCOMPLETE
+#PM#
+    int_literal_constant / logical_literal_constant / char_literal_constant
 
-    int_literal_constant / char_literal_constant
+  end
+
+  rule logical_literal_constant
+
+    # R421
+    #
+    # Constraint: The value of kind-param must specify a representation that
+    # exists on the processor.
+
+    ( t_true / t_false ) ( t_underscore kind_param )? <Verbatim>
 
   end
 
@@ -403,6 +430,14 @@ grammar Fortran
     # R719
 
     ".not." <Verbatim>
+
+  end
+
+  rule or_op
+
+    # R721
+
+    ".or." <Verbatim>
 
   end
 
@@ -632,6 +667,12 @@ grammar Fortran
 
   end
 
+  rule t_false
+
+    ".false." <Verbatim>
+
+  end
+
   rule t_format
 
     "format" <Verbatim>
@@ -694,6 +735,12 @@ grammar Fortran
   rule t_star
 
     "*" <Verbatim>
+
+  end
+
+  rule t_true
+
+    ".true." <Verbatim>
 
   end
 
