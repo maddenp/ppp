@@ -19,7 +19,7 @@ grammar Fortran
 
     # R216 -- INCOMPLETE
     #
-    # Provide label handling in rules for individual statements.
+    # Note: Provide label handling in rules for individual statements.
 
     print_stmt
 
@@ -37,7 +37,7 @@ grammar Fortran
 
     # R706
     #
-    # Left-recursive rule implied by standard:
+    # Note: Left-recursive rule implied by standard:
     # ( add_operand mult_op)? mult_operand
 
     mult_operand ( mult_op add_operand )? <Verbatim>
@@ -56,7 +56,28 @@ grammar Fortran
 
     # R302
 
-    letter / digit / t_underscore
+    t_letter / t_digit / t_underscore
+
+  end
+
+  rule binary_constant
+
+    # R408
+    #
+    # Constraint: digit must have one of the values 0 or 1. Note: 'digit is
+    # replaced by 't_binary' here to enforce the constraint.
+
+    "b" ( ( t_apostrophe t_binary+ t_apostrophe ) / ( t_quotemark t_binary+ t_quotemark ) ) <Verbatim>
+
+  end
+
+  rule boz_literal_constant
+
+    # R407
+    #
+    # Constraint: A boz-literal-constant may appear only in a DATA statement.
+
+    binary_constant / octal_constant / hex_constant
 
   end
 
@@ -120,7 +141,7 @@ grammar Fortran
     # Constraint: Must not contain more than 31 letters and must not be the same
     # as any intrinsic-operator or logical-literal-constant.
 
-    t_dot letter letter+ t_dot <Verbatim>
+    t_dot t_letter t_letter+ t_dot <Verbatim>
 
   end
 
@@ -131,15 +152,7 @@ grammar Fortran
     # Constraint: Must not contain more than 31 letters and must not be the same
     # as any intrinsic-operator or logical-literal-constant.
 
-    !( intrinsic_operator / logical_literal_constant ) t_dot letter letter+ t_dot <Verbatim>
-
-  end
-
-  rule digit
-
-    # 3.1.2
-
-    [0-9]
+    !( intrinsic_operator / logical_literal_constant ) t_dot t_letter t_letter+ t_dot <Verbatim>
 
   end
 
@@ -147,7 +160,7 @@ grammar Fortran
 
     # R402
 
-    digit+ <Verbatim>
+    t_digit+ <Verbatim>
 
   end
 
@@ -210,7 +223,7 @@ grammar Fortran
 
     # R723
     #
-    # Left-recursive rule implied by standard:
+    # Note: Left-recursive rule implied by standard:
     # ( expr defined_binary_op )? level_5_expr
 
     level_5_expr ( defined_binary_op expr )? <Verbatim>
@@ -235,9 +248,9 @@ grammar Fortran
 
     # R1002
     #
-    # A vast simplification is made here under the assumption that it is only
-    # necessary to pass a format-specification through verbatim, not to analyze
-    # its contents.
+    # Note: A vast simplification is made here under the assumption that it is
+    # only necessary to pass a format-specification through verbatim, not to
+    # analyze its contents.
 
     t_paren_l (!t_paren_r character)+ t_paren_r <Verbatim>
 
@@ -250,6 +263,22 @@ grammar Fortran
     # Constraint: The format-stmt must be labeled.
 
     label t_format format_specification t_newline <Format_Stmt>
+
+  end
+
+  rule hex_constant
+
+    # R410
+
+    "z" ( ( t_apostrophe hex_digit+ t_apostrophe ) / ( t_quotemark hex_digit+ t_quotemark ) ) <Verbatim>
+
+  end
+
+  rule hex_digit
+
+    # R411
+
+    digit / [abcdef] <Verbatim>
 
   end
 
@@ -297,15 +326,7 @@ grammar Fortran
     # unit. Leading zeros are not significant in distinguishing between
     # statement labels.
 
-    digit 1..5 <Verbatim>
-
-  end
-
-  rule letter
-
-    # 3.1.1
-
-    [a-z]
+    t_digit 1..5 <Verbatim>
 
   end
 
@@ -321,7 +342,7 @@ grammar Fortran
 
     # R707
     #
-    # Left-recursive rule implied by standard:
+    # Note: Left-recursive rule implied by standard:
     # ( level_2_expr? add_op )? add_operand
 
     add_op? add_operand level_2_expr? <Verbatim>
@@ -332,7 +353,7 @@ grammar Fortran
 
     # R711
     #
-    # Left-recursive rule implied by standard:
+    # Note: Left-recursive rule implied by standard:
     # ( level_3_expr concat_op )? level_2_expr
 
     level_2_expr ( concat_op level_3_expr )? <Verbatim>
@@ -343,7 +364,7 @@ grammar Fortran
 
     # R713
     #
-    # Left-recursive rule implied by standard:
+    # Note: Left-recursive rule implied by standard:
     # ( level_3_expr rel_op )? level_3_expr
 
     level_3_expr ( rel_op level_3_expr )? <Verbatim>
@@ -354,7 +375,7 @@ grammar Fortran
 
     # R718
     #
-    # Left-recursive rule implied by standard:
+    # Note: Left-recursive rule implied by standard:
     # ( level_5_expr equiv_op)? equiv_operand
 
     equiv_operand ( equiv_op level_5_expr )? <Verbatim>
@@ -365,7 +386,7 @@ grammar Fortran
 
     # R306 -- INCOMPLETE
 #PM#
-    int_literal_constant / logical_literal_constant / char_literal_constant
+    int_literal_constant / logical_literal_constant / char_literal_constant / boz_literal_constant
 
   end
 
@@ -407,13 +428,24 @@ grammar Fortran
 
   end
 
+  rule octal_constant
+
+    # R409
+    #
+    # Constraint: digit must have one of the values 0 through 7. Note: 'digit is
+    # replaced by 't_octal' here to enforce the constraint.
+
+    "o" ( ( t_apostrophe t_octal+ t_apostrophe ) / ( t_quotemark t_octal+ t_quotemark ) ) <Verbatim>
+
+  end
+
   rule name
 
     # R304
     #
     # Constraint: The maximum length of a name is 31 characters.
 
-    letter alphanumeric_character* <Name>
+    t_letter alphanumeric_character* <Name>
 
   end
 
@@ -596,7 +628,7 @@ grammar Fortran
 
     # Section 6 (not explicitly defined)
     #
-    # Constraint (assumed): scalar-variable-name must be a scalar.
+    # Note: Assumed constraint: scalar-variable-name must be a scalar.
 
     variable_name
 
@@ -649,9 +681,21 @@ grammar Fortran
 
   end
 
+  rule t_binary
+
+    [01] <Verbatim>
+
+  end
+
   rule t_comma
 
     "," <Verbatim>
+
+  end
+
+  rule t_digit
+
+    [0-9] <Verbatim>
 
   end
 
@@ -679,6 +723,12 @@ grammar Fortran
 
   end
 
+  rule t_letter
+
+    [a-z]
+
+  end
+
   rule t_minus
 
     "-" <Verbatim>
@@ -688,6 +738,12 @@ grammar Fortran
   rule t_newline
 
     "\n" <Verbatim>
+
+  end
+
+  rule t_octal
+
+    [01234567] <Verbatim>
 
   end
 
