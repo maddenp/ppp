@@ -1,0 +1,13 @@
+FC=gfortran
+FFLAGS=-pedantic-errors -std=f95
+TARGETS=clean control
+TEST=$(wildcard t.f t.f90)
+
+default:
+	$(error Valid targets are: $(TARGETS))
+
+clean:
+	$(RM) a.out
+
+control: $(TEST)
+	$(FC) $(FFLAGS) $^ && a.out > control && $(RM) a.out

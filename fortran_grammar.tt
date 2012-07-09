@@ -385,10 +385,60 @@ grammar Fortran
   rule literal_constant
 
     # R306 -- INCOMPLETE
-#PM#
-    int_literal_constant / logical_literal_constant / char_literal_constant / boz_literal_constant
+    #
+    # Note: The choice order is different than that given in the standard, e.g.
+    # an int_literal_constant should only be matched after failure to match a
+    # real_literal_constant.
+
+    real_literal_constant / int_literal_constant / logical_literal_constant / char_literal_constant / boz_literal_constant
 
   end
+
+#PM#
+  rule signed_real_literal_constant
+
+    # R412
+
+    sign? real_literal_constant <Verbatim>
+
+  end
+
+  rule real_literal_constant
+
+    # R413
+    #
+    # Constraint: If both kind-param and exponent-letter are present,
+    # exponent-letter bust be E. The value of kind-param must specify an
+    # approximation method that exists on the processor.
+
+    significand ( exponent_letter exponent )? ( t_underscore kind_param )? <Verbatim> / digit_string exponent_letter exponent ( t_underscore kind_param )? <Verbatim>
+
+  end
+
+  rule significand
+
+    # R414
+
+    digit_string t_dot digit_string? <Verbatim> / t_dot digit_string <Verbatim>
+
+  end
+
+  rule exponent_letter
+
+    # R415
+
+    [ed] <Verbatim>
+
+  end
+
+  rule exponent
+
+    # R416
+
+    signed_digit_string
+
+  end
+#PM#
 
   rule logical_literal_constant
 
