@@ -236,8 +236,7 @@ grammar Fortran
 
     # R209 -- INCOMPLETE
 
-    #( executable_construct / format_stmt / data-stmt )* <Execution_Part_Construct>
-    ( executable_construct / format_stmt )* <Execution_Part_Construct>
+    ( executable_construct / format_stmt / data_stmt )* <Execution_Part_Construct>
 
   end
 
@@ -954,120 +953,120 @@ grammar Fortran
   end
 
 #PM#
-#  rule data_stmt
-#
-#    # R529
-#
-#    label? t_data data_stmt_set ( t_comma data_stmt_set )* t_newline <Data_Stmt>
-#
-#  end
-#
-#  rule data_stmt_set
-#
-#    # R530
-#
-#    data_stmt_object_list t_slash data_stmt_value_list t_slash <Verbatim>
-#
-#  end
-#
-#  rule data_stmt_object
-#
-#    # R531
-#    #
-#    # Constraint: In a variable that is a data-stmt-object, any subscript,
-#    # section subscript, substring starting point, and substring ending point
-#    # must be an initialization expression. A variable whose name or
-#    # designator is included in a data-stmt-object-list or a
-#    # data-i-do-object-list must not be: a dummy argument, made accessible by
-#    # use assocation or host association, in a named common block unless the
-#    # DATA statement is in a block data program unit, in a blank common block,
-#    # a function name, a function result name, an automatic object, a pointer,
-#    # or an allocatable array.
-#
-#    variable / data_implied_do
-#
-#  end
-#
-#  rule data_stmt_object_list
-#
-#    data_stmt_object ( t_comma data_stmt_object )* <Verbatim>
-#
-#  end
-#
-#  rule data_stmt_value
-#
-#    # R531
-#
-#    data_stmt_repeat* data_stmt_constant <Verbatim>
-#
-#  end
-#
-#  rule data_stmt_value_list
-#
-#    data_stmt_value ( t_comma data_stmt_value )* <Verbatim>
-#
-#  end
-#
-#  rule data_stmt_constant
-#
-#    # R533
-#    #
-#    # Constraint: If a data-stmt-constant is a structure-constructor, each
-#    # component must be an initialization expression.
-#
-#    scalar_constant / signed_int_literal_constant / signed_real_literal_constant / structure_constructor / boz_literal_constant
-#
-#  end
-#
-#  rule data_stmt_repeat
-#
-#    # R534
-#    #
-#    # Constraint: The DATA statement repeat factor must be positive or zero. If
-#    # the DATA statement repeat factor is a named constant, it must have been
-#    # declared previously in the scoping unit or made accessible by use
-#    # association or host association.
-#
-#    scalar_int_constant
-#
-#  end
-#
-#  rule data_implied_do
-#
-#    # R535
-#    #
-#    # Constraint: A scalar-int-expr of a data-implied-do must involve as
-#    # primaries only constants or DO variables of the containing
-#    # data-implied-dos, and each operation must be intrinsic.
-#
-#    t_paren_l data_i_do_object_list t_comma data_i_do_variable t_equal scalar_int_expr t_comma scalar_int_expr ( t_comma scalar_int_expr )* t_paren_r <Verbatim>
-#
-#  end
-#
-#  rule data_i_do_object
-#
-#  # R536
-#  #
-#  # Constraint: The array-element must not have a constant parent. The
-#  # scalar-structure_component must not have a constant parent. In an
-#  # array-element or a scalar-structure-component that is a data-i-do-object,
-#  # any subscript must be an expression whose primaries are either constant or
-#  # DO variables of the containing data-implied-dos, and each operation must be
-#  # intrinsic.
-#
-#  array_element / scalar_structure_component / data_implied_do
-#
-#  end
-#
-#  rule data_i_do_variable
-#
-#    # R537
-#    #
-#    # Constraint: The data_i_do_variable must be a named variable.
-#
-#    scalar_int_variable
-#
-#  end
+  rule data_stmt
+
+    # R529
+
+    label? t_data data_stmt_set ( t_comma data_stmt_set )* t_newline <Data_Stmt>
+
+  end
+
+  rule data_stmt_set
+
+    # R530
+
+    data_stmt_object_list t_slash data_stmt_value_list t_slash <Verbatim>
+
+  end
+
+  rule data_stmt_object
+
+    # R531
+    #
+    # Constraint: In a variable that is a data-stmt-object, any subscript,
+    # section subscript, substring starting point, and substring ending point
+    # must be an initialization expression. A variable whose name or
+    # designator is included in a data-stmt-object-list or a
+    # data-i-do-object-list must not be: a dummy argument, made accessible by
+    # use assocation or host association, in a named common block unless the
+    # DATA statement is in a block data program unit, in a blank common block,
+    # a function name, a function result name, an automatic object, a pointer,
+    # or an allocatable array.
+
+    variable / data_implied_do
+
+  end
+
+  rule data_stmt_object_list
+
+    data_stmt_object ( t_comma data_stmt_object )* <Verbatim>
+
+  end
+
+  rule data_stmt_value
+
+    # R531
+
+    data_stmt_repeat* data_stmt_constant <Verbatim>
+
+  end
+
+  rule data_stmt_value_list
+
+    data_stmt_value ( t_comma data_stmt_value )* <Verbatim>
+
+  end
+
+  rule data_stmt_constant
+
+    # R533
+    #
+    # Constraint: If a data-stmt-constant is a structure-constructor, each
+    # component must be an initialization expression.
+
+    scalar_constant / signed_int_literal_constant / signed_real_literal_constant / structure_constructor / boz_literal_constant
+
+  end
+
+  rule data_stmt_repeat
+
+    # R534
+    #
+    # Constraint: The DATA statement repeat factor must be positive or zero. If
+    # the DATA statement repeat factor is a named constant, it must have been
+    # declared previously in the scoping unit or made accessible by use
+    # association or host association.
+
+    scalar_int_constant
+
+  end
+
+  rule data_implied_do
+
+    # R535
+    #
+    # Constraint: A scalar-int-expr of a data-implied-do must involve as
+    # primaries only constants or DO variables of the containing
+    # data-implied-dos, and each operation must be intrinsic.
+
+    t_paren_l data_i_do_object_list t_comma data_i_do_variable t_equal scalar_int_expr t_comma scalar_int_expr ( t_comma scalar_int_expr )* t_paren_r <Verbatim>
+
+  end
+
+  rule data_i_do_object
+
+  # R536
+  #
+  # Constraint: The array-element must not have a constant parent. The
+  # scalar-structure_component must not have a constant parent. In an
+  # array-element or a scalar-structure-component that is a data-i-do-object,
+  # any subscript must be an expression whose primaries are either constant or
+  # DO variables of the containing data-implied-dos, and each operation must be
+  # intrinsic.
+
+  array_element / scalar_structure_component / data_implied_do
+
+  end
+
+  rule data_i_do_variable
+
+    # R537
+    #
+    # Constraint: The data_i_do_variable must be a named variable.
+
+    scalar_int_variable
+
+  end
 #PM#
 
 end
