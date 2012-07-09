@@ -66,8 +66,14 @@ module Fortran
 
   # TODO auto-gen empty classes?
 
-  class Assign_Stmt < ASTNode
+  class StmtNode < ASTNode
     def to_s() stmt(join) end
+  end
+
+  class Assign_Stmt < StmtNode
+  end
+
+  class Data_Stmt < StmtNode
   end
 
   class End_Program_Stmt < ASTNode
@@ -81,8 +87,7 @@ module Fortran
   class Execution_Part_Construct < ASTNode
   end
 
-  class Format_Stmt < ASTNode
-    def to_s() stmt(join) end
+  class Format_Stmt < StmtNode
   end
 
   class Main_Program < ASTNode
