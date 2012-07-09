@@ -416,7 +416,7 @@ grammar Fortran
 
   rule literal_constant
 
-    # R306 -- INCOMPLETE
+    # R306
     #
     # Note: The choice order is different than that given in the standard, e.g.
     # an int_literal_constant should only be matched after failure to match a
