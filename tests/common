@@ -1,7 +1,7 @@
 BIN=a.out
 EXT=$(suffix $(TEST))
 FC=gfortran
-FFLAGS=-pedantic-errors -std=f95
+FFLAGS=
 PPP=../../ppp
 STEM=$(basename $(TEST))
 TARGETS=bin clean control translation

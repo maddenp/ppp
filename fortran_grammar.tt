@@ -21,7 +21,7 @@ grammar Fortran
     #
     # Note: Provide label handling in rules for individual statements.
 
-    print_stmt
+    print_stmt / assign_stmt
 
   end
 
@@ -57,6 +57,19 @@ grammar Fortran
     # R302
 
     t_letter / t_digit / t_underscore
+
+  end
+
+  rule assign_stmt
+
+    # R838
+    #
+    # Constraint: The label must be the statement label of a branch target
+    # statement of format-stmt that appears in the same scoping unit as the
+    # assign-stmt. scalar-int-variable must be named and of type default
+    # integer.
+
+    label? t_assign label t_to scalar_int_variable t_newline <Assign_Stmt>
 
   end
 
@@ -680,6 +693,17 @@ grammar Fortran
 
   end
 
+  rule scalar_int_variable
+
+    # Wide use (not explicitly defined)
+    #
+    # Constraint (assumed): scalar-int-variable must be a scalar, and must be of
+    # type INTEGER.    
+
+    variable
+
+  end
+
   rule scalar_variable_name
 
     # Section 6 (not explicitly defined)
@@ -750,6 +774,12 @@ grammar Fortran
   rule t_apostrophe
 
     "'" <Verbatim>
+
+  end
+
+  rule t_assign
+
+    "assign" <Verbatim>
 
   end
 
@@ -866,6 +896,12 @@ grammar Fortran
 
   end
 
+  rule t_to
+
+    "to" <Verbatim>
+
+  end
+
   rule t_true
 
     ".true." <Verbatim>
@@ -903,6 +939,9 @@ grammar Fortran
     name
 
   end
+
+#PM#
+#PM#
 
 end
 
