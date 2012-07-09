@@ -421,7 +421,7 @@ grammar Fortran
     # Constraint: In an output-item-list, an io-implied-do-object must be an
     # output-item.
 
-    t_comma output_item+ <Verbatim>
+    ( t_comma output_item )+ <Verbatim>
 
   end
 
