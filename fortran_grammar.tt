@@ -100,6 +100,14 @@ grammar Fortran
 
   end
 
+  rule complex_literal_constant
+
+    # R417
+
+    t_paren_l real_part t_comma imag_part t_paren_r <Verbatim>
+
+  end
+
   rule concat_op
 
     # R712
@@ -298,6 +306,14 @@ grammar Fortran
 
   end
 
+  rule imag_part
+
+    # R419
+
+    signed_real_literal_constant / signed_int_literal_constant
+
+  end
+
   rule int_literal_constant
 
     # R404
@@ -406,7 +422,7 @@ grammar Fortran
     # an int_literal_constant should only be matched after failure to match a
     # real_literal_constant.
 
-    real_literal_constant / int_literal_constant / logical_literal_constant / char_literal_constant / boz_literal_constant
+    complex_literal_constant / real_literal_constant / int_literal_constant / logical_literal_constant / char_literal_constant / boz_literal_constant
 
   end
 
@@ -575,6 +591,14 @@ grammar Fortran
 
   end
 
+  rule real_part
+
+    # R418
+
+    signed_real_literal_constant / signed_int_literal_constant
+
+  end
+
   rule rel_op_eq
 
     ".eq." <Verbatim> / "==" <Verbatim>
@@ -710,7 +734,7 @@ grammar Fortran
 
     # 3.1.4
 
-    [\ \=\+\-\*\/\(\)\;\.\'\:\!\"\%\&\;\<\>\?\$]
+    [\ \=\+\-\*\/\(\)\,\.\'\:\!\"\%\&\;\<\>\?\$]
 
   end
 

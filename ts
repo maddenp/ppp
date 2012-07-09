@@ -30,6 +30,7 @@ exe('make')
 load 'ppp'
 tests.each do |test|
   print '.'
+  exe("make -C #{test} clean")
   exe("make -C #{test} bin")
   stdout=exe(File.join(test,'a.out'))
   control=File.open(File.join(test,'control'),"rb").read
