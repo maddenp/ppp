@@ -960,7 +960,7 @@ grammar Fortran
 
     # R529
 
-    label? t_data data_stmt_set ( t_comma data_stmt_set )* t_newline <Data_Stmt>
+    label? t_data data_stmt_set_list t_newline <Data_Stmt>
 
   end
 
@@ -969,6 +969,12 @@ grammar Fortran
     # R530
 
     data_stmt_object_list t_slash data_stmt_value_list t_slash <Verbatim>
+
+  end
+
+  rule data_stmt_set_list
+
+    data_stmt_set ( t_comma data_stmt_set )* <Verbatim>
 
   end
 

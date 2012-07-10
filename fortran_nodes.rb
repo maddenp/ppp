@@ -102,7 +102,7 @@ module Fortran
   end
 
   class Print_Stmt < ASTNode
-    def to_s() stmt(label+"#{e1} #{e2}#{e3}") end
+    def to_s() stmt(label+"#{e1}#{e2}#{e3}") end
   end
 
   class Program_Stmt < ASTNode
