@@ -117,6 +117,28 @@ module Fortran
   class Specification_Part < ASTNode
   end
 
+#PM#
+  class If_Construct < ASTNode
+    def to_s() blockbegin(stmt(join)) end
+  end
+
+  class If_Then_Stmt < ASTNode
+    def to_s() blockbegin(blockend(stmt(join))) end
+  end
+
+  class Else_If_Stmt < ASTNode
+    def to_s() blockbegin(blockend(stmt(join))) end
+  end
+
+  class Else_Stmt < ASTNode
+    def to_s() blockbegin(blockend(stmt(join))) end
+  end
+
+  class End_If_Stmt < ASTNode
+    def to_s() blockend(stmt(join)) end
+  end
+#PM#
+
 end
 
 # paul.a.madden@noaa.gov

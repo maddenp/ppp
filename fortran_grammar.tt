@@ -358,7 +358,7 @@ grammar Fortran
 
     # R215 -- INCOMPLETE
 
-    action_stmt
+    action_stmt / if_construct
 
   end
 
@@ -962,6 +962,12 @@ grammar Fortran
 
   end
 
+  rule t_colon
+
+    ":" <Verbatim>
+
+  end
+
   rule t_comma
 
     "," <Verbatim>
@@ -1127,6 +1133,91 @@ grammar Fortran
   end
 
 #PM#
+  rule block
+
+    # R801
+
+    execution_part_construct* <Verbatim>
+
+  end
+
+  rule if_construct
+
+    # R802
+
+    label? if_then_stmt block ( else_if_stmt block )* ( else_stmt block )? end_if_stmt t_newline <If_Construct>
+
+  end
+
+  rule t_if
+
+    "if" <Verbatim>
+
+  end
+
+  rule t_then
+
+    "then" <Verbatim>
+
+  end
+
+  rule t_elseif
+
+    "elseif" <Verbatim>
+
+  end
+
+  rule t_else
+
+    "else" <Verbatim>
+
+  end
+
+  rule t_endif
+
+    "endif" <Verbatim>
+
+  end
+
+  rule if_then_stmt
+
+    # R803
+
+    label? ( if_construct_name t_colon )? t_if t_paren_l scalar_logical_expr t_paren_r t_then t_newline <If_Then_Stmt>
+
+  end
+
+  rule else_if_stmt
+
+    # R804
+
+    label? t_elseif t_paren_l scalar_logical_expr t_paren_r t_then t_newline <Else_If_Stmt>
+
+  end
+
+  rule else_stmt
+
+    # R805
+
+    label? t_else if_construct_name? t_newline <Else_Stmt>
+
+  end
+
+  rule end_if_stmt
+
+    # R806
+
+    label? t_endif if_construct_name? <End_If_Stmt>
+
+  end
+
+  rule if_construct_name
+
+    # Multiple uses (not explicitly defined)
+
+    name
+
+  end
 #PM#
 
 end
