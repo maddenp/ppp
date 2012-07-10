@@ -137,6 +137,9 @@ module Fortran
   class End_If_Stmt < ASTNode
     def to_s() blockend(stmt(join)) end
   end
+
+  class If_Stmt < StmtNode
+  end
 #PM#
 
 end

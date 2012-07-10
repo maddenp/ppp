@@ -819,7 +819,7 @@ grammar Fortran
     # Multiple uses (not explicitly defined)
     #
     # Note: Unclear what this is supposed to be... Assumed constraint: Any
-    # named_constant must represent a scalar.
+    # named_constant must be scalar.
 
     literal_constant / named_constant
 
@@ -829,7 +829,7 @@ grammar Fortran
 
     # Multiple uses (not explicitly defined)
     #
-    # Note: Assumed constraint: scalar_default_int_variable must be a scalar,
+    # Note: Assumed constraint: scalar_default_int_variable must be scalar,
     # and must be of type default integer.    
 
     variable
@@ -851,7 +851,7 @@ grammar Fortran
 
     # 4.3.1.1 (not explicitly defined)
     #
-    # Note: Assumed constraint: scalar_int_constant_name must be a scalar, and
+    # Note: Assumed constraint: scalar_int_constant_name must be scalar, and
     # must be of type integer.
 
     named_constant
@@ -862,7 +862,7 @@ grammar Fortran
 
     # Multiple uses (not explicitly defined)
     #
-    # Note: Assumed constraint: scalar_int_variable must be a scalar, and must
+    # Note: Assumed constraint: scalar_int_variable must be scalar, and must
     # be of type integer.    
 
     variable
@@ -873,7 +873,7 @@ grammar Fortran
 
     # Section 6 (not explicitly defined)
     #
-    # Note: Assumed constraint: scalar_variable_name must be a scalar.
+    # Note: Assumed constraint: scalar_variable_name must be scalar.
 
     variable_name
 
@@ -1218,6 +1218,78 @@ grammar Fortran
     name
 
   end
+
+  rule if_stmt
+
+    # R807
+    #
+    # Constraint: The action_stmt in the if_stmt must not be an if_stmt,
+    # end_program_stmt, end_function_stmt, or end_subroutine_stmt.
+
+    label? t_if t_paren_l scalar_logical_expr t_paren_r action_stmt t_newline <If_Stmt>
+
+  end
+
+  rule scalar_logical_expr
+  
+    # Multiple uses (not explicitly defined)
+    #
+    # Note: Assumed constraint: logical_expr must be scalar.
+
+    logical_expr
+
+  end
+
+  rule logical_expr
+
+    # R725
+    #
+    # Constraint: logical_expr must be type logical.
+
+    expr
+
+  end
+
+  rule char_expr
+
+    # R726
+    #
+    # Constraint: char_expr must be type character.
+
+    expr
+
+  end
+
+  rule default_char_expr
+
+    # R727
+    #
+    # Constraint: default_char_expr must be of type default character.
+
+    expr
+
+  end
+
+  rule int_expr
+
+    # R728
+    #
+    # Constraint: int_expr must be type integer.
+
+    expr
+
+  end
+
+  rule numeric_expr
+
+    # R729
+    #
+    # Constraint: numeric_expr must be of type integer, real or complex.
+
+    expr
+
+  end
+
 #PM#
 
 end
