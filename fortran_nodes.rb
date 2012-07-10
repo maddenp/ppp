@@ -81,6 +81,10 @@ module Fortran
   class Assign_Stmt < StmtNode
   end
 
+  class Assignment_Stmt < StmtNode
+    def to_s() stmt(label+"#{e1}#{e2}#{e3}") end
+  end
+
   class Data_Stmt < StmtNode
   end
 
@@ -102,7 +106,7 @@ module Fortran
   end
 
   class Print_Stmt < ASTNode
-    def to_s() stmt(label+"#{e1}#{e2}#{e3}") end
+    def to_s() stmt(label+"#{e1} #{e2}#{e3}") end
   end
 
   class Program_Stmt < ASTNode

@@ -138,7 +138,7 @@ class PPP
 
   def parse(s)
     tree=FortranParser.new.parse(s)
-    strip(tree)
+#   strip(tree)
     p tree if @debug
     tree.to_s
   end

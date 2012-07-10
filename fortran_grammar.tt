@@ -21,7 +21,7 @@ grammar Fortran
     #
     # Note: Provide label handling in rules for individual statements.
 
-    print_stmt / assign_stmt
+    assignment_stmt / print_stmt / assign_stmt
 
   end
 
@@ -57,6 +57,17 @@ grammar Fortran
     # R302
 
     t_letter / t_digit / t_underscore
+
+  end
+
+  rule assignment_stmt
+
+    # R735
+    #
+    # Constraint: A variable in an assignment_stmt must not be an assumed-size
+    # array.
+
+    label? variable t_equal expr t_newline <Assignment_Stmt>
 
   end
 
