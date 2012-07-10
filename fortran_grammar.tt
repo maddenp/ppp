@@ -141,7 +141,7 @@ grammar Fortran
 
     # R207 -- INCOMPLETE
 
-    format_stmt
+    specification_stmt / format_stmt
 
   end
 
@@ -149,7 +149,7 @@ grammar Fortran
 
     # R727
     #
-    # Note: Assumed constraint: must be of type default character
+    # Note: Assumed constraint: Must be of type default character
 
     expr
 
@@ -433,9 +433,11 @@ grammar Fortran
     #
     # Note: The choice order is different than that given in the standard, e.g.
     # an int_literal_constant should only be matched after failure to match a
-    # real_literal_constant.
+    # real_literal_constant. Also, signed versions of real_literal_constant and
+    # int_literal_constant are used here, though the standard (seemingly
+    # incorrectly) specifies the unsigned versions.
 
-    complex_literal_constant / real_literal_constant / int_literal_constant / logical_literal_constant / char_literal_constant / boz_literal_constant
+    complex_literal_constant / signed_real_literal_constant / signed_int_literal_constant / logical_literal_constant / char_literal_constant / boz_literal_constant
 
   end
 
@@ -673,10 +675,10 @@ grammar Fortran
 
   rule scalar_default_int_variable
 
-    # Wide use (not explicitly defined)
+    # Multiple uses (not explicitly defined)
     #
     # Note: Assumed constraint: scalar_default_int_variable must be a scalar,
-    # and must be of type default INTEGER.    
+    # and must be of type default integer.    
 
     variable
 
@@ -687,7 +689,7 @@ grammar Fortran
     # 4.3.1.1 (not explicitly defined)
     #
     # Note: Assumed constraint: scalar_int_constant_name must be a scalar, and
-    # must be of type INTEGER.
+    # must be of type integer.
 
     named_constant
 
@@ -695,10 +697,10 @@ grammar Fortran
 
   rule scalar_int_variable
 
-    # Wide use (not explicitly defined)
+    # Multiple uses (not explicitly defined)
     #
     # Note: Assumed constraint: scalar_int_variable must be a scalar, and must
-    # be of type INTEGER.    
+    # be of type integer.    
 
     variable
 
@@ -944,7 +946,7 @@ grammar Fortran
 
   rule variable_name
 
-    # Wide use (not explicitly defined)
+    # Multiple uses (not explicitly defined)
     #
     # Note: Assumed constraint: variable_name must not have the PARAMETER
     # attribute.
@@ -958,7 +960,8 @@ grammar Fortran
 
     # R529
 
-    label? t_data data_stmt_set ( t_comma data_stmt_set )* t_newline <Data_Stmt>
+    #label? t_data data_stmt_set ( t_comma data_stmt_set )* t_newline <Data_Stmt>
+    label? t_data data_stmt_set t_newline <Data_Stmt>
 
   end
 
@@ -998,7 +1001,7 @@ grammar Fortran
 
     # R531
 
-    data_stmt_repeat* data_stmt_constant <Verbatim>
+    ( data_stmt_repeat t_star )? data_stmt_constant <Verbatim>
 
   end
 
@@ -1010,12 +1013,25 @@ grammar Fortran
 
   rule data_stmt_constant
 
-    # R533
+    # R533 -- INCOMPLETE
     #
     # Constraint: If a data_stmt_constant is a structure_constructor, each
-    # component must be an initialization expression.
+    # component must be an initialization expression. Note: Choice order changed
+    # vs that presented in standard.
 
-    scalar_constant / signed_int_literal_constant / signed_real_literal_constant / structure_constructor / boz_literal_constant
+    #scalar_constant / signed_int_literal_constant / signed_real_literal_constant / structure_constructor / boz_literal_constant
+    signed_real_literal_constant / signed_int_literal_constant / boz_literal_constant / scalar_constant
+
+  end
+
+  rule scalar_constant
+
+    # Multiple uses (not explicitly defined)
+    #
+    # Note: Unclear what this is supposed to be... Assumed constraint: Any
+    # named_constant must represent a scalar.
+
+    literal_constant / named_constant
 
   end
 
@@ -1029,6 +1045,17 @@ grammar Fortran
     # association or host association.
 
     scalar_int_constant
+
+  end
+
+  rule scalar_int_constant
+
+    # Multiple uses (not explicitly defined)
+    #
+    # Note: Assumed constraint: If scalar_int_constant is a variable name, it
+    # must be of type integer and must have the PARAMETER attribute.
+
+    signed_int_literal_constant / scalar_int_constant_name
 
   end
 
@@ -1066,6 +1093,14 @@ grammar Fortran
     # Constraint: The data_i_do_variable must be a named variable.
 
     scalar_int_variable
+
+  end
+
+  rule specification_stmt
+
+    # R214 -- INCOMPLETE
+
+    data_stmt
 
   end
 #PM#
