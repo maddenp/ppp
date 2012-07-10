@@ -155,7 +155,7 @@ class PPP
   end
 
   def strip(tree)
-    return if tree.elements.nil?
+    return if tree.nil? or tree.elements.nil?
     tree.elements.delete_if { |e| prunable(e) }
     tree.elements.each { |e| strip(e) }
   end
