@@ -496,7 +496,7 @@ grammar Fortran
     #
     # Constraint: The maximum length of a name is 31 characters.
 
-    t_letter alphanumeric_character* <Name>
+    t_letter alphanumeric_character* <Verbatim>
 
   end
 
@@ -960,8 +960,7 @@ grammar Fortran
 
     # R529
 
-    #label? t_data data_stmt_set ( t_comma data_stmt_set )* t_newline <Data_Stmt>
-    label? t_data data_stmt_set t_newline <Data_Stmt>
+    label? t_data data_stmt_set ( t_comma data_stmt_set )* t_newline <Data_Stmt>
 
   end
 

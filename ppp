@@ -138,10 +138,28 @@ class PPP
 
   def parse(s)
     tree=FortranParser.new.parse(s)
+    strip(tree)
     p tree if @debug
     tree.to_s
   end
 
+  def prunable(tree)
+    strict=true
+    return false unless tree.class==Treetop::Runtime::SyntaxNode
+    if strict
+      return true
+    else
+      return true if tree.elements.nil?
+      tree.elements.reduce(true) { |p,e| p and prunable(e) }
+    end
+  end
+
+  def strip(tree)
+    return if tree.elements.nil?
+    tree.elements.delete_if { |e| prunable(e) }
+    tree.elements.each { |e| strip(e) }
+  end
+  
   def usage
     f=File.basename(__FILE__)
     "usage: #{f} [-I dir[:dir:...]] source"

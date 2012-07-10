@@ -64,11 +64,19 @@ module Fortran
 
   end
 
-  # TODO auto-gen empty classes?
+  # General Subclasses
 
   class StmtNode < ASTNode
     def to_s() stmt(join) end
   end
+
+  class Verbatim < ASTNode
+    def to_s() verbatim end
+  end
+
+  # Specific Subclasses
+
+  # TODO auto-gen empty classes?
 
   class Assign_Stmt < StmtNode
   end
@@ -93,10 +101,6 @@ module Fortran
   class Main_Program < ASTNode
   end
 
-  class Name < ASTNode
-    def to_s() verbatim end
-  end
-
   class Print_Stmt < ASTNode
     def to_s() stmt(label+"#{e1} #{e2}#{e3}") end
   end
@@ -107,10 +111,6 @@ module Fortran
   end
 
   class Specification_Part < ASTNode
-  end
-
-  class Verbatim < ASTNode
-    def to_s() verbatim end
   end
 
 end
