@@ -315,7 +315,7 @@ grammar Fortran
 
     # R411
 
-    digit / [abcdef] <Verbatim>
+    [0123456789abcdef]
 
   end
 
