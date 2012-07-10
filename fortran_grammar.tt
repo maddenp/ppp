@@ -21,7 +21,7 @@ grammar Fortran
     #
     # Note: Provide label handling in rules for individual statements.
 
-    assignment_stmt / print_stmt / assign_stmt
+    assignment_stmt / if_stmt / print_stmt / assign_stmt
 
   end
 
@@ -60,17 +60,6 @@ grammar Fortran
 
   end
 
-  rule assignment_stmt
-
-    # R735
-    #
-    # Constraint: A variable in an assignment_stmt must not be an assumed-size
-    # array.
-
-    label? variable t_equal expr t_newline <Assignment_Stmt>
-
-  end
-
   rule assign_stmt
 
     # R838
@@ -81,6 +70,17 @@ grammar Fortran
     # integer.
 
     label? t_assign label t_to scalar_int_variable t_newline <Assign_Stmt>
+
+  end
+
+  rule assignment_stmt
+
+    # R735
+    #
+    # Constraint: A variable in an assignment_stmt must not be an assumed-size
+    # array.
+
+    label? variable t_equal expr t_newline <Assignment_Stmt>
 
   end
 
@@ -102,6 +102,16 @@ grammar Fortran
     # Constraint: A boz-literal-constant may appear only in a DATA statement.
 
     binary_constant / octal_constant / hex_constant
+
+  end
+
+  rule char_expr
+
+    # R726
+    #
+    # Constraint: char_expr must be type character.
+
+    expr
 
   end
 
@@ -148,18 +158,6 @@ grammar Fortran
 
   end
 
-  rule data_implied_do
-
-    # R535
-    #
-    # Constraint: A scalar_int_expr of a data_implied_do must involve as
-    # primaries only constants or DO variables of the containing
-    # data_implied_dos, and each operation must be intrinsic.
-
-   t_paren_l data_i_do_object_list t_comma data_i_do_variable t_equal scalar_int_expr t_comma scalar_int_expr ( t_comma scalar_int_expr )* t_paren_r <Verbatim>
-
-  end
-
   rule data_i_do_object
 
   # R536 -- INCOMPLETE
@@ -189,6 +187,18 @@ grammar Fortran
     # Constraint: The data_i_do_variable must be a named variable.
 
     scalar_int_variable
+
+  end
+
+  rule data_implied_do
+
+    # R535
+    #
+    # Constraint: A scalar_int_expr of a data_implied_do must involve as
+    # primaries only constants or DO variables of the containing
+    # data_implied_dos, and each operation must be intrinsic.
+
+   t_paren_l data_i_do_object_list t_comma data_i_do_variable t_equal scalar_int_expr t_comma scalar_int_expr ( t_comma scalar_int_expr )* t_paren_r <Verbatim>
 
   end
 
@@ -290,7 +300,7 @@ grammar Fortran
 
     # R727
     #
-    # Note: Assumed constraint: Must be of type default character
+    # Constraint: default_char_expr must be of type default character.
 
     expr
 
@@ -460,11 +470,32 @@ grammar Fortran
 
   end
 
+  rule if_stmt
+
+    # R807
+    #
+    # Constraint: The action_stmt in the if_stmt must not be an if_stmt,
+    # end_program_stmt, end_function_stmt, or end_subroutine_stmt.
+
+    label? t_if t_paren_l scalar_logical_expr t_paren_r action_stmt <If_Stmt>
+
+  end
+
   rule imag_part
 
     # R419
 
     signed_real_literal_constant / signed_int_literal_constant
+
+  end
+
+  rule int_expr
+
+    # R728
+    #
+    # Constraint: int_expr must be type integer.
+
+    expr
 
   end
 
@@ -582,6 +613,16 @@ grammar Fortran
 
   end
 
+  rule logical_expr
+
+    # R725
+    #
+    # Constraint: logical_expr must be type logical.
+
+    expr
+
+  end
+
   rule logical_literal_constant
 
     # R421
@@ -654,6 +695,16 @@ grammar Fortran
     # R719
 
     ".not." <Verbatim>
+
+  end
+
+  rule numeric_expr
+
+    # R729
+    #
+    # Constraint: numeric_expr must be of type integer, real or complex.
+
+    expr
 
   end
 
@@ -869,6 +920,16 @@ grammar Fortran
 
   end
 
+  rule scalar_logical_expr
+  
+    # Multiple uses (not explicitly defined)
+    #
+    # Note: Assumed constraint: logical_expr must be scalar.
+
+    logical_expr
+
+  end
+
   rule scalar_variable_name
 
     # Section 6 (not explicitly defined)
@@ -1018,7 +1079,7 @@ grammar Fortran
 
   rule t_letter
 
-    [a-z]
+    [a-z] <Verbatim>
 
   end
 
@@ -1075,6 +1136,7 @@ grammar Fortran
     "\"" <Verbatim>
 
   end
+
   rule t_slash
 
     "/" <Verbatim>
@@ -1218,78 +1280,6 @@ grammar Fortran
     name
 
   end
-
-  rule if_stmt
-
-    # R807
-    #
-    # Constraint: The action_stmt in the if_stmt must not be an if_stmt,
-    # end_program_stmt, end_function_stmt, or end_subroutine_stmt.
-
-    label? t_if t_paren_l scalar_logical_expr t_paren_r action_stmt t_newline <If_Stmt>
-
-  end
-
-  rule scalar_logical_expr
-  
-    # Multiple uses (not explicitly defined)
-    #
-    # Note: Assumed constraint: logical_expr must be scalar.
-
-    logical_expr
-
-  end
-
-  rule logical_expr
-
-    # R725
-    #
-    # Constraint: logical_expr must be type logical.
-
-    expr
-
-  end
-
-  rule char_expr
-
-    # R726
-    #
-    # Constraint: char_expr must be type character.
-
-    expr
-
-  end
-
-  rule default_char_expr
-
-    # R727
-    #
-    # Constraint: default_char_expr must be of type default character.
-
-    expr
-
-  end
-
-  rule int_expr
-
-    # R728
-    #
-    # Constraint: int_expr must be type integer.
-
-    expr
-
-  end
-
-  rule numeric_expr
-
-    # R729
-    #
-    # Constraint: numeric_expr must be of type integer, real or complex.
-
-    expr
-
-  end
-
 #PM#
 
 end

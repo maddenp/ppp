@@ -139,6 +139,7 @@ module Fortran
   end
 
   class If_Stmt < StmtNode
+    def to_s() stmt(label+"#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}") end
   end
 #PM#
 
