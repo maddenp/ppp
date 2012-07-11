@@ -142,10 +142,16 @@ module Fortran
     end
   end
 
+  class If_Then_Construct < ASTNode
+  end
+
   class Else_Construct < ASTNode
   end
 
   class Else_If_Construct < ASTNode
+  end
+
+  class Else_If_Construct_Element < ASTNode
   end
 
   class Else_Stmt < ASTNode

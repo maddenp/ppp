@@ -1206,15 +1206,29 @@ grammar Fortran
   rule if_construct
 
     # R802
+    #
+    # Note: if_then_construct, else_if_construct and else_construct added for
+    # clarity, not specified in standard.
 
-    #label? if_then_stmt block ( else_if_stmt block )* else_construct? end_if_stmt t_newline <If_Construct>
-    label? if_then_stmt block else_if_construct? else_construct? end_if_stmt <If_Construct>
+    label? if_then_construct else_if_construct? else_construct? end_if_stmt <If_Construct>
+
+  end
+
+  rule if_then_construct
+
+    if_then_stmt block <If_Then_Construct>
 
   end
 
   rule else_if_construct
 
-    else_if_stmt block <Else_If_Construct>
+    else_if_construct_element+ <Else_If_Construct>
+
+  end
+
+  rule else_if_construct_element
+
+    else_if_stmt block <Else_If_Construct_Element>
 
   end
 
