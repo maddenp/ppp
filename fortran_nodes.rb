@@ -1,21 +1,19 @@
 module Fortran
 
+  @@level=0
+  
   class Treetop::Runtime::SyntaxNode
     def to_s() '' end
   end
 
   class ASTNode < Treetop::Runtime::SyntaxNode
 
-    @@level=0
-
-    def blockbegin(s)
+    def blockbegin
       @@level+=1
-      s
     end
 
-    def blockend(s)
-      @@level-=1 unless @@level==0
-      s.sub(/^  /,'')
+    def blockend
+      @@level-=1 if @@level>0
     end
 
     def cat()
@@ -27,7 +25,7 @@ module Fortran
     end
 
     def indent(s)
-      '  '*@@level+s
+      ' '*2*@@level+s
     end
 
     def initialize(a='',b=(0..0),c=[])
@@ -43,7 +41,7 @@ module Fortran
     end
 
     def method_missing(m)
-      (m=~/e(\d+)/)?(elements[$~[1].to_i]):('')
+      (m=~/e(\d+)/)?(elements[$~[1].to_i]):(nil)
     end
 
     def set(k,v)
@@ -51,7 +49,7 @@ module Fortran
     end
 
     def stmt(s)
-      indent(s.chomp)+"\n"
+      indent(s.chomp.strip)+"\n"
     end
 
     def to_s()
@@ -90,7 +88,7 @@ module Fortran
 
   class End_Program_Stmt < ASTNode
     def name() e2 end
-    def to_s() blockend(stmt(join)) end
+    def to_s() blockend; stmt(join) end
   end
 
   class Execution_Part < ASTNode
@@ -110,8 +108,14 @@ module Fortran
   end
 
   class Program_Stmt < ASTNode
-    def name() e1 end
-    def to_s() blockbegin(stmt(join)) end
+    def name()
+      e1
+    end
+    def to_s()
+      s=stmt(join)
+      blockbegin
+      s
+    end
   end
 
   class Specification_Part < ASTNode
@@ -119,27 +123,47 @@ module Fortran
 
 #PM#
   class If_Construct < ASTNode
-    def to_s() blockbegin(stmt(join)) end
   end
 
   class If_Then_Stmt < ASTNode
-    def to_s() blockbegin(blockend(stmt(join))) end
+    def to_s()
+      s=stmt(label+"#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")
+      blockbegin
+      s
+    end
   end
 
   class Else_If_Stmt < ASTNode
-    def to_s() blockbegin(blockend(stmt(join))) end
+    def to_s()
+      blockend
+      s=stmt(join)
+      blockbegin
+      s
+    end
   end
 
   class Else_Stmt < ASTNode
-    def to_s() blockbegin(blockend(stmt(join))) end
+    def to_s()
+      blockend
+      s=stmt(join)
+      blockbegin
+      s
+    end
   end
 
   class End_If_Stmt < ASTNode
-    def to_s() blockend(stmt(join)) end
+    def to_s()
+      blockend
+      s=stmt(label+"#{e1}"+((e2)?(" #{e2}"):('')))
+      s
+    end
   end
 
   class If_Stmt < StmtNode
-    def to_s() stmt(label+"#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}") end
+    def to_s()
+      s=stmt(label+"#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
+      s
+    end
   end
 #PM#
 
