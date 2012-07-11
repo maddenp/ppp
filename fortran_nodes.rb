@@ -142,6 +142,9 @@ module Fortran
     end
   end
 
+  class Else_Construct < ASTNode
+  end
+
   class Else_Stmt < ASTNode
     def to_s()
       blockend

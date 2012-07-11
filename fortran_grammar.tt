@@ -1207,8 +1207,14 @@ grammar Fortran
 
     # R802
 
-    #label? if_then_stmt block ( else_if_stmt block )* ( else_stmt block )? end_if_stmt t_newline <If_Construct>
-    label? if_then_stmt block end_if_stmt <If_Construct>
+    #label? if_then_stmt block ( else_if_stmt block )* else_construct? end_if_stmt t_newline <If_Construct>
+    label? if_then_stmt block else_construct? end_if_stmt <If_Construct>
+
+  end
+
+  rule else_construct
+
+    else_stmt block <Else_Construct>
 
   end
 
