@@ -74,7 +74,7 @@ module Fortran
 
   # Specific Subclasses
 
-  # TODO auto-gen empty classes?
+# TODO auto-gen empty classes?
 
   class Assign_Stmt < StmtNode
   end
@@ -84,6 +84,41 @@ module Fortran
   end
 
   class Data_Stmt < StmtNode
+  end
+
+  class Else_Construct < ASTNode
+  end
+
+  class Else_If_Construct < ASTNode
+  end
+
+  class Else_If_Construct_Element < ASTNode
+  end
+
+  class Else_If_Stmt < ASTNode
+    def to_s()
+      blockend
+      s=stmt(join)
+      blockbegin
+      s
+    end
+  end
+
+  class Else_Stmt < ASTNode
+    def to_s()
+      blockend
+      s=stmt(join)
+      blockbegin
+      s
+    end
+  end
+
+  class End_If_Stmt < ASTNode
+    def to_s()
+      blockend
+      s=stmt(label+"#{e1}"+((e2)?(" #{e2}"):('')))
+      s
+    end
   end
 
   class End_Program_Stmt < ASTNode
@@ -98,6 +133,26 @@ module Fortran
   end
 
   class Format_Stmt < StmtNode
+  end
+
+  class If_Construct < ASTNode
+  end
+
+  class If_Stmt < StmtNode
+    def to_s()
+      s=stmt(label+"#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
+      s
+    end
+  end
+  class If_Then_Construct < ASTNode
+  end
+
+  class If_Then_Stmt < ASTNode
+    def to_s()
+      s=stmt(label+"#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")
+      blockbegin
+      s
+    end
   end
 
   class Main_Program < ASTNode
@@ -122,61 +177,6 @@ module Fortran
   end
 
 #PM#
-  class If_Construct < ASTNode
-  end
-
-  class If_Then_Stmt < ASTNode
-    def to_s()
-      s=stmt(label+"#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")
-      blockbegin
-      s
-    end
-  end
-
-  class Else_If_Stmt < ASTNode
-    def to_s()
-      blockend
-      s=stmt(join)
-      blockbegin
-      s
-    end
-  end
-
-  class If_Then_Construct < ASTNode
-  end
-
-  class Else_Construct < ASTNode
-  end
-
-  class Else_If_Construct < ASTNode
-  end
-
-  class Else_If_Construct_Element < ASTNode
-  end
-
-  class Else_Stmt < ASTNode
-    def to_s()
-      blockend
-      s=stmt(join)
-      blockbegin
-      s
-    end
-  end
-
-  class End_If_Stmt < ASTNode
-    def to_s()
-      blockend
-      s=stmt(label+"#{e1}"+((e2)?(" #{e2}"):('')))
-      s
-    end
-  end
-
-  class If_Stmt < StmtNode
-    def to_s()
-      s=stmt(label+"#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
-      s
-    end
-  end
 #PM#
 
 end

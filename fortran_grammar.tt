@@ -10,221 +10,161 @@
 grammar Fortran
 
   rule start
-
     program_unit
-
   end
 
   rule action_stmt
-
     # R216 -- INCOMPLETE
     #
     # Note: Provide label handling in rules for individual statements.
-
     assignment_stmt / if_stmt / print_stmt / assign_stmt
-
   end
 
   rule add_op
-
     # R710
-
     t_plus / t_minus
-
   end
 
   rule add_operand
-
     # R706
     #
     # Note: Left-recursive rule implied by standard:
     # ( add_operand mult_op)? mult_operand
-
     mult_operand ( mult_op add_operand )? <Verbatim>
-
   end
 
   rule and_op
-
     # R720
-
     ".and." <Verbatim>
-
   end
 
   rule alphanumeric_character
-
     # R302
-
     t_letter / t_digit / t_underscore
-
   end
 
   rule assign_stmt
-
     # R838
     #
     # Constraint: The label must be the statement label of a branch target
     # statement of format_stmt that appears in the same scoping unit as the
     # assign_stmt. scalar_int_variable must be named and of type default
     # integer.
-
     label? t_assign label t_to scalar_int_variable t_newline <Assign_Stmt>
-
   end
 
   rule assignment_stmt
-
     # R735
     #
     # Constraint: A variable in an assignment_stmt must not be an assumed-size
     # array.
-
     label? variable t_equal expr t_newline <Assignment_Stmt>
-
   end
 
   rule binary_constant
-
     # R408
     #
     # Constraint: digit must have one of the values 0 or 1. Note: 'digit is
     # replaced by 't_binary' here to enforce the constraint.
-
     "b" ( ( t_apostrophe t_binary+ t_apostrophe ) / ( t_quotemark t_binary+ t_quotemark ) ) <Verbatim>
+  end
 
+  rule block
+    # R801
+    execution_part_construct
   end
 
   rule boz_literal_constant
-
     # R407
     #
     # Constraint: A boz-literal-constant may appear only in a DATA statement.
-
     binary_constant / octal_constant / hex_constant
-
   end
 
   rule char_expr
-
     # R726
     #
     # Constraint: char_expr must be type character.
-
     expr
-
   end
 
   rule char_literal_constant
-
     # R420
     #
     # Constraint: The value of kind_param must specify a representation method
     # that exists on the processor.
-
     ( kind_param t_underscore )? t_apostrophe (!t_apostrophe rep_char)* t_apostrophe <Verbatim> / ( kind_param t_underscore )? t_quotemark (!t_quotemark rep_char)* t_quotemark <Verbatim>
-
   end
 
   rule character
-
     # R301
-
     alphanumeric_character / special_character
-
   end
 
   rule complex_literal_constant
-
     # R417
-
     t_paren_l real_part t_comma imag_part t_paren_r <Verbatim>
-
   end
 
   rule concat_op
-
     # R712
-
     "//" <Verbatim>
-
   end
 
   rule constant
-
     # R305
-
     literal_constant / named_constant
-
   end
 
   rule data_i_do_object
-
-  # R536 -- INCOMPLETE
-  #
-  # Constraint: The array_element must not have a constant parent. The
-  # scalar_structure_component must not have a constant parent. In an
-  # array_element or a scalar_structure_component that is a data_i_do_object,
-  # any subscript must be an expression whose primaries are either constant or
-  # DO variables of the containing data_implied_dos, and each operation must be
-  # intrinsic.
-
-  #array_element / scalar_structure_component / data_implied_do
-  data_implied_do
-
+    # R536 -- INCOMPLETE
+    #
+    # Constraint: The array_element must not have a constant parent. The
+    # scalar_structure_component must not have a constant parent. In an
+    # array_element or a scalar_structure_component that is a data_i_do_object,
+    # any subscript must be an expression whose primaries are either constant or
+    # DO variables of the containing data_implied_dos, and each operation must be
+    # intrinsic.
+#array_element / scalar_structure_component / data_implied_do
+    data_implied_do
   end
 
   rule data_i_do_object_list
-
     data_i_do_object ( t_comma data_i_do_object )* <Verbatim>
-
   end
 
   rule data_i_do_variable
-
     # R537
     #
     # Constraint: The data_i_do_variable must be a named variable.
-
     scalar_int_variable
-
   end
 
   rule data_implied_do
-
     # R535
     #
     # Constraint: A scalar_int_expr of a data_implied_do must involve as
     # primaries only constants or DO variables of the containing
     # data_implied_dos, and each operation must be intrinsic.
-
-   t_paren_l data_i_do_object_list t_comma data_i_do_variable t_equal scalar_int_expr t_comma scalar_int_expr ( t_comma scalar_int_expr )* t_paren_r <Verbatim>
-
+    t_paren_l data_i_do_object_list t_comma data_i_do_variable t_equal scalar_int_expr t_comma scalar_int_expr ( t_comma scalar_int_expr )* t_paren_r <Verbatim>
   end
 
   rule data_stmt
-
     # R529
-
     label? t_data data_stmt_set_list t_newline <Data_Stmt>
-
   end
 
   rule data_stmt_constant
-
     # R533 -- INCOMPLETE
     #
     # Constraint: If a data_stmt_constant is a structure_constructor, each
     # component must be an initialization expression. Note: Choice order changed
     # vs that presented in standard.
-
-    #scalar_constant / signed_int_literal_constant / signed_real_literal_constant / structure_constructor / boz_literal_constant
+#scalar_constant / signed_int_literal_constant / signed_real_literal_constant / structure_constructor / boz_literal_constant
     signed_real_literal_constant / signed_int_literal_constant / boz_literal_constant / scalar_constant
-
   end
 
   rule data_stmt_object
-
     # R531
     #
     # Constraint: In a variable that is a data_stmt_object, any subscript,
@@ -236,190 +176,157 @@ grammar Fortran
     # DATA statement is in a block data program unit, in a blank common block,
     # a function name, a function result name, an automatic object, a pointer,
     # or an allocatable array.
-
     variable / data_implied_do
-
   end
 
   rule data_stmt_object_list
-
     data_stmt_object ( t_comma data_stmt_object )* <Verbatim>
-
   end
 
   rule data_stmt_repeat
-
     # R534
     #
     # Constraint: The DATA statement repeat factor must be positive or zero. If
     # the DATA statement repeat factor is a named constant, it must have been
     # declared previously in the scoping unit or made accessible by use
     # association or host association.
-
     scalar_int_constant
-
   end
 
   rule data_stmt_set
-
     # R530
-
     data_stmt_object_list t_slash data_stmt_value_list t_slash <Verbatim>
-
   end
 
   rule data_stmt_set_list
-
     data_stmt_set ( t_comma data_stmt_set )* <Verbatim>
-
   end
 
   rule data_stmt_value
-
     # R531
-
     ( data_stmt_repeat t_star )? data_stmt_constant <Verbatim>
-
   end
 
   rule data_stmt_value_list
-
     data_stmt_value ( t_comma data_stmt_value )* <Verbatim>
-
   end
 
   rule declaration_construct
-
     # R207 -- INCOMPLETE
-
     specification_stmt / format_stmt
-
   end
 
   rule default_char_expr
-
     # R727
     #
     # Constraint: default_char_expr must be of type default character.
-
     expr
-
   end
 
   rule defined_binary_op
-
     # R724
     #
     # Constraint: Must not contain more than 31 letters and must not be the same
     # as any intrinsic_operator or logical_literal_constant.
-
     t_dot t_letter t_letter+ t_dot <Verbatim>
-
   end
 
   rule defined_unary_op
-
     # R704
     #
     # Constraint: Must not contain more than 31 letters and must not be the same
     # as any intrinsic_operator or logical_literal_constant.
-
     !( intrinsic_operator / logical_literal_constant ) t_dot t_letter t_letter+ t_dot <Verbatim>
-
   end
 
   rule digit_string
-
     # R402
-
     t_digit+ <Verbatim>
+  end
 
+  rule else_construct
+    else_stmt block <Else_Construct>
+  end
+
+  rule else_if_construct
+    else_if_construct_element+ <Else_If_Construct>
+  end
+
+  rule else_if_construct_element
+    else_if_stmt block <Else_If_Construct_Element>
+  end
+
+  rule else_if_stmt
+    # R804
+    label? t_elseif t_paren_l scalar_logical_expr t_paren_r t_then t_newline <Else_If_Stmt>
+  end
+
+  rule else_stmt
+    # R805
+    label? t_else if_construct_name? t_newline <Else_Stmt>
+  end
+
+  rule end_if_stmt
+    # R806
+    label? t_endif if_construct_name? t_newline <End_If_Stmt>
   end
 
   rule end_program_stmt
-
     # R1103
     #
     # Constraint: The program_name may be included in the end_program_stmt only
     # if the optional program_stmt is used and, if included, must be identical
     # to the program_name specified in the program_stmt.
-
     label? t_end t_program? program_name? t_newline? <End_Program_Stmt>
-
   end
 
   rule equiv_op
-
     # R722
-
     ".eqv." <Verbatim> / ".neqv." <Verbatim>
-
   end
 
   rule equiv_operand
-
     # R715
-
     not_op? level_4_expr <Verbatim>
-
   end
 
   rule executable_construct
-
     # R215 -- INCOMPLETE
-
     action_stmt / if_construct
-
   end
 
   rule execution_part
-
     # R208
     #
     # Constraint: An execution_part must not contain an end_function_stmt,
     # end_program_stmt, or end_subroutine_stmt.
-
     executable_construct execution_part_construct <Execution_Part>
-
   end
 
   rule execution_part_construct
-
     # R209 -- INCOMPLETE
-
     ( executable_construct / format_stmt / data_stmt )* <Execution_Part_Construct>
-
   end
 
   rule exponent
-
     # R416
-
     signed_digit_string
-
   end
 
   rule exponent_letter
-
     # R415
-
     [ed] <Verbatim>
-
   end
 
   rule expr
-
     # R723
     #
     # Note: Left-recursive rule implied by standard:
     # ( expr defined_binary_op )? level_5_expr
-
     level_5_expr ( defined_binary_op expr )? <Verbatim>
-
   end
 
   rule format
-
     # R913
     #
     # Constraint: The label must be the label of a FORMAT statement that appears
@@ -427,114 +334,105 @@ grammar Fortran
     # The scalar_default_int_variable must have been assigned (8.2.4) the
     # statement label of a FORMAT statement that appears in the same scoping
     # unit as the format.
-    
     default_char_expr / label / t_star / scalar_default_int_variable
-  
   end
 
   rule format_specification
-
     # R1002
     #
     # Note: A vast simplification is made here under the assumption that it is
     # only necessary to pass a format-specification through verbatim, not to
     # analyze its contents.
-
     t_paren_l (!t_paren_r character)+ t_paren_r <Verbatim>
-
   end
 
  rule format_stmt
-
     # R1001
     #
     # Constraint: The format_stmt must be labeled.
-
     label t_format format_specification t_newline <Format_Stmt>
-
   end
 
   rule hex_constant
-
     # R410
-
     "z" ( ( t_apostrophe hex_digit+ t_apostrophe ) / ( t_quotemark hex_digit+ t_quotemark ) ) <Verbatim>
-
   end
 
   rule hex_digit
-
     # R411
-
     [0123456789abcdef]
+  end
 
+  rule if_construct
+    # R802
+    #
+    # Note: if_then_construct, else_if_construct and else_construct added for
+    # clarity, not specified in standard.
+    label? if_then_construct else_if_construct? else_construct? end_if_stmt <If_Construct>
+  end
+
+  rule if_construct_name
+    # Multiple uses (not explicitly defined)
+    name
+  end
+
+  rule if_construct_name_label
+    if_construct_name t_colon <Verbatim>
   end
 
   rule if_stmt
-
     # R807
     #
     # Constraint: The action_stmt in the if_stmt must not be an if_stmt,
     # end_program_stmt, end_function_stmt, or end_subroutine_stmt.
-
     label? t_if t_paren_l scalar_logical_expr t_paren_r action_stmt <If_Stmt>
+  end
 
+  rule if_then_construct
+    if_then_stmt block <If_Then_Construct>
+  end
+
+  rule if_then_stmt
+    # R803
+    label? if_construct_name_label? t_if t_paren_l scalar_logical_expr t_paren_r t_then t_newline <If_Then_Stmt>
   end
 
   rule imag_part
-
     # R419
-
     signed_real_literal_constant / signed_int_literal_constant
-
   end
 
   rule int_expr
-
     # R728
     #
     # Constraint: int_expr must be type integer.
-
     expr
-
   end
 
   rule int_literal_constant
-
     # R404
-
     digit_string ( t_underscore kind_param )? <Verbatim>
-
   end
 
   rule internal_subprogram_part
-
     ""
-
   end
 
   rule intrinsic_operator
-
     # R310
-
     power_op / mult_op / add_op / concat_op / rel_op / not_op / and_op / or_op / equiv_op
-
   end
 
   rule kind_param
-
     # R405
     #
     # Constraint: The value of kind_param must be nonnegative. The value of
     # kind_param must specify a representation method that exists on the
     # processor.
-
     digit_string / scalar_int_constant_name
-
   end
 
   rule label
-
     # R313
     #
     # Constraint: At least one digit in a label must be nonzero. If a statement
@@ -542,65 +440,47 @@ grammar Fortran
     # statement label must not be given to more than one statement in a scoping
     # unit. Leading zeros are not significant in distinguishing between
     # statement labels.
-
     t_digit 1..5 <Verbatim>
-
   end
 
   rule level_1_expr
-
     # R703
-
     defined_unary_op? primary <Verbatim>
-
   end
 
   rule level_2_expr
-
     # R707
     #
     # Note: Left-recursive rule implied by standard:
     # ( level_2_expr? add_op )? add_operand
-
     add_op? add_operand level_2_expr? <Verbatim>
-
   end
 
   rule level_3_expr
-
     # R711
     #
     # Note: Left-recursive rule implied by standard:
     # ( level_3_expr concat_op )? level_2_expr
-
     level_2_expr ( concat_op level_3_expr )? <Verbatim>
-
   end
 
   rule level_4_expr
-
     # R713
     #
     # Note: Left-recursive rule implied by standard:
     # ( level_3_expr rel_op )? level_3_expr
-
     level_3_expr ( rel_op level_3_expr )? <Verbatim>
-
   end
-  
-  rule level_5_expr
 
+  rule level_5_expr
     # R718
     #
     # Note: Left-recursive rule implied by standard:
     # ( level_5_expr equiv_op)? equiv_operand
-
     equiv_operand ( equiv_op level_5_expr )? <Verbatim>
-
   end
 
   rule literal_constant
-
     # R306
     #
     # Note: The choice order is different than that given in the standard, e.g.
@@ -608,250 +488,169 @@ grammar Fortran
     # real_literal_constant. Also, signed versions of real_literal_constant and
     # int_literal_constant are used here, though the standard (seemingly
     # incorrectly) specifies the unsigned versions.
-
     complex_literal_constant / signed_real_literal_constant / signed_int_literal_constant / logical_literal_constant / char_literal_constant / boz_literal_constant
-
   end
 
   rule logical_expr
-
     # R725
     #
     # Constraint: logical_expr must be type logical.
-
     expr
-
   end
 
   rule logical_literal_constant
-
     # R421
     #
     # Constraint: The value of kind_param must specify a representation that
     # exists on the processor.
-
     ( t_true / t_false ) ( t_underscore kind_param )? <Verbatim>
-
   end
 
   rule main_program
-
     # R1101 -- INCOMPLETE
     #
     # Constraint: In a main_program, the execution_part must not contain a
     # RETURN statement or an ENTRY statement.
-
     program_stmt? specification_part? execution_part? end_program_stmt <Main_Program>
-
   end
 
   rule mult_op
-
     # R709
-
     t_star / t_slash
-
   end
 
   rule mult_operand
-
     # R705
-
     level_1_expr ( power_op mult_operand )? <Verbatim>
-
   end
 
   rule octal_constant
-
     # R409
     #
     # Constraint: digit must have one of the values 0 through 7. Note: 'digit is
     # replaced by 't_octal' here to enforce the constraint.
-
     "o" ( ( t_apostrophe t_octal+ t_apostrophe ) / ( t_quotemark t_octal+ t_quotemark ) ) <Verbatim>
-
   end
 
   rule name
-
     # R304
     #
     # Constraint: The maximum length of a name is 31 characters.
-
     t_letter alphanumeric_character* <Verbatim>
-
   end
 
   rule named_constant
-
     # R307
-
     name
-
   end
 
   rule not_op
-
     # R719
-
     ".not." <Verbatim>
-
   end
 
   rule numeric_expr
-
     # R729
     #
     # Constraint: numeric_expr must be of type integer, real or complex.
-
     expr
-
   end
 
   rule or_op
-
     # R721
-
     ".or." <Verbatim>
-
   end
 
   rule output_item
-
     # R915 -- INCOMPLETE
-
     expr
-
   end
 
   rule output_item_list
-
     # 9.4.2
     #
     # Constraint: In an output_item_list, an io_implied_do_object must be an
     # output_item.
-
     ( t_comma output_item )+ <Verbatim>
-
   end
 
   rule power_op
-
     # R708
-
     "**" <Verbatim>
-
   end
 
   rule primary
-
     # R701 -- INCOMPLETE
     #
     # Constraint: subobject must be a subobject whose parent is a constant. A
     # variable that is a primary must not be an assumed-size array.
-
     constant
-
   end
 
   rule print_stmt
-
     # R911
-
     label? t_print format output_item_list? t_newline <Print_Stmt>
-
   end
 
   rule program_name
-
     # 11.1
-
     name
-
   end
 
   rule program_stmt
-
     # R1102
-
     label? t_program program_name t_newline <Program_Stmt>
-
   end
 
   rule program_unit
-
     # R202 -- INCOMPLETE
-
     main_program # / external_subprogram / module / block_data
-
   end
 
   rule real_literal_constant
-
     # R413
     #
     # Constraint: If both kind_param and exponent_letter are present,
     # exponent_letter bust be E. The value of kind_param must specify an
     # approximation method that exists on the processor.
-
     significand ( exponent_letter exponent )? ( t_underscore kind_param )? <Verbatim> / digit_string exponent_letter exponent ( t_underscore kind_param )? <Verbatim>
-
   end
 
   rule real_part
-
     # R418
-
     signed_real_literal_constant / signed_int_literal_constant
-
   end
 
   rule rel_op_eq
-
     ".eq." <Verbatim> / "==" <Verbatim>
-
   end
 
   rule rel_op_ge
-
     ".ge." <Verbatim> / ">=" <Verbatim>
-
   end
 
   rule rel_op_gt
-
     ".gt." <Verbatim> / ">" <Verbatim>
-
   end
 
   rule rel_op_le
-
     ".le." <Verbatim> / "<=" <Verbatim>
-
   end
 
   rule rel_op_lt
-
     ".lt." <Verbatim> / "<" <Verbatim>
-
   end
 
   rule rel_op_ne
-
     ".ne." <Verbatim> / "/=" <Verbatim>
-
   end
 
   rule rel_op
-
     # R714
-
     rel_op_eq / rel_op_ne / rel_op_lt / rel_op_le / rel_op_gt / rel_op_ge
-
   end
 
   rule rep_char
-
     # 4.3.2.1 (processor-dependent)
     #
     # Constraint: For the type character with kind kind_param, and for type
@@ -860,317 +659,234 @@ grammar Fortran
     # form. A processor may restrict the occurrence of some of all of the
     # control characters. (2) Any graphic character in the processor-dependent
     # character set in free source form.
-
     character
-
   end
 
   rule scalar_constant
-
     # Multiple uses (not explicitly defined)
     #
     # Note: Unclear what this is supposed to be... Assumed constraint: Any
     # named_constant must be scalar.
-
     literal_constant / named_constant
-
   end
 
   rule scalar_default_int_variable
-
     # Multiple uses (not explicitly defined)
     #
     # Note: Assumed constraint: scalar_default_int_variable must be scalar,
     # and must be of type default integer.    
-
     variable
-
   end
 
   rule scalar_int_constant
-
     # Multiple uses (not explicitly defined)
     #
     # Note: Assumed constraint: If scalar_int_constant is a variable name, it
     # must be of type integer and must have the PARAMETER attribute.
-
     signed_int_literal_constant / scalar_int_constant_name
-
   end
 
   rule scalar_int_constant_name
-
     # 4.3.1.1 (not explicitly defined)
     #
     # Note: Assumed constraint: scalar_int_constant_name must be scalar, and
     # must be of type integer.
-
     named_constant
-
   end
 
   rule scalar_int_variable
-
     # Multiple uses (not explicitly defined)
     #
     # Note: Assumed constraint: scalar_int_variable must be scalar, and must
     # be of type integer.    
-
     variable
-
   end
 
   rule scalar_logical_expr
-  
     # Multiple uses (not explicitly defined)
     #
     # Note: Assumed constraint: logical_expr must be scalar.
-
     logical_expr
-
   end
 
   rule scalar_variable_name
-
     # Section 6 (not explicitly defined)
     #
     # Note: Assumed constraint: scalar_variable_name must be scalar.
-
     variable_name
-
   end
 
   rule sign
-
     # R406
-
     t_plus / t_minus
-
   end
 
   rule signed_digit_string
-
     # R401
-
     sign? digit_string <Verbatim>
-
   end
 
   rule signed_int_literal_constant
-
     # R403
-
     sign? int_literal_constant <Verbatim>
-
   end
 
   rule signed_real_literal_constant
-
     # R412
-
     sign? real_literal_constant <Verbatim>
-
   end
 
   rule significand
-
     # R414
-
     digit_string t_dot digit_string? <Verbatim> / t_dot digit_string <Verbatim>
-
   end
 
   rule special_character
-
     # 3.1.4
-
     [\ \=\+\-\*\/\(\)\,\.\'\:\!\"\%\&\;\<\>\?\$]
-
   end
 
   rule specification_part
-
     # R204 -- INCOMPLETE
-
     #use_stmt* implicit_part? declaration_construct* <Specification_Part> 
     declaration_construct* <Specification_Part> 
-
   end
 
   rule specification_stmt
-
     # R214 -- INCOMPLETE
-
     data_stmt
-
   end
 
   rule t_apostrophe
-
     "'" <Verbatim>
-
   end
 
   rule t_assign
-
     "assign" <Verbatim>
-
   end
 
   rule t_binary
-
     [01] <Verbatim>
-
   end
 
   rule t_colon
-
     ":" <Verbatim>
-
   end
 
   rule t_comma
-
     "," <Verbatim>
-
   end
 
   rule t_data
-
     "data" <Verbatim>
-
   end
 
   rule t_digit
-
     [0-9] <Verbatim>
-
   end
 
   rule t_dot
-
     "." <Verbatim>
+  end
 
+  rule t_else
+    "else" <Verbatim>
+  end
+
+  rule t_elseif
+    "elseif" <Verbatim>
+  end
+
+  rule t_endif
+    "endif" <Verbatim>
   end
 
   rule t_end
-
     "end" <Verbatim>
-
   end
 
   rule t_equal
-
     "=" <Verbatim>
-
   end
 
   rule t_false
-
     ".false." <Verbatim>
-
   end
 
   rule t_format
-
     "format" <Verbatim>
+  end
 
+  rule t_if
+    "if" <Verbatim>
   end
 
   rule t_letter
-
     [a-z] <Verbatim>
-
   end
 
   rule t_minus
-
     "-" <Verbatim>
-
   end
 
   rule t_newline
-
     "\n" <Verbatim>
-
   end
 
   rule t_octal
-
     [01234567] <Verbatim>
-
   end
 
   rule t_paren_l
-
     "(" <Verbatim>
-
   end
 
   rule t_paren_r
-
     ")" <Verbatim>
-
   end
 
   rule t_plus
-
     "+" <Verbatim>
-
   end
 
   rule t_print
-
     "print" <Verbatim>
-
   end
 
   rule t_program
-
     "program" <Verbatim>
-
   end
 
   rule t_quotemark
-
     "\"" <Verbatim>
-
   end
 
   rule t_slash
-
     "/" <Verbatim>
-
   end
 
   rule t_star
-
     "*" <Verbatim>
+  end
 
+  rule t_then
+    "then" <Verbatim>
   end
 
   rule t_to
-
     "to" <Verbatim>
-
   end
 
   rule t_true
-
     ".true." <Verbatim>
-
   end
 
   rule t_underscore
-
     # R303
-
     "_"
-
   end
 
   rule variable
-
     # R601 -- INCOMPLETE
     #
     # Constraint: scalar_variable_name must not have the PARAMETER attribute.
@@ -1178,141 +894,18 @@ grammar Fortran
     # array_variable_name must not have the PARAMETER attribute. subobject
     # must not be a subobject designator (for example, a substring) whose
     # parent is a constant.
-
     scalar_variable_name
-
   end
 
   rule variable_name
-
     # Multiple uses (not explicitly defined)
     #
     # Note: Assumed constraint: variable_name must not have the PARAMETER
     # attribute.
-
     name
-
   end
 
 #PM#
-  rule block
-
-    # R801
-
-    execution_part_construct
-
-  end
-
-  rule if_construct
-
-    # R802
-    #
-    # Note: if_then_construct, else_if_construct and else_construct added for
-    # clarity, not specified in standard.
-
-    label? if_then_construct else_if_construct? else_construct? end_if_stmt <If_Construct>
-
-  end
-
-  rule if_then_construct
-
-    if_then_stmt block <If_Then_Construct>
-
-  end
-
-  rule else_if_construct
-
-    else_if_construct_element+ <Else_If_Construct>
-
-  end
-
-  rule else_if_construct_element
-
-    else_if_stmt block <Else_If_Construct_Element>
-
-  end
-
-  rule else_construct
-
-    else_stmt block <Else_Construct>
-
-  end
-
-  rule t_if
-
-    "if" <Verbatim>
-
-  end
-
-  rule t_then
-
-    "then" <Verbatim>
-
-  end
-
-  rule t_elseif
-
-    "elseif" <Verbatim>
-
-  end
-
-  rule t_else
-
-    "else" <Verbatim>
-
-  end
-
-  rule t_endif
-
-    "endif" <Verbatim>
-
-  end
-
-  rule if_then_stmt
-
-    # R803
-
-    label? if_construct_name_label? t_if t_paren_l scalar_logical_expr t_paren_r t_then t_newline <If_Then_Stmt>
-
-  end
-
-  rule if_construct_name_label
-
-    if_construct_name t_colon <Verbatim>
-
-  end
-
-  rule else_if_stmt
-
-    # R804
-
-    label? t_elseif t_paren_l scalar_logical_expr t_paren_r t_then t_newline <Else_If_Stmt>
-
-  end
-
-  rule else_stmt
-
-    # R805
-
-    label? t_else if_construct_name? t_newline <Else_Stmt>
-
-  end
-
-  rule end_if_stmt
-
-    # R806
-
-    label? t_endif if_construct_name? t_newline <End_If_Stmt>
-
-  end
-
-  rule if_construct_name
-
-    # Multiple uses (not explicitly defined)
-
-    name
-
-  end
 #PM#
 
 end
