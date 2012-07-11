@@ -176,8 +176,11 @@ module Fortran
   class Specification_Part < ASTNode
   end
 
-#PM#
-#PM#
+  class Stop_Stmt < StmtNode
+  end
+
+  #PM#
+  #PM#
 
 end
 

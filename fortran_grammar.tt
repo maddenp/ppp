@@ -17,7 +17,7 @@ grammar Fortran
     # R216 -- INCOMPLETE
     #
     # Note: Provide label handling in rules for individual statements.
-    assignment_stmt / if_stmt / print_stmt / assign_stmt
+    assignment_stmt / if_stmt / print_stmt / assign_stmt / stop_stmt
   end
 
   rule add_op
@@ -662,6 +662,14 @@ grammar Fortran
     character
   end
 
+  rule scalar_char_constant
+    # 8.4 (not explicitly defined)
+    #
+    # Note: Assumed constraint: named_constant must be of type default
+    # character.
+    char_literal_constant / named_constant
+  end
+
   rule scalar_constant
     # Multiple uses (not explicitly defined)
     #
@@ -755,6 +763,18 @@ grammar Fortran
   rule specification_stmt
     # R214 -- INCOMPLETE
     data_stmt
+  end
+
+  rule stop_code
+    # R843
+    #
+    # Constraint: scalar_char_constant must be of type default character.
+    scalar_char_constant / t_digit 1..5 <Verbatim>
+  end
+
+  rule stop_stmt
+    # R842
+    t_stop stop_code? t_newline <Stop_Stmt>
   end
 
   rule t_apostrophe
@@ -867,6 +887,10 @@ grammar Fortran
 
   rule t_star
     "*" <Verbatim>
+  end
+
+  rule t_stop
+    "stop" <Verbatim>
   end
 
   rule t_then

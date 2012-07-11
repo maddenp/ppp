@@ -19,7 +19,7 @@ clean:
 	$(RM) $(TRANSLATION) $(BIN)
 
 control: $(TEST)
-	$(FC) $(FFLAGS) $^ && a.out > control && $(RM) a.out
+	$(FC) $(FFLAGS) $^ && a.out >control 2>&1 && $(RM) a.out
 
 translation: $(TRANSLATION)
 
