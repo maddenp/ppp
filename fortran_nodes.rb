@@ -76,14 +76,8 @@ module Fortran
 
 # TODO auto-gen empty classes?
 
-  class Assign_Stmt < StmtNode
-  end
-
   class Assignment_Stmt < StmtNode
     def to_s() stmt(label+"#{e1}#{e2}#{e3}") end
-  end
-
-  class Data_Stmt < StmtNode
   end
 
   class Else_Construct < ASTNode
@@ -132,12 +126,6 @@ module Fortran
   class Execution_Part_Construct < ASTNode
   end
 
-  class Format_Stmt < StmtNode
-  end
-
-  class Goto_Stmt < StmtNode
-  end
-
   class If_Construct < ASTNode
   end
 
@@ -180,9 +168,6 @@ module Fortran
   end
 
   class Stmt < StmtNode
-  end
-
-  class Stop_Stmt < StmtNode
   end
 
   #PM#

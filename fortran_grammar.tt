@@ -51,7 +51,7 @@ grammar Fortran
     # statement of format_stmt that appears in the same scoping unit as the
     # assign_stmt. scalar_int_variable must be named and of type default
     # integer.
-    label? t_assign label t_to scalar_int_variable t_newline <Assign_Stmt>
+    label? t_assign label t_to scalar_int_variable t_newline <Stmt>
   end
 
   rule assignment_stmt
@@ -152,7 +152,7 @@ grammar Fortran
 
   rule data_stmt
     # R529
-    label? t_data data_stmt_set_list t_newline <Data_Stmt>
+    label? t_data data_stmt_set_list t_newline <Stmt>
   end
 
   rule data_stmt_constant
@@ -360,7 +360,7 @@ grammar Fortran
     # R1001
     #
     # Constraint: The format_stmt must be labeled.
-    label t_format format_specification t_newline <Format_Stmt>
+    label t_format format_specification t_newline <Stmt>
   end
 
   rule goto_stmt
@@ -368,7 +368,7 @@ grammar Fortran
     #
     # Constraint: The label must be the statement label of a branch target
     # statement that appears in the same scoping unit as the goto_stmt.
-    t_goto label t_newline <Goto_Stmt>
+    t_goto label t_newline <Stmt>
   end
 
   rule hex_constant
@@ -792,7 +792,7 @@ grammar Fortran
 
   rule stop_stmt
     # R842
-    t_stop stop_code? t_newline <Stop_Stmt>
+    t_stop stop_code? t_newline <Stmt>
   end
 
   rule t_apostrophe
