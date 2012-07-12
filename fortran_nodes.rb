@@ -179,6 +179,9 @@ module Fortran
   class Specification_Part < ASTNode
   end
 
+  class Stmt < StmtNode
+  end
+
   class Stop_Stmt < StmtNode
   end
 

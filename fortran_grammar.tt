@@ -18,7 +18,7 @@ grammar Fortran
     #
     # Note: Provide label handling in rules for individual statements.
     # allocate|assignment|backspace|call|close|computed_goto|continue|cycle|deallocate|endfile|end_function|end_program|end_subroutine|exit|goto|if|inquire|nullify|open|pointer_assignment|print|read|return|rewind|stop|where|write|arithmetic_if|assign|assigned_goto|pause
-    assignment_stmt / goto_stmt / if_stmt / print_stmt / assign_stmt / stop_stmt
+    assignment_stmt / end_program_stmt / goto_stmt / if_stmt / print_stmt / assign_stmt / stop_stmt
   end
 
   rule add_op
@@ -293,7 +293,11 @@ grammar Fortran
 
   rule executable_construct
     # R215 -- INCOMPLETE
-    action_stmt / if_construct
+    executable_construct_action_stmt / if_construct
+  end
+
+  rule executable_construct_action_stmt
+    !execution_part_disallowed action_stmt <Stmt>
   end
 
   rule execution_part
@@ -302,6 +306,11 @@ grammar Fortran
     # Constraint: An execution_part must not contain an end_function_stmt,
     # end_program_stmt, or end_subroutine_stmt.
     executable_construct execution_part_construct <Execution_Part>
+  end
+
+  rule execution_part_disallowed
+    # end_function_stmt / end_program_stmt / end_subroutine_stmt
+    end_program_stmt
   end
 
   rule execution_part_construct
