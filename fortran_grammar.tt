@@ -18,7 +18,7 @@ grammar Fortran
     #
     # Note: Provide label handling in rules for individual statements.
     # allocate|assignment|backspace|call|close|computed_goto|continue|cycle|deallocate|endfile|end_function|end_program|end_subroutine|exit|goto|if|inquire|nullify|open|pointer_assignment|print|read|return|rewind|stop|where|write|arithmetic_if|assign|assigned_goto|pause
-    assignment_stmt / end_program_stmt / goto_stmt / if_stmt / print_stmt / assign_stmt / stop_stmt
+    assignment_stmt / computed_goto_stmt / end_program_stmt / goto_stmt / if_stmt / print_stmt / assign_stmt / stop_stmt
   end
 
   rule add_op
@@ -105,6 +105,15 @@ grammar Fortran
   rule complex_literal_constant
     # R417
     t_paren_l real_part t_comma imag_part t_paren_r <Verbatim>
+  end
+
+  rule computed_goto_stmt
+    # R837
+    #
+    # Constraint: Each label in label_list must be the statement label of a
+    # branch target statement that appears in the same scoping unit as the
+    # computed_goto_stmt.
+    label? t_goto t_paren_l label_list t_paren_r t_comma? scalar_int_expr t_newline <Computed_Goto_Stmt>
   end
 
   rule concat_op
@@ -297,7 +306,7 @@ grammar Fortran
   end
 
   rule executable_construct_action_stmt
-    !execution_part_disallowed action_stmt <Stmt>
+    !execution_part_disallowed action_stmt <Stmt> # need 'label?' prefix here?
   end
 
   rule execution_part
@@ -368,7 +377,7 @@ grammar Fortran
     #
     # Constraint: The label must be the statement label of a branch target
     # statement that appears in the same scoping unit as the goto_stmt.
-    t_goto label t_newline <Stmt>
+    label? t_goto label t_newline <Stmt>
   end
 
   rule hex_constant
@@ -459,6 +468,10 @@ grammar Fortran
     # unit. Leading zeros are not significant in distinguishing between
     # statement labels.
     t_digit 1..5 <Verbatim>
+  end
+
+  rule label_list
+    label ( t_comma label )* <Verbatim>
   end
 
   rule level_1_expr
@@ -707,11 +720,18 @@ grammar Fortran
   rule scalar_int_constant
     # Multiple uses (not explicitly defined)
     #
-    # Note: Assumed constraint: If scalar_int_constant is a variable name, it
-    # must be of type integer and must have the PARAMETER attribute.
+    # Note: Assumed constraint: must be scalar and, if a variable name, must be
+    # of type integer and must have the PARAMETER attribute.
     signed_int_literal_constant / scalar_int_constant_name
   end
 
+  rule scalar_int_expr
+    # Multiple uses (not explicitly defined)
+    #
+    # Note: Assumed constraint: must refer to a scalar entity of type integer.
+    expr
+  end
+    
   rule scalar_int_constant_name
     # 4.3.1.1 (not explicitly defined)
     #
@@ -792,7 +812,7 @@ grammar Fortran
 
   rule stop_stmt
     # R842
-    t_stop stop_code? t_newline <Stmt>
+    label? t_stop stop_code? t_newline <Stmt>
   end
 
   rule t_apostrophe

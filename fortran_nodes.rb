@@ -64,7 +64,7 @@ module Fortran
 
   # General Subclasses
 
-  class StmtNode < ASTNode
+  class Stmt < ASTNode
     def to_s() stmt(join) end
   end
 
@@ -76,8 +76,15 @@ module Fortran
 
 # TODO auto-gen empty classes?
 
-  class Assignment_Stmt < StmtNode
+  class Assignment_Stmt < ASTNode
     def to_s() stmt(label+"#{e1}#{e2}#{e3}") end
+  end
+
+  class Computed_Goto_Stmt < ASTNode
+    def to_s()
+      s=stmt(label+"#{e1} #{e2}#{e3}#{e4}#{(e5=='')?(' '):(e5)}#{e6}")
+      s
+    end
   end
 
   class Else_Construct < ASTNode
@@ -129,12 +136,13 @@ module Fortran
   class If_Construct < ASTNode
   end
 
-  class If_Stmt < StmtNode
+  class If_Stmt < ASTNode
     def to_s()
       s=stmt(label+"#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
       s
     end
   end
+
   class If_Then_Construct < ASTNode
   end
 
@@ -165,9 +173,6 @@ module Fortran
   end
 
   class Specification_Part < ASTNode
-  end
-
-  class Stmt < StmtNode
   end
 
   #PM#
