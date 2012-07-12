@@ -76,6 +76,13 @@ module Fortran
 
 # TODO auto-gen empty classes?
 
+  class Arithmetic_If_Stmt < ASTNode
+    def to_s()
+      s=stmt(label+"#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}")
+      s
+    end
+  end
+
   class Assigned_Goto_Stmt < ASTNode
     def to_s()
       s=stmt(label+"#{e1} #{e2}#{(e3.to_s[0]==',')?(e3):(' '+e3.to_s)}")

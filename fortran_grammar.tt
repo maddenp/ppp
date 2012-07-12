@@ -18,7 +18,7 @@ grammar Fortran
     #
     # Note: Provide label handling in rules for individual statements.
     # allocate|assignment|backspace|call|close|computed_goto|continue|cycle|deallocate|endfile|end_function|end_program|end_subroutine|exit|goto|if|inquire|nullify|open|pointer_assignment|print|read|return|rewind|stop|where|write|arithmetic_if|assign|assigned_goto|pause
-    assignment_stmt / computed_goto_stmt / end_program_stmt / goto_stmt / if_stmt / print_stmt / assign_stmt / stop_stmt / assigned_goto_stmt
+    assignment_stmt / computed_goto_stmt / end_program_stmt / goto_stmt / if_stmt / print_stmt / stop_stmt / arithmetic_if_stmt / assign_stmt / assigned_goto_stmt
   end
 
   rule add_op
@@ -42,6 +42,15 @@ grammar Fortran
   rule alphanumeric_character
     # R302
     t_letter / t_digit / t_underscore
+  end
+
+  rule arithmetic_if_stmt
+    # R840
+    #
+    # Constraint: Each label must be the label of a branch target statement that
+    # appears in the same scoping unit as the arithmetic_if_stmt. The
+    # scalar_numeric_expr must not be of type complex.
+    label? t_if t_paren_l scalar_numeric_expr t_paren_r label t_comma label t_comma label t_newline <Arithmetic_If_Stmt>
   end
 
   rule assign_stmt
@@ -767,6 +776,13 @@ grammar Fortran
     #
     # Note: Assumed constraint: logical_expr must be scalar.
     logical_expr
+  end
+
+  rule scalar_numeric_expr
+    # Multiple users (not explicitly defined)
+    #
+    # Note: Assumed constraint: numeric_expr must be scalar.
+    numeric_expr
   end
 
   rule scalar_variable_name
