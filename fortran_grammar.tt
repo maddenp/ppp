@@ -17,7 +17,8 @@ grammar Fortran
     # R216 -- INCOMPLETE
     #
     # Note: Provide label handling in rules for individual statements.
-    assignment_stmt / if_stmt / print_stmt / assign_stmt / stop_stmt
+    # allocate|assignment|backspace|call|close|computed_goto|continue|cycle|deallocate|endfile|end_function|end_program|end_subroutine|exit|goto|if|inquire|nullify|open|pointer_assignment|print|read|return|rewind|stop|where|write|arithmetic_if|assign|assigned_goto|pause
+    assignment_stmt / goto_stmt / if_stmt / print_stmt / assign_stmt / stop_stmt
   end
 
   rule add_op
@@ -351,6 +352,14 @@ grammar Fortran
     #
     # Constraint: The format_stmt must be labeled.
     label t_format format_specification t_newline <Format_Stmt>
+  end
+
+  rule goto_stmt
+    # R836
+    #
+    # Constraint: The label must be the statement label of a branch target
+    # statement that appears in the same scoping unit as the goto_stmt.
+    t_goto label t_newline <Goto_Stmt>
   end
 
   rule hex_constant
@@ -835,6 +844,10 @@ grammar Fortran
 
   rule t_format
     "format" <Verbatim>
+  end
+
+  rule t_goto
+    "goto" <Verbatim>
   end
 
   rule t_if

@@ -135,6 +135,9 @@ module Fortran
   class Format_Stmt < StmtNode
   end
 
+  class Goto_Stmt < StmtNode
+  end
+
   class If_Construct < ASTNode
   end
 
