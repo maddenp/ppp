@@ -76,6 +76,13 @@ module Fortran
 
 # TODO auto-gen empty classes?
 
+  class Assigned_Goto_Stmt < ASTNode
+    def to_s()
+      s=stmt(label+"#{e1} #{e2}#{(e3.to_s[0]==',')?(e3):(' '+e3.to_s)}")
+      s
+    end
+  end
+
   class Assignment_Stmt < ASTNode
     def to_s() stmt(label+"#{e1}#{e2}#{e3}") end
   end

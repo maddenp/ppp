@@ -18,7 +18,7 @@ grammar Fortran
     #
     # Note: Provide label handling in rules for individual statements.
     # allocate|assignment|backspace|call|close|computed_goto|continue|cycle|deallocate|endfile|end_function|end_program|end_subroutine|exit|goto|if|inquire|nullify|open|pointer_assignment|print|read|return|rewind|stop|where|write|arithmetic_if|assign|assigned_goto|pause
-    assignment_stmt / computed_goto_stmt / end_program_stmt / goto_stmt / if_stmt / print_stmt / assign_stmt / stop_stmt
+    assignment_stmt / computed_goto_stmt / end_program_stmt / goto_stmt / if_stmt / print_stmt / assign_stmt / stop_stmt / assigned_goto_stmt
   end
 
   rule add_op
@@ -52,6 +52,20 @@ grammar Fortran
     # assign_stmt. scalar_int_variable must be named and of type default
     # integer.
     label? t_assign label t_to scalar_int_variable t_newline <Stmt>
+  end
+
+  rule assigned_goto_stmt
+    # R839
+    #
+    # Constraint: Each label in label_list must be the statement label of a
+    # branch target statement that appears in the same scoping unit as the
+    # assigned_goto_stmt. scalar_int_variable must be named and of type
+    # default integer.
+    label? t_goto scalar_int_variable assigned_goto_stmt_label_list? t_newline <Assigned_Goto_Stmt>
+  end
+
+  rule assigned_goto_stmt_label_list
+    t_comma? t_paren_l label_list t_paren_r <Verbatim>
   end
 
   rule assignment_stmt
