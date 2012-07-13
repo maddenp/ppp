@@ -1,0 +1,14 @@
+!sms$barrier
+!sms$compare_var
+!sms$create_decomp
+!sms$distribute
+!sms$exchange
+!sms$halo_comp
+!sms$ignore
+!sms$insert
+!sms$parallel
+!sms$reduce
+!sms$serial
+!sms$set_communicator
+!sms$to_local
+!sms$unstructured_grid

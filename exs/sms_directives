@@ -1,0 +1,317 @@
+!sms$barrier
+!sms$compare_var
+!sms$compare_var(antiflx  , "trcadv.f90 - antiflx4 ")
+!sms$compare_var(antiflx   , "trcadv.f90 - antiflx5 ")
+!sms$compare_var(antifx, "cnuity.f90 - antifx7 ")
+!sms$compare_var(antifx, "cnuity.f90 - antifx8 ")
+!sms$compare_var(antifx    , "cnuity.f90 - antifx9 ")
+!sms$compare_var(bnll_edg, "before momtum - bnll_edg5 ")
+!sms$compare_var(bnll_edg, "momtum.f90 - bnll_edg5 ")
+!sms$compare_var(cumufx , "transp3d.f90 - cumufx1  ")
+!sms$compare_var(cumufx , "transp3d.f90 - cumufx2  ")
+!sms$compare_var(delp     , "cnuity.f90 - delp6 ")
+!sms$compare_var(delp_lo   , "cnuity.f90 - delp_lo10")
+!sms$compare_var(delp_lo,"cnuity.f90 - delp_lo8 ")
+!sms$compare_var(dp_edg   , "cnuity.f90 - dp_edg6 ")
+!sms$compare_var(dplo_tndcy, "cnuity.f90 - dplo_tndcy10")
+!sms$compare_var(ex3d    , "before momtum - exner5 ")
+!sms$compare_var(ex3d, "diag.f90 - ex3d5 ")
+!sms$compare_var(ex3d, "dyn_run before hystat - ex3d5 ")
+!sms$compare_var(ex3d, "hybgen.f90 - ex3d7 ")
+!sms$compare_var(exch,'begin physics')
+!sms$compare_var(exch,'end physics')
+!sms$compare_var(exner   , "momtum.f90 - exner5 ")
+!sms$compare_var(gfs_cld, "do_physics.f90 - gfs_cld0 ")
+!sms$compare_var(gfs_cld, "do_physics.f90 - gfs_cld1 ")
+!sms$compare_var(gfs_dp, "do_physics.f90 - gfs_dp0 ")
+!sms$compare_var(gfs_dp, "do_physics.f90 - gfs_dp1 ")
+!sms$compare_var(gfs_dpdt, "do_physics.f90 - gfs_dpdt0 ")
+!sms$compare_var(gfs_dpdt, "do_physics.f90 - gfs_dpdt1 ")
+!sms$compare_var(gfs_oz, "do_physics.f90 - gfs_oz0 ")
+!sms$compare_var(gfs_oz, "do_physics.f90 - gfs_oz1 ")
+!sms$compare_var(gfs_p, "do_physics.f90 - gfs_p0 ")
+!sms$compare_var(gfs_p, "do_physics.f90 - gfs_p1 ")
+!sms$compare_var(gfs_ps, "do_physics.f90 - gfs_ps0 ")
+!sms$compare_var(gfs_ps, "do_physics.f90 - gfs_ps1 ")
+!sms$compare_var(gfs_q, "do_physics.f90 - gfs_q0 ")
+!sms$compare_var(gfs_q, "do_physics.f90 - gfs_q1 ")
+!sms$compare_var(gfs_t, "do_physics.f90 - gfs_t0 ")
+!sms$compare_var(gfs_t, "do_physics.f90 - gfs_t1 ")
+!sms$compare_var(gfs_u, "do_physics.f90 - gfs_u0 ")
+!sms$compare_var(gfs_u, "do_physics.f90 - gfs_u1 ")
+!sms$compare_var(gfs_v, "do_physics.f90 - gfs_v0 ")
+!sms$compare_var(gfs_v, "do_physics.f90 - gfs_v1 ")
+!sms$compare_var(hf2d   , 'begin cpl_run')
+!sms$compare_var(hf2d   , "begin wrf_physics ")
+!sms$compare_var(hf2d   , "dyn_run begin iteration ")
+!sms$compare_var(hf2d   , "dyn_run begin second half of iteration ")
+!sms$compare_var(hf2d   , "dyn_run end first half of iteration ")
+!sms$compare_var(hf2d   , "dyn_run end iteration ")
+!sms$compare_var(hf2d   , 'end cpl_run')
+!sms$compare_var(hf2d   , "end wrf_physics ")
+!sms$compare_var(massfx    , "cnuity.f90 - massfx10")
+!sms$compare_var(massfx , "trcadv.f90 - massfx1   ")
+!sms$compare_var(mp3d, "dyn_run.f90 - mp3d10 ")
+!sms$compare_var(ozplineq, "do_physics.f90 - ozplineq ")
+!sms$compare_var(ozplout, "do_physics.f90 - ozplout ")
+!sms$compare_var(pb2d,'begin physics')
+!sms$compare_var(pb2d,'end physics')
+!sms$compare_var(ph3d, "diag.f90 - ph3d5 ")
+!sms$compare_var(ph3d, "dyn_run before hystat - ph3d5 ")
+!sms$compare_var(phys3dwrf,'begin physics')
+!sms$compare_var(phys3dwrf,'end physics')
+!sms$compare_var(rc2d   , 'begin cpl_run')
+!sms$compare_var(rc2d   , "begin wrf_physics ")
+!sms$compare_var(rc2d   , "dyn_run begin iteration ")
+!sms$compare_var(rc2d   , "dyn_run begin second half of iteration ")
+!sms$compare_var(rc2d   , "dyn_run end first half of iteration ")
+!sms$compare_var(rc2d   , "dyn_run end iteration ")
+!sms$compare_var(rc2d   , 'end cpl_run')
+!sms$compare_var(rc2d   , "end wrf_physics ")
+!sms$compare_var(r_mnus   , "trcadv.f90 - r_mnus4 ")
+!sms$compare_var(rn2d   , 'begin cpl_run')
+!sms$compare_var(rn2d   , "begin wrf_physics ")
+!sms$compare_var(rn2d   , "dyn_run begin iteration ")
+!sms$compare_var(rn2d   , "dyn_run begin second half of iteration ")
+!sms$compare_var(rn2d   , "dyn_run end first half of iteration ")
+!sms$compare_var(rn2d   , "dyn_run end iteration ")
+!sms$compare_var(rn2d   , 'end cpl_run')
+!sms$compare_var(rn2d   , "end wrf_physics ")
+!sms$compare_var(r_plus   , "trcadv.f90 - r_plus4 ")
+!sms$compare_var(sidevec_e, "cnuity.f90 - sidevec_e6 ")
+!sms$compare_var(slmsk2d, 'begin cpl_run')
+!sms$compare_var(slmsk2d, "begin wrf_physics ")
+!sms$compare_var(slmsk2d, 'end cpl_run')
+!sms$compare_var(slmsk2d, "end wrf_physics ")
+!sms$compare_var(sm3d   , "begin chem_driver ")
+!sms$compare_var(sm3d   , 'begin cpl_run')
+!sms$compare_var(sm3d   , "begin wrf_physics ")
+!sms$compare_var(sm3d   , "dyn_run begin iteration ")
+!sms$compare_var(sm3d   , "dyn_run begin second half of iteration ")
+!sms$compare_var(sm3d   , "dyn_run end first half of iteration ")
+!sms$compare_var(sm3d   , "dyn_run end iteration ")
+!sms$compare_var(sm3d   , "end chem_driver ")
+!sms$compare_var(sm3d   , 'end cpl_run')
+!sms$compare_var(sm3d   , "end wrf_physics ")
+!sms$compare_var(st3d   , "begin chem_driver ")
+!sms$compare_var(st3d   , 'begin cpl_run')
+!sms$compare_var(st3d   , "begin wrf_physics ")
+!sms$compare_var(st3d   , "dyn_run begin iteration ")
+!sms$compare_var(st3d   , "dyn_run begin second half of iteration ")
+!sms$compare_var(st3d   , "dyn_run end first half of iteration ")
+!sms$compare_var(st3d   , "dyn_run end iteration ")
+!sms$compare_var(st3d   , "end chem_driver ")
+!sms$compare_var(st3d   , 'end cpl_run')
+!sms$compare_var(st3d   , "end wrf_physics ")
+!sms$compare_var(strs2d,  'begin cpl_run')
+!sms$compare_var(sw2d   , "begin chem_driver ")
+!sms$compare_var(sw2d   , 'begin cpl_run')
+!sms$compare_var(sw2d   , "begin wrf_physics ")
+!sms$compare_var(sw2d   , "dyn_run begin iteration ")
+!sms$compare_var(sw2d   , "dyn_run begin second half of iteration ")
+!sms$compare_var(sw2d   , "dyn_run end first half of iteration ")
+!sms$compare_var(sw2d   , "dyn_run end iteration ")
+!sms$compare_var(sw2d   , "end chem_driver ")
+!sms$compare_var(sw2d   , 'end cpl_run')
+!sms$compare_var(sw2d   , "end wrf_physics ")
+!sms$compare_var(tracr  , "transp3d.f90 - tracr1   ")
+!sms$compare_var(tracr  , "transp3d.f90 - tracr2   ")
+!sms$compare_var(tracr  , "trcadv.f90 - tracr1   ")
+!sms$compare_var(trcdp     , "trcadv.f90 - trcdp5 ")
+!sms$compare_var(trclo_tdcy, "trcadv.f90 - trclo_tdcy5  ")
+!sms$compare_var(trcr_edg, "trcadv.f90 - trcr_edg1  ")
+!sms$compare_var(trcr_lo  , "trcadv.f90 - trcr_lo3 ")
+!sms$compare_var(trc_tdcy, "dyn_run - trc_tdcy5 ")
+!sms$compare_var(trc_tdcy, "trcadv.f90 - trc_tdcy1  ")
+!sms$compare_var(trdp    , "dyn_run - trdp5 ")
+!sms$compare_var(ts2d   , "begin chem_driver ")
+!sms$compare_var(ts2d   , 'begin cpl_run')
+!sms$compare_var(ts2d   , "begin wrf_physics ")
+!sms$compare_var(ts2d   , "dyn_run begin iteration ")
+!sms$compare_var(ts2d   , "dyn_run begin second half of iteration ")
+!sms$compare_var(ts2d   , "dyn_run end first half of iteration ")
+!sms$compare_var(ts2d   , "dyn_run end iteration ")
+!sms$compare_var(ts2d   , "end chem_driver ")
+!sms$compare_var(ts2d   , 'end cpl_run')
+!sms$compare_var(ts2d   , "end wrf_physics ")
+!sms$compare_var(u_edg    , "cnuity.f90 - u_edg6 ")
+!sms$compare_var(us2d   , "begin chem_driver ")
+!sms$compare_var(us2d   , 'begin cpl_run')
+!sms$compare_var(us2d   , "begin wrf_physics ")
+!sms$compare_var(us2d   , "dyn_run begin iteration ")
+!sms$compare_var(us2d   , "dyn_run begin second half of iteration ")
+!sms$compare_var(us2d   , "dyn_run end first half of iteration ")
+!sms$compare_var(us2d   , "dyn_run end iteration ")
+!sms$compare_var(us2d   , "end chem_driver ")
+!sms$compare_var(us2d   , 'end cpl_run')
+!sms$compare_var(us2d   , "end wrf_physics ")
+!sms$compare_var(us3d    , "after momtum - us3d ")
+!sms$compare_var(u_tdcy  , "after momtum - u_tdcy6 ")
+!sms$compare_var(u_tdcy  , "before momtum - u_tndcy5 ")
+!sms$compare_var(u_tndcy , "momtum.f90 - u_tndcy5 ")
+!sms$compare_var(u_tndcy, "momtum.f90 - u_tndcy6 ")
+!sms$compare_var(u_velo , "momtum.f90 - u_velo6 ")
+!sms$compare_var(v_edg    , "cnuity.f90 - v_edg6 ")
+!sms$compare_var(vs3d    , "after momtum - vs3d ")
+!sms$compare_var(v_tdcy  , "after momtum - v_tdcy6 ")
+!sms$compare_var(v_tdcy  , "before momtum - v_tndcy5 ")
+!sms$compare_var(v_tndcy , "momtum.f90 - v_tndcy5 ")
+!sms$compare_var(v_tndcy, "momtum.f90 - v_tndcy6 ")
+!sms$compare_var(v_velo , "momtum.f90 - v_velo6 ")
+!sms$create_decomp
+!sms$create_decomp(dh,<nip>,<halosize>:regionsize=regionsize)
+!sms$distribute
+!sms$distribute (dh,1) begin
+!sms$distribute(dh,1) begin
+!sms$distribute (dh,2) begin
+!sms$distribute(dh,2) begin
+!sms$distribute(dh,3) begin
+!sms$distribute (dh,dim2) begin
+!sms$distribute (dh,dim) begin
+!sms$distribute (dh,nip) begin
+!sms$distribute(dh,nip) begin
+!sms$distribute end
+!sms$exchange
+!sms$exchange(corio,deg_lat,deg_lon,rarea,rsideln,actual)
+!sms$exchange(cumufx,dpinit,dpfinl)
+!sms$exchange(delp,fld)
+!sms$exchange(delp_lo)
+!sms$exchange(dp3d,workb)
+!sms$exchange(exsmo3d)
+!sms$exchange(field)
+!sms$exchange(fields,thko,thkn)
+!sms$exchange(fld)
+!sms$exchange(flp,fln)
+!sms$exchange(g3p(:,:,1))
+!sms$exchange(lat,lon)
+!sms$exchange(lat,lon,nprox,proxs,area,cs,sn,sidevec_c,sidevec_e,sideln,rprox_ln)
+!sms$exchange(prox)
+!sms$exchange(ptdcy)
+!sms$exchange(r_plus,r_mnus)
+!sms$exchange(trcr_lo)
+!sms$exchange(us3d,vs3d,dp3d,tr3d,mp3d,pr3d)
+!sms$exchange (u_velo,v_velo,dp3d)
+!sms$exchange(work_edg)
+!sms$exchange (worku,workv)
+!sms$halo_comp
+!sms$halo_comp(<1,1>) begin
+!sms$halo_comp end
+!sms$ignore
+!sms$ignore begin
+!sms$ignore end
+!sms$ignore end  
+!sms$insert
+!sms$insert allocate(regionsize(nprocs))
+!sms$insert call mpi_comm_rank (mpi_comm_world, mype, ret)
+!sms$insert call nnt_me(iam)
+!sms$insert call nnt_me(me)
+!sms$insert call nnt_me(mype)
+!sms$insert call nnt_nprocs(nprocs)
+!sms$insert call returnunit (unitno)
+!sms$insert character(len=80)    :: decompinfofile
+!sms$insert close(unitno)
+!sms$insert endif
+!sms$insert end if
+!sms$insert if (ios /= 0) then
+!sms$insert if (unitno < 0) then
+!sms$insert ihe = dh__e1(nip,1,dh__nestlevel)
+!sms$insert integer,allocatable  :: regionsize(:)
+!sms$insert integer              :: halosize
+!sms$insert integer :: mype
+!sms$insert ios = 0 ! avoid lahey complaint on non-root tasks
+!sms$insert open (unitno,file=trim(decompinfofile),status='old',iostat=ios)
+!sms$insert   print*,'dyn_init: getunit failed for file=', trim(decompinfofile),'. stopping'
+!sms$insert   print*,'error:  cannot find ',trim(decompinfofile),', prep and fim must be run with the same setting for computetasks in fimnamelist.'
+!sms$insert print"(' halo size:       '                    ,i28,' points'    )",halosize
+!sms$insert read (unitno,*) halosize
+!sms$insert read (unitno,*) regionsize
+!sms$insert   stop
+!sms$insert unitno = getunit ()
+!sms$insert use module_decomp
+!sms$insert use module_physics,only: dh
+!sms$insert write(decompinfofile,"('decompinfo_',i0,'.dat')") nprocs
+!sms$parallel
+!sms$parallel (dh,i) begin
+!sms$parallel (dh,ico) begin
+!sms$parallel (dh,ipn) begin
+!sms$parallel(dh, ipn) begin
+!sms$parallel(dh,ipn) begin 
+!sms$parallel (dh,j) begin
+!sms$parallel(dh, j) begin
+!sms$parallel (dh,n2) begin
+!sms$parallel (dh,n) begin
+!sms$parallel end
+!sms$parallel end 
+!sms$reduce
+!sms$reduce (alat,alon,valu,max)
+!sms$reduce(aveqv3d,avedp3d,sum)
+!sms$reduce (cell1,max)
+!sms$reduce(deriv2,derivma,sum)
+!sms$reduce(globmax,max)
+!sms$reduce(globmin,min)
+!sms$reduce(globmn,min)
+!sms$reduce(globmx,max)
+!sms$reduce(globsum,sum)
+!sms$reduce(imax,imin,max)
+!sms$reduce(ipnmin,ipnmax,kmin,kmax,edgmin,edgmax,max)
+!sms$reduce(isum,isum1,sum,sum1,sum)
+!sms$reduce(laplac_mean,sum)
+!sms$reduce(latimax,lonimax,latimin,lonimin,max)
+!sms$reduce(maxqv3d,maxdp3d,max)
+!sms$reduce(maxtmp,max)
+!sms$reduce(maxtmp,min)
+!sms$reduce(mini,maxi,max)
+!sms$reduce(minqv3d,mindp3d,min)
+!sms$reduce (ntot,alat,alon,valu,max)
+!sms$reduce (ntot,alat,alon,valu,valu_edg,max)
+!sms$reduce(qvamax,max)
+!sms$reduce(qvamin,min)
+!sms$reduce(qvamn,sum)
+!sms$reduce(rssmax,max)
+!sms$reduce(rssmin,min)
+!sms$reduce(summ,smqv,smqw,sumr,sume,sumrc,sumrn,sum)
+!sms$reduce(valmax,max)
+!sms$reduce(valmin,min)
+!sms$reduce(var1,var2,sum)
+!sms$serial
+!sms$serial (<arr,in> : default=ignore) begin
+!sms$serial (<arr,out> : default=ignore) begin
+!sms$serial begin
+!sms$serial begin    
+!sms$serial (<clayfrac,out> : default=ignore)  begin
+!sms$serial (<dm0,out> : default=ignore)  begin
+!sms$serial (<dpsig,out> : default=ignore)  begin
+!sms$serial (<dummy,out> : default=ignore)  begin
+!sms$serial (<emiss_bc,emiss_ash_mass,emiss_ash_height,emiss_ash_dt,out> : default=ignore)  begin
+!sms$serial (<emiss_bc,out> : default=ignore)  begin
+!sms$serial (<emiss_bc,plumestuff,out> : default=ignore)  begin
+!sms$serial (<emiss_co2,out> : default=ignore)  begin
+!sms$serial (<emiss_oc,out> : default=ignore)  begin
+!sms$serial (<emiss_pm10,out> : default=ignore)  begin
+!sms$serial (<emiss_pm25,out> : default=ignore)  begin
+!sms$serial (<emiss_sulf,out> : default=ignore)  begin
+!sms$serial end
+!sms$serial (<ero1,out> : default=ignore)  begin
+!sms$serial (<ero2,out> : default=ignore)  begin
+!sms$serial (<ero3,out> : default=ignore)  begin
+!sms$serial (<ex3d,pr3d,tr3d,in>,<td3d,tv3d,out> : default=ignore) begin
+!sms$serial (<fac,out> : default=ignore) begin
+!sms$serial (<h2o2_backgd,p_gocart,out> : default=ignore)  begin
+!sms$serial (<no3_backgd,p_gocart,out> : default=ignore)  begin
+!sms$serial (<nvp,out> : default=ignore)  begin
+!sms$serial (<oh_backgd,p_gocart,out> : default=ignore)  begin
+!sms$serial(<ozplineq,poz,out>) begin
+!sms$serial (<pr3d,ph3d,us3d,vs3d,dp3d,mp3d,tr,rh3d,ws3d,st3d,sm3d,rn2d,pw2d,ts2d,us2d,hf2d,qf2d,sw2d,lw2d,in> : default=ignore)  begin
+!sms$serial (<sandfrac,out> : default=ignore)  begin
+!sms$serial (<sst_next,fice2d_next,out> : default=ignore) begin 
+!sms$serial (<sst_prev,sst_next,fice2d_prev,fice2d_next,out> : default=ignore) begin 
+!sms$serial (<thetac,out> : default=ignore)  begin
+!sms$serial (<us2d,ts2d,hf2d,qf2d,th3d,pr3d,qv3d,pr3d,in> : default=ignore)  begin
+!sms$set_communicator
+!sms$set_communicator( my_comm )
+!sms$to_local
+!sms$to_local (<1,jds:lbound>, <1,jde:ubound>) begin
+!sms$to_local(dh:<1,ips:lbound>,<1,nip:ubound>) begin
+!sms$to_local end
+!sms$unstructured_grid
+!sms$unstructured_grid(prox)
