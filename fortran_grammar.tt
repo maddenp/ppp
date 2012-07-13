@@ -25,7 +25,7 @@ grammar Fortran
     # close_stmt /
     computed_goto_stmt /
     continue_stmt /
-    # cycle_stmt /
+    cycle_stmt /
     # deallocate_stmt /
     # endfile_stmt /
     # end_function_stmt /
@@ -221,6 +221,16 @@ grammar Fortran
     # R841
 
     label? t_continue t_newline <Stmt>
+  end
+
+  rule cycle_stmt
+    # R834
+    #
+    # Constraint: If a cycle_stmt refers to a do_construct_name, it must be
+    # within the range of that do_construct; otherwise, it must be within the
+    # range of at least one do_construct.
+
+    label? t_cycle do_construct_name? t_newline <Stmt>
   end
 
   rule data_i_do_object
@@ -1213,6 +1223,10 @@ grammar Fortran
 
   rule t_continue
     "continue" <Verbatim>
+  end
+
+  rule t_cycle
+    "cycle" <Verbatim>
   end
 
   rule t_data

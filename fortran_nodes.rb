@@ -228,7 +228,7 @@ module Fortran
 
   class Nonlabel_Do_Stmt < ASTNode
     def to_s
-      s=stmt("#{sa(e0)}#{e1}#{e2}#{e3}")
+      s=stmt("#{sa(e0)}#{sa(e1)}#{e2}#{e3}")
       blockbegin
       s
     end
