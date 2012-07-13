@@ -426,7 +426,10 @@ grammar Fortran
     # R215 -- INCOMPLETE
 
     executable_construct_action_stmt /
-    if_construct
+    # case_construct /
+    do_construct /
+    if_construct # /
+    # where_construct
   end
 
   rule executable_construct_action_stmt
@@ -1239,6 +1242,116 @@ grammar Fortran
   end
 
 #PM#
+  rule do_construct
+    # R816
+
+    block_do_construct # /
+    # nonblock_do_construct
+  end
+
+  rule block_do_construct
+    # R817
+
+    do_stmt do_block end_do <Do_Construct>
+  end
+
+  rule do_stmt
+    # R818
+
+    label_do_stmt /
+    nonlabel_do_stmt
+  end
+
+  rule t_do
+    "do" <Verbatim>
+  end
+
+  rule do_construct_name_label
+    do_construct_name t_colon <Verbatim>
+  end
+
+  rule label_do_stmt
+    # R819
+
+    label? do_construct_name_label? t_do label loop_control? t_newline <Stmt>
+  end
+
+  rule nonlabel_do_stmt
+    # R820
+
+    label? do_construct_name_label? t_do loop_control? t_newline <Stmt>
+  end
+
+  rule loop_control
+    # R821
+    #
+    # Constraint: Each scalar_numeric_expr in loop_control must be of type
+    # integer, default real, or double precision real.
+
+    t_comma? do_variable t_equal scalar_numeric_expr t_comma scalar_numeric_expr ( t_comma scalar_numeric_expr )? <Verbatim> /
+    t_comma? t_while t_paren_l scalar_logical_expr t_paren_r <Verbatim>
+  end
+
+  rule t_while
+    "while" <Verbatim>
+  end
+
+  rule do_variable
+    # R822
+    #
+    # Constraint: The do_variable must be a name scalar variable of type
+    # integer, default real, or double precision real.
+
+    scalar_variable
+  end
+
+  rule scalar_variable
+    # 8.1.4.1.1 (not explicitly defiend)
+    #
+    # Note: Unclear what is needed here, making assumption...
+
+    scalar_variable_name
+  end
+
+  rule do_construct_name
+    # 8.1.4.1.1 (not explicitly defiend)
+    #
+    # Note: Unclear what is needed here, making assumption...
+
+    name
+  end
+
+  rule do_block
+    # R823
+
+    block
+  end
+
+  rule end_do
+    # R824
+    # Constraint: If the do_stmt of a block_do_construct is identified by a
+    # do_construct_name, the corresponding end_do must be an end_do_stmt
+    # specifying the same do_construct_name. If the do_stmt of a
+    # block_do_construct is not identified by a do_construct_name, the
+    # corresponding end_do must not specify a do_construct_name. If the do_stmt
+    # is a nonlabel_do_stmt, the corresponding end_do must be an end_do_stmt.
+    # If the do_stmt is a label_do_stmt, the corresponding end_do must be
+    # identified with the same label.
+
+    end_do_stmt /
+    continue_stmt
+  end
+
+  rule end_do_stmt
+    # R825
+
+    label? t_enddo do_construct_name? t_newline <Stmt>
+  end
+
+  rule t_enddo
+    "enddo" <Verbatim>
+  end
+
 #PM#
 
 end

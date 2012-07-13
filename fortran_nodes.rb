@@ -190,6 +190,8 @@ module Fortran
   end
 
   #PM#
+  class Do_Construct < ASTNode
+  end
   #PM#
 
 end
