@@ -31,7 +31,7 @@ grammar Fortran
     # end_function_stmt /
     end_program_stmt /
     # end_subroutine_stmt /
-    # exit_stmt /
+    exit_stmt /
     goto_stmt /
     if_stmt /
     # inquire_stmt /
@@ -528,6 +528,16 @@ grammar Fortran
 
     ( executable_construct / format_stmt / data_stmt )*
       <Execution_Part_Construct>
+  end
+
+  rule exit_stmt
+    # R835
+    #
+    # Constraint: If an exit_stmt refers to a do_construct_name, it must be
+    # within the range of that do_construct; otherwise, it must be within the
+    # range of at least one do_construct.
+
+    label? t_exit do_construct_name? t_newline <Stmt>
   end
 
   rule exponent
@@ -1243,6 +1253,10 @@ grammar Fortran
 
   rule t_equal
     "=" <Verbatim>
+  end
+
+  rule t_exit
+    "exit" <Verbatim>
   end
 
   rule t_false
