@@ -3,7 +3,9 @@ module Fortran
   @@level=0
   
   class Treetop::Runtime::SyntaxNode
-    def to_s() '' end
+    def to_s
+      ''
+    end
   end
 
   class ASTNode < Treetop::Runtime::SyntaxNode
@@ -16,8 +18,13 @@ module Fortran
       @@level-=1 if @@level>0
     end
 
-    def cat()
+    def cat
       elements.map { |e| e.to_s }.join
+    end
+
+    def fail(msg)
+      puts "ERROR: "+msg
+      exit(1)
     end
 
     def get(k)
@@ -32,16 +39,25 @@ module Fortran
       super(a,b,c)
     end
 
-    def join()
+    def join
       elements.map { |e| e.to_s }.join(' ').strip
     end
 
-    def label()
-      (e0.empty?)?(''):("#{e0} ")
+    def method_missing(m,*a)
+      if m=~/e(\d+)/
+        e=elements[$~[1].to_i]
+        (e.to_s=='')?(nil):(e)
+      else
+        fail "method_missing cannot process '#{m}'"
+      end
     end
 
-    def method_missing(m)
-      (m=~/e(\d+)/)?(elements[$~[1].to_i]):(nil)
+    def sa(e)
+      (e.to_s=='')?(''):("#{e} ")
+    end
+
+    def sb(e)
+      (e.to_s=='')?(''):(" #{e}")
     end
 
     def set(k,v)
@@ -52,11 +68,11 @@ module Fortran
       indent(s.chomp.strip)+"\n"
     end
 
-    def to_s()
+    def to_s
       cat
     end
 
-    def verbatim()
+    def verbatim
       text_value
     end
 
@@ -65,11 +81,15 @@ module Fortran
   # General Subclasses
 
   class Stmt < ASTNode
-    def to_s() stmt(join) end
+    def to_s
+      stmt(join)
+    end
   end
 
   class Verbatim < ASTNode
-    def to_s() verbatim end
+    def to_s
+      verbatim
+    end
   end
 
   # Specific Subclasses
@@ -77,26 +97,29 @@ module Fortran
 # TODO auto-gen empty classes?
 
   class Arithmetic_If_Stmt < ASTNode
-    def to_s()
-      s=stmt(label+"#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}")
+    def to_s
+      s=stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}")
       s
     end
   end
 
   class Assigned_Goto_Stmt < ASTNode
-    def to_s()
-      s=stmt(label+"#{e1} #{e2}#{(e3.to_s[0]==',')?(e3):(' '+e3.to_s)}")
+    def to_s
+      s=stmt("#{sa(e0)}#{e1} #{e2}#{(e3.to_s[0]==',')?(e3):(' '+e3.to_s)}")
       s
     end
   end
 
   class Assignment_Stmt < ASTNode
-    def to_s() stmt(label+"#{e1}#{e2}#{e3}") end
+    def to_s
+      s=stmt("#{sa(e0)}#{e1}#{e2}#{e3}")
+      s
+    end
   end
 
   class Computed_Goto_Stmt < ASTNode
-    def to_s()
-      s=stmt(label+"#{e1} #{e2}#{e3}#{e4}#{(e5=='')?(' '):(e5)}#{e6}")
+    def to_s
+      s=stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
       s
     end
   end
@@ -111,7 +134,7 @@ module Fortran
   end
 
   class Else_If_Stmt < ASTNode
-    def to_s()
+    def to_s
       blockend
       s=stmt(join)
       blockbegin
@@ -120,7 +143,7 @@ module Fortran
   end
 
   class Else_Stmt < ASTNode
-    def to_s()
+    def to_s
       blockend
       s=stmt(join)
       blockbegin
@@ -129,16 +152,22 @@ module Fortran
   end
 
   class End_If_Stmt < ASTNode
-    def to_s()
+    def to_s
       blockend
-      s=stmt(label+"#{e1}"+((e2)?(" #{e2}"):('')))
+      s=stmt("#{sa(e0)}#{e1}#{sb(e2)}")
       s
     end
   end
 
   class End_Program_Stmt < ASTNode
-    def name() e2 end
-    def to_s() blockend; stmt(join) end
+    def name
+      e2
+    end
+    def to_s
+      blockend
+      s=stmt(join)
+      s
+    end
   end
 
   class Execution_Part < ASTNode
@@ -151,8 +180,8 @@ module Fortran
   end
 
   class If_Stmt < ASTNode
-    def to_s()
-      s=stmt(label+"#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
+    def to_s
+      s=stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
       s
     end
   end
@@ -161,8 +190,8 @@ module Fortran
   end
 
   class If_Then_Stmt < ASTNode
-    def to_s()
-      s=stmt(label+"#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")
+    def to_s
+      s=stmt("#{sa(e0)}#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")
       blockbegin
       s
     end
@@ -172,14 +201,17 @@ module Fortran
   end
 
   class Print_Stmt < ASTNode
-    def to_s() stmt(label+"#{e1} #{e2}#{e3}") end
+    def to_s
+      s=stmt("#{sa(e0)}#{e1} #{e2}#{e3}")
+      s
+    end
   end
 
   class Program_Stmt < ASTNode
-    def name()
+    def name
       e1
     end
-    def to_s()
+    def to_s
       s=stmt(join)
       blockbegin
       s
@@ -190,7 +222,38 @@ module Fortran
   end
 
   #PM#
-  class Do_Construct < ASTNode
+  class Block_Do_Construct < ASTNode
+  end
+  
+  class Label_Do_Stmt < ASTNode
+    def to_s
+      s=stmt("#{sa(e0)}#{sa(e1)}#{e2} #{e3}#{sb(e4)}")
+      blockbegin
+      s
+    end
+  end
+
+  class Nonlabel_Do_Stmt < ASTNode
+    def to_s
+      s=stmt("#{sa(e0)}#{sa(e1)}#{e2}#{sb(e3)}")
+      blockbegin
+      s
+    end
+  end
+
+  class End_Do_Stmt < ASTNode
+    def to_s
+      blockend
+      s=stmt(join)
+      s
+    end
+  end
+
+  class Loop_Control_1 < ASTNode
+    def to_s
+      s="#{(e0)?(e0):(' ')}"
+      s
+    end
   end
   #PM#
 

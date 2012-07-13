@@ -1252,7 +1252,7 @@ grammar Fortran
   rule block_do_construct
     # R817
 
-    do_stmt do_block end_do <Do_Construct>
+    do_stmt do_block end_do <Block_Do_Construct>
   end
 
   rule do_stmt
@@ -1273,13 +1273,13 @@ grammar Fortran
   rule label_do_stmt
     # R819
 
-    label? do_construct_name_label? t_do label loop_control? t_newline <Stmt>
+    label? do_construct_name_label? t_do label loop_control? t_newline <Label_Do_Stmt>
   end
 
   rule nonlabel_do_stmt
     # R820
 
-    label? do_construct_name_label? t_do loop_control? t_newline <Stmt>
+    label? do_construct_name_label? t_do loop_control? t_newline <Nonlabel_Do_Stmt>
   end
 
   rule loop_control
@@ -1288,7 +1288,7 @@ grammar Fortran
     # Constraint: Each scalar_numeric_expr in loop_control must be of type
     # integer, default real, or double precision real.
 
-    t_comma? do_variable t_equal scalar_numeric_expr t_comma scalar_numeric_expr ( t_comma scalar_numeric_expr )? <Verbatim> /
+    t_comma? do_variable t_equal scalar_numeric_expr t_comma scalar_numeric_expr ( t_comma scalar_numeric_expr )? <Loop_Control_1> /
     t_comma? t_while t_paren_l scalar_logical_expr t_paren_r <Verbatim>
   end
 
@@ -1339,13 +1339,17 @@ grammar Fortran
     # identified with the same label.
 
     end_do_stmt /
-    continue_stmt
+    end_do_continue_stmt
   end
 
   rule end_do_stmt
     # R825
 
-    label? t_enddo do_construct_name? t_newline <Stmt>
+    label? t_enddo do_construct_name? t_newline <End_Do_Stmt>
+  end
+
+  rule end_do_continue_stmt
+    label? t_continue t_newline <End_Do_Stmt>
   end
 
   rule t_enddo
