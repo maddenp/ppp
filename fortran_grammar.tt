@@ -1290,7 +1290,7 @@ grammar Fortran
 
     #t_comma? do_variable t_equal scalar_numeric_expr t_comma scalar_numeric_expr ( t_comma scalar_numeric_expr )? <Loop_Control_1> /
     t_comma? do_variable t_equal scalar_numeric_expr loop_control_pair loop_control_pair? <Loop_Control_1> /
-    t_comma? t_while t_paren_l scalar_logical_expr t_paren_r <Verbatim>
+    t_comma? t_while t_paren_l scalar_logical_expr t_paren_r <Loop_Control_2>
   end
 
   rule loop_control_pair
