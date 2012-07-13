@@ -251,7 +251,7 @@ module Fortran
 
   class Loop_Control_1 < ASTNode
     def to_s
-      s="#{(e0)?(e0):(' ')}"
+      s="#{(e0)?(e0):('')}#{e1}#{e2}#{e3}#{e4}#{e5}#{e6}"
       s
     end
   end
