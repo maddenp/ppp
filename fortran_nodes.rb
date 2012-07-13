@@ -227,7 +227,7 @@ module Fortran
   
   class Label_Do_Stmt < ASTNode
     def to_s
-      s=stmt("#{sa(e0)}#{sa(e1)}#{e2} #{e3}#{sb(e4)}")
+      s=stmt("#{sa(e0)}#{sa(e1)}#{e2} #{e3}#{e4}")
       blockbegin
       s
     end
@@ -235,7 +235,7 @@ module Fortran
 
   class Nonlabel_Do_Stmt < ASTNode
     def to_s
-      s=stmt("#{sa(e0)}#{sa(e1)}#{e2}#{sb(e3)}")
+      s=stmt("#{sa(e0)}#{e1}#{e2}#{e3}")
       blockbegin
       s
     end
@@ -251,7 +251,7 @@ module Fortran
 
   class Loop_Control_1 < ASTNode
     def to_s
-      s="#{(e0)?(e0):('')}#{e1}#{e2}#{e3}#{e4}#{e5}"
+      s="#{(e0)?(e0):(' ')}#{e1}#{e2}#{e3}#{e4}#{e5}"
       s
     end
   end
