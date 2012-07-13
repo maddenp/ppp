@@ -22,10 +22,8 @@ def fail(msg=nil,cmd=nil)
   exit(1)
 end
 
-def tests
-  Dir.glob("tests/t*").sort
-end
-
+tdir='tests'
+tests=(ARGV[0])?(["#{tdir}/#{ARGV[0]}"]):(Dir.glob("#{tdir}/t*").sort)
 exe('make')
 load 'ppp'
 tests.each do |test|
