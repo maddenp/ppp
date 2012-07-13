@@ -916,6 +916,10 @@ grammar Fortran
     ( t_comma output_item )+ <Verbatim>
   end
 
+  rule parenthesized_expr
+    t_paren_l expr t_paren_r <Verbatim>
+  end
+
   rule pause_stmt
     # R844
 
@@ -934,7 +938,13 @@ grammar Fortran
     # Constraint: subobject must be a subobject whose parent is a constant. A
     # variable that is a primary must not be an assumed-size array.
 
-    constant
+    constant /
+    # constant_subobject /
+    variable /
+    # array_constructor /
+    # structure_constructor /
+    # function_reference /
+    parenthesized_expr
   end
 
   rule print_stmt
