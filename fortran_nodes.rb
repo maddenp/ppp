@@ -1,7 +1,8 @@
 module Fortran
 
+  @@labelstack=[]
   @@level=0
-  
+
   class Treetop::Runtime::SyntaxNode
     def to_s
       ''
@@ -167,9 +168,6 @@ module Fortran
   end
 
   class End_Program_Stmt < ASTNode
-    def name
-      e2
-    end
     def to_s
       blockend
       s=stmt(join)
@@ -241,9 +239,6 @@ module Fortran
   end
 
   class Program_Stmt < ASTNode
-    def name
-      e1
-    end
     def to_s
       s=stmt(join)
       blockbegin
