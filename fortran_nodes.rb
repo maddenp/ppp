@@ -98,29 +98,28 @@ module Fortran
 
   class Arithmetic_If_Stmt < ASTNode
     def to_s
-      s=stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}")
-      s
+      stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}")
     end
   end
 
   class Assigned_Goto_Stmt < ASTNode
     def to_s
-      s=stmt("#{sa(e0)}#{e1} #{e2}#{(e3.to_s[0]==',')?(e3):(' '+e3.to_s)}")
-      s
+      stmt("#{sa(e0)}#{e1} #{e2}#{(e3.to_s[0]==',')?(e3):(' '+e3.to_s)}")
     end
   end
 
   class Assignment_Stmt < ASTNode
     def to_s
-      s=stmt("#{sa(e0)}#{e1}#{e2}#{e3}")
-      s
+      stmt("#{sa(e0)}#{e1}#{e2}#{e3}")
     end
   end
 
+  class Block_Do_Construct < ASTNode
+  end
+  
   class Computed_Goto_Stmt < ASTNode
     def to_s
-      s=stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
-      s
+      stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
     end
   end
 
@@ -147,6 +146,14 @@ module Fortran
       blockend
       s=stmt(join)
       blockbegin
+      s
+    end
+  end
+
+  class End_Do_Stmt < ASTNode
+    def to_s
+      blockend
+      s=stmt(join)
       s
     end
   end
@@ -181,8 +188,7 @@ module Fortran
 
   class If_Stmt < ASTNode
     def to_s
-      s=stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
-      s
+      stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
     end
   end
 
@@ -197,13 +203,40 @@ module Fortran
     end
   end
 
+  class Label_Do_Stmt < ASTNode
+    def to_s
+      s=stmt("#{sa(e0)}#{sa(e1)}#{e2} #{e3}#{e4}")
+      blockbegin
+      s
+    end
+  end
+
+  class Loop_Control_1 < ASTNode
+    def to_s
+      "#{(e0)?(e0):(' ')}#{e1}#{e2}#{e3}#{e4}#{e5}"
+    end
+  end
+
+  class Loop_Control_2 < ASTNode
+    def to_s
+      "#{(e0)?(e0):(' ')}#{e1} #{e2}#{e3}#{e4}"
+    end
+  end
+
   class Main_Program < ASTNode
+  end
+
+  class Nonlabel_Do_Stmt < ASTNode
+    def to_s
+      s=stmt("#{sa(e0)}#{e1}#{e2}#{e3}")
+      blockbegin
+      s
+    end
   end
 
   class Print_Stmt < ASTNode
     def to_s
-      s=stmt("#{sa(e0)}#{e1} #{e2}#{e3}")
-      s
+      stmt("#{sa(e0)}#{e1} #{e2}#{e3}")
     end
   end
 
@@ -222,46 +255,6 @@ module Fortran
   end
 
   #PM#
-  class Block_Do_Construct < ASTNode
-  end
-  
-  class Label_Do_Stmt < ASTNode
-    def to_s
-      s=stmt("#{sa(e0)}#{sa(e1)}#{e2} #{e3}#{e4}")
-      blockbegin
-      s
-    end
-  end
-
-  class Nonlabel_Do_Stmt < ASTNode
-    def to_s
-      s=stmt("#{sa(e0)}#{e1}#{e2}#{e3}")
-      blockbegin
-      s
-    end
-  end
-
-  class End_Do_Stmt < ASTNode
-    def to_s
-      blockend
-      s=stmt(join)
-      s
-    end
-  end
-
-  class Loop_Control_1 < ASTNode
-    def to_s
-      s="#{(e0)?(e0):(' ')}#{e1}#{e2}#{e3}#{e4}#{e5}"
-      s
-    end
-  end
-
-  class Loop_Control_2 < ASTNode
-    def to_s
-      s="#{(e0)?(e0):(' ')}#{e1} #{e2}#{e3}#{e4}"
-      s
-    end
-  end
   #PM#
 
 end
