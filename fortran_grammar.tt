@@ -51,6 +51,18 @@ grammar Fortran
     pause_stmt
   end
 
+  rule action_term_do_construct
+    # R827
+
+    action_term_do_construct_label_do_stmt do_body do_term_action_stmt
+      <Action_Term_Do_Construct>
+  end
+
+  rule action_term_do_construct_label_do_stmt
+    label_do_stmt &{ |e| nonblock_do_begin(e[0]) }
+      <Action_Term_Do_Construct_Label_Do_Stmt>
+  end
+
   rule add_op
     # R710
 
@@ -390,6 +402,12 @@ grammar Fortran
     block
   end
 
+  rule do_body
+    # R828
+
+    execution_part_construct
+  end
+
   rule do_construct
     # R816
     #
@@ -416,6 +434,34 @@ grammar Fortran
 
     label_do_stmt /
     nonlabel_do_stmt
+  end
+
+  rule do_term_action_stmt
+    # R829
+    #
+    # Constraint: A do_term_action_stmt must not be a continue_stmt, a
+    # goto_stmt, a return_stmt, a stop_stmt, an exit_stmt, a cycle_stmt, an
+    # end_function_stmt, an end_subroutine_stmt, an end_program_stmt, an
+    # arithmetic_if_stmt, or an assigned_goto_stmt. The do_term_action_stmt
+    # must be identified with a label and the corresponding label_do_stmt
+    # must refer to the same label.
+
+    !do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end!(e[1]) }
+      <Do_Term_Action_Stmt>
+  end
+
+  rule do_term_action_stmt_disallowed
+    arithmetic_if_stmt /
+    assigned_goto_stmt /
+    continue_stmt /
+    cycle_stmt /
+    # end_function_stmt /
+    end_program_stmt /
+    # end_subroutine_stmt /
+    exit_stmt /
+    goto_stmt /
+    # return_stmt /
+    stop_stmt
   end
 
   rule do_variable
@@ -518,7 +564,8 @@ grammar Fortran
   end
 
   rule executable_construct_action_stmt
-    !execution_part_disallowed action_stmt !{ |e| nonblock_do_end?(e[1]) } <Stmt>
+    !execution_part_disallowed action_stmt !{ |e| nonblock_do_end?(e[1]) }
+      <Stmt>
   end
 
   rule execution_part
@@ -739,7 +786,8 @@ grammar Fortran
   rule label_do_stmt
     # R819
 
-    label:label? do_construct_name_label? t_do dolabel:label loop_control? t_newline <Label_Do_Stmt>
+    label:label? do_construct_name_label? t_do dolabel:label loop_control?
+      t_newline <Label_Do_Stmt>
   end
 
   rule label_list
@@ -1413,49 +1461,6 @@ grammar Fortran
 
     action_term_do_construct # /
     # outer_shared_do_construct
-  end
-
-  rule action_term_do_construct
-    # R827
-
-    action_term_do_construct_label_do_stmt do_body do_term_action_stmt <Action_Term_Do_Construct>
-  end
-
-  rule action_term_do_construct_label_do_stmt
-    label_do_stmt &{ |e| nonblock_do_begin(e[0]) } <Action_Term_Do_Construct_Label_Do_Stmt>
-  end
-
-  rule do_body
-    # R828
-
-    execution_part_construct
-  end
-
-  rule do_term_action_stmt
-    # R829
-    #
-    # Constraint: A do_term_action_stmt must not be a continue_stmt, a
-    # goto_stmt, a return_stmt, a stop_stmt, an exit_stmt, a cycle_stmt, an
-    # end_function_stmt, an end_subroutine_stmt, an end_program_stmt, an
-    # arithmetic_if_stmt, or an assigned_goto_stmt. The do_term_action_stmt
-    # must be identified with a label and the corresponding label_do_stmt
-    # must refer to the same label.
-
-    !do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end!(e[1]) } <Do_Term_Action_Stmt>
-  end
-
-  rule do_term_action_stmt_disallowed
-    arithmetic_if_stmt /
-    assigned_goto_stmt /
-    continue_stmt /
-    cycle_stmt /
-    # end_function_stmt /
-    end_program_stmt /
-    # end_subroutine_stmt /
-    exit_stmt /
-    goto_stmt /
-    # return_stmt /
-    stop_stmt
   end
 
 #  rule outer_shared_do_construct
