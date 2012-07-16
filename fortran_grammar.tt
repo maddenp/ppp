@@ -1459,52 +1459,52 @@ grammar Fortran
   rule nonblock_do_construct
     # R826
 
-    action_term_do_construct # /
-    # outer_shared_do_construct
+    action_term_do_construct /
+    outer_shared_do_construct
   end
 
-#  rule outer_shared_do_construct
-#    # R830
-#
-#    label_do_stmt do_body shared_term_do_construct <Verbatim>
-#  end
-#
-#  rule shared_term_do_construct
-#    # R831
-#
-#    outer_shared_do_construct /
-#    inner_shared_do_construct
-#  end
-#
-#  rule inner_shared_do_construct
-#    # R832
-#
-#    label_do_stmt do_body do_term_shared_stmt <Verbatim>
-#  end
-#
-#  rule do_term_shared_stmt
-#    # R833
-#    #
-#    # Constraint: A do_term_shared_stmt must not be a goto_stmt, a return_stmt,
-#    # a stop_stmt, an exit_stmt, a cycle_stmt, an end_fuction_stmt, an
-#    # end_subroutine_stmt, and end_program_stmt, an arithmetic_if_stmt, or an
-#    # assigned_goto_stmt.
-#
-#    !do_term_shared_stmt_disallowed action_stmt <Stmt>
-#  end
-#
-#  rule do_term_shared_stmt_disallowed
-#    arithmetic_if_stmt /
-#    assigned_goto_stmt /
-#    cycle_stmt /
-#    # end_function_stmt /
-#    end_program_stmt /
-#    # end_subroutine_stmt /
-#    exit_stmt /
-#    goto_stmt /
-#    # return_stmt /
-#    stop_stmt
-#  end
+  rule outer_shared_do_construct
+    # R830
+
+    label_do_stmt do_body shared_term_do_construct <Verbatim>
+  end
+
+  rule shared_term_do_construct
+    # R831
+
+    outer_shared_do_construct /
+    inner_shared_do_construct
+  end
+
+  rule inner_shared_do_construct
+    # R832
+
+    label_do_stmt do_body do_term_shared_stmt <Verbatim>
+  end
+
+  rule do_term_shared_stmt
+    # R833
+    #
+    # Constraint: A do_term_shared_stmt must not be a goto_stmt, a return_stmt,
+    # a stop_stmt, an exit_stmt, a cycle_stmt, an end_fuction_stmt, an
+    # end_subroutine_stmt, and end_program_stmt, an arithmetic_if_stmt, or an
+    # assigned_goto_stmt.
+
+    !do_term_shared_stmt_disallowed action_stmt <Stmt>
+  end
+
+  rule do_term_shared_stmt_disallowed
+    arithmetic_if_stmt /
+    assigned_goto_stmt /
+    cycle_stmt /
+    # end_function_stmt /
+    end_program_stmt /
+    # end_subroutine_stmt /
+    exit_stmt /
+    goto_stmt /
+    # return_stmt /
+    stop_stmt
+  end
 
 #PM#
 
