@@ -8,14 +8,13 @@ module Fortran
   end
 
   def nonblock_do_end?(node)
-    return false unless defined? @ndls
-    return false unless node.respond_to?(:label)
-    ("#{node.label}"=="#{@ndls.last}")?(@ndls.pop;true):(false)
+    return false unless defined?(@ndls) and node.respond_to?(:label)
+    ("#{node.label}"=="#{@ndls.last}")?(true):(false)
   end
-# def nonblock_do_end?(node)
-#   return true if defined? @ndls  and node.respond_to? :label  and "#{node.label}"=="#{@ndls.last}"
-#   false
-# end
+
+  def nonblock_do_end!(node)
+    @ndls.pop if nonblock_do_end?(node)
+  end
 
   class Treetop::Runtime::SyntaxNode
     def to_s
@@ -117,6 +116,16 @@ module Fortran
 
 # TODO auto-gen empty classes?
 
+  class Action_Term_Do_Construct < ASTNode
+  end
+
+  class Action_Term_Do_Construct_Label_Do_Stmt < ASTNode
+    def to_s
+      blockend
+      "#{e0}"
+    end
+  end
+
   class Arithmetic_If_Stmt < ASTNode
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}")
@@ -141,6 +150,14 @@ module Fortran
   class Computed_Goto_Stmt < ASTNode
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
+    end
+  end
+
+  class Do_Term_Action_Stmt < ASTNode
+    def to_s
+      blockend
+      s=stmt(join)
+      s
     end
   end
 

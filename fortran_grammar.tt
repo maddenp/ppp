@@ -392,9 +392,11 @@ grammar Fortran
 
   rule do_construct
     # R816
+    #
+    # Note: Choice order differs from standard to accommodate PEG backtracking.
 
-    block_do_construct /
-    nonblock_do_construct
+    nonblock_do_construct /
+    block_do_construct
   end
 
   rule do_construct_name
@@ -516,9 +518,6 @@ grammar Fortran
   end
 
   rule executable_construct_action_stmt
-    #!execution_part_disallowed action_stmt <Stmt>
-    #!execution_part_disallowed action_stmt !{ |e| p e[1];nonblock_do_end?(e[1].label) } <Stmt>
-    #!execution_part_disallowed action_stmt !{ |e| p e[1];nonblock_do_end?(e[1]) } <Stmt>
     !execution_part_disallowed action_stmt !{ |e| nonblock_do_end?(e[1]) } <Stmt>
   end
 
@@ -740,8 +739,7 @@ grammar Fortran
   rule label_do_stmt
     # R819
 
-    label:label? do_construct_name_label? t_do dolabel:label loop_control?
-      t_newline <Label_Do_Stmt>
+    label:label? do_construct_name_label? t_do dolabel:label loop_control? t_newline <Label_Do_Stmt>
   end
 
   rule label_list
@@ -1413,21 +1411,18 @@ grammar Fortran
   rule nonblock_do_construct
     # R826
 
-    action_term_do_construct /
-    outer_shared_do_construct
+    action_term_do_construct # /
+    # outer_shared_do_construct
   end
 
   rule action_term_do_construct
     # R827
 
-    #label_do_stmt do_body do_term_action_stmt <Verbatim>
-    #action_term_do_construct_label_do_stmt do_body do_term_action_stmt <Verbatim>
-    action_term_do_construct_label_do_stmt do_body <Verbatim>
+    action_term_do_construct_label_do_stmt do_body do_term_action_stmt <Action_Term_Do_Construct>
   end
 
   rule action_term_do_construct_label_do_stmt
-    #label_do_stmt &{ |e| nonblock_do_begin(e[0].dolabel) }
-    label_do_stmt &{ |e| nonblock_do_begin(e[0]) }
+    label_do_stmt &{ |e| nonblock_do_begin(e[0]) } <Action_Term_Do_Construct_Label_Do_Stmt>
   end
 
   rule do_body
@@ -1446,8 +1441,7 @@ grammar Fortran
     # must be identified with a label and the corresponding label_do_stmt
     # must refer to the same label.
 
-    #!do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end?(e[1].label) } <Stmt>
-    !do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end?(e[1]) } <Stmt>
+    !do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end!(e[1]) } <Do_Term_Action_Stmt>
   end
 
   rule do_term_action_stmt_disallowed
@@ -1464,48 +1458,48 @@ grammar Fortran
     stop_stmt
   end
 
-  rule outer_shared_do_construct
-    # R830
-
-    label_do_stmt do_body shared_term_do_construct <Verbatim>
-  end
-
-  rule shared_term_do_construct
-    # R831
-
-    outer_shared_do_construct /
-    inner_shared_do_construct
-  end
-
-  rule inner_shared_do_construct
-    # R832
-
-    label_do_stmt do_body do_term_shared_stmt <Verbatim>
-  end
-
-  rule do_term_shared_stmt
-    # R833
-    #
-    # Constraint: A do_term_shared_stmt must not be a goto_stmt, a return_stmt,
-    # a stop_stmt, an exit_stmt, a cycle_stmt, an end_fuction_stmt, an
-    # end_subroutine_stmt, and end_program_stmt, an arithmetic_if_stmt, or an
-    # assigned_goto_stmt.
-
-    !do_term_shared_stmt_disallowed action_stmt <Stmt>
-  end
-
-  rule do_term_shared_stmt_disallowed
-    arithmetic_if_stmt /
-    assigned_goto_stmt /
-    cycle_stmt /
-    # end_function_stmt /
-    end_program_stmt /
-    # end_subroutine_stmt /
-    exit_stmt /
-    goto_stmt /
-    # return_stmt /
-    stop_stmt
-  end
+#  rule outer_shared_do_construct
+#    # R830
+#
+#    label_do_stmt do_body shared_term_do_construct <Verbatim>
+#  end
+#
+#  rule shared_term_do_construct
+#    # R831
+#
+#    outer_shared_do_construct /
+#    inner_shared_do_construct
+#  end
+#
+#  rule inner_shared_do_construct
+#    # R832
+#
+#    label_do_stmt do_body do_term_shared_stmt <Verbatim>
+#  end
+#
+#  rule do_term_shared_stmt
+#    # R833
+#    #
+#    # Constraint: A do_term_shared_stmt must not be a goto_stmt, a return_stmt,
+#    # a stop_stmt, an exit_stmt, a cycle_stmt, an end_fuction_stmt, an
+#    # end_subroutine_stmt, and end_program_stmt, an arithmetic_if_stmt, or an
+#    # assigned_goto_stmt.
+#
+#    !do_term_shared_stmt_disallowed action_stmt <Stmt>
+#  end
+#
+#  rule do_term_shared_stmt_disallowed
+#    arithmetic_if_stmt /
+#    assigned_goto_stmt /
+#    cycle_stmt /
+#    # end_function_stmt /
+#    end_program_stmt /
+#    # end_subroutine_stmt /
+#    exit_stmt /
+#    goto_stmt /
+#    # return_stmt /
+#    stop_stmt
+#  end
 
 #PM#
 
