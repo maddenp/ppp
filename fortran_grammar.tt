@@ -516,7 +516,10 @@ grammar Fortran
   end
 
   rule executable_construct_action_stmt
-    !execution_part_disallowed action_stmt <Stmt>
+    #!execution_part_disallowed action_stmt <Stmt>
+    #!execution_part_disallowed action_stmt !{ |e| p e[1];nonblock_do_end?(e[1].label) } <Stmt>
+    #!execution_part_disallowed action_stmt !{ |e| p e[1];nonblock_do_end?(e[1]) } <Stmt>
+    !execution_part_disallowed action_stmt !{ |e| nonblock_do_end?(e[1]) } <Stmt>
   end
 
   rule execution_part
@@ -537,8 +540,12 @@ grammar Fortran
   rule execution_part_construct
     # R209 -- INCOMPLETE
 
-    ( executable_construct / format_stmt / data_stmt )*
-      <Execution_Part_Construct>
+    (
+      executable_construct /
+      format_stmt /
+      data_stmt # /
+      # entry_stmt
+    )* <Execution_Part_Construct>
   end
 
   rule exit_stmt
@@ -733,8 +740,8 @@ grammar Fortran
   rule label_do_stmt
     # R819
 
-    label:label? do_construct_name_label? t_do label loop_control? t_newline
-      <Label_Do_Stmt>
+    label:label? do_construct_name_label? t_do dolabel:label loop_control?
+      t_newline <Label_Do_Stmt>
   end
 
   rule label_list
@@ -1414,7 +1421,13 @@ grammar Fortran
     # R827
 
     #label_do_stmt do_body do_term_action_stmt <Verbatim>
-    label_do_stmt do_body &{ |e| true } <Verbatim>
+    #action_term_do_construct_label_do_stmt do_body do_term_action_stmt <Verbatim>
+    action_term_do_construct_label_do_stmt do_body <Verbatim>
+  end
+
+  rule action_term_do_construct_label_do_stmt
+    #label_do_stmt &{ |e| nonblock_do_begin(e[0].dolabel) }
+    label_do_stmt &{ |e| nonblock_do_begin(e[0]) }
   end
 
   rule do_body
@@ -1433,7 +1446,8 @@ grammar Fortran
     # must be identified with a label and the corresponding label_do_stmt
     # must refer to the same label.
 
-    !do_term_action_stmt_disallowed action_stmt <Stmt>
+    #!do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end?(e[1].label) } <Stmt>
+    !do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end?(e[1]) } <Stmt>
   end
 
   rule do_term_action_stmt_disallowed

@@ -1,7 +1,21 @@
 module Fortran
 
-  @@labelstack=[]
   @@level=0
+
+  def nonblock_do_begin(node)
+    @ndls||=[]
+    @ndls.push(node.dolabel)
+  end
+
+  def nonblock_do_end?(node)
+    return false unless defined? @ndls
+    return false unless node.respond_to?(:label)
+    ("#{node.label}"=="#{@ndls.last}")?(@ndls.pop;true):(false)
+  end
+# def nonblock_do_end?(node)
+#   return true if defined? @ndls  and node.respond_to? :label  and "#{node.label}"=="#{@ndls.last}"
+#   false
+# end
 
   class Treetop::Runtime::SyntaxNode
     def to_s
@@ -24,7 +38,13 @@ module Fortran
     end
 
     def fail(msg)
-      puts "ERROR: "+msg
+      puts "\nERROR: "+msg+"\n\nbacktrace:\n\n"
+      begin
+        raise
+      rescue => e
+        puts e.backtrace
+      end
+      puts
       exit(1)
     end
 
@@ -49,7 +69,7 @@ module Fortran
         e=elements[$~[1].to_i]
         (e.to_s=='')?(nil):(e)
       else
-        fail "method_missing cannot process '#{m}'"
+        fail "method_missing cannot find method '#{m}'"
       end
     end
 
