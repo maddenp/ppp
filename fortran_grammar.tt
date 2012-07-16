@@ -1461,12 +1461,21 @@ grammar Fortran
 
     action_term_do_construct /
     outer_shared_do_construct
+
+    #outer_shared_do_construct /
+    #action_term_do_construct
   end
 
   rule outer_shared_do_construct
     # R830
 
-    label_do_stmt do_body shared_term_do_construct <Verbatim>
+    #label_do_stmt do_body shared_term_do_construct <Verbatim>
+    outer_shared_do_construct_label_do_stmt do_body shared_term_do_construct <Verbatim>
+  end
+
+  rule outer_shared_do_construct_label_do_stmt
+    label_do_stmt &{ |e| nonblock_do_begin(e[0]) }
+      <Verbatim>
   end
 
   rule shared_term_do_construct
@@ -1479,7 +1488,13 @@ grammar Fortran
   rule inner_shared_do_construct
     # R832
 
-    label_do_stmt do_body do_term_shared_stmt <Verbatim>
+    #label_do_stmt do_body do_term_shared_stmt <Verbatim>
+    inner_shared_do_construct_label_do_stmt do_body do_term_shared_stmt <Verbatim>
+  end
+
+  rule inner_shared_do_construct_label_do_stmt
+    label_do_stmt &{ |e| nonblock_do_end?(e[0]) }
+      <Verbatim>
   end
 
   rule do_term_shared_stmt
@@ -1490,7 +1505,8 @@ grammar Fortran
     # end_subroutine_stmt, and end_program_stmt, an arithmetic_if_stmt, or an
     # assigned_goto_stmt.
 
-    !do_term_shared_stmt_disallowed action_stmt <Stmt>
+    #!do_term_shared_stmt_disallowed action_stmt <Stmt>
+    !do_term_shared_stmt_disallowed action_stmt &{ |e| nonblock_do_end!(e[1]) } <Stmt>
   end
 
   rule do_term_shared_stmt_disallowed
