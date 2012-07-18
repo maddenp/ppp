@@ -54,12 +54,7 @@ grammar Fortran
   rule action_term_do_construct
     # R827
 
-    action_term_do_construct_label_do_stmt do_body do_term_action_stmt
-      <Action_Term_Do_Construct>
-  end
-
-  rule action_term_do_construct_label_do_stmt
-    label_do_stmt
+    label_do_stmt do_body do_term_action_stmt <Action_Term_Do_Construct>
   end
 
   rule add_op
@@ -1459,22 +1454,14 @@ grammar Fortran
   rule nonblock_do_construct
     # R826
 
-    action_term_do_construct /
-    outer_shared_do_construct
-
-    #outer_shared_do_construct /
-    #action_term_do_construct
+    outer_shared_do_construct /
+    action_term_do_construct
   end
 
   rule outer_shared_do_construct
     # R830
 
-    #label_do_stmt do_body shared_term_do_construct <Verbatim>
-    outer_shared_do_construct_label_do_stmt do_body shared_term_do_construct <Verbatim>
-  end
-
-  rule outer_shared_do_construct_label_do_stmt
-    label_do_stmt
+    label_do_stmt do_body shared_term_do_construct <Verbatim>
   end
 
   rule shared_term_do_construct
