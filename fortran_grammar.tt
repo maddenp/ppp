@@ -54,7 +54,7 @@ grammar Fortran
   rule action_term_do_construct
     # R827
 
-    label_do_stmt do_body do_term_action_stmt <Action_Term_Do_Construct>
+    label_do_stmt do_body do_term_action_stmt <Cat>
   end
 
   rule add_op
@@ -153,7 +153,7 @@ grammar Fortran
   rule block_do_construct
     # R817
 
-    do_stmt do_block end_do <Block_Do_Construct>
+    do_stmt do_block end_do <Cat>
   end
 
   rule boz_literal_constant
@@ -399,16 +399,14 @@ grammar Fortran
   rule do_body
     # R828
 
-    execution_part_construct
+    execution_part_construct &{ |e| say "execution_part_construct:\n#{e[0]}" } <Cat>
   end
 
   rule do_construct
     # R816
-    #
-    # Note: Choice order differs from standard to accommodate PEG backtracking.
 
     nonblock_do_construct /
-    block_do_construct
+    block_do_construct &{ |e| say "do_construct\n#{e[0]}" } <Cat>
   end
 
   rule do_construct_name
@@ -468,15 +466,15 @@ grammar Fortran
   end
 
   rule else_construct
-    else_stmt block <Else_Construct>
+    else_stmt block <Cat>
   end
 
   rule else_if_construct
-    else_if_construct_element+ <Else_If_Construct>
+    else_if_construct_element+ <Cat>
   end
 
   rule else_if_construct_element
-    else_if_stmt block <Else_If_Construct_Element>
+    else_if_stmt block <Cat>
   end
 
   rule else_if_stmt
@@ -569,7 +567,7 @@ grammar Fortran
     # Constraint: An execution_part must not contain an end_function_stmt,
     # end_program_stmt, or end_subroutine_stmt.
 
-    executable_construct execution_part_construct <Execution_Part>
+    executable_construct execution_part_construct <Cat>
   end
 
   rule execution_part_disallowed
@@ -586,7 +584,7 @@ grammar Fortran
       format_stmt /
       data_stmt # /
       # entry_stmt
-    )* <Execution_Part_Construct>
+    )* <Cat>
   end
 
   rule exit_stmt
@@ -682,7 +680,7 @@ grammar Fortran
     # clarity, not specified in standard.
 
     label:label? if_then_construct else_if_construct? else_construct?
-      end_if_stmt <If_Construct>
+      end_if_stmt <Cat>
   end
 
   rule if_construct_name
@@ -706,7 +704,7 @@ grammar Fortran
   end
 
   rule if_then_construct
-    if_then_stmt block <If_Then_Construct>
+    if_then_stmt block <Cat>
   end
 
   rule if_then_stmt
@@ -886,8 +884,7 @@ grammar Fortran
     # Constraint: In a main_program, the execution_part must not contain a
     # RETURN statement or an ENTRY statement.
 
-    program_stmt? specification_part? execution_part? end_program_stmt
-      <Main_Program>
+    program_stmt? specification_part? execution_part? end_program_stmt <Cat>
   end
 
   rule mult_op
@@ -1239,8 +1236,8 @@ grammar Fortran
   rule specification_part
     # R204 -- INCOMPLETE
 
-    #use_stmt* implicit_part? declaration_construct* <Specification_Part> 
-    declaration_construct* <Specification_Part> 
+    #use_stmt* implicit_part? declaration_construct* <Cat>
+    declaration_construct* <Cat>
   end
 
   rule specification_stmt
@@ -1461,7 +1458,7 @@ grammar Fortran
   rule outer_shared_do_construct
     # R830
 
-    label_do_stmt do_body shared_term_do_construct <Verbatim>
+    label_do_stmt !{ |e| dolabel_dupe? } do_body &{ |e| say "x body #{e[1]}" } shared_term_do_construct &{ |e| say "x stdc #{e[2]}" } <Verbatim>
   end
 
   rule shared_term_do_construct
@@ -1474,13 +1471,7 @@ grammar Fortran
   rule inner_shared_do_construct
     # R832
 
-    #label_do_stmt do_body do_term_shared_stmt <Verbatim>
-    inner_shared_do_construct_label_do_stmt do_body do_term_shared_stmt <Verbatim>
-  end
-
-  rule inner_shared_do_construct_label_do_stmt
-    label_do_stmt &{ |e| nonblock_do_end?(e[0]) }
-      <Verbatim>
+    label_do_stmt &{ |e| say "y label #{e[0]}" } do_body do_term_shared_stmt <Verbatim>
   end
 
   rule do_term_shared_stmt

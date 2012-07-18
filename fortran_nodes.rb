@@ -18,9 +18,21 @@ module Fortran
     @dolabel_stack.pop
   end
 
+  def dolabel_dupe?
+    c=@dolabel_stack[-1]
+    p=@dolabel_stack[-2]
+    say " current label: #{c}"
+    say "previous label: #{p}"
+    r="#{c}"=="#{p}"
+    say "dupe? #{r}"
+    r
+  end
+  
   def nonblock_do_end?(node)
     return false unless defined?(@dolabel_stack) and node.respond_to?(:label)
-    ("#{node.label}"=="#{@dolabel_stack.last}")?(true):(false)
+    r=("#{node.label}"=="#{@dolabel_stack.last}")?(true):(false)
+    say "nonblock_do_end? #{r} for #{node}"
+    r
   end
 
   def nonblock_do_end!(node)
@@ -111,6 +123,12 @@ module Fortran
 
   # General Subclasses
 
+  class Cat < ASTNode
+    def to_s
+      cat
+    end
+  end
+
   class Stmt < ASTNode
     def to_s
       stmt(join)
@@ -124,11 +142,6 @@ module Fortran
   end
 
   # Specific Subclasses
-
-# TODO auto-gen empty classes?
-
-  class Action_Term_Do_Construct < ASTNode
-  end
 
   class Arithmetic_If_Stmt < ASTNode
     def to_s
@@ -148,9 +161,6 @@ module Fortran
     end
   end
 
-  class Block_Do_Construct < ASTNode
-  end
-  
   class Computed_Goto_Stmt < ASTNode
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
@@ -163,15 +173,6 @@ module Fortran
       s=stmt(join)
       s
     end
-  end
-
-  class Else_Construct < ASTNode
-  end
-
-  class Else_If_Construct < ASTNode
-  end
-
-  class Else_If_Construct_Element < ASTNode
   end
 
   class Else_If_Stmt < ASTNode
@@ -216,22 +217,10 @@ module Fortran
     end
   end
 
-  class Execution_Part < ASTNode
-  end
-
-  class Execution_Part_Construct < ASTNode
-  end
-
-  class If_Construct < ASTNode
-  end
-
   class If_Stmt < ASTNode
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
     end
-  end
-
-  class If_Then_Construct < ASTNode
   end
 
   class If_Then_Stmt < ASTNode
@@ -262,9 +251,6 @@ module Fortran
     end
   end
 
-  class Main_Program < ASTNode
-  end
-
   class Nonlabel_Do_Stmt < ASTNode
     def to_s
       s=stmt("#{sa(e0)}#{sa(e1)}#{e2}#{e3}")
@@ -285,9 +271,6 @@ module Fortran
       blockbegin
       s
     end
-  end
-
-  class Specification_Part < ASTNode
   end
 
   #PM#
