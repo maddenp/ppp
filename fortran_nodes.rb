@@ -2,18 +2,29 @@ module Fortran
 
   @@level=0
 
-  def nonblock_do_begin(node)
-    @ndls||=[]
-    @ndls.push(node.dolabel)
+  def say(msg)
+    $stderr.write("#PM# #{msg}\n")
+  end
+
+  def dolabel_push(label)
+    @dolabel_stack||=[]
+    say "push '#{label}'"
+    @dolabel_stack.push(label)
+  end
+
+  def dolabel_pop(label)
+    @dolabel_stack||=[]
+    say "pop '#{label}'"
+    @dolabel_stack.pop
   end
 
   def nonblock_do_end?(node)
-    return false unless defined?(@ndls) and node.respond_to?(:label)
-    ("#{node.label}"=="#{@ndls.last}")?(true):(false)
+    return false unless defined?(@dolabel_stack) and node.respond_to?(:label)
+    ("#{node.label}"=="#{@dolabel_stack.last}")?(true):(false)
   end
 
   def nonblock_do_end!(node)
-    @ndls.pop if nonblock_do_end?(node)
+    @dolabel_stack.pop if nonblock_do_end?(node)
   end
 
   class Treetop::Runtime::SyntaxNode
@@ -117,13 +128,6 @@ module Fortran
 # TODO auto-gen empty classes?
 
   class Action_Term_Do_Construct < ASTNode
-  end
-
-  class Action_Term_Do_Construct_Label_Do_Stmt < ASTNode
-    def to_s
-      blockend
-      "#{e0}"
-    end
   end
 
   class Arithmetic_If_Stmt < ASTNode

@@ -59,8 +59,7 @@ grammar Fortran
   end
 
   rule action_term_do_construct_label_do_stmt
-    label_do_stmt &{ |e| nonblock_do_begin(e[0]) }
-      <Action_Term_Do_Construct_Label_Do_Stmt>
+    label_do_stmt
   end
 
   rule add_op
@@ -514,13 +513,14 @@ grammar Fortran
   end
 
   rule end_do_continue_stmt
-    label:label? t_continue t_newline <End_Do_Stmt>
+    label:label? t_continue t_newline &{ |e| dolabel_pop(e[0]) } <End_Do_Stmt>
   end
 
   rule end_do_stmt
     # R825
 
-    label:label? t_enddo do_construct_name? t_newline <End_Do_Stmt>
+    label:label? t_enddo do_construct_name? t_newline &{ |e| dolabel_pop(e[0]) }
+      <End_Do_Stmt>
   end
 
   rule end_if_stmt
@@ -787,7 +787,7 @@ grammar Fortran
     # R819
 
     label:label? do_construct_name_label? t_do dolabel:label loop_control?
-      t_newline <Label_Do_Stmt>
+      t_newline &{ |e| dolabel_push(e[3]) } <Label_Do_Stmt>
   end
 
   rule label_list
@@ -936,7 +936,7 @@ grammar Fortran
     # R820
 
     label:label? do_construct_name_label? t_do loop_control? t_newline
-      <Nonlabel_Do_Stmt>
+      &{ |e| dolabel_push(:nolabel) } <Nonlabel_Do_Stmt>
   end
 
   rule not_op
@@ -1474,8 +1474,7 @@ grammar Fortran
   end
 
   rule outer_shared_do_construct_label_do_stmt
-    label_do_stmt &{ |e| nonblock_do_begin(e[0]) }
-      <Verbatim>
+    label_do_stmt
   end
 
   rule shared_term_do_construct
