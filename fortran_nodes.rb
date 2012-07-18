@@ -1,34 +1,34 @@
 module Fortran
 
+  @@dolabels=[]
   @@level=0
 
   # Module methods
 
   def dolabel_dupe?
-    "#{@dolabel_stack[-1]}"=="#{@dolabel_stack[-2]}"
+    "#{@@dolabels[-1]}"=="#{@@dolabels[-2]}"
   end
   
   def dolabel_pop(label)
-    @dolabel_stack||=[]
-    @dolabel_stack.pop
+    @@dolabels.pop
   end
 
   def dolabel_push(label)
-    @dolabel_stack||=[]
-    @dolabel_stack.push(label)
+    @@dolabels.push(label)
   end
 
   def msg(s)
-    $stderr.write("#DEBUG# #{s}\n")
+    $stderr.write("### #{s}\n")
   end
 
   def nonblock_do_end?(node)
-    return false unless defined?(@dolabel_stack) and node.respond_to?(:label)
-    ("#{node.label}"=="#{@dolabel_stack.last}")?(true):(false)
+    return false unless node.respond_to?(:label)
+    return false if node.label.to_s.empty?
+    ("#{node.label}"=="#{@@dolabels.last}")?(true):(false)
   end
 
   def nonblock_do_end!(node)
-    @dolabel_stack.pop if nonblock_do_end?(node)
+    @@dolabels.pop if nonblock_do_end?(node)
   end
 
   # Extension of SyntaxNode class
