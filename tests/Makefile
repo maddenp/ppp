@@ -5,7 +5,7 @@ default:
 	$(error Valid targets are: $(TARGETS))
 
 clean:
-	$(foreach x,$(TESTS),$(MAKE) -C $(x) clean;)
+	@$(foreach x,$(TESTS),$(MAKE) --quiet -C $(x) clean;)
 
 control:
-	$(error Bad idea (see README))
+	@$(foreach x,$(TESTS),echo "Updating 'control' for test $(x)" && $(MAKE) --quiet -C $(x) control;)

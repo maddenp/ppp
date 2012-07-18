@@ -1,7 +1,7 @@
 BIN=a.out
 EXT=$(suffix $(TEST))
 FC=gfortran
-FFLAGS=
+FFLAGS=-w
 PPP=../../ppp
 STEM=$(basename $(TEST))
 TARGETS=bin clean control translation
@@ -19,7 +19,11 @@ clean:
 	$(RM) $(TRANSLATION) $(BIN)
 
 control: $(TEST)
+ifdef MAKE_CONTROL_DISABLED
+	$(info Auto-generation of 'control' is disabled for test $(TEST), investigate...)
+else
 	$(FC) $(FFLAGS) $^ && a.out >control 2>&1 && $(RM) a.out
+endif
 
 translation: $(TRANSLATION)
 
