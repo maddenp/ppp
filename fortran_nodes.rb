@@ -8,31 +8,21 @@ module Fortran
 
   def dolabel_push(label)
     @dolabel_stack||=[]
-    say "push '#{label}'"
     @dolabel_stack.push(label)
   end
 
   def dolabel_pop(label)
     @dolabel_stack||=[]
-    say "pop '#{label}'"
     @dolabel_stack.pop
   end
 
   def dolabel_dupe?
-    c=@dolabel_stack[-1]
-    p=@dolabel_stack[-2]
-    say " current label: #{c}"
-    say "previous label: #{p}"
-    r="#{c}"=="#{p}"
-    say "dupe? #{r}"
-    r
+    "#{@dolabel_stack[-1]}"=="#{@dolabel_stack[-2]}"
   end
   
   def nonblock_do_end?(node)
     return false unless defined?(@dolabel_stack) and node.respond_to?(:label)
-    r=("#{node.label}"=="#{@dolabel_stack.last}")?(true):(false)
-    say "nonblock_do_end? #{r} for #{node}"
-    r
+    ("#{node.label}"=="#{@dolabel_stack.last}")?(true):(false)
   end
 
   def nonblock_do_end!(node)

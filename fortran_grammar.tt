@@ -54,7 +54,7 @@ grammar Fortran
   rule action_term_do_construct
     # R827
 
-    label_do_stmt do_body do_term_action_stmt <Cat>
+    label_do_stmt !{ |e| dolabel_dupe? } do_body do_term_action_stmt <Cat>
   end
 
   rule add_op
@@ -399,14 +399,14 @@ grammar Fortran
   rule do_body
     # R828
 
-    execution_part_construct &{ |e| say "execution_part_construct:\n#{e[0]}" } <Cat>
+    execution_part_construct
   end
 
   rule do_construct
     # R816
 
     nonblock_do_construct /
-    block_do_construct &{ |e| say "do_construct\n#{e[0]}" } <Cat>
+    block_do_construct
   end
 
   rule do_construct_name
@@ -1458,7 +1458,8 @@ grammar Fortran
   rule outer_shared_do_construct
     # R830
 
-    label_do_stmt !{ |e| dolabel_dupe? } do_body &{ |e| say "x body #{e[1]}" } shared_term_do_construct &{ |e| say "x stdc #{e[2]}" } <Verbatim>
+    label_do_stmt !{ |e| dolabel_dupe? } do_body shared_term_do_construct
+      <Verbatim>
   end
 
   rule shared_term_do_construct
@@ -1471,7 +1472,7 @@ grammar Fortran
   rule inner_shared_do_construct
     # R832
 
-    label_do_stmt &{ |e| say "y label #{e[0]}" } do_body do_term_shared_stmt <Verbatim>
+    label_do_stmt do_body do_term_shared_stmt <Verbatim>
   end
 
   rule do_term_shared_stmt
@@ -1482,8 +1483,8 @@ grammar Fortran
     # end_subroutine_stmt, and end_program_stmt, an arithmetic_if_stmt, or an
     # assigned_goto_stmt.
 
-    #!do_term_shared_stmt_disallowed action_stmt <Stmt>
-    !do_term_shared_stmt_disallowed action_stmt &{ |e| nonblock_do_end!(e[1]) } <Stmt>
+    !do_term_shared_stmt_disallowed action_stmt &{ |e| nonblock_do_end!(e[1]) }
+      <Stmt>
   end
 
   rule do_term_shared_stmt_disallowed
