@@ -2,8 +2,15 @@ module Fortran
 
   @@level=0
 
-  def say(msg)
-    $stderr.write("#PM# #{msg}\n")
+  # Module methods
+
+  def dolabel_dupe?
+    "#{@dolabel_stack[-1]}"=="#{@dolabel_stack[-2]}"
+  end
+  
+  def dolabel_pop(label)
+    @dolabel_stack||=[]
+    @dolabel_stack.pop
   end
 
   def dolabel_push(label)
@@ -11,15 +18,10 @@ module Fortran
     @dolabel_stack.push(label)
   end
 
-  def dolabel_pop(label)
-    @dolabel_stack||=[]
-    @dolabel_stack.pop
+  def msg(s)
+    $stderr.write("#DEBUG# #{s}\n")
   end
 
-  def dolabel_dupe?
-    "#{@dolabel_stack[-1]}"=="#{@dolabel_stack[-2]}"
-  end
-  
   def nonblock_do_end?(node)
     return false unless defined?(@dolabel_stack) and node.respond_to?(:label)
     ("#{node.label}"=="#{@dolabel_stack.last}")?(true):(false)
@@ -29,11 +31,15 @@ module Fortran
     @dolabel_stack.pop if nonblock_do_end?(node)
   end
 
+  # Extension of SyntaxNode class
+
   class Treetop::Runtime::SyntaxNode
     def to_s
       ''
     end
   end
+
+  # Generic Subclasses
 
   class ASTNode < Treetop::Runtime::SyntaxNode
 
@@ -49,8 +55,8 @@ module Fortran
       elements.map { |e| e.to_s }.join
     end
 
-    def fail(msg)
-      puts "\nERROR: "+msg+"\n\nbacktrace:\n\n"
+    def fail(s)
+      puts "\nERROR: "+s+"\n\nbacktrace:\n\n"
       begin
         raise
       rescue => e
@@ -111,8 +117,6 @@ module Fortran
 
   end
 
-  # General Subclasses
-
   class Cat < ASTNode
     def to_s
       cat
@@ -160,8 +164,14 @@ module Fortran
   class Do_Term_Action_Stmt < ASTNode
     def to_s
       blockend
-      s=stmt(join)
-      s
+      stmt(join)
+    end
+  end
+
+  class Do_Term_Shared_Stmt < ASTNode
+    def to_s
+      blockend
+      cat
     end
   end
 
@@ -186,24 +196,21 @@ module Fortran
   class End_Do_Stmt < ASTNode
     def to_s
       blockend
-      s=stmt(join)
-      s
+      stmt(join)
     end
   end
 
   class End_If_Stmt < ASTNode
     def to_s
       blockend
-      s=stmt("#{sa(e0)}#{e1}#{sb(e2)}")
-      s
+      stmt("#{sa(e0)}#{e1}#{sb(e2)}")
     end
   end
 
   class End_Program_Stmt < ASTNode
     def to_s
       blockend
-      s=stmt(join)
-      s
+      stmt(join)
     end
   end
 
@@ -218,6 +225,13 @@ module Fortran
       s=stmt("#{sa(e0)}#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")
       blockbegin
       s
+    end
+  end
+
+  class Inner_Shared_Do_Construct < ASTNode
+    def to_s
+      blockend
+      cat
     end
   end
 
