@@ -456,6 +456,31 @@ grammar Fortran
     stop_stmt
   end
 
+  rule do_term_shared_stmt
+    # R833
+    #
+    # Constraint: A do_term_shared_stmt must not be a goto_stmt, a return_stmt,
+    # a stop_stmt, an exit_stmt, a cycle_stmt, an end_fuction_stmt, an
+    # end_subroutine_stmt, and end_program_stmt, an arithmetic_if_stmt, or an
+    # assigned_goto_stmt.
+
+    !do_term_shared_stmt_disallowed action_stmt &{ |e| nonblock_do_end!(e[1]) }
+      <Do_Term_Shared_Stmt>
+  end
+
+  rule do_term_shared_stmt_disallowed
+    arithmetic_if_stmt /
+    assigned_goto_stmt /
+    cycle_stmt /
+    # end_function_stmt /
+    end_program_stmt /
+    # end_subroutine_stmt /
+    exit_stmt /
+    goto_stmt /
+    # return_stmt /
+    stop_stmt
+  end
+
   rule do_variable
     # R822
     #
@@ -721,6 +746,12 @@ grammar Fortran
     signed_int_literal_constant
   end
 
+  rule inner_shared_do_construct
+    # R832
+
+    label_do_stmt do_body do_term_shared_stmt <Inner_Shared_Do_Construct>
+  end
+
   rule int_expr
     # R728
     #
@@ -900,16 +931,6 @@ grammar Fortran
     level_1_expr ( power_op mult_operand )? <Verbatim>
   end
 
-  rule octal_constant
-    # R409
-    #
-    # Constraint: digit must have one of the values 0 through 7. Note: 'digit is
-    # replaced by 't_octal' here to enforce the constraint.
-
-    "o" ( ( t_apostrophe t_octal+ t_apostrophe ) /
-      ( t_quotemark t_octal+ t_quotemark ) ) <Verbatim>
-  end
-
   rule name
     # R304
     #
@@ -922,6 +943,13 @@ grammar Fortran
     # R307
 
     name
+  end
+
+  rule nonblock_do_construct
+    # R826
+
+    outer_shared_do_construct /
+    action_term_do_construct
   end
 
   rule nonlabel_do_stmt
@@ -945,10 +973,26 @@ grammar Fortran
     expr
   end
 
+  rule octal_constant
+    # R409
+    #
+    # Constraint: digit must have one of the values 0 through 7. Note: 'digit is
+    # replaced by 't_octal' here to enforce the constraint.
+
+    "o" ( ( t_apostrophe t_octal+ t_apostrophe ) /
+      ( t_quotemark t_octal+ t_quotemark ) ) <Verbatim>
+  end
+
   rule or_op
     # R721
 
     ".or." <Verbatim>
+  end
+
+  rule outer_shared_do_construct
+    # R830
+
+    label_do_stmt !{ |e| dolabel_dupe? } do_body shared_term_do_construct <Cat>
   end
 
   rule output_item
@@ -1193,6 +1237,13 @@ grammar Fortran
     # Note: Assumed constraint: scalar_variable_name must be scalar.
 
     variable_name
+  end
+
+  rule shared_term_do_construct
+    # R831
+
+    outer_shared_do_construct /
+    inner_shared_do_construct
   end
 
   rule sign
@@ -1448,57 +1499,6 @@ grammar Fortran
   end
 
 #PM#
-  rule nonblock_do_construct
-    # R826
-
-    outer_shared_do_construct /
-    action_term_do_construct
-  end
-
-  rule outer_shared_do_construct
-    # R830
-
-    label_do_stmt !{ |e| dolabel_dupe? } do_body shared_term_do_construct <Cat>
-  end
-
-  rule shared_term_do_construct
-    # R831
-
-    outer_shared_do_construct /
-    inner_shared_do_construct
-  end
-
-  rule inner_shared_do_construct
-    # R832
-
-    label_do_stmt do_body do_term_shared_stmt <Inner_Shared_Do_Construct>
-  end
-
-  rule do_term_shared_stmt
-    # R833
-    #
-    # Constraint: A do_term_shared_stmt must not be a goto_stmt, a return_stmt,
-    # a stop_stmt, an exit_stmt, a cycle_stmt, an end_fuction_stmt, an
-    # end_subroutine_stmt, and end_program_stmt, an arithmetic_if_stmt, or an
-    # assigned_goto_stmt.
-
-    !do_term_shared_stmt_disallowed action_stmt &{ |e| nonblock_do_end!(e[1]) }
-      <Do_Term_Shared_Stmt>
-  end
-
-  rule do_term_shared_stmt_disallowed
-    arithmetic_if_stmt /
-    assigned_goto_stmt /
-    cycle_stmt /
-    # end_function_stmt /
-    end_program_stmt /
-    # end_subroutine_stmt /
-    exit_stmt /
-    goto_stmt /
-    # return_stmt /
-    stop_stmt
-  end
-
 #PM#
 
 end
