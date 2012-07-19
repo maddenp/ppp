@@ -13,6 +13,16 @@ grammar Fortran
     program_unit
   end
 
+  rule access_spec
+    # R510
+    #
+    # Constraint: An access_spec attribute may appear only in the scoping unit
+    # of a module.
+
+    t_public /
+    t_private
+  end
+
   rule action_stmt
     # R216 -- INCOMPLETE
 
@@ -96,6 +106,17 @@ grammar Fortran
       label t_comma label t_newline <Arithmetic_If_Stmt>
   end
 
+  rule array_spec
+    # R512
+    #
+    # Constraint: The maximum rank is seven.
+
+    explicit_shape_spec_list /
+    assumed_shape_spec_list /
+    deferred_shape_spec_list /
+    assumed_size_spec
+  end
+
   rule assign_stmt
     # R838
     #
@@ -130,6 +151,50 @@ grammar Fortran
     # array.
 
     label:label? variable t_equal expr t_newline <Assignment_Stmt>
+  end
+
+  rule assumed_shape_spec
+    # R516
+
+    lower_bound? t_colon <Verbatim>
+  end
+
+  rule assumed_size_spec
+    # R518
+    #
+    # Constraint: The function name of an array-valued function must not be
+    # declared as an assumed-size array.
+
+    ( explicit_shape_spec_list t_comma )? lower_bound_pair? t_star <Verbatim>
+  end
+
+  rule assumed_shape_spec_list
+    assumed_shape_spec ( t_comma assumed_shape_spec )* <Verbatim>
+  end
+
+  rule attr_spec
+    # R503
+
+    t_parameter /
+    access_spec /
+    t_allocatable /
+    t_dimension t_paren_l array_spec t_paren_r <Verbatim> /
+    t_external /
+    t_intent t_paren_l intent_spec t_paren_r <Verbatim> /
+    t_intrinsic /
+    t_optional /
+    t_pointer /
+    t_save /
+    t_target
+  end
+
+  rule attr_spec_list
+    attr_spec ( t_comma attr_spec )* <Verbatim>
+  end
+
+  rule attr_spec_option
+    t_comma attr_spec_list double_colon <Verbatim> /
+    double_colon
   end
 
   rule binary_constant
@@ -172,6 +237,29 @@ grammar Fortran
     expr
   end
 
+  rule char_initialization_expr
+    # R731
+    #
+    # Constraint: A char_initialization_expr must be an initialization
+    # expression (7.1.6.1).
+
+    char_expr
+  end
+
+  rule char_length
+    # R508
+    #
+    # Constraint: The value of scalar_int_literal_constant must not include a
+    # kind_param.
+
+    t_paren_l type_param_value t_paren_r <Verbatim> /
+    scalar_int_literal_constant
+  end
+
+  rule char_length_pair
+    t_star char_length <Verbatim>
+  end
+
   rule char_literal_constant
     # R420
     #
@@ -182,6 +270,19 @@ grammar Fortran
       t_apostrophe <Verbatim> /
     ( kind_param t_underscore )? t_quotemark (!t_quotemark rep_char)*
       t_quotemark <Verbatim>
+  end
+
+  rule char_selector
+    # R506
+    #
+    # Constraint: The value of scalar_int_initialization_expr must be
+    # nonnegative and must specify a representation method that exists on the
+    # processor.
+
+    length_selector /
+    t_paren_l len_pair type_param_value t_comma kind_pair scalar_int_initialization_expr t_paren_r <Verbatim> /
+    t_paren_l type_param_value t_comma kind_pair? scalar_int_initialization_expr t_paren_r <Verbatim> /
+    t_paren_l kind_pair scalar_int_initialization_expr ( t_comma len_pair type_param_value )? t_paren_r <Verbatim>
   end
 
   rule character
@@ -373,6 +474,16 @@ grammar Fortran
     expr
   end
 
+  rule deferred_shape_spec
+    # R517
+
+    t_colon
+  end
+
+  rule deferred_shape_spec_list
+    deferred_shape_spec ( t_comma deferred_shape_spec )* <Verbatim>
+  end
+
   rule defined_binary_op
     # R724
     #
@@ -498,6 +609,10 @@ grammar Fortran
     scalar_variable
   end
 
+  rule double_colon
+    t_colon t_colon <Verbatim>
+  end
+
   rule else_construct
     else_stmt block <Cat>
   end
@@ -566,6 +681,51 @@ grammar Fortran
       <End_Program_Stmt>
   end
 
+  rule entity_decl
+    # R504
+    #
+    # Constraint: The function_name must be the name of an external function,
+    # an intrinsic function, a function dummy procedure, or a statement
+    # function. The initialization_expr_pair must appear if the statement
+    # contains a PARAMETER attribute. If initialization_expr_pair appears, a
+    # double colon separator must appear before the entity_decl_list. The
+    # initialization_expr_pair must not appear if object_name is a dummy
+    # argument, a function result, an object in a named common block unless the
+    # type declaration is in a block data program unit, an object in blank
+    # common, an allocatable array, a pointer, an external name, an intrinsic
+    # name, or an automatic object. The char_length_pair is permitted only if
+    # type type specified is character. The ALLOCATABLE attribute may be used
+    # only when declaring an array that is not a dummy argument or a function
+    # result. An array declared with a POINTER or an ALLOCATABLE attribute must
+    # be specified with an array_spec that is a deferred_share_spec_list. If
+    # the POINTER attribute is specified, the TARGET, INTENT, EXTERNAL, or
+    # INTRINSIC attribute must not be specified. If the TARGET attribute is
+    # specified, the POINTER, EXTERNAL, INTRINSIC, or PARAMETER attribute must
+    # not be specified. The PARAMETER attribute must not be specified for dummy
+    # arguments, pointers, allocatable arrays, functions, or objects in a common
+    # block. The INTENT and OPTIONAL attributes may be specified only for dummy
+    # arguments. An entity must not have the PUBLIC attribute if its type has
+    # the PRIVATE attribute. The SAVE attribute must not be specified for an
+    # object that is in a common block, a dummy argument, a procedure, a function
+    # result, or an automatic data object. An entity must not have the EXTERNAL
+    # attribute if it has the INTRINSIC attribute. An entity in a
+    # type_declaration_stmt must not have the EXTERNAL or INTRINSIC attribute
+    # specified unless it is a function. An array must not have both the
+    # ALLOCATABLE and the POINTER attribute. An entity must not be given
+    # explicitly any attribute more than once in a scoping unit.
+
+    object_name entity_decl_array_spec? char_length_pair? initialization_expr_pair? <Verbatim> /
+    function_name char_length_pair? <Verbatim>
+  end
+
+  rule entity_decl_list
+    entity_decl ( t_comma entity_decl )* <Verbatim>
+  end
+
+  rule entity_decl_array_spec
+    t_paren_l array_spec t_paren_r <Verbatim>
+  end
+
   rule equiv_op
     # R722
 
@@ -630,6 +790,20 @@ grammar Fortran
     label:label? t_exit do_construct_name? t_newline <Stmt>
   end
 
+  rule explicit_shape_spec
+    # R513
+    #
+    # Constraint: An explicit-shape array whose bounds depend on the values of
+    # nonconstant expressions must be a dummy argument, a function result, or an
+    # automatic array of a procedure.
+
+    lower_bound_pair? upper_bound <Verbatim>
+  end
+
+  rule explicit_shape_spec_list
+    explicit_shape_spec ( t_comma explicit_shape_spec )* <Verbatim>
+  end
+
   rule exponent
     # R416
 
@@ -682,6 +856,12 @@ grammar Fortran
     # Constraint: The format_stmt must be labeled.
 
     label t_format format_specification t_newline <Stmt>
+  end
+
+  rule function_name
+    # Multiple uses (not explicitly defined)
+
+    name
   end
 
   rule goto_stmt
@@ -754,6 +934,19 @@ grammar Fortran
     signed_int_literal_constant
   end
 
+  rule initialization_expr
+    # R730
+    #
+    # Constraint: An initialization_expr must be an initialization expression
+    # (7.1.6.1).
+
+    expr
+  end
+
+  rule initialization_expr_pair
+    t_equal initialization_expr <Verbatim>
+  end
+
   rule inner_shared_do_construct
     # R832
 
@@ -768,10 +961,30 @@ grammar Fortran
     expr
   end
 
+  rule int_initialization_expr
+    # R732
+    #
+    # Constraint: An int_initialization_expr must be an initialization
+    # expression (7.1.6.1).
+
+    int_expr
+  end
+
   rule int_literal_constant
     # R404
 
     digit_string ( t_underscore kind_param )? <Verbatim>
+  end
+
+  rule intent_spec
+    # R511
+    #
+    # Constraint: The INTENT attribute must not be specified for a dummy
+    # argument that is a dummy procedure or a dummy pointer.
+
+    t_in /
+    t_out /
+    t_inout
   end
 
   rule internal_subprogram_part
@@ -792,6 +1005,10 @@ grammar Fortran
     equiv_op
   end
 
+  rule kind_pair
+    t_kind t_equal <Verbatim>
+  end
+
   rule kind_param
     # R405
     #
@@ -801,6 +1018,16 @@ grammar Fortran
 
     digit_string /
     scalar_int_constant_name
+  end
+
+  rule kind_selector
+    # R505
+    #
+    # Constraint: The value of a scalar_int_initialization_expr must be
+    # nonnegative and must specify a representation method that exists on the
+    # processor.
+
+    t_paren_l kind_pair? scalar_int_initialization_expr t_paren_r <Verbatim>
   end
 
   rule label
@@ -824,6 +1051,24 @@ grammar Fortran
 
   rule label_list
     label ( t_comma label )* <Verbatim>
+  end
+
+  rule len_pair
+    t_len t_equal <Verbatim>
+  end
+
+  rule length_selector
+    # R507
+    #
+    # Constraint: The optional comma in a length_selector is permitted only in a
+    # type_spec in a type_declaration_stmt. The optional comma in a
+    # length_selector is permitted only if no double colon separator appears in
+    # the type_declaration_stmt.
+
+    t_paren_l len_pair? type_param_value t_paren_r <Verbatim> /
+#    char_length_pair t_comma? <Verbatim>
+# TODO this is WRONG -- need to handle the optional comma, see spec
+    char_length_pair
   end
 
   rule level_1_expr
@@ -893,6 +1138,15 @@ grammar Fortran
     expr
   end
 
+  rule logical_initialization_expr
+    # R733
+    #
+    # Constraint: A logical_initialization_expr must be an initialization
+    # expression (7.1.6.1).
+
+    logical_expr
+  end
+
   rule logical_literal_constant
     # R421
     #
@@ -915,6 +1169,16 @@ grammar Fortran
 
   rule loop_control_pair
     t_comma scalar_numeric_expr <Verbatim>
+  end
+
+  rule lower_bound
+    # R514
+
+    specification_expr
+  end
+
+  rule lower_bound_pair
+    lower_bound t_colon <Verbatim>
   end
 
   rule main_program
@@ -979,6 +1243,12 @@ grammar Fortran
     # Constraint: numeric_expr must be of type integer, real or complex.
 
     expr
+  end
+
+  rule object_name
+    # Multiple uses (not explicitly defined)
+
+    name
   end
 
   rule octal_constant
@@ -1206,6 +1476,15 @@ grammar Fortran
     expr
   end
     
+  rule scalar_int_initialization_expr
+    # Multiple uses (not explicitly defined)
+    #
+    # Note: Assumed constraint: initialization_expr is scalar and is of type
+    # integer.
+
+    initialization_expr
+  end
+
   rule scalar_int_literal_constant
     # 5.1.1.5 (not explicitly defined)
     #
@@ -1300,6 +1579,14 @@ grammar Fortran
     [\ \=\+\-\*\/\(\)\,\.\'\:\!\"\%\&\;\<\>\?\$]
   end
 
+  rule specification_expr
+    # R734
+    #
+    # Constraint: The scalar_int_expr must be a restricted expression (7.1.6.2).
+
+    scalar_int_expr
+  end
+
   rule specification_part
     # R204 -- INCOMPLETE
 
@@ -1328,6 +1615,10 @@ grammar Fortran
     label:label? t_stop stop_code? t_newline <Stmt>
   end
 
+  rule t_allocatable
+    "allocatable" <Verbatim>
+  end
+
   rule t_apostrophe
     "'" <Verbatim>
   end
@@ -1340,12 +1631,20 @@ grammar Fortran
     [01] <Verbatim>
   end
 
+  rule t_character
+    "character" <Verbatim>
+  end
+
   rule t_colon
     ":" <Verbatim>
   end
 
   rule t_comma
     "," <Verbatim>
+  end
+
+  rule t_complex
+    "complex" <Verbatim>
   end
 
   rule t_continue
@@ -1364,12 +1663,20 @@ grammar Fortran
     [0-9] <Verbatim>
   end
 
+  rule t_dimension
+    "dimension" <Verbatim>
+  end
+
   rule t_do
     "do" <Verbatim>
   end
 
   rule t_dot
     "." <Verbatim>
+  end
+
+  rule t_doubleprecision
+    "doubleprecision" <Verbatim>
   end
 
   rule t_else
@@ -1400,6 +1707,10 @@ grammar Fortran
     "exit" <Verbatim>
   end
 
+  rule t_external
+    "external" <Verbatim>
+  end
+
   rule t_false
     ".false." <Verbatim>
   end
@@ -1414,129 +1725,6 @@ grammar Fortran
 
   rule t_if
     "if" <Verbatim>
-  end
-
-  rule t_letter
-    [a-z] <Verbatim>
-  end
-
-  rule t_minus
-    "-" <Verbatim>
-  end
-
-  rule t_newline
-    "\n" <Verbatim>
-  end
-
-  rule t_octal
-    [01234567] <Verbatim>
-  end
-
-  rule t_pause
-    "pause" <Verbatim>
-  end
-
-  rule t_paren_l
-    "(" <Verbatim>
-  end
-
-  rule t_paren_r
-    ")" <Verbatim>
-  end
-
-  rule t_plus
-    "+" <Verbatim>
-  end
-
-  rule t_print
-    "print" <Verbatim>
-  end
-
-  rule t_program
-    "program" <Verbatim>
-  end
-
-  rule t_quotemark
-    "\"" <Verbatim>
-  end
-
-  rule t_slash
-    "/" <Verbatim>
-  end
-
-  rule t_star
-    "*" <Verbatim>
-  end
-
-  rule t_stop
-    "stop" <Verbatim>
-  end
-
-  rule t_then
-    "then" <Verbatim>
-  end
-
-  rule t_to
-    "to" <Verbatim>
-  end
-
-  rule t_true
-    ".true." <Verbatim>
-  end
-
-  rule t_underscore
-    # R303
-    "_"
-  end
-
-  rule t_while
-    "while" <Verbatim>
-  end
-
-  rule variable
-    # R601 -- INCOMPLETE
-    #
-    # Constraint: scalar_variable_name must not have the PARAMETER attribute.
-    # array_variable_name must be the name of a data object that is an array.
-    # array_variable_name must not have the PARAMETER attribute. subobject
-    # must not be a subobject designator (for example, a substring) whose
-    # parent is a constant.
-
-    scalar_variable_name
-  end
-
-  rule variable_name
-    # Multiple uses (not explicitly defined)
-    #
-    # Note: Assumed constraint: variable_name must not have the PARAMETER
-    # attribute.
-
-    name
-  end
-
-#PM#
-  rule t_allocatable
-    "allocatable" <Verbatim>
-  end
-
-  rule t_character
-    "character" <Verbatim>
-  end
-
-  rule t_complex
-    "complex" <Verbatim>
-  end
-
-  rule t_dimension
-    "dimension" <Verbatim>
-  end
-
-  rule t_doubleprecision
-    "doubleprecision" <Verbatim>
-  end
-
-  rule t_external
-    "external" <Verbatim>
   end
 
   rule t_in
@@ -1567,12 +1755,24 @@ grammar Fortran
     "len" <Verbatim>
   end
 
+  rule t_letter
+    [a-z] <Verbatim>
+  end
+
   rule t_logical
     "logical" <Verbatim>
   end
 
-  rule t_parameter
-    "parameter" <Verbatim>
+  rule t_minus
+    "-" <Verbatim>
+  end
+
+  rule t_newline
+    "\n" <Verbatim>
+  end
+
+  rule t_octal
+    [01234567] <Verbatim>
   end
 
   rule t_optional
@@ -1583,16 +1783,48 @@ grammar Fortran
     "out" <Verbatim>
   end
 
+  rule t_parameter
+    "parameter" <Verbatim>
+  end
+
+  rule t_pause
+    "pause" <Verbatim>
+  end
+
+  rule t_paren_l
+    "(" <Verbatim>
+  end
+
+  rule t_paren_r
+    ")" <Verbatim>
+  end
+
+  rule t_plus
+    "+" <Verbatim>
+  end
+
   rule t_pointer
     "pointer" <Verbatim>
+  end
+
+  rule t_print
+    "print" <Verbatim>
   end
 
   rule t_private
     "private" <Verbatim>
   end
 
+  rule t_program
+    "program" <Verbatim>
+  end
+
   rule t_public
     "public" <Verbatim>
+  end
+
+  rule t_quotemark
+    "\"" <Verbatim>
   end
 
   rule t_real
@@ -1603,12 +1835,45 @@ grammar Fortran
     "save" <Verbatim>
   end
 
+  rule t_slash
+    "/" <Verbatim>
+  end
+
+  rule t_star
+    "*" <Verbatim>
+  end
+
+  rule t_stop
+    "stop" <Verbatim>
+  end
+
   rule t_target
     "target" <Verbatim>
   end
 
+  rule t_then
+    "then" <Verbatim>
+  end
+
+  rule t_to
+    "to" <Verbatim>
+  end
+
+  rule t_true
+    ".true." <Verbatim>
+  end
+
   rule t_type
     "type" <Verbatim>
+  end
+
+  rule t_underscore
+    # R303
+    "_"
+  end
+
+  rule t_while
+    "while" <Verbatim>
   end
 
   rule type_declaration_stmt
@@ -1620,21 +1885,21 @@ grammar Fortran
     label:label? type_spec attr_spec_option? entity_decl_list t_newline <Type_Declaration_Stmt>
   end
 
-  rule double_colon
-    t_colon t_colon <Verbatim>
+  rule type_name
+    # Multiple uses (not explicitly defined)
+
+    name
   end
 
-  rule attr_spec_option
-    t_comma attr_spec_list double_colon <Verbatim> /
-    double_colon
-  end
+  rule type_param_value
+    # R509
+    #
+    # Constraint: A function name must not be declared with an asterisk
+    # type_param_value if the function is an internal or module function,
+    # array-valued, pointer-valued, or recursive.
 
-  rule attr_spec_list
-    attr_spec ( t_comma attr_spec )* <Verbatim>
-  end
-
-  rule entity_decl_list
-    entity_decl ( t_comma entity_decl )* <Verbatim>
+    specification_expr /
+    t_star
   end
 
   rule type_spec
@@ -1649,299 +1914,34 @@ grammar Fortran
     t_type t_paren_l type_name t_paren_r <Verbatim>
   end
 
-  rule char_selector
-    # R506
-    #
-    # Constraint: The value of scalar_int_initialization_expr must be
-    # nonnegative and must specify a representation method that exists on the
-    # processor.
-
-    length_selector /
-    t_paren_l len_pair type_param_value t_comma kind_pair scalar_int_initialization_expr t_paren_r <Verbatim> /
-    t_paren_l type_param_value t_comma kind_pair? scalar_int_initialization_expr t_paren_r <Verbatim> /
-    t_paren_l kind_pair scalar_int_initialization_expr ( t_comma len_pair type_param_value )? t_paren_r <Verbatim>
-  end
-
-  rule len_pair
-    t_len t_equal <Verbatim>
-  end
-
-  rule length_selector
-    # R507
-    #
-    # Constraint: The optional comma in a length_selector is permitted only in a
-    # type_spec in a type_declaration_stmt. The optional comma in a
-    # length_selector is permitted only if no double colon separator appears in
-    # the type_declaration_stmt.
-
-    t_paren_l len_pair? type_param_value t_paren_r <Verbatim> /
-#    char_length_pair t_comma? <Verbatim>
-# TODO this is WRONG -- need to handle the optional comma, see spec
-    char_length_pair
-  end
-
-  rule char_length
-    # R508
-    #
-    # Constraint: The value of scalar_int_literal_constant must not include a
-    # kind_param.
-
-    t_paren_l type_param_value t_paren_r <Verbatim> /
-    scalar_int_literal_constant
-  end
-
-  rule type_param_value
-    # R509
-    #
-    # Constraint: A function name must not be declared with an asterisk
-    # type_param_value if the function is an internal or module function,
-    # array-valued, pointer-valued, or recursive.
-
-    specification_expr /
-    t_star
-  end
-
-  rule attr_spec
-    # R503
-
-    t_parameter /
-    access_spec /
-    t_allocatable /
-    t_dimension t_paren_l array_spec t_paren_r <Verbatim> /
-    t_external /
-    t_intent t_paren_l intent_spec t_paren_r <Verbatim> /
-    t_intrinsic /
-    t_optional /
-    t_pointer /
-    t_save /
-    t_target
-  end
-
-  rule entity_decl
-    # R504
-    #
-    # Constraint: The function_name must be the name of an external function,
-    # an intrinsic function, a function dummy procedure, or a statement
-    # function. The initialization_expr_pair must appear if the statement
-    # contains a PARAMETER attribute. If initialization_expr_pair appears, a
-    # double colon separator must appear before the entity_decl_list. The
-    # initialization_expr_pair must not appear if object_name is a dummy
-    # argument, a function result, an object in a named common block unless the
-    # type declaration is in a block data program unit, an object in blank
-    # common, an allocatable array, a pointer, an external name, an intrinsic
-    # name, or an automatic object. The char_length_pair is permitted only if
-    # type type specified is character. The ALLOCATABLE attribute may be used
-    # only when declaring an array that is not a dummy argument or a function
-    # result. An array declared with a POINTER or an ALLOCATABLE attribute must
-    # be specified with an array_spec that is a deferred_share_spec_list. If
-    # the POINTER attribute is specified, the TARGET, INTENT, EXTERNAL, or
-    # INTRINSIC attribute must not be specified. If the TARGET attribute is
-    # specified, the POINTER, EXTERNAL, INTRINSIC, or PARAMETER attribute must
-    # not be specified. The PARAMETER attribute must not be specified for dummy
-    # arguments, pointers, allocatable arrays, functions, or objects in a common
-    # block. The INTENT and OPTIONAL attributes may be specified only for dummy
-    # arguments. An entity must not have the PUBLIC attribute if its type has
-    # the PRIVATE attribute. The SAVE attribute must not be specified for an
-    # object that is in a common block, a dummy argument, a procedure, a function
-    # result, or an automatic data object. An entity must not have the EXTERNAL
-    # attribute if it has the INTRINSIC attribute. An entity in a
-    # type_declaration_stmt must not have the EXTERNAL or INTRINSIC attribute
-    # specified unless it is a function. An array must not have both the
-    # ALLOCATABLE and the POINTER attribute. An entity must not be given
-    # explicitly any attribute more than once in a scoping unit.
-
-    object_name entity_decl_array_spec? char_length_pair? initialization_expr_pair? <Verbatim> /
-    function_name char_length_pair? <Verbatim>
-  end
-
-  rule entity_decl_array_spec
-    t_paren_l array_spec t_paren_r <Verbatim>
-  end
-
-  rule char_length_pair
-    t_star char_length <Verbatim>
-  end
-
-  rule initialization_expr_pair
-    t_equal initialization_expr <Verbatim>
-  end
-
-  rule kind_selector
-    # R505
-    #
-    # Constraint: The value of a scalar_int_initialization_expr must be
-    # nonnegative and must specify a representation method that exists on the
-    # processor.
-
-    t_paren_l kind_pair? scalar_int_initialization_expr t_paren_r <Verbatim>
-  end
-
-  rule kind_pair
-    t_kind t_equal <Verbatim>
-  end
-
-  rule type_name
-    # Multiple uses (not explicitly defined)
-
-    name
-  end
-
-  rule object_name
-    # Multiple uses (not explicitly defined)
-
-    name
-  end
-
-  rule function_name
-    # Multiple uses (not explicitly defined)
-
-    name
-  end
-
-  rule scalar_int_initialization_expr
-    # Multiple uses (not explicitly defined)
-    #
-    # Note: Assumed constraint: initialization_expr is scalar and is of type
-    # integer.
-
-    initialization_expr
-  end
-
-  rule specification_expr
-    # R734
-    #
-    # Constraint: The scalar_int_expr must be a restricted expression (7.1.6.2).
-
-    scalar_int_expr
-  end
-
-  rule access_spec
-    # R510
-    #
-    # Constraint: An access_spec attribute may appear only in the scoping unit
-    # of a module.
-
-    t_public /
-    t_private
-  end
-
-  rule array_spec
-    # R512
-    #
-    # Constraint: The maximum rank is seven.
-
-    explicit_shape_spec_list /
-    assumed_shape_spec_list /
-    deferred_shape_spec_list /
-    assumed_size_spec
-  end
-
-  rule explicit_shape_spec
-    # R513
-    #
-    # Constraint: An explicit-shape array whose bounds depend on the values of
-    # nonconstant expressions must be a dummy argument, a function result, or an
-    # automatic array of a procedure.
-
-    lower_bound_pair? upper_bound <Verbatim>
-  end
-
-  rule lower_bound_pair
-    lower_bound t_colon <Verbatim>
-  end
-
-  rule lower_bound
-    # R514
-
-    specification_expr
-  end
-
   rule upper_bound
     # R515
 
     specification_expr
   end
 
-  rule assumed_shape_spec
-    # R516
-
-    lower_bound? t_colon <Verbatim>
-  end
-
-  rule deferred_shape_spec
-    # R517
-
-    t_colon
-  end
-
-  rule assumed_size_spec
-    # R518
+  rule variable
+    # R601 -- INCOMPLETE
     #
-    # Constraint: The function name of an array-valued function must not be
-    # declared as an assumed-size array.
+    # Constraint: scalar_variable_name must not have the PARAMETER attribute.
+    # array_variable_name must be the name of a data object that is an array.
+    # array_variable_name must not have the PARAMETER attribute. subobject
+    # must not be a subobject designator (for example, a substring) whose
+    # parent is a constant.
 
-    ( explicit_shape_spec_list t_comma )? lower_bound_pair? t_star <Verbatim>
+    scalar_variable_name
   end
 
-  rule explicit_shape_spec_list
-    explicit_shape_spec ( t_comma explicit_shape_spec )* <Verbatim>
-  end
-
-  rule assumed_shape_spec_list
-    assumed_shape_spec ( t_comma assumed_shape_spec )* <Verbatim>
-  end
-
-  rule deferred_shape_spec_list
-    deferred_shape_spec ( t_comma deferred_shape_spec )* <Verbatim>
-  end
-
-  rule intent_spec
-    # R511
+  rule variable_name
+    # Multiple uses (not explicitly defined)
     #
-    # Constraint: The INTENT attribute must not be specified for a dummy
-    # argument that is a dummy procedure or a dummy pointer.
+    # Note: Assumed constraint: variable_name must not have the PARAMETER
+    # attribute.
 
-    t_in /
-    t_out /
-    t_inout
+    name
   end
 
-  rule initialization_expr
-    # R730
-    #
-    # Constraint: An initialization_expr must be an initialization expression
-    # (7.1.6.1).
-
-    expr
-  end
-
-  rule char_initialization_expr
-    # R731
-    #
-    # Constraint: A char_initialization_expr must be an initialization
-    # expression (7.1.6.1).
-
-    char_expr
-  end
-
-  rule int_initialization_expr
-    # R732
-    #
-    # Constraint: An int_initialization_expr must be an initialization
-    # expression (7.1.6.1).
-
-    int_expr
-  end
-
-  rule logical_initialization_expr
-    # R733
-    #
-    # Constraint: A logical_initialization_expr must be an initialization
-    # expression (7.1.6.1).
-
-    logical_expr
-  end
-
+#PM#
 #PM#
 
 end
