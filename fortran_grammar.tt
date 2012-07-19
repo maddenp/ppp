@@ -1535,6 +1535,14 @@ grammar Fortran
     "external" <Verbatim>
   end
 
+  rule t_in
+    "in" <Verbatim>
+  end
+
+  rule inout
+    "inout" <Verbatim>
+  end
+
   rule t_integer
     "integer" <Verbatim>
   end
@@ -1561,6 +1569,10 @@ grammar Fortran
 
   rule t_optional
     "optional" <Verbatim>
+  end
+
+  rule t_out
+    "out" <Verbatim>
   end
 
   rule t_pointer
@@ -1799,7 +1811,14 @@ grammar Fortran
   end
 
   rule intent_spec
-    "intent_spec"
+    # R511
+    #
+    # Constraint: The INTENT attribute must not be specified for a dummy
+    # argument that is a dummy procedure or a dummy pointer.
+
+    t_in /
+    t_out /
+    t_inout
   end
 
   rule initialization_expr
