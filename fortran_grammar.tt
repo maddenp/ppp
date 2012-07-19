@@ -1807,7 +1807,73 @@ grammar Fortran
   end
 
   rule array_spec
-    "array_spec"
+    # R512
+    #
+    # Constraint: The maximum rank is seven.
+
+    explicit_shape_spec_list /
+    assumed_shape_spec_list /
+    deferred_shape_spec_list /
+    assumed_size_spec
+  end
+
+  rule explicit_shape_spec
+    # R513
+    #
+    # Constraint: An explicit-shape array whose bounds depend on the values of
+    # nonconstant expressions must be a dummy argument, a function result, or an
+    # automatic array of a procedure.
+
+    lower_bound_pair? upper_bound <Verbatim>
+  end
+
+  rule lower_bound_pair
+    lower_bound t_colon <Verbatim>
+  end
+
+  rule lower_bound
+    # R514
+
+    specification_expr
+  end
+
+  rule upper_bound
+    # R515
+
+    specification_expr
+  end
+
+  rule assumed_shape_spec
+    # R516
+
+    lower_bound? t_colon <Verbatim>
+  end
+
+  rule deferred_shape_spec
+    # R517
+
+    t_colon
+  end
+
+  rule assumed_size_spec
+    # R518
+    #
+    # Constraint: The function name of an array-valued function must not be
+    # declared as an assumed-size array.
+
+    ( explicit_shape_spec_list t_comma )? lower_bound_pair? t_star <Verbatim>
+  end
+
+  rule explicit_shape_spec_list
+    explicit_shape_spec ( t_comma explicit_shape_spec )* <Verbatim>
+  end
+
+  rule assumed_shape_spec_list
+    assumed_shape_spec ( t_comma assumed_shape_spec )* <Verbatim>
+  end
+
+  rule deferred_shape_spec_list
+    deferred_shape_spec ( t_comma deferred_shape_spec )* <Verbatim>
   end
 
   rule intent_spec
