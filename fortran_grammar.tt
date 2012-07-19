@@ -288,8 +288,8 @@ grammar Fortran
     # R533 -- INCOMPLETE
     #
     # Constraint: If a data_stmt_constant is a structure_constructor, each
-    # component must be an initialization expression. Note: Choice order changed
-    # vs that presented in standard.
+    # component must be an initialization expression (7.1.6.1). Note: Choice
+    # order changed vs that presented in standard.
 
     signed_real_literal_constant /
     signed_int_literal_constant /
@@ -303,7 +303,7 @@ grammar Fortran
     #
     # Constraint: In a variable that is a data_stmt_object, any subscript,
     # section subscript, substring starting point, and substring ending point
-    # must be an initialization expression. A variable whose name or
+    # must be an initialization expression (7.1.6.1). A variable whose name or
     # designator is included in a data_stmt_object_list or a
     # data_i_do_object_list must not be: a dummy argument, made accessible by
     # use assocation or host association, in a named common block unless the
@@ -1787,7 +1787,8 @@ grammar Fortran
   rule initialization_expr
     # R730
     #
-    # Constraint: An initialization_expr must be an initialization expression.
+    # Constraint: An initialization_expr must be an initialization expression
+    # (7.1.6.1).
 
     expr
   end
@@ -1796,7 +1797,7 @@ grammar Fortran
     # R731
     #
     # Constraint: A char_initialization_expr must be an initialization
-    # expression.
+    # expression (7.1.6.1).
 
     char_expr
   end
@@ -1805,7 +1806,7 @@ grammar Fortran
     # R732
     #
     # Constraint: An int_initialization_expr must be an initialization
-    # expression.
+    # expression (7.1.6.1).
 
     int_expr
   end
@@ -1814,7 +1815,7 @@ grammar Fortran
     # R733
     #
     # Constraint: A logical_initialization_expr must be an initialization
-    # expression.
+    # expression (7.1.6.1).
 
     logical_expr
   end
