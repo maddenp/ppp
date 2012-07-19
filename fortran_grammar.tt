@@ -357,8 +357,14 @@ grammar Fortran
   rule declaration_construct
     # R207 -- INCOMPLETE
 
+    # derived_type_def /
+    # interface_block /
+    type_declaration_stmt /
     specification_stmt /
-    format_stmt
+    # parameter_stmt /
+    format_stmt # /
+    # entry_stmt /
+    # stmt_function_stmt
   end
 
   rule default_char_expr
