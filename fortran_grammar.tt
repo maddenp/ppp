@@ -343,7 +343,11 @@ grammar Fortran
   rule data_stmt_value
     # R531
 
-    ( data_stmt_repeat t_star )? data_stmt_constant <Verbatim>
+    data_stmt_repeat_pair? data_stmt_constant <Verbatim>
+  end
+
+  rule data_stmt_repeat_pair
+    data_stmt_repeat t_star <Verbatim>
   end
 
   rule data_stmt_value_list
@@ -1177,8 +1181,17 @@ grammar Fortran
     # Note: Assumed constraint: must be scalar and, if a variable name, must be
     # of type integer and must have the PARAMETER attribute.
 
-    signed_int_literal_constant /
+    scalar_int_literal_constant /
     scalar_int_constant_name
+  end
+
+  rule scalar_int_constant_name
+    # 4.3.1.1 (not explicitly defined)
+    #
+    # Note: Assumed constraint: scalar_int_constant_name must be scalar, and
+    # must be of type integer.
+
+    named_constant
   end
 
   rule scalar_int_expr
@@ -1189,13 +1202,12 @@ grammar Fortran
     expr
   end
     
-  rule scalar_int_constant_name
-    # 4.3.1.1 (not explicitly defined)
+  rule scalar_int_literal_constant
+    # 5.1.1.5 (not explicitly defined)
     #
-    # Note: Assumed constraint: scalar_int_constant_name must be scalar, and
-    # must be of type integer.
+    # Note: Assumed constraint: must be scalar of type integer.
 
-    named_constant
+    signed_int_literal_constant
   end
 
   rule scalar_int_variable
@@ -1730,11 +1742,21 @@ grammar Fortran
   end
 
   rule type_name
-    "type_name"
+    # Multiple uses (not explicitly defined)
+
+    name
   end
 
-  rule scalar_int_literal_constant
-    "scalar_int_literal_constant"
+  rule object_name
+    # Multiple uses (not explicitly defined)
+
+    name
+  end
+
+  rule function_name
+    # Multiple uses (not explicitly defined)
+
+    name
   end
 
   rule scalar_int_initialization_expr
@@ -1755,14 +1777,6 @@ grammar Fortran
 
   rule intent_spec
     "intent_spec"
-  end
-
-  rule object_name
-    "object_name"
-  end
-
-  rule function_name
-    "function_name"
   end
 
   rule initialization_expr
