@@ -278,6 +278,11 @@ module Fortran
   end
 
   #PM#
+  class Type_Declaration_Stmt < ASTNode
+    def to_s
+      stmt("#{sa(e0)}#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
+    end
+  end
   #PM#
 
 end

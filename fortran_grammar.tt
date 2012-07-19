@@ -15,8 +15,6 @@ grammar Fortran
 
   rule action_stmt
     # R216 -- INCOMPLETE
-    #
-    # Note: Provide label handling in rules for individual statements.
 
     # allocate_stmt /
     assignment_stmt /
@@ -37,7 +35,7 @@ grammar Fortran
     # inquire_stmt /
     # nullify_stmt /
     # open_stmt /
-    # pointer_assignement_stmt /
+    # pointer_assignment_stmt /
     print_stmt /
     # read_stmt /
     # return_stmt /
@@ -1561,6 +1559,10 @@ grammar Fortran
     "intrinsic" <Verbatim>
   end
 
+  rule t_kind
+    "kind" <Verbatim>
+  end
+
   rule t_len
     "len" <Verbatim>
   end
@@ -1615,7 +1617,16 @@ grammar Fortran
     # Constraint: The same attr_spec must not appear more than once in a given
     # type_declaration_stmt.
 
-    label:label? type_spec attr_spec_list? entity_decl_list t_newline <Verbatim>
+    label:label? type_spec attr_spec_option? entity_decl_list t_newline <Type_Declaration_Stmt>
+  end
+
+  rule double_colon
+    t_colon t_colon <Verbatim>
+  end
+
+  rule attr_spec_option
+    t_comma attr_spec_list double_colon <Verbatim> /
+    double_colon
   end
 
   rule attr_spec_list
@@ -1791,7 +1802,7 @@ grammar Fortran
     # Note: Assumed constraint: initialization_expr is scalar and is of type
     # integer.
 
-    initialization_expression
+    initialization_expr
   end
 
   rule specification_expr
