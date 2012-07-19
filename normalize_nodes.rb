@@ -22,8 +22,8 @@ module Normalize
       # [std:f90:3.3.1.2].
       t=t.downcase
       t=t.gsub(/\t/,' ')
-#     t=t.gsub(/  */,' ')
-      t=t.gsub(/  */,'')
+#     t=t.gsub(/  */,' ') # spaces: single
+      t=t.gsub(/  */,'')  # spaces: none
       t=t.gsub(/;/,"\n")
 #     # Remove optional spaces from keywords [std:f90:3.3.1].
 #     t=t.gsub(/block data/,'blockdata')
