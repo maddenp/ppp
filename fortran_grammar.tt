@@ -1567,6 +1567,14 @@ grammar Fortran
     "pointer" <Verbatim>
   end
 
+  rule t_private
+    "private" <Verbatim>
+  end
+
+  rule t_public
+    "public" <Verbatim>
+  end
+
   rule t_real
     "real" <Verbatim>
   end
@@ -1777,7 +1785,13 @@ grammar Fortran
   end
 
   rule access_spec
-    "access_spec"
+    # R510
+    #
+    # Constraint: An access_spec attribute may appear only in the scoping unit
+    # of a module.
+
+    t_public /
+    t_private
   end
 
   rule array_spec
