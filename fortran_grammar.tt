@@ -1769,7 +1769,11 @@ grammar Fortran
   end
 
   rule specification_expr
-    "specification_expr"
+    # R734
+    #
+    # Constraint: The scalar_int_expr must be a restricted expression (7.1.6.2).
+
+    scalar_int_expr
   end
 
   rule access_spec
