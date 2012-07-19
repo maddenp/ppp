@@ -1760,7 +1760,12 @@ grammar Fortran
   end
 
   rule scalar_int_initialization_expr
-    "scalar_int_initialization_expr"
+    # Multiple uses (not explicitly defined)
+    #
+    # Note: Assumed constraint: initialization_expr is scalar and is of type
+    # integer.
+
+    initialization_expression
   end
 
   rule specification_expr
@@ -1780,7 +1785,38 @@ grammar Fortran
   end
 
   rule initialization_expr
-    "initialization_expr"
+    # R730
+    #
+    # Constraint: An initialization_expr must be an initialization expression.
+
+    expr
+  end
+
+  rule char_initialization_expr
+    # R731
+    #
+    # Constraint: A char_initialization_expr must be an initialization
+    # expression.
+
+    char_expr
+  end
+
+  rule int_initialization_expr
+    # R732
+    #
+    # Constraint: An int_initialization_expr must be an initialization
+    # expression.
+
+    int_expr
+  end
+
+  rule logical_initialization_expr
+    # R733
+    #
+    # Constraint: A logical_initialization_expr must be an initialization
+    # expression.
+
+    logical_expr
   end
 
 #PM#
