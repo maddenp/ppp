@@ -1675,7 +1675,9 @@ grammar Fortran
     # the type_declaration_stmt.
 
     t_paren_l len_pair? type_param_value t_paren_r <Verbatim> /
-    char_length_pair t_comma? <Verbatim>
+#    char_length_pair t_comma? <Verbatim>
+# TODO this is WRONG -- need to handle the optional comma, see spec
+    char_length_pair
   end
 
   rule char_length
