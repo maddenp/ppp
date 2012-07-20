@@ -24,13 +24,13 @@ grammar Fortran
   rule ac_implied_do
     # R433
 
-    t_paren_l ac_value_list t_comma ac_implied_do_control t_paren_r <Cat>
+    t_paren_l ac_value_list t_comma ac_implied_do_control t_paren_r <E>
   end
 
   rule ac_implied_do_control
     # R434
 
-    ac_do_variable t_equal scalar_int_expr ( t_comma scalar_int_expr )? <Cat>
+    ac_do_variable t_equal scalar_int_expr ( t_comma scalar_int_expr )? <E>
   end
 
   rule ac_value
@@ -44,7 +44,7 @@ grammar Fortran
   end
 
   rule ac_value_list
-    ac_value ( t_comma ac_value )* <Cat>
+    ac_value ( t_comma ac_value )* <E>
   end
 
   rule access_spec
@@ -96,7 +96,7 @@ grammar Fortran
   rule action_term_do_construct
     # R827
 
-    label_do_stmt !{ |e| dolabel_dupe? } do_body do_term_action_stmt <Cat>
+    label_do_stmt !{ |e| dolabel_dupe? } do_body do_term_action_stmt <E>
   end
 
   rule add_op
@@ -112,13 +112,13 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( add_operand mult_op)? mult_operand
 
-    mult_operand ( mult_op add_operand )? <Verbatim>
+    mult_operand ( mult_op add_operand )? <T>
   end
 
   rule and_op
     # R720
 
-    ".and." <Verbatim>
+    ".and." <T>
   end
 
   rule alphanumeric_character
@@ -143,7 +143,7 @@ grammar Fortran
   rule array_constructor
     # R431
 
-    t_paren_l t_slash ac_value_list t_slash t_paren_r <Cat>
+    t_paren_l t_slash ac_value_list t_slash t_paren_r <E>
   end
 
   rule array_spec
@@ -181,7 +181,7 @@ grammar Fortran
   end
 
   rule assigned_goto_stmt_label_list
-    t_comma? t_paren_l label_list t_paren_r <Verbatim>
+    t_comma? t_paren_l label_list t_paren_r <T>
   end
 
   rule assignment_stmt
@@ -196,7 +196,7 @@ grammar Fortran
   rule assumed_shape_spec
     # R516
 
-    lower_bound? t_colon <Verbatim>
+    lower_bound? t_colon <T>
   end
 
   rule assumed_size_spec
@@ -205,11 +205,11 @@ grammar Fortran
     # Constraint: The function name of an array-valued function must not be
     # declared as an assumed-size array.
 # TODO is this a left-recursion problem waiting to happen?
-    ( explicit_shape_spec_list t_comma )? lower_bound_pair? t_star <Verbatim>
+    ( explicit_shape_spec_list t_comma )? lower_bound_pair? t_star <T>
   end
 
   rule assumed_shape_spec_list
-    assumed_shape_spec ( t_comma assumed_shape_spec )* <Verbatim>
+    assumed_shape_spec ( t_comma assumed_shape_spec )* <T>
   end
 
   rule attr_spec
@@ -218,9 +218,9 @@ grammar Fortran
     t_parameter /
     access_spec /
     t_allocatable /
-    t_dimension t_paren_l array_spec t_paren_r <Verbatim> /
+    t_dimension t_paren_l array_spec t_paren_r <T> /
     t_external /
-    t_intent t_paren_l intent_spec t_paren_r <Verbatim> /
+    t_intent t_paren_l intent_spec t_paren_r <T> /
     t_intrinsic /
     t_optional /
     t_pointer /
@@ -229,11 +229,11 @@ grammar Fortran
   end
 
   rule attr_spec_list
-    attr_spec ( t_comma attr_spec )* <Verbatim>
+    attr_spec ( t_comma attr_spec )* <T>
   end
 
   rule attr_spec_option
-    t_comma attr_spec_list double_colon <Verbatim> /
+    t_comma attr_spec_list double_colon <T> /
     double_colon
   end
 
@@ -244,7 +244,7 @@ grammar Fortran
     # replaced by 't_binary' here to enforce the constraint.
 
     "b" ( ( t_apostrophe t_binary+ t_apostrophe ) /
-      ( t_quotemark t_binary+ t_quotemark ) ) <Verbatim>
+      ( t_quotemark t_binary+ t_quotemark ) ) <T>
   end
 
   rule block
@@ -256,7 +256,7 @@ grammar Fortran
   rule block_do_construct
     # R817
 
-    do_stmt do_block end_do <Cat>
+    do_stmt do_block end_do <E>
   end
 
   rule boz_literal_constant
@@ -292,12 +292,12 @@ grammar Fortran
     # Constraint: The value of scalar_int_literal_constant must not include a
     # kind_param.
 
-    t_paren_l type_param_value t_paren_r <Verbatim> /
+    t_paren_l type_param_value t_paren_r <T> /
     scalar_int_literal_constant
   end
 
   rule char_length_pair
-    t_star char_length <Verbatim>
+    t_star char_length <T>
   end
 
   rule char_literal_constant
@@ -307,9 +307,9 @@ grammar Fortran
     # that exists on the processor.
 
     ( kind_param t_underscore )? t_apostrophe (!t_apostrophe rep_char)*
-      t_apostrophe <Verbatim> /
+      t_apostrophe <T> /
     ( kind_param t_underscore )? t_quotemark (!t_quotemark rep_char)*
-      t_quotemark <Verbatim>
+      t_quotemark <T>
   end
 
   rule char_selector
@@ -320,9 +320,9 @@ grammar Fortran
     # processor.
 
     length_selector /
-    t_paren_l len_pair type_param_value t_comma kind_pair scalar_int_initialization_expr t_paren_r <Verbatim> /
-    t_paren_l type_param_value t_comma kind_pair? scalar_int_initialization_expr t_paren_r <Verbatim> /
-    t_paren_l kind_pair scalar_int_initialization_expr ( t_comma len_pair type_param_value )? t_paren_r <Verbatim>
+    t_paren_l len_pair type_param_value t_comma kind_pair scalar_int_initialization_expr t_paren_r <T> /
+    t_paren_l type_param_value t_comma kind_pair? scalar_int_initialization_expr t_paren_r <T> /
+    t_paren_l kind_pair scalar_int_initialization_expr ( t_comma len_pair type_param_value )? t_paren_r <T>
   end
 
   rule character
@@ -335,7 +335,7 @@ grammar Fortran
   rule complex_literal_constant
     # R417
 
-    t_paren_l real_part t_comma imag_part t_paren_r <Verbatim>
+    t_paren_l real_part t_comma imag_part t_paren_r <T>
   end
 
   rule computed_goto_stmt
@@ -352,7 +352,7 @@ grammar Fortran
   rule concat_op
     # R712
 
-    "//" <Verbatim>
+    "//" <T>
   end
 
   rule constant
@@ -394,7 +394,7 @@ grammar Fortran
   end
 
   rule data_i_do_object_list
-    data_i_do_object ( t_comma data_i_do_object )* <Verbatim>
+    data_i_do_object ( t_comma data_i_do_object )* <T>
   end
 
   rule data_i_do_variable
@@ -414,7 +414,7 @@ grammar Fortran
 
     t_paren_l data_i_do_object_list t_comma data_i_do_variable t_equal
       scalar_int_expr t_comma scalar_int_expr ( t_comma scalar_int_expr )*
-      t_paren_r <Verbatim>
+      t_paren_r <T>
   end
 
   rule data_stmt
@@ -455,7 +455,7 @@ grammar Fortran
   end
 
   rule data_stmt_object_list
-    data_stmt_object ( t_comma data_stmt_object )* <Verbatim>
+    data_stmt_object ( t_comma data_stmt_object )* <T>
   end
 
   rule data_stmt_repeat
@@ -472,25 +472,25 @@ grammar Fortran
   rule data_stmt_set
     # R530
 
-    data_stmt_object_list t_slash data_stmt_value_list t_slash <Verbatim>
+    data_stmt_object_list t_slash data_stmt_value_list t_slash <T>
   end
 
   rule data_stmt_set_list
-    data_stmt_set ( t_comma data_stmt_set )* <Verbatim>
+    data_stmt_set ( t_comma data_stmt_set )* <T>
   end
 
   rule data_stmt_value
     # R531
 
-    data_stmt_repeat_pair? data_stmt_constant <Verbatim>
+    data_stmt_repeat_pair? data_stmt_constant <T>
   end
 
   rule data_stmt_repeat_pair
-    data_stmt_repeat t_star <Verbatim>
+    data_stmt_repeat t_star <T>
   end
 
   rule data_stmt_value_list
-    data_stmt_value ( t_comma data_stmt_value )* <Verbatim>
+    data_stmt_value ( t_comma data_stmt_value )* <T>
   end
 
   rule declaration_construct
@@ -521,7 +521,7 @@ grammar Fortran
   end
 
   rule deferred_shape_spec_list
-    deferred_shape_spec ( t_comma deferred_shape_spec )* <Verbatim>
+    deferred_shape_spec ( t_comma deferred_shape_spec )* <T>
   end
 
   rule defined_binary_op
@@ -530,7 +530,7 @@ grammar Fortran
     # Constraint: Must not contain more than 31 letters and must not be the same
     # as any intrinsic_operator or logical_literal_constant.
 
-    t_dot t_letter t_letter+ t_dot <Verbatim>
+    t_dot t_letter t_letter+ t_dot <T>
   end
 
   rule defined_unary_op
@@ -540,13 +540,13 @@ grammar Fortran
     # as any intrinsic_operator or logical_literal_constant.
 
     !( intrinsic_operator / logical_literal_constant ) t_dot t_letter t_letter+
-      t_dot <Verbatim>
+      t_dot <T>
   end
 
   rule digit_string
     # R402
 
-    t_digit+ <Verbatim>
+    t_digit+ <T>
   end
 
   rule do_block
@@ -577,7 +577,7 @@ grammar Fortran
   end
 
   rule do_construct_name_label
-    do_construct_name t_colon <Verbatim>
+    do_construct_name t_colon <T>
   end
 
   rule do_stmt
@@ -650,19 +650,19 @@ grammar Fortran
   end
 
   rule double_colon
-    t_colon t_colon <Verbatim>
+    t_colon t_colon <T>
   end
 
   rule else_construct
-    else_stmt block <Cat>
+    else_stmt block <E>
   end
 
   rule else_if_construct
-    else_if_construct_element+ <Cat>
+    else_if_construct_element+ <E>
   end
 
   rule else_if_construct_element
-    else_if_stmt block <Cat>
+    else_if_stmt block <E>
   end
 
   rule else_if_stmt
@@ -754,29 +754,29 @@ grammar Fortran
     # ALLOCATABLE and the POINTER attribute. An entity must not be given
     # explicitly any attribute more than once in a scoping unit.
 
-    object_name entity_decl_array_spec? char_length_pair? initialization_expr_pair? <Verbatim> /
-    function_name char_length_pair? <Verbatim>
+    object_name entity_decl_array_spec? char_length_pair? initialization_expr_pair? <T> /
+    function_name char_length_pair? <T>
   end
 
   rule entity_decl_list
-    entity_decl ( t_comma entity_decl )* <Verbatim>
+    entity_decl ( t_comma entity_decl )* <T>
   end
 
   rule entity_decl_array_spec
-    t_paren_l array_spec t_paren_r <Verbatim>
+    t_paren_l array_spec t_paren_r <T>
   end
 
   rule equiv_op
     # R722
 
-    ".eqv." <Verbatim> /
-    ".neqv." <Verbatim>
+    ".eqv." <T> /
+    ".neqv." <T>
   end
 
   rule equiv_operand
     # R715
 
-    not_op? level_4_expr <Verbatim>
+    not_op? level_4_expr <T>
   end
 
   rule executable_construct
@@ -800,7 +800,7 @@ grammar Fortran
     # Constraint: An execution_part must not contain an end_function_stmt,
     # end_program_stmt, or end_subroutine_stmt.
 
-    executable_construct execution_part_construct <Cat>
+    executable_construct execution_part_construct <E>
   end
 
   rule execution_part_disallowed
@@ -817,7 +817,7 @@ grammar Fortran
       format_stmt /
       data_stmt # /
       # entry_stmt
-    )* <Cat>
+    )* <E>
   end
 
   rule exit_stmt
@@ -837,11 +837,11 @@ grammar Fortran
     # nonconstant expressions must be a dummy argument, a function result, or an
     # automatic array of a procedure.
 
-    lower_bound_pair? upper_bound <Verbatim>
+    lower_bound_pair? upper_bound <T>
   end
 
   rule explicit_shape_spec_list
-    explicit_shape_spec ( t_comma explicit_shape_spec )* <Verbatim>
+    explicit_shape_spec ( t_comma explicit_shape_spec )* <T>
   end
 
   rule exponent
@@ -853,7 +853,7 @@ grammar Fortran
   rule exponent_letter
     # R415
 
-    [ed] <Verbatim>
+    [ed] <T>
   end
 
   rule expr
@@ -862,7 +862,7 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( expr defined_binary_op )? level_5_expr
 
-    level_5_expr ( defined_binary_op expr )? <Verbatim>
+    level_5_expr ( defined_binary_op expr )? <T>
   end
 
   rule format
@@ -887,7 +887,7 @@ grammar Fortran
     # only necessary to pass a format-specification through verbatim, not to
     # analyze its contents.
 
-    t_paren_l (!t_paren_r character)+ t_paren_r <Verbatim>
+    t_paren_l (!t_paren_r character)+ t_paren_r <T>
   end
 
  rule format_stmt
@@ -917,7 +917,7 @@ grammar Fortran
     # R410
 
     "z" ( ( t_apostrophe hex_digit+ t_apostrophe ) / ( t_quotemark hex_digit+
-      t_quotemark ) ) <Verbatim>
+      t_quotemark ) ) <T>
   end
 
   rule hex_digit
@@ -933,7 +933,7 @@ grammar Fortran
     # clarity, not specified in standard.
 
     label:label? if_then_construct else_if_construct? else_construct?
-      end_if_stmt <Cat>
+      end_if_stmt <E>
   end
 
   rule if_construct_name
@@ -943,7 +943,7 @@ grammar Fortran
   end
 
   rule if_construct_name_label
-    if_construct_name t_colon <Verbatim>
+    if_construct_name t_colon <T>
   end
 
   rule if_stmt
@@ -957,7 +957,7 @@ grammar Fortran
   end
 
   rule if_then_construct
-    if_then_stmt block <Cat>
+    if_then_stmt block <E>
   end
 
   rule if_then_stmt
@@ -984,7 +984,7 @@ grammar Fortran
   end
 
   rule initialization_expr_pair
-    t_equal initialization_expr <Verbatim>
+    t_equal initialization_expr <T>
   end
 
   rule inner_shared_do_construct
@@ -1013,7 +1013,7 @@ grammar Fortran
   rule int_literal_constant
     # R404
 
-    digit_string ( t_underscore kind_param )? <Verbatim>
+    digit_string ( t_underscore kind_param )? <T>
   end
 
   rule intent_spec
@@ -1046,7 +1046,7 @@ grammar Fortran
   end
 
   rule kind_pair
-    t_kind t_equal <Verbatim>
+    t_kind t_equal <T>
   end
 
   rule kind_param
@@ -1067,7 +1067,7 @@ grammar Fortran
     # nonnegative and must specify a representation method that exists on the
     # processor.
 
-    t_paren_l kind_pair? scalar_int_initialization_expr t_paren_r <Verbatim>
+    t_paren_l kind_pair? scalar_int_initialization_expr t_paren_r <T>
   end
 
   rule label
@@ -1079,7 +1079,7 @@ grammar Fortran
     # unit. Leading zeros are not significant in distinguishing between
     # statement labels.
 
-    t_digit 1..5 <Verbatim>
+    t_digit 1..5 <T>
   end
 
   rule label_do_stmt
@@ -1090,11 +1090,11 @@ grammar Fortran
   end
 
   rule label_list
-    label ( t_comma label )* <Verbatim>
+    label ( t_comma label )* <T>
   end
 
   rule len_pair
-    t_len t_equal <Verbatim>
+    t_len t_equal <T>
   end
 
   rule length_selector
@@ -1105,8 +1105,8 @@ grammar Fortran
     # length_selector is permitted only if no double colon separator appears in
     # the type_declaration_stmt.
 
-    t_paren_l len_pair? type_param_value t_paren_r <Verbatim> /
-#    char_length_pair t_comma? <Verbatim>
+    t_paren_l len_pair? type_param_value t_paren_r <T> /
+#    char_length_pair t_comma? <T>
 # TODO this is WRONG -- need to handle the optional comma, see spec
     char_length_pair
   end
@@ -1114,7 +1114,7 @@ grammar Fortran
   rule level_1_expr
     # R703
 
-    defined_unary_op? primary <Verbatim>
+    defined_unary_op? primary <T>
   end
 
   rule level_2_expr
@@ -1123,7 +1123,7 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_2_expr? add_op )? add_operand
 
-    add_op? add_operand level_2_expr? <Verbatim>
+    add_op? add_operand level_2_expr? <T>
   end
 
   rule level_3_expr
@@ -1132,7 +1132,7 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_3_expr concat_op )? level_2_expr
 
-    level_2_expr ( concat_op level_3_expr )? <Verbatim>
+    level_2_expr ( concat_op level_3_expr )? <T>
   end
 
   rule level_4_expr
@@ -1141,7 +1141,7 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_3_expr rel_op )? level_3_expr
 
-    level_3_expr ( rel_op level_3_expr )? <Verbatim>
+    level_3_expr ( rel_op level_3_expr )? <T>
   end
 
   rule level_5_expr
@@ -1150,7 +1150,7 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_5_expr equiv_op)? equiv_operand
 
-    equiv_operand ( equiv_op level_5_expr )? <Verbatim>
+    equiv_operand ( equiv_op level_5_expr )? <T>
   end
 
   rule literal_constant
@@ -1193,7 +1193,7 @@ grammar Fortran
     # Constraint: The value of kind_param must specify a representation that
     # exists on the processor.
 
-    ( t_true / t_false ) ( t_underscore kind_param )? <Verbatim>
+    ( t_true / t_false ) ( t_underscore kind_param )? <T>
   end
 
   rule loop_control
@@ -1208,7 +1208,7 @@ grammar Fortran
   end
 
   rule loop_control_pair
-    t_comma scalar_numeric_expr <Verbatim>
+    t_comma scalar_numeric_expr <T>
   end
 
   rule lower_bound
@@ -1218,7 +1218,7 @@ grammar Fortran
   end
 
   rule lower_bound_pair
-    lower_bound t_colon <Verbatim>
+    lower_bound t_colon <T>
   end
 
   rule main_program
@@ -1227,7 +1227,7 @@ grammar Fortran
     # Constraint: In a main_program, the execution_part must not contain a
     # RETURN statement or an ENTRY statement.
 
-    program_stmt? specification_part? execution_part? end_program_stmt <Cat>
+    program_stmt? specification_part? execution_part? end_program_stmt <E>
   end
 
   rule mult_op
@@ -1240,7 +1240,7 @@ grammar Fortran
   rule mult_operand
     # R705
 
-    level_1_expr ( power_op mult_operand )? <Verbatim>
+    level_1_expr ( power_op mult_operand )? <T>
   end
 
   rule name
@@ -1248,7 +1248,7 @@ grammar Fortran
     #
     # Constraint: The maximum length of a name is 31 characters.
 
-    t_letter alphanumeric_character* <Verbatim>
+    t_letter alphanumeric_character* <T>
   end
 
   rule named_constant
@@ -1274,7 +1274,7 @@ grammar Fortran
   rule not_op
     # R719
 
-    ".not." <Verbatim>
+    ".not." <T>
   end
 
   rule numeric_expr
@@ -1298,19 +1298,19 @@ grammar Fortran
     # replaced by 't_octal' here to enforce the constraint.
 
     "o" ( ( t_apostrophe t_octal+ t_apostrophe ) /
-      ( t_quotemark t_octal+ t_quotemark ) ) <Verbatim>
+      ( t_quotemark t_octal+ t_quotemark ) ) <T>
   end
 
   rule or_op
     # R721
 
-    ".or." <Verbatim>
+    ".or." <T>
   end
 
   rule outer_shared_do_construct
     # R830
 
-    label_do_stmt !{ |e| dolabel_dupe? } do_body shared_term_do_construct <Cat>
+    label_do_stmt !{ |e| dolabel_dupe? } do_body shared_term_do_construct <E>
   end
 
   rule output_item
@@ -1325,11 +1325,11 @@ grammar Fortran
     # Constraint: In an output_item_list, an io_implied_do_object must be an
     # output_item.
 
-    ( t_comma output_item )+ <Verbatim>
+    ( t_comma output_item )+ <T>
   end
 
   rule parenthesized_expr
-    t_paren_l expr t_paren_r <Verbatim>
+    t_paren_l expr t_paren_r <T>
   end
 
   rule pause_stmt
@@ -1341,7 +1341,7 @@ grammar Fortran
   rule power_op
     # R708
 
-    "**" <Verbatim>
+    "**" <T>
   end
 
   rule primary
@@ -1394,9 +1394,9 @@ grammar Fortran
     # approximation method that exists on the processor.
 
     significand ( exponent_letter exponent )? ( t_underscore kind_param )?
-      <Verbatim> /
+      <T> /
     digit_string exponent_letter exponent ( t_underscore kind_param )?
-      <Verbatim>
+      <T>
   end
 
   rule real_part
@@ -1407,33 +1407,33 @@ grammar Fortran
   end
 
   rule rel_op_eq
-    ".eq." <Verbatim> /
-    "==" <Verbatim>
+    ".eq." <T> /
+    "==" <T>
   end
 
   rule rel_op_ge
-    ".ge." <Verbatim> /
-    ">=" <Verbatim>
+    ".ge." <T> /
+    ">=" <T>
   end
 
   rule rel_op_gt
-    ".gt." <Verbatim> /
-    ">" <Verbatim>
+    ".gt." <T> /
+    ">" <T>
   end
 
   rule rel_op_le
-    ".le." <Verbatim> /
-    "<=" <Verbatim>
+    ".le." <T> /
+    "<=" <T>
   end
 
   rule rel_op_lt
-    ".lt." <Verbatim> /
-    "<" <Verbatim>
+    ".lt." <T> /
+    "<" <T>
   end
 
   rule rel_op_ne
-    ".ne." <Verbatim> /
-    "/=" <Verbatim>
+    ".ne." <T> /
+    "/=" <T>
   end
 
   rule rel_op
@@ -1591,26 +1591,26 @@ grammar Fortran
   rule signed_digit_string
     # R401
 
-    sign? digit_string <Verbatim>
+    sign? digit_string <T>
   end
 
   rule signed_int_literal_constant
     # R403
 
-    sign? int_literal_constant <Verbatim>
+    sign? int_literal_constant <T>
   end
 
   rule signed_real_literal_constant
     # R412
 
-    sign? real_literal_constant <Verbatim>
+    sign? real_literal_constant <T>
   end
 
   rule significand
     # R414
 
-    digit_string t_dot digit_string? <Verbatim> /
-    t_dot digit_string <Verbatim>
+    digit_string t_dot digit_string? <T> /
+    t_dot digit_string <T>
   end
 
   rule special_character
@@ -1630,8 +1630,8 @@ grammar Fortran
   rule specification_part
     # R204 -- INCOMPLETE
 
-    #use_stmt* implicit_part? declaration_construct* <Cat>
-    declaration_construct* <Cat>
+    #use_stmt* implicit_part? declaration_construct* <E>
+    declaration_construct* <E>
   end
 
   rule specification_stmt
@@ -1646,7 +1646,7 @@ grammar Fortran
     # Constraint: scalar_char_constant must be of type default character.
 
     scalar_char_constant /
-    t_digit 1..5 <Verbatim>
+    t_digit 1..5 <T>
   end
 
   rule stop_stmt
@@ -1656,255 +1656,255 @@ grammar Fortran
   end
 
   rule t_allocatable
-    "allocatable" <Verbatim>
+    "allocatable" <T>
   end
 
   rule t_apostrophe
-    "'" <Verbatim>
+    "'" <T>
   end
 
   rule t_assign
-    "assign" <Verbatim>
+    "assign" <T>
   end
 
   rule t_binary
-    [01] <Verbatim>
+    [01] <T>
   end
 
   rule t_character
-    "character" <Verbatim>
+    "character" <T>
   end
 
   rule t_colon
-    ":" <Verbatim>
+    ":" <T>
   end
 
   rule t_comma
-    "," <Verbatim>
+    "," <T>
   end
 
   rule t_complex
-    "complex" <Verbatim>
+    "complex" <T>
   end
 
   rule t_continue
-    "continue" <Verbatim>
+    "continue" <T>
   end
 
   rule t_cycle
-    "cycle" <Verbatim>
+    "cycle" <T>
   end
 
   rule t_data
-    "data" <Verbatim>
+    "data" <T>
   end
 
   rule t_digit
-    [0-9] <Verbatim>
+    [0-9] <T>
   end
 
   rule t_dimension
-    "dimension" <Verbatim>
+    "dimension" <T>
   end
 
   rule t_do
-    "do" <Verbatim>
+    "do" <T>
   end
 
   rule t_dot
-    "." <Verbatim>
+    "." <T>
   end
 
   rule t_doubleprecision
-    "doubleprecision" <Verbatim>
+    "doubleprecision" <T>
   end
 
   rule t_else
-    "else" <Verbatim>
+    "else" <T>
   end
 
   rule t_elseif
-    "elseif" <Verbatim>
+    "elseif" <T>
   end
 
   rule t_end
-    "end" <Verbatim>
+    "end" <T>
   end
 
   rule t_endif
-    "endif" <Verbatim>
+    "endif" <T>
   end
 
   rule t_enddo
-    "enddo" <Verbatim>
+    "enddo" <T>
   end
 
   rule t_equal
-    "=" <Verbatim>
+    "=" <T>
   end
 
   rule t_exit
-    "exit" <Verbatim>
+    "exit" <T>
   end
 
   rule t_external
-    "external" <Verbatim>
+    "external" <T>
   end
 
   rule t_false
-    ".false." <Verbatim>
+    ".false." <T>
   end
 
   rule t_format
-    "format" <Verbatim>
+    "format" <T>
   end
 
   rule t_goto
-    "goto" <Verbatim>
+    "goto" <T>
   end
 
   rule t_if
-    "if" <Verbatim>
+    "if" <T>
   end
 
   rule t_in
-    "in" <Verbatim>
+    "in" <T>
   end
 
   rule inout
-    "inout" <Verbatim>
+    "inout" <T>
   end
 
   rule t_integer
-    "integer" <Verbatim>
+    "integer" <T>
   end
 
   rule t_intent
-    "intent" <Verbatim>
+    "intent" <T>
   end
 
   rule t_intrinsic
-    "intrinsic" <Verbatim>
+    "intrinsic" <T>
   end
 
   rule t_kind
-    "kind" <Verbatim>
+    "kind" <T>
   end
 
   rule t_len
-    "len" <Verbatim>
+    "len" <T>
   end
 
   rule t_letter
-    [a-z] <Verbatim>
+    [a-z] <T>
   end
 
   rule t_logical
-    "logical" <Verbatim>
+    "logical" <T>
   end
 
   rule t_minus
-    "-" <Verbatim>
+    "-" <T>
   end
 
   rule t_newline
-    "\n" <Verbatim>
+    "\n" <T>
   end
 
   rule t_octal
-    [01234567] <Verbatim>
+    [01234567] <T>
   end
 
   rule t_optional
-    "optional" <Verbatim>
+    "optional" <T>
   end
 
   rule t_out
-    "out" <Verbatim>
+    "out" <T>
   end
 
   rule t_parameter
-    "parameter" <Verbatim>
+    "parameter" <T>
   end
 
   rule t_pause
-    "pause" <Verbatim>
+    "pause" <T>
   end
 
   rule t_paren_l
-    "(" <Verbatim>
+    "(" <T>
   end
 
   rule t_paren_r
-    ")" <Verbatim>
+    ")" <T>
   end
 
   rule t_plus
-    "+" <Verbatim>
+    "+" <T>
   end
 
   rule t_pointer
-    "pointer" <Verbatim>
+    "pointer" <T>
   end
 
   rule t_print
-    "print" <Verbatim>
+    "print" <T>
   end
 
   rule t_private
-    "private" <Verbatim>
+    "private" <T>
   end
 
   rule t_program
-    "program" <Verbatim>
+    "program" <T>
   end
 
   rule t_public
-    "public" <Verbatim>
+    "public" <T>
   end
 
   rule t_quotemark
-    "\"" <Verbatim>
+    "\"" <T>
   end
 
   rule t_real
-    "real" <Verbatim>
+    "real" <T>
   end
 
   rule t_save
-    "save" <Verbatim>
+    "save" <T>
   end
 
   rule t_slash
-    "/" <Verbatim>
+    "/" <T>
   end
 
   rule t_star
-    "*" <Verbatim>
+    "*" <T>
   end
 
   rule t_stop
-    "stop" <Verbatim>
+    "stop" <T>
   end
 
   rule t_target
-    "target" <Verbatim>
+    "target" <T>
   end
 
   rule t_then
-    "then" <Verbatim>
+    "then" <T>
   end
 
   rule t_to
-    "to" <Verbatim>
+    "to" <T>
   end
 
   rule t_true
-    ".true." <Verbatim>
+    ".true." <T>
   end
 
   rule t_type
-    "type" <Verbatim>
+    "type" <T>
   end
 
   rule t_underscore
@@ -1913,7 +1913,7 @@ grammar Fortran
   end
 
   rule t_while
-    "while" <Verbatim>
+    "while" <T>
   end
 
   rule type_declaration_stmt
@@ -1945,13 +1945,13 @@ grammar Fortran
   rule type_spec
     # R502
 
-    t_integer kind_selector? <Verbatim> /
-    t_real kind_selector? <Verbatim> /
+    t_integer kind_selector? <T> /
+    t_real kind_selector? <T> /
     t_doubleprecision /
-    t_complex kind_selector? <Verbatim> /
-    t_character char_selector? <Verbatim> /
-    t_logical kind_selector? <Verbatim> /
-    t_type t_paren_l type_name t_paren_r <Verbatim>
+    t_complex kind_selector? <T> /
+    t_character char_selector? <T> /
+    t_logical kind_selector? <T> /
+    t_type t_paren_l type_name t_paren_r <T>
   end
 
   rule upper_bound

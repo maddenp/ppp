@@ -41,7 +41,7 @@ module Fortran
 
   # Generic Subclasses
 
-  class ASTNode < Treetop::Runtime::SyntaxNode
+  class T < Treetop::Runtime::SyntaxNode
 
     def blockbegin
       @@level+=1
@@ -108,74 +108,64 @@ module Fortran
     end
 
     def to_s
-      cat
-    end
-
-    def verbatim
       text_value
     end
 
   end
 
-  class Cat < ASTNode
+  class E < T
     def to_s
       cat
     end
   end
 
-  class Stmt < ASTNode
+  class Stmt < T
     def to_s
       stmt(join)
-    end
-  end
-
-  class Verbatim < ASTNode
-    def to_s
-      verbatim
     end
   end
 
   # Specific Subclasses
 
-  class Arithmetic_If_Stmt < ASTNode
+  class Arithmetic_If_Stmt < T
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}")
     end
   end
 
-  class Assigned_Goto_Stmt < ASTNode
+  class Assigned_Goto_Stmt < T
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{(e3.to_s[0]==',')?(e3):(' '+e3.to_s)}")
     end
   end
 
-  class Assignment_Stmt < ASTNode
+  class Assignment_Stmt < T
     def to_s
       stmt("#{sa(e0)}#{e1}#{e2}#{e3}")
     end
   end
 
-  class Computed_Goto_Stmt < ASTNode
+  class Computed_Goto_Stmt < T
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
     end
   end
 
-  class Do_Term_Action_Stmt < ASTNode
+  class Do_Term_Action_Stmt < T
     def to_s
       blockend
       stmt(join)
     end
   end
 
-  class Do_Term_Shared_Stmt < ASTNode
+  class Do_Term_Shared_Stmt < T
     def to_s
       blockend
       cat
     end
   end
 
-  class Else_If_Stmt < ASTNode
+  class Else_If_Stmt < T
     def to_s
       blockend
       s=stmt(join)
@@ -184,7 +174,7 @@ module Fortran
     end
   end
 
-  class Else_Stmt < ASTNode
+  class Else_Stmt < T
     def to_s
       blockend
       s=stmt(join)
@@ -193,34 +183,34 @@ module Fortran
     end
   end
 
-  class End_Do_Stmt < ASTNode
+  class End_Do_Stmt < T
     def to_s
       blockend
       stmt(join)
     end
   end
 
-  class End_If_Stmt < ASTNode
+  class End_If_Stmt < T
     def to_s
       blockend
       stmt("#{sa(e0)}#{e1}#{sb(e2)}")
     end
   end
 
-  class End_Program_Stmt < ASTNode
+  class End_Program_Stmt < T
     def to_s
       blockend
       stmt(join)
     end
   end
 
-  class If_Stmt < ASTNode
+  class If_Stmt < T
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
     end
   end
 
-  class If_Then_Stmt < ASTNode
+  class If_Then_Stmt < T
     def to_s
       s=stmt("#{sa(e0)}#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")
       blockbegin
@@ -228,14 +218,14 @@ module Fortran
     end
   end
 
-  class Inner_Shared_Do_Construct < ASTNode
+  class Inner_Shared_Do_Construct < T
     def to_s
       blockend
       cat
     end
   end
 
-  class Label_Do_Stmt < ASTNode
+  class Label_Do_Stmt < T
     def to_s
       s=stmt("#{sa(e0)}#{sa(e1)}#{e2} #{e3}#{e4}")
       blockbegin
@@ -243,19 +233,19 @@ module Fortran
     end
   end
 
-  class Loop_Control_1 < ASTNode
+  class Loop_Control_1 < T
     def to_s
       "#{(e0)?(e0):(' ')}#{e1}#{e2}#{e3}#{e4}#{e5}"
     end
   end
 
-  class Loop_Control_2 < ASTNode
+  class Loop_Control_2 < T
     def to_s
       "#{(e0)?(e0):(' ')}#{e1} #{e2}#{e3}#{e4}"
     end
   end
 
-  class Nonlabel_Do_Stmt < ASTNode
+  class Nonlabel_Do_Stmt < T
     def to_s
       s=stmt("#{sa(e0)}#{sa(e1)}#{e2}#{e3}")
       blockbegin
@@ -263,13 +253,13 @@ module Fortran
     end
   end
 
-  class Print_Stmt < ASTNode
+  class Print_Stmt < T
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{e3}")
     end
   end
 
-  class Program_Stmt < ASTNode
+  class Program_Stmt < T
     def to_s
       s=stmt(join)
       blockbegin
@@ -277,7 +267,7 @@ module Fortran
     end
   end
 
-  class Type_Declaration_Stmt < ASTNode
+  class Type_Declaration_Stmt < T
     def to_s
       stmt("#{sa(e0)}#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
     end
