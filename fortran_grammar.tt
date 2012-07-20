@@ -13,6 +13,40 @@ grammar Fortran
     program_unit
   end
 
+  rule ac_do_variable
+    # R435
+    #
+    # Constraint: ac_do_variable must be a named variable.
+
+    scalar_int_variable
+  end
+
+  rule ac_implied_do
+    # R433
+
+    t_paren_l ac_value_list t_comma ac_implied_do_control t_paren_r <Cat>
+  end
+
+  rule ac_implied_do_control
+    # R434
+
+    ac_do_variable t_equal scalar_int_expr ( t_comma scalar_int_expr )? <Cat>
+  end
+
+  rule ac_value
+    # R432
+    #
+    # Constraint: Each ac_value expression in the array_constructor must have
+    # the same type and type parameters.
+
+    expr !t_equal /
+    ac_implied_do
+  end
+
+  rule ac_value_list
+    ac_value ( t_comma ac_value )* <Cat>
+  end
+
   rule access_spec
     # R510
     #
@@ -106,6 +140,12 @@ grammar Fortran
       label t_comma label t_newline <Arithmetic_If_Stmt>
   end
 
+  rule array_constructor
+    # R431
+
+    t_paren_l t_slash ac_value_list t_slash t_paren_r <Cat>
+  end
+
   rule array_spec
     # R512
     #
@@ -164,7 +204,7 @@ grammar Fortran
     #
     # Constraint: The function name of an array-valued function must not be
     # declared as an assumed-size array.
-
+# TODO is this a left-recursion problem waiting to happen?
     ( explicit_shape_spec_list t_comma )? lower_bound_pair? t_star <Verbatim>
   end
 
@@ -1313,7 +1353,7 @@ grammar Fortran
     constant /
     # constant_subobject /
     variable /
-    # array_constructor /
+    array_constructor /
     # structure_constructor /
     # function_reference /
     parenthesized_expr
