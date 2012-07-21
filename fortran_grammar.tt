@@ -2009,11 +2009,7 @@ grammar Fortran
   rule allocation
     # R624
 
-    allocate_object allocate_shape_spec_construct? <E>
-  end
-
-  rule allocate_shape_spec_construct
-    t_paren_l allocate_shape_spec_list t_paren_r <E>
+    allocate_object ( t_paren_l allocate_shape_spec_list t_paren_r )? <E>
   end
 
   rule allocation_list
@@ -2026,14 +2022,14 @@ grammar Fortran
     # Constraint: Each allocate_object must be a pointer or an allocatable
     # array.
 
-    variable_name # /
+    !( t_stat t_equal ) variable_name # /
     #structure_component
   end
 
   rule allocate_shape_spec
     # R626
 
-    ( allocate_lower_bound t_colon )? allocate_upper_bound <T>
+    ( allocate_lower_bound t_colon )? allocate_upper_bound <E>
   end
 
   rule allocate_shape_spec_list
