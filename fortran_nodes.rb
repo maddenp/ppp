@@ -274,6 +274,11 @@ module Fortran
   end
 
   #PM#
+  class Allocate_Stmt < T
+    def to_s
+      stmt("#{sa(e0)}#{e1}#{e2}#{e3}#{e4}#{e5}")
+    end
+  end
   #PM#
 
 end

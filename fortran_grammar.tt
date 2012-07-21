@@ -60,7 +60,7 @@ grammar Fortran
   rule action_stmt
     # R216 -- INCOMPLETE
 
-    # allocate_stmt /
+    allocate_stmt /
     assignment_stmt /
     # backspace_stmt /
     # call_stmt /
@@ -1993,7 +1993,11 @@ grammar Fortran
   rule allocate_stmt
     # R622
 
-    label:label? t_allocate t_paren_l allocation_list ( t_comma t_stat t_equal stat_variable )? t_paren_r t_newline <E>
+    label:label? t_allocate t_paren_l allocation_list allocate_stat_construct? t_paren_r t_newline <Allocate_Stmt>
+  end
+
+  rule allocate_stat_construct
+    t_comma t_stat t_equal stat_variable <E>
   end
 
   rule stat_variable
@@ -2005,11 +2009,15 @@ grammar Fortran
   rule allocation
     # R624
 
-    allocate_object ( t_paren_l allocate_shape_spec_list t_paren_r )? <E>
+    allocate_object allocate_shape_spec_construct? <E>
+  end
+
+  rule allocate_shape_spec_construct
+    t_paren_l allocate_shape_spec_list t_paren_r <E>
   end
 
   rule allocation_list
-    allocation ( t_comma allocation )* <E>
+    allocation ( t_comma allocation )* <T>
   end
 
   rule allocate_object
@@ -2025,7 +2033,7 @@ grammar Fortran
   rule allocate_shape_spec
     # R626
 
-    ( allocate_lower_bound t_colon )? allocate_upper_bound <E>
+    ( allocate_lower_bound t_colon )? allocate_upper_bound <T>
   end
 
   rule allocate_shape_spec_list
