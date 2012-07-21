@@ -1982,6 +1982,74 @@ grammar Fortran
   end
 
 #PM#
+  rule t_allocate
+    "allocate" <T>
+  end
+
+  rule t_stat
+    "stat" <T>
+  end
+
+  rule allocate_stmt
+    # R622
+
+    label:label? t_allocate t_paren_l allocation_list ( t_comma t_stat t_equal stat_variable )? t_paren_r t_newline <E>
+  end
+
+  rule stat_variable
+    # R623
+
+    scalar_int_variable
+  end
+
+  rule allocation
+    # R624
+
+    allocate_object ( t_paren_l allocate_shape_spec_list t_paren_r )? <E>
+  end
+
+  rule allocation_list
+    allocation ( t_comma allocation )* <E>
+  end
+
+  rule allocate_object
+    # R625
+    #
+    # Constraint: Each allocate_object must be a pointer or an allocatable
+    # array.
+
+    variable_name # /
+    #structure_component
+  end
+
+  rule allocate_shape_spec
+    # R626
+
+    ( allocate_lower_bound t_colon )? allocate_upper_bound <E>
+  end
+
+  rule allocate_shape_spec_list
+    # 6.3.1
+    #
+    # Constraint: The number of allocate_shape_specs in an
+    # allocate_shape_spec_list must be the same as the rank of the pointer or
+    # allocatable array.
+
+    allocate_shape_spec ( t_comma allocate_shape_spec )* <E>
+  end
+
+  rule allocate_lower_bound
+    # R627
+
+    scalar_int_expr
+  end
+
+  rule allocate_upper_bound
+    # R628
+
+    scalar_int_expr
+  end
+
 #PM#
 
 end
