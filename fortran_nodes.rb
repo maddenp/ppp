@@ -127,6 +127,12 @@ module Fortran
 
   # Specific Subclasses
 
+  class Allocate_Stmt < T
+    def to_s
+      stmt("#{sa(e0)}#{e1}#{e2}#{e3}#{e4}#{e5}")
+    end
+  end
+
   class Arithmetic_If_Stmt < T
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}")
@@ -148,6 +154,12 @@ module Fortran
   class Computed_Goto_Stmt < T
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
+    end
+  end
+
+  class Deallocate_Stmt < T
+    def to_s
+      stmt("#{sa(e0)}#{e1}#{e2}#{e3}#{e4}#{e5}")
     end
   end
 
@@ -274,11 +286,6 @@ module Fortran
   end
 
   #PM#
-  class Allocate_Stmt < T
-    def to_s
-      stmt("#{sa(e0)}#{e1}#{e2}#{e3}#{e4}#{e5}")
-    end
-  end
   #PM#
 
 end

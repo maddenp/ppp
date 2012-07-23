@@ -68,7 +68,7 @@ grammar Fortran
     computed_goto_stmt /
     continue_stmt /
     cycle_stmt /
-    # deallocate_stmt /
+    deallocate_stmt /
     # endfile_stmt /
     # end_function_stmt /
     end_program_stmt /
@@ -119,6 +119,69 @@ grammar Fortran
     # R720
 
     ".and." <T>
+  end
+
+  rule allocate_lower_bound
+    # R627
+
+    scalar_int_expr
+  end
+
+  rule allocate_object
+    # R625
+    #
+    # Constraint: Each allocate_object must be a pointer or an allocatable
+    # array.
+
+    !( t_stat t_equal ) variable_name # /
+    #structure_component
+  end
+
+  rule allocate_object_list
+    allocate_object ( t_comma allocate_object )* <T>
+  end
+
+  rule allocate_shape_spec
+    # R626
+
+    ( allocate_lower_bound t_colon )? allocate_upper_bound <E>
+  end
+
+  rule allocate_shape_spec_list
+    # 6.3.1
+    #
+    # Constraint: The number of allocate_shape_specs in an
+    # allocate_shape_spec_list must be the same as the rank of the pointer or
+    # allocatable array.
+
+    allocate_shape_spec ( t_comma allocate_shape_spec )* <E>
+  end
+
+  rule allocate_stat_construct
+    t_comma t_stat t_equal stat_variable <E>
+  end
+
+  rule allocate_stmt
+    # R622
+
+    label:label? t_allocate t_paren_l allocation_list allocate_stat_construct?
+      t_paren_r t_newline <Allocate_Stmt>
+  end
+
+  rule allocate_upper_bound
+    # R628
+
+    scalar_int_expr
+  end
+
+  rule allocation
+    # R624
+
+    allocate_object ( t_paren_l allocate_shape_spec_list t_paren_r )? <E>
+  end
+
+  rule allocation_list
+    allocation ( t_comma allocation )* <T>
   end
 
   rule alphanumeric_character
@@ -320,9 +383,12 @@ grammar Fortran
     # processor.
 
     length_selector /
-    t_paren_l len_pair type_param_value t_comma kind_pair scalar_int_initialization_expr t_paren_r <T> /
-    t_paren_l type_param_value t_comma kind_pair? scalar_int_initialization_expr t_paren_r <T> /
-    t_paren_l kind_pair scalar_int_initialization_expr ( t_comma len_pair type_param_value )? t_paren_r <T>
+    t_paren_l len_pair type_param_value t_comma kind_pair
+      scalar_int_initialization_expr t_paren_r <T> /
+    t_paren_l type_param_value t_comma kind_pair? scalar_int_initialization_expr
+      t_paren_r <T> /
+    t_paren_l kind_pair scalar_int_initialization_expr ( t_comma len_pair
+      type_param_value )? t_paren_r <T>
   end
 
   rule character
@@ -491,6 +557,16 @@ grammar Fortran
 
   rule data_stmt_value_list
     data_stmt_value ( t_comma data_stmt_value )* <T>
+  end
+
+  rule deallocate_stmt
+    # R631
+    #
+    # Constraint: Each allocate_object must be a pointer or an allocatable
+    # array.
+
+    label:label? t_deallocate t_paren_l allocate_object_list
+      allocate_stat_construct? t_paren_r t_newline <Deallocate_Stmt>
   end
 
   rule declaration_construct
@@ -746,15 +822,16 @@ grammar Fortran
     # block. The INTENT and OPTIONAL attributes may be specified only for dummy
     # arguments. An entity must not have the PUBLIC attribute if its type has
     # the PRIVATE attribute. The SAVE attribute must not be specified for an
-    # object that is in a common block, a dummy argument, a procedure, a function
-    # result, or an automatic data object. An entity must not have the EXTERNAL
-    # attribute if it has the INTRINSIC attribute. An entity in a
+    # object that is in a common block, a dummy argument, a procedure, a
+    # function result, or an automatic data object. An entity must not have the
+    # EXTERNAL attribute if it has the INTRINSIC attribute. An entity in a
     # type_declaration_stmt must not have the EXTERNAL or INTRINSIC attribute
     # specified unless it is a function. An array must not have both the
     # ALLOCATABLE and the POINTER attribute. An entity must not be given
     # explicitly any attribute more than once in a scoping unit.
 
-    object_name entity_decl_array_spec? char_length_pair? initialization_expr_pair? <T> /
+    object_name entity_decl_array_spec? char_length_pair?
+      initialization_expr_pair? <T> /
     function_name char_length_pair? <T>
   end
 
@@ -1640,6 +1717,12 @@ grammar Fortran
     data_stmt
   end
 
+  rule stat_variable
+    # R623
+
+    scalar_int_variable
+  end
+
   rule stop_code
     # R843
     #
@@ -1657,6 +1740,10 @@ grammar Fortran
 
   rule t_allocatable
     "allocatable" <T>
+  end
+
+  rule t_allocate
+    "allocate" <T>
   end
 
   rule t_apostrophe
@@ -1697,6 +1784,10 @@ grammar Fortran
 
   rule t_data
     "data" <T>
+  end
+
+  rule t_deallocate
+    "deallocate" <T>
   end
 
   rule t_digit
@@ -1883,6 +1974,10 @@ grammar Fortran
     "*" <T>
   end
 
+  rule t_stat
+    "stat" <T>
+  end
+
   rule t_stop
     "stop" <T>
   end
@@ -1922,7 +2017,8 @@ grammar Fortran
     # Constraint: The same attr_spec must not appear more than once in a given
     # type_declaration_stmt.
 
-    label:label? type_spec attr_spec_option? entity_decl_list t_newline <Type_Declaration_Stmt>
+    label:label? type_spec attr_spec_option? entity_decl_list t_newline
+      <Type_Declaration_Stmt>
   end
 
   rule type_name
@@ -1982,78 +2078,6 @@ grammar Fortran
   end
 
 #PM#
-  rule t_allocate
-    "allocate" <T>
-  end
-
-  rule t_stat
-    "stat" <T>
-  end
-
-  rule allocate_stmt
-    # R622
-
-    label:label? t_allocate t_paren_l allocation_list allocate_stat_construct? t_paren_r t_newline <Allocate_Stmt>
-  end
-
-  rule allocate_stat_construct
-    t_comma t_stat t_equal stat_variable <E>
-  end
-
-  rule stat_variable
-    # R623
-
-    scalar_int_variable
-  end
-
-  rule allocation
-    # R624
-
-    allocate_object ( t_paren_l allocate_shape_spec_list t_paren_r )? <E>
-  end
-
-  rule allocation_list
-    allocation ( t_comma allocation )* <T>
-  end
-
-  rule allocate_object
-    # R625
-    #
-    # Constraint: Each allocate_object must be a pointer or an allocatable
-    # array.
-
-    !( t_stat t_equal ) variable_name # /
-    #structure_component
-  end
-
-  rule allocate_shape_spec
-    # R626
-
-    ( allocate_lower_bound t_colon )? allocate_upper_bound <E>
-  end
-
-  rule allocate_shape_spec_list
-    # 6.3.1
-    #
-    # Constraint: The number of allocate_shape_specs in an
-    # allocate_shape_spec_list must be the same as the rank of the pointer or
-    # allocatable array.
-
-    allocate_shape_spec ( t_comma allocate_shape_spec )* <E>
-  end
-
-  rule allocate_lower_bound
-    # R627
-
-    scalar_int_expr
-  end
-
-  rule allocate_upper_bound
-    # R628
-
-    scalar_int_expr
-  end
-
 #PM#
 
 end
