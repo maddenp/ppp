@@ -85,7 +85,7 @@ grammar Fortran
     # return_stmt /
     # rewind_stmt /
     stop_stmt /
-    # where_stmt /
+    where_stmt /
     # write_stmt /
     arithmetic_if_stmt /
     assign_stmt /
@@ -2128,6 +2128,58 @@ grammar Fortran
   end
 
 #PM#
+  rule t_elsewhere
+    "elsewhere" <T>
+  end
+
+  rule t_endwhere
+    "endwhere" <T>
+  end
+
+  rule t_where
+    "where" <T>
+  end
+
+  rule where_stmt
+    # R738
+    #
+    # Constraint: The assignment_stmt must not be a defined assignment.
+
+    label:label? t_where t_paren_l mask_expr t_paren_r !label assignment_stmt <T>
+  end
+
+  rule where_construct
+    # R739
+    #
+    # Constraint: The assignment_stmt must not be a defined assignment.
+
+    where_construct_stmt assignment_stmt? elsewhere_stmt? assignment_stmt? end_where_stmt <T>
+  end
+
+  rule where_construct_stmt
+    # R740
+
+    label:label? t_where t_paren_l mask_expr t_paren_r t_newline <T>
+  end
+
+  rule mask_expr
+    # R741
+
+    logical_expr
+  end
+
+  rule elsewhere_stmt
+    # R742
+
+    label:label? t_elsewhere t_newline <StmtC>
+  end
+
+  rule end_where_stmt
+    # R743
+
+    label:label? t_endwhere t_newline <StmtC>
+  end
+
 #PM#
 
 end
