@@ -77,9 +77,9 @@ grammar Fortran
     goto_stmt /
     if_stmt /
     # inquire_stmt /
-    # nullify_stmt /
+    nullify_stmt /
     # open_stmt /
-    # pointer_assignment_stmt /
+    pointer_assignment_stmt /
     print_stmt /
     # read_stmt /
     # return_stmt /
@@ -2078,6 +2078,55 @@ grammar Fortran
   end
 
 #PM#
+  rule pointer_assignment_stmt
+    # R736
+    #
+    # Constraint: The pointer_object must have the POINTER attirbute. The
+    # target must be of the same type, type parameters, and rank as the
+    # pointer.
+
+    label:label? pointer_object t_pointer_assign target t_newline <T>
+  end
+
+  rule target
+    # R737
+    #
+    # Constraint: The variable must have the TARGET attribute or be a subobject
+    # of an object with the TARGET attribute, or it must have the pointer
+    # attribute. The target must not be an array section with a vector
+    # subscript. The expr must deliver a pointer result.
+
+    variable /
+    expr
+  end
+
+  rule t_pointer_assign
+    "=>" <T>
+  end
+
+  rule pointer_object
+    # R630
+
+    variable_name #/
+    # structure_component
+  end
+
+  rule pointer_object_list
+    pointer_object ( t_comma pointer_object )* <T>
+  end
+
+  rule nullify_stmt
+    # R629
+    #
+    # Constraint: Each pointer_object must have the POINTER attribute.
+
+    label:label? t_nullify t_paren_l pointer_object_list t_paren_r t_newline <T>
+  end
+
+  rule t_nullify
+    "nullify" <T>
+  end
+
 #PM#
 
 end
