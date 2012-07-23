@@ -183,6 +183,15 @@ module Fortran
     end
   end
 
+  class Elsewhere_Stmt < T
+    def to_s
+      blockend
+      s=stmt("#{sa(e0)}#{e1}")
+      blockbegin
+      s
+    end
+  end
+
   class End_Do_Stmt < T
     def to_s
       blockend
@@ -201,6 +210,13 @@ module Fortran
     def to_s
       blockend
       stmt(join)
+    end
+  end
+
+  class End_Where_Stmt < T
+    def to_s
+      blockend
+      stmt("#{sa(e0)}#{e1}")
     end
   end
 
@@ -273,9 +289,25 @@ module Fortran
     end
   end
 
+  class Where_Construct_Stmt < T
+    def to_s
+      s=stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4}")
+      blockbegin
+      s
+    end
+  end
+
+  class Where_Stmt < T
+    def to_s
+      stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e6.to_s.strip}")
+    end
+  end
+
   #PM#
   #PM#
 
 end
 
 # paul.a.madden@noaa.gov
+
+# TODO: stmt() to handle optional label instead of each class?

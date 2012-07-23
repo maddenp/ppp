@@ -754,6 +754,16 @@ grammar Fortran
     label:label? t_else if_construct_name? t_newline <Else_Stmt>
   end
 
+  rule elsewhere_construct
+    elsewhere_stmt where_assignment_stmt_block <E>
+  end
+
+  rule elsewhere_stmt
+    # R742
+
+    label:label? t_elsewhere t_newline <Elsewhere_Stmt>
+  end
+
   rule end_do
     # R824
     # Constraint: If the do_stmt of a block_do_construct is identified by a
@@ -795,6 +805,12 @@ grammar Fortran
 
     label:label? t_end t_program? name:program_name? t_newline?
       <End_Program_Stmt>
+  end
+
+  rule end_where_stmt
+    # R743
+
+    label:label? t_endwhere t_newline <End_Where_Stmt>
   end
 
   rule entity_decl
@@ -862,8 +878,8 @@ grammar Fortran
     executable_construct_action_stmt /
     # case_construct /
     do_construct /
-    if_construct # /
-    # where_construct
+    if_construct /
+    where_construct
   end
 
   rule executable_construct_action_stmt
@@ -1305,6 +1321,12 @@ grammar Fortran
     # RETURN statement or an ENTRY statement.
 
     program_stmt? specification_part? execution_part? end_program_stmt <E>
+  end
+
+  rule mask_expr
+    # R741
+
+    logical_expr
   end
 
   rule mult_op
@@ -1848,6 +1870,10 @@ grammar Fortran
     "elseif" <T>
   end
 
+  rule t_elsewhere
+    "elsewhere" <T>
+  end
+
   rule t_end
     "end" <T>
   end
@@ -1858,6 +1884,10 @@ grammar Fortran
 
   rule t_enddo
     "enddo" <T>
+  end
+
+  rule t_endwhere
+    "endwhere" <T>
   end
 
   rule t_equal
@@ -2045,6 +2075,10 @@ grammar Fortran
     "_"
   end
 
+  rule t_where
+    "where" <T>
+  end
+
   rule t_while
     "while" <T>
   end
@@ -2127,25 +2161,8 @@ grammar Fortran
     name
   end
 
-#PM#
-  rule t_elsewhere
-    "elsewhere" <T>
-  end
-
-  rule t_endwhere
-    "endwhere" <T>
-  end
-
-  rule t_where
-    "where" <T>
-  end
-
-  rule where_stmt
-    # R738
-    #
-    # Constraint: The assignment_stmt must not be a defined assignment.
-
-    label:label? t_where t_paren_l mask_expr t_paren_r !label assignment_stmt <T>
+  rule where_assignment_stmt_block
+    assignment_stmt* <E>
   end
 
   rule where_construct
@@ -2153,33 +2170,27 @@ grammar Fortran
     #
     # Constraint: The assignment_stmt must not be a defined assignment.
 
-    where_construct_stmt assignment_stmt? elsewhere_stmt? assignment_stmt? end_where_stmt <T>
+    where_construct_stmt where_assignment_stmt_block elsewhere_construct?
+      end_where_stmt <E>
   end
 
   rule where_construct_stmt
     # R740
 
-    label:label? t_where t_paren_l mask_expr t_paren_r t_newline <T>
+    label:label? t_where t_paren_l mask_expr t_paren_r t_newline
+      <Where_Construct_Stmt>
   end
 
-  rule mask_expr
-    # R741
+  rule where_stmt
+    # R738
+    #
+    # Constraint: The assignment_stmt must not be a defined assignment.
 
-    logical_expr
+    label:label? t_where t_paren_l mask_expr t_paren_r !label assignment_stmt
+      <Where_Stmt>
   end
 
-  rule elsewhere_stmt
-    # R742
-
-    label:label? t_elsewhere t_newline <StmtC>
-  end
-
-  rule end_where_stmt
-    # R743
-
-    label:label? t_endwhere t_newline <StmtC>
-  end
-
+#PM#
 #PM#
 
 end
