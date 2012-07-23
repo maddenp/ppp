@@ -2191,6 +2191,114 @@ grammar Fortran
   end
 
 #PM#
+  rule t_select
+    "select" <T>
+  end
+
+  rule t_case
+    "case" <T>
+  end
+
+  rule case_construct
+    # R808
+    #
+    # Constraint: If the select_case_stmt of a case_construct is identified by a
+    # case_construct_name, the corresponding end_select_stmt must specify the
+    # same case_construct_name. If the select_case_stmt of a case_construct is
+    # not identified by a case_construct_name, the corresponding end_select_stmt
+    # must not specify a case_construct_name. If a case_stmt is identified by a
+    # case_construct_name, the corresponding select_case_stmt must specify the
+    # same case_construct_name.
+
+    select_case_stmt case_stmt_construct_block end_select_stmt <E>
+  end
+
+  rule case_stmt_construct_block
+    case_stmt_construct* <E>
+  end
+
+  rule case_stmt_construct
+    case_stmt block <E>
+  end
+
+  rule select_case_stmt
+    # R809
+
+    label:label? case_construct_name_pair? t_select t_case t_paren_l case_expr t_paren_r t_newline <StmtC>
+  end
+
+  rule cast_construct_name_pair
+    case_construct_name t_colon <T>
+  end
+
+  rule cast_construct_name
+    name
+  end
+
+  rule case_stmt
+    # R810
+
+    label:label? t_case case_selector case_construct_name? t_newline <StmtC>
+  end
+
+  rule end_select_stmt
+    # R811
+
+    label:label? t_end t_select case_construct_name? t_newline <StmtC>
+  end
+
+  rule case_expr
+    # R812
+
+    scalar_int_expr /
+    scalar_char_expr /
+    scalar_logical_expr
+  end
+
+  rule case_selector
+    # R813
+    #
+    # Constraint: No more than one of the selectors of one of the CASE
+    # statements may be DEFAULT.
+
+    t_paren_l case_value_range_list t_paren_r <E> /
+    t_default
+  end
+
+  rule t_default
+    "default" <T>
+  end
+
+  rule case_value_range
+    # R814
+    #
+    # Constraint: A case_value_range using a colon must not be used if case_expr
+    # is of type logical. For a given case_construct, the case_value_ranges must
+    # not overlap; that is, there must be no possible value of the case_expr
+    # that matches more than one case_value_range.
+
+    case_value /
+    case_value t_colon <T> /
+    t_colon case_value <T> /
+    case_value t_colon case_value <T>
+  end
+
+  rule case_value_range_list
+    case_value_range ( t_comma case_value_range ) <T>
+  end
+
+  rule case_value
+    # R815
+    #
+    # Constraint: For a given case_construct, each case_value must be of the
+    # same type as case_expr. For character type, length differences are
+    # allowed, but the kind type parameters must be the same.
+
+    scalar_int_initialization_expr /
+    scalar_char_initialization_expr /
+    scalar_logical_initialization_expr
+  end
+
 #PM#
 
 end
