@@ -542,7 +542,7 @@ grammar Fortran
     # DO variables of the containing data_implied_dos, and each operation must
     # be intrinsic.
 
-    # array_element /
+    array_element /
     # scalar_structure_component /
     data_implied_do
   end
@@ -2322,6 +2322,98 @@ grammar Fortran
   end
 
 #PM#
+  rule array_element
+    # R615
+    #
+    # Constraint: In an array_element, every part_ref must have rank zero and
+    # the last part_ref must contain a subscript_list.
+
+    data_ref
+  end
+
+  rule array_section
+    # R616
+    #
+    # Constraint: In an array_section, exactly one part_ref must have nonzero
+    # rank, and either the final part_ref has a section_subscript with nonzero
+    # rank or another part_ref has nonzero rank. In an array_section with a
+    # substring_range, the rightmost part_name has nonzero rank.
+
+    data_ref ( t_paren_l substring_range t_paren_r )? <E>
+  end
+
+  rule subscript
+    # R617
+
+    scalar_int_expr
+  end
+
+  rule section_subscript
+    # R618
+
+    subscript /
+    subscript_triplet /
+    vector_subscript
+  end
+
+  rule section_subscript_list
+    section_subscript ( t_comma section_subscript )* <E>
+  end
+
+  rule subscript_triplet
+    # R619
+    #
+    # Constraint: The second subscript must not be omitted from a
+    # subscript_triplet in the last dimension of an assumed-size array.
+
+    subscript? t_colon subscript? ( t_colon stride )? <T>
+  end
+
+  rule stride
+    # R620
+
+    scalar_int_expr
+  end
+
+  rule vector_subscript
+    # R621
+    #
+    # Constraint: A vector_subscript must be an integer array expression of rank
+    # one.
+
+    int_expr
+  end
+
+  rule t_percent
+    "%" <T>
+  end
+
+  rule data_ref
+    # R612
+    #
+    # Constraint: In a data_ref, each part_name except the rightmost must be
+    # of derived type. In a data_ref, each part_name except the leftmost must be
+    # the name of a component of the derived type definition of the type of the
+    # preceding part_name.
+
+    part_ref ( t_percent part_ref )* <T>
+  end
+
+  rule part_ref
+    # R613
+    #
+    # Constraint: In a part_ref containing a section_subscript_list, the number
+    # of section_subscripts must equal the rank of part_name.
+
+    part_name ( t_paren_l section_subscript_list t_paren_r )? <T>
+  end
+
+  rule part_name
+    # Multiple uses (not explicitly defined)
+
+    name
+  end
+    
 #PM#
 
 end
