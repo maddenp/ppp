@@ -1947,7 +1947,7 @@ grammar Fortran
   end
 
   rule t_letter
-    [a-z] <T>
+    [a-zA-Z] <T>
   end
 
   rule t_logical

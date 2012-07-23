@@ -1,3 +1,3 @@
 program p
-  print *,'hello ','world'
+  print *,'Hello ','World'
 end program p
