@@ -2,6 +2,7 @@ module Fortran
 
   @@dolabels=[]
   @@level=0
+  @@levelstack=[]
 
   # Module methods
 
@@ -82,6 +83,14 @@ module Fortran
       elements.map { |e| e.to_s }.join(' ').strip
     end
 
+    def levelreset
+      @@level=@@levelstack.pop
+    end
+
+    def levelset
+      @@levelstack.push(@@level)
+    end
+
     def method_missing(m,*a)
       if m=~/e(\d+)/
         e=elements[$~[1].to_i]
@@ -145,6 +154,15 @@ module Fortran
     end
   end
 
+  class Case_Stmt < T
+    def to_s
+      blockend
+      s=stmt("#{sa(e0)}#{e1} #{e2}")
+      blockbegin
+      s
+    end
+  end
+  
   class Computed_Goto_Stmt < T
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
@@ -213,6 +231,13 @@ module Fortran
     end
   end
 
+  class End_Select_Stmt < T
+    def to_s
+      levelreset
+      stmt("#{sa(e0)}#{e1} #{e2}#{sb(e3)}")
+    end
+  end
+  
   class End_Where_Stmt < T
     def to_s
       blockend
@@ -283,6 +308,16 @@ module Fortran
     end
   end
 
+  class Select_Case_Stmt < T
+    def to_s
+      s=stmt("#{sa(e0)}#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}")
+      levelset
+      blockbegin
+      blockbegin
+      s
+    end
+  end
+  
   class Type_Declaration_Stmt < T
     def to_s
       stmt("#{sa(e0)}#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")

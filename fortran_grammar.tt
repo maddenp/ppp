@@ -873,10 +873,10 @@ grammar Fortran
   end
 
   rule executable_construct
-    # R215 -- INCOMPLETE
+    # R215
 
     executable_construct_action_stmt /
-    # case_construct /
+    case_construct /
     do_construct /
     if_construct /
     where_construct
@@ -1599,6 +1599,15 @@ grammar Fortran
     named_constant
   end
 
+  rule scalar_char_initialization_expr
+    # 8.1.3.1 (not explicitly defined)
+    #
+    # Note: Assumed constraint: initialization_expr is scalar and is of type
+    # character.
+
+    initialization_expr
+  end
+
   rule scalar_constant
     # Multiple uses (not explicitly defined)
     #
@@ -1677,6 +1686,15 @@ grammar Fortran
     # Note: Assumed constraint: logical_expr must be scalar.
 
     logical_expr
+  end
+
+  rule scalar_logical_initialization_expr
+    # 8.1.3.1 (not explicitly defined)
+    #
+    # Note: Assumed constraint: initialization_expr is scalar and is of type
+    # logical.
+
+    initialization_expr
   end
 
   rule scalar_numeric_expr
@@ -2224,27 +2242,27 @@ grammar Fortran
   rule select_case_stmt
     # R809
 
-    label:label? case_construct_name_pair? t_select t_case t_paren_l case_expr t_paren_r t_newline <StmtC>
+    label:label? case_construct_name_pair? t_select t_case t_paren_l case_expr t_paren_r t_newline <Select_Case_Stmt>
   end
 
-  rule cast_construct_name_pair
+  rule case_construct_name_pair
     case_construct_name t_colon <T>
   end
 
-  rule cast_construct_name
+  rule case_construct_name
     name
   end
 
   rule case_stmt
     # R810
 
-    label:label? t_case case_selector case_construct_name? t_newline <StmtC>
+    label:label? t_case case_selector case_construct_name? t_newline <Case_Stmt>
   end
 
   rule end_select_stmt
     # R811
 
-    label:label? t_end t_select case_construct_name? t_newline <StmtC>
+    label:label? t_end t_select case_construct_name? t_newline <End_Select_Stmt>
   end
 
   rule case_expr
@@ -2261,8 +2279,12 @@ grammar Fortran
     # Constraint: No more than one of the selectors of one of the CASE
     # statements may be DEFAULT.
 
-    t_paren_l case_value_range_list t_paren_r <E> /
+    case_selector_range /
     t_default
+  end
+
+  rule case_selector_range
+    t_paren_l case_value_range_list t_paren_r <E>
   end
 
   rule t_default
@@ -2277,14 +2299,14 @@ grammar Fortran
     # not overlap; that is, there must be no possible value of the case_expr
     # that matches more than one case_value_range.
 
-    case_value /
-    case_value t_colon <T> /
     t_colon case_value <T> /
-    case_value t_colon case_value <T>
+    case_value t_colon case_value <T> /
+    case_value t_colon <T> /
+    case_value
   end
 
   rule case_value_range_list
-    case_value_range ( t_comma case_value_range ) <T>
+    case_value_range ( t_comma case_value_range )* <T>
   end
 
   rule case_value
