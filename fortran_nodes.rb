@@ -79,10 +79,6 @@ module Fortran
       super(a,b,c)
     end
 
-    def join
-      elements.map { |e| e.to_s }.join(' ').strip
-    end
-
     def levelreset
       @@level=@@levelstack.pop
     end
@@ -112,8 +108,12 @@ module Fortran
       (@attrs.nil?)?(@attrs={k=>v}):(@attrs[k]=v)
     end
 
+    def space
+      elements[1..-1].map { |e| e.to_s }.join(' ').strip
+    end
+
     def stmt(s)
-      indent(s.chomp.strip)+"\n"
+      indent(("#{sa(e0)}"+s.chomp).strip)+"\n"
     end
 
     def to_s
@@ -130,13 +130,13 @@ module Fortran
 
   class StmtC < T
     def to_s
-      stmt(sa(elements[0])+elements[1..-1].map { |e| e.to_s }.join)
+      stmt(elements[1..-1].map { |e| e.to_s }.join)
     end
   end
 
   class StmtJ < T
     def to_s
-      stmt(join)
+      stmt(space)
     end
   end
 
@@ -144,20 +144,20 @@ module Fortran
 
   class Arithmetic_If_Stmt < T
     def to_s
-      stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}")
+      stmt("#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}")
     end
   end
 
   class Assigned_Goto_Stmt < T
     def to_s
-      stmt("#{sa(e0)}#{e1} #{e2}#{(e3.to_s[0]==',')?(e3):(' '+e3.to_s)}")
+      stmt("#{e1} #{e2}#{(e3.to_s[0]==',')?(e3):(' '+e3.to_s)}")
     end
   end
 
   class Case_Stmt < T
     def to_s
       blockend
-      s=stmt("#{sa(e0)}#{e1} #{e2}")
+      s=stmt("#{e1} #{e2}")
       blockbegin
       s
     end
@@ -165,14 +165,14 @@ module Fortran
   
   class Computed_Goto_Stmt < T
     def to_s
-      stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
+      stmt("#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
     end
   end
 
   class Do_Term_Action_Stmt < T
     def to_s
       blockend
-      stmt(join)
+      stmt(space)
     end
   end
 
@@ -186,7 +186,7 @@ module Fortran
   class Else_If_Stmt < T
     def to_s
       blockend
-      s=stmt(join)
+      s=stmt(space)
       blockbegin
       s
     end
@@ -195,7 +195,7 @@ module Fortran
   class Else_Stmt < T
     def to_s
       blockend
-      s=stmt(join)
+      s=stmt(space)
       blockbegin
       s
     end
@@ -204,7 +204,7 @@ module Fortran
   class Elsewhere_Stmt < T
     def to_s
       blockend
-      s=stmt("#{sa(e0)}#{e1}")
+      s=stmt("#{e1}")
       blockbegin
       s
     end
@@ -213,47 +213,47 @@ module Fortran
   class End_Do_Stmt < T
     def to_s
       blockend
-      stmt(join)
+      stmt(space)
     end
   end
 
   class End_If_Stmt < T
     def to_s
       blockend
-      stmt("#{sa(e0)}#{e1}#{sb(e2)}")
+      stmt("#{e1}#{sb(e2)}")
     end
   end
 
   class End_Program_Stmt < T
     def to_s
       blockend
-      stmt(join)
+      stmt(space)
     end
   end
 
   class End_Select_Stmt < T
     def to_s
       levelreset
-      stmt("#{sa(e0)}#{e1} #{e2}#{sb(e3)}")
+      stmt("#{e1} #{e2}#{sb(e3)}")
     end
   end
   
   class End_Where_Stmt < T
     def to_s
       blockend
-      stmt("#{sa(e0)}#{e1}")
+      stmt("#{e1}")
     end
   end
 
   class If_Stmt < T
     def to_s
-      stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
+      stmt("#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
     end
   end
 
   class If_Then_Stmt < T
     def to_s
-      s=stmt("#{sa(e0)}#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")
+      s=stmt("#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")
       blockbegin
       s
     end
@@ -268,7 +268,7 @@ module Fortran
 
   class Label_Do_Stmt < T
     def to_s
-      s=stmt("#{sa(e0)}#{sa(e1)}#{e2} #{e3}#{e4}")
+      s=stmt("#{sa(e1)}#{e2} #{e3}#{e4}")
       blockbegin
       s
     end
@@ -288,7 +288,7 @@ module Fortran
 
   class Nonlabel_Do_Stmt < T
     def to_s
-      s=stmt("#{sa(e0)}#{sa(e1)}#{e2}#{e3}")
+      s=stmt("#{sa(e1)}#{e2}#{e3}")
       blockbegin
       s
     end
@@ -296,13 +296,13 @@ module Fortran
 
   class Print_Stmt < T
     def to_s
-      stmt("#{sa(e0)}#{e1} #{e2}#{e3}")
+      stmt("#{e1} #{e2}#{e3}")
     end
   end
 
   class Program_Stmt < T
     def to_s
-      s=stmt(join)
+      s=stmt(space)
       blockbegin
       s
     end
@@ -310,7 +310,7 @@ module Fortran
 
   class Select_Case_Stmt < T
     def to_s
-      s=stmt("#{sa(e0)}#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}")
+      s=stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}")
       levelset
       blockbegin
       blockbegin
@@ -320,13 +320,13 @@ module Fortran
   
   class Type_Declaration_Stmt < T
     def to_s
-      stmt("#{sa(e0)}#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
+      stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
     end
   end
 
   class Where_Construct_Stmt < T
     def to_s
-      s=stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4}")
+      s=stmt("#{e1} #{e2}#{e3}#{e4}")
       blockbegin
       s
     end
@@ -334,7 +334,7 @@ module Fortran
 
   class Where_Stmt < T
     def to_s
-      stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4} #{e6.to_s.strip}")
+      stmt("#{e1} #{e2}#{e3}#{e4} #{e6.to_s.strip}")
     end
   end
 
@@ -345,5 +345,4 @@ end
 
 # paul.a.madden@noaa.gov
 
-# TODO: stmt() to handle optional label instead of each class?
 # TODO: use blockbegin / blockend for program / program end?
