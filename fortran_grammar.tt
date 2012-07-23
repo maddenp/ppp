@@ -165,7 +165,7 @@ grammar Fortran
     # R622
 
     label:label? t_allocate t_paren_l allocation_list allocate_stat_construct?
-      t_paren_r t_newline <Allocate_Stmt>
+      t_paren_r t_newline <StmtC>
   end
 
   rule allocate_upper_bound
@@ -228,7 +228,7 @@ grammar Fortran
     # assign_stmt. scalar_int_variable must be named and of type default
     # integer.
 
-    label:label? t_assign label t_to scalar_int_variable t_newline <Stmt>
+    label:label? t_assign label t_to scalar_int_variable t_newline <StmtJ>
   end
 
   rule assigned_goto_stmt
@@ -253,7 +253,7 @@ grammar Fortran
     # Constraint: A variable in an assignment_stmt must not be an assumed-size
     # array.
 
-    label:label? variable t_equal expr t_newline <Assignment_Stmt>
+    label:label? variable t_equal expr t_newline <StmtC>
   end
 
   rule assumed_shape_spec
@@ -431,7 +431,7 @@ grammar Fortran
   rule continue_stmt
     # R841
 
-    label:label? t_continue t_newline <Stmt>
+    label:label? t_continue t_newline <StmtJ>
   end
 
   rule cycle_stmt
@@ -441,7 +441,7 @@ grammar Fortran
     # within the range of that do_construct; otherwise, it must be within the
     # range of at least one do_construct.
 
-    label:label? t_cycle do_construct_name? t_newline <Stmt>
+    label:label? t_cycle do_construct_name? t_newline <StmtJ>
   end
 
   rule data_i_do_object
@@ -486,7 +486,7 @@ grammar Fortran
   rule data_stmt
     # R529
 
-    label:label? t_data data_stmt_set_list t_newline <Stmt>
+    label:label? t_data data_stmt_set_list t_newline <StmtJ>
   end
 
   rule data_stmt_constant
@@ -566,7 +566,7 @@ grammar Fortran
     # array.
 
     label:label? t_deallocate t_paren_l allocate_object_list
-      allocate_stat_construct? t_paren_r t_newline <Deallocate_Stmt>
+      allocate_stat_construct? t_paren_r t_newline <StmtC>
   end
 
   rule declaration_construct
@@ -868,7 +868,7 @@ grammar Fortran
 
   rule executable_construct_action_stmt
     !execution_part_disallowed action_stmt !{ |e| nonblock_do_end?(e[1]) }
-      <Stmt>
+      <StmtJ>
   end
 
   rule execution_part
@@ -904,7 +904,7 @@ grammar Fortran
     # within the range of that do_construct; otherwise, it must be within the
     # range of at least one do_construct.
 
-    label:label? t_exit do_construct_name? t_newline <Stmt>
+    label:label? t_exit do_construct_name? t_newline <StmtJ>
   end
 
   rule explicit_shape_spec
@@ -972,7 +972,7 @@ grammar Fortran
     #
     # Constraint: The format_stmt must be labeled.
 
-    label t_format format_specification t_newline <Stmt>
+    label t_format format_specification t_newline <StmtJ>
   end
 
   rule function_name
@@ -987,7 +987,7 @@ grammar Fortran
     # Constraint: The label must be the statement label of a branch target
     # statement that appears in the same scoping unit as the goto_stmt.
 
-    label:label? t_goto label t_newline <Stmt>
+    label:label? t_goto label t_newline <StmtJ>
   end
 
   rule hex_constant
@@ -1354,6 +1354,15 @@ grammar Fortran
     ".not." <T>
   end
 
+  rule nullify_stmt
+    # R629
+    #
+    # Constraint: Each pointer_object must have the POINTER attribute.
+
+    label:label? t_nullify t_paren_l pointer_object_list t_paren_r t_newline
+      <StmtC>
+  end
+
   rule numeric_expr
     # R729
     #
@@ -1412,7 +1421,28 @@ grammar Fortran
   rule pause_stmt
     # R844
 
-    label:label? t_pause stop_code? t_newline <Stmt>
+    label:label? t_pause stop_code? t_newline <StmtJ>
+  end
+
+  rule pointer_assignment_stmt
+    # R736
+    #
+    # Constraint: The pointer_object must have the POINTER attirbute. The
+    # target must be of the same type, type parameters, and rank as the
+    # pointer.
+
+    label:label? pointer_object t_pointer_assign target t_newline <StmtC>
+  end
+
+  rule pointer_object
+    # R630
+
+    variable_name #/
+    # structure_component
+  end
+
+  rule pointer_object_list
+    pointer_object ( t_comma pointer_object )* <T>
   end
 
   rule power_op
@@ -1735,7 +1765,7 @@ grammar Fortran
   rule stop_stmt
     # R842
 
-    label:label? t_stop stop_code? t_newline <Stmt>
+    label:label? t_stop stop_code? t_newline <StmtJ>
   end
 
   rule t_allocatable
@@ -1902,6 +1932,10 @@ grammar Fortran
     "\n" <T>
   end
 
+  rule t_nullify
+    "nullify" <T>
+  end
+
   rule t_octal
     [01234567] <T>
   end
@@ -1936,6 +1970,10 @@ grammar Fortran
 
   rule t_pointer
     "pointer" <T>
+  end
+
+  rule t_pointer_assign
+    "=>" <T>
   end
 
   rule t_print
@@ -2011,6 +2049,18 @@ grammar Fortran
     "while" <T>
   end
 
+  rule target
+    # R737
+    #
+    # Constraint: The variable must have the TARGET attribute or be a subobject
+    # of an object with the TARGET attribute, or it must have the pointer
+    # attribute. The target must not be an array section with a vector
+    # subscript. The expr must deliver a pointer result.
+
+    variable /
+    expr
+  end
+
   rule type_declaration_stmt
     # R501
     #
@@ -2078,55 +2128,6 @@ grammar Fortran
   end
 
 #PM#
-  rule pointer_assignment_stmt
-    # R736
-    #
-    # Constraint: The pointer_object must have the POINTER attirbute. The
-    # target must be of the same type, type parameters, and rank as the
-    # pointer.
-
-    label:label? pointer_object t_pointer_assign target t_newline <T>
-  end
-
-  rule target
-    # R737
-    #
-    # Constraint: The variable must have the TARGET attribute or be a subobject
-    # of an object with the TARGET attribute, or it must have the pointer
-    # attribute. The target must not be an array section with a vector
-    # subscript. The expr must deliver a pointer result.
-
-    variable /
-    expr
-  end
-
-  rule t_pointer_assign
-    "=>" <T>
-  end
-
-  rule pointer_object
-    # R630
-
-    variable_name #/
-    # structure_component
-  end
-
-  rule pointer_object_list
-    pointer_object ( t_comma pointer_object )* <T>
-  end
-
-  rule nullify_stmt
-    # R629
-    #
-    # Constraint: Each pointer_object must have the POINTER attribute.
-
-    label:label? t_nullify t_paren_l pointer_object_list t_paren_r t_newline <T>
-  end
-
-  rule t_nullify
-    "nullify" <T>
-  end
-
 #PM#
 
 end

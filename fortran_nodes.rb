@@ -119,19 +119,19 @@ module Fortran
     end
   end
 
-  class Stmt < T
+  class StmtC < T
+    def to_s
+      stmt(sa(elements[0])+elements[1..-1].map { |e| e.to_s }.join)
+    end
+  end
+
+  class StmtJ < T
     def to_s
       stmt(join)
     end
   end
 
   # Specific Subclasses
-
-  class Allocate_Stmt < T
-    def to_s
-      stmt("#{sa(e0)}#{e1}#{e2}#{e3}#{e4}#{e5}")
-    end
-  end
 
   class Arithmetic_If_Stmt < T
     def to_s
@@ -145,21 +145,9 @@ module Fortran
     end
   end
 
-  class Assignment_Stmt < T
-    def to_s
-      stmt("#{sa(e0)}#{e1}#{e2}#{e3}")
-    end
-  end
-
   class Computed_Goto_Stmt < T
     def to_s
       stmt("#{sa(e0)}#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
-    end
-  end
-
-  class Deallocate_Stmt < T
-    def to_s
-      stmt("#{sa(e0)}#{e1}#{e2}#{e3}#{e4}#{e5}")
     end
   end
 
