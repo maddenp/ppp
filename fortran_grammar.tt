@@ -2509,13 +2509,13 @@ grammar Fortran
   rule type_spec
     # R502
 
-    t_integer kind_selector? <T> /
-    t_real kind_selector? <T> /
-    t_doubleprecision "" <T> /
-    t_complex kind_selector? <T> /
-    t_character char_selector? <T> /
-    t_logical kind_selector? <T> /
-    t_type t_paren_l type_name t_paren_r <T>
+    t_integer kind_selector? <Type_Spec> /
+    t_real kind_selector? <Type_Spec> /
+    t_doubleprecision "" <Type_Spec> /
+    t_complex kind_selector? <Type_Spec> /
+    t_character char_selector? <Type_Spec> /
+    t_logical kind_selector? <Type_Spec> /
+    t_type t_paren_l type_name t_paren_r <Type_Spec>
   end
 
   rule upper_bound

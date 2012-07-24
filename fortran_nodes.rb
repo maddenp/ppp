@@ -346,6 +346,8 @@ module Fortran
   end
 
   #PM#
+  class Type_Spec < E
+  end
   #PM#
 
 end
