@@ -347,7 +347,38 @@ module Fortran
 
   #PM#
   class Type_Spec < E
+    def derived?
+      "#{e0}"=="type"
+    end
+    def type
+      (derived?)?("#{e2}"):("#{e0}")
+    end
   end
+
+  class Entity_Decl_List < T
+    def names
+      [e0.name]+((e1.nil?)?([]):(e1.names))
+    end
+  end
+
+  class Entity_Decl < T
+    def name
+      "#{e0}"
+    end
+  end
+
+  class Entity_Decl_List_Pair < T
+    def name
+      "#{e1.name}"
+    end
+  end
+
+  class Entity_Decl_List_Pairs < T
+    def names
+      elements.map { |e| e.name }
+    end
+  end
+
   #PM#
 
 end

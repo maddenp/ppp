@@ -1020,12 +1020,20 @@ grammar Fortran
     # explicitly any attribute more than once in a scoping unit.
 
     object_name entity_decl_array_spec? char_length_pair?
-      initialization_expr_pair? <T> /
+      initialization_expr_pair? <Entity_Decl> /
     function_name char_length_pair? <T>
   end
 
   rule entity_decl_list
-    entity_decl ( t_comma entity_decl )* <T>
+    entity_decl entity_decl_list_pairs <Entity_Decl_List>
+  end
+
+  rule entity_decl_list_pair
+    t_comma entity_decl <Entity_Decl_List_Pair>
+  end
+
+  rule entity_decl_list_pairs
+    entity_decl_list_pair* <Entity_Decl_List_Pairs>
   end
 
   rule entity_decl_array_spec
@@ -2485,8 +2493,10 @@ grammar Fortran
     # Constraint: The same attr_spec must not appear more than once in a given
     # type_declaration_stmt.
 
+#    label:label? type_spec attr_spec_option? entity_decl_list t_newline
+#      <Type_Declaration_Stmt>
     label:label? type_spec attr_spec_option? entity_decl_list t_newline
-      <Type_Declaration_Stmt>
+      &{ |e| msg "type: #{e[1].type}"; msg "names: #{e[3].names.join(' ')}" } <Type_Declaration_Stmt>
   end
 
   rule type_name
