@@ -1319,6 +1319,41 @@ grammar Fortran
     equiv_op
   end
 
+  rule io_implied_do
+    # R916
+
+    t_paren_l io_implied_do_object_list t_comma io_implied_do_control t_paren_r
+      <T>
+  end
+
+  rule io_implied_do_control
+    # R918
+    #
+    # Constraint: The do_variable must be a named scalar variable of type
+    # integer, default real, or double precision real. Each scalar_numeric_expr
+    # in an io_implied_do_control must be of type integer, default real, or
+    # double precision real.
+
+    do_variable t_equal scalar_numeric_expr t_comma scalar_numeric_expr
+      ( t_comma scalar_numeric_expr )? <T>
+  end
+
+  rule io_implied_do_object
+    # R917
+    #
+    # Constraint: A variable that is an input_item must not be an assumed-size
+    # array. In an input_item_list, an io_implied_do_object must be an
+    # input_item. In an output_item_list, an io_implied_do_object must be an
+    # output_item.
+
+    # input_item /
+    output_item !t_equal <T>
+  end
+
+  rule io_implied_do_object_list
+    io_implied_do_object ( t_comma io_implied_do_object )* <T>
+  end
+
   rule kind_pair
     t_kind t_equal <T>
   end
@@ -1621,10 +1656,10 @@ grammar Fortran
   end
 
   rule output_item
-    # R915 -- INCOMPLETE
+    # R915
 
-    expr #/
-    # io_implied_do
+    io_implied_do /
+    expr
   end
 
   rule output_item_list
