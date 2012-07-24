@@ -2019,7 +2019,20 @@ grammar Fortran
   rule specification_stmt
     # R214 -- INCOMPLETE
 
-    data_stmt
+    # access_stmt /
+    # allocatable_stmt /
+    # common_stmt /
+    data_stmt #/
+    # dimension_stmt /
+    # equivalence_stmt /
+    # external_stmt /
+    # intent_stmt /
+    # intrinsic_stmt /
+    # namelist_stmt /
+    # optional_stmt /
+    # pointer_stmt /
+    # save_stmt /
+    # target_stmt
   end
 
   rule stat_variable
