@@ -209,6 +209,26 @@ grammar Fortran
     t_paren_l t_slash ac_value_list t_slash t_paren_r <E>
   end
 
+  rule array_element
+    # R615
+    #
+    # Constraint: In an array_element, every part_ref must have rank zero and
+    # the last part_ref must contain a subscript_list.
+
+    data_ref
+  end
+
+  rule array_section
+    # R616
+    #
+    # Constraint: In an array_section, exactly one part_ref must have nonzero
+    # rank, and either the final part_ref has a section_subscript with nonzero
+    # rank or another part_ref has nonzero rank. In an array_section with a
+    # substring_range, the rightmost part_name has nonzero rank.
+
+    data_ref substring_range_triplet? <E>
+  end
+
   rule array_spec
     # R512
     #
@@ -218,6 +238,14 @@ grammar Fortran
     assumed_shape_spec_list /
     deferred_shape_spec_list /
     assumed_size_spec
+  end
+
+  rule array_variable_name
+    # Section 6 (not explicitly defined)
+    #
+    # Note: Assumed constraint: The object named by variable_name is an array.
+
+    variable_name
   end
 
   rule assign_stmt
@@ -267,7 +295,7 @@ grammar Fortran
     #
     # Constraint: The function name of an array-valued function must not be
     # declared as an assumed-size array.
-# TODO is this a left-recursion problem waiting to happen?
+
     ( explicit_shape_spec_list t_comma )? lower_bound_pair? t_star <T>
   end
 
@@ -479,6 +507,14 @@ grammar Fortran
       type_param_value )? t_paren_r <T>
   end
 
+  rule char_variable
+    # R605
+    #
+    # Constraint: char_variable must be of type character.
+
+    variable
+  end
+
   rule character
     # R301
 
@@ -514,6 +550,14 @@ grammar Fortran
 
     literal_constant /
     named_constant
+  end
+
+  rule constant_subobject
+    # R702
+    #
+    # Constrint: subobject must be a subobject designator whose parent is a
+
+    subobject
   end
 
   rule continue_stmt
@@ -569,6 +613,17 @@ grammar Fortran
     t_paren_l data_i_do_object_list t_comma data_i_do_variable t_equal
       scalar_int_expr t_comma scalar_int_expr ( t_comma scalar_int_expr )*
       t_paren_r <T>
+  end
+
+  rule data_ref
+    # R612
+    #
+    # Constraint: In a data_ref, each part_name except the rightmost must be
+    # of derived type. In a data_ref, each part_name except the leftmost must be
+    # the name of a component of the derived type definition of the type of the
+    # preceding part_name.
+
+    part_ref ( t_percent part_ref )* <T>
   end
 
   rule data_stmt
@@ -670,12 +725,36 @@ grammar Fortran
     # stmt_function_stmt
   end
 
+  rule default_char_variable
+    # R606
+    #
+    # Constraint: default_char_variable must be of type default character.
+
+    variable
+  end
+
   rule default_char_expr
     # R727
     #
     # Constraint: default_char_expr must be of type default character.
 
     expr
+  end
+
+  rule default_int_variable
+    # R608
+    #
+    # Constraint: default_int_variable must be of type default integer.
+
+    variable
+  end
+
+  rule default_logical_variable
+    # R604
+    #
+    # Constraint: default_logical_variable must be of type default logical.
+
+    variable
   end
 
   rule deferred_shape_spec
@@ -1203,6 +1282,14 @@ grammar Fortran
     digit_string ( t_underscore kind_param )? <T>
   end
 
+  rule int_variable
+    # R607
+    #
+    # Constraint: int_variable must be of type integer.
+
+    variable
+  end
+
   rule intent_spec
     # R511
     #
@@ -1383,6 +1470,14 @@ grammar Fortran
     ( t_true / t_false ) ( t_underscore kind_param )? <T>
   end
 
+  rule logical_variable
+    # R603
+    #
+    # Constraint: logical_variable must be of type logical.
+
+    variable
+  end
+
   rule loop_control
     # R821
     #
@@ -1518,7 +1613,8 @@ grammar Fortran
   rule output_item
     # R915 -- INCOMPLETE
 
-    expr
+    expr #/
+    # io_implied_do
   end
 
   rule output_item_list
@@ -1530,8 +1626,34 @@ grammar Fortran
     ( t_comma output_item )+ <T>
   end
 
+  rule parent_string
+    # R610
+    #
+    # Constraint: parent_string must be of tyep character.
+
+    array_element /
+    # scalar_structure_component /
+    scalar_variable_name /
+    scalar_constant
+  end
+
   rule parenthesized_expr
     t_paren_l expr t_paren_r <T>
+  end
+
+  rule part_name
+    # Multiple uses (not explicitly defined)
+
+    name
+  end
+
+  rule part_ref
+    # R613
+    #
+    # Constraint: In a part_ref containing a section_subscript_list, the number
+    # of section_subscripts must equal the rank of part_name.
+
+    part_name ( t_paren_l section_subscript_list t_paren_r )? <T>
   end
 
   rule pause_stmt
@@ -1573,9 +1695,9 @@ grammar Fortran
     # Constraint: subobject must be a subobject whose parent is a constant. A
     # variable that is a primary must not be an assumed-size array.
 
-    constant /
-    # constant_subobject /
     variable /
+    constant /
+    constant_subobject /
     array_constructor /
     # structure_constructor /
     # function_reference /
@@ -1815,6 +1937,18 @@ grammar Fortran
     variable_name
   end
 
+  rule section_subscript
+    # R618
+
+    subscript_triplet /
+    vector_subscript /
+    subscript
+  end
+
+  rule section_subscript_list
+    section_subscript ( t_comma section_subscript )* <E>
+  end
+
   rule select_case_stmt
     # R809
 
@@ -1907,6 +2041,52 @@ grammar Fortran
     # R842
 
     label:label? t_stop stop_code? t_newline <StmtJ>
+  end
+
+  rule stride
+    # R620
+
+    scalar_int_expr
+  end
+
+  rule subscript
+    # R617
+
+    scalar_int_expr
+  end
+
+  rule subscript_triplet
+    # R619
+    #
+    # Constraint: The second subscript must not be omitted from a
+    # subscript_triplet in the last dimension of an assumed-size array.
+
+    subscript? t_colon subscript? ( t_colon stride )? <T>
+  end
+
+  rule subobject
+    # R602
+
+    array_section /
+    array_element /
+    # structure_component /
+    substring
+  end
+
+  rule substring
+    # R609
+
+    parent_string t_paren_l substring_range t_paren_r <T>
+  end
+
+  rule substring_range
+    # R611
+
+    scalar_int_expr? t_colon scalar_int_expr? <T>
+  end
+
+  rule substring_range_triplet
+    t_paren_l substring_range t_paren_r <E>
   end
 
   rule t_allocatable
@@ -2121,6 +2301,10 @@ grammar Fortran
     ")" <T>
   end
 
+  rule t_percent
+    "%" <T>
+  end
+
   rule t_plus
     "+" <T>
   end
@@ -2272,7 +2456,7 @@ grammar Fortran
   end
 
   rule variable
-    # R601 -- INCOMPLETE
+    # R601
     #
     # Constraint: scalar_variable_name must not have the PARAMETER attribute.
     # array_variable_name must be the name of a data object that is an array.
@@ -2280,6 +2464,8 @@ grammar Fortran
     # must not be a subobject designator (for example, a substring) whose
     # parent is a constant.
 
+    subobject /
+    array_variable_name /
     scalar_variable_name
   end
 
@@ -2290,6 +2476,15 @@ grammar Fortran
     # attribute.
 
     name
+  end
+
+  rule vector_subscript
+    # R621
+    #
+    # Constraint: A vector_subscript must be an integer array expression of rank
+    # one.
+
+    int_expr
   end
 
   rule where_assignment_stmt_block
@@ -2322,98 +2517,6 @@ grammar Fortran
   end
 
 #PM#
-  rule array_element
-    # R615
-    #
-    # Constraint: In an array_element, every part_ref must have rank zero and
-    # the last part_ref must contain a subscript_list.
-
-    data_ref
-  end
-
-  rule array_section
-    # R616
-    #
-    # Constraint: In an array_section, exactly one part_ref must have nonzero
-    # rank, and either the final part_ref has a section_subscript with nonzero
-    # rank or another part_ref has nonzero rank. In an array_section with a
-    # substring_range, the rightmost part_name has nonzero rank.
-
-    data_ref ( t_paren_l substring_range t_paren_r )? <E>
-  end
-
-  rule subscript
-    # R617
-
-    scalar_int_expr
-  end
-
-  rule section_subscript
-    # R618
-
-    subscript /
-    subscript_triplet /
-    vector_subscript
-  end
-
-  rule section_subscript_list
-    section_subscript ( t_comma section_subscript )* <E>
-  end
-
-  rule subscript_triplet
-    # R619
-    #
-    # Constraint: The second subscript must not be omitted from a
-    # subscript_triplet in the last dimension of an assumed-size array.
-
-    subscript? t_colon subscript? ( t_colon stride )? <T>
-  end
-
-  rule stride
-    # R620
-
-    scalar_int_expr
-  end
-
-  rule vector_subscript
-    # R621
-    #
-    # Constraint: A vector_subscript must be an integer array expression of rank
-    # one.
-
-    int_expr
-  end
-
-  rule t_percent
-    "%" <T>
-  end
-
-  rule data_ref
-    # R612
-    #
-    # Constraint: In a data_ref, each part_name except the rightmost must be
-    # of derived type. In a data_ref, each part_name except the leftmost must be
-    # the name of a component of the derived type definition of the type of the
-    # preceding part_name.
-
-    part_ref ( t_percent part_ref )* <T>
-  end
-
-  rule part_ref
-    # R613
-    #
-    # Constraint: In a part_ref containing a section_subscript_list, the number
-    # of section_subscripts must equal the rank of part_name.
-
-    part_name ( t_paren_l section_subscript_list t_paren_r )? <T>
-  end
-
-  rule part_name
-    # Multiple uses (not explicitly defined)
-
-    name
-  end
-    
 #PM#
 
 end
