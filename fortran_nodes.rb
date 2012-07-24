@@ -294,6 +294,12 @@ module Fortran
     end
   end
 
+  class Parameter_Stmt <T
+    def to_s
+      stmt("#{e1} #{e2}#{e3}#{e4}")
+    end
+  end
+
   class Print_Stmt < T
     def to_s
       stmt("#{e1} #{e2}#{e3}")

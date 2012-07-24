@@ -719,7 +719,7 @@ grammar Fortran
     # interface_block /
     type_declaration_stmt /
     specification_stmt /
-    # parameter_stmt /
+    parameter_stmt /
     format_stmt # /
     # entry_stmt /
     # stmt_function_stmt
@@ -1545,6 +1545,16 @@ grammar Fortran
     name
   end
 
+  rule named_constant_def
+    # R539
+
+    named_constant t_equal initialization_expr <E>
+  end
+
+  rule named_constant_def_list
+    named_constant_def ( t_comma named_constant_def )* <T>
+  end
+
   rule nonblock_do_construct
     # R826
 
@@ -1624,6 +1634,13 @@ grammar Fortran
     # output_item.
 
     ( t_comma output_item )+ <T>
+  end
+
+  rule parameter_stmt
+    # R538
+
+    label:label? t_parameter t_paren_l named_constant_def_list t_paren_r
+      t_newline <Parameter_Stmt>
   end
 
   rule parent_string
@@ -2304,6 +2321,10 @@ grammar Fortran
 
   rule t_pause
     "pause" <T>
+  end
+
+  rule t_parameter
+    "parameter" <T>
   end
 
   rule t_paren_l
