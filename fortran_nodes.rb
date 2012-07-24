@@ -1,5 +1,6 @@
 module Fortran
 
+  @@attrs={}
   @@dolabels=[]
   @@level=0
   @@levelstack=[]
@@ -68,7 +69,7 @@ module Fortran
     end
 
     def get(k)
-      (@attrs.nil?)?(nil):(@attrs[k])
+      @@attrs[k]
     end
 
     def indent(s)
@@ -105,7 +106,7 @@ module Fortran
     end
 
     def set(k,v)
-      (@attrs.nil?)?(@attrs={k=>v}):(@attrs[k]=v)
+      @@attrs[k]=v
     end
 
     def space

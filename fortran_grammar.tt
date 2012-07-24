@@ -2586,6 +2586,65 @@ grammar Fortran
   end
 
 #PM#
+  rule implicit_part
+    # R205
+
+    implicit_part_stmt* implicit_stmt <E> /
+    implicit_stmt
+  end
+
+  rule implicit_part_stmt
+    # R206 -- INCOMPLETE
+
+    implicit_stmt /
+    parameter_stmt /
+    format_stmt #/
+    # entry_stmt
+  end
+
+  rule implicit_stmt
+    # R540
+    #
+    # Constraint: If IMPLICIT NONE is specified in a scoping unit, it must
+    # precede any PARAMETER statements that appear in the scoping unit and
+    # there must be no other IMPLICIT statements in the scoping unit.
+
+    label:label? t_implicit t_none t_newline <StmtJ> #/
+#    label:label? t_implicit implicit_spec_list t_newline <StmtJ>
+  end
+
+  rule t_i
+    "i" <T>
+  end
+
+  rule implicit_spec
+    # R541
+
+#    type_spec t_paren_l letter_spec_list t_paren_r <T>
+    type_spec t_paren_l t_i t_paren_r <T>
+  end
+
+  rule implicit_spec_list
+    implicit_spec ( t_comma implicit_spec )* <T>
+  end
+
+  rule letter_spec
+    # R542
+    #
+    # Constraint: If the minus and the second letter appear, the second letter
+    # must follow the first letter alphabetically.
+
+    t_letter ( t_minus t_letter )? <T>
+  end
+
+  rule t_implicit
+    "implicit" <T>
+  end
+
+  rule t_none
+    "none" <T>
+  end
+
 #PM#
 
 end
