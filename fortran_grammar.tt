@@ -2511,7 +2511,7 @@ grammar Fortran
 
     t_integer kind_selector? <T> /
     t_real kind_selector? <T> /
-    t_doubleprecision /
+    t_doubleprecision "" <T> /
     t_complex kind_selector? <T> /
     t_character char_selector? <T> /
     t_logical kind_selector? <T> /
