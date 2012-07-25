@@ -246,6 +246,30 @@ module Fortran
     end
   end
 
+  class Entity_Decl < T
+    def name
+      "#{e0}"
+    end
+  end
+
+  class Entity_Decl_List < T
+    def names
+      [e0.name]+((e1.nil?)?([]):(e1.names))
+    end
+  end
+
+  class Entity_Decl_List_Pair < T
+    def name
+      "#{e1.name}"
+    end
+  end
+
+  class Entity_Decl_List_Pairs < T
+    def names
+      elements.map { |e| e.name }
+    end
+  end
+
   class If_Stmt < T
     def to_s
       stmt("#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
@@ -331,6 +355,15 @@ module Fortran
     end
   end
 
+  class Type_Spec < E
+    def derived?
+      "#{e0}"=="type"
+    end
+    def type
+      (derived?)?("#{e2}"):("#{e0}")
+    end
+  end
+
   class Where_Construct_Stmt < T
     def to_s
       s=stmt("#{e1} #{e2}#{e3}#{e4}")
@@ -346,39 +379,6 @@ module Fortran
   end
 
   #PM#
-  class Type_Spec < E
-    def derived?
-      "#{e0}"=="type"
-    end
-    def type
-      (derived?)?("#{e2}"):("#{e0}")
-    end
-  end
-
-  class Entity_Decl_List < T
-    def names
-      [e0.name]+((e1.nil?)?([]):(e1.names))
-    end
-  end
-
-  class Entity_Decl < T
-    def name
-      "#{e0}"
-    end
-  end
-
-  class Entity_Decl_List_Pair < T
-    def name
-      "#{e1.name}"
-    end
-  end
-
-  class Entity_Decl_List_Pairs < T
-    def names
-      elements.map { |e| e.name }
-    end
-  end
-
   #PM#
 
 end

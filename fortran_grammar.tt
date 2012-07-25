@@ -725,6 +725,10 @@ grammar Fortran
     # stmt_function_stmt
   end
 
+  rule declaration_constructs
+    declaration_construct* <E>
+  end
+
   rule default_char_variable
     # R606
     #
@@ -2073,7 +2077,7 @@ grammar Fortran
     # R204 -- INCOMPLETE
 
     #use_stmt* implicit_part? declaration_construct* <E>
-    declaration_construct* <E>
+    implicit_part? declaration_constructs <E>
   end
 
   rule specification_stmt
@@ -2493,10 +2497,9 @@ grammar Fortran
     # Constraint: The same attr_spec must not appear more than once in a given
     # type_declaration_stmt.
 
-#    label:label? type_spec attr_spec_option? entity_decl_list t_newline
-#      <Type_Declaration_Stmt>
     label:label? type_spec attr_spec_option? entity_decl_list t_newline
-      &{ |e| msg "type: #{e[1].type}"; msg "names: #{e[3].names.join(' ')}" } <Type_Declaration_Stmt>
+#      &{ |e| msg "type: #{e[1].type}"; msg "names: #{e[3].names.join(' ')}" }
+      <Type_Declaration_Stmt>
   end
 
   rule type_name
@@ -2519,12 +2522,24 @@ grammar Fortran
   rule type_spec
     # R502
 
-    t_integer kind_selector? <Type_Spec> /
-    t_real kind_selector? <Type_Spec> /
+    type_spec_with_kind_selector /
+    type_spec_without_kind_selector
+  end
+
+  rule type_spec_with_kind_selector
+    t_integer kind_selector <Type_Spec> /
+    t_real kind_selector <Type_Spec> /
+    t_complex kind_selector <Type_Spec> /
+    t_logical kind_selector <Type_Spec>
+  end
+
+  rule type_spec_without_kind_selector
+    t_integer "" <Type_Spec> /
+    t_real "" <Type_Spec> /
     t_doubleprecision "" <Type_Spec> /
-    t_complex kind_selector? <Type_Spec> /
+    t_complex "" <Type_Spec> /
     t_character char_selector? <Type_Spec> /
-    t_logical kind_selector? <Type_Spec> /
+    t_logical "" <Type_Spec> /
     t_type t_paren_l type_name t_paren_r <Type_Spec>
   end
 
@@ -2619,19 +2634,13 @@ grammar Fortran
     # precede any PARAMETER statements that appear in the scoping unit and
     # there must be no other IMPLICIT statements in the scoping unit.
 
-    label:label? t_implicit t_none t_newline <StmtJ> #/
-#    label:label? t_implicit implicit_spec_list t_newline <StmtJ>
-  end
-
-  rule t_i
-    "i" <T>
+    label:label? t_implicit ( t_none / implicit_spec_list ) t_newline <StmtJ>
   end
 
   rule implicit_spec
     # R541
 
-#    type_spec t_paren_l letter_spec_list t_paren_r <T>
-    type_spec t_paren_l t_i t_paren_r <T>
+     ( type_spec_with_kind_selector / type_spec_without_kind_selector ) t_paren_l letter_spec_list t_paren_r <T>
   end
 
   rule implicit_spec_list
@@ -2645,6 +2654,10 @@ grammar Fortran
     # must follow the first letter alphabetically.
 
     t_letter ( t_minus t_letter )? <T>
+  end
+
+  rule letter_spec_list
+    letter_spec ( t_comma letter_spec )* <T>
   end
 
   rule t_implicit
