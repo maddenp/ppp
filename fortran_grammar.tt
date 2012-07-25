@@ -128,7 +128,7 @@ grammar Fortran
   end
 
   rule allocate_object
-    # R625
+    # R625 -- INCOMPLETE
     #
     # Constraint: Each allocate_object must be a pointer or an allocatable
     # array.
