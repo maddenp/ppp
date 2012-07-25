@@ -24,7 +24,7 @@ end
 
 tdir='tests'
 tests=(ARGV[0])?(["#{tdir}/#{ARGV[0]}"]):(Dir.glob("#{tdir}/t*").sort)
-exe('make clean && make')
+exe('make')
 load 'ppp'
 tests.each do |test|
   print '.'

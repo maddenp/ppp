@@ -715,7 +715,7 @@ grammar Fortran
   rule declaration_construct
     # R207 -- INCOMPLETE
 
-    # derived_type_def /
+    derived_type_def /
     # interface_block /
     type_declaration_stmt /
     specification_stmt /
@@ -2707,7 +2707,7 @@ grammar Fortran
     # any intrinsic type nor the same as any other accessible derived type
     # type_name.
 
-    label:label? t_type derived_typeaccess_spec? type_name t_newline <E>
+    label:label? t_type derived_typeaccess_spec? type_name t_newline <Derived_Type_Stmt>
   end
 
   rule derived_typeaccess_spec
@@ -2720,13 +2720,13 @@ grammar Fortran
     # Constraint: If END TYPE is followed by a type_name, the type_name must be
     # the same as that in the corresponding derived_type_stmt.
 
-    label:label? t_end t_type type_name? t_newline <StmtJ>
+    label:label? t_end t_type type_name? t_newline <End_Type_Stmt>
   end
 
   rule component_def_stmt
     # R426
 
-    label:label? type_spec component_attr_spec_list_option? component_decl_list t_newline <E>
+    label:label? type_spec component_attr_spec_list_option? component_decl_list t_newline <Component_Def_Stmt>
   end
 
   rule component_def_stmts
@@ -2777,7 +2777,11 @@ grammar Fortran
     # in a component_decl or the char_selector in a type_spec (5.1, 5.1.1.5)
     # must be a constant specification expression (7.1.6.2).
 
-    component_name ( t_paren_l component_array_spec t_paren_r )? ( t_star char_length )?
+    component_name ( t_paren_l component_array_spec t_paren_r )? ( t_star char_length )? <E>
+  end
+
+  rule component_decl_list
+    component_decl ( t_comma component_decl )* <E>
   end
 
   rule component_name
