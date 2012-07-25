@@ -2614,17 +2614,20 @@ grammar Fortran
   rule implicit_part
     # R205
 
-    implicit_part_stmt* implicit_stmt <E> /
-    implicit_stmt
+    implicit_part_stmts &{ |e| e[0].elements.last.class==Implicit_Stmt } <Implicit_Part>
   end
 
   rule implicit_part_stmt
     # R206 -- INCOMPLETE
 
     implicit_stmt /
-    parameter_stmt /
-    format_stmt #/
+    format_stmt /
+    parameter_stmt #/
     # entry_stmt
+  end
+
+  rule implicit_part_stmts
+    implicit_part_stmt+ <Implicit_Part_Stmts>
   end
 
   rule implicit_stmt
@@ -2634,13 +2637,14 @@ grammar Fortran
     # precede any PARAMETER statements that appear in the scoping unit and
     # there must be no other IMPLICIT statements in the scoping unit.
 
-    label:label? t_implicit ( t_none / implicit_spec_list ) t_newline <StmtJ>
+    label:label? t_implicit ( t_none / implicit_spec_list ) t_newline <Implicit_Stmt>
   end
 
   rule implicit_spec
     # R541
 
-     ( type_spec_with_kind_selector / type_spec_without_kind_selector ) t_paren_l letter_spec_list t_paren_r <T>
+     type_spec_with_kind_selector t_paren_l letter_spec_list t_paren_r <T> /
+     type_spec_without_kind_selector t_paren_l letter_spec_list t_paren_r <T>
   end
 
   rule implicit_spec_list
