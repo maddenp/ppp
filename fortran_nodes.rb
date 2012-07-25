@@ -284,6 +284,18 @@ module Fortran
     end
   end
 
+  class Implicit_None_Stmt < E
+    def to_s
+      stmt(space)
+    end
+  end
+
+  class Implicit_Stmt < E
+    def to_s
+      stmt(space)
+    end
+  end
+
   class Inner_Shared_Do_Construct < T
     def to_s
       blockend
@@ -379,18 +391,6 @@ module Fortran
   end
 
   #PM#
-  class Implicit_Part < E
-  end
-
-  class Implicit_Stmt < E
-    def to_s
-      stmt(space)
-    end
-  end
-  
-  class Implicit_Part_Stmts < E
-  end
-
   #PM#
 
 end

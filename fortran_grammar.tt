@@ -1252,6 +1252,48 @@ grammar Fortran
     signed_int_literal_constant
   end
 
+  rule implicit_part
+    # R205
+    #
+    # Note: The standard requires that the last statement in implicit_part be
+    # an implicit_stmt but, given that this seems unlikely to affect parsing,
+    # and the availibility of 3rd-party syntax-checking compilers, it is not
+    # enforced here.
+
+    implicit_part_stmt+ <E>
+  end
+
+  rule implicit_part_stmt
+    # R206 -- INCOMPLETE
+
+    implicit_stmt /
+    format_stmt /
+    parameter_stmt #/
+    # entry_stmt
+  end
+
+  rule implicit_spec
+    # R541
+
+     type_spec_with_kind_selector t_paren_l letter_spec_list t_paren_r <T> /
+     type_spec_without_kind_selector t_paren_l letter_spec_list t_paren_r <T>
+  end
+
+  rule implicit_spec_list
+    implicit_spec ( t_comma implicit_spec )* <T>
+  end
+
+  rule implicit_stmt
+    # R540
+    #
+    # Constraint: If IMPLICIT NONE is specified in a scoping unit, it must
+    # precede any PARAMETER statements that appear in the scoping unit and
+    # there must be no other IMPLICIT statements in the scoping unit.
+
+    label:label? t_implicit t_none t_newline <Implicit_None_Stmt> /
+    label:label? t_implicit implicit_spec_list t_newline <Implicit_Stmt>
+  end
+
   rule initialization_expr
     # R730
     #
@@ -1430,6 +1472,19 @@ grammar Fortran
 #    char_length_pair t_comma? <T>
 # TODO this is WRONG -- need to handle the optional comma, see spec
     char_length_pair
+  end
+
+  rule letter_spec
+    # R542
+    #
+    # Constraint: If the minus and the second letter appear, the second letter
+    # must follow the first letter alphabetically.
+
+    t_letter ( t_minus t_letter )? <T>
+  end
+
+  rule letter_spec_list
+    letter_spec ( t_comma letter_spec )* <T>
   end
 
   rule level_1_expr
@@ -2302,6 +2357,10 @@ grammar Fortran
     "if" <T>
   end
 
+  rule t_implicit
+    "implicit" <T>
+  end
+
   rule t_in
     "in" <T>
   end
@@ -2344,6 +2403,10 @@ grammar Fortran
 
   rule t_newline
     "\n" <T>
+  end
+
+  rule t_none
+    "none" <T>
   end
 
   rule t_nullify
@@ -2611,67 +2674,6 @@ grammar Fortran
   end
 
 #PM#
-  rule implicit_part
-    # R205
-
-    implicit_part_stmts &{ |e| e[0].elements.last.class==Implicit_Stmt } <Implicit_Part>
-  end
-
-  rule implicit_part_stmt
-    # R206 -- INCOMPLETE
-
-    implicit_stmt /
-    format_stmt /
-    parameter_stmt #/
-    # entry_stmt
-  end
-
-  rule implicit_part_stmts
-    implicit_part_stmt+ <Implicit_Part_Stmts>
-  end
-
-  rule implicit_stmt
-    # R540
-    #
-    # Constraint: If IMPLICIT NONE is specified in a scoping unit, it must
-    # precede any PARAMETER statements that appear in the scoping unit and
-    # there must be no other IMPLICIT statements in the scoping unit.
-
-    label:label? t_implicit ( t_none / implicit_spec_list ) t_newline <Implicit_Stmt>
-  end
-
-  rule implicit_spec
-    # R541
-
-     type_spec_with_kind_selector t_paren_l letter_spec_list t_paren_r <T> /
-     type_spec_without_kind_selector t_paren_l letter_spec_list t_paren_r <T>
-  end
-
-  rule implicit_spec_list
-    implicit_spec ( t_comma implicit_spec )* <T>
-  end
-
-  rule letter_spec
-    # R542
-    #
-    # Constraint: If the minus and the second letter appear, the second letter
-    # must follow the first letter alphabetically.
-
-    t_letter ( t_minus t_letter )? <T>
-  end
-
-  rule letter_spec_list
-    letter_spec ( t_comma letter_spec )* <T>
-  end
-
-  rule t_implicit
-    "implicit" <T>
-  end
-
-  rule t_none
-    "none" <T>
-  end
-
 #PM#
 
 end
