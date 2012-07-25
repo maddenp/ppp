@@ -1,4 +1,4 @@
-program p
+program t
   character(len=5)::a='lemon'
   character(len=5),parameter::b='melon'
   select case (a)
@@ -7,4 +7,4 @@ program p
   case default
     print '(a,a,a)',a,' comes after ',b
   end select
-end program p
+end program t

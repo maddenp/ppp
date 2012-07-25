@@ -1,4 +1,4 @@
-program p
+program t
   print *,.true.
   print *,.false.
-end program p
+end program t

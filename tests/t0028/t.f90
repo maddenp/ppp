@@ -1,3 +1,3 @@
-program p
+program t
   print '(f3.2)',.14
-end program p
+end program t

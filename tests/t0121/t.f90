@@ -1,4 +1,4 @@
-program p
+program t
   integer::i=1
   select case (i)
   case (1)
@@ -8,4 +8,4 @@ program p
     print '(a)','default'
     print '(i0)',i
   end select
-end program p
+end program t

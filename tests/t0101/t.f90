@@ -1,4 +1,4 @@
-program p
+program t
   x: do i=1,2
     print *,'i1'
     y: do j=1,2
@@ -8,4 +8,4 @@ program p
     enddo y
     print *,'i2'
   end do x
-end program p
+end program t

@@ -1,4 +1,4 @@
-program p
+program t
   integer a
   integer :: b
   integer c,d
@@ -30,4 +30,4 @@ program p
   print '(i0)',k
   print '(i0)',l
   print '(i0)',q
-end program p
+end program t

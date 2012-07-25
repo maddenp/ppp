@@ -1,4 +1,4 @@
-program p
+program t
   x: if (.true.) then
   end if x
-end program p
+end program t

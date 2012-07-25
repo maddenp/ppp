@@ -1,3 +1,3 @@
-program p
+program t
   print *,1234e-2
-end program p
+end program t

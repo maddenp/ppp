@@ -1,3 +1,3 @@
-program p
+program t
   print *,'don''t'
-end program p
+end program t

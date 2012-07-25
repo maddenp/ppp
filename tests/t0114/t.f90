@@ -1,4 +1,4 @@
-program p
+program t
   integer,allocatable::i(:),j(:)
   integer::ierr
   allocate(i(1:3),j(2+1),stat=ierr)
@@ -7,4 +7,4 @@ program p
   print *,i
   print *,j
   deallocate(i,j,stat=ierr)
-end program p
+end program t

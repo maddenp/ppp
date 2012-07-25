@@ -1,3 +1,3 @@
-program p
+program t
   if (.true.) print *,'true'
-end program p
+end program t

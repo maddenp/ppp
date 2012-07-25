@@ -1,4 +1,4 @@
-program p
+program t
   logical::x=.true.
   select case (x)
   case (.true.)
@@ -6,4 +6,4 @@ program p
   case default
     print '(a)','false!'
   end select
-end program p
+end program t

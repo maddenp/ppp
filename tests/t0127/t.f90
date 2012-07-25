@@ -1,5 +1,5 @@
-program p
+program t
   integer::i(4)
   i=7
   print '(i0)',i(2:3)
-end program p
+end program t

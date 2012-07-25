@@ -1,3 +1,3 @@
-program p
+program t
   implicit none
-end program p
+end program t

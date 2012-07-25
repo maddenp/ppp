@@ -1,3 +1,3 @@
-program p
+program t
   print *,"literal quote: """
-end program p
+end program t

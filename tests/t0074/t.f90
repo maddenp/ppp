@@ -1,4 +1,4 @@
-program p
+program t
   i=3
   if (i.eq.1) then
     print *,1
@@ -9,4 +9,4 @@ program p
   else
     print *,4
   end if
-end program p
+end program t

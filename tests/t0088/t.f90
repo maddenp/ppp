@@ -1,3 +1,3 @@
-program p
+program t
 100 continue
-end program p
+end program t

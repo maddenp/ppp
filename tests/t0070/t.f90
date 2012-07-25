@@ -1,7 +1,7 @@
-program p
+program t
   if (.false.) then
     print *,1
   else
     print *,'hello'
   end if
-end program p
+end program t

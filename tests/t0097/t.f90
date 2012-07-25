@@ -1,4 +1,4 @@
-program p
+program t
   x: do i=1,2
     print *,'i'
     do j=1,2
@@ -7,4 +7,4 @@ program p
     enddo
     exit
   end do x
-end program p
+end program t

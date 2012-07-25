@@ -1,4 +1,4 @@
-program p
+program t
   integer::i
   do i=0,5
     print '(i0)',i
@@ -11,4 +11,4 @@ program p
       print '(a)','more than three'
     end select
   end do
-end program p
+end program t

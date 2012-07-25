@@ -1,4 +1,4 @@
-program p
+program t
   print *,1.0.gt.0.1
   print *,1.0> 0.1
   print *,1.lt.2
@@ -9,4 +9,4 @@ program p
   print *,1/=2
   print *,1==1.0
   print *,1.eq.1.0
-end program p
+end program t

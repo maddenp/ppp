@@ -1,4 +1,4 @@
-program p
+program t
   real::a=2.71
   real(kind=8)::b=3.14
   double precision::c=7.77
@@ -9,4 +9,4 @@ program p
   print *,c
   print *,d
   print *,e
-end program p
+end program t

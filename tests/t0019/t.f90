@@ -1,3 +1,3 @@
-program p
+program t
   print *,'Hello ','World'
-end program p
+end program t

@@ -1,3 +1,3 @@
-program p
+program t
   print *,3._8
-end program p
+end program t

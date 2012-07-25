@@ -1,4 +1,4 @@
-program p
+program t
   character(len=5)::a='hello'
   character(5)::b
   character*5::c
@@ -11,4 +11,4 @@ program p
   print '(a)',c
   print '(a)',d
   print '(a)',e
-end program p
+end program t

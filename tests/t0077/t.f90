@@ -1,6 +1,6 @@
-program p
+program t
   if (.true.) then
     stop 0
   end if
   print *,'bad'
-end program p
+end program t

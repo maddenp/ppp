@@ -1,5 +1,5 @@
-program p
+program t
 100 format (a)
   assign 100 to i
   print i,'hello'
-end program p
+end program t
