@@ -2683,7 +2683,8 @@ grammar Fortran
     # type declared to be private, either the derived type definition must
     # contain the PRIVATE statement, or the derived type must be private.
 
-    derived_type_stmt private_sequence_stmts component_def_stmts end_type_stmt <E>
+    derived_type_stmt private_sequence_stmts component_def_stmts end_type_stmt
+      <E>
   end
 
   rule private_sequence_stmt
@@ -2707,7 +2708,8 @@ grammar Fortran
     # any intrinsic type nor the same as any other accessible derived type
     # type_name.
 
-    label:label? t_type derived_typeaccess_spec? type_name t_newline <Derived_Type_Stmt>
+    label:label? t_type derived_typeaccess_spec? type_name t_newline
+      <Derived_Type_Stmt>
   end
 
   rule derived_typeaccess_spec
@@ -2726,7 +2728,8 @@ grammar Fortran
   rule component_def_stmt
     # R426
 
-    label:label? type_spec component_attr_spec_list_option? component_decl_list t_newline <Component_Def_Stmt>
+    label:label? type_spec component_attr_spec_list_option? component_decl_list
+      t_newline <Component_Def_Stmt>
   end
 
   rule component_def_stmts
@@ -2777,11 +2780,12 @@ grammar Fortran
     # in a component_decl or the char_selector in a type_spec (5.1, 5.1.1.5)
     # must be a constant specification expression (7.1.6.2).
 
-    component_name ( t_paren_l component_array_spec t_paren_r )? ( t_star char_length )? <E>
+    component_name ( t_paren_l component_array_spec t_paren_r )?
+      ( t_star char_length )? <E>
   end
 
   rule component_decl_list
-    component_decl ( t_comma component_decl )* <E>
+    component_decl ( t_comma component_decl )* <T>
   end
 
   rule component_name
