@@ -2425,10 +2425,6 @@ grammar Fortran
     "out" <T>
   end
 
-  rule t_parameter
-    "parameter" <T>
-  end
-
   rule t_pause
     "pause" <T>
   end
@@ -2674,6 +2670,7 @@ grammar Fortran
   end
 
 #PM#
+
 #PM#
 
 end
