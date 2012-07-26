@@ -580,7 +580,7 @@ grammar Fortran
   end
 
   rule data_i_do_object
-    # R536 -- INCOMPLETE
+    # R536
     #
     # Constraint: The array_element must not have a constant parent. The
     # scalar_structure_component must not have a constant parent. In an
@@ -590,7 +590,7 @@ grammar Fortran
     # be intrinsic.
 
     array_element !t_equal <E> /
-    # scalar_structure_component /
+    scalar_structure_component !t_equal <E> /
     data_implied_do
   end
 
