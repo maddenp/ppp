@@ -164,9 +164,23 @@ module Fortran
     end
   end
   
+  class Component_Def_Stmt < T
+    def to_s
+      stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
+    end
+  end
+
   class Computed_Goto_Stmt < T
     def to_s
       stmt("#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
+    end
+  end
+
+  class Derived_Type_Stmt < T
+    def to_s
+      s=stmt("#{e1}#{sb(e2.to_s)}#{sb(e3.to_s)}")
+      blockbegin
+      s
     end
   end
 
@@ -239,6 +253,13 @@ module Fortran
     end
   end
   
+  class End_Type_Stmt < T
+    def to_s
+      blockend
+      stmt("#{e1} #{e2}#{sb(e3.to_s)}")
+    end
+  end
+
   class End_Where_Stmt < T
     def to_s
       blockend
@@ -391,27 +412,6 @@ module Fortran
   end
 
   #PM#
-  class Derived_Type_Stmt < T
-    def to_s
-      s=stmt("#{e1}#{sb(e2.to_s)}#{sb(e3.to_s)}")
-      blockbegin
-      s
-    end
-  end
-
-  class End_Type_Stmt < T
-    def to_s
-      blockend
-      stmt("#{e1} #{e2}#{sb(e3.to_s)}")
-    end
-  end
-
-  class Component_Def_Stmt < T
-    def to_s
-      stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
-    end
-  end
-
   #PM#
 
 end
