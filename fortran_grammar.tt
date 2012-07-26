@@ -214,6 +214,9 @@ grammar Fortran
     #
     # Constraint: In an array_element, every part_ref must have rank zero and
     # the last part_ref must contain a subscript_list.
+    #
+    # Note: The requirement that the last part_ref contain a subscript_list is
+    # not enforced or checked for here.
 
     data_ref
   end
@@ -586,13 +589,13 @@ grammar Fortran
     # DO variables of the containing data_implied_dos, and each operation must
     # be intrinsic.
 
-    array_element /
+    array_element !t_equal <E> /
     # scalar_structure_component /
     data_implied_do
   end
 
   rule data_i_do_object_list
-    data_i_do_object ( t_comma data_i_do_object )* <T>
+    data_i_do_object ( t_comma data_i_do_object )* <E>
   end
 
   rule data_i_do_variable
@@ -681,11 +684,19 @@ grammar Fortran
   rule data_stmt_set
     # R530
 
-    data_stmt_object_list t_slash data_stmt_value_list t_slash <T>
+    data_stmt_object_list t_slash data_stmt_value_list t_slash <E>
   end
 
   rule data_stmt_set_list
-    data_stmt_set ( t_comma data_stmt_set )* <T>
+    data_stmt_set data_stmt_set_list_pairs <E>
+  end
+
+  rule data_stmt_set_list_pair
+    t_comma data_stmt_set <E>
+  end
+
+  rule data_stmt_set_list_pairs
+    data_stmt_set_list_pair* <E>
   end
 
   rule data_stmt_value
