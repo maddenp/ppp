@@ -1759,10 +1759,10 @@ grammar Fortran
   rule parent_string
     # R610
     #
-    # Constraint: parent_string must be of tyep character.
+    # Constraint: parent_string must be of type character.
 
     array_element /
-    # scalar_structure_component /
+    scalar_structure_component /
     scalar_variable_name /
     scalar_constant
   end
