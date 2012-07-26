@@ -128,13 +128,13 @@ grammar Fortran
   end
 
   rule allocate_object
-    # R625 -- INCOMPLETE
+    # R625
     #
     # Constraint: Each allocate_object must be a pointer or an allocatable
     # array.
 
-    !( t_stat t_equal ) variable_name # /
-    #structure_component
+    !( t_stat t_equal ) structure_component /
+    !( t_stat t_equal ) variable_name
   end
 
   rule allocate_object_list
