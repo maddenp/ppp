@@ -2212,7 +2212,7 @@ grammar Fortran
 
     array_section /
     array_element /
-    # structure_component /
+    structure_component /
     substring
   end
 
