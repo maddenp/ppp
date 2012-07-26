@@ -1805,8 +1805,8 @@ grammar Fortran
   rule pointer_object
     # R630
 
-    variable_name #/
-    # structure_component
+    structure_component /
+    variable_name
   end
 
   rule pointer_object_list
