@@ -2557,7 +2557,7 @@ grammar Fortran
     # type_declaration_stmt.
 
     label:label? type_spec attr_spec_option? entity_decl_list t_newline
-#      &{ |e| msg "type: #{e[1].type}"; msg "names: #{e[3].names.join(' ')}" }
+#      &{ |e| m_s_g "type: #{e[1].type}"; m_s_g "names: #{e[3].names.join(' ')}" }
       <Type_Declaration_Stmt>
   end
 
@@ -2792,6 +2792,23 @@ grammar Fortran
     # 4.4.1 (not explicitly defined)
 
     name
+  end
+
+  rule structure_component
+    # R614
+    #
+    # Constraint: In a structure_component, there must be more than one part_ref
+    # and the rightmost part_ref must be of the form part_name.
+
+    data_ref
+  end
+
+  rule scalar_structure_component
+    # Multiple uses (not explicitly defined)
+    #
+    # Note: Assumed constraint: The structure_component must be scalar.
+
+    structure_component
   end
 
 #PM#
