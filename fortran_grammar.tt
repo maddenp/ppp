@@ -1260,6 +1260,10 @@ grammar Fortran
     level_5_expr ( defined_binary_op expr )? <T>
   end
 
+  rule expr_list
+    expr ( t_comma expr )* <E>
+  end
+
   rule format
     # R913
     #
@@ -2329,6 +2333,12 @@ grammar Fortran
     data_ref
   end
 
+  rule structure_constructor
+    # R430
+
+    type_name t_paren_l expr_list t_paren_r <E>
+  end
+
   rule subscript
     # R617
 
@@ -2822,16 +2832,6 @@ grammar Fortran
   end
 
 #PM#
-  rule structure_constructor
-    # R430
-
-    type_name t_paren_l expr_list t_paren_r <E>
-  end
-
-  rule expr_list
-    expr ( t_comma expr )* <E>
-  end
-
 #PM#
 
 end
