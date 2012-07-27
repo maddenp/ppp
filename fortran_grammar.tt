@@ -121,6 +121,18 @@ grammar Fortran
     ".and." <T>
   end
 
+  rule allocatable_stmt
+    # R526
+    #
+    # Constraint: The array_name [ in an array_name_and_spec_list ] must not be
+    # a dummy argument or function result. If the DIMENSION attribute for an
+    # array_name is specified elsewhere in teh scoping unit, the array_spec must
+    # be a deferred_shape_spec_list.
+
+    label:label? t_allocatable double_colon? array_names_and_spec_lists
+      t_newline <Allocatable_Stmt>
+  end
+
   rule allocate_lower_bound
     # R627
 
@@ -219,6 +231,24 @@ grammar Fortran
     # not enforced or checked for here.
 
     data_ref
+  end
+
+  rule array_name
+    # Multiple uses (not explicitly defined)
+
+    name
+  end
+
+  rule array_name_and_spec_list
+    array_name ( t_paren_l deferred_shape_spec_list t_paren_r )? <E>
+  end
+
+  rule array_name_and_spec_list_pair
+    t_comma array_name_and_spec_list <E>
+  end
+
+  rule array_names_and_spec_lists
+    array_name_and_spec_list array_name_and_spec_list_pair* <T>
   end
 
   rule array_section
@@ -2282,7 +2312,7 @@ grammar Fortran
     # R214 -- INCOMPLETE
 
     # access_stmt /
-    # allocatable_stmt /
+    allocatable_stmt /
     # common_stmt /
     data_stmt #/
     # dimension_stmt /
