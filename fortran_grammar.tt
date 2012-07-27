@@ -252,6 +252,18 @@ grammar Fortran
       array_name_and_deferred_shape_spec_list_pair* <T>
   end
 
+  rule array_name_and_spec
+    array_name t_paren_l array_spec t_paren_r <E>
+  end
+
+  rule array_name_and_spec_pair
+    t_comma array_name_and_spec <E>
+  end
+
+  rule array_names_and_specs
+    array_name_and_spec array_name_and_spec_pair* <T>
+  end
+
   rule array_section
     # R616
     #
@@ -933,6 +945,13 @@ grammar Fortran
     # R402
 
     t_digit+ <T>
+  end
+
+  rule dimension_stmt
+    # R525
+
+    label:label? t_dimension double_colon? array_names_and_specs t_newline
+      <Dimension_Stmt>
   end
 
   rule do_block
@@ -1852,6 +1871,18 @@ grammar Fortran
     name
   end
 
+  rule object_name_and_spec_list
+    object_name ( t_paren_l deferred_shape_spec_list t_paren_r )? <E>
+  end
+
+  rule object_name_and_spec_list_pair
+    t_comma object_name_and_spec_list <E>
+  end
+
+  rule object_names_and_spec_lists
+    object_name_and_spec_list object_name_and_spec_list_pair* <T>
+  end
+
   rule octal_constant
     # R409
     #
@@ -1952,6 +1983,17 @@ grammar Fortran
 
   rule pointer_object_list
     pointer_object ( t_comma pointer_object )* <T>
+  end
+
+  rule pointer_stmt
+    # R527
+    #
+    # Constraint: The INTENT attribute must not be specified for an object_name.
+    # If the DIMENSION attribute ofr an object_name is specified elsewhere in
+    # the scoping unit, the array_spec must be a deferred_shape_spec_list.
+
+    label:label? t_pointer double_colon? object_names_and_spec_lists t_newline
+      <Pointer_Stmt>
   end
 
   rule power_op
@@ -2743,6 +2785,16 @@ grammar Fortran
     expr
   end
 
+  rule target_stmt
+    # R528
+    #
+    # Constraint: The PARAMETER attribute must not be specified for an
+    # object_name.
+
+    label:label? t_target double_colon? array_names_and_specs t_newline
+      <Target_Stmt>
+  end
+
   rule type_declaration_stmt
     # R501
     #
@@ -2863,58 +2915,6 @@ grammar Fortran
   end
 
 #PM#
-  rule pointer_stmt
-    # R527
-    #
-    # Constraint: The INTENT attribute must not be specified for an object_name.
-    # If the DIMENSION attribute ofr an object_name is specified elsewhere in
-    # the scoping unit, the array_spec must be a deferred_shape_spec_list.
-
-    label:label? t_pointer double_colon? object_names_and_spec_lists t_newline
-      <Pointer_Stmt>
-  end
-
-  rule target_stmt
-    # R528
-    #
-    # Constraint: The PARAMETER attribute must not be specified for an
-    # object_name.
-
-    label:label? t_target double_colon? array_names_and_specs t_newline
-      <Target_Stmt>
-  end
-
-  rule object_name_and_spec_list
-    object_name ( t_paren_l deferred_shape_spec_list t_paren_r )? <E>
-  end
-
-  rule object_name_and_spec_list_pair
-    t_comma object_name_and_spec_list <E>
-  end
-
-  rule object_names_and_spec_lists
-    object_name_and_spec_list object_name_and_spec_list_pair* <T>
-  end
-
-  rule dimension_stmt
-    # R525
-
-    label:label? t_dimension double_colon? array_names_and_specs t_newline
-      <Dimension_Stmt>
-  end
-
-  rule array_name_and_spec
-    array_name t_paren_l array_spec t_paren_r <E>
-  end
-
-  rule array_name_and_spec_pair
-    t_comma array_name_and_spec <E>
-  end
-
-  rule array_names_and_specs
-    array_name_and_spec array_name_and_spec_pair* <T>
-  end
-
 #PM#
 
 end
