@@ -1935,7 +1935,7 @@ grammar Fortran
     constant /
     constant_subobject /
     array_constructor /
-    # structure_constructor /
+    structure_constructor /
     # function_reference /
     parenthesized_expr
   end
@@ -2822,6 +2822,16 @@ grammar Fortran
   end
 
 #PM#
+  rule structure_constructor
+    # R430
+
+    type_name t_paren_l expr_list t_paren_r <E>
+  end
+
+  rule expr_list
+    expr ( t_comma expr )* <E>
+  end
+
 #PM#
 
 end
