@@ -408,7 +408,8 @@ module Fortran
   
   class Type_Declaration_Stmt < T
     def to_s
-      stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
+      sep=(e1.to_s[-1]==",")?(""):(" ")
+      stmt("#{e1}#{(e2.to_s.empty?)?(sep):(e2)}#{e3}")
     end
   end
 

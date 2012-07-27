@@ -1640,9 +1640,8 @@ grammar Fortran
     # the type_declaration_stmt.
 
     t_paren_l len_pair? type_param_value t_paren_r <T> /
-#    char_length_pair t_comma? <T>
-# TODO this is WRONG -- need to handle the optional comma, see spec
-    char_length_pair
+    char_length_pair &( [^\:\n]* double_colon ) <T> /
+    char_length_pair t_comma <T>
   end
 
   rule letter_spec
