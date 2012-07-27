@@ -705,7 +705,7 @@ grammar Fortran
   end
 
   rule data_stmt_constant
-    # R533 -- INCOMPLETE
+    # R533
     #
     # Constraint: If a data_stmt_constant is a structure_constructor, each
     # component must be an initialization expression (7.1.6.1). Note: Choice
@@ -714,7 +714,7 @@ grammar Fortran
     signed_real_literal_constant /
     signed_int_literal_constant /
     boz_literal_constant /
-    # structure_constructor /
+    structure_constructor /
     scalar_constant
   end
 
