@@ -364,6 +364,12 @@ module Fortran
     end
   end
 
+  class Pointer_Stmt < T
+    def to_s
+      stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
+    end
+  end
+  
   class Print_Stmt < T
     def to_s
       stmt("#{e1} #{e2}#{e3}")

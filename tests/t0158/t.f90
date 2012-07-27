@@ -1,5 +1,5 @@
 program t
   integer :: i ( : )
   integer :: j
-  allocatable :: i , j ( : , : )
+  pointer :: i , j(: , :)
 end program t

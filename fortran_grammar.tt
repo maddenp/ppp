@@ -2314,7 +2314,7 @@ grammar Fortran
     # access_stmt /
     allocatable_stmt /
     # common_stmt /
-    data_stmt #/
+    data_stmt /
     # dimension_stmt /
     # equivalence_stmt /
     # external_stmt /
@@ -2322,7 +2322,7 @@ grammar Fortran
     # intrinsic_stmt /
     # namelist_stmt /
     # optional_stmt /
-    # pointer_stmt /
+    pointer_stmt #/
     # save_stmt /
     # target_stmt
   end
@@ -2862,6 +2862,29 @@ grammar Fortran
   end
 
 #PM#
+  rule pointer_stmt
+    # R527
+    #
+    # Constraint: The INTENT attribute must not be specified for an object_name.
+    # If the DIMENSION attribute ofr an object_name is specified elsewhere in
+    # the scoping unit, the array_spec must be a deferred_shape_spec_list.
+
+    label:label? t_pointer double_colon? object_names_and_spec_lists t_newline
+      <Pointer_Stmt>
+  end
+
+  rule object_name_and_spec_list
+    object_name ( t_paren_l deferred_shape_spec_list t_paren_r )? <E>
+  end
+
+  rule object_name_and_spec_list_pair
+    t_comma object_name_and_spec_list <E>
+  end
+
+  rule object_names_and_spec_lists
+    object_name_and_spec_list object_name_and_spec_list_pair* <T>
+  end
+
 #PM#
 
 end
