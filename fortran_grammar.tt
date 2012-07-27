@@ -2365,7 +2365,7 @@ grammar Fortran
     # namelist_stmt /
     # optional_stmt /
     pointer_stmt /
-    # save_stmt /
+    save_stmt /
     target_stmt
   end
 
@@ -2914,6 +2914,41 @@ grammar Fortran
   end
 
 #PM#
+  rule save_stmt
+    # R523
+    #
+    # Constraint: If a SAVE statement with an omitted saved entity list occurs
+    # in a scoping unit, no other explicit occurrence of the SAVE attribute or
+    # SAVE statement is permitted in the same scoping unit.
+
+    label:label? t_save save_stmt_entity_list? t_newline <Save_Stmt>
+  end
+
+  rule save_stmt_entity_list
+    double_colon? saved_entity_list <Save_Stmt_Entity_List>
+  end
+
+  rule saved_entity
+    # R524
+    #
+    # Constraint: An object_name must not be a dummy argument name, a procedure
+    # name, a function result name, an automatic data object name, or the name
+    # of an entity in a common block.
+
+    object_name /
+    t_slash common_block_name t_slash <E>
+  end
+
+  rule saved_entity_list
+    saved_entity ( t_comma saved_entity )* <T>
+  end
+
+  rule common_block_name
+    # Multiple uses (not explicitly defined)
+
+    name
+  end
+
 #PM#
 
 end

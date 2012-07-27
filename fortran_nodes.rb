@@ -437,6 +437,18 @@ module Fortran
   end
 
   #PM#
+  class Save_Stmt < T
+    def to_s
+      stmt("#{e1}#{e2}")
+    end
+  end
+
+  class Save_Stmt_Entity_List < T
+    def to_s
+      "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}"
+    end
+  end
+  
   #PM#
 
 end
