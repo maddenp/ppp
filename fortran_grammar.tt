@@ -189,7 +189,7 @@ grammar Fortran
   rule allocation
     # R624
 
-    allocate_object ( t_paren_l allocate_shape_spec_list t_paren_r )? <E>
+    allocate_object parenthesized_allocate_shape_spec_list? <E>
   end
 
   rule allocation_list
@@ -240,7 +240,7 @@ grammar Fortran
   end
 
   rule array_name_and_deferred_shape_spec_list
-    array_name ( t_paren_l deferred_shape_spec_list t_paren_r )? <E>
+    array_name parenthesized_deferred_shape_spec_list? <E>
   end
 
   rule array_name_and_deferred_shape_spec_list_pair
@@ -618,8 +618,8 @@ grammar Fortran
     # in a component_decl or the char_selector in a type_spec (5.1, 5.1.1.5)
     # must be a constant specification expression (7.1.6.2).
 
-    component_name ( t_paren_l component_array_spec t_paren_r )?
-      ( t_star char_length )? <E>
+    component_name parenthesized_component_array_spec? ( t_star char_length )?
+      <E>
   end
 
   rule component_decl_list
@@ -1871,7 +1871,7 @@ grammar Fortran
   end
 
   rule object_name_and_spec_list
-    object_name ( t_paren_l deferred_shape_spec_list t_paren_r )? <E>
+    object_name parenthesized_deferred_shape_spec_list? <E>
   end
 
   rule object_name_and_spec_list_pair
@@ -1954,7 +1954,7 @@ grammar Fortran
     # Constraint: In a part_ref containing a section_subscript_list, the number
     # of section_subscripts must equal the rank of part_name.
 
-    part_name ( t_paren_l section_subscript_list t_paren_r )? <T>
+    part_name parenthesized_section_subscript_list? <T>
   end
 
   rule pause_stmt
@@ -2947,6 +2947,73 @@ grammar Fortran
     # Multiple uses (not explicitly defined)
 
     name
+  end
+
+  rule t_common
+    "common" <T>
+  end
+
+  rule common_stmt
+    # R548
+    #
+    # Constraint: Only one appearance of a given variable_name is permitted in
+    # all common_block_object_lists withing a scoping unit. A
+    # common_block_object must not be a dummy argument, an allocatable array,
+    # an automatic object, a function name, an entry name, or a result name. If
+    # a common_block_object is of a derived type, it must be a sequence type
+    # (4.4.1).
+
+    label:label? t_common common_block_name_triplet? common_block_object_list common_block_names_and_object_lists t_newline <StmtJ>
+  end
+
+  rule common_block_name_triplet
+    t_slash common_block_name? t_slash <T>
+  end
+
+  rule common_block_names_and_object_lists
+    common_block_name_and_object_list* <T>
+  end
+
+  rule common_block_name_and_object_list
+    t_comma? common_block_name_triplet common_block_object_list <T>
+  end
+
+  rule common_block_object
+    # R549
+    #
+    # Constraint: Each bound in the explicit_shape_list must be a constant
+    # specification expression (7.1.6.2) If a variable_name appears with an
+    # explicit_shape_spec_list, it must not have the POINTER attribute.
+
+    variable_name common_block_object_explicit_shape_list? <T>
+  end
+
+  rule common_block_object_list
+    common_block_object ( t_comma common_block_object )* <T>
+  end
+
+  rule common_block_object_explicit_shape_list
+    parenthesized_explicit_shape_spec_list
+  end
+
+  rule parenthesized_allocate_shape_spec_list
+    t_paren_l allocate_shape_spec_list t_paren_r
+  end
+
+  rule parenthesized_component_array_spec
+    t_paren_l component_array_spec t_paren_r
+  end
+
+  rule parenthesized_deferred_shape_spec_list
+    t_paren_l deferred_shape_spec_list t_paren_r
+  end
+
+  rule parenthesized_explicit_shape_spec_list
+    t_paren_l explicit_shape_spec_list t_paren_r <T>
+  end
+
+  rule parenthesized_section_subscript_list
+    t_paren_l section_subscript_list t_paren_r
   end
 
 #PM#
