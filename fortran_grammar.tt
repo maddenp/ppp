@@ -129,8 +129,8 @@ grammar Fortran
     # array_name is specified elsewhere in teh scoping unit, the array_spec must
     # be a deferred_shape_spec_list.
 
-    label:label? t_allocatable double_colon? array_names_and_spec_lists
-      t_newline <Allocatable_Stmt>
+    label:label? t_allocatable double_colon?
+      array_names_and_deferred_shape_spec_lists t_newline <Allocatable_Stmt>
   end
 
   rule allocate_lower_bound
@@ -239,16 +239,17 @@ grammar Fortran
     name
   end
 
-  rule array_name_and_spec_list
+  rule array_name_and_deferred_shape_spec_list
     array_name ( t_paren_l deferred_shape_spec_list t_paren_r )? <E>
   end
 
-  rule array_name_and_spec_list_pair
-    t_comma array_name_and_spec_list <E>
+  rule array_name_and_deferred_shape_spec_list_pair
+    t_comma array_name_and_deferred_shape_spec_list <E>
   end
 
-  rule array_names_and_spec_lists
-    array_name_and_spec_list array_name_and_spec_list_pair* <T>
+  rule array_names_and_deferred_shape_spec_lists
+    array_name_and_deferred_shape_spec_list
+      array_name_and_deferred_shape_spec_list_pair* <T>
   end
 
   rule array_section
@@ -2315,7 +2316,7 @@ grammar Fortran
     allocatable_stmt /
     # common_stmt /
     data_stmt /
-    # dimension_stmt /
+    dimension_stmt /
     # equivalence_stmt /
     # external_stmt /
     # intent_stmt /
@@ -2883,6 +2884,25 @@ grammar Fortran
 
   rule object_names_and_spec_lists
     object_name_and_spec_list object_name_and_spec_list_pair* <T>
+  end
+
+  rule dimension_stmt
+    # R525
+
+    label:label? t_dimension double_colon? array_names_and_specs t_newline
+      <Dimension_Stmt>
+  end
+
+  rule array_name_and_spec
+    array_name t_paren_l array_spec t_paren_r <E>
+  end
+
+  rule array_name_and_spec_pair
+    t_comma array_name_and_spec <E>
+  end
+
+  rule array_names_and_specs
+    array_name_and_spec array_name_and_spec_pair* <T>
   end
 
 #PM#

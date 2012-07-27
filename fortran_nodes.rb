@@ -190,6 +190,12 @@ module Fortran
     end
   end
 
+  class Dimension_Stmt < T
+    def to_s
+      stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
+    end
+  end
+  
   class Do_Term_Action_Stmt < T
     def to_s
       blockend
