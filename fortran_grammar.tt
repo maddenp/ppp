@@ -1328,7 +1328,7 @@ grammar Fortran
   rule equivalence_stmt
     # R545
 
-    label:label? t_equivalence equivalence_set_list t_newline <Equivalence_Stmt>
+    label:label? t_equivalence equivalence_set_list t_newline <StmtJ>
   end
 
   rule executable_construct
@@ -1649,6 +1649,22 @@ grammar Fortran
     and_op /
     or_op /
     equiv_op
+  end
+
+  rule intrinsic_procedure_name
+    # 12.3.2.3 (not explicitly defined)
+
+    name
+  end
+
+  rule intrinsic_procedure_name_list
+    intrinsic_procedure_name ( t_comma intrinsic_procedure_name )* <T>
+  end
+
+  rule intrinsic_stmt
+    # R1208
+
+    label:label? t_intrinsic intrinsic_procedure_name_list t_newline <StmtJ>
   end
 
   rule io_implied_do
@@ -2517,7 +2533,7 @@ grammar Fortran
     equivalence_stmt /
     # external_stmt /
     # intent_stmt /
-    # intrinsic_stmt /
+    intrinsic_stmt /
     # namelist_stmt /
     # optional_stmt /
     pointer_stmt /
