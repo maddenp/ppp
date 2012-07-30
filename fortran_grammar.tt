@@ -1,9 +1,11 @@
 # TODOs
 #
-# - rule primary cannot tell the difference between function and array
+# - Rule primary cannot tell the difference between function and array
 #   references. Since variable -> subobject -> ( array_section / array_element )
 #   precedes function_reference, the latter is recognized as the former. This
 #   needs to be fixed with environment analysis.
+#
+# - Need tests of all open/close specifications.
 
 # NOTES: Grammar rule numbers or section numbers from the Fortran 90 standard
 # document are given when possible. Grammar rule names used here match those
@@ -2784,6 +2786,14 @@ grammar Fortran
     t_paren_l substring_range t_paren_r <E>
   end
 
+  rule t_access
+    "access" <T>
+  end
+
+  rule t_action
+    "action" <T>
+  end
+
   rule t_allocatable
     "allocatable" <T>
   end
@@ -2804,6 +2814,10 @@ grammar Fortran
     [01] <T>
   end
 
+  rule t_blank
+    "blank" <T>
+  end
+
   rule t_call
     "call" <T>
   end
@@ -2814,6 +2828,10 @@ grammar Fortran
 
   rule t_character
     "character" <T>
+  end
+
+  rule t_close
+    "close" <T>
   end
 
   rule t_colon
@@ -2850,6 +2868,10 @@ grammar Fortran
 
   rule t_default
     "default" <T>
+  end
+
+  rule t_delim
+    "delim" <T>
   end
 
   rule t_digit
@@ -2908,6 +2930,10 @@ grammar Fortran
     "equivalence" <T>
   end
 
+  rule t_err
+    "err" <T>
+  end
+
   rule t_exit
     "exit" <T>
   end
@@ -2918,6 +2944,14 @@ grammar Fortran
 
   rule t_false
     ".false." <T>
+  end
+
+  rule t_file
+    "file" <T>
+  end
+
+  rule t_form
+    "form" <T>
   end
 
   rule t_format
@@ -2954,6 +2988,10 @@ grammar Fortran
 
   rule t_intrinsic
     "intrinsic" <T>
+  end
+
+  rule t_iostat
+    "iostat" <T>
   end
 
   rule t_kind
@@ -2996,6 +3034,10 @@ grammar Fortran
     [01234567] <T>
   end
 
+  rule t_open
+    "open" <T>
+  end
+
   rule t_optional
     "optional" <T>
   end
@@ -3004,8 +3046,8 @@ grammar Fortran
     "out" <T>
   end
 
-  rule t_pause
-    "pause" <T>
+  rule t_pad
+    "pad" <T>
   end
 
   rule t_parameter
@@ -3018,6 +3060,10 @@ grammar Fortran
 
   rule t_paren_r
     ")" <T>
+  end
+
+  rule t_pause
+    "pause" <T>
   end
 
   rule t_percent
@@ -3034,6 +3080,10 @@ grammar Fortran
 
   rule t_pointer_assign
     "=>" <T>
+  end
+
+  rule t_position
+    "position" <T>
   end
 
   rule t_print
@@ -3060,6 +3110,10 @@ grammar Fortran
     "real" <T>
   end
 
+  rule t_recl
+    "recl" <T>
+  end
+
   rule t_save
     "save" <T>
   end
@@ -3082,6 +3136,10 @@ grammar Fortran
 
   rule t_stat
     "stat" <T>
+  end
+
+  rule t_status
+    "status" <T>
   end
 
   rule t_stop
@@ -3111,6 +3169,10 @@ grammar Fortran
   rule t_underscore
     # R303
     "_"
+  end
+
+  rule t_unit
+    "unit" <T>
   end
 
   rule t_where
@@ -3263,70 +3325,10 @@ grammar Fortran
   end
 
 #PM#
-  rule t_close
-    "close" <T>
-  end
-
-  rule t_open
-    "open" <T>
-  end
-
-  rule t_unit
-    "unit" <T>
-  end
-
-  rule t_iostat
-    "iostat" <T>
-  end
-
-  rule t_err
-    "err" <T>
-  end
-
-  rule t_file
-    "file" <T>
-  end
-
-  rule t_status
-    "status" <T>
-  end
-
-  rule t_access
-    "access" <T>
-  end
-
-  rule t_form
-    "form" <T>
-  end
-
-  rule t_recl
-    "recl" <T>
-  end
-
-  rule t_blank
-    "blank" <T>
-  end
-
-  rule t_position
-    "position" <T>
-  end
-
-  rule t_action
-    "action" <T>
-  end
-
-  rule t_delim
-    "delim" <T>
-  end
-
-  rule t_pad
-    "pad" <T>
-  end
-
   rule open_stmt
     # R904
 
-    label:label? t_open t_paren_l connect_spec_list t_paren_r t_newline <StmtJ>
+    label:label? t_open t_paren_l connect_spec_list t_paren_r t_newline <StmtC>
   end
 
   rule connect_spec
@@ -3339,7 +3341,6 @@ grammar Fortran
     # in the ERR = specifier must be the statement label of a branch target
     # statement that appears in the same scoping unit as the OPEN statement.
 
-    ( t_unit t_equal )? external_file_unit <T> /
     t_iostat t_equal scalar_default_int_variable <T> /
     t_err t_equal label <T> /
     t_file t_equal file_name_expr <T> /
@@ -3351,7 +3352,12 @@ grammar Fortran
     t_position t_equal scalar_default_char_expr <T> /
     t_action t_equal scalar_default_char_expr <T> /
     t_delim t_equal scalar_default_char_expr <T> /
-    t_pad t_equal scalar_default_char_expr <T>
+    t_pad t_equal scalar_default_char_expr <T> /
+    ( t_unit t_equal )? external_file_unit <T>
+  end
+
+  rule connect_spec_list
+    connect_spec ( t_comma connect_spec )* <T>
   end
 
   rule file_name_expr
