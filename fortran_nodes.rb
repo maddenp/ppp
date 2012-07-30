@@ -20,7 +20,7 @@ module Fortran
   end
 
   def msg(s)
-    $stderr.write("### #{s}\n")
+    $stderr.write(">|#{s}|<\n")
   end
 
   def nonblock_do_end?(node)
@@ -440,6 +440,18 @@ module Fortran
   class Save_Stmt < T
     def to_s
       stmt("#{e1}#{e2}")
+    end
+  end
+
+  class Common_Stmt < T
+    def to_s
+      stmt("#{e1} #{e2}#{e3}#{e4}")
+    end
+  end
+
+  class Common_Block_Name_And_Object_List < T
+    def to_s
+      "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}#{e2}"
     end
   end
 

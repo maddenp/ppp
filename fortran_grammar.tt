@@ -2355,7 +2355,7 @@ grammar Fortran
 
     # access_stmt /
     allocatable_stmt /
-    # common_stmt /
+    common_stmt /
     data_stmt /
     dimension_stmt /
     # equivalence_stmt /
@@ -2963,19 +2963,19 @@ grammar Fortran
     # a common_block_object is of a derived type, it must be a sequence type
     # (4.4.1).
 
-    label:label? t_common common_block_name_triplet? common_block_object_list common_block_names_and_object_lists t_newline <StmtJ>
+    label:label? t_common common_block_name_triplet? common_block_object_list common_block_name_and_object_lists t_newline <Common_Stmt>
   end
 
   rule common_block_name_triplet
     t_slash common_block_name? t_slash <T>
   end
 
-  rule common_block_names_and_object_lists
-    common_block_name_and_object_list* <T>
+  rule common_block_name_and_object_lists
+    common_block_name_and_object_list* <E>
   end
 
   rule common_block_name_and_object_list
-    t_comma? common_block_name_triplet common_block_object_list <T>
+    t_comma? common_block_name_triplet common_block_object_list <Common_Block_Name_And_Object_List>
   end
 
   rule common_block_object
@@ -2985,27 +2985,35 @@ grammar Fortran
     # specification expression (7.1.6.2) If a variable_name appears with an
     # explicit_shape_spec_list, it must not have the POINTER attribute.
 
-    variable_name common_block_object_explicit_shape_list? <T>
+    variable_name common_block_object_explicit_shape_spec_list? <T>
   end
 
   rule common_block_object_list
-    common_block_object ( t_comma common_block_object )* <T>
+    common_block_object common_block_object_pairs <E>
   end
 
-  rule common_block_object_explicit_shape_list
+  rule common_block_object_pairs
+    common_block_object_pair* <E>
+  end
+
+  rule common_block_object_pair
+    t_comma common_block_object <E>
+  end
+
+  rule common_block_object_explicit_shape_spec_list
     parenthesized_explicit_shape_spec_list
   end
 
   rule parenthesized_allocate_shape_spec_list
-    t_paren_l allocate_shape_spec_list t_paren_r
+    t_paren_l allocate_shape_spec_list t_paren_r <T>
   end
 
   rule parenthesized_component_array_spec
-    t_paren_l component_array_spec t_paren_r
+    t_paren_l component_array_spec t_paren_r <T>
   end
 
   rule parenthesized_deferred_shape_spec_list
-    t_paren_l deferred_shape_spec_list t_paren_r
+    t_paren_l deferred_shape_spec_list t_paren_r <T>
   end
 
   rule parenthesized_explicit_shape_spec_list
@@ -3013,7 +3021,7 @@ grammar Fortran
   end
 
   rule parenthesized_section_subscript_list
-    t_paren_l section_subscript_list t_paren_r
+    t_paren_l section_subscript_list t_paren_r <T>
   end
 
 #PM#
