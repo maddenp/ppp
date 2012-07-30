@@ -85,7 +85,7 @@ grammar Fortran
     if_stmt /
     # inquire_stmt /
     nullify_stmt /
-    # open_stmt /
+    open_stmt /
     pointer_assignment_stmt /
     print_stmt /
     # read_stmt /
@@ -3263,6 +3263,145 @@ grammar Fortran
   end
 
 #PM#
+  rule t_close
+    "close" <T>
+  end
+
+  rule t_open
+    "open" <T>
+  end
+
+  rule t_unit
+    "unit" <T>
+  end
+
+  rule t_iostat
+    "iostat" <T>
+  end
+
+  rule t_err
+    "err" <T>
+  end
+
+  rule t_file
+    "file" <T>
+  end
+
+  rule t_status
+    "status" <T>
+  end
+
+  rule t_access
+    "access" <T>
+  end
+
+  rule t_form
+    "form" <T>
+  end
+
+  rule t_recl
+    "recl" <T>
+  end
+
+  rule t_blank
+    "blank" <T>
+  end
+
+  rule t_position
+    "position" <T>
+  end
+
+  rule t_action
+    "action" <T>
+  end
+
+  rule t_delim
+    "delim" <T>
+  end
+
+  rule t_pad
+    "pad" <T>
+  end
+
+  rule open_stmt
+    # R904
+
+    label:label? t_open t_paren_l connect_spec_list t_paren_r t_newline <StmtJ>
+  end
+
+  rule connect_spec
+    # R905
+    #
+    # Constraint: If the optional characters UNIT = are ommitted from the unit
+    # specifier, the unit specifier must be the first item in the
+    # connect_spec_list. Each specifier must not appear more than once in a
+    # given open_stmt; an external_file_unit must be specified. The label used
+    # in the ERR = specifier must be the statement label of a branch target
+    # statement that appears in the same scoping unit as the OPEN statement.
+
+    ( t_unit t_equal )? external_file_unit <T> /
+    t_iostat t_equal scalar_default_int_variable <T> /
+    t_err t_equal label <T> /
+    t_file t_equal file_name_expr <T> /
+    t_status t_equal scalar_default_char_expr <T> /
+    t_access t_equal scalar_default_char_expr <T> /
+    t_form t_equal scalar_default_char_expr <T> /
+    t_recl t_equal scalar_int_expr <T> /
+    t_blank t_equal scalar_default_char_expr <T> /
+    t_position t_equal scalar_default_char_expr <T> /
+    t_action t_equal scalar_default_char_expr <T> /
+    t_delim t_equal scalar_default_char_expr <T> /
+    t_pad t_equal scalar_default_char_expr <T>
+  end
+
+  rule file_name_expr
+    # R906
+
+    scalar_default_char_expr
+  end
+
+  rule scalar_default_char_expr
+    # Multiple uses (not explicitly defined)
+    #
+    # Note: Assumed constraint: default_char_expr is scalar.
+
+    default_char_expr
+  end
+
+  rule scalar_char_expr
+    # 8.1.3.1
+    #
+    # Note: Assumed constraint: char_expr is scalar.
+
+    char_expr  
+  end
+
+  rule io_unit
+    # R901
+
+    external_file_unit /
+    t_star /
+    internal_file_unit
+  end
+
+  rule external_file_unit
+    # R902
+
+    scalar_int_expr
+  end
+
+  rule internal_file_unit
+    # R903
+    #
+    # Constraint: The default_char_variable must not be an array section with a
+    # vector subscript.
+
+    default_char_variable
+  end
+
+#  rule close_stmt
+#  end
+
 #PM#
 
 end
