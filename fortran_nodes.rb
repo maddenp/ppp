@@ -374,6 +374,18 @@ module Fortran
     end
   end
 
+  class Namelist_Group_Set_Pair < T
+    def to_s
+      "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}"
+    end
+  end
+
+  class Namelist_Stmt < T
+    def to_s
+      stmt("#{e1} #{e2}#{e3}")
+    end
+  end
+
   class Nonlabel_Do_Stmt < T
     def to_s
       s=stmt("#{sa(e1)}#{e2}#{e3}")
