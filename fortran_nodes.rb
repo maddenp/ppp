@@ -161,6 +161,12 @@ module Fortran
     end
   end
 
+  class Call_Stmt < T
+    def to_s
+      stmt("#{e1} #{e2}#{e3}")
+    end
+  end
+  
   class Case_Stmt < T
     def to_s
       blockend
@@ -461,12 +467,6 @@ module Fortran
   end
 
   #PM#
-  class Call_Stmt < T
-    def to_s
-      stmt("#{e1} #{e2}#{e3}")
-    end
-  end
-  
   #PM#
 
 end

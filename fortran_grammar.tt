@@ -106,6 +106,38 @@ grammar Fortran
     label_do_stmt !{ |e| dolabel_dupe? } do_body do_term_action_stmt <E>
   end
 
+  rule actual_arg
+    # R1213
+    #
+    # Constraint: A procedure_name actual_arg must not be the name of an
+    # internal procedure or of a statement function and must not be the generic
+    # name of a procedure (12.3.2.1, 13.1).
+
+    expr /
+    variable /
+    procedure_name /
+    alt_return_spec
+  end
+
+  rule actual_arg_spec
+    # R1211
+    #
+    # Constraint: The keyword = must not appear if the interface of the
+    # procedure is implicit in the scoping unit. The keyword = may be omitted
+    # from an actual_arg_spec only if the keyword = has been omitted from each
+    # preceding actual_arg_spec in the argument list.
+
+    keyword_option actual_arg <T>
+  end
+
+  rule actual_arg_spec_list
+    actual_arg_spec ( t_comma actual_arg_spec )* <T>
+  end
+
+  rule actual_arg_spec_list_option
+    actual_arg_spec_list? <T>
+  end
+
   rule add_op
     # R710
 
@@ -209,6 +241,16 @@ grammar Fortran
     t_letter /
     t_digit /
     t_underscore
+  end
+
+  rule alt_return_spec
+    # R1214
+    #
+    # Constraint: The label used in the alt_return_spec must be the statement
+    # label of a branch target statement that appears in the same scoping unit
+    # as the call_stmt.
+
+    t_star label <T>
   end
 
   rule arithmetic_if_stmt
@@ -411,6 +453,13 @@ grammar Fortran
     binary_constant /
     octal_constant /
     hex_constant
+  end
+
+  rule call_stmt
+    # R1210
+
+    label:label? t_call subroutine_name parenthesized_args? t_newline
+      <Call_Stmt>
   end
 
   rule case_construct
@@ -1124,6 +1173,12 @@ grammar Fortran
     t_colon t_colon <T>
   end
 
+  rule dummy_arg_name
+    # Multiple uses (not explicitly defined)
+
+    name
+  end
+
   rule else_construct
     else_stmt block <E>
   end
@@ -1483,6 +1538,12 @@ grammar Fortran
     name
   end
 
+  rule function_reference
+    # R1209
+
+    function_name t_paren_l parenthesized_args t_paren_r <T>
+  end
+
   rule goto_stmt
     # R836
     #
@@ -1723,6 +1784,23 @@ grammar Fortran
 
   rule io_implied_do_object_list
     io_implied_do_object ( t_comma io_implied_do_object )* <T>
+  end
+
+  rule keyword
+    # R1212
+    #
+    # Constraint: Each keyword must be the name of a dummy argument in the
+    # explicit interface of the procedure.
+
+    dummy_arg_name
+  end
+
+  rule keyword_option
+    keyword_pair?
+  end
+
+  rule keyword_pair
+    keyword t_equal <T>
   end
 
   rule kind_pair
@@ -2089,6 +2167,10 @@ grammar Fortran
     t_paren_l allocate_shape_spec_list t_paren_r <T>
   end
 
+  rule parenthesized_args
+    t_paren_l actual_arg_spec_list_option t_paren_r <T>
+  end
+
   rule parenthesized_component_array_spec
     t_paren_l component_array_spec t_paren_r <T>
   end
@@ -2201,6 +2283,12 @@ grammar Fortran
 
   rule private_sequence_stmts
     private_sequence_stmt* <E>
+  end
+
+  rule procedure_name
+    # 12.4.1
+
+    name
   end
 
   rule program_name
@@ -2607,6 +2695,12 @@ grammar Fortran
     type_name t_paren_l expr_list t_paren_r <E>
   end
 
+  rule subroutine_name
+    # Multiple uses (not explicitly defined)
+
+    name
+  end
+
   rule subscript
     # R617
 
@@ -2665,6 +2759,10 @@ grammar Fortran
 
   rule t_binary
     [01] <T>
+  end
+
+  rule t_call
+    "call" <T>
   end
 
   rule t_case
@@ -3118,104 +3216,6 @@ grammar Fortran
   end
 
 #PM#
-  rule t_call
-    "call" <T>
-  end
-
-  rule call_stmt
-    # R1210
-
-    label:label? t_call subroutine_name parenthesized_args? t_newline
-      <Call_Stmt>
-  end
-
-  rule subroutine_name
-    # Multiple uses (not explicitly defined)
-
-    name
-  end
-
-  rule parenthesized_args
-    t_paren_l actual_arg_spec_list_option t_paren_r <T>
-  end
-
-  rule actual_arg_spec_list_option
-    actual_arg_spec_list? <T>
-  end
-
-  rule actual_arg_spec_list
-    actual_arg_spec ( t_comma actual_arg_spec )* <T>
-  end
-
-  rule actual_arg_spec
-    # R1211
-    #
-    # Constraint: The keyword = must not appear if the interface of the
-    # procedure is implicit in the scoping unit. The keyword = may be omitted
-    # from an actual_arg_spec only if the keyword = has been omitted from each
-    # preceding actual_arg_spec in the argument list.
-
-    keyword_option actual_arg <T>
-  end
-
-  rule keyword_option
-    keyword_pair?
-  end
-
-  rule keyword_pair
-    keyword t_equal <T>
-  end
-
-  rule keyword
-    # R1212
-    #
-    # Constraint: Each keyword must be the name of a dummy argument in the
-    # explicit interface of the procedure.
-
-    dummy_arg_name
-  end
-
-  rule dummy_arg_name
-    # Multiple uses (not explicitly defined)
-
-    name
-  end
-
-  rule actual_arg
-    # R1213
-    #
-    # Constraint: A procedure_name actual_arg must not be the name of an
-    # internal procedure or of a statement function and must not be the generic
-    # name of a procedure (12.3.2.1, 13.1).
-
-    expr /
-    variable /
-    procedure_name /
-    alt_return_spec
-  end
-
-  rule procedure_name
-    # 12.4.1
-
-    name
-  end
-
-  rule alt_return_spec
-    # R1214
-    #
-    # Constraint: The label used in the alt_return_spec must be the statement
-    # label of a branch target statement that appears in the same scoping unit
-    # as the call_stmt.
-
-    t_star label <T>
-  end
-
-  rule function_reference
-    # R1209
-
-    function_name t_paren_l parenthesized_args t_paren_r <T>
-  end
-
 #PM#
 
 end
