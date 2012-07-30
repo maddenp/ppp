@@ -170,6 +170,18 @@ module Fortran
     end
   end
   
+  class Common_Block_Name_And_Object_List < T
+    def to_s
+      "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}#{e2}"
+    end
+  end
+
+  class Common_Stmt < T
+    def to_s
+      stmt("#{e1} #{e2}#{e3}#{e4}")
+    end
+  end
+
   class Component_Def_Stmt < T
     def to_s
       stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
@@ -390,6 +402,18 @@ module Fortran
     end
   end
 
+  class Save_Stmt < T
+    def to_s
+      stmt("#{e1}#{e2}")
+    end
+  end
+
+  class Save_Stmt_Entity_List < T
+    def to_s
+      "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}"
+    end
+  end
+  
   class Select_Case_Stmt < T
     def to_s
       s=stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}")
@@ -437,30 +461,6 @@ module Fortran
   end
 
   #PM#
-  class Save_Stmt < T
-    def to_s
-      stmt("#{e1}#{e2}")
-    end
-  end
-
-  class Common_Stmt < T
-    def to_s
-      stmt("#{e1} #{e2}#{e3}#{e4}")
-    end
-  end
-
-  class Common_Block_Name_And_Object_List < T
-    def to_s
-      "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}#{e2}"
-    end
-  end
-
-  class Save_Stmt_Entity_List < T
-    def to_s
-      "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}"
-    end
-  end
-  
   #PM#
 
 end

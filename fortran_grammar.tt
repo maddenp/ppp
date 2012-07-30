@@ -568,6 +568,65 @@ grammar Fortran
     special_character
   end
 
+  rule common_block_name
+    # Multiple uses (not explicitly defined)
+
+    name
+  end
+
+  rule common_block_name_and_object_list
+    t_comma? common_block_name_triplet common_block_object_list
+      <Common_Block_Name_And_Object_List>
+  end
+
+  rule common_block_name_and_object_lists
+    common_block_name_and_object_list* <E>
+  end
+
+  rule common_block_name_triplet
+    t_slash common_block_name? t_slash <T>
+  end
+
+  rule common_block_object
+    # R549
+    #
+    # Constraint: Each bound in the explicit_shape_list must be a constant
+    # specification expression (7.1.6.2) If a variable_name appears with an
+    # explicit_shape_spec_list, it must not have the POINTER attribute.
+
+    variable_name common_block_object_explicit_shape_spec_list? <T>
+  end
+
+  rule common_block_object_explicit_shape_spec_list
+    parenthesized_explicit_shape_spec_list
+  end
+
+  rule common_block_object_list
+    common_block_object common_block_object_pairs <E>
+  end
+
+  rule common_block_object_pair
+    t_comma common_block_object <E>
+  end
+
+  rule common_block_object_pairs
+    common_block_object_pair* <E>
+  end
+
+  rule common_stmt
+    # R548
+    #
+    # Constraint: Only one appearance of a given variable_name is permitted in
+    # all common_block_object_lists withing a scoping unit. A
+    # common_block_object must not be a dummy argument, an allocatable array,
+    # an automatic object, a function name, an entry name, or a result name. If
+    # a common_block_object is of a derived type, it must be a sequence type
+    # (4.4.1).
+
+    label:label? t_common common_block_name_triplet? common_block_object_list
+      common_block_name_and_object_lists t_newline <Common_Stmt>
+  end
+
   rule complex_literal_constant
     # R417
 
@@ -1938,8 +1997,28 @@ grammar Fortran
     scalar_constant
   end
 
+  rule parenthesized_allocate_shape_spec_list
+    t_paren_l allocate_shape_spec_list t_paren_r <T>
+  end
+
+  rule parenthesized_component_array_spec
+    t_paren_l component_array_spec t_paren_r <T>
+  end
+
+  rule parenthesized_deferred_shape_spec_list
+    t_paren_l deferred_shape_spec_list t_paren_r <T>
+  end
+
+  rule parenthesized_explicit_shape_spec_list
+    t_paren_l explicit_shape_spec_list t_paren_r <T>
+  end
+
   rule parenthesized_expr
     t_paren_l expr t_paren_r <T>
+  end
+
+  rule parenthesized_section_subscript_list
+    t_paren_l section_subscript_list t_paren_r <T>
   end
 
   rule part_name
@@ -2129,6 +2208,35 @@ grammar Fortran
     # character set in free source form.
 
     character
+  end
+
+  rule save_stmt
+    # R523
+    #
+    # Constraint: If a SAVE statement with an omitted saved entity list occurs
+    # in a scoping unit, no other explicit occurrence of the SAVE attribute or
+    # SAVE statement is permitted in the same scoping unit.
+
+    label:label? t_save save_stmt_entity_list? t_newline <Save_Stmt>
+  end
+
+  rule save_stmt_entity_list
+    double_colon? saved_entity_list <Save_Stmt_Entity_List>
+  end
+
+  rule saved_entity
+    # R524
+    #
+    # Constraint: An object_name must not be a dummy argument name, a procedure
+    # name, a function result name, an automatic data object name, or the name
+    # of an entity in a common block.
+
+    object_name /
+    t_slash common_block_name t_slash <E>
+  end
+
+  rule saved_entity_list
+    saved_entity ( t_comma saved_entity )* <T>
   end
 
   rule scalar_char_constant
@@ -2485,6 +2593,10 @@ grammar Fortran
 
   rule t_comma
     "," <T>
+  end
+
+  rule t_common
+    "common" <T>
   end
 
   rule t_complex
@@ -2914,116 +3026,6 @@ grammar Fortran
   end
 
 #PM#
-  rule save_stmt
-    # R523
-    #
-    # Constraint: If a SAVE statement with an omitted saved entity list occurs
-    # in a scoping unit, no other explicit occurrence of the SAVE attribute or
-    # SAVE statement is permitted in the same scoping unit.
-
-    label:label? t_save save_stmt_entity_list? t_newline <Save_Stmt>
-  end
-
-  rule save_stmt_entity_list
-    double_colon? saved_entity_list <Save_Stmt_Entity_List>
-  end
-
-  rule saved_entity
-    # R524
-    #
-    # Constraint: An object_name must not be a dummy argument name, a procedure
-    # name, a function result name, an automatic data object name, or the name
-    # of an entity in a common block.
-
-    object_name /
-    t_slash common_block_name t_slash <E>
-  end
-
-  rule saved_entity_list
-    saved_entity ( t_comma saved_entity )* <T>
-  end
-
-  rule common_block_name
-    # Multiple uses (not explicitly defined)
-
-    name
-  end
-
-  rule t_common
-    "common" <T>
-  end
-
-  rule common_stmt
-    # R548
-    #
-    # Constraint: Only one appearance of a given variable_name is permitted in
-    # all common_block_object_lists withing a scoping unit. A
-    # common_block_object must not be a dummy argument, an allocatable array,
-    # an automatic object, a function name, an entry name, or a result name. If
-    # a common_block_object is of a derived type, it must be a sequence type
-    # (4.4.1).
-
-    label:label? t_common common_block_name_triplet? common_block_object_list common_block_name_and_object_lists t_newline <Common_Stmt>
-  end
-
-  rule common_block_name_triplet
-    t_slash common_block_name? t_slash <T>
-  end
-
-  rule common_block_name_and_object_lists
-    common_block_name_and_object_list* <E>
-  end
-
-  rule common_block_name_and_object_list
-    t_comma? common_block_name_triplet common_block_object_list <Common_Block_Name_And_Object_List>
-  end
-
-  rule common_block_object
-    # R549
-    #
-    # Constraint: Each bound in the explicit_shape_list must be a constant
-    # specification expression (7.1.6.2) If a variable_name appears with an
-    # explicit_shape_spec_list, it must not have the POINTER attribute.
-
-    variable_name common_block_object_explicit_shape_spec_list? <T>
-  end
-
-  rule common_block_object_list
-    common_block_object common_block_object_pairs <E>
-  end
-
-  rule common_block_object_pairs
-    common_block_object_pair* <E>
-  end
-
-  rule common_block_object_pair
-    t_comma common_block_object <E>
-  end
-
-  rule common_block_object_explicit_shape_spec_list
-    parenthesized_explicit_shape_spec_list
-  end
-
-  rule parenthesized_allocate_shape_spec_list
-    t_paren_l allocate_shape_spec_list t_paren_r <T>
-  end
-
-  rule parenthesized_component_array_spec
-    t_paren_l component_array_spec t_paren_r <T>
-  end
-
-  rule parenthesized_deferred_shape_spec_list
-    t_paren_l deferred_shape_spec_list t_paren_r <T>
-  end
-
-  rule parenthesized_explicit_shape_spec_list
-    t_paren_l explicit_shape_spec_list t_paren_r <T>
-  end
-
-  rule parenthesized_section_subscript_list
-    t_paren_l section_subscript_list t_paren_r <T>
-  end
-
 #PM#
 
 end
