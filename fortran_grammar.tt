@@ -1421,6 +1421,22 @@ grammar Fortran
     expr ( t_comma expr )* <E>
   end
 
+  rule external_name
+    # 12.3.2.2
+
+    name
+  end
+
+  rule external_name_list
+    external_name ( t_comma external_name )* <T>
+  end
+
+  rule external_stmt
+    # R1207
+
+    label:label? t_external external_name_list t_newline <StmtJ>
+  end
+
   rule format
     # R913
     #
@@ -2531,7 +2547,7 @@ grammar Fortran
     data_stmt /
     dimension_stmt /
     equivalence_stmt /
-    # external_stmt /
+    external_stmt /
     # intent_stmt /
     intrinsic_stmt /
     # namelist_stmt /
