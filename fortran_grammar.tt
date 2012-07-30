@@ -1,3 +1,10 @@
+# TODOs
+#
+# - rule primary cannot tell the difference between function and array
+#   references. Since variable -> subobject -> ( array_section / array_element )
+#   precedes function_reference, the latter is recognized as the former. This
+#   needs to be fixed with environment analysis.
+
 # NOTES: Grammar rule numbers or section numbers from the Fortran 90 standard
 # document are given when possible. Grammar rule names used here match those
 # from the standard document, with underscores in place of hyphens. Some left-
@@ -2162,7 +2169,7 @@ grammar Fortran
   end
 
   rule primary
-    # R701 -- INCOMPLETE
+    # R701
     #
     # Constraint: subobject must be a subobject whose parent is a constant. A
     # variable that is a primary must not be an assumed-size array.
@@ -2172,7 +2179,7 @@ grammar Fortran
     constant_subobject /
     array_constructor /
     structure_constructor /
-    # function_reference /
+    function_reference /
     parenthesized_expr
   end
 
@@ -3202,7 +3209,13 @@ grammar Fortran
 
     t_star label <T>
   end
-  
+
+  rule function_reference
+    # R1209
+
+    function_name t_paren_l parenthesized_args t_paren_r <T>
+  end
+
 #PM#
 
 end
