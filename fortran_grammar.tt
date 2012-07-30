@@ -63,7 +63,7 @@ grammar Fortran
     allocate_stmt /
     assignment_stmt /
     # backspace_stmt /
-    # call_stmt /
+    call_stmt /
     # close_stmt /
     computed_goto_stmt /
     continue_stmt /
@@ -1920,6 +1920,7 @@ grammar Fortran
     # Constraint: In a main_program, the execution_part must not contain a
     # RETURN statement or an ENTRY statement.
 
+#    program_stmt? specification_part? execution_part? internal_subprogram_part? end_program_stmt <E>
     program_stmt? specification_part? execution_part? end_program_stmt <E>
   end
 
@@ -3110,6 +3111,98 @@ grammar Fortran
   end
 
 #PM#
+  rule t_call
+    "call" <T>
+  end
+
+  rule call_stmt
+    # R1210
+
+    label:label? t_call subroutine_name parenthesized_args? t_newline
+      <Call_Stmt>
+  end
+
+  rule subroutine_name
+    # Multiple uses (not explicitly defined)
+
+    name
+  end
+
+  rule parenthesized_args
+    t_paren_l actual_arg_spec_list_option t_paren_r <T>
+  end
+
+  rule actual_arg_spec_list_option
+    actual_arg_spec_list? <T>
+  end
+
+  rule actual_arg_spec_list
+    actual_arg_spec ( t_comma actual_arg_spec )* <T>
+  end
+
+  rule actual_arg_spec
+    # R1211
+    #
+    # Constraint: The keyword = must not appear if the interface of the
+    # procedure is implicit in the scoping unit. The keyword = may be omitted
+    # from an actual_arg_spec only if the keyword = has been omitted from each
+    # preceding actual_arg_spec in the argument list.
+
+    keyword_option actual_arg <T>
+  end
+
+  rule keyword_option
+    keyword_pair?
+  end
+
+  rule keyword_pair
+    keyword t_equal <T>
+  end
+
+  rule keyword
+    # R1212
+    #
+    # Constraint: Each keyword must be the name of a dummy argument in the
+    # explicit interface of the procedure.
+
+    dummy_arg_name
+  end
+
+  rule dummy_arg_name
+    # Multiple uses (not explicitly defined)
+
+    name
+  end
+
+  rule actual_arg
+    # R1213
+    #
+    # Constraint: A procedure_name actual_arg must not be the name of an
+    # internal procedure or of a statement function and must not be the generic
+    # name of a procedure (12.3.2.1, 13.1).
+
+    expr /
+    variable /
+    procedure_name /
+    alt_return_spec
+  end
+
+  rule procedure_name
+    # 12.4.1
+
+    name
+  end
+
+  rule alt_return_spec
+    # R1214
+    #
+    # Constraint: The label used in the alt_return_spec must be the statement
+    # label of a branch target statement that appears in the same scoping unit
+    # as the call_stmt.
+
+    t_star label <T>
+  end
+  
 #PM#
 
 end
