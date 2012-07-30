@@ -315,6 +315,12 @@ module Fortran
     end
   end
 
+  class Equivalence_Stmt < T
+    def to_s
+      stmt("#{e1} #{e2}")
+    end
+  end
+  
   class If_Stmt < T
     def to_s
       stmt("#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")

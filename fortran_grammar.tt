@@ -1283,6 +1283,54 @@ grammar Fortran
     not_op? level_4_expr <T>
   end
 
+  rule equivalence_object
+    # R547
+    #
+    # Constraint: An equivalence_object must not be a dummy argument, a pointer,
+    # an allocatable array, an object of a nonsequence derived type or of a
+    # sequence derived type containing a pointer at any level of component
+    # selection, an automatic object, a function name, an entry name, a result
+    # name, a named constant, a structure component, or a subobject of any of
+    # the preceding objects. Each subscript or substring range expression in an
+    # equivalence_object must be an integer initialization expression (7.1.6.1).
+    # If an equivalence_object is of type default integer, default real, double
+    # precision real, default complex, default logical, or numeric sequence
+    # type, all of the objects in the equivalence set must be of these types. If
+    # an equivalence_object is of type default character or character sequence
+    # type, all of the objects in the equivalence set must be of these types. If
+    # an equivalence_object is of a derived type that is not a numeric sequence
+    # or character sequence type, all of the objects in the equivalence set must
+    # be of the same type. If an equivalence_object is of an intrinsic type
+    # other than default integer, default real, double precision real, default
+    # complex, default logical, or default character, all of the objects in the
+    # equivalence set must be of the same type with the same kind type parameter
+    # value.
+
+    substring /
+    array_element /
+    variable_name
+  end
+
+  rule equivalence_object_list
+    equivalence_object ( t_comma equivalence_object )? <T>
+  end
+
+  rule equivalence_set
+    # R546
+
+    t_paren_l equivalence_object t_comma equivalence_object_list t_paren_r <T>
+  end
+
+  rule equivalence_set_list
+    equivalence_set ( t_comma equivalence_set )* <T>
+  end
+
+  rule equivalence_stmt
+    # R545
+
+    label:label? t_equivalence equivalence_set_list t_newline <Equivalence_Stmt>
+  end
+
   rule executable_construct
     # R215
 
@@ -2466,7 +2514,7 @@ grammar Fortran
     common_stmt /
     data_stmt /
     dimension_stmt /
-    # equivalence_stmt /
+    equivalence_stmt /
     # external_stmt /
     # intent_stmt /
     # intrinsic_stmt /
@@ -2673,6 +2721,10 @@ grammar Fortran
 
   rule t_equal
     "=" <T>
+  end
+
+  rule t_equivalence
+    "equivalence" <T>
   end
 
   rule t_exit
