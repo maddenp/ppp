@@ -73,7 +73,7 @@ grammar Fortran
     assignment_stmt /
     # backspace_stmt /
     call_stmt /
-    # close_stmt /
+    close_stmt /
     computed_goto_stmt /
     continue_stmt /
     cycle_stmt /
@@ -3334,7 +3334,7 @@ grammar Fortran
   rule connect_spec
     # R905
     #
-    # Constraint: If the optional characters UNIT = are ommitted from the unit
+    # Constraint: If the optional characters UNIT = are omitted from the unit
     # specifier, the unit specifier must be the first item in the
     # connect_spec_list. Each specifier must not appear more than once in a
     # given open_stmt; an external_file_unit must be specified. The label used
@@ -3405,9 +3405,32 @@ grammar Fortran
     default_char_variable
   end
 
-#  rule close_stmt
-#  end
+  rule close_stmt
+    # R907
 
+    label:label? t_close t_paren_l close_spec_list t_paren_r t_newline <StmtC>
+  end
+
+  rule close_spec
+    # R908
+    #
+    # Constraint: If the optional characters UNIT = are omitted from the unit
+    # specifier, the unit specifier must be the first item in the
+    # close_spec_list. Each specifier must not appear more than once in a given
+    # close_stmt; an external_file_unit must be specified. The label used in the
+    # ERR = specifier must be the statement label of a branch target statement
+    # that appears in the same scoping unit as the CLOSE statement.
+
+    t_iostat t_equal scalar_default_int_variable <T> /
+    t_err t_equal label <T> /
+    t_status t_equal scalar_default_char_expr <T> /
+    ( t_unit t_equal )? external_file_unit <T>
+  end
+
+  rule close_spec_list
+    close_spec ( t_comma close_spec )* <T>
+  end
+    
 #PM#
 
 end
