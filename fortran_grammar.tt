@@ -2646,7 +2646,7 @@ grammar Fortran
     external_stmt /
     # intent_stmt /
     intrinsic_stmt /
-    # namelist_stmt /
+    namelist_stmt /
     # optional_stmt /
     pointer_stmt /
     save_stmt /
@@ -3216,6 +3216,52 @@ grammar Fortran
   end
 
 #PM#
+  rule t_namelist
+    "namelist" <T>
+  end
+
+  rule namelist_stmt
+    # R543
+
+    label:label t_namelist namelist_group_set namelist_group_sets t_newline <StmtJ>
+  end
+
+  rule namelist_group_set
+    t_slash namelist_group_name t_slash namelist_group_object_list <T>
+  end
+
+  rule namelist_group_sets
+    namelist_group_set_pair* <T>
+  end
+
+  rule namelist_group_set_pair
+    t_comma? namelist_group_set <T>
+  end
+
+  rule namelist_group_name
+    # Multiple uses (not explicitly defined)
+    #
+    # Constraint: If a namelist_group_name has the PUBLIC attribute, no item in
+    # the namelist_group_object_list may have the PRIVATE attribute.
+
+    name
+  end
+
+  rule namelist_group_object
+    # R544
+    #
+    # Constraint: A namelist_group_object must not be an array dummy argument
+    # with a nonconstant bound, a variable with nonconstant character length, an
+    # automatic object, a pointer, a variable of a type that has an ultimate
+    # component that is a pointer, or an allocatable array.
+
+    variable_name
+  end
+
+  rule namelist_group_object_list
+    namelist_group_object ( t_comma namelist_group_object )* <T>
+  end
+
 #PM#
 
 end
