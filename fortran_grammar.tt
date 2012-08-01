@@ -427,6 +427,14 @@ grammar Fortran
     double_colon
   end
 
+  rule backspace_stmt
+    # R919
+
+    label:label? t_backspace t_paren_l position_spec_list t_paren_r t_newline
+      <StmtC> /
+    label:label? t_backspace external_file_unit t_newline <StmtJ>
+  end
+
   rule binary_constant
     # R408
     #
@@ -1335,6 +1343,14 @@ grammar Fortran
     # R743
 
     label:label? t_endwhere t_newline <End_Where_Stmt>
+  end
+
+  rule endfile_stmt
+    # R920
+
+    label:label? t_endfile t_paren_l position_spec_list t_paren_r t_newline
+      <StmtC> /
+    label:label? t_endfile external_file_unit t_newline <StmtJ>
   end
 
   rule entity_decl
@@ -3035,6 +3051,10 @@ grammar Fortran
     "assign" <T>
   end
 
+  rule t_backspace
+    "backspace" <T>
+  end
+
   rule t_binary
     [01] <T>
   end
@@ -3135,12 +3155,16 @@ grammar Fortran
     "end" !"file" <T>
   end
 
-  rule t_endif
-    "endif" <T>
-  end
-
   rule t_enddo
     "enddo" <T>
+  end
+
+  rule t_endfile
+    "endfile" <T>
+  end
+
+  rule t_endif
+    "endif" <T>
   end
 
   rule t_endwhere
@@ -3589,30 +3613,6 @@ grammar Fortran
   end
 
 #PM#
-  rule t_backspace
-    "backspace" <T>
-  end
-
-  rule t_endfile
-    "endfile" <T>
-  end
-
-  rule backspace_stmt
-    # R919
-
-    label:label? t_backspace t_paren_l position_spec_list t_paren_r t_newline
-      <StmtC> /
-    label:label? t_backspace external_file_unit t_newline <StmtJ>
-  end
-
-  rule endfile_stmt
-    # R920
-
-    label:label? t_endfile t_paren_l position_spec_list t_paren_r t_newline
-      <StmtC> /
-    label:label? t_endfile external_file_unit t_newline <StmtJ>
-  end
-
 #PM#
 
 end
