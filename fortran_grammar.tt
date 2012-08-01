@@ -80,7 +80,7 @@ grammar Fortran
     continue_stmt /
     cycle_stmt /
     deallocate_stmt /
-    # endfile_stmt /
+    endfile_stmt /
     # end_function_stmt /
     end_program_stmt /
     # end_subroutine_stmt /
@@ -3132,7 +3132,7 @@ grammar Fortran
   end
 
   rule t_end
-    "end" <T>
+    "end" !"file" <T>
   end
 
   rule t_endif
