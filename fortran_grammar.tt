@@ -94,7 +94,7 @@ grammar Fortran
     print_stmt /
     read_stmt /
     # return_stmt /
-    # rewind_stmt /
+    rewind_stmt /
     stop_stmt /
     where_stmt /
     write_stmt /
@@ -2447,6 +2447,27 @@ grammar Fortran
       <Pointer_Stmt>
   end
 
+  rule position_spec
+    # R922
+    #
+    # Constraint: The label in the ERR= specifier must be the statement label
+    # of a branch target statement that appears in the same scoping unit as the
+    # file positioning statement. If the optional characters UNIT= are omitted
+    # from the unit specifier, the unit specifier must be the first item in the
+    # position_spec_list. A position_spec_list must contain exactly one
+    # external_file_unit and may contain at most one of each of the other
+    # specifiers.
+
+    external_file_unit &t_comma <T> /
+    t_unit t_equal external_file_unit <T> /
+    t_iostat t_equal scalar_default_int_variable <T> /
+    t_err t_equal label
+  end
+
+  rule position_spec_list
+    position_spec ( t_comma position_spec )* <T>
+  end
+
   rule power_op
     # R708
 
@@ -2605,6 +2626,14 @@ grammar Fortran
     # character set in free source form.
 
     character
+  end
+
+  rule rewind_stmt
+    # R921
+
+    label:label? t_rewind t_paren_l position_spec_list t_paren_r t_newline
+      <Rewind_Stmt> /
+    label:label? t_rewind external_file_unit t_newline <StmtJ>
   end
 
   rule save_stmt
@@ -3328,6 +3357,10 @@ grammar Fortran
 
   rule t_recl
     "recl" <T>
+  end
+
+  rule t_rewind
+    "rewind" <T>
   end
 
   rule t_save

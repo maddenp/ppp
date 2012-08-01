@@ -432,6 +432,12 @@ module Fortran
     end
   end
 
+  class Rewind_Stmt < T
+    def to_s
+      stmt("#{e1} #{e2}#{e3}#{e4}")
+    end
+  end
+  
   class Save_Stmt < T
     def to_s
       stmt("#{e1}#{e2}")
