@@ -73,7 +73,7 @@ grammar Fortran
 
     allocate_stmt /
     assignment_stmt /
-    # backspace_stmt /
+    backspace_stmt /
     call_stmt /
     close_stmt /
     computed_goto_stmt /
@@ -2632,7 +2632,7 @@ grammar Fortran
     # R921
 
     label:label? t_rewind t_paren_l position_spec_list t_paren_r t_newline
-      <Rewind_Stmt> /
+      <StmtC> /
     label:label? t_rewind external_file_unit t_newline <StmtJ>
   end
 
@@ -3589,6 +3589,30 @@ grammar Fortran
   end
 
 #PM#
+  rule t_backspace
+    "backspace" <T>
+  end
+
+  rule t_endfile
+    "endfile" <T>
+  end
+
+  rule backspace_stmt
+    # R919
+
+    label:label? t_backspace t_paren_l position_spec_list t_paren_r t_newline
+      <StmtC> /
+    label:label? t_backspace external_file_unit t_newline <StmtJ>
+  end
+
+  rule endfile_stmt
+    # R920
+
+    label:label? t_endfile t_paren_l position_spec_list t_paren_r t_newline
+      <StmtC> /
+    label:label? t_endfile external_file_unit t_newline <StmtJ>
+  end
+
 #PM#
 
 end
