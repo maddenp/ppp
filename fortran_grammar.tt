@@ -2799,6 +2799,10 @@ grammar Fortran
     "action" <T>
   end
 
+  rule t_advance
+    "advance" <T>
+  end
+
   rule t_allocatable
     "allocatable" <T>
   end
@@ -2927,6 +2931,10 @@ grammar Fortran
     "endwhere" <T>
   end
 
+  rule t_eor
+    "eor" <T>
+  end
+
   rule t_equal
     "=" <T>
   end
@@ -2953,6 +2961,10 @@ grammar Fortran
 
   rule t_file
     "file" <T>
+  end
+
+  rule t_fmt
+    "fmt" <T>
   end
 
   rule t_form
@@ -3025,6 +3037,10 @@ grammar Fortran
 
   rule t_newline
     "\n" <T>
+  end
+
+  rule t_nml
+    "nml" <T>
   end
 
   rule t_none
@@ -3111,8 +3127,16 @@ grammar Fortran
     "\"" <T>
   end
 
+  rule t_read
+    "read" <T>
+  end
+
   rule t_real
     "real" <T>
+  end
+
+  rule t_rec
+    "rec" <T>
   end
 
   rule t_recl
@@ -3129,6 +3153,10 @@ grammar Fortran
 
   rule t_sequence
     "sequence" <T>
+  end
+
+  rule t_size
+    "size" <T>
   end
 
   rule t_slash
@@ -3186,6 +3214,10 @@ grammar Fortran
 
   rule t_while
     "while" <T>
+  end
+
+  rule t_write
+    "write" <T>
   end
 
   rule target
@@ -3436,43 +3468,54 @@ grammar Fortran
     close_spec ( t_comma close_spec )* <T>
   end
 
-  rule t_read
-    "read" <T>
+  rule read_stmt
+    # R909
+
+    label:label? t_read t_paren_l io_control_spec_list t_paren_r input_item_list? t_newline <StmtJ> /
+    label:label? t_read format ( t_comma input_item_list )? t_newline <StmtJ>
   end
 
-  rule t_write
-    "write" <T>
+  rule write_stmt
+    # R910
+
+    label:label? t_write t_paren_l io_control_spec_list t_paren_r output_item_list? t_newline <StmtJ>
   end
 
-#  rule read_stmt
-#    # R909
-#
-#    label:label? t_read t_paren_l io_control_spec_list t_paren_r input_item_list? t_newline <StmtJ> /
-#    label:label? t_read format ( t_comma input_item_list )? t_newline <StmtJ>
-#  end
-#
-#  rule write_stmt
-#    # R910
-#
-#    label:label? t_write t_paren_l io_control_spec_list t_paren_r output_item_list? t_newline <StmtJ>
-#  end
-#
-#  rule input_item
-#    # R914
-#
-#    variable /
-#    io_implied_do
-#  end
-#
-#  rule intput_item_list
-#    # 9.4.2
-#    #
-#    # Constraint: In an input_item_list, an io_implied_do_object must be an
-#    # input_item.
-#
-#    input_item ( t_comma input_item )* <E>
-#  end
-#
+  rule input_item
+    # R914
+
+    variable /
+    io_implied_do
+  end
+
+  rule intput_item_list
+    # 9.4.2
+    #
+    # Constraint: In an input_item_list, an io_implied_do_object must be an
+    # input_item.
+
+    input_item ( t_comma input_item )* <E>
+  end
+
+  rule io_control_spec
+    # R912
+
+    ( t_unit t_equal )? io_unit /
+    ( t_fmt t_equal )? format /
+    ( t_nml t_equal )? namelist_group_name /
+    t_rec t_equal scalar_int_expr /
+    t_iostat t_equal scalar_default_int_variable /
+    t_err t_equal label /
+    t_end t_equal label /
+    t_advance t_equal scalar_default_char_expr /
+    t_size t_equal scalar_default_int_variable /
+    t_eor t_equal label
+  end
+
+  rule io_control_spec_list
+    io_control_spec ( t_comma io_control_spec )* <E>
+  end
+
 #PM#
 
 end
