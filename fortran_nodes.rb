@@ -479,6 +479,18 @@ module Fortran
   end
 
   #PM#
+  class Read_Stmt_1 < T
+    def to_s
+      stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5.to_s)}")
+    end
+  end
+
+  class Read_Stmt_2 < T
+    def to_s
+      stmt("#{e1} #{e2}#{e3}")
+    end
+  end
+  
   #PM#
 
 end
