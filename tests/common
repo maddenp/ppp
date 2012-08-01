@@ -6,6 +6,7 @@ PPP=../../ppp
 STEM=$(basename $(TEST))
 TARGETS=bin clean control translation
 TEST=$(wildcard t.f t.f90)
+TMPFILE=tmpfile
 TRANSLATION=$(STEM)_ppp$(EXT)
 
 .PHONY: control
@@ -16,7 +17,7 @@ default:
 bin: $(BIN)
 
 clean:
-	$(RM) $(TRANSLATION) $(BIN)
+	$(RM) $(BIN) $(TMPFILE) $(TRANSLATION)
 
 control: $(TEST)
 ifdef MAKE_CONTROL_DISABLED

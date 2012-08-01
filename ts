@@ -30,7 +30,7 @@ tests.each do |test|
   print '.'
   exe("make -C #{test} clean")
   exe("make -C #{test} bin")
-  stdout=exe(File.join(test,'a.out'))
+  stdout=exe("cd #{test} && ./a.out")
   control=File.open(File.join(test,'control'),"rb").read
   unless stdout==control
     msg="#{test} output expected:\n--begin--\n"

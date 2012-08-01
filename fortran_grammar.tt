@@ -3484,7 +3484,7 @@ grammar Fortran
   rule write_stmt
     # R910
 
-    label:label? t_write t_paren_l io_control_spec_list t_paren_r output_item_list? t_newline <StmtJ>
+    label:label? t_write t_paren_l io_control_spec_list t_paren_r output_item_list? t_newline <Write_Stmt>
   end
 
   rule input_item

@@ -490,6 +490,12 @@ module Fortran
       stmt("#{e1} #{e2}#{e3}")
     end
   end
+
+  class Write_Stmt < T
+    def to_s
+      stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5.to_s)}")
+    end
+  end
   
   #PM#
 
