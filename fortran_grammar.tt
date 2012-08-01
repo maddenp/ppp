@@ -2187,7 +2187,7 @@ grammar Fortran
     # Constraint: In an output_item_list, an io_implied_do_object must be an
     # output_item.
 
-    ( t_comma output_item )+ <T>
+    output_item ( t_comma output_item )* <E>
   end
 
   rule parameter_stmt
@@ -2313,7 +2313,12 @@ grammar Fortran
   rule print_stmt
     # R911
 
-    label:label? t_print format output_item_list? t_newline <Print_Stmt>
+    label:label? t_print format print_stmt_output_item_list? t_newline
+      <Print_Stmt>
+  end
+
+  rule print_stmt_output_item_list
+    t_comma output_item_list <T>
   end
 
   rule private_sequence_stmt
@@ -3430,7 +3435,44 @@ grammar Fortran
   rule close_spec_list
     close_spec ( t_comma close_spec )* <T>
   end
-    
+
+  rule t_read
+    "read" <T>
+  end
+
+  rule t_write
+    "write" <T>
+  end
+
+#  rule read_stmt
+#    # R909
+#
+#    label:label? t_read t_paren_l io_control_spec_list t_paren_r input_item_list? t_newline <StmtJ> /
+#    label:label? t_read format ( t_comma input_item_list )? t_newline <StmtJ>
+#  end
+#
+#  rule write_stmt
+#    # R910
+#
+#    label:label? t_write t_paren_l io_control_spec_list t_paren_r output_item_list? t_newline <StmtJ>
+#  end
+#
+#  rule input_item
+#    # R914
+#
+#    variable /
+#    io_implied_do
+#  end
+#
+#  rule intput_item_list
+#    # 9.4.2
+#    #
+#    # Constraint: In an input_item_list, an io_implied_do_object must be an
+#    # input_item.
+#
+#    input_item ( t_comma input_item )* <E>
+#  end
+#
 #PM#
 
 end
