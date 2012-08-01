@@ -1749,8 +1749,8 @@ grammar Fortran
   rule input_item
     # R914
 
-    variable /
-    io_implied_do
+    io_implied_do /
+    variable
   end
 
   rule input_item_list
@@ -1924,8 +1924,8 @@ grammar Fortran
     # input_item. In an output_item_list, an io_implied_do_object must be an
     # output_item.
 
-    # input_item /
-    output_item !t_equal <T>
+    output_item !t_equal <T> /
+    input_item !t_equal <T>
   end
 
   rule io_implied_do_object_list
