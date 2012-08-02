@@ -545,6 +545,15 @@ module Fortran
   end
   
   #PM#
+  class Contains_Stmt < T
+    def to_s
+      blockend
+      s=stmt("#{e1}")
+      blockbegin
+      s
+    end
+  end
+  
   #PM#
 
 end

@@ -1,4 +1,13 @@
-# TODOs
+# NOTES: Grammar rule numbers or section numbers from the Fortran 90 standard
+# document are given when possible. Grammar rule names used here match those
+# from the standard document, with underscores in place of hyphens. Some left-
+# recursive rules given by the standard have been translated to right-recursive
+# for PEG compatability; the original (implied) rules are given in comments. The
+# "start" rule must go first; other rules are in alphabetical order. Constraints
+# described in the standard document are given in comments. Rule names for
+# literal terminals not defined in the standard are prefixed with "t_".
+
+# TODO
 #
 # - Rule primary cannot tell the difference between function and array
 #   references. Since variable -> subobject -> ( array_section / array_element )
@@ -11,15 +20,6 @@
 #
 # - Need tests of all R924 possibilities.
 
-# NOTES: Grammar rule numbers or section numbers from the Fortran 90 standard
-# document are given when possible. Grammar rule names used here match those
-# from the standard document, with underscores in place of hyphens. Some left-
-# recursive rules given by the standard have been translated to right-recursive
-# for PEG compatability; the original (implied) rules are given in comments. The
-# "start" rule must go first; other rules are in alphabetical order. Constraints
-# described in the standard document are given in comments. Rule names for
-# literal terminals not defined in the standard are prefixed with "t_".
-
 grammar Fortran
 
   rule start
@@ -27,6 +27,27 @@ grammar Fortran
   end
 
 #PM#
+  rule internal_subprogram_part
+    # R210 -- INCOMPLETE
+
+# contains_stmt internal_subprogram+ <E>
+    contains_stmt
+  end
+
+  rule t_contains
+    "contains" <T>
+  end
+
+  rule contains_stmt
+    # R1225
+
+    label:label? t_contains t_newline <Contains_Stmt>
+  end
+
+#  rule internal_subprogram
+#    ""
+#  end
+
 #PM#
 
   rule ac_do_variable
@@ -1940,10 +1961,6 @@ grammar Fortran
     default_char_variable
   end
 
-  rule internal_subprogram_part
-    ""
-  end
-
   rule intrinsic_operator
     # R310
 
@@ -2281,13 +2298,13 @@ grammar Fortran
   end
 
   rule main_program
-    # R1101 -- INCOMPLETE
+    # R1101
     #
     # Constraint: In a main_program, the execution_part must not contain a
     # RETURN statement or an ENTRY statement.
 
-# program_stmt? specification_part? execution_part? internal_subprogram_part? end_program_stmt <E>
-    program_stmt? specification_part? execution_part? end_program_stmt <E>
+    program_stmt? specification_part? execution_part? internal_subprogram_part?
+      end_program_stmt <E>
   end
 
   rule mask_expr
