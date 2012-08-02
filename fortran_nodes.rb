@@ -54,7 +54,8 @@ module Fortran
       @@level-=1 if @@level>0
     end
 
-    def cat
+    def cat(f=nil)
+      send(f) unless f.nil?
       elements.map { |e| e.to_s }.join
     end
 
@@ -81,11 +82,11 @@ module Fortran
       super(a,b,c)
     end
 
-    def levelreset
+    def lr
       @@level=@@levelstack.pop
     end
 
-    def levelset
+    def ls
       @@levelstack.push(@@level)
     end
 
@@ -122,7 +123,8 @@ module Fortran
       ((x.nil?)?(elements[1..-1]):(elements)).map { |e| e.to_s }.join(' ').strip
     end
 
-    def stmt(s)
+    def stmt(s,f=nil)
+      send(f) unless f.nil?
       indent(("#{sa(e0)}"+s.chomp).strip)+"\n"
     end
 
@@ -179,10 +181,7 @@ module Fortran
   end
   
   class Case_Stmt < T
-    def to_s
-      be
-      bb(stmt(space))
-    end
+    def to_s() bb(stmt(space,:be)) end
   end
   
   class Common_Block_Name_And_Object_List < T
@@ -210,38 +209,23 @@ module Fortran
   end
   
   class Do_Term_Action_Stmt < T
-    def to_s
-      be
-      stmt(space)
-    end
+    def to_s() stmt(space,:be) end
   end
 
   class Do_Term_Shared_Stmt < T
-    def to_s
-      be
-      cat
-    end
+    def to_s() cat(:be) end
   end
 
   class Else_If_Stmt < T
-    def to_s
-      be
-      bb(stmt(space))
-    end
+    def to_s() bb(stmt(space,:be)) end
   end
 
   class Else_Stmt < T
-    def to_s
-      be
-      bb(stmt(space))
-    end
+    def to_s() bb(stmt(space,:be)) end
   end
 
   class Elsewhere_Stmt < T
-    def to_s
-      be
-      bb(stmt(space))
-    end
+    def to_s() bb(stmt(space,:be)) end
   end
 
   class End_Block_Data_Option < T
@@ -249,24 +233,15 @@ module Fortran
   end
 
   class End_Block_Data_Stmt < T
-    def to_s
-      be
-      stmt(space)
-    end
+    def to_s() stmt(space,:be) end
   end
   
   class End_Do_Stmt < T
-    def to_s
-      be
-      stmt(space)
-    end
+    def to_s() stmt(space,:be) end
   end
 
   class End_If_Stmt < T
-    def to_s
-      be
-      stmt(space)
-    end
+    def to_s() stmt(space,:be) end
   end
 
   class End_Module_Option < T
@@ -274,38 +249,23 @@ module Fortran
   end
 
   class End_Module_Stmt < T
-    def to_s
-      be
-      stmt(space)
-    end
+    def to_s() stmt(space,:be) end
   end
   
   class End_Program_Stmt < T
-    def to_s
-      be
-      stmt(space)
-    end
+    def to_s() stmt(space,:be) end
   end
 
   class End_Select_Stmt < T
-    def to_s
-      levelreset
-      stmt(space)
-    end
+    def to_s() stmt(space,:lr) end
   end
   
   class End_Type_Stmt < T
-    def to_s
-      be
-      stmt(space)
-    end
+    def to_s() stmt(space,:be) end
   end
 
   class End_Where_Stmt < T
-    def to_s
-      be
-      stmt(space)
-    end
+    def to_s() stmt(space,:be) end
   end
 
   class Entity_Decl < T
@@ -341,10 +301,7 @@ module Fortran
   end
 
   class Inner_Shared_Do_Construct < T
-    def to_s
-      be
-      cat
-    end
+    def to_s() cat(:be) end
   end
 
   class Label_Do_Stmt < T
@@ -412,10 +369,7 @@ module Fortran
   end
   
   class Select_Case_Stmt < T
-    def to_s
-      levelset
-      bb(bb(stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}")))
-    end
+    def to_s() bb(bb(stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}",:ls))) end
   end
   
   class Target_Stmt < T
@@ -423,10 +377,7 @@ module Fortran
   end
   
   class Type_Declaration_Stmt < T
-    def to_s
-      sep=(e1.to_s[-1]==",")?(""):(" ")
-      stmt("#{e1}#{mp(e2,'',sep)}#{e3}")
-    end
+    def to_s() stmt("#{e1}#{mp(e2,'',mn(e1,',',' '))}#{e3}") end
   end
 
   class Type_Spec < E
@@ -448,10 +399,7 @@ module Fortran
   
   #PM#
   class Contains_Stmt < T
-    def to_s
-      be
-      bb(stmt(space))
-    end
+    def to_s() bb(stmt(space,:be)) end
   end
 
   class Function_Stmt < T
@@ -459,10 +407,7 @@ module Fortran
   end
 
   class End_Function_Stmt < T
-    def to_s
-      be
-      stmt(space)
-    end
+    def to_s() stmt(space,:be) end
   end
   
   #PM#
