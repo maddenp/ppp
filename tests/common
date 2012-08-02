@@ -17,7 +17,7 @@ default:
 bin: $(BIN)
 
 clean:
-	$(RM) $(BIN) $(TMPFILE) $(TRANSLATION)
+	$(RM) $(BIN) $(TMPFILE) $(TRANSLATION) *.mod
 
 control: $(TEST)
 ifdef MAKE_CONTROL_DISABLED

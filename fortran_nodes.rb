@@ -290,6 +290,19 @@ module Fortran
     end
   end
 
+  class End_Module_Option < T
+    def to_s
+      "#{e0}#{sb(e1.to_s)}"
+    end
+  end
+
+  class End_Module_Stmt < T
+    def to_s
+      blockend
+      stmt("#{e1}#{sb(e2.to_s)}")
+    end
+  end
+  
   class End_Program_Stmt < T
     def to_s
       blockend
@@ -395,6 +408,14 @@ module Fortran
     end
   end
 
+  class Module_Stmt < T
+    def to_s
+      s=stmt("#{e1}#{sb(e2.to_s)}")
+      blockbegin
+      s
+    end
+  end
+  
   class Namelist_Group_Set_Pair < T
     def to_s
       "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}"

@@ -86,9 +86,9 @@ grammar Fortran
     cycle_stmt /
     deallocate_stmt /
     endfile_stmt /
-    # end_function_stmt /
+# end_function_stmt /
     end_program_stmt /
-    # end_subroutine_stmt /
+# end_subroutine_stmt /
     exit_stmt /
     goto_stmt /
     if_stmt /
@@ -98,7 +98,7 @@ grammar Fortran
     pointer_assignment_stmt /
     print_stmt /
     read_stmt /
-    # return_stmt /
+# return_stmt /
     rewind_stmt /
     stop_stmt /
     where_stmt /
@@ -1052,13 +1052,14 @@ grammar Fortran
     # R207 -- INCOMPLETE
 
     derived_type_def /
-    # interface_block /
+# interface_block /
     type_declaration_stmt /
     specification_stmt /
     parameter_stmt /
-    format_stmt # /
-    # entry_stmt /
-    # stmt_function_stmt
+    format_stmt
+# /
+# entry_stmt /
+# stmt_function_stmt
   end
 
   rule declaration_constructs
@@ -1358,6 +1359,19 @@ grammar Fortran
     label:label? t_endif if_construct_name? t_newline <End_If_Stmt>
   end
 
+  rule end_module_option
+    t_module module_name? <End_Module_Option>
+  end
+
+  rule end_module_stmt
+    # R1106
+    #
+    # Constraint: If the module_name is specified in the end_module_stmt, it
+    # must be identical to the module_name specified in the module_stmt.
+
+    label:label? t_end end_module_option? t_newline <End_Module_Stmt>
+  end
+
   rule end_program_stmt
     # R1103
     #
@@ -1549,8 +1563,9 @@ grammar Fortran
     (
       executable_construct /
       format_stmt /
-      data_stmt # /
-      # entry_stmt
+      data_stmt
+# /
+# entry_stmt
     )* <E>
   end
 
@@ -1762,8 +1777,9 @@ grammar Fortran
 
     implicit_stmt /
     format_stmt /
-    parameter_stmt #/
-    # entry_stmt
+    parameter_stmt
+#/
+# entry_stmt
   end
 
   rule implicit_spec
@@ -2270,7 +2286,7 @@ grammar Fortran
     # Constraint: In a main_program, the execution_part must not contain a
     # RETURN statement or an ENTRY statement.
 
-#    program_stmt? specification_part? execution_part? internal_subprogram_part? end_program_stmt <E>
+# program_stmt? specification_part? execution_part? internal_subprogram_part? end_program_stmt <E>
     program_stmt? specification_part? execution_part? end_program_stmt <E>
   end
 
@@ -2278,6 +2294,29 @@ grammar Fortran
     # R741
 
     logical_expr
+  end
+
+  rule module
+    # R1104 -- INCOMPLETE
+    #
+    # Constraint: A module specification_part must not contain a
+    # stmt_function_stmt, an entry_stmt, or a format_stmt. An automatic object
+    # must not appear in the specification_part (R204) of a module.
+
+# module_stmt specification_part? module_subprogram_part? end_module_stmt <E>
+    module_stmt specification_part? end_module_stmt <E>
+  end
+
+  rule module_name
+    # 11.3 (not explicitly defined)
+
+    name
+  end
+
+  rule module_stmt
+    # R1105
+
+    label:label? t_module module_name t_newline <Module_Stmt>
   end
 
   rule mult_op
@@ -2647,8 +2686,8 @@ grammar Fortran
     # R202 -- INCOMPLETE
 
     main_program /
-    # external_subprogram /
-    # module /
+# external_subprogram /
+    module /
     block_data
   end
 
@@ -3024,24 +3063,24 @@ grammar Fortran
   rule specification_part
     # R204 -- INCOMPLETE
 
-    #use_stmt* implicit_part? declaration_construct* <E>
+# use_stmt* implicit_part? declaration_construct* <E>
     implicit_part? declaration_constructs <E>
   end
 
   rule specification_stmt
     # R214 -- INCOMPLETE
 
-    # access_stmt /
+# access_stmt /
     allocatable_stmt /
     common_stmt /
     data_stmt /
     dimension_stmt /
     equivalence_stmt /
     external_stmt /
-    # intent_stmt /
+# intent_stmt /
     intrinsic_stmt /
     namelist_stmt /
-    # optional_stmt /
+# optional_stmt /
     pointer_stmt /
     save_stmt /
     target_stmt
@@ -3405,6 +3444,10 @@ grammar Fortran
 
   rule t_minus
     "-" <T>
+  end
+
+  rule t_module
+    "module" <T>
   end
 
   rule t_name
