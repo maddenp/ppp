@@ -129,6 +129,12 @@ module Fortran
     end
   end
 
+  class J < T
+    def to_s
+      space
+    end
+  end
+
   class StmtC < T
     def to_s
       stmt(elements[1..-1].map { |e| e.to_s }.join)
@@ -551,6 +557,21 @@ module Fortran
       s=stmt("#{e1}")
       blockbegin
       s
+    end
+  end
+
+  class Function_Stmt < T
+    def to_s
+      s=stmt("#{sa(e1.to_s)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7.to_s)}")
+      blockbegin
+      s
+    end
+  end
+
+  class End_Function_Stmt < T
+    def to_s
+      blockend
+      stmt(space)
     end
   end
   
