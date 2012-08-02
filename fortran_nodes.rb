@@ -109,8 +109,8 @@ module Fortran
       @@attrs[k]=v
     end
 
-    def space
-      elements[1..-1].map { |e| e.to_s }.join(' ').strip
+    def space(x=nil)
+      ((x.nil?)?(elements[1..-1]):(elements)).map { |e| e.to_s }.join(' ').strip
     end
 
     def stmt(s)
@@ -169,7 +169,7 @@ module Fortran
 
   class Block_Data_Stmt < T
     def to_s
-      s=stmt("#{e1} #{e2}#{sb(e3.to_s)}")
+      s=stmt(space)
       blockbegin
       s
     end
@@ -184,7 +184,7 @@ module Fortran
   class Case_Stmt < T
     def to_s
       blockend
-      s=stmt("#{e1} #{e2}")
+      s=stmt(space)
       blockbegin
       s
     end
@@ -216,7 +216,7 @@ module Fortran
 
   class Derived_Type_Stmt < T
     def to_s
-      s=stmt("#{e1}#{sb(e2.to_s)}#{sb(e3.to_s)}")
+      s=stmt(space)
       blockbegin
       s
     end
@@ -263,7 +263,7 @@ module Fortran
   class Elsewhere_Stmt < T
     def to_s
       blockend
-      s=stmt("#{e1}")
+      s=stmt(space)
       blockbegin
       s
     end
@@ -278,7 +278,7 @@ module Fortran
   class End_Block_Data_Stmt < T
     def to_s
       blockend
-      stmt("#{e1}#{sb(e2.to_s)}")
+      stmt(space)
     end
   end
   
@@ -292,20 +292,20 @@ module Fortran
   class End_If_Stmt < T
     def to_s
       blockend
-      stmt("#{e1}#{sb(e2)}")
+      stmt(space)
     end
   end
 
   class End_Module_Option < T
     def to_s
-      "#{e0}#{sb(e1.to_s)}"
+      space(:all)
     end
   end
 
   class End_Module_Stmt < T
     def to_s
       blockend
-      stmt("#{e1}#{sb(e2.to_s)}")
+      stmt(space)
     end
   end
   
@@ -319,27 +319,27 @@ module Fortran
   class End_Select_Stmt < T
     def to_s
       levelreset
-      stmt("#{e1} #{e2}#{sb(e3)}")
+      stmt(space)
     end
   end
   
   class End_Type_Stmt < T
     def to_s
       blockend
-      stmt("#{e1} #{e2}#{sb(e3.to_s)}")
+      stmt(space)
     end
   end
 
   class End_Where_Stmt < T
     def to_s
       blockend
-      stmt("#{e1}")
+      stmt(space)
     end
   end
 
   class Entity_Decl < T
     def name
-      "#{e0}"
+      space(:all)
     end
   end
 
@@ -416,7 +416,7 @@ module Fortran
 
   class Module_Stmt < T
     def to_s
-      s=stmt("#{e1}#{sb(e2.to_s)}")
+      s=stmt(space)
       blockbegin
       s
     end
@@ -436,7 +436,7 @@ module Fortran
 
   class Nonlabel_Do_Stmt < T
     def to_s
-      s=stmt("#{sa(e1)}#{e2}#{e3}")
+      s=stmt(space)
       blockbegin
       s
     end
@@ -554,7 +554,7 @@ module Fortran
   class Contains_Stmt < T
     def to_s
       blockend
-      s=stmt("#{e1}")
+      s=stmt(space)
       blockbegin
       s
     end
