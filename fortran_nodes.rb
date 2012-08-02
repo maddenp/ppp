@@ -45,7 +45,7 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
-    def blockbegin(s=nil)
+    def blockbegin(s)
       @@level+=1
       s
     end
@@ -98,6 +98,14 @@ module Fortran
       end
     end
 
+    def mn(p,c,v)
+      (p.to_s!=c)?(v):(p)
+    end
+  
+    def mp(p,c,v)
+      (p.to_s==c)?(v):(p)
+    end
+  
     def sa(e)
       (e.to_s=='')?(''):("#{e} ")
     end
@@ -151,7 +159,7 @@ module Fortran
   # Specific Subclasses
 
   class Allocatable_Stmt < T
-    def to_s() stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}") end
+    def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
   end
   
   class Arithmetic_If_Stmt < T
@@ -159,7 +167,7 @@ module Fortran
   end
 
   class Assigned_Goto_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{(e3.to_s[0]==',')?(e3):(' '+e3.to_s)}") end
+    def to_s() stmt("#{e1} #{e2}#{mn(e3,',',' '+e3.to_s)}") end
   end
 
   class Block_Data_Stmt < T
@@ -178,7 +186,7 @@ module Fortran
   end
   
   class Common_Block_Name_And_Object_List < T
-    def to_s() "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}#{e2}" end
+    def to_s() "#{mp(e0,'',' ')}#{e1}#{e2}" end
   end
 
   class Common_Stmt < T
@@ -186,11 +194,11 @@ module Fortran
   end
 
   class Component_Def_Stmt < T
-    def to_s() stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}") end
+    def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
   end
 
   class Computed_Goto_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}") end
+    def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{mp(e5,'',' ')}#{e6}") end
   end
 
   class Derived_Type_Stmt < T
@@ -198,7 +206,7 @@ module Fortran
   end
 
   class Dimension_Stmt < T
-    def to_s() stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}") end
+    def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
   end
   
   class Do_Term_Action_Stmt < T
@@ -237,7 +245,7 @@ module Fortran
   end
 
   class End_Block_Data_Option < T
-    def to_s() "#{e0} #{e1}#{sb(e2.to_s)}" end
+    def to_s() space(:all) end
   end
 
   class End_Block_Data_Stmt < T
@@ -344,11 +352,11 @@ module Fortran
   end
 
   class Loop_Control_1 < T
-    def to_s() "#{(e0)?(e0):(' ')}#{e1}#{e2}#{e3}#{e4}#{e5}" end
+    def to_s() "#{mp(e0,'',' ')}#{e1}#{e2}#{e3}#{e4}#{e5}" end
   end
 
   class Loop_Control_2 < T
-    def to_s() "#{(e0)?(e0):(' ')}#{e1} #{e2}#{e3}#{e4}" end
+    def to_s() "#{mp(e0,'',' ')}#{e1} #{e2}#{e3}#{e4}" end
   end
 
   class Module_Stmt < T
@@ -356,7 +364,7 @@ module Fortran
   end
   
   class Namelist_Group_Set_Pair < T
-    def to_s() "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}" end
+    def to_s() "#{mp(e0,'',' ')}#{e1}" end
   end
 
   class Namelist_Stmt < T
@@ -372,7 +380,7 @@ module Fortran
   end
 
   class Pointer_Stmt < T
-    def to_s() stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}") end
+    def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
   end
   
   class Print_Stmt < T
@@ -400,7 +408,7 @@ module Fortran
   end
 
   class Save_Stmt_Entity_List < T
-    def to_s() "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}" end
+    def to_s() "#{mp(e0,'',' ')}#{e1}" end
   end
   
   class Select_Case_Stmt < T
@@ -411,13 +419,13 @@ module Fortran
   end
   
   class Target_Stmt < T
-    def to_s() stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}") end
+    def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
   end
   
   class Type_Declaration_Stmt < T
     def to_s
       sep=(e1.to_s[-1]==",")?(""):(" ")
-      stmt("#{e1}#{(e2.to_s.empty?)?(sep):(e2)}#{e3}")
+      stmt("#{e1}#{mp(e2,'',sep)}#{e3}")
     end
   end
 
