@@ -396,7 +396,7 @@ module Fortran
   end
   
   class Read_Stmt_1 < T
-    def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5.to_s)}") end
+    def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5)}") end
   end
 
   class Read_Stmt_2 < T
@@ -443,7 +443,7 @@ module Fortran
   end
 
   class Write_Stmt < T
-    def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5.to_s)}") end
+    def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5)}") end
   end
   
   #PM#
@@ -455,7 +455,7 @@ module Fortran
   end
 
   class Function_Stmt < T
-    def to_s() blockbegin(stmt("#{sa(e1.to_s)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7.to_s)}")) end
+    def to_s() blockbegin(stmt("#{sa(e1)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7)}")) end
   end
 
   class End_Function_Stmt < T
