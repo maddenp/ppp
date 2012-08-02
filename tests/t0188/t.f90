@@ -3,7 +3,7 @@ program t
   integer::ierr
   logical::p
   p=.false.
-! inquire(file=fname,exist=p,iostat=ierr)
+  inquire(file=fname,exist=p,iostat=ierr)
   write (*,fmt='(l)',iostat=ierr) .true.
   open(unit=77,file=fname,status='old',iostat=ierr)
   if (ierr.ne.0) then
