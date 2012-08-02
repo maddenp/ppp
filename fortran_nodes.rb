@@ -45,8 +45,9 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
-    def blockbegin
+    def blockbegin(s=nil)
       @@level+=1
+      s
     end
 
     def blockend
@@ -150,82 +151,54 @@ module Fortran
   # Specific Subclasses
 
   class Allocatable_Stmt < T
-    def to_s
-      stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
-    end
+    def to_s() stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}") end
   end
   
   class Arithmetic_If_Stmt < T
-    def to_s
-      stmt("#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}")
-    end
+    def to_s() stmt("#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}") end
   end
 
   class Assigned_Goto_Stmt < T
-    def to_s
-      stmt("#{e1} #{e2}#{(e3.to_s[0]==',')?(e3):(' '+e3.to_s)}")
-    end
+    def to_s() stmt("#{e1} #{e2}#{(e3.to_s[0]==',')?(e3):(' '+e3.to_s)}") end
   end
 
   class Block_Data_Stmt < T
-    def to_s
-      s=stmt(space)
-      blockbegin
-      s
-    end
+    def to_s() blockbegin(stmt(space)) end
   end
   
   class Call_Stmt < T
-    def to_s
-      stmt("#{e1} #{e2}#{e3}")
-    end
+    def to_s() stmt("#{e1} #{e2}#{e3}") end
   end
   
   class Case_Stmt < T
     def to_s
       blockend
-      s=stmt(space)
-      blockbegin
-      s
+      blockbegin(stmt(space))
     end
   end
   
   class Common_Block_Name_And_Object_List < T
-    def to_s
-      "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}#{e2}"
-    end
+    def to_s() "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}#{e2}" end
   end
 
   class Common_Stmt < T
-    def to_s
-      stmt("#{e1} #{e2}#{e3}#{e4}")
-    end
+    def to_s() stmt("#{e1} #{e2}#{e3}#{e4}") end
   end
 
   class Component_Def_Stmt < T
-    def to_s
-      stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
-    end
+    def to_s() stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}") end
   end
 
   class Computed_Goto_Stmt < T
-    def to_s
-      stmt("#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}")
-    end
+    def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{(e5.to_s=='')?(' '):(e5)}#{e6}") end
   end
 
   class Derived_Type_Stmt < T
-    def to_s
-      s=stmt(space)
-      blockbegin
-      s
-    end
+    def to_s() blockbegin(stmt(space)) end
   end
 
   class Dimension_Stmt < T
-    def to_s
-      stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
-    end
+    def to_s() stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}") end
   end
   
   class Do_Term_Action_Stmt < T
@@ -245,34 +218,26 @@ module Fortran
   class Else_If_Stmt < T
     def to_s
       blockend
-      s=stmt(space)
-      blockbegin
-      s
+      blockbegin(stmt(space))
     end
   end
 
   class Else_Stmt < T
     def to_s
       blockend
-      s=stmt(space)
-      blockbegin
-      s
+      blockbegin(stmt(space))
     end
   end
 
   class Elsewhere_Stmt < T
     def to_s
       blockend
-      s=stmt(space)
-      blockbegin
-      s
+      blockbegin(stmt(space))
     end
   end
 
   class End_Block_Data_Option < T
-    def to_s
-      "#{e0} #{e1}#{sb(e2.to_s)}"
-    end
+    def to_s() "#{e0} #{e1}#{sb(e2.to_s)}" end
   end
 
   class End_Block_Data_Stmt < T
@@ -297,9 +262,7 @@ module Fortran
   end
 
   class End_Module_Option < T
-    def to_s
-      space(:all)
-    end
+    def to_s() space(:all) end
   end
 
   class End_Module_Stmt < T
@@ -338,53 +301,35 @@ module Fortran
   end
 
   class Entity_Decl < T
-    def name
-      space(:all)
-    end
+    def name() space(:all) end
   end
 
   class Entity_Decl_List < T
-    def names
-      [e0.name]+((e1.nil?)?([]):(e1.names))
-    end
+    def names() [e0.name]+((e1.nil?)?([]):(e1.names)) end
   end
 
   class Entity_Decl_List_Pair < T
-    def name
-      "#{e1.name}"
-    end
+    def name() "#{e1.name}" end
   end
 
   class Entity_Decl_List_Pairs < T
-    def names
-      elements.map { |e| e.name }
-    end
+    def names() elements.map { |e| e.name } end
   end
 
   class If_Stmt < T
-    def to_s
-      stmt("#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}")
-    end
+    def to_s() stmt("#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}") end
   end
 
   class If_Then_Stmt < T
-    def to_s
-      s=stmt("#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")
-      blockbegin
-      s
-    end
+    def to_s() blockbegin(stmt("#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")) end
   end
 
   class Implicit_None_Stmt < E
-    def to_s
-      stmt(space)
-    end
+    def to_s() stmt(space) end
   end
 
   class Implicit_Stmt < E
-    def to_s
-      stmt(space)
-    end
+    def to_s() stmt(space) end
   end
 
   class Inner_Shared_Do_Construct < T
@@ -395,123 +340,78 @@ module Fortran
   end
 
   class Label_Do_Stmt < T
-    def to_s
-      s=stmt("#{sa(e1)}#{e2} #{e3}#{e4}")
-      blockbegin
-      s
-    end
+    def to_s() blockbegin(stmt("#{sa(e1)}#{e2} #{e3}#{e4}")) end
   end
 
   class Loop_Control_1 < T
-    def to_s
-      "#{(e0)?(e0):(' ')}#{e1}#{e2}#{e3}#{e4}#{e5}"
-    end
+    def to_s() "#{(e0)?(e0):(' ')}#{e1}#{e2}#{e3}#{e4}#{e5}" end
   end
 
   class Loop_Control_2 < T
-    def to_s
-      "#{(e0)?(e0):(' ')}#{e1} #{e2}#{e3}#{e4}"
-    end
+    def to_s() "#{(e0)?(e0):(' ')}#{e1} #{e2}#{e3}#{e4}" end
   end
 
   class Module_Stmt < T
-    def to_s
-      s=stmt(space)
-      blockbegin
-      s
-    end
+    def to_s() blockbegin(stmt(space)) end
   end
   
   class Namelist_Group_Set_Pair < T
-    def to_s
-      "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}"
-    end
+    def to_s() "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}" end
   end
 
   class Namelist_Stmt < T
-    def to_s
-      stmt("#{e1} #{e2}#{e3}")
-    end
+    def to_s() stmt("#{e1} #{e2}#{e3}") end
   end
 
   class Nonlabel_Do_Stmt < T
-    def to_s
-      s=stmt(space)
-      blockbegin
-      s
-    end
+    def to_s() blockbegin(stmt(space)) end
   end
 
   class Parameter_Stmt <T
-    def to_s
-      stmt("#{e1} #{e2}#{e3}#{e4}")
-    end
+    def to_s() stmt("#{e1} #{e2}#{e3}#{e4}") end
   end
 
   class Pointer_Stmt < T
-    def to_s
-      stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
-    end
+    def to_s() stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}") end
   end
   
   class Print_Stmt < T
-    def to_s
-      stmt("#{e1} #{e2}#{e3}")
-    end
+    def to_s() stmt("#{e1} #{e2}#{e3}") end
   end
 
   class Program_Stmt < T
-    def to_s
-      s=stmt(space)
-      blockbegin
-      s
-    end
+    def to_s() blockbegin(stmt(space)) end
   end
 
   class Program_Units < T
-    def to_s
-      elements.reduce('') { |m,e| m << "#{e}\n" }.chomp
-    end
+    def to_s() elements.reduce('') { |m,e| m << "#{e}\n" }.chomp end
   end
   
   class Read_Stmt_1 < T
-    def to_s
-      stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5.to_s)}")
-    end
+    def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5.to_s)}") end
   end
 
   class Read_Stmt_2 < T
-    def to_s
-      stmt("#{e1} #{e2}#{e3}")
-    end
+    def to_s() stmt("#{e1} #{e2}#{e3}") end
   end
 
   class Save_Stmt < T
-    def to_s
-      stmt("#{e1}#{e2}")
-    end
+    def to_s() stmt("#{e1}#{e2}") end
   end
 
   class Save_Stmt_Entity_List < T
-    def to_s
-      "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}"
-    end
+    def to_s() "#{(e0.to_s.empty?)?(" "):(e0)}#{e1}" end
   end
   
   class Select_Case_Stmt < T
     def to_s
-      s=stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}")
       levelset
-      blockbegin
-      blockbegin
-      s
+      blockbegin(blockbegin(stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}")))
     end
   end
   
   class Target_Stmt < T
-    def to_s
-      stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}")
-    end
+    def to_s() stmt("#{e1}#{(e2.to_s.empty?)?(' '):(e2)}#{e3}") end
   end
   
   class Type_Declaration_Stmt < T
@@ -522,50 +422,32 @@ module Fortran
   end
 
   class Type_Spec < E
-    def derived?
-      "#{e0}"=="type"
-    end
-    def type
-      (derived?)?("#{e2}"):("#{e0}")
-    end
+    def derived?() "#{e0}"=="type" end
+    def type() (derived?)?("#{e2}"):("#{e0}") end
   end
 
   class Where_Construct_Stmt < T
-    def to_s
-      s=stmt("#{e1} #{e2}#{e3}#{e4}")
-      blockbegin
-      s
-    end
+    def to_s() blockbegin(stmt("#{e1} #{e2}#{e3}#{e4}")) end
   end
 
   class Where_Stmt < T
-    def to_s
-      stmt("#{e1} #{e2}#{e3}#{e4} #{e6.to_s.strip}")
-    end
+    def to_s() stmt("#{e1} #{e2}#{e3}#{e4} #{e6.to_s.strip}") end
   end
 
   class Write_Stmt < T
-    def to_s
-      stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5.to_s)}")
-    end
+    def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5.to_s)}") end
   end
   
   #PM#
   class Contains_Stmt < T
     def to_s
       blockend
-      s=stmt(space)
-      blockbegin
-      s
+      blockbegin(stmt(space))
     end
   end
 
   class Function_Stmt < T
-    def to_s
-      s=stmt("#{sa(e1.to_s)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7.to_s)}")
-      blockbegin
-      s
-    end
+    def to_s() blockbegin(stmt("#{sa(e1.to_s)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7.to_s)}")) end
   end
 
   class End_Function_Stmt < T
