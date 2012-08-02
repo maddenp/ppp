@@ -59,11 +59,12 @@ class PPP
   end
 
   def clean(s)
-    s.gsub!(comment_line,'') # remove comment lines
-    s.gsub!(/\s+$/,'')       # remove trailing whitespace
-    s.gsub!(/^\s+/,'')       # left-justify line
-    s.gsub!(/&$\n&?/,'')     # join continuation lines
-    s.gsub!(/\n\n/,"\n")     # remove blank lines
+    s.gsub!(comment_line,'')      # remove comment lines
+    s.gsub!(/\s+$/,'')            # remove trailing whitespace
+    s.gsub!(/^\s+/,'')            # left-justify line
+    s.gsub!(/&$\n&?/,'')          # join continuation lines
+    s.gsub!(/\n\n/,"\n")          # remove blank lines
+    s << "\n"  unless s[-1]=="\n" # ensure final newline
     s
   end
 

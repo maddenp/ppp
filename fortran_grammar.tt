@@ -23,7 +23,7 @@
 grammar Fortran
 
   rule start
-    program_unit
+    program_unit+ <Program_Units>
   end
 
 #PM#
@@ -454,6 +454,32 @@ grammar Fortran
     # R801
 
     execution_part_construct
+  end
+
+  rule block_data
+    # R1110
+    #
+    # Constraint: A block_data specification_part may contain only USE
+    # statements, type declaration statements, IMPLICIT statements,
+    # derived-type definitions, and the following specification statements:
+    # COMMON, DATA, DIMENSION, EQUIVALENCE, INTRINSIC, POINTER, SAVE, and
+    # TARGET. A type declaration statement in a block_data specification_part
+    # must not contains ALLOCATABLE, EXTERNAL, INTENT, OPTIONAL, PRIVATE, or
+    # PUBLIC attribute specifiers.
+
+    block_data_stmt specification_part? end_block_data_stmt <E>
+  end
+
+  rule block_data_name
+    # 11.4 (not explicitly defined)
+
+    name
+  end
+
+  rule block_data_stmt
+    # R1111
+
+    label:label? t_block t_data block_data_name? t_newline <Block_Data_Stmt>
   end
 
   rule block_do_construct
@@ -1284,6 +1310,20 @@ grammar Fortran
     # R742
 
     label:label? t_elsewhere t_newline <Elsewhere_Stmt>
+  end
+
+  rule end_block_data_option
+    t_block t_data block_data_name? <End_Block_Data_Option>
+  end
+
+  rule end_block_data_stmt
+    # R1112
+    #
+    # Constraint: The block_data_name may be included in the end_block_data_stmt
+    # only if it was provided in the block_stat_stmt and, if included, must be
+    # identical to the block_data_name in the block_data_stmt.
+
+    label:label? t_end end_block_data_option? t_newline <End_Block_Data_Stmt>
   end
 
   rule end_do
@@ -2606,10 +2646,10 @@ grammar Fortran
   rule program_unit
     # R202 -- INCOMPLETE
 
-    main_program # /
+    main_program /
     # external_subprogram /
     # module /
-    # block_data
+    block_data
   end
 
   rule read_stmt
@@ -3133,6 +3173,10 @@ grammar Fortran
 
   rule t_blank
     "blank" <T>
+  end
+
+  rule t_block
+    "block" <T>
   end
 
   rule t_call
