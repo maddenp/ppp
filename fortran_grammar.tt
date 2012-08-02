@@ -8,6 +8,8 @@
 # - Need tests of all R905 possibilities.
 #
 # - Need tests of all R912 possibilities.
+#
+# - Need tests of all R924 possibilities.
 
 # NOTES: Grammar rule numbers or section numbers from the Fortran 90 standard
 # document are given when possible. Grammar rule names used here match those
@@ -23,6 +25,9 @@ grammar Fortran
   rule start
     program_unit
   end
+
+#PM#
+#PM#
 
   rule ac_do_variable
     # R435
@@ -87,7 +92,7 @@ grammar Fortran
     exit_stmt /
     goto_stmt /
     if_stmt /
-    # inquire_stmt /
+    inquire_stmt /
     nullify_stmt /
     open_stmt /
     pointer_assignment_stmt /
@@ -1778,6 +1783,56 @@ grammar Fortran
     input_item ( t_comma input_item )* <E>
   end
 
+  rule inquire_spec
+    # R924
+    #
+    # Constraint: An inquire_spec_list must contain one FILE= specifier or one
+    # UNIT= specifier, but not both, and at most one of each of the other
+    # specifiers. In the inquire by unit form of the INQUIRE statement, all of
+    # the inquiry specifier variables become undefined, except for the variable
+    # in the IOSTAT= specifier (if any).
+
+    external_file_unit &t_comma <T> /
+    t_unit t_equal external_file_unit <T> /
+    t_file t_equal file_name_expr <T> /
+    t_iostat t_equal scalar_default_int_variable <T> /
+    t_err t_equal label <T> /
+    t_exist t_equal scalar_default_logical_variable <T> /
+    t_opened t_equal scalar_default_logical_variable <T> /
+    t_number t_equal scalar_default_int_variable <T> /
+    t_named t_equal scalar_default_logical_variable <T> /
+    t_name t_equal scalar_default_char_variable <T> /
+    t_access t_equal scalar_default_char_variable <T> /
+    t_sequential t_equal scalar_default_char_variable <T> /
+    t_direct t_equal scalar_default_char_variable <T> /
+    t_form t_equal scalar_default_char_variable <T> /
+    t_formatted t_equal scalar_default_char_variable <T> /
+    t_unformatted t_equal scalar_default_char_variable <T> /
+    t_recl t_equal scalar_default_int_variable <T> /
+    t_nextrec t_equal scalar_default_int_variable <T> /
+    t_blank t_equal scalar_default_char_variable <T> /
+    t_position t_equal scalar_default_char_variable <T> /
+    t_action t_equal scalar_default_char_variable <T> /
+    t_read t_equal scalar_default_char_variable <T> /
+    t_write t_equal scalar_default_char_variable <T> /
+    t_readwrite t_equal scalar_default_char_variable <T> /
+    t_delim t_equal scalar_default_char_variable <T> /
+    t_pad t_equal scalar_default_char_variable <T>
+  end
+
+  rule inquire_spec_list
+    inquire_spec ( t_comma inquire_spec )* <T>
+  end
+
+  rule inquire_stmt
+    # R923
+
+    label:label? t_inquire t_paren_l inquire_spec_list t_paren_r t_newline
+      <StmtC> /
+    label:label? t_inquire t_paren_l t_iolength t_equal
+      scalar_default_int_variable t_paren_r output_item_list t_newline <StmtC>
+  end
+
   rule int_expr
     # R728
     #
@@ -1894,9 +1949,8 @@ grammar Fortran
     # specifier must also appear. If a SIZE= specifier is present, an ADVANCE=
     # specifier must also appear.
 
-    io_unit &t_comma <T> /
-    io_unit t_comma format <T>  /
-    io_unit t_comma namelist_group_name <T> /
+    io_unit t_comma format !t_equal <T> /
+    io_unit t_comma namelist_group_name !t_equal <T> /
     t_advance t_equal scalar_default_char_expr <T> /
     t_end t_equal label <T> /
     t_eor t_equal label <T> /
@@ -1906,7 +1960,8 @@ grammar Fortran
     t_nml t_equal namelist_group_name <T> /
     t_rec t_equal scalar_int_expr <T> /
     t_size t_equal scalar_default_int_variable <T> /
-    t_unit t_equal io_unit <T>
+    t_unit t_equal io_unit <T> /
+    io_unit &t_comma <T>
   end
 
   rule io_control_spec_list
@@ -1951,8 +2006,8 @@ grammar Fortran
   rule io_unit
     # R901
 
-    external_file_unit /
     t_star /
+    external_file_unit /
     internal_file_unit
   end
 
@@ -2726,6 +2781,14 @@ grammar Fortran
     default_char_expr
   end
 
+  rule scalar_default_char_variable
+    # 9.6.1 (not explicitly defined)
+    #
+    # Note: Assumed constraint: scalar_default_char_variable must be scalar.
+
+    default_char_variable
+  end
+
   rule scalar_default_int_variable
     # Multiple uses (not explicitly defined)
     #
@@ -2733,6 +2796,15 @@ grammar Fortran
     # and must be of type default integer.    
 
     variable
+  end
+
+  rule scalar_default_logical_variable
+    # 9.6.1 (not explicitly defined)
+    #
+    # Note: Assumed constraint: scalar_default_logical_variable must be of type
+    # default logical.
+
+    default_logical_variable
   end
 
   rule scalar_int_constant
@@ -3127,6 +3199,10 @@ grammar Fortran
     "dimension" <T>
   end
 
+  rule t_direct
+    "direct" <T>
+  end
+
   rule t_do
     "do" <T>
   end
@@ -3140,7 +3216,7 @@ grammar Fortran
   end
 
   rule t_else
-    "else" <T>
+    "else" !( "if" / "where" ) <T>
   end
 
   rule t_elseif
@@ -3152,7 +3228,7 @@ grammar Fortran
   end
 
   rule t_end
-    "end" !"file" <T>
+    "end" !( "file" / "do" / "if" / "where" ) <T>
   end
 
   rule t_enddo
@@ -3187,6 +3263,10 @@ grammar Fortran
     "err" <T>
   end
 
+  rule t_exist
+    "exist" <T>
+  end
+
   rule t_exit
     "exit" <T>
   end
@@ -3208,11 +3288,15 @@ grammar Fortran
   end
 
   rule t_form
-    "form" <T>
+    "form" !"at" <T>
   end
 
   rule t_format
-    "format" <T>
+    "format" !"ted" <T>
+  end
+
+  rule t_formatted
+    "formatted" <T>
   end
 
   rule t_goto
@@ -3228,11 +3312,15 @@ grammar Fortran
   end
 
   rule t_in
-    "in" <T>
+    "in" !( "out" / "quire" / "teger" / "tent" / "trinsic" ) <T>
   end
 
   rule inout
     "inout" <T>
+  end
+
+  rule t_inquire
+    "inquire" <T>
   end
 
   rule t_integer
@@ -3245,6 +3333,10 @@ grammar Fortran
 
   rule t_intrinsic
     "intrinsic" <T>
+  end
+
+  rule t_iolength
+    "iolength" <T>
   end
 
   rule t_iostat
@@ -3271,12 +3363,24 @@ grammar Fortran
     "-" <T>
   end
 
+  rule t_name
+    "name" !( "d" / "list" ) <T>
+  end
+
+  rule t_named
+    "named" <T>
+  end
+
   rule t_namelist
     "namelist" <T>
   end
 
   rule t_newline
     "\n" <T>
+  end
+
+  rule t_nextrec
+    "nextrec" <T>
   end
 
   rule t_nml
@@ -3291,12 +3395,20 @@ grammar Fortran
     "nullify" <T>
   end
 
+  rule t_number
+    "number" <T>
+  end
+
   rule t_octal
     [01234567] <T>
   end
 
   rule t_open
-    "open" <T>
+    "open" !"ed" <T>
+  end
+
+  rule t_opened
+    "opened" <T>
   end
 
   rule t_optional
@@ -3368,7 +3480,11 @@ grammar Fortran
   end
 
   rule t_read
-    "read" <T>
+    "read" !"write" <T>
+  end
+
+  rule t_readwrite
+    "readwrite" <T>
   end
 
   rule t_real
@@ -3376,7 +3492,7 @@ grammar Fortran
   end
 
   rule t_rec
-    "rec" <T>
+    "rec" !"l" <T>
   end
 
   rule t_recl
@@ -3399,6 +3515,10 @@ grammar Fortran
     "sequence" <T>
   end
 
+  rule t_sequential
+    "sequential" <T>
+  end
+
   rule t_size
     "size" <T>
   end
@@ -3412,7 +3532,7 @@ grammar Fortran
   end
 
   rule t_stat
-    "stat" <T>
+    "stat" !"us" <T>
   end
 
   rule t_status
@@ -3446,6 +3566,10 @@ grammar Fortran
   rule t_underscore
     # R303
     "_"
+  end
+
+  rule t_unformatted
+    "unformatted" <T>
   end
 
   rule t_unit
@@ -3611,9 +3735,6 @@ grammar Fortran
     label:label? t_write t_paren_l io_control_spec_list t_paren_r
       output_item_list? t_newline <Write_Stmt>
   end
-
-#PM#
-#PM#
 
 end
 
