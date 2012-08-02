@@ -45,12 +45,12 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
-    def blockbegin(s)
+    def bb(s)
       @@level+=1
       s
     end
 
-    def blockend
+    def be
       @@level-=1 if @@level>0
     end
 
@@ -171,7 +171,7 @@ module Fortran
   end
 
   class Block_Data_Stmt < T
-    def to_s() blockbegin(stmt(space)) end
+    def to_s() bb(stmt(space)) end
   end
   
   class Call_Stmt < T
@@ -180,8 +180,8 @@ module Fortran
   
   class Case_Stmt < T
     def to_s
-      blockend
-      blockbegin(stmt(space))
+      be
+      bb(stmt(space))
     end
   end
   
@@ -202,7 +202,7 @@ module Fortran
   end
 
   class Derived_Type_Stmt < T
-    def to_s() blockbegin(stmt(space)) end
+    def to_s() bb(stmt(space)) end
   end
 
   class Dimension_Stmt < T
@@ -211,36 +211,36 @@ module Fortran
   
   class Do_Term_Action_Stmt < T
     def to_s
-      blockend
+      be
       stmt(space)
     end
   end
 
   class Do_Term_Shared_Stmt < T
     def to_s
-      blockend
+      be
       cat
     end
   end
 
   class Else_If_Stmt < T
     def to_s
-      blockend
-      blockbegin(stmt(space))
+      be
+      bb(stmt(space))
     end
   end
 
   class Else_Stmt < T
     def to_s
-      blockend
-      blockbegin(stmt(space))
+      be
+      bb(stmt(space))
     end
   end
 
   class Elsewhere_Stmt < T
     def to_s
-      blockend
-      blockbegin(stmt(space))
+      be
+      bb(stmt(space))
     end
   end
 
@@ -250,21 +250,21 @@ module Fortran
 
   class End_Block_Data_Stmt < T
     def to_s
-      blockend
+      be
       stmt(space)
     end
   end
   
   class End_Do_Stmt < T
     def to_s
-      blockend
+      be
       stmt(space)
     end
   end
 
   class End_If_Stmt < T
     def to_s
-      blockend
+      be
       stmt(space)
     end
   end
@@ -275,14 +275,14 @@ module Fortran
 
   class End_Module_Stmt < T
     def to_s
-      blockend
+      be
       stmt(space)
     end
   end
   
   class End_Program_Stmt < T
     def to_s
-      blockend
+      be
       stmt(space)
     end
   end
@@ -296,14 +296,14 @@ module Fortran
   
   class End_Type_Stmt < T
     def to_s
-      blockend
+      be
       stmt(space)
     end
   end
 
   class End_Where_Stmt < T
     def to_s
-      blockend
+      be
       stmt(space)
     end
   end
@@ -329,7 +329,7 @@ module Fortran
   end
 
   class If_Then_Stmt < T
-    def to_s() blockbegin(stmt("#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")) end
+    def to_s() bb(stmt("#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")) end
   end
 
   class Implicit_None_Stmt < E
@@ -342,13 +342,13 @@ module Fortran
 
   class Inner_Shared_Do_Construct < T
     def to_s
-      blockend
+      be
       cat
     end
   end
 
   class Label_Do_Stmt < T
-    def to_s() blockbegin(stmt("#{sa(e1)}#{e2} #{e3}#{e4}")) end
+    def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}")) end
   end
 
   class Loop_Control_1 < T
@@ -360,7 +360,7 @@ module Fortran
   end
 
   class Module_Stmt < T
-    def to_s() blockbegin(stmt(space)) end
+    def to_s() bb(stmt(space)) end
   end
   
   class Namelist_Group_Set_Pair < T
@@ -372,7 +372,7 @@ module Fortran
   end
 
   class Nonlabel_Do_Stmt < T
-    def to_s() blockbegin(stmt(space)) end
+    def to_s() bb(stmt(space)) end
   end
 
   class Parameter_Stmt <T
@@ -388,7 +388,7 @@ module Fortran
   end
 
   class Program_Stmt < T
-    def to_s() blockbegin(stmt(space)) end
+    def to_s() bb(stmt(space)) end
   end
 
   class Program_Units < T
@@ -414,7 +414,7 @@ module Fortran
   class Select_Case_Stmt < T
     def to_s
       levelset
-      blockbegin(blockbegin(stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}")))
+      bb(bb(stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}")))
     end
   end
   
@@ -435,7 +435,7 @@ module Fortran
   end
 
   class Where_Construct_Stmt < T
-    def to_s() blockbegin(stmt("#{e1} #{e2}#{e3}#{e4}")) end
+    def to_s() bb(stmt("#{e1} #{e2}#{e3}#{e4}")) end
   end
 
   class Where_Stmt < T
@@ -449,18 +449,18 @@ module Fortran
   #PM#
   class Contains_Stmt < T
     def to_s
-      blockend
-      blockbegin(stmt(space))
+      be
+      bb(stmt(space))
     end
   end
 
   class Function_Stmt < T
-    def to_s() blockbegin(stmt("#{sa(e1)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7)}")) end
+    def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7)}")) end
   end
 
   class End_Function_Stmt < T
     def to_s
-      blockend
+      be
       stmt(space)
     end
   end
