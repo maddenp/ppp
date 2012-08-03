@@ -30,6 +30,7 @@ grammar Fortran
   end
 
 #PM#
+
 ### test return w/ scalar_int_expr in subroutine
   rule return_stmt
     # R1224
@@ -42,15 +43,62 @@ grammar Fortran
   end
 
   rule internal_subprogram
-    # R211 -- INCOMPLETE
+    # R211
 
+    subroutine_subprogram /
     function_subprogram
-#/
-# subroutine_subprogram
   end
 
-#  rule subroutine_subprogram
-#  end
+  rule subroutine_subprogram
+    # R1219
+    #
+    # Constraint: An internal subroutine must not contain an ENTRY statement. An
+    # internal subroutine must not contain an internal_subprogram_part.
+
+    subroutine_stmt specification_part? execution_part? internal_subroutine_part
+      end_subroutine_stmt <E>
+  end
+
+  rule t_subroutine
+    "subroutine" <T>
+  end
+
+  rule subroutine_stmt
+    # R1220
+
+    label:label? t_recursive? t_subroutine subroutine_name
+      subroutime_stmt_option? t_newline <Subroutine_Stmt>
+  end
+
+  rule subroutine_stmt_option
+    t_paren_l dummy_arg_list? t_paren_r <E>
+  end
+
+  rule dummy_arg
+    # R1221
+
+    dummy_arg_name /
+    t_star
+  end
+
+  rule dummy_arg_list
+    dummy_arg ( t_comma dummy_arg )* <T>
+  end
+
+  rule end_subroutine_stmt
+    # R1222
+    #
+    # Constraint: SUBROUTINE must be present on the end_subroutine_stmt of an
+    # internal or module subroutine. If a subroutine_name is present on the
+    # end_subroutine_stmt, it must be identical to the subroutine_name specified
+    # in the subroutine_stmt.
+
+    label:label? t_end end_subroutine_option? t_newline <End_Subroutine_Stmt>
+  end
+
+  rule end_subroutine_option
+    t_subroutine subroutine_name? <J>
+  end
 
 #PM#
 
@@ -130,7 +178,7 @@ grammar Fortran
   end
 
   rule action_stmt
-    # R216 -- INCOMPLETE
+    # R216
 
     allocate_stmt /
     assignment_stmt /
@@ -144,7 +192,7 @@ grammar Fortran
     endfile_stmt /
     end_function_stmt /
     end_program_stmt /
-# end_subroutine_stmt /
+    end_subroutine_stmt /
     exit_stmt /
     goto_stmt /
     if_stmt /
@@ -1287,14 +1335,13 @@ grammar Fortran
   end
 
   rule do_term_action_stmt_disallowed
-# INCOMPLETE
     arithmetic_if_stmt /
     assigned_goto_stmt /
     continue_stmt /
     cycle_stmt /
     end_function_stmt /
     end_program_stmt /
-# end_subroutine_stmt /
+    end_subroutine_stmt /
     exit_stmt /
     goto_stmt /
     return_stmt /
@@ -1314,13 +1361,12 @@ grammar Fortran
   end
 
   rule do_term_shared_stmt_disallowed
-# INCOMPLETE
     arithmetic_if_stmt /
     assigned_goto_stmt /
     cycle_stmt /
     end_function_stmt /
     end_program_stmt /
-# end_subroutine_stmt /
+    end_subroutine_stmt /
     exit_stmt /
     goto_stmt /
     return_stmt /
@@ -1639,10 +1685,9 @@ grammar Fortran
   end
 
   rule execution_part_disallowed
-# INCOMPLETE
     end_function_stmt /
-    end_program_stmt # /
-# end_subroutine_stmt
+    end_program_stmt /
+    end_subroutine_stmt
   end
 
   rule execution_part_construct
