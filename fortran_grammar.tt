@@ -27,98 +27,12 @@ grammar Fortran
   end
 
 #PM#
-  rule internal_subprogram_part
-    # R210
-
-    contains_stmt internal_subprograms <E>
-  end
-
-  rule internal_subprograms
-    internal_subprogram internal_subprogram* <E>
-  end
-
-  rule t_contains
-    "contains" <T>
-  end
-
-  rule contains_stmt
-    # R1225
-
-    label:label? t_contains t_newline <Contains_Stmt>
-  end
-
   rule internal_subprogram
     # R211 -- INCOMPLETE
 
     function_subprogram
 #/
 # subroutine_subprogram
-  end
-
-  rule function_subprogram
-    # R1215
-    #
-    # Constraint: An internal function must not contain an ENTRY statement. An
-    # internal function must not contain an internal_subprogram_part.
-
-    function_stmt specification_part? execution_part? internal_subprogram_part? end_function_stmt <E>
-  end
-
-  rule t_function
-    "function" <T>
-  end
-
-  rule function_stmt
-    # R1216
-    #
-    # Constraint: If RESULT is specified, result_name must not be the same as
-    # function_name.
-
-    label:label? prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r function_result? t_newline <Function_Stmt>
-  end
-
-  rule dummy_arg_name_list
-    dummy_arg_name ( t_comma dummy_arg_name )* <T>
-  end
-
-  rule t_result
-    "result" <T>
-  end
-
-  rule function_result
-    t_result t_paren_l result_name t_paren_r <T>
-  end
-
-  rule result_name
-    # Multiple uses (not explicitly defined)
-
-    name
-  end
-
-  rule end_function_stmt
-    # R1218
-    #
-    # Constraint: FUNCTION must be present on the end_function_stmt of an
-    # internal or module function. If a function_name is present on the
-    # end_function_stmt, it must be identical to the function_name specified in
-    # the function_stmt.
-
-    label:label? t_end end_function_option? t_newline <End_Function_Stmt>
-  end
-
-  rule end_function_option
-    t_function function_name? <J>
-  end
-
-  rule t_recursive
-    "recursive" <T>
-  end
-
-  rule prefix
-    # R1217
-
-    type_spec t_recursive? <J> /
-    t_recursive type_spec? <J>
   end
 
 #  rule subroutine_subprogram
@@ -985,6 +899,12 @@ grammar Fortran
     subobject
   end
 
+  rule contains_stmt
+    # R1225
+
+    label:label? t_contains t_newline <Contains_Stmt>
+  end
+
   rule continue_stmt
     # R841
 
@@ -1375,6 +1295,10 @@ grammar Fortran
     name
   end
 
+  rule dummy_arg_name_list
+    dummy_arg_name ( t_comma dummy_arg_name )* <T>
+  end
+
   rule else_construct
     else_stmt block <E>
   end
@@ -1448,6 +1372,21 @@ grammar Fortran
 
     label:label? t_enddo do_construct_name? t_newline &{ |e| dolabel_pop(e[0]) }
       <End_Do_Stmt>
+  end
+
+  rule end_function_option
+    t_function function_name? <J>
+  end
+
+  rule end_function_stmt
+    # R1218
+    #
+    # Constraint: FUNCTION must be present on the end_function_stmt of an
+    # internal or module function. If a function_name is present on the
+    # end_function_stmt, it must be identical to the function_name specified in
+    # the function_stmt.
+
+    label:label? t_end end_function_option? t_newline <End_Function_Stmt>
   end
 
   rule end_if_stmt
@@ -1788,6 +1727,30 @@ grammar Fortran
     function_name t_paren_l parenthesized_args t_paren_r <T>
   end
 
+  rule function_result
+    t_result t_paren_l result_name t_paren_r <T>
+  end
+
+  rule function_stmt
+    # R1216
+    #
+    # Constraint: If RESULT is specified, result_name must not be the same as
+    # function_name.
+
+    label:label? prefix? t_function function_name t_paren_l dummy_arg_name_list?
+      t_paren_r function_result? t_newline <Function_Stmt>
+  end
+
+  rule function_subprogram
+    # R1215
+    #
+    # Constraint: An internal function must not contain an ENTRY statement. An
+    # internal function must not contain an internal_subprogram_part.
+
+    function_stmt specification_part? execution_part? internal_subprogram_part?
+      end_function_stmt <E>
+  end
+
   rule goto_stmt
     # R836
     #
@@ -2035,6 +1998,16 @@ grammar Fortran
     # vector subscript.
 
     default_char_variable
+  end
+
+  rule internal_subprogram_part
+    # R210
+
+    contains_stmt internal_subprograms <E>
+  end
+
+  rule internal_subprograms
+    internal_subprogram internal_subprogram* <E>
   end
 
   rule intrinsic_operator
@@ -2717,6 +2690,13 @@ grammar Fortran
     "**" <T>
   end
 
+  rule prefix
+    # R1217
+
+    type_spec t_recursive? <J> /
+    t_recursive type_spec? <J>
+  end
+
   rule primary
     # R701
     #
@@ -2869,6 +2849,12 @@ grammar Fortran
     # character set in free source form.
 
     character
+  end
+
+  rule result_name
+    # Multiple uses (not explicitly defined)
+
+    name
   end
 
   rule rewind_stmt
@@ -3339,6 +3325,10 @@ grammar Fortran
     "common" <T>
   end
 
+  rule t_contains
+    "contains" <T>
+  end
+
   rule t_complex
     "complex" <T>
   end
@@ -3473,6 +3463,10 @@ grammar Fortran
 
   rule t_formatted
     "formatted" <T>
+  end
+
+  rule t_function
+    "function" <T>
   end
 
   rule t_goto
@@ -3677,6 +3671,14 @@ grammar Fortran
 
   rule t_recl
     "recl" <T>
+  end
+
+  rule t_recursive
+    "recursive" <T>
+  end
+
+  rule t_result
+    "result" <T>
   end
 
   rule t_rewind

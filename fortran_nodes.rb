@@ -200,6 +200,10 @@ module Fortran
     def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{mp(e5,'',' ')}#{e6}") end
   end
 
+  class Contains_Stmt < T
+    def to_s() bb(stmt(space,:be)) end
+  end
+
   class Derived_Type_Stmt < T
     def to_s() bb(stmt("#{e1}#{sb(e2)} #{e3}")) end
   end
@@ -240,6 +244,10 @@ module Fortran
     def to_s() stmt(space,:be) end
   end
 
+  class End_Function_Stmt < T
+    def to_s() stmt(space,:be) end
+  end
+  
   class End_If_Stmt < T
     def to_s() stmt(space,:be) end
   end
@@ -282,6 +290,10 @@ module Fortran
 
   class Entity_Decl_List_Pairs < T
     def names() elements.map { |e| e.name } end
+  end
+
+  class Function_Stmt < T
+    def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7)}")) end
   end
 
   class If_Stmt < T
@@ -394,18 +406,6 @@ module Fortran
   end
   
   #PM#
-  class Contains_Stmt < T
-    def to_s() bb(stmt(space,:be)) end
-  end
-
-  class Function_Stmt < T
-    def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7)}")) end
-  end
-
-  class End_Function_Stmt < T
-    def to_s() stmt(space,:be) end
-  end
-  
   #PM#
 
 end
