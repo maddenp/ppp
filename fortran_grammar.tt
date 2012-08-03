@@ -97,7 +97,7 @@ grammar Fortran
     cycle_stmt /
     deallocate_stmt /
     endfile_stmt /
-# end_function_stmt /
+    end_function_stmt /
     end_program_stmt /
 # end_subroutine_stmt /
     exit_stmt /
@@ -1238,16 +1238,17 @@ grammar Fortran
   end
 
   rule do_term_action_stmt_disallowed
+# INCOMPLETE
     arithmetic_if_stmt /
     assigned_goto_stmt /
     continue_stmt /
     cycle_stmt /
-    # end_function_stmt /
+    end_function_stmt /
     end_program_stmt /
-    # end_subroutine_stmt /
+# end_subroutine_stmt /
     exit_stmt /
     goto_stmt /
-    # return_stmt /
+# return_stmt /
     stop_stmt
   end
 
@@ -1264,15 +1265,16 @@ grammar Fortran
   end
 
   rule do_term_shared_stmt_disallowed
+# INCOMPLETE
     arithmetic_if_stmt /
     assigned_goto_stmt /
     cycle_stmt /
-    # end_function_stmt /
+    end_function_stmt /
     end_program_stmt /
-    # end_subroutine_stmt /
+# end_subroutine_stmt /
     exit_stmt /
     goto_stmt /
-    # return_stmt /
+# return_stmt /
     stop_stmt
   end
 
@@ -1588,9 +1590,10 @@ grammar Fortran
   end
 
   rule execution_part_disallowed
-    # end_function_stmt /
+# INCOMPLETE
+    end_function_stmt /
     end_program_stmt # /
-    # end_subroutine_stmt
+# end_subroutine_stmt
   end
 
   rule execution_part_construct
