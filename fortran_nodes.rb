@@ -316,6 +316,10 @@ module Fortran
     def to_s() cat(:be) end
   end
 
+  class Intent_Stmt < T
+    def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{mn(e5,'::',' ')}#{e6}") end
+  end
+
   class Label_Do_Stmt < T
     def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}")) end
   end

@@ -27,6 +27,20 @@ grammar Fortran
   end
 
 #PM#
+  rule t_return
+    "return" <T>
+  end
+
+  rule return_stmt
+    # R1224
+    #
+    # Constraint: The return_stmt must be contained in the scoping unit of a
+    # function or subroutine subprogram. The scalar_int_expr is allowed only
+    # in the scoping unit of a subroutine subprogram.
+
+    label:label? t_return scalar_int_expr? t_newline <J>
+  end
+
   rule internal_subprogram
     # R211 -- INCOMPLETE
 
@@ -109,7 +123,7 @@ grammar Fortran
     pointer_assignment_stmt /
     print_stmt /
     read_stmt /
-# return_stmt /
+    return_stmt /
     rewind_stmt /
     stop_stmt /
     where_stmt /
@@ -1248,7 +1262,7 @@ grammar Fortran
 # end_subroutine_stmt /
     exit_stmt /
     goto_stmt /
-# return_stmt /
+    return_stmt /
     stop_stmt
   end
 
@@ -1274,7 +1288,7 @@ grammar Fortran
 # end_subroutine_stmt /
     exit_stmt /
     goto_stmt /
-# return_stmt /
+    return_stmt /
     stop_stmt
   end
 
@@ -1992,6 +2006,17 @@ grammar Fortran
     t_in /
     t_out /
     t_inout
+  end
+
+  rule intent_stmt
+    # R519
+    #
+    # Constraint: An intent_stmt may appear only in the specification_part of a
+    # subprogram or an interface body (12.3.2.1). dummy_arg_name must not be the
+    # name of a dummy procedure or a dummy pointer.
+
+    label:label? t_intent t_paren_l intent_spec t_paren_r double_colon?
+      dummy_arg_name_list t_newline <Intent_Stmt>
   end
 
   rule internal_file_unit
@@ -3159,7 +3184,7 @@ grammar Fortran
     dimension_stmt /
     equivalence_stmt /
     external_stmt /
-# intent_stmt /
+    intent_stmt /
     intrinsic_stmt /
     namelist_stmt /
 # optional_stmt /
@@ -3488,7 +3513,7 @@ grammar Fortran
     "in" !( "out" / "quire" / "teger" / "tent" / "trinsic" ) <T>
   end
 
-  rule inout
+  rule t_inout
     "inout" <T>
   end
 
