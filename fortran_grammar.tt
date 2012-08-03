@@ -30,76 +30,6 @@ grammar Fortran
   end
 
 #PM#
-
-### test return w/ scalar_int_expr in subroutine
-  rule return_stmt
-    # R1224
-    #
-    # Constraint: The return_stmt must be contained in the scoping unit of a
-    # function or subroutine subprogram. The scalar_int_expr is allowed only
-    # in the scoping unit of a subroutine subprogram.
-
-    label:label? t_return scalar_int_expr? t_newline <J>
-  end
-
-  rule internal_subprogram
-    # R211
-
-    subroutine_subprogram /
-    function_subprogram
-  end
-
-  rule subroutine_subprogram
-    # R1219
-    #
-    # Constraint: An internal subroutine must not contain an ENTRY statement. An
-    # internal subroutine must not contain an internal_subprogram_part.
-
-    subroutine_stmt specification_part? execution_part? internal_subroutine_part
-      end_subroutine_stmt <E>
-  end
-
-  rule t_subroutine
-    "subroutine" <T>
-  end
-
-  rule subroutine_stmt
-    # R1220
-
-    label:label? t_recursive? t_subroutine subroutine_name
-      subroutime_stmt_option? t_newline <Subroutine_Stmt>
-  end
-
-  rule subroutine_stmt_option
-    t_paren_l dummy_arg_list? t_paren_r <E>
-  end
-
-  rule dummy_arg
-    # R1221
-
-    dummy_arg_name /
-    t_star
-  end
-
-  rule dummy_arg_list
-    dummy_arg ( t_comma dummy_arg )* <T>
-  end
-
-  rule end_subroutine_stmt
-    # R1222
-    #
-    # Constraint: SUBROUTINE must be present on the end_subroutine_stmt of an
-    # internal or module subroutine. If a subroutine_name is present on the
-    # end_subroutine_stmt, it must be identical to the subroutine_name specified
-    # in the subroutine_stmt.
-
-    label:label? t_end end_subroutine_option? t_newline <End_Subroutine_Stmt>
-  end
-
-  rule end_subroutine_option
-    t_subroutine subroutine_name? <J>
-  end
-
 #PM#
 
   rule ac_do_variable
@@ -1386,6 +1316,17 @@ grammar Fortran
     t_colon t_colon <T>
   end
 
+  rule dummy_arg
+    # R1221
+
+    dummy_arg_name /
+    t_star
+  end
+
+  rule dummy_arg_list
+    dummy_arg ( t_comma dummy_arg )* <T>
+  end
+
   rule dummy_arg_name
     # Multiple uses (not explicitly defined)
 
@@ -1520,6 +1461,21 @@ grammar Fortran
     # R811
 
     label:label? t_end t_select case_construct_name? t_newline <End_Select_Stmt>
+  end
+
+  rule end_subroutine_stmt
+    # R1222
+    #
+    # Constraint: SUBROUTINE must be present on the end_subroutine_stmt of an
+    # internal or module subroutine. If a subroutine_name is present on the
+    # end_subroutine_stmt, it must be identical to the subroutine_name specified
+    # in the subroutine_stmt.
+
+    label:label? t_end end_subroutine_option? t_newline <End_Subroutine_Stmt>
+  end
+
+  rule end_subroutine_option
+    t_subroutine subroutine_name? <J>
   end
 
   rule end_type_stmt
@@ -2132,6 +2088,13 @@ grammar Fortran
     # R210
 
     contains_stmt internal_subprograms <E>
+  end
+
+  rule internal_subprogram
+    # R211
+
+    subroutine_subprogram /
+    function_subprogram
   end
 
   rule internal_subprograms
@@ -2995,6 +2958,16 @@ grammar Fortran
     name
   end
 
+  rule return_stmt
+    # R1224
+    #
+    # Constraint: The return_stmt must be contained in the scoping unit of a
+    # function or subroutine subprogram. The scalar_int_expr is allowed only
+    # in the scoping unit of a subroutine subprogram.
+
+    label:label? t_return scalar_int_expr? t_newline <J>
+  end
+
   rule rewind_stmt
     # R921
 
@@ -3349,6 +3322,27 @@ grammar Fortran
     # Multiple uses (not explicitly defined)
 
     name
+  end
+
+  rule subroutine_stmt
+    # R1220
+
+    label:label? t_recursive? t_subroutine subroutine_name
+      subroutine_stmt_option? t_newline <Subroutine_Stmt>
+  end
+
+  rule subroutine_stmt_option
+    t_paren_l dummy_arg_list? t_paren_r <E>
+  end
+
+  rule subroutine_subprogram
+    # R1219
+    #
+    # Constraint: An internal subroutine must not contain an ENTRY statement. An
+    # internal subroutine must not contain an internal_subprogram_part.
+
+    subroutine_stmt specification_part? execution_part?
+      internal_subprogram_part? end_subroutine_stmt <E>
   end
 
   rule subscript
@@ -3873,6 +3867,10 @@ grammar Fortran
 
   rule t_stop
     "stop" <T>
+  end
+
+  rule t_subroutine
+    "subroutine" <T>
   end
 
   rule t_target

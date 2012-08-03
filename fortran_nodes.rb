@@ -225,7 +225,7 @@ module Fortran
   end
 
   class Else_If_Stmt < T
-    def to_s() bb(stmt(space,:be)) end
+    def to_s() bb(stmt("#{e1} #{e2}#{e3}#{e4} #{e5}",:be)) end
   end
 
   class Else_Stmt < T
@@ -270,6 +270,10 @@ module Fortran
 
   class End_Select_Stmt < T
     def to_s() stmt(space,:lr) end
+  end
+  
+  class End_Subroutine_Stmt < T
+    def to_s() stmt(space,:be) end
   end
   
   class End_Type_Stmt < T
@@ -392,6 +396,10 @@ module Fortran
     def to_s() bb(bb(stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}",:ls))) end
   end
   
+  class Subroutine_Stmt < T
+    def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}")) end
+  end
+
   class Target_Stmt < T
     def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
   end
