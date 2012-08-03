@@ -30,6 +30,13 @@ grammar Fortran
   end
 
 #PM#
+  rule external_subprogram
+    # R203
+
+    subroutine_subprogram /
+    function_subprogram
+  end
+
 #PM#
 
   rule ac_do_variable
@@ -2857,10 +2864,10 @@ grammar Fortran
   end
 
   rule program_unit
-    # R202 -- INCOMPLETE
+    # R202
 
     main_program /
-# external_subprogram /
+    external_subprogram /
     module /
     block_data
   end
