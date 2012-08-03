@@ -2597,7 +2597,7 @@ grammar Fortran
     # R538
 
     label:label? t_parameter t_paren_l named_constant_def_list t_paren_r
-      t_newline <Parameter_Stmt>
+      t_newline <StmtC>
   end
 
   rule parent_string

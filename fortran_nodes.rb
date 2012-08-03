@@ -201,7 +201,7 @@ module Fortran
   end
 
   class Derived_Type_Stmt < T
-    def to_s() bb(stmt(space)) end
+    def to_s() bb(stmt("#{e1}#{sb(e2)} #{e3}")) end
   end
 
   class Dimension_Stmt < T
@@ -329,11 +329,7 @@ module Fortran
   end
 
   class Nonlabel_Do_Stmt < T
-    def to_s() bb(stmt(space)) end
-  end
-
-  class Parameter_Stmt <T
-    def to_s() stmt("#{e1} #{e2}#{e3}#{e4}") end
+    def to_s() bb(stmt("#{sa(e1)}#{e2}#{e3}")) end
   end
 
   class Pointer_Stmt < T
