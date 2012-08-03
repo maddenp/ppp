@@ -5,7 +5,10 @@
 # for PEG compatability; the original (implied) rules are given in comments. The
 # "start" rule must go first; other rules are in alphabetical order. Constraints
 # described in the standard document are given in comments. Rule names for
-# literal terminals not defined in the standard are prefixed with "t_".
+# literal terminals not defined in the standard are prefixed with "t_". Rules
+# not defined by the standard are introduced where they appear to be useful to
+# for parsing. Ordered-choice order difference in many places from that given in
+# the standard, for correctness.
 
 # TODO
 #
@@ -27,10 +30,6 @@ grammar Fortran
   end
 
 #PM#
-  rule t_return
-    "return" <T>
-  end
-
   rule return_stmt
     # R1224
     #
@@ -166,10 +165,6 @@ grammar Fortran
 
   rule actual_arg_spec_list
     actual_arg_spec ( t_comma actual_arg_spec )* <T>
-  end
-
-  rule actual_arg_spec_list_option
-    actual_arg_spec_list? <T>
   end
 
   rule add_op
@@ -1741,7 +1736,7 @@ grammar Fortran
   rule function_reference
     # R1209
 
-    function_name t_paren_l parenthesized_args t_paren_r <T>
+    function_name t_paren_l parenthesized_args? t_paren_r <T>
   end
 
   rule function_result
@@ -2564,6 +2559,16 @@ grammar Fortran
     label:label? t_open t_paren_l connect_spec_list t_paren_r t_newline <StmtC>
   end
 
+  rule optional_stmt
+    # R520
+    #
+    # Constraint: An optional_stmt may occur only in the scoping unit of a
+    # subprogram of an interface body.
+
+    label:label? t_optional double_colon? dummy_arg_name_list t_newline
+      <Optional_Stmt>
+  end
+
   rule or_op
     # R721
 
@@ -2615,7 +2620,7 @@ grammar Fortran
   end
 
   rule parenthesized_args
-    t_paren_l actual_arg_spec_list_option t_paren_r <T>
+    t_paren_l actual_arg_spec_list t_paren_r <T>
   end
 
   rule parenthesized_component_array_spec
@@ -2731,12 +2736,12 @@ grammar Fortran
     # Constraint: subobject must be a subobject whose parent is a constant. A
     # variable that is a primary must not be an assumed-size array.
 
+    function_reference /
     variable /
     constant /
     constant_subobject /
     array_constructor /
     structure_constructor /
-    function_reference /
     parenthesized_expr
   end
 
@@ -3187,7 +3192,7 @@ grammar Fortran
     intent_stmt /
     intrinsic_stmt /
     namelist_stmt /
-# optional_stmt /
+    optional_stmt /
     pointer_stmt /
     save_stmt /
     target_stmt
@@ -3707,6 +3712,10 @@ grammar Fortran
 
   rule t_result
     "result" <T>
+  end
+
+  rule t_return
+    "return" <T>
   end
 
   rule t_rewind

@@ -348,6 +348,10 @@ module Fortran
     def to_s() bb(stmt("#{sa(e1)}#{e2}#{e3}")) end
   end
 
+  class Optional_Stmt < T
+    def to_s() stmt("#{e1}#{mn(e2,'::',' ')}#{e3}") end
+  end
+  
   class Pointer_Stmt < T
     def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
   end
