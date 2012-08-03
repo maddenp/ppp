@@ -30,7 +30,11 @@ grammar Fortran
   rule internal_subprogram_part
     # R210
 
-    contains_stmt internal_subprogram+ <E>
+    contains_stmt internal_subprograms <E>
+  end
+
+  rule internal_subprograms
+    internal_subprogram internal_subprogram* <E>
   end
 
   rule t_contains
@@ -57,7 +61,7 @@ grammar Fortran
     # Constraint: An internal function must not contain an ENTRY statement. An
     # internal function must not contain an internal_subprogram_part.
 
-    function_stmt specification_part? execution_part? internal_subprogram_part end_function_stmt <E>
+    function_stmt specification_part? execution_part? internal_subprogram_part? end_function_stmt <E>
   end
 
   rule t_function
@@ -70,7 +74,7 @@ grammar Fortran
     # Constraint: If RESULT is specified, result_name must not be the same as
     # function_name.
 
-    label:label? prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r function_result_option? t_newline <Function_Stmt>
+    label:label? prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r function_result? t_newline <Function_Stmt>
   end
 
   rule dummy_arg_name_list
@@ -81,14 +85,8 @@ grammar Fortran
     "result" <T>
   end
 
-  rule function_result_option
+  rule function_result
     t_result t_paren_l result_name t_paren_r <T>
-  end
-
-  rule function_name
-    # Multiple uses (not explicitly defined)
-
-    name
   end
 
   rule result_name
@@ -105,7 +103,7 @@ grammar Fortran
     # end_function_stmt, it must be identical to the function_name specified in
     # the function_stmt.
 
-    label:label? t_end t_end_function_option t_newline <End_Function_Stmt>
+    label:label? t_end end_function_option? t_newline <End_Function_Stmt>
   end
 
   rule end_function_option

@@ -142,7 +142,7 @@ module Fortran
 
   class J < T
     def to_s
-      space
+      space(:all)
     end
   end
 
