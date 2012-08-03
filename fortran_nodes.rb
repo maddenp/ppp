@@ -160,6 +160,10 @@ module Fortran
 
   # Specific Subclasses
 
+  class Access_Stmt_Option < T
+    def to_s() "#{mn(e0,'::',' ')}#{e1}" end
+  end
+  
   class Allocatable_Stmt < T
     def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
   end

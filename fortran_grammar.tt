@@ -30,6 +30,7 @@ grammar Fortran
   end
 
 #PM#
+### test return w/ scalar_int_expr in subroutine
   rule return_stmt
     # R1224
     #
@@ -87,6 +88,20 @@ grammar Fortran
     ac_value ( t_comma ac_value )* <E>
   end
 
+  rule access_id
+    # R522
+    #
+    # Constraint: Each use_name must be the name of a named variable, procedure,
+    # derived type, named constant, or namelist group.
+
+    use_name /
+    generic_spec
+  end
+
+  rule access_id_list
+    access_id ( t_comma access_id )* <T>
+  end
+
   rule access_spec
     # R510
     #
@@ -95,6 +110,23 @@ grammar Fortran
 
     t_public /
     t_private
+  end
+
+  rule access_stmt
+    # R521
+    #
+    # Constraint: An access_stmt may appear only in the scoping unit of a
+    # module. Only one accessibility statement with an omitted access_id_list is
+    # permitted in the scoping unit of a module. A module procedure that has a
+    # dummy argument or function result of a type that has PRIVATE accessibility
+    # must have PRIVATE accessibility and must not have a generic identifier
+    # that has PUBLIC accessibility.
+
+    label:label? access_spec access_stmt_option? t_newline <StmtC>
+  end
+
+  rule access_stmt_option
+    double_colon? access_id_list <Access_Stmt_Option>
   end
 
   rule action_stmt
@@ -1143,6 +1175,14 @@ grammar Fortran
     t_dot t_letter t_letter+ t_dot <T>
   end
 
+  rule defined_operator
+    # R311
+
+    defined_unary_op /
+    defined_binary_op /
+    extended_intrinsic_op
+  end
+
   rule defined_unary_op
     # R704
     #
@@ -1666,6 +1706,12 @@ grammar Fortran
     expr ( t_comma expr )* <E>
   end
 
+  rule extended_intrinsic_op
+    # R312
+
+    intrinsic_operator
+  end
+  
   rule external_file_unit
     # R902
 
@@ -1761,6 +1807,20 @@ grammar Fortran
 
     function_stmt specification_part? execution_part? internal_subprogram_part?
       end_function_stmt <E>
+  end
+
+  rule generic_name
+    # 12.3.2.1 (not explicitly defined)
+
+    name
+  end
+
+  rule generic_spec
+    # R1206
+
+    generic_name /
+    t_operator t_paren_l defined_operator t_paren_r <T> /
+    t_assignment t_paren_l e_equal t_paren_r <T>
   end
 
   rule goto_stmt
@@ -3180,9 +3240,9 @@ grammar Fortran
   end
 
   rule specification_stmt
-    # R214 -- INCOMPLETE
+    # R214
 
-# access_stmt /
+    access_stmt /
     allocatable_stmt /
     common_stmt /
     data_stmt /
@@ -3311,9 +3371,13 @@ grammar Fortran
   end
 
   rule t_assign
-    "assign" <T>
+    "assign" !"ment" <T>
   end
 
+  rule t_assignment
+    "assignment" <T>
+  end
+   
   rule t_backspace
     "backspace" <T>
   end
@@ -3618,6 +3682,10 @@ grammar Fortran
     "opened" <T>
   end
 
+  rule t_operator
+    "operator" <T>
+  end
+
   rule t_optional
     "optional" <T>
   end
@@ -3885,6 +3953,12 @@ grammar Fortran
     # R515
 
     specification_expr
+  end
+
+  rule use_name
+    # Multiple uses (not explicitly defined)
+
+    name
   end
 
   rule variable
