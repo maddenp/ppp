@@ -1,3 +1,3 @@
 program t
-  print *,3.14e1
+  print '(f4.1)',3.14e1
 end program t

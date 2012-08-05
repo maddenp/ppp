@@ -1,3 +1,3 @@
 program t
-  print *,.14
+  print '(f3.2)',.14
 end program t

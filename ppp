@@ -127,14 +127,17 @@ class PPP
   end
 
   def normalize(s)
-    s=clean(s)
-    s=s.gsub(/!sms\$insert */i,'')                           # process inserts
-    s=s.gsub(/!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
-    tree=NormalizeParser.new.parse(s)
+    np=NormalizeParser.new
+    s=np.parse(s).to_s                                   # 1st normalizer pass
+    s=clean(s)                                           # 1st cleaner pass
+    s=s.gsub(/!sms\$insert */i,'')                       # process inserts
+    s=s.gsub(/!sms\$removebegin.*?!sms\$removeend/im,'') # process removes
+    tree=np.parse(s)                                     # 2nd normalizer pass
+    s=clean(tree.to_s)                                   # 2nd cleaner pass
     if tree.nil?
       fail "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}"
     end
-    clean(tree.to_s)
+    s
   end
 
   def parse(s)

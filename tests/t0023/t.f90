@@ -1,3 +1,3 @@
 program t
-  print *,3.
+  print '(f3.1)',3.
 end program t
