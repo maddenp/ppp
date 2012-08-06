@@ -30,34 +30,6 @@ grammar Fortran
   end
 
 #PM#
-  rule t_entry
-    "entry" <T>
-  end
-
-  rule entry_name
-    # 12.5.2.5 (not explicitly defined)
-
-    name
-  end
-
-  rule entry_stmt
-    # R1223
-    #
-    # Constraint: If RESULT is specified, the entry_name must not appear in any
-    # specification statement in the scoping unit of the function program. An
-    # entry_stmt may appear only in an external_subprogram or module_subprogram.
-    # An entry_stmt must not appear within an executable_construct. RESULT may
-    # be present only if the entry_stmt is contained in a function subprogram.
-    # Within the subprogram containing the entry_stmt, the entry_name must not
-    # appear as a dummy argument in the FUNCTION or SUBROUTINE statement or in
-    # another ENTRY statement and it must not appear in an EXTERNAL or INTRINSIC
-    # statement. A dummy-arg may be an alternate return indicator only if the
-    # ENTRY statement is contained in a subroutine subprogram. If RESULT is
-    # specified, result_name must not be the same as entry_name.
-
-    label:label? t_entry entry_name dummy_arg_list_option? result_option? t_newline <Entry_Stmt>
-  end
-
 #PM#
 
   rule ac_do_variable
@@ -1585,6 +1557,30 @@ grammar Fortran
 
   rule entity_decl_array_spec
     t_paren_l array_spec t_paren_r <T>
+  end
+
+  rule entry_name
+    # 12.5.2.5 (not explicitly defined)
+
+    name
+  end
+
+  rule entry_stmt
+    # R1223
+    #
+    # Constraint: If RESULT is specified, the entry_name must not appear in any
+    # specification statement in the scoping unit of the function program. An
+    # entry_stmt may appear only in an external_subprogram or module_subprogram.
+    # An entry_stmt must not appear within an executable_construct. RESULT may
+    # be present only if the entry_stmt is contained in a function subprogram.
+    # Within the subprogram containing the entry_stmt, the entry_name must not
+    # appear as a dummy argument in the FUNCTION or SUBROUTINE statement or in
+    # another ENTRY statement and it must not appear in an EXTERNAL or INTRINSIC
+    # statement. A dummy-arg may be an alternate return indicator only if the
+    # ENTRY statement is contained in a subroutine subprogram. If RESULT is
+    # specified, result_name must not be the same as entry_name.
+
+    label:label? t_entry entry_name dummy_arg_list_option? result_option? t_newline <Entry_Stmt>
   end
 
   rule equiv_op
@@ -3580,6 +3576,10 @@ grammar Fortran
 
   rule t_endwhere
     "endwhere" <T>
+  end
+
+  rule t_entry
+    "entry" <T>
   end
 
   rule t_eor

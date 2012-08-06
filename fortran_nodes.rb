@@ -300,6 +300,10 @@ module Fortran
     def names() elements.map { |e| e.name } end
   end
 
+  class Entry_Stmt < T
+    def to_s() stmt("#{e1} #{e2}#{e3}#{sb(e4)}") end
+  end
+
   class Function_Stmt < T
     def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7)}")) end
   end
@@ -426,9 +430,6 @@ module Fortran
   end
   
   #PM#
-  class Entry_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{e3}#{sb(e4)}") end
-  end
   #PM#
 
 end
