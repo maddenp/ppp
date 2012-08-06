@@ -430,6 +430,14 @@ module Fortran
   end
   
   #PM#
+  class Use_Stmt_1 < T
+    def to_s() stmt("#{e1} #{e2}#{e3}") end
+  end
+  
+  class Use_Stmt_2 < T
+    def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{e5}#{e6}") end
+  end
+  
   #PM#
 
 end

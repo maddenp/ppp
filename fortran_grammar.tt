@@ -33,8 +33,12 @@ grammar Fortran
   rule use_stmt
     # R1107
 
-    label:label? t_use module_name ( t_comma rename_list )? t_newline <StmtJ> /
-    label:label? t_use module_name t_comma t_only t_colon only_list? t_newline <StmtJ>
+    label:label? t_use module_name rename_list_option? t_newline <Use_Stmt_1> /
+    label:label? t_use module_name t_comma t_only t_colon only_list? t_newline <Use_Stmt_2>
+  end
+
+  rule rename_list_option
+    t_comma rename_list <T>
   end
 
   rule use_stmts
@@ -57,12 +61,12 @@ grammar Fortran
     # Constraint: Each access_id must be a public entity in the module. Each
     # use_name must be the name of a public entity in the module.
 
-    access_id /
-    ( local_name t_point )? use_name <E>
+    ( local_name t_point )? use_name <E> /
+    access_id
   end
 
   rule only_list
-    only ( t_comma only )* <E>
+    only ( t_comma only )* <T>
   end
 
   rule local_name
