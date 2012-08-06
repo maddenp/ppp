@@ -23,7 +23,7 @@ control: $(TEST)
 ifdef MAKE_CONTROL_DISABLED
 	$(info Auto-generation of 'control' is disabled for test $(TEST), investigate...)
 else
-	$(FC) $(FFLAGS) $^ && a.out >control 2>&1 && $(RM) a.out
+	$(FC) $(FFLAGS) $(INCFLAG) $^ && a.out >control 2>&1 && $(RM) a.out
 endif
 
 translation: $(TRANSLATION)
@@ -32,4 +32,4 @@ $(BIN): $(TRANSLATION)
 	$(FC) $(FFLAGS) $(TRANSLATION)
 
 $(TRANSLATION): $(TEST)
-	$(PPP) $(TEST) > $(TRANSLATION)
+	$(PPP) $(INCFLAG) $(TEST) > $(TRANSLATION)
