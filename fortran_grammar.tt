@@ -3400,6 +3400,10 @@ grammar Fortran
     target_stmt
   end
 
+  rule star_int
+    t_star int_literal_constant <T>
+  end
+
   rule stat_variable
     # R623
 
@@ -4156,6 +4160,7 @@ grammar Fortran
 
   rule type_spec_without_kind_selector
     t_integer "" <Type_Spec> /
+    t_real star_int <Type_Spec> / # NONSTANDARD!
     t_real "" <Type_Spec> /
     t_doubleprecision "" <Type_Spec> /
     t_complex "" <Type_Spec> /
