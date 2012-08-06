@@ -17,43 +17,6 @@ grammar Fortran
   end
 
 #PM#
-  rule stmt_function_stmt
-    # R1226
-    #
-    # Constraint: The scalar_expr may be composed only of constants (literal and
-    # named), references to variables, references to functions and function
-    # dummy procedures, and intrinsic operations. If scalar_expr contains a
-    # reference to a function or a function dummy procedure, the reference must
-    # not require an explicit interface, the function must not require an
-    # explicit interface or be a transformational intrinsic, and the result must
-    # be scalar. If an argument to a function or a function dummy procedure is
-    # array valued, it must be an array name. If a reference to a statement
-    # function appears in scalar_expr, its definition must have been provided
-    # earlier in the scoping unit and must not be the name of the statement
-    # function being defined. Named constants in scalar_expr must have been
-    # declared earlier in the scoping unit or made accessible by use or host
-    # association. If array elements appear in scalar_expr, the parent array
-    # must have been declared as an array earlier in the scoping unit or made
-    # accessible by use or host association. If a dummy_arg_name, variable,
-    # function reference, or dummy function reference is typed by the implicit
-    # typing rules, its appearance in any subsequent type declaration must
-    # confirm this implied type and the values of any implied type parameters.
-    # The function_name and each dummy_arg_name must be specified, explicitly or
-    # implicitly, to be scalar data objects. A given dummy_arg_name may appear
-    # only once in any dummy_arg_name_list. Each variable reference in
-    # scalar_expr may be either a reference to a dummy argument of the statement
-    # function or a reference to a variable accessible in the same scoping unit
-    # as the statement function statement.
-
-    label:label? function_name t_paren_l dummy_arg_name_list? t_paren_r t_equal scalar_expr t_newline <StmtJ>
-  end
-
-  rule scalar_expr
-    # 12.5.4 (not explicitly defined)
-
-    expr
-  end
-
 #PM#
 
   rule ac_do_variable
@@ -3183,6 +3146,12 @@ grammar Fortran
     default_logical_variable
   end
 
+  rule scalar_expr
+    # 12.5.4 (not explicitly defined)
+
+    expr
+  end
+
   rule scalar_int_constant
     # Multiple uses (not explicitly defined)
     #
@@ -3386,6 +3355,38 @@ grammar Fortran
     # R623
 
     scalar_int_variable
+  end
+
+  rule stmt_function_stmt
+    # R1226
+    #
+    # Constraint: The scalar_expr may be composed only of constants (literal and
+    # named), references to variables, references to functions and function
+    # dummy procedures, and intrinsic operations. If scalar_expr contains a
+    # reference to a function or a function dummy procedure, the reference must
+    # not require an explicit interface, the function must not require an
+    # explicit interface or be a transformational intrinsic, and the result must
+    # be scalar. If an argument to a function or a function dummy procedure is
+    # array valued, it must be an array name. If a reference to a statement
+    # function appears in scalar_expr, its definition must have been provided
+    # earlier in the scoping unit and must not be the name of the statement
+    # function being defined. Named constants in scalar_expr must have been
+    # declared earlier in the scoping unit or made accessible by use or host
+    # association. If array elements appear in scalar_expr, the parent array
+    # must have been declared as an array earlier in the scoping unit or made
+    # accessible by use or host association. If a dummy_arg_name, variable,
+    # function reference, or dummy function reference is typed by the implicit
+    # typing rules, its appearance in any subsequent type declaration must
+    # confirm this implied type and the values of any implied type parameters.
+    # The function_name and each dummy_arg_name must be specified, explicitly or
+    # implicitly, to be scalar data objects. A given dummy_arg_name may appear
+    # only once in any dummy_arg_name_list. Each variable reference in
+    # scalar_expr may be either a reference to a dummy argument of the statement
+    # function or a reference to a variable accessible in the same scoping unit
+    # as the statement function statement.
+
+    label:label? function_name t_paren_l dummy_arg_name_list? t_paren_r t_equal
+      scalar_expr t_newline <StmtC>
   end
 
   rule stop_code
