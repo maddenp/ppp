@@ -417,6 +417,14 @@ module Fortran
     def type() (derived?)?("#{e2}"):("#{e0}") end
   end
 
+  class Use_Stmt_1 < T
+    def to_s() stmt("#{e1} #{e2}#{e3}") end
+  end
+  
+  class Use_Stmt_2 < T
+    def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{e5}#{e6}") end
+  end
+  
   class Where_Construct_Stmt < T
     def to_s() bb(stmt("#{e1} #{e2}#{e3}#{e4}")) end
   end
@@ -430,14 +438,6 @@ module Fortran
   end
   
   #PM#
-  class Use_Stmt_1 < T
-    def to_s() stmt("#{e1} #{e2}#{e3}") end
-  end
-  
-  class Use_Stmt_2 < T
-    def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{e5}#{e6}") end
-  end
-  
   #PM#
 
 end
