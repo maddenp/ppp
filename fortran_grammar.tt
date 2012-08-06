@@ -2785,7 +2785,7 @@ grammar Fortran
   end
 
   rule parenthesized_args
-    t_paren_l actual_arg_spec_list t_paren_r <T>
+    t_paren_l actual_arg_spec_list? t_paren_r <T>
   end
 
   rule parenthesized_component_array_spec
