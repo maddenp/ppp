@@ -16,61 +16,6 @@ grammar Fortran
     program_unit+ <Program_Units>
   end
 
-#PM#
-  rule t_interface
-    "interface" <T>
-  end
-
-  rule t_procedure
-    "procedure" <T>
-  end
-
-  rule interface_block
-    # R1201
-    #
-    # Constraint: An interface_body must not contain an entry_stmt, data_stmt,
-    # format_stmt, or stmt_function_stmt. The MODULE PROCEDURE specification is
-    # allowed only if the interface_block has a generic_spec and has a host that
-    # is a module or accesses a module by use association; each procedure_name
-    # must be the name of a module procedure that is accessible in the host. An
-    # interface_block must not appear in a BLOCK DATA program unit. An
-    # interface_block in a subprogram must not contain an interface_body for a
-    # procedure defined by that subprogram.
-
-    interface_stmt interface_body? module_procedure_stmt? end_interface_stmt <E>
-  end
-
-  rule interface_stmt
-    # R1202
-
-    label:label? t_interface generic_spec? t_newline <StmtJ>
-  end
-
-  rule end_interface_stmt
-    # R1203
-
-    label:label? t_end t_interface t_newline <StmtJ>
-  end
-
-  rule interface_body
-    # R1204
-
-    function_stmt specification_part? end_function_stmt <E> /
-    subroutine_stmt specification_part? end_function_stmt <E>
-  end
-
-  rule module_procedure_stmt
-    # R1205
-
-    label:label? t_module t_procedure procedure_name_list t_newline <StmtJ>
-  end
-
-  rule procedure_name_list
-    procedure_name ( t_comma procedure_name )* <T>
-  end
-  
-#PM#
-
   rule ac_do_variable
     # R435
     #
@@ -1475,6 +1420,12 @@ grammar Fortran
     label:label? t_endif if_construct_name? t_newline <End_If_Stmt>
   end
 
+  rule end_interface_stmt
+    # R1203
+
+    label:label? t_end t_interface t_newline <End_Interface_Stmt>
+  end
+
   rule end_module_option
     t_module module_name? <End_Module_Option>
   end
@@ -2143,6 +2094,38 @@ grammar Fortran
       dummy_arg_name_list t_newline <Intent_Stmt>
   end
 
+  rule interface_block
+    # R1201
+    #
+    # Constraint: An interface_body must not contain an entry_stmt, data_stmt,
+    # format_stmt, or stmt_function_stmt. The MODULE PROCEDURE specification is
+    # allowed only if the interface_block has a generic_spec and has a host that
+    # is a module or accesses a module by use association; each procedure_name
+    # must be the name of a module procedure that is accessible in the host. An
+    # interface_block must not appear in a BLOCK DATA program unit. An
+    # interface_block in a subprogram must not contain an interface_body for a
+    # procedure defined by that subprogram.
+
+    interface_stmt interface_bodies module_procedure_stmts end_interface_stmt <E>
+  end
+
+  rule interface_bodies
+    interface_body* <E>
+  end
+
+  rule interface_body
+    # R1204
+
+    subroutine_stmt specification_part? end_subroutine_stmt <E> /
+    function_stmt specification_part? end_function_stmt <E>
+  end
+
+  rule interface_stmt
+    # R1202
+
+    label:label? t_interface generic_spec? t_newline <Interface_Stmt>
+  end
+
   rule internal_file_unit
     # R903
     #
@@ -2541,6 +2524,16 @@ grammar Fortran
     # 11.3 (not explicitly defined)
 
     name
+  end
+
+  rule module_procedure_stmt
+    # R1205
+
+    label:label? t_module t_procedure procedure_name_list t_newline <StmtJ>
+  end
+
+  rule module_procedure_stmts
+    module_procedure_stmt* <E>
   end
 
   rule module_subprogram
@@ -2948,6 +2941,10 @@ grammar Fortran
     name
   end
 
+  rule procedure_name_list
+    procedure_name ( t_comma procedure_name )* <T>
+  end
+  
   rule program_name
     # 11.1
 
@@ -3796,6 +3793,10 @@ grammar Fortran
     "intent" <T>
   end
 
+  rule t_interface
+    "interface" <T>
+  end
+
   rule t_intrinsic
     "intrinsic" <T>
   end
@@ -3942,6 +3943,10 @@ grammar Fortran
 
   rule t_private
     "private" <T>
+  end
+
+  rule t_procedure
+    "procedure" <T>
   end
 
   rule t_program

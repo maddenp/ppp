@@ -256,6 +256,10 @@ module Fortran
     def to_s() stmt(space,:be) end
   end
 
+  class End_Interface_Stmt < T
+    def to_s() stmt(space,:be) end
+  end
+  
   class End_Module_Option < T
     def to_s() space(:all) end
   end
@@ -332,6 +336,10 @@ module Fortran
     def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{mn(e5,'::',' ')}#{e6}") end
   end
 
+  class Interface_Stmt < T
+    def to_s() bb(stmt(space)) end
+  end
+  
   class Label_Do_Stmt < T
     def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}")) end
   end
@@ -437,9 +445,6 @@ module Fortran
     def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5)}") end
   end
   
-  #PM#
-  #PM#
-
 end
 
 # paul.a.madden@noaa.gov
