@@ -426,6 +426,9 @@ module Fortran
   end
   
   #PM#
+  class Entry_Stmt < T
+    def to_s() stmt("#{e1} #{e2}#{e3}#{sb(e4)}") end
+  end
   #PM#
 
 end

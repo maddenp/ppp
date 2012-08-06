@@ -55,7 +55,7 @@ grammar Fortran
     # ENTRY statement is contained in a subroutine subprogram. If RESULT is
     # specified, result_name must not be the same as entry_name.
 
-    label:label? t_entry entry_name entry_name dummy_arg_list_option? result_option? t_newline <StmtJ>
+    label:label? t_entry entry_name dummy_arg_list_option? result_option? t_newline <Entry_Stmt>
   end
 
 #PM#
