@@ -30,11 +30,20 @@ grammar Fortran
   end
 
 #PM#
-  rule external_subprogram
-    # R203
+  rule t_entry
+    "entry" <T>
+  end
 
-    subroutine_subprogram /
-    function_subprogram
+  rule entry_name
+    # 12.5.2.5 (not explicitly defined)
+
+    name
+  end
+
+  rule entry_stmt
+    # R1223
+
+    label:label? t_entry entry_name entry_name dummy_arg_list_option? result_option? t_newline <StmtJ>
   end
 
 #PM#
@@ -1340,6 +1349,10 @@ grammar Fortran
     name
   end
 
+  rule dummy_arg_list_option
+    t_paren_l dummy_arg_list? t_paren_r <E>
+  end
+
   rule dummy_arg_name_list
     dummy_arg_name ( t_comma dummy_arg_name )* <T>
   end
@@ -1742,6 +1755,13 @@ grammar Fortran
     label:label? t_external external_name_list t_newline <StmtJ>
   end
 
+  rule external_subprogram
+    # R203
+
+    subroutine_subprogram /
+    function_subprogram
+  end
+
   rule file_name_expr
     # R906
 
@@ -1793,10 +1813,6 @@ grammar Fortran
     function_name t_paren_l parenthesized_args? t_paren_r <T>
   end
 
-  rule function_result
-    t_result t_paren_l result_name t_paren_r <T>
-  end
-
   rule function_stmt
     # R1216
     #
@@ -1804,7 +1820,7 @@ grammar Fortran
     # function_name.
 
     label:label? prefix? t_function function_name t_paren_l dummy_arg_name_list?
-      t_paren_r function_result? t_newline <Function_Stmt>
+      t_paren_r result_option? t_newline <Function_Stmt>
   end
 
   rule function_subprogram
@@ -2965,6 +2981,10 @@ grammar Fortran
     name
   end
 
+  rule result_option
+    t_result t_paren_l result_name t_paren_r <T>
+  end
+
   rule return_stmt
     # R1224
     #
@@ -3335,11 +3355,7 @@ grammar Fortran
     # R1220
 
     label:label? t_recursive? t_subroutine subroutine_name
-      subroutine_stmt_option? t_newline <Subroutine_Stmt>
-  end
-
-  rule subroutine_stmt_option
-    t_paren_l dummy_arg_list? t_paren_r <E>
+      dummy_arg_list_option? t_newline <Subroutine_Stmt>
   end
 
   rule subroutine_subprogram
