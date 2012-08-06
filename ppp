@@ -1,9 +1,5 @@
 #!/usr/bin/env ruby
 
-# TODO normalize specifier strings like STATUS='KEEP' et al (see e.g. 9.3.5)?
-# TODO treat 'H' edit descriptor's suffix verbatim (e.g. '100 format (5Hhello)')?
-# TODO need to recognize other directives (e.g. omp)
-
 pppbase=File.dirname(File.expand_path($0))
 
 ENV['GEM_PATH']=File.join(pppbase,'gems')

@@ -1,0 +1,18 @@
+
+- Rule primary cannot tell the difference between function and array
+  references. Since variable -> subobject -> ( array_section / array_element )
+  precedes function_reference, the latter is recognized as the former. This
+  needs to be fixed with environment analysis.
+
+- Need tests of all R905 possibilities.
+
+- Need tests of all R912 possibilities.
+
+- Need tests of all R924 possibilities.
+
+- Normalize specifier strings like STATUS='KEEP' et al (see e.g. 9.3.5) in ppp?
+
+- Treat 'H' edit descriptor's suffix verbatim (e.g. '100 format (5Hhello)')?
+
+- Need to recognize other directives (e.g. omp)
+

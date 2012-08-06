@@ -10,19 +10,6 @@
 # for parsing. Ordered-choice order difference in many places from that given in
 # the standard, for correctness.
 
-# TODO
-#
-# - Rule primary cannot tell the difference between function and array
-#   references. Since variable -> subobject -> ( array_section / array_element )
-#   precedes function_reference, the latter is recognized as the former. This
-#   needs to be fixed with environment analysis.
-#
-# - Need tests of all R905 possibilities.
-#
-# - Need tests of all R912 possibilities.
-#
-# - Need tests of all R924 possibilities.
-
 grammar Fortran
 
   rule start

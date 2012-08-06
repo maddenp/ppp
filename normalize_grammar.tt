@@ -9,7 +9,6 @@ grammar Normalize
   end
 
   rule directive
-    # TODO need to recognize other (e.g. 'omp') directives
     sms
   end
 
