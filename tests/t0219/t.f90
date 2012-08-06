@@ -5,10 +5,11 @@ program p
   print '(i0)',a()
 end program p
 
-integer function s()
+integer function s() result(r)
   implicit none
-  s=0
+  integer::r
+  r=0
   return
-  entry a() result(s)
-  s=1
+  entry a() result(r)
+  r=1
 end function s
