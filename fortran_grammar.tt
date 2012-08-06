@@ -30,6 +30,47 @@ grammar Fortran
   end
 
 #PM#
+  rule use_stmt
+    # R1107
+
+    label:label? t_use module_name ( t_comma rename_list )? t_newline <StmtJ> /
+    label:label? t_use module_name t_comma t_only t_colon only_list? t_newline <StmtJ>
+  end
+
+  rule use_stmts
+    use_stmt* <E>
+  end
+
+  rule rename
+    # R1108
+
+    local_name t_point use_name <E>
+  end
+
+  rule rename_list
+    rename ( t_comma rename )* <E>
+  end
+
+  rule only
+    # R1109
+    #
+    # Constraint: Each access_id must be a public entity in the module. Each
+    # use_name must be the name of a public entity in the module.
+
+    access_id /
+    ( local_name t_point )? use_name <E>
+  end
+
+  rule only_list
+    only ( t_comma only )* <E>
+  end
+
+  rule local_name
+    # 11.3.2 (not explicitly defined)
+
+    name
+  end
+    
 #PM#
 
   rule ac_do_variable
@@ -2784,7 +2825,7 @@ grammar Fortran
     # target must be of the same type, type parameters, and rank as the
     # pointer.
 
-    label:label? pointer_object t_pointer_assign target t_newline <StmtC>
+    label:label? pointer_object t_point target t_newline <StmtC>
   end
 
   rule pointer_object
@@ -3300,10 +3341,9 @@ grammar Fortran
   end
 
   rule specification_part
-    # R204 -- INCOMPLETE
+    # R204
 
-# use_stmt* implicit_part? declaration_construct <E>
-    implicit_part? declaration_constructs <E>
+    use_stmts implicit_part? declaration_constructs <E>
   end
 
   rule specification_stmt
@@ -3762,6 +3802,10 @@ grammar Fortran
     [01234567] <T>
   end
 
+  rule t_only
+    "only" <T>
+  end
+
   rule t_open
     "open" !"ed" <T>
   end
@@ -3810,12 +3854,12 @@ grammar Fortran
     "+" <T>
   end
 
-  rule t_pointer
-    "pointer" <T>
+  rule t_point
+    "=>" <T>
   end
 
-  rule t_pointer_assign
-    "=>" <T>
+  rule t_pointer
+    "pointer" <T>
   end
 
   rule t_position
@@ -3953,6 +3997,10 @@ grammar Fortran
 
   rule t_unit
     "unit" <T>
+  end
+
+  rule t_use
+    "use" <T>
   end
 
   rule t_where
