@@ -2483,20 +2483,36 @@ grammar Fortran
   end
 
   rule module
-    # R1104 -- INCOMPLETE
+    # R1104
     #
     # Constraint: A module specification_part must not contain a
     # stmt_function_stmt, an entry_stmt, or a format_stmt. An automatic object
     # must not appear in the specification_part (R204) of a module.
 
-# module_stmt specification_part? module_subprogram_part? end_module_stmt <E>
-    module_stmt specification_part? end_module_stmt <E>
+    module_stmt specification_part? module_subprogram_part? end_module_stmt <E>
   end
 
   rule module_name
     # 11.3 (not explicitly defined)
 
     name
+  end
+
+  rule module_subprogram
+    # R213
+
+    subroutine_subprogram /
+    function_subprogram
+  end
+
+  rule module_subprogram_part
+    # R212
+
+    contains_stmt module_subprograms <E>
+  end
+
+  rule module_subprograms
+    module_subprogram module_subprogram* <E>
   end
 
   rule module_stmt
