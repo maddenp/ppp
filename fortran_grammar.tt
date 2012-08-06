@@ -42,6 +42,18 @@ grammar Fortran
 
   rule entry_stmt
     # R1223
+    #
+    # Constraint: If RESULT is specified, the entry_name must not appear in any
+    # specification statement in the scoping unit of the function program. An
+    # entry_stmt may appear only in an external_subprogram or module_subprogram.
+    # An entry_stmt must not appear within an executable_construct. RESULT may
+    # be present only if the entry_stmt is contained in a function subprogram.
+    # Within the subprogram containing the entry_stmt, the entry_name must not
+    # appear as a dummy argument in the FUNCTION or SUBROUTINE statement or in
+    # another ENTRY statement and it must not appear in an EXTERNAL or INTRINSIC
+    # statement. A dummy-arg may be an alternate return indicator only if the
+    # ENTRY statement is contained in a subroutine subprogram. If RESULT is
+    # specified, result_name must not be the same as entry_name.
 
     label:label? t_entry entry_name entry_name dummy_arg_list_option? result_option? t_newline <StmtJ>
   end
@@ -1108,9 +1120,9 @@ grammar Fortran
     type_declaration_stmt /
     specification_stmt /
     parameter_stmt /
-    format_stmt
-# /
-# entry_stmt /
+    format_stmt /
+    entry_stmt
+#/
 # stmt_function_stmt
   end
 
@@ -1667,14 +1679,13 @@ grammar Fortran
   end
 
   rule execution_part_construct
-    # R209 -- INCOMPLETE
+    # R209
 
     (
       executable_construct /
       format_stmt /
-      data_stmt
-# /
-# entry_stmt
+      data_stmt /
+      entry_stmt
     )* <E>
   end
 
@@ -1929,13 +1940,12 @@ grammar Fortran
   end
 
   rule implicit_part_stmt
-    # R206 -- INCOMPLETE
+    # R206
 
     implicit_stmt /
     format_stmt /
-    parameter_stmt
-#/
-# entry_stmt
+    parameter_stmt /
+    entry_stmt
   end
 
   rule implicit_spec
@@ -3280,7 +3290,7 @@ grammar Fortran
   rule specification_part
     # R204 -- INCOMPLETE
 
-# use_stmt* implicit_part? declaration_construct* <E>
+# use_stmt* implicit_part? declaration_construct <E>
     implicit_part? declaration_constructs <E>
   end
 
