@@ -2391,7 +2391,11 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_3_expr concat_op )? level_2_expr
 
-    level_2_expr ( concat_op level_3_expr )? <T>
+    level_2_expr level_3_expr_option? <T>
+  end
+
+  rule level_3_expr_option
+    concat_op level_3_expr <T>
   end
 
   rule level_4_expr
@@ -2400,7 +2404,11 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_3_expr rel_op )? level_3_expr
 
-    level_3_expr ( rel_op level_3_expr )? <T>
+    level_3_expr level_4_expr_option? <T>
+  end
+
+  rule level_4_expr_option
+    rel_op level_3_expr <T>
   end
 
   rule level_5_expr
@@ -2409,7 +2417,11 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_5_expr equiv_op)? equiv_operand
 
-    equiv_operand ( equiv_op level_5_expr )? <T>
+    equiv_operand level_5_expr_option? <T>
+  end
+
+  rule level_5_expr_option
+    equiv_op level_5_expr <T>
   end
 
   rule literal_constant
@@ -3034,10 +3046,10 @@ grammar Fortran
 
     rel_op_eq /
     rel_op_ne /
-    rel_op_lt /
     rel_op_le /
-    rel_op_gt /
-    rel_op_ge
+    rel_op_lt /
+    rel_op_ge /
+    rel_op_gt
   end
 
   rule rename
