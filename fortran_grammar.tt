@@ -3369,8 +3369,21 @@ grammar Fortran
   rule significand
     # R414
 
-    digit_string t_dot digit_string? <T> /
+    digit_string t_dot !significand_disallowed digit_string? <T> /
     t_dot digit_string <T>
+  end
+
+  rule significand_disallowed
+    # Note: The use of this rule as a negative lookahead assertion in rule
+    # significand allows parsing of an if_then_stmt like:
+    #
+    #  if (a>0.and.b>1) then
+    #
+    # Without the negative lookahead assertion, '0.' would be recognized as a
+    # real_literal_constant and consumed, and the parse would fail.
+
+    "and." /
+    "or."
   end
 
   rule special_character
