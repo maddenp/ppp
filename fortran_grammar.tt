@@ -3711,7 +3711,19 @@ grammar Fortran
   end
 
   rule t_end
-    "end" !( "file" / "do" / "if" / "where" ) <T>
+    "end" !t_end_disallowed <T>
+  end
+
+  rule t_end_disallowed
+    # Note: Used as a negative lookahead assertion, prevents t_end from matching
+    # 'endfile', 'enddo', etc. Also prevents t_end from matching an assignment
+    # statement like 'endxyz=1'.
+
+    "file" /
+    "do" /
+    "if" /
+    "where" /
+    alphanumeric_character* t_equal
   end
 
   rule t_enddo
