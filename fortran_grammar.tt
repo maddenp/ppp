@@ -2558,11 +2558,7 @@ grammar Fortran
   rule module_subprogram_part
     # R212
 
-    contains_stmt module_subprograms <E>
-  end
-
-  rule module_subprograms
-    module_subprogram module_subprogram* <E>
+    contains_stmt module_subprogram+ <Module_Subprogram_Part>
   end
 
   rule module_stmt

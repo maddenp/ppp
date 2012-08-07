@@ -355,7 +355,11 @@ module Fortran
   class Module_Stmt < T
     def to_s() bb(stmt(space)) end
   end
-  
+
+  class Module_Subprogram_Part < T
+    def to_s() "#{e0}#{elements[1].elements.reduce('') { |m,e| m << "#{e}" }}" end
+  end
+
   class Namelist_Group_Set_Pair < T
     def to_s() "#{mp(e0,'',' ')}#{e1}" end
   end
