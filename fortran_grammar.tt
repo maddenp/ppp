@@ -1085,7 +1085,8 @@ grammar Fortran
     format_stmt /
     entry_stmt /
     stmt_function_stmt /
-    sms_declarative
+#    sms_declarative
+    directive
   end
 
   rule declaration_constructs
@@ -1200,6 +1201,13 @@ grammar Fortran
 
     label:label? t_dimension double_colon? array_names_and_specs t_newline
       <Dimension_Stmt>
+  end
+
+  rule directive
+    # Note: Any "comment" not stripped out during normalization is assumed to be
+    # a directive.
+
+    "!" character+ t_newline <T>
   end
 
   rule do_block
@@ -1649,7 +1657,8 @@ grammar Fortran
     do_construct /
     if_construct /
     where_construct /
-    sms_executable
+#    sms_executable
+    directive
   end
 
   rule executable_construct_action_stmt
@@ -4402,7 +4411,8 @@ grammar Fortran
   end
 
   rule use_part
-    ( use_stmt / sms_declarative )* <E>
+#    ( use_stmt / sms_declarative )* <E>
+    ( use_stmt / directive )* <E>
   end
 
   rule use_stmt
