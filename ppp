@@ -44,6 +44,7 @@ class PPP
     end
     s=File.open(srcfile,'rb').read
     s=assemble(s,incdirs,[srcfile])
+    cppcheck(s)
     puts "normalized:\n\n" if @debug
     s=normalize(s)
     unless @normalize
@@ -66,6 +67,16 @@ class PPP
 
   def comment_line
     Regexp.new("^\s*!(?!sms).*",true)
+  end
+
+  def cppcheck(s)
+    r=Regexp.new('^\s*#')
+    i=1
+    s.split("\n").each do |line|
+      m=r.match(line)
+      fail "Detected cpp directive:\n\n#{i}: #{line.strip}" if m
+      i+=1
+    end
   end
 
   def fail(msg)
