@@ -5,7 +5,19 @@ module Fortran
   @@level=0
   @@levelstack=[]
 
-  # Module methods
+  def bb(s)
+    @@level+=1
+    s
+  end
+
+  def be
+    @@level-=1 if @@level>0
+  end
+
+  def cat(f=nil)
+    send(f) unless f.nil?
+    self.elements.map { |e| e.to_s }.join
+  end
 
   def dolabel_dupe?
     "#{@@dolabels[-1]}"=="#{@@dolabels[-2]}"
@@ -19,6 +31,41 @@ module Fortran
     @@dolabels.push(label)
   end
 
+  def fail(s)
+    puts "\nERROR: "+s+"\n\nbacktrace:\n\n"
+    begin
+      raise
+    rescue => e
+      puts e.backtrace
+    end
+    puts
+    exit(1)
+  end
+
+  def get(k)
+    @@attrs[k]
+  end
+
+  def indent(s)
+    ' '*2*@@level+s
+  end
+
+  def lr
+    @@level=@@levelstack.pop
+  end
+
+  def ls
+    @@levelstack.push(@@level)
+  end
+
+  def mn(p,c,v)
+    (p.to_s!=c)?(v):(p)
+  end
+  
+  def mp(p,c,v)
+    (p.to_s==c)?(v):(p)
+  end
+  
   def msg(s)
     $stderr.write(">|#{s}|<\n")
   end
@@ -33,6 +80,28 @@ module Fortran
     @@dolabels.pop if nonblock_do_end?(node)
   end
 
+  def sa(e)
+    (e.to_s=='')?(''):("#{e} ")
+  end
+
+  def sb(e)
+    (e.to_s=='')?(''):(" #{e}")
+  end
+
+  def set(k,v)
+    @@attrs[k]=v
+  end
+
+  def space(x=nil)
+    a=(x.nil?)?(self.elements[1..-1]):(self.elements)
+    a.map { |e| e.to_s }.join(' ').strip
+  end
+
+  def stmt(s,f=nil)
+    send(f) unless f.nil?
+    indent(("#{sa(e0)}"+s.chomp).strip)+"\n"
+  end
+
   # Extension of SyntaxNode class
 
   class Treetop::Runtime::SyntaxNode
@@ -45,49 +114,8 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
-    def bb(s)
-      @@level+=1
-      s
-    end
-
-    def be
-      @@level-=1 if @@level>0
-    end
-
-    def cat(f=nil)
-      send(f) unless f.nil?
-      elements.map { |e| e.to_s }.join
-    end
-
-    def fail(s)
-      puts "\nERROR: "+s+"\n\nbacktrace:\n\n"
-      begin
-        raise
-      rescue => e
-        puts e.backtrace
-      end
-      puts
-      exit(1)
-    end
-
-    def get(k)
-      @@attrs[k]
-    end
-
-    def indent(s)
-      ' '*2*@@level+s
-    end
-
     def initialize(a='',b=(0..0),c=[])
       super(a,b,c)
-    end
-
-    def lr
-      @@level=@@levelstack.pop
-    end
-
-    def ls
-      @@levelstack.push(@@level)
     end
 
     def method_missing(m,*a)
@@ -97,35 +125,6 @@ module Fortran
       else
         fail "method_missing cannot find method '#{m}'"
       end
-    end
-
-    def mn(p,c,v)
-      (p.to_s!=c)?(v):(p)
-    end
-  
-    def mp(p,c,v)
-      (p.to_s==c)?(v):(p)
-    end
-  
-    def sa(e)
-      (e.to_s=='')?(''):("#{e} ")
-    end
-
-    def sb(e)
-      (e.to_s=='')?(''):(" #{e}")
-    end
-
-    def set(k,v)
-      @@attrs[k]=v
-    end
-
-    def space(x=nil)
-      ((x.nil?)?(elements[1..-1]):(elements)).map { |e| e.to_s }.join(' ').strip
-    end
-
-    def stmt(s,f=nil)
-      send(f) unless f.nil?
-      indent(("#{sa(e0)}"+s.chomp).strip)+"\n"
     end
 
     def to_s
