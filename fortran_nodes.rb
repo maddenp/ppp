@@ -410,7 +410,50 @@ module Fortran
   class Select_Case_Stmt < T
     def to_s() bb(bb(stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}",:ls))) end
   end
+
+  ## SMS ##
+  class SMS_Distribute_Begin < T
+    def to_s() "" end
+  end
   
+  class SMS_Distribute_End < T
+    def to_s() "" end
+  end
+  
+  class SMS_Halo_Comp_Begin < T
+    def to_s() "" end
+  end
+  
+  class SMS_Halo_Comp_End < T
+    def to_s() "" end
+  end
+  
+  class SMS_Parallel_Begin < T
+    def to_s() "" end
+  end
+  
+  class SMS_Parallel_End < T
+    def to_s() "" end
+  end
+  
+  class SMS_Serial_Begin < T
+    def to_s() "" end
+  end
+  
+  class SMS_Serial_End < T
+    def to_s() "" end
+  end
+  
+  class SMS_To_Local_Begin < T
+    def to_s() "" end
+  end
+  
+  class SMS_To_Local_End < T
+    def to_s() "" end
+  end
+  
+  ## SMS ##
+
   class Subroutine_Stmt < T
     def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}")) end
   end
