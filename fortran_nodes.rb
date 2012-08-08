@@ -92,6 +92,10 @@ module Fortran
     @@attrs[k]=v
   end
 
+  def sms(s)
+    "#{e0}#{e1} "+s+"\n"
+  end
+
   def space(x=nil)
     a=(x.nil?)?(self.elements[1..-1]):(self.elements)
     a.map { |e| e.to_s }.join(' ').strip
@@ -413,43 +417,51 @@ module Fortran
 
   ## SMS ##
   class SMS_Distribute_Begin < T
-    def to_s() "" end
+    def to_s() sms("#{e2} #{e3}") end
   end
   
   class SMS_Distribute_End < T
-    def to_s() "" end
+    def to_s() sms("#{e2}") end
   end
   
   class SMS_Halo_Comp_Begin < T
-    def to_s() "" end
+    def to_s() sms("#{e2} #{e3}") end
   end
   
   class SMS_Halo_Comp_End < T
-    def to_s() "" end
+    def to_s() sms("#{e2}") end
+  end
+  
+  class SMS_Ignore_Begin < T
+    def to_s() sms("#{e2} #{e3}") end
+  end
+  
+  class SMS_Ignore_End < T
+    def to_s() sms("#{e2}") end
   end
   
   class SMS_Parallel_Begin < T
-    def to_s() "" end
+    def to_s() sms("#{e2} #{e3}") end
   end
   
   class SMS_Parallel_End < T
-    def to_s() "" end
+    def to_s() sms("#{e2}") end
   end
   
   class SMS_Serial_Begin < T
-    def to_s() "" end
+    def to_s() sms("#{e2} #{e3}") end
   end
   
   class SMS_Serial_End < T
-    def to_s() "" end
+    def to_s() sms("#{e2}") end
   end
   
   class SMS_To_Local_Begin < T
-    def to_s() "" end
+    def to_s() sms("#{e2} #{e3}") end
   end
   
   class SMS_To_Local_End < T
-    def to_s() "" end
+    def to_s() sms("#{e2}") end
   end
   
   ## SMS ##

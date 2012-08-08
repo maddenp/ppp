@@ -1085,7 +1085,7 @@ grammar Fortran
     format_stmt /
     entry_stmt /
     stmt_function_stmt /
-    sms_generic
+    sms_declarative
   end
 
   rule declaration_constructs
@@ -1649,7 +1649,7 @@ grammar Fortran
     do_construct /
     if_construct /
     where_construct /
-    sms_generic
+    sms_executable
   end
 
   rule executable_construct_action_stmt
@@ -3424,6 +3424,10 @@ grammar Fortran
     "halo_comp" <T>
   end
 
+  rule sms_t_ignore
+    "ignore" <T>
+  end
+
   rule sms_t_parallel
     "parallel" <T>
   end
@@ -3481,6 +3485,14 @@ grammar Fortran
     sms_sentinel sms_t_halo_comp sms_t_end t_newline <SMS_Halo_Comp_End>
   end
 
+  rule sms_ignore_begin
+    sms_sentinel sms_t_ignore sms_junk sms_t_begin t_newline <SMS_Ignore_Begin>
+  end
+
+  rule sms_ignore_end
+    sms_sentinel sms_t_ignore sms_t_end t_newline <SMS_Ignore_End>
+  end
+
   rule sms_parallel_begin
     sms_sentinel sms_t_parallel sms_junk sms_t_begin t_newline <SMS_Parallel_Begin>
   end
@@ -3526,8 +3538,33 @@ grammar Fortran
     "!sms$" <T>
   end
 
-  rule sms_generic
-    sms_sentinel character+ t_newline <T>
+  rule sms_declarative
+    # Note: Eventually, we do not want the 'ignore' directive in
+    # specification_part, if at all.
+
+    sms_create_decomp /
+    sms_distribute_begin /
+    sms_distribute_end /
+    sms_ignore_begin /
+    sms_ignore_end
+  end
+
+  rule sms_executable
+    sms_barrier /
+    sms_compare_var /
+    sms_halo_comp_begin /
+    sms_halo_comp_end /
+    sms_ignore_begin /
+    sms_ignore_end /
+    sms_parallel_begin /
+    sms_parallel_end /
+    sms_reduce /
+    sms_serial_begin /
+    sms_serial_end /
+    sms_set_communicator /
+    sms_to_local_begin /
+    sms_to_local_end /
+    sms_unstructured_grid
   end
 
 ## SMS ##
@@ -4365,7 +4402,7 @@ grammar Fortran
   end
 
   rule use_part
-    ( use_stmt / sms_generic )* <E>
+    ( use_stmt / sms_declarative )* <E>
   end
 
   rule use_stmt
