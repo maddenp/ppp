@@ -3405,7 +3405,7 @@ grammar Fortran
   rule specification_part
     # R204
 
-    use_stmts implicit_part? declaration_constructs <E>
+    use_part implicit_part? declaration_constructs <E>
   end
 
   rule specification_stmt
@@ -4220,16 +4220,16 @@ grammar Fortran
     name
   end
 
+  rule use_part
+    ( use_stmt / sms_generic )* <E>
+  end
+
   rule use_stmt
     # R1107
 
     label:label? t_use module_name rename_list_option? t_newline <Use_Stmt_1> /
     label:label? t_use module_name t_comma t_only t_colon only_list? t_newline
       <Use_Stmt_2>
-  end
-
-  rule use_stmts
-    use_stmt* <E>
   end
 
   rule variable
