@@ -17,7 +17,6 @@ module Normalize
       t=text_value
       t=t.downcase
       t=t.gsub(/\t/,' ')  # convert tabs to spaces
-#     t=t.gsub(/  */,' ') # squeeze spaces
       t=t.gsub(/  */,'')  # remove spaces
       t=t.gsub(/;/,"\n")  # split semicolon-delimited statement lines
     end
