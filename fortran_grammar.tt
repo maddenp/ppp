@@ -1078,7 +1078,8 @@ grammar Fortran
     parameter_stmt /
     format_stmt /
     entry_stmt /
-    stmt_function_stmt
+    stmt_function_stmt /
+    sms_generic
   end
 
   rule declaration_constructs
@@ -1641,7 +1642,8 @@ grammar Fortran
     case_construct /
     do_construct /
     if_construct /
-    where_construct
+    where_construct /
+    sms_generic
   end
 
   rule executable_construct_action_stmt
@@ -3380,6 +3382,10 @@ grammar Fortran
 
     "and." /
     "or."
+  end
+
+  rule sms_generic
+    "!sms$" ( alphanumeric_character / special_character )+ t_newline <T>
   end
 
   rule special_character
