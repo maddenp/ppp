@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
-pppbase=File.dirname(File.expand_path($0))
+basedir=File.dirname(File.expand_path($0))
 
-ENV['GEM_PATH']=File.join(pppbase,'gems')
+ENV['GEM_PATH']=File.join(basedir,'gems')
 
-$: << pppbase
+$: << basedir
 
 require 'rubygems'
 require 'treetop'
@@ -17,7 +17,8 @@ include Fortran
 
 class PPP
 
-  def initialize(args)
+  def initialize(basedir,args)
+    @basedir=basedir
     @debug=false
     srcfile=args.pop
     fail(usage) unless srcfile
@@ -75,6 +76,15 @@ class PPP
     end
   end
 
+  def directive
+    unless @directive
+      f=File.join(@basedir,'sentinels')
+      d=File.open(f,'rb').read.gsub(/\$/,'\$').split("\n").<<('sms\$').join('|')
+      @directive=Regexp.new("^\s*!((#{d}).*)",true)
+    end
+    @directive
+  end
+    
   def fail(msg)
     puts "\n#{msg}\n\n"
     exit 1
@@ -133,12 +143,12 @@ class PPP
     s=s.gsub(/!sms\$insert */i,'')                           # process inserts
     s=s.gsub(/!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
     np=NormalizeParser.new
-    s.gsub!(/^\s*!(sms.*)/i,'@\1') # hide directives
-    s=np.parse(s).to_s             # pass 1: normalize
-    s=clean(s)                     # pass 1: clean
-    tree=np.parse(s)               # pass 2: normalize
-    s=clean(tree.to_s)             # pass 2: clean
-    s.gsub!(/@(.*)/i,'!\1')        # show directives
+    s.gsub!(directive,'@\1') # hide directives
+    s=np.parse(s).to_s       # pass 1: normalize
+    s=clean(s)               # pass 1: clean
+    tree=np.parse(s)         # pass 2: normalize
+    s=clean(tree.to_s)       # pass 2: clean
+    s.gsub!(/@(.*)/i,'!\1')  # show directives
     if tree.nil?
       fail "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}"
     end
@@ -176,6 +186,6 @@ class PPP
 
 end
 
-PPP.new(ARGV) if (__FILE__==$0)
+PPP.new(basedir,ARGV) if (__FILE__==$0)
 
 # paul.a.madden@noaa.gov
