@@ -56,9 +56,8 @@ class PPP
   end
 
   def clean(s)
-    s.gsub!(comment_line,'')      # remove comment lines
     s.gsub!(/\s+$/,'')            # remove trailing whitespace
-    s.gsub!(/^\s+/,'')            # left-justify line
+    s.gsub!(/^\s+/,'')            # left-justify lines
     s.gsub!(/&$\n&?/,'')          # join continuation lines
     s.gsub!(/\n\n/,"\n")          # remove blank lines
     s << "\n"  unless s[-1]=="\n" # ensure final newline
@@ -137,10 +136,11 @@ class PPP
     s=s.gsub(/!sms\$insert */i,'')                           # process inserts
     s=s.gsub(/!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
     np=NormalizeParser.new
-    s=np.parse(s).to_s                                       # 1st normalizer pass
-    s=clean(s)                                               # 1st cleaner pass
-    tree=np.parse(s)                                         # 2nd normalizer pass
-    s=clean(tree.to_s)                                       # 2nd cleaner pass
+    s.gsub!(comment_line,'') # remove comment lines
+    s=np.parse(s).to_s       # 1st normalizer pass
+    s=clean(s)               # 1st cleaner pass
+    tree=np.parse(s)         # 2nd normalizer pass
+    s=clean(tree.to_s)       # 3rd cleaner pass
     if tree.nil?
       fail "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}"
     end

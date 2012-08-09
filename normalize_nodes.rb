@@ -15,10 +15,10 @@ module Normalize
   class Normalize < Treetop::Runtime::SyntaxNode
     def to_s
       t=text_value
-      t=t.downcase
-      t=t.gsub(/\t/,' ')  # convert tabs to spaces
-      t=t.gsub(/  */,'')  # remove spaces
-      t=t.gsub(/;/,"\n")  # split semicolon-delimited statement lines
+      t=t.downcase       # make upper-case characters lower-case
+      t=t.gsub(/\t/,' ') # convert tabs to spaces
+      t=t.gsub(/  */,'') # remove spaces
+      t=t.gsub(/;/,"\n") # split semicolon-delimited statement lines
     end
   end
 
