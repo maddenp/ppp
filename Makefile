@@ -6,4 +6,4 @@ all: $(BINS)
 	tt -o $@ $<
 
 clean:
-	$(RM) $(BINS)
+	$(RM) $(BINS) *.mod a.out

@@ -1,4 +1,5 @@
 #!/bin/sh
+make clean
 cd ..
 tar czf /tmp/ppp.tgz ppp
 jetput /tmp/ppp.tgz

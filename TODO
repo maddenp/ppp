@@ -15,9 +15,7 @@
 
 - Need tests of all R924 possibilities.
 
-- Normalize specifier strings like STATUS='KEEP' et al (see e.g. 9.3.5) in ppp?
-
 - Treat 'H' edit descriptor's suffix verbatim (e.g. '100 format (5Hhello)')?
 
-- Need to recognize other directives (e.g. omp)
+- Wrap long lines
 
