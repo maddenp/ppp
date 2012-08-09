@@ -272,7 +272,7 @@ module Fortran
   end
   
   class End_Program_Stmt < T
-    def to_s() stmt(space,:be) end
+    def to_s() stmt("#{e1}#{sb(e3)}#{sb(e4)}",:be) end
   end
 
   class End_Select_Stmt < T
