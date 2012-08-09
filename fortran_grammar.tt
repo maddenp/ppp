@@ -3099,7 +3099,8 @@ grammar Fortran
     # control characters. (2) Any graphic character in the processor-dependent
     # character set in free source form.
 
-    character
+    character /
+    [\[\]\~\`\@\#\^\|\{\}]
   end
 
   rule result_name

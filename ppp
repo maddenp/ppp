@@ -148,7 +148,7 @@ class PPP
     s=clean(s)               # pass 1: clean
     tree=np.parse(s)         # pass 2: normalize
     s=clean(tree.to_s)       # pass 2: clean
-    s.gsub!(/@(.*)/i,'!\1')  # show directives
+    s.gsub!(/^@(.*)/i,'!\1') # show directives
     if tree.nil?
       fail "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}"
     end
