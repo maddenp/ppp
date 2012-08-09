@@ -1461,8 +1461,18 @@ grammar Fortran
     # if the optional program_stmt is used and, if included, must be identical
     # to the program_name specified in the program_stmt.
 
-    label:label? t_end t_program? name:program_name? t_newline?
-      <End_Program_Stmt>
+    label:label? t_end !end_program_stmt_disallowed t_program?
+      name:program_name? t_newline? <End_Program_Stmt>
+  end
+
+  rule end_program_stmt_disallowed
+    t_block /
+    t_function /
+    t_interface /
+    t_module /
+    t_select /
+    t_subroutine /
+    t_type
   end
 
   rule end_select_stmt
