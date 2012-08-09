@@ -56,16 +56,13 @@ class PPP
   end
 
   def clean(s)
+    s.gsub!(/^\s*!.*/,'')         # zero out comment lines
     s.gsub!(/\s+$/,'')            # remove trailing whitespace
     s.gsub!(/^\s+/,'')            # left-justify lines
     s.gsub!(/&$\n&?/,'')          # join continuation lines
     s.gsub!(/\n\n/,"\n")          # remove blank lines
     s << "\n"  unless s[-1]=="\n" # ensure final newline
     s
-  end
-
-  def comment_line
-    Regexp.new("^\s*!(?!sms).*",true)
   end
 
   def cppcheck(s)
@@ -136,11 +133,12 @@ class PPP
     s=s.gsub(/!sms\$insert */i,'')                           # process inserts
     s=s.gsub(/!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
     np=NormalizeParser.new
-    s.gsub!(comment_line,'') # remove comment lines
-    s=np.parse(s).to_s       # 1st normalizer pass
-    s=clean(s)               # 1st cleaner pass
-    tree=np.parse(s)         # 2nd normalizer pass
-    s=clean(tree.to_s)       # 3rd cleaner pass
+    s.gsub!(/^\s*!(sms.*)/i,'@\1') # hide directives
+    s=np.parse(s).to_s             # normalizer pass
+    s=clean(s)                     # cleaner pass 1
+    tree=np.parse(s)               # normalizer pass 1
+    s=clean(tree.to_s)             # cleaner pass 2
+    s.gsub!(/@(.*)/i,'!\1')        # show directives 2
     if tree.nil?
       fail "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}"
     end
