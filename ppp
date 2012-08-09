@@ -134,11 +134,11 @@ class PPP
     s=s.gsub(/!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
     np=NormalizeParser.new
     s.gsub!(/^\s*!(sms.*)/i,'@\1') # hide directives
-    s=np.parse(s).to_s             # normalizer pass
-    s=clean(s)                     # cleaner pass 1
-    tree=np.parse(s)               # normalizer pass 1
-    s=clean(tree.to_s)             # cleaner pass 2
-    s.gsub!(/@(.*)/i,'!\1')        # show directives 2
+    s=np.parse(s).to_s             # pass 1: normalize
+    s=clean(s)                     # pass 1: clean
+    tree=np.parse(s)               # pass 2: normalize
+    s=clean(tree.to_s)             # pass 2: clean
+    s.gsub!(/@(.*)/i,'!\1')        # show directives
     if tree.nil?
       fail "#{p.failure_reason}: #{p.failure_line}:#{p.failure_column}"
     end

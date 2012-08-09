@@ -5,11 +5,11 @@ grammar Normalize
   end
 
   rule comment
-    '!' [^\n]* <Delete>
+    "!" [^\n]* <Delete>
   end
 
   rule directive
-    sms
+    "@" [^\n]* <Verbatim>
   end
 
   rule quoted
@@ -17,11 +17,11 @@ grammar Normalize
   end
 
   rule sms
-    '!' [sS] [mM] [sS] '$' <Normalize>
+    "@" [^\n]* <Verbatim> # <SMS> & normalize for parsing
   end
 
   rule unquoted
-    [^'"!]+ <Normalize>
+    [^'"!@]+ <Normalize>
   end
 
 end
