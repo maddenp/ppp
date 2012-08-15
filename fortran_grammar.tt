@@ -2172,7 +2172,8 @@ grammar Fortran
     # R211
 
     subroutine_subprogram /
-    function_subprogram
+    function_subprogram /
+    directive # REMOVE!
   end
 
   rule internal_subprograms
@@ -2579,7 +2580,8 @@ grammar Fortran
     # R213
 
     subroutine_subprogram /
-    function_subprogram
+    function_subprogram /
+    directive # REMOVE!
   end
 
   rule module_subprogram_part
@@ -3412,180 +3414,180 @@ grammar Fortran
 
 ## SMS ##
 
-  rule sms_barrier
-    sms_sentinel "barrier" t_newline <T>
-  end
-
-  rule sms_t_begin
-    "begin" <T>
-  end
-
-  rule sms_t_end
-    "end" <T>
-  end
-
-  rule sms_t_compare_var
-    "compare_var" <T>
-  end
-
-  rule sms_t_create_decomp
-    "create_decomp" <T>
-  end
-
-  rule sms_t_distribute
-    "distribute" <T>
-  end
-
-  rule sms_t_exchange
-    "exchange" <T>
-  end
-
-  rule sms_t_halo_comp
-    "halo_comp" <T>
-  end
-
-  rule sms_t_ignore
-    "ignore" <T>
-  end
-
-  rule sms_t_parallel
-    "parallel" <T>
-  end
-
-  rule sms_t_reduce
-    "reduce" <T>
-  end
-
-  rule sms_t_serial
-    "serial" <T>
-  end
-
-  rule sms_t_set_communicator
-    "set_communicator" <T>
-  end
-
-  rule sms_t_to_local
-    "to_local" <T>
-  end
-
-  rule sms_t_unstructured_grid
-    "unstructured_grid" <T>
-  end
-
-  rule sms_junk
-    # GET RID OF THIS!
-    t_paren_l (!t_paren_r character)* t_paren_r <T>
-  end
-
-  rule sms_compare_var
-    sms_sentinel sms_t_compare_var character* t_newline <T>
-  end
-
-  rule sms_create_decomp
-    sms_sentinel sms_t_create_decomp character* t_newline <T>
-  end
-
-  rule sms_distribute_begin
-    sms_sentinel sms_t_distribute sms_junk sms_t_begin t_newline <SMS_Distribute_Begin>
-  end
-
-  rule sms_distribute_end
-    sms_sentinel sms_t_distribute sms_t_end t_newline <SMS_Distribute_End>
-  end
-
-  rule sms_exchange
-    sms_sentinel sms_t_exchange character* t_newline <T>
-  end
-
-  rule sms_halo_comp_begin
-    sms_sentinel sms_t_halo_comp sms_junk sms_t_begin t_newline <SMS_Halo_Comp_Begin>
-  end
-
-  rule sms_halo_comp_end
-    sms_sentinel sms_t_halo_comp sms_t_end t_newline <SMS_Halo_Comp_End>
-  end
-
-  rule sms_ignore_begin
-    sms_sentinel sms_t_ignore sms_junk sms_t_begin t_newline <SMS_Ignore_Begin>
-  end
-
-  rule sms_ignore_end
-    sms_sentinel sms_t_ignore sms_t_end t_newline <SMS_Ignore_End>
-  end
-
-  rule sms_parallel_begin
-    sms_sentinel sms_t_parallel sms_junk sms_t_begin t_newline <SMS_Parallel_Begin>
-  end
-
-  rule sms_parallel_end
-    sms_sentinel sms_t_parallel sms_t_end t_newline <SMS_Parallel_End>
-  end
-
-  rule sms_reduce
-    sms_sentinel sms_t_reduce sms_junk t_newline <T>
-  end
-
-  rule sms_serial_begin
-    sms_sentinel sms_t_serial sms_junk sms_t_begin t_newline <SMS_Serial_Begin>
-  end
-
-  rule sms_serial_end
-    sms_sentinel sms_t_serial sms_t_end t_newline <SMS_Serial_End>
-  end
-
-  rule sms_set_communicator
-    sms_sentinel sms_t_set_communicator sms_junk t_newline <T>
-  end
-
-  rule sms_to_local_begin
-    sms_sentinel sms_t_to_local sms_junk sms_t_begin t_newline <SMS_To_Local_Begin>
-  end
- 
-  rule sms_to_local_end
-    sms_sentinel sms_t_to_local sms_t_end t_newline <SMS_To_Local_End>
-  end
-
-  rule sms_unstructured_grid
-    sms_sentinel sms_t_unstructured_grid sms_junk t_newline <T>
-  end
-
-  rule sms_string
-    char_literal_constant_dq /
-    char_literal_constant_sq
-  end
-
-  rule sms_sentinel
-    "!sms$" <T>
-  end
-
-  rule sms_declarative
-    # Note: Eventually, we do not want the 'ignore' directive in
-    # specification_part, if at all.
-
-    sms_create_decomp /
-    sms_distribute_begin /
-    sms_distribute_end /
-    sms_ignore_begin /
-    sms_ignore_end
-  end
-
-  rule sms_executable
-    sms_barrier /
-    sms_compare_var /
-    sms_halo_comp_begin /
-    sms_halo_comp_end /
-    sms_ignore_begin /
-    sms_ignore_end /
-    sms_parallel_begin /
-    sms_parallel_end /
-    sms_reduce /
-    sms_serial_begin /
-    sms_serial_end /
-    sms_set_communicator /
-    sms_to_local_begin /
-    sms_to_local_end /
-    sms_unstructured_grid
-  end
+#  rule sms_barrier
+#    sms_sentinel "barrier" t_newline <T>
+#  end
+#
+#  rule sms_t_begin
+#    "begin" <T>
+#  end
+#
+#  rule sms_t_end
+#    "end" <T>
+#  end
+#
+#  rule sms_t_compare_var
+#    "compare_var" <T>
+#  end
+#
+#  rule sms_t_create_decomp
+#    "create_decomp" <T>
+#  end
+#
+#  rule sms_t_distribute
+#    "distribute" <T>
+#  end
+#
+#  rule sms_t_exchange
+#    "exchange" <T>
+#  end
+#
+#  rule sms_t_halo_comp
+#    "halo_comp" <T>
+#  end
+#
+#  rule sms_t_ignore
+#    "ignore" <T>
+#  end
+#
+#  rule sms_t_parallel
+#    "parallel" <T>
+#  end
+#
+#  rule sms_t_reduce
+#    "reduce" <T>
+#  end
+#
+#  rule sms_t_serial
+#    "serial" <T>
+#  end
+#
+#  rule sms_t_set_communicator
+#    "set_communicator" <T>
+#  end
+#
+#  rule sms_t_to_local
+#    "to_local" <T>
+#  end
+#
+#  rule sms_t_unstructured_grid
+#    "unstructured_grid" <T>
+#  end
+#
+#  rule sms_junk
+#    # GET RID OF THIS!
+#    t_paren_l (!t_paren_r character)* t_paren_r <T>
+#  end
+#
+#  rule sms_compare_var
+#    sms_sentinel sms_t_compare_var character* t_newline <T>
+#  end
+#
+#  rule sms_create_decomp
+#    sms_sentinel sms_t_create_decomp character* t_newline <T>
+#  end
+#
+#  rule sms_distribute_begin
+#    sms_sentinel sms_t_distribute sms_junk sms_t_begin t_newline <SMS_Distribute_Begin>
+#  end
+#
+#  rule sms_distribute_end
+#    sms_sentinel sms_t_distribute sms_t_end t_newline <SMS_Distribute_End>
+#  end
+#
+#  rule sms_exchange
+#    sms_sentinel sms_t_exchange character* t_newline <T>
+#  end
+#
+#  rule sms_halo_comp_begin
+#    sms_sentinel sms_t_halo_comp sms_junk sms_t_begin t_newline <SMS_Halo_Comp_Begin>
+#  end
+#
+#  rule sms_halo_comp_end
+#    sms_sentinel sms_t_halo_comp sms_t_end t_newline <SMS_Halo_Comp_End>
+#  end
+#
+#  rule sms_ignore_begin
+#    sms_sentinel sms_t_ignore sms_junk sms_t_begin t_newline <SMS_Ignore_Begin>
+#  end
+#
+#  rule sms_ignore_end
+#    sms_sentinel sms_t_ignore sms_t_end t_newline <SMS_Ignore_End>
+#  end
+#
+#  rule sms_parallel_begin
+#    sms_sentinel sms_t_parallel sms_junk sms_t_begin t_newline <SMS_Parallel_Begin>
+#  end
+#
+#  rule sms_parallel_end
+#    sms_sentinel sms_t_parallel sms_t_end t_newline <SMS_Parallel_End>
+#  end
+#
+#  rule sms_reduce
+#    sms_sentinel sms_t_reduce sms_junk t_newline <T>
+#  end
+#
+#  rule sms_serial_begin
+#    sms_sentinel sms_t_serial sms_junk sms_t_begin t_newline <SMS_Serial_Begin>
+#  end
+#
+#  rule sms_serial_end
+#    sms_sentinel sms_t_serial sms_t_end t_newline <SMS_Serial_End>
+#  end
+#
+#  rule sms_set_communicator
+#    sms_sentinel sms_t_set_communicator sms_junk t_newline <T>
+#  end
+#
+#  rule sms_to_local_begin
+#    sms_sentinel sms_t_to_local sms_junk sms_t_begin t_newline <SMS_To_Local_Begin>
+#  end
+# 
+#  rule sms_to_local_end
+#    sms_sentinel sms_t_to_local sms_t_end t_newline <SMS_To_Local_End>
+#  end
+#
+#  rule sms_unstructured_grid
+#    sms_sentinel sms_t_unstructured_grid sms_junk t_newline <T>
+#  end
+#
+#  rule sms_string
+#    char_literal_constant_dq /
+#    char_literal_constant_sq
+#  end
+#
+#  rule sms_sentinel
+#    "!sms$" <T>
+#  end
+#
+#  rule sms_declarative
+#    # Note: Eventually, we do not want the 'ignore' directive in
+#    # specification_part, if at all.
+#
+#    sms_create_decomp /
+#    sms_distribute_begin /
+#    sms_distribute_end /
+#    sms_ignore_begin /
+#    sms_ignore_end
+#  end
+#
+#  rule sms_executable
+#    sms_barrier /
+#    sms_compare_var /
+#    sms_halo_comp_begin /
+#    sms_halo_comp_end /
+#    sms_ignore_begin /
+#    sms_ignore_end /
+#    sms_parallel_begin /
+#    sms_parallel_end /
+#    sms_reduce /
+#    sms_serial_begin /
+#    sms_serial_end /
+#    sms_set_communicator /
+#    sms_to_local_begin /
+#    sms_to_local_end /
+#    sms_unstructured_grid
+#  end
 
 ## SMS ##
 
