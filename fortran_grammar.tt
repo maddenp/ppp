@@ -222,7 +222,7 @@ grammar Fortran
   end
 
   rule allocate_shape_spec_list
-    # 6.3.1
+    # F90:6.3.1
     #
     # Constraint: The number of allocate_shape_specs in an
     # allocate_shape_spec_list must be the same as the rank of the pointer or
@@ -485,7 +485,7 @@ grammar Fortran
   end
 
   rule block_data_name
-    # 11.4 (not explicitly defined)
+    # F90:11.4 (not explicitly defined)
 
     name
   end
@@ -842,7 +842,7 @@ grammar Fortran
   end
 
   rule component_name
-    # 4.4.1 (not explicitly defined)
+    # F90:4.4.1 (not explicitly defined)
 
     name
   end
@@ -1230,7 +1230,7 @@ grammar Fortran
   end
 
   rule do_construct_name
-    # 8.1.4.1.1 (not explicitly defiend)
+    # F90:8.1.4.1.1 (not explicitly defiend)
     #
     # Note: Unclear what is needed here, making assumption...
 
@@ -1574,7 +1574,7 @@ grammar Fortran
   end
 
   rule entry_name
-    # 12.5.2.5 (not explicitly defined)
+    # F90:12.5.2.5 (not explicitly defined)
 
     name
   end
@@ -1764,7 +1764,7 @@ grammar Fortran
   end
 
   rule external_name
-    # 12.3.2.2
+    # F90:12.3.2.2
 
     name
   end
@@ -1858,7 +1858,7 @@ grammar Fortran
   end
 
   rule generic_name
-    # 12.3.2.1 (not explicitly defined)
+    # F90:12.3.2.1 (not explicitly defined)
 
     name
   end
@@ -2010,7 +2010,7 @@ grammar Fortran
   end
 
   rule input_item_list
-    # 9.4.2
+    # F90:9.4.2
     #
     # Constraint: In an input_item_list, an io_implied_do_object must be an
     # input_item.
@@ -2195,7 +2195,7 @@ grammar Fortran
   end
 
   rule intrinsic_procedure_name
-    # 12.3.2.3 (not explicitly defined)
+    # F90:12.3.2.3 (not explicitly defined)
 
     name
   end
@@ -2470,7 +2470,7 @@ grammar Fortran
   end
 
   rule local_name
-    # 11.3.2 (not explicitly defined)
+    # F90:11.3.2 (not explicitly defined)
 
     name
   end
@@ -2561,7 +2561,7 @@ grammar Fortran
   end
 
   rule module_name
-    # 11.3 (not explicitly defined)
+    # F90:11.3 (not explicitly defined)
 
     name
   end
@@ -2791,7 +2791,7 @@ grammar Fortran
   end
 
   rule output_item_list
-    # 9.4.2
+    # F90:9.4.2
     #
     # Constraint: In an output_item_list, an io_implied_do_object must be an
     # output_item.
@@ -2973,7 +2973,7 @@ grammar Fortran
   end
 
   rule procedure_name
-    # 12.4.1
+    # F90:12.4.1
 
     name
   end
@@ -2983,7 +2983,7 @@ grammar Fortran
   end
   
   rule program_name
-    # 11.1
+    # F90:11.1
 
     name
   end
@@ -3092,7 +3092,7 @@ grammar Fortran
   end
 
   rule rep_char
-    # 4.3.2.1 (processor-dependent)
+    # F90:4.3.2.1 (processor-dependent)
     #
     # Constraint: For the type character with kind kind_param, and for type
     # default character otherwise, a representable character, rep_char, is:
@@ -3163,7 +3163,7 @@ grammar Fortran
   end
 
   rule scalar_char_constant
-    # 8.4 (not explicitly defined)
+    # F90:8.4 (not explicitly defined)
     #
     # Note: Assumed constraint: named_constant must be of type default
     # character.
@@ -3173,7 +3173,7 @@ grammar Fortran
   end
 
   rule scalar_char_expr
-    # 8.1.3.1
+    # F90:8.1.3.1
     #
     # Note: Assumed constraint: char_expr is scalar.
 
@@ -3181,7 +3181,7 @@ grammar Fortran
   end
 
   rule scalar_char_initialization_expr
-    # 8.1.3.1 (not explicitly defined)
+    # F90:8.1.3.1 (not explicitly defined)
     #
     # Note: Assumed constraint: initialization_expr is scalar and is of type
     # character.
@@ -3208,7 +3208,7 @@ grammar Fortran
   end
 
   rule scalar_default_char_variable
-    # 9.6.1 (not explicitly defined)
+    # F90:9.6.1 (not explicitly defined)
     #
     # Note: Assumed constraint: scalar_default_char_variable must be scalar.
 
@@ -3225,7 +3225,7 @@ grammar Fortran
   end
 
   rule scalar_default_logical_variable
-    # 9.6.1 (not explicitly defined)
+    # F90:9.6.1 (not explicitly defined)
     #
     # Note: Assumed constraint: scalar_default_logical_variable must be of type
     # default logical.
@@ -3234,7 +3234,7 @@ grammar Fortran
   end
 
   rule scalar_expr
-    # 12.5.4 (not explicitly defined)
+    # F90:12.5.4 (not explicitly defined)
 
     expr
   end
@@ -3250,7 +3250,7 @@ grammar Fortran
   end
 
   rule scalar_int_constant_name
-    # 4.3.1.1 (not explicitly defined)
+    # F90:4.3.1.1 (not explicitly defined)
     #
     # Note: Assumed constraint: scalar_int_constant_name must be scalar, and
     # must be of type integer.
@@ -3276,7 +3276,7 @@ grammar Fortran
   end
 
   rule scalar_int_literal_constant
-    # 5.1.1.5 (not explicitly defined)
+    # F90:5.1.1.5 (not explicitly defined)
     #
     # Note: Assumed constraint: must be scalar of type integer.
 
@@ -3301,7 +3301,7 @@ grammar Fortran
   end
 
   rule scalar_logical_initialization_expr
-    # 8.1.3.1 (not explicitly defined)
+    # F90:8.1.3.1 (not explicitly defined)
     #
     # Note: Assumed constraint: initialization_expr is scalar and is of type
     # logical.
@@ -3326,7 +3326,7 @@ grammar Fortran
   end
 
   rule scalar_variable
-    # 8.1.4.1.1 (not explicitly defiend)
+    # F90:8.1.4.1.1 (not explicitly defiend)
     #
     # Note: Unclear what is needed here, making assumption...
 
@@ -3592,7 +3592,7 @@ grammar Fortran
 ## SMS ##
 
   rule special_character
-    # 3.1.4
+    # F90:3.1.4
 
     [\ \=\+\-\*\/\(\)\,\.\'\:\!\"\%\&\;\<\>\?\$]
   end
