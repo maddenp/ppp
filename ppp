@@ -57,30 +57,6 @@ class PPP
     puts s
   end
 
-  def cppcheck(s)
-    r=Regexp.new('^\s*#')
-    i=1
-    s.split("\n").each do |line|
-      m=r.match(line)
-      fail "Detected cpp directive:\n\n#{i}: #{line.strip}" if m
-      i+=1
-    end
-  end
-
-  def directive
-    unless @directive
-      f=File.join(@basedir,'sentinels')
-      d=File.open(f,'rb').read.gsub(/\$/,'\$').split("\n").<<('sms\$').join('|')
-      @directive=Regexp.new("^\s*!((#{d}).*)",true)
-    end
-    @directive
-  end
-    
-  def fail(msg)
-    $stderr.puts "\n#{msg}\n\n"
-    exit 1
-  end
-
   def assemble(s,incdirs,seen)
     current=seen.last
     a=''
@@ -124,6 +100,30 @@ class PPP
       end
     end
     a
+  end
+
+  def cppcheck(s)
+    r=Regexp.new('^\s*#')
+    i=1
+    s.split("\n").each do |line|
+      m=r.match(line)
+      fail "Detected cpp directive:\n\n#{i}: #{line.strip}" if m
+      i+=1
+    end
+  end
+
+  def directive
+    unless @directive
+      f=File.join(@basedir,'sentinels')
+      d=File.open(f,'rb').read.gsub(/\$/,'\$').split("\n").<<('sms\$').join('|')
+      @directive=Regexp.new("^\s*!((#{d}).*)",true)
+    end
+    @directive
+  end
+    
+  def fail(msg)
+    $stderr.puts "\n#{msg}\n\n"
+    exit 1
   end
 
   def incchain(seen,incfile)
