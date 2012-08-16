@@ -640,10 +640,11 @@ grammar Fortran
   end
 
   rule component_attr_spec
-    # F90:R427
+    # F90:R427 + F95:R426 + F03:R441
 
     t_pointer /
-    t_dimension t_paren_l component_array_spec t_paren_r <E>
+    t_dimension t_paren_l component_array_spec t_paren_r <E> /
+    t_allocatable
   end
 
   rule component_attr_spec_list
@@ -655,7 +656,7 @@ grammar Fortran
   end
 
   rule component_decl
-    # F90:R429 / F95:R428
+    # F90:R429 + F95:R428
 
     component_name parenthesized_component_array_spec? ( t_star char_length )?
       component_initialization? <E>
@@ -1232,7 +1233,7 @@ grammar Fortran
   end
 
   rule entity_decl
-    # F90:R504 / F95:R504
+    # F90:R504 + F95:R504
 
     object_name entity_decl_array_spec? char_length_pair?
       initialization? <Entity_Decl> /

@@ -1,6 +1,6 @@
 BIN=a.out
 EXT=$(suffix $(TEST))
-FC=gfortran
+FC=gfortran44
 FFLAGS=-w
 PPP=../../ppp
 STEM=$(basename $(TEST))
