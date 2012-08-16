@@ -1,3 +1,8 @@
+# gfortran pre 4.2 does not support F03 allocatable derived-type components.
+# Facts: 4.1.2 does NOT support them, and 4.4.6 does. In-between versions have
+# not been tested. Set 'FC' appropriately. See http://bit.ly/N6I39Y for more
+# information.
+
 BIN=a.out
 EXT=$(suffix $(TEST))
 FC=gfortran44
