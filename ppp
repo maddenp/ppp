@@ -53,6 +53,7 @@ class PPP
       puts "\nparsed:\n\n" if @debug
       s=parse(s)
     end
+    fail "Parse failed." if s.empty?
     puts s
   end
 
@@ -86,7 +87,7 @@ class PPP
   end
     
   def fail(msg)
-    puts "\n#{msg}\n\n"
+    $stderr.puts "\n#{msg}\n\n"
     exit 1
   end
 
