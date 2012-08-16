@@ -25,6 +25,8 @@ class PPP
     fail("Cannot read file: #{srcfile}") unless File.readable?(srcfile)
     psargs(args)
     s=File.open(srcfile,'rb').read
+    s=s.gsub(/^\s*!sms\$insert */i,'')                           # process inserts
+    s=s.gsub(/^\s*!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
     s=assemble(s,[srcfile])
     cppcheck(s)
     puts "normalized:\n\n" if @debug
@@ -112,8 +114,6 @@ class PPP
   end
 
   def normalize(s)
-    s=s.gsub(/!sms\$insert */i,'')                           # process inserts
-    s=s.gsub(/!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
     s=s.gsub(directive,'@\1')                                # hide directives
     s=NormalizeParser.new.parse(s).to_s                      # normalize & clean
     s=s.gsub(/^\s*!.*/,'')                                   # clear comment lines
