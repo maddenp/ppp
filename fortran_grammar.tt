@@ -821,9 +821,16 @@ grammar Fortran
     # specified is character. The character length specified by the char_length
     # in a component_decl or the char_selector in a type_spec (5.1, 5.1.1.5)
     # must be a constant specification expression (7.1.6.2).
+    #
+    # F95:R428
+    #
+    # Constraint: If component_initialization appears, a double colon separator
+    # shall appear before the component_decl_list.
+    #
+    # Note: F95 adds the optional component_initialization.
 
     component_name parenthesized_component_array_spec? ( t_star char_length )?
-      <E>
+      component_initialization? <E>
   end
 
   rule component_decl_list
@@ -839,6 +846,18 @@ grammar Fortran
 
   rule component_def_stmts
     component_def_stmt+ <E>
+  end
+
+  rule component_initialization
+    # F95:R429
+    #
+    # Constraint: If => appears in component_initialization, the POINTER
+    # attribute shall appear in the component_attr_spec_list. If = appears in
+    # component_initialization, the POINTER attribute shall not appear in the
+    # component_attr_spec_list.
+
+    t_equal initialization_expr <E> /
+    t_point null_function_ref <T>
   end
 
   rule component_name
@@ -2696,6 +2715,10 @@ grammar Fortran
     ".not." <T>
   end
 
+  rule null_function_ref
+    t_null t_paren_l t_paren_r <T>
+  end
+
   rule nullify_stmt
     # F90:R629
     #
@@ -4105,6 +4128,10 @@ grammar Fortran
 
   rule t_none
     "none" <T>
+  end
+
+  rule t_null
+    "null" <T>
   end
 
   rule t_nullify
