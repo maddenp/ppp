@@ -1448,10 +1448,16 @@ grammar Fortran
     # only necessary to pass a format-specification through verbatim, not to
     # analyze its contents.
 
-    t_paren_l (!t_paren_r character)+ t_paren_r <T>
+    t_paren_l format_specification_element+ t_paren_r <T>
   end
 
- rule format_stmt
+  rule format_specification_element
+    format_specification /
+    char_literal_constant /
+    ( !( t_paren_l / t_paren_r ) character)+ <T>
+  end
+
+  rule format_stmt
     # F90:R1001
 
     label t_format format_specification t_newline <StmtJ>
