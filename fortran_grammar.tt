@@ -17,7 +17,7 @@ grammar Fortran
   end
 
   rule ac_do_variable
-    # R435
+    # F90:R435
     #
     # Constraint: ac_do_variable must be a named variable.
 
@@ -25,19 +25,19 @@ grammar Fortran
   end
 
   rule ac_implied_do
-    # R433
+    # F90:R433
 
     t_paren_l ac_value_list t_comma ac_implied_do_control t_paren_r <E>
   end
 
   rule ac_implied_do_control
-    # R434
+    # F90:R434
 
     ac_do_variable t_equal scalar_int_expr ( t_comma scalar_int_expr )? <E>
   end
 
   rule ac_value
-    # R432
+    # F90:R432
     #
     # Constraint: Each ac_value expression in the array_constructor must have
     # the same type and type parameters.
@@ -51,7 +51,7 @@ grammar Fortran
   end
 
   rule access_id
-    # R522
+    # F90:R522
     #
     # Constraint: Each use_name must be the name of a named variable, procedure,
     # derived type, named constant, or namelist group.
@@ -65,7 +65,7 @@ grammar Fortran
   end
 
   rule access_spec
-    # R510
+    # F90:R510
     #
     # Constraint: An access_spec attribute may appear only in the scoping unit
     # of a module.
@@ -75,7 +75,7 @@ grammar Fortran
   end
 
   rule access_stmt
-    # R521
+    # F90:R521
     #
     # Constraint: An access_stmt may appear only in the scoping unit of a
     # module. Only one accessibility statement with an omitted access_id_list is
@@ -92,7 +92,7 @@ grammar Fortran
   end
 
   rule action_stmt
-    # R216
+    # F90:R216
 
     allocate_stmt /
     assignment_stmt /
@@ -128,13 +128,13 @@ grammar Fortran
   end
 
   rule action_term_do_construct
-    # R827
+    # F90:R827
 
     label_do_stmt !{ |e| dolabel_dupe? } do_body do_term_action_stmt <E>
   end
 
   rule actual_arg
-    # R1213
+    # F90:R1213
     #
     # Constraint: A procedure_name actual_arg must not be the name of an
     # internal procedure or of a statement function and must not be the generic
@@ -147,7 +147,7 @@ grammar Fortran
   end
 
   rule actual_arg_spec
-    # R1211
+    # F90:R1211
     #
     # Constraint: The keyword = must not appear if the interface of the
     # procedure is implicit in the scoping unit. The keyword = may be omitted
@@ -162,14 +162,14 @@ grammar Fortran
   end
 
   rule add_op
-    # R710
+    # F90:R710
 
     t_plus /
     t_minus
   end
 
   rule add_operand
-    # R706
+    # F90:R706
     #
     # Note: Left-recursive rule implied by standard:
     # ( add_operand mult_op)? mult_operand
@@ -178,13 +178,13 @@ grammar Fortran
   end
 
   rule and_op
-    # R720
+    # F90:R720
 
     ".and." <T>
   end
 
   rule allocatable_stmt
-    # R526
+    # F90:R526
     #
     # Constraint: The array_name [ in an array_name_and_spec_list ] must not be
     # a dummy argument or function result. If the DIMENSION attribute for an
@@ -196,13 +196,13 @@ grammar Fortran
   end
 
   rule allocate_lower_bound
-    # R627
+    # F90:R627
 
     scalar_int_expr
   end
 
   rule allocate_object
-    # R625
+    # F90:R625
     #
     # Constraint: Each allocate_object must be a pointer or an allocatable
     # array.
@@ -216,7 +216,7 @@ grammar Fortran
   end
 
   rule allocate_shape_spec
-    # R626
+    # F90:R626
 
     ( allocate_lower_bound t_colon )? allocate_upper_bound <E>
   end
@@ -236,20 +236,20 @@ grammar Fortran
   end
 
   rule allocate_stmt
-    # R622
+    # F90:R622
 
     label:label? t_allocate t_paren_l allocation_list allocate_stat_construct?
       t_paren_r t_newline <StmtC>
   end
 
   rule allocate_upper_bound
-    # R628
+    # F90:R628
 
     scalar_int_expr
   end
 
   rule allocation
-    # R624
+    # F90:R624
 
     allocate_object parenthesized_allocate_shape_spec_list? <E>
   end
@@ -259,7 +259,7 @@ grammar Fortran
   end
 
   rule alphanumeric_character
-    # R302
+    # F90:R302
 
     t_letter /
     t_digit /
@@ -267,7 +267,7 @@ grammar Fortran
   end
 
   rule alt_return_spec
-    # R1214
+    # F90:R1214
     #
     # Constraint: The label used in the alt_return_spec must be the statement
     # label of a branch target statement that appears in the same scoping unit
@@ -277,7 +277,7 @@ grammar Fortran
   end
 
   rule arithmetic_if_stmt
-    # R840
+    # F90:R840
     #
     # Constraint: Each label must be the label of a branch target statement that
     # appears in the same scoping unit as the arithmetic_if_stmt. The
@@ -288,13 +288,13 @@ grammar Fortran
   end
 
   rule array_constructor
-    # R431
+    # F90:R431
 
     t_paren_l t_slash ac_value_list t_slash t_paren_r <E>
   end
 
   rule array_element
-    # R615
+    # F90:R615
     #
     # Constraint: In an array_element, every part_ref must have rank zero and
     # the last part_ref must contain a subscript_list.
@@ -337,7 +337,7 @@ grammar Fortran
   end
 
   rule array_section
-    # R616
+    # F90:R616
     #
     # Constraint: In an array_section, exactly one part_ref must have nonzero
     # rank, and either the final part_ref has a section_subscript with nonzero
@@ -348,7 +348,7 @@ grammar Fortran
   end
 
   rule array_spec
-    # R512
+    # F90:R512
     #
     # Constraint: The maximum rank is seven.
 
@@ -367,7 +367,7 @@ grammar Fortran
   end
 
   rule assign_stmt
-    # R838
+    # F90:R838
     #
     # Constraint: The label must be the statement label of a branch target
     # statement or format_stmt that appears in the same scoping unit as the
@@ -378,7 +378,7 @@ grammar Fortran
   end
 
   rule assigned_goto_stmt
-    # R839
+    # F90:R839
     #
     # Constraint: Each label in label_list must be the statement label of a
     # branch target statement that appears in the same scoping unit as the
@@ -394,7 +394,7 @@ grammar Fortran
   end
 
   rule assignment_stmt
-    # R735
+    # F90:R735
     #
     # Constraint: A variable in an assignment_stmt must not be an assumed-size
     # array.
@@ -403,13 +403,13 @@ grammar Fortran
   end
 
   rule assumed_shape_spec
-    # R516
+    # F90:R516
 
     lower_bound? t_colon <T>
   end
 
   rule assumed_size_spec
-    # R518
+    # F90:R518
     #
     # Constraint: The function name of an array-valued function must not be
     # declared as an assumed-size array.
@@ -422,7 +422,7 @@ grammar Fortran
   end
 
   rule attr_spec
-    # R503
+    # F90:R503
 
     t_parameter /
     access_spec /
@@ -447,7 +447,7 @@ grammar Fortran
   end
 
   rule backspace_stmt
-    # R919
+    # F90:R919
 
     label:label? t_backspace t_paren_l position_spec_list t_paren_r t_newline
       <StmtC> /
@@ -455,7 +455,7 @@ grammar Fortran
   end
 
   rule binary_constant
-    # R408
+    # F90:R408
     #
     # Constraint: digit must have one of the values 0 or 1. Note: 'digit is
     # replaced by 't_binary' here to enforce the constraint.
@@ -465,13 +465,13 @@ grammar Fortran
   end
 
   rule block
-    # R801
+    # F90:R801
 
     execution_part_construct
   end
 
   rule block_data
-    # R1110
+    # F90:R1110
     #
     # Constraint: A block_data specification_part may contain only USE
     # statements, type declaration statements, IMPLICIT statements,
@@ -491,19 +491,19 @@ grammar Fortran
   end
 
   rule block_data_stmt
-    # R1111
+    # F90:R1111
 
     label:label? t_block t_data block_data_name? t_newline <Block_Data_Stmt>
   end
 
   rule block_do_construct
-    # R817
+    # F90:R817
 
     do_stmt do_block end_do <E>
   end
 
   rule boz_literal_constant
-    # R407
+    # F90:R407
     #
     # Constraint: A boz-literal-constant may appear only in a DATA statement.
 
@@ -513,14 +513,14 @@ grammar Fortran
   end
 
   rule call_stmt
-    # R1210
+    # F90:R1210
 
     label:label? t_call subroutine_name parenthesized_args? t_newline
       <Call_Stmt>
   end
 
   rule case_construct
-    # R808
+    # F90:R808
     #
     # Constraint: If the select_case_stmt of a case_construct is identified by a
     # case_construct_name, the corresponding end_select_stmt must specify the
@@ -542,7 +542,7 @@ grammar Fortran
   end
 
   rule case_expr
-    # R812
+    # F90:R812
 
     scalar_int_expr /
     scalar_char_expr /
@@ -550,7 +550,7 @@ grammar Fortran
   end
 
   rule case_selector
-    # R813
+    # F90:R813
     #
     # Constraint: No more than one of the selectors of one of the CASE
     # statements may be DEFAULT.
@@ -564,7 +564,7 @@ grammar Fortran
   end
 
   rule case_stmt
-    # R810
+    # F90:R810
 
     label:label? t_case case_selector case_construct_name? t_newline <Case_Stmt>
   end
@@ -578,7 +578,7 @@ grammar Fortran
   end
 
   rule case_value
-    # R815
+    # F90:R815
     #
     # Constraint: For a given case_construct, each case_value must be of the
     # same type as case_expr. For character type, length differences are
@@ -590,7 +590,7 @@ grammar Fortran
   end
 
   rule case_value_range
-    # R814
+    # F90:R814
     #
     # Constraint: A case_value_range using a colon must not be used if case_expr
     # is of type logical. For a given case_construct, the case_value_ranges must
@@ -608,7 +608,7 @@ grammar Fortran
   end
 
   rule char_expr
-    # R726
+    # F90:R726
     #
     # Constraint: char_expr must be type character.
 
@@ -616,7 +616,7 @@ grammar Fortran
   end
 
   rule char_initialization_expr
-    # R731
+    # F90:R731
     #
     # Constraint: A char_initialization_expr must be an initialization
     # expression (7.1.6.1).
@@ -625,7 +625,7 @@ grammar Fortran
   end
 
   rule char_length
-    # R508
+    # F90:R508
     #
     # Constraint: The value of scalar_int_literal_constant must not include a
     # kind_param.
@@ -639,7 +639,7 @@ grammar Fortran
   end
 
   rule char_literal_constant
-    # R420
+    # F90:R420
     #
     # Constraint: The value of kind_param must specify a representation method
     # that exists on the processor.
@@ -657,7 +657,7 @@ grammar Fortran
   end
 
   rule char_selector
-    # R506
+    # F90:R506
     #
     # Constraint: The value of scalar_int_initialization_expr must be
     # nonnegative and must specify a representation method that exists on the
@@ -673,7 +673,7 @@ grammar Fortran
   end
 
   rule char_variable
-    # R605
+    # F90:R605
     #
     # Constraint: char_variable must be of type character.
 
@@ -681,14 +681,14 @@ grammar Fortran
   end
 
   rule character
-    # R301
+    # F90:R301
 
     alphanumeric_character /
     special_character
   end
 
   rule close_spec
-    # R908
+    # F90:R908
     #
     # Constraint: If the optional characters UNIT = are omitted from the unit
     # specifier, the unit specifier must be the first item in the
@@ -708,7 +708,7 @@ grammar Fortran
   end
 
   rule close_stmt
-    # R907
+    # F90:R907
 
     label:label? t_close t_paren_l close_spec_list t_paren_r t_newline <StmtC>
   end
@@ -733,7 +733,7 @@ grammar Fortran
   end
 
   rule common_block_object
-    # R549
+    # F90:R549
     #
     # Constraint: Each bound in the explicit_shape_list must be a constant
     # specification expression (7.1.6.2) If a variable_name appears with an
@@ -759,7 +759,7 @@ grammar Fortran
   end
 
   rule common_stmt
-    # R548
+    # F90:R548
     #
     # Constraint: Only one appearance of a given variable_name is permitted in
     # all common_block_object_lists withing a scoping unit. A
@@ -773,13 +773,13 @@ grammar Fortran
   end
 
   rule complex_literal_constant
-    # R417
+    # F90:R417
 
     t_paren_l real_part t_comma imag_part t_paren_r <T>
   end
 
   rule component_array_spec
-    # R428
+    # F90:R428
     #
     # Constraint: Each bound in the explicit_shape_spec (R428) must be a
     # constant specification expression (7.1.6.2).
@@ -789,7 +789,7 @@ grammar Fortran
   end
 
   rule component_attr_spec
-    # R427
+    # F90:R427
     #
     # Constraint: No component_attr_spec may appear more than once in a given
     # component_def_stmt. If the POINTER attribute is not specified for a
@@ -815,7 +815,7 @@ grammar Fortran
   end
 
   rule component_decl
-    # R429
+    # F90:R429
     #
     # Constraint: The t_star char_length option is permitted only if the type
     # specified is character. The character length specified by the char_length
@@ -831,7 +831,7 @@ grammar Fortran
   end
 
   rule component_def_stmt
-    # R426
+    # F90:R426
 
     label:label? type_spec component_attr_spec_list_option? component_decl_list
       t_newline <Component_Def_Stmt>
@@ -848,7 +848,7 @@ grammar Fortran
   end
 
   rule computed_goto_stmt
-    # R837
+    # F90:R837
     #
     # Constraint: Each label in label_list must be the statement label of a
     # branch target statement that appears in the same scoping unit as the
@@ -859,13 +859,13 @@ grammar Fortran
   end
 
   rule concat_op
-    # R712
+    # F90:R712
 
     "//" <T>
   end
 
   rule connect_spec
-    # R905
+    # F90:R905
     #
     # Constraint: If the optional characters UNIT = are omitted from the unit
     # specifier, the unit specifier must be the first item in the
@@ -894,14 +894,14 @@ grammar Fortran
   end
 
   rule constant
-    # R305
+    # F90:R305
 
     literal_constant /
     named_constant
   end
 
   rule constant_subobject
-    # R702
+    # F90:R702
     #
     # Constrint: subobject must be a subobject designator whose parent is a
 
@@ -909,19 +909,19 @@ grammar Fortran
   end
 
   rule contains_stmt
-    # R1225
+    # F90:R1225
 
     label:label? t_contains t_newline <Contains_Stmt>
   end
 
   rule continue_stmt
-    # R841
+    # F90:R841
 
     label:label? t_continue t_newline <StmtJ>
   end
 
   rule cycle_stmt
-    # R834
+    # F90:R834
     #
     # Constraint: If a cycle_stmt refers to a do_construct_name, it must be
     # within the range of that do_construct; otherwise, it must be within the
@@ -931,7 +931,7 @@ grammar Fortran
   end
 
   rule data_i_do_object
-    # R536
+    # F90:R536
     #
     # Constraint: The array_element must not have a constant parent. The
     # scalar_structure_component must not have a constant parent. In an
@@ -950,7 +950,7 @@ grammar Fortran
   end
 
   rule data_i_do_variable
-    # R537
+    # F90:R537
     #
     # Constraint: The data_i_do_variable must be a named variable.
 
@@ -958,7 +958,7 @@ grammar Fortran
   end
 
   rule data_implied_do
-    # R535
+    # F90:R535
     #
     # Constraint: A scalar_int_expr of a data_implied_do must involve as
     # primaries only constants or DO variables of the containing
@@ -970,7 +970,7 @@ grammar Fortran
   end
 
   rule data_ref
-    # R612
+    # F90:R612
     #
     # Constraint: In a data_ref, each part_name except the rightmost must be
     # of derived type. In a data_ref, each part_name except the leftmost must be
@@ -981,13 +981,13 @@ grammar Fortran
   end
 
   rule data_stmt
-    # R529
+    # F90:R529
 
     label:label? t_data data_stmt_set_list t_newline <StmtJ>
   end
 
   rule data_stmt_constant
-    # R533
+    # F90:R533
     #
     # Constraint: If a data_stmt_constant is a structure_constructor, each
     # component must be an initialization expression (7.1.6.1). Note: Choice
@@ -1001,7 +1001,7 @@ grammar Fortran
   end
 
   rule data_stmt_object
-    # R531
+    # F90:R531
     #
     # Constraint: In a variable that is a data_stmt_object, any subscript,
     # section subscript, substring starting point, and substring ending point
@@ -1022,7 +1022,7 @@ grammar Fortran
   end
 
   rule data_stmt_repeat
-    # R534
+    # F90:R534
     #
     # Constraint: The DATA statement repeat factor must be positive or zero. If
     # the DATA statement repeat factor is a named constant, it must have been
@@ -1033,7 +1033,7 @@ grammar Fortran
   end
 
   rule data_stmt_set
-    # R530
+    # F90:R530
 
     data_stmt_object_list t_slash data_stmt_value_list t_slash <E>
   end
@@ -1051,7 +1051,7 @@ grammar Fortran
   end
 
   rule data_stmt_value
-    # R531
+    # F90:R531
 
     data_stmt_repeat_pair? data_stmt_constant <T>
   end
@@ -1065,7 +1065,7 @@ grammar Fortran
   end
 
   rule deallocate_stmt
-    # R631
+    # F90:R631
     #
     # Constraint: Each allocate_object must be a pointer or an allocatable
     # array.
@@ -1075,7 +1075,7 @@ grammar Fortran
   end
 
   rule declaration_construct
-    # R207
+    # F90:R207
 
     derived_type_def /
     interface_block /
@@ -1094,7 +1094,7 @@ grammar Fortran
   end
 
   rule default_char_variable
-    # R606
+    # F90:R606
     #
     # Constraint: default_char_variable must be of type default character.
 
@@ -1102,7 +1102,7 @@ grammar Fortran
   end
 
   rule default_char_expr
-    # R727
+    # F90:R727
     #
     # Constraint: default_char_expr must be of type default character.
 
@@ -1110,7 +1110,7 @@ grammar Fortran
   end
 
   rule default_int_variable
-    # R608
+    # F90:R608
     #
     # Constraint: default_int_variable must be of type default integer.
 
@@ -1118,7 +1118,7 @@ grammar Fortran
   end
 
   rule default_logical_variable
-    # R604
+    # F90:R604
     #
     # Constraint: default_logical_variable must be of type default logical.
 
@@ -1126,7 +1126,7 @@ grammar Fortran
   end
 
   rule deferred_shape_spec
-    # R517
+    # F90:R517
 
     t_colon
   end
@@ -1136,7 +1136,7 @@ grammar Fortran
   end
 
   rule defined_binary_op
-    # R724
+    # F90:R724
     #
     # Constraint: Must not contain more than 31 letters and must not be the same
     # as any intrinsic_operator or logical_literal_constant.
@@ -1145,7 +1145,7 @@ grammar Fortran
   end
 
   rule defined_operator
-    # R311
+    # F90:R311
 
     defined_unary_op /
     defined_binary_op /
@@ -1153,7 +1153,7 @@ grammar Fortran
   end
 
   rule defined_unary_op
-    # R704
+    # F90:R704
     #
     # Constraint: Must not contain more than 31 letters and must not be the same
     # as any intrinsic_operator or logical_literal_constant.
@@ -1163,7 +1163,7 @@ grammar Fortran
   end
 
   rule derived_type_def
-    # R422
+    # F90:R422
     #
     # Constraint: An access_spec (5.1.2.2) or a PRIVATE statement within the
     # definition is permitted only if the type definition is within the
@@ -1176,7 +1176,7 @@ grammar Fortran
   end
 
   rule derived_type_stmt
-    # R424
+    # F90:R424
     #
     # Constraint: A derived type type_name must not be the same as the name of
     # any intrinsic type nor the same as any other accessible derived type
@@ -1191,13 +1191,13 @@ grammar Fortran
   end
 
   rule digit_string
-    # R402
+    # F90:R402
 
     t_digit+ <T>
   end
 
   rule dimension_stmt
-    # R525
+    # F90:R525
 
     label:label? t_dimension double_colon? array_names_and_specs t_newline
       <Dimension_Stmt>
@@ -1211,19 +1211,19 @@ grammar Fortran
   end
 
   rule do_block
-    # R823
+    # F90:R823
 
     block
   end
 
   rule do_body
-    # R828
+    # F90:R828
 
     execution_part_construct
   end
 
   rule do_construct
-    # R816
+    # F90:R816
 
     nonblock_do_construct /
     block_do_construct
@@ -1242,14 +1242,14 @@ grammar Fortran
   end
 
   rule do_stmt
-    # R818
+    # F90:R818
 
     label_do_stmt /
     nonlabel_do_stmt
   end
 
   rule do_term_action_stmt
-    # R829
+    # F90:R829
     #
     # Constraint: A do_term_action_stmt must not be a continue_stmt, a
     # goto_stmt, a return_stmt, a stop_stmt, an exit_stmt, a cycle_stmt, an
@@ -1277,7 +1277,7 @@ grammar Fortran
   end
 
   rule do_term_shared_stmt
-    # R833
+    # F90:R833
     #
     # Constraint: A do_term_shared_stmt must not be a goto_stmt, a return_stmt,
     # a stop_stmt, an exit_stmt, a cycle_stmt, an end_fuction_stmt, an
@@ -1302,7 +1302,7 @@ grammar Fortran
   end
 
   rule do_variable
-    # R822
+    # F90:R822
     #
     # Constraint: The do_variable must be a name scalar variable of type
     # integer, default real, or double precision real.
@@ -1315,7 +1315,7 @@ grammar Fortran
   end
 
   rule dummy_arg
-    # R1221
+    # F90:R1221
 
     dummy_arg_name /
     t_star
@@ -1352,14 +1352,14 @@ grammar Fortran
   end
 
   rule else_if_stmt
-    # R804
+    # F90:R804
 
     label:label? t_elseif t_paren_l scalar_logical_expr t_paren_r t_then
       t_newline <Else_If_Stmt>
   end
 
   rule else_stmt
-    # R805
+    # F90:R805
 
     label:label? t_else if_construct_name? t_newline <Else_Stmt>
   end
@@ -1369,7 +1369,7 @@ grammar Fortran
   end
 
   rule elsewhere_stmt
-    # R742
+    # F90:R742
 
     label:label? t_elsewhere t_newline <Elsewhere_Stmt>
   end
@@ -1379,7 +1379,7 @@ grammar Fortran
   end
 
   rule end_block_data_stmt
-    # R1112
+    # F90:R1112
     #
     # Constraint: The block_data_name may be included in the end_block_data_stmt
     # only if it was provided in the block_stat_stmt and, if included, must be
@@ -1389,7 +1389,7 @@ grammar Fortran
   end
 
   rule end_do
-    # R824
+    # F90:R824
     # Constraint: If the do_stmt of a block_do_construct is identified by a
     # do_construct_name, the corresponding end_do must be an end_do_stmt
     # specifying the same do_construct_name. If the do_stmt of a
@@ -1408,7 +1408,7 @@ grammar Fortran
   end
 
   rule end_do_stmt
-    # R825
+    # F90:R825
 
     label:label? t_enddo do_construct_name? t_newline &{ |e| dolabel_pop(e[0]) }
       <End_Do_Stmt>
@@ -1419,7 +1419,7 @@ grammar Fortran
   end
 
   rule end_function_stmt
-    # R1218
+    # F90:R1218
     #
     # Constraint: FUNCTION must be present on the end_function_stmt of an
     # internal or module function. If a function_name is present on the
@@ -1430,13 +1430,13 @@ grammar Fortran
   end
 
   rule end_if_stmt
-    # R806
+    # F90:R806
 
     label:label? t_endif if_construct_name? t_newline <End_If_Stmt>
   end
 
   rule end_interface_stmt
-    # R1203
+    # F90:R1203
 
     label:label? t_end t_interface t_newline <End_Interface_Stmt>
   end
@@ -1446,7 +1446,7 @@ grammar Fortran
   end
 
   rule end_module_stmt
-    # R1106
+    # F90:R1106
     #
     # Constraint: If the module_name is specified in the end_module_stmt, it
     # must be identical to the module_name specified in the module_stmt.
@@ -1455,7 +1455,7 @@ grammar Fortran
   end
 
   rule end_program_stmt
-    # R1103
+    # F90:R1103
     #
     # Constraint: The program_name may be included in the end_program_stmt only
     # if the optional program_stmt is used and, if included, must be identical
@@ -1476,13 +1476,13 @@ grammar Fortran
   end
 
   rule end_select_stmt
-    # R811
+    # F90:R811
 
     label:label? t_end t_select case_construct_name? t_newline <End_Select_Stmt>
   end
 
   rule end_subroutine_stmt
-    # R1222
+    # F90:R1222
     #
     # Constraint: SUBROUTINE must be present on the end_subroutine_stmt of an
     # internal or module subroutine. If a subroutine_name is present on the
@@ -1497,7 +1497,7 @@ grammar Fortran
   end
 
   rule end_type_stmt
-    # R415
+    # F90:R415
     #
     # Constraint: If END TYPE is followed by a type_name, the type_name must be
     # the same as that in the corresponding derived_type_stmt.
@@ -1506,13 +1506,13 @@ grammar Fortran
   end
 
   rule end_where_stmt
-    # R743
+    # F90:R743
 
     label:label? t_endwhere t_newline <End_Where_Stmt>
   end
 
   rule endfile_stmt
-    # R920
+    # F90:R920
 
     label:label? t_endfile t_paren_l position_spec_list t_paren_r t_newline
       <StmtC> /
@@ -1520,7 +1520,7 @@ grammar Fortran
   end
 
   rule entity_decl
-    # R504
+    # F90:R504
     #
     # Constraint: The function_name must be the name of an external function,
     # an intrinsic function, a function dummy procedure, or a statement
@@ -1580,7 +1580,7 @@ grammar Fortran
   end
 
   rule entry_stmt
-    # R1223
+    # F90:R1223
     #
     # Constraint: If RESULT is specified, the entry_name must not appear in any
     # specification statement in the scoping unit of the function program. An
@@ -1599,20 +1599,20 @@ grammar Fortran
   end
 
   rule equiv_op
-    # R722
+    # F90:R722
 
     ".eqv." <T> /
     ".neqv." <T>
   end
 
   rule equiv_operand
-    # R715
+    # F90:R715
 
     not_op? level_4_expr <T>
   end
 
   rule equivalence_object
-    # R547
+    # F90:R547
     #
     # Constraint: An equivalence_object must not be a dummy argument, a pointer,
     # an allocatable array, an object of a nonsequence derived type or of a
@@ -1644,7 +1644,7 @@ grammar Fortran
   end
 
   rule equivalence_set
-    # R546
+    # F90:R546
 
     t_paren_l equivalence_object t_comma equivalence_object_list t_paren_r <T>
   end
@@ -1654,13 +1654,13 @@ grammar Fortran
   end
 
   rule equivalence_stmt
-    # R545
+    # F90:R545
 
     label:label? t_equivalence equivalence_set_list t_newline <StmtJ>
   end
 
   rule executable_construct
-    # R215
+    # F90:R215
 
     executable_construct_action_stmt /
     case_construct /
@@ -1677,7 +1677,7 @@ grammar Fortran
   end
 
   rule execution_part
-    # R208
+    # F90:R208
     #
     # Constraint: An execution_part must not contain an end_function_stmt,
     # end_program_stmt, or end_subroutine_stmt.
@@ -1692,7 +1692,7 @@ grammar Fortran
   end
 
   rule execution_part_construct
-    # R209
+    # F90:R209
 
     (
       executable_construct /
@@ -1703,7 +1703,7 @@ grammar Fortran
   end
 
   rule exit_stmt
-    # R835
+    # F90:R835
     #
     # Constraint: If an exit_stmt refers to a do_construct_name, it must be
     # within the range of that do_construct; otherwise, it must be within the
@@ -1713,7 +1713,7 @@ grammar Fortran
   end
 
   rule explicit_shape_spec
-    # R513
+    # F90:R513
     #
     # Constraint: An explicit-shape array whose bounds depend on the values of
     # nonconstant expressions must be a dummy argument, a function result, or an
@@ -1727,19 +1727,19 @@ grammar Fortran
   end
 
   rule exponent
-    # R416
+    # F90:R416
 
     signed_digit_string
   end
 
   rule exponent_letter
-    # R415
+    # F90:R415
 
     [ed] <T>
   end
 
   rule expr
-    # R723
+    # F90:R723
     #
     # Note: Left-recursive rule implied by standard:
     # ( expr defined_binary_op )? level_5_expr
@@ -1752,13 +1752,13 @@ grammar Fortran
   end
 
   rule extended_intrinsic_op
-    # R312
+    # F90:R312
 
     intrinsic_operator
   end
   
   rule external_file_unit
-    # R902
+    # F90:R902
 
     scalar_int_expr
   end
@@ -1774,26 +1774,26 @@ grammar Fortran
   end
 
   rule external_stmt
-    # R1207
+    # F90:R1207
 
     label:label? t_external external_name_list t_newline <StmtJ>
   end
 
   rule external_subprogram
-    # R203
+    # F90:R203
 
     subroutine_subprogram /
     function_subprogram
   end
 
   rule file_name_expr
-    # R906
+    # F90:R906
 
     scalar_default_char_expr
   end
 
   rule format
-    # R913
+    # F90:R913
     #
     # Constraint: The label must be the label of a FORMAT statement that appears
     # in the same scoping unit as the statement containing the format specifier.
@@ -1808,7 +1808,7 @@ grammar Fortran
   end
 
   rule format_specification
-    # R1002
+    # F90:R1002
     #
     # Note: A vast simplification is made here under the assumption that it is
     # only necessary to pass a format-specification through verbatim, not to
@@ -1818,7 +1818,7 @@ grammar Fortran
   end
 
  rule format_stmt
-    # R1001
+    # F90:R1001
     #
     # Constraint: The format_stmt must be labeled.
 
@@ -1832,13 +1832,13 @@ grammar Fortran
   end
 
   rule function_reference
-    # R1209
+    # F90:R1209
 
     function_name t_paren_l parenthesized_args? t_paren_r <T>
   end
 
   rule function_stmt
-    # R1216
+    # F90:R1216
     #
     # Constraint: If RESULT is specified, result_name must not be the same as
     # function_name.
@@ -1848,7 +1848,7 @@ grammar Fortran
   end
 
   rule function_subprogram
-    # R1215
+    # F90:R1215
     #
     # Constraint: An internal function must not contain an ENTRY statement. An
     # internal function must not contain an internal_subprogram_part.
@@ -1864,7 +1864,7 @@ grammar Fortran
   end
 
   rule generic_spec
-    # R1206
+    # F90:R1206
 
     generic_name /
     t_operator t_paren_l defined_operator t_paren_r <T> /
@@ -1872,7 +1872,7 @@ grammar Fortran
   end
 
   rule goto_stmt
-    # R836
+    # F90:R836
     #
     # Constraint: The label must be the statement label of a branch target
     # statement that appears in the same scoping unit as the goto_stmt.
@@ -1881,20 +1881,20 @@ grammar Fortran
   end
 
   rule hex_constant
-    # R410
+    # F90:R410
 
     "z" ( ( t_apostrophe hex_digit+ t_apostrophe ) / ( t_quotemark hex_digit+
       t_quotemark ) ) <T>
   end
 
   rule hex_digit
-    # R411
+    # F90:R411
 
     [0123456789abcdef]
   end
 
   rule if_construct
-    # R802
+    # F90:R802
     #
     # Note: if_then_construct, else_if_construct and else_construct added for
     # clarity, not specified in standard.
@@ -1914,7 +1914,7 @@ grammar Fortran
   end
 
   rule if_stmt
-    # R807
+    # F90:R807
     #
     # Constraint: The action_stmt in the if_stmt must not be an if_stmt,
     # end_program_stmt, end_function_stmt, or end_subroutine_stmt.
@@ -1928,21 +1928,21 @@ grammar Fortran
   end
 
   rule if_then_stmt
-    # R803
+    # F90:R803
 
     label:label? if_construct_name_label? t_if t_paren_l scalar_logical_expr
       t_paren_r t_then t_newline <If_Then_Stmt>
   end
 
   rule imag_part
-    # R419
+    # F90:R419
 
     signed_real_literal_constant /
     signed_int_literal_constant
   end
 
   rule implicit_part
-    # R205
+    # F90:R205
     #
     # Note: The standard requires that the last statement in implicit_part be
     # an implicit_stmt but, given that this seems unlikely to affect parsing,
@@ -1953,7 +1953,7 @@ grammar Fortran
   end
 
   rule implicit_part_stmt
-    # R206
+    # F90:R206
 
     implicit_stmt /
     format_stmt /
@@ -1962,7 +1962,7 @@ grammar Fortran
   end
 
   rule implicit_spec
-    # R541
+    # F90:R541
 
      type_spec_with_kind_selector t_paren_l letter_spec_list t_paren_r <T> /
      type_spec_without_kind_selector t_paren_l letter_spec_list t_paren_r <T>
@@ -1973,7 +1973,7 @@ grammar Fortran
   end
 
   rule implicit_stmt
-    # R540
+    # F90:R540
     #
     # Constraint: If IMPLICIT NONE is specified in a scoping unit, it must
     # precede any PARAMETER statements that appear in the scoping unit and
@@ -1984,7 +1984,7 @@ grammar Fortran
   end
 
   rule initialization_expr
-    # R730
+    # F90:R730
     #
     # Constraint: An initialization_expr must be an initialization expression
     # (7.1.6.1).
@@ -1997,13 +1997,13 @@ grammar Fortran
   end
 
   rule inner_shared_do_construct
-    # R832
+    # F90:R832
 
     label_do_stmt do_body do_term_shared_stmt <Inner_Shared_Do_Construct>
   end
 
   rule input_item
-    # R914
+    # F90:R914
 
     io_implied_do /
     variable
@@ -2019,7 +2019,7 @@ grammar Fortran
   end
 
   rule inquire_spec
-    # R924
+    # F90:R924
     #
     # Constraint: An inquire_spec_list must contain one FILE= specifier or one
     # UNIT= specifier, but not both, and at most one of each of the other
@@ -2060,7 +2060,7 @@ grammar Fortran
   end
 
   rule inquire_stmt
-    # R923
+    # F90:R923
 
     label:label? t_inquire t_paren_l inquire_spec_list t_paren_r t_newline
       <StmtC> /
@@ -2069,7 +2069,7 @@ grammar Fortran
   end
 
   rule int_expr
-    # R728
+    # F90:R728
     #
     # Constraint: int_expr must be type integer.
 
@@ -2077,7 +2077,7 @@ grammar Fortran
   end
 
   rule int_initialization_expr
-    # R732
+    # F90:R732
     #
     # Constraint: An int_initialization_expr must be an initialization
     # expression (7.1.6.1).
@@ -2086,13 +2086,13 @@ grammar Fortran
   end
 
   rule int_literal_constant
-    # R404
+    # F90:R404
 
     digit_string ( t_underscore kind_param )? <T>
   end
 
   rule int_variable
-    # R607
+    # F90:R607
     #
     # Constraint: int_variable must be of type integer.
 
@@ -2100,7 +2100,7 @@ grammar Fortran
   end
 
   rule intent_spec
-    # R511
+    # F90:R511
     #
     # Constraint: The INTENT attribute must not be specified for a dummy
     # argument that is a dummy procedure or a dummy pointer.
@@ -2111,7 +2111,7 @@ grammar Fortran
   end
 
   rule intent_stmt
-    # R519
+    # F90:R519
     #
     # Constraint: An intent_stmt may appear only in the specification_part of a
     # subprogram or an interface body (12.3.2.1). dummy_arg_name must not be the
@@ -2122,7 +2122,7 @@ grammar Fortran
   end
 
   rule interface_block
-    # R1201
+    # F90:R1201
     #
     # Constraint: An interface_body must not contain an entry_stmt, data_stmt,
     # format_stmt, or stmt_function_stmt. The MODULE PROCEDURE specification is
@@ -2141,20 +2141,20 @@ grammar Fortran
   end
 
   rule interface_body
-    # R1204
+    # F90:R1204
 
     subroutine_stmt specification_part? end_subroutine_stmt <E> /
     function_stmt specification_part? end_function_stmt <E>
   end
 
   rule interface_stmt
-    # R1202
+    # F90:R1202
 
     label:label? t_interface generic_spec? t_newline <Interface_Stmt>
   end
 
   rule internal_file_unit
-    # R903
+    # F90:R903
     #
     # Constraint: The default_char_variable must not be an array section with a
     # vector subscript.
@@ -2163,13 +2163,13 @@ grammar Fortran
   end
 
   rule internal_subprogram_part
-    # R210
+    # F90:R210
 
     contains_stmt internal_subprograms <E>
   end
 
   rule internal_subprogram
-    # R211
+    # F90:R211
 
     subroutine_subprogram /
     function_subprogram /
@@ -2181,7 +2181,7 @@ grammar Fortran
   end
 
   rule intrinsic_operator
-    # R310
+    # F90:R310
 
     power_op /
     mult_op /
@@ -2205,13 +2205,13 @@ grammar Fortran
   end
 
   rule intrinsic_stmt
-    # R1208
+    # F90:R1208
 
     label:label? t_intrinsic intrinsic_procedure_name_list t_newline <StmtJ>
   end
 
   rule io_control_spec
-    # R912
+    # F90:R912
     #
     # Constraint: An io_control_spec_list must contain exactly one io_unit and
     # may contain at most one of each of the other specifiers. An END=, EOR=, or
@@ -2261,14 +2261,14 @@ grammar Fortran
   end
 
   rule io_implied_do
-    # R916
+    # F90:R916
 
     t_paren_l io_implied_do_object_list t_comma io_implied_do_control t_paren_r
       <T>
   end
 
   rule io_implied_do_control
-    # R918
+    # F90:R918
     #
     # Constraint: The do_variable must be a named scalar variable of type
     # integer, default real, or double precision real. Each scalar_numeric_expr
@@ -2280,7 +2280,7 @@ grammar Fortran
   end
 
   rule io_implied_do_object
-    # R917
+    # F90:R917
     #
     # Constraint: A variable that is an input_item must not be an assumed-size
     # array. In an input_item_list, an io_implied_do_object must be an
@@ -2296,7 +2296,7 @@ grammar Fortran
   end
 
   rule io_unit
-    # R901
+    # F90:R901
 
     t_star /
     external_file_unit /
@@ -2304,7 +2304,7 @@ grammar Fortran
   end
 
   rule keyword
-    # R1212
+    # F90:R1212
     #
     # Constraint: Each keyword must be the name of a dummy argument in the
     # explicit interface of the procedure.
@@ -2325,7 +2325,7 @@ grammar Fortran
   end
 
   rule kind_param
-    # R405
+    # F90:R405
     #
     # Constraint: The value of kind_param must be nonnegative. The value of
     # kind_param must specify a representation method that exists on the
@@ -2336,7 +2336,7 @@ grammar Fortran
   end
 
   rule kind_selector
-    # R505
+    # F90:R505
     #
     # Constraint: The value of a scalar_int_initialization_expr must be
     # nonnegative and must specify a representation method that exists on the
@@ -2346,7 +2346,7 @@ grammar Fortran
   end
 
   rule label
-    # R313
+    # F90:R313
     #
     # Constraint: At least one digit in a label must be nonzero. If a statement
     # is labeled, the statement must contain a nonblank character. The same
@@ -2358,7 +2358,7 @@ grammar Fortran
   end
 
   rule label_do_stmt
-    # R819
+    # F90:R819
 
     label:label? do_construct_name_label? t_do dolabel:label loop_control?
       t_newline &{ |e| dolabel_push(e[3]) } <Label_Do_Stmt>
@@ -2373,7 +2373,7 @@ grammar Fortran
   end
 
   rule length_selector
-    # R507
+    # F90:R507
     #
     # Constraint: The optional comma in a length_selector is permitted only in a
     # type_spec in a type_declaration_stmt. The optional comma in a
@@ -2386,7 +2386,7 @@ grammar Fortran
   end
 
   rule letter_spec
-    # R542
+    # F90:R542
     #
     # Constraint: If the minus and the second letter appear, the second letter
     # must follow the first letter alphabetically.
@@ -2399,13 +2399,13 @@ grammar Fortran
   end
 
   rule level_1_expr
-    # R703
+    # F90:R703
 
     defined_unary_op? primary <T>
   end
 
   rule level_2_expr
-    # R707
+    # F90:R707
     #
     # Note: Left-recursive rule implied by standard:
     # ( level_2_expr? add_op )? add_operand
@@ -2414,7 +2414,7 @@ grammar Fortran
   end
 
   rule level_3_expr
-    # R711
+    # F90:R711
     #
     # Note: Left-recursive rule implied by standard:
     # ( level_3_expr concat_op )? level_2_expr
@@ -2427,7 +2427,7 @@ grammar Fortran
   end
 
   rule level_4_expr
-    # R713
+    # F90:R713
     #
     # Note: Left-recursive rule implied by standard:
     # ( level_3_expr rel_op )? level_3_expr
@@ -2440,7 +2440,7 @@ grammar Fortran
   end
 
   rule level_5_expr
-    # R718
+    # F90:R718
     #
     # Note: Left-recursive rule implied by standard:
     # ( level_5_expr equiv_op)? equiv_operand
@@ -2453,7 +2453,7 @@ grammar Fortran
   end
 
   rule literal_constant
-    # R306
+    # F90:R306
     #
     # Note: The choice order is different than that given in the standard, e.g.
     # an int_literal_constant should only be matched after failure to match a
@@ -2476,7 +2476,7 @@ grammar Fortran
   end
     
   rule logical_expr
-    # R725
+    # F90:R725
     #
     # Constraint: logical_expr must be type logical.
 
@@ -2484,7 +2484,7 @@ grammar Fortran
   end
 
   rule logical_initialization_expr
-    # R733
+    # F90:R733
     #
     # Constraint: A logical_initialization_expr must be an initialization
     # expression (7.1.6.1).
@@ -2493,7 +2493,7 @@ grammar Fortran
   end
 
   rule logical_literal_constant
-    # R421
+    # F90:R421
     #
     # Constraint: The value of kind_param must specify a representation that
     # exists on the processor.
@@ -2502,7 +2502,7 @@ grammar Fortran
   end
 
   rule logical_variable
-    # R603
+    # F90:R603
     #
     # Constraint: logical_variable must be of type logical.
 
@@ -2510,7 +2510,7 @@ grammar Fortran
   end
 
   rule loop_control
-    # R821
+    # F90:R821
     #
     # Constraint: Each scalar_numeric_expr in loop_control must be of type
     # integer, default real, or double precision real.
@@ -2525,7 +2525,7 @@ grammar Fortran
   end
 
   rule lower_bound
-    # R514
+    # F90:R514
 
     specification_expr
   end
@@ -2535,23 +2535,23 @@ grammar Fortran
   end
 
   rule main_program
-    # R1101
+    # F90:R1101
     #
     # Constraint: In a main_program, the execution_part must not contain a
-    # RETURN statement or an ENTRY statement.
+    # F90:RETURN statement or an ENTRY statement.
 
     program_stmt? specification_part? execution_part? internal_subprogram_part?
       end_program_stmt <E>
   end
 
   rule mask_expr
-    # R741
+    # F90:R741
 
     logical_expr
   end
 
   rule module
-    # R1104
+    # F90:R1104
     #
     # Constraint: A module specification_part must not contain a
     # stmt_function_stmt, an entry_stmt, or a format_stmt. An automatic object
@@ -2567,7 +2567,7 @@ grammar Fortran
   end
 
   rule module_procedure_stmt
-    # R1205
+    # F90:R1205
 
     label:label? t_module t_procedure procedure_name_list t_newline <StmtJ>
   end
@@ -2577,7 +2577,7 @@ grammar Fortran
   end
 
   rule module_subprogram
-    # R213
+    # F90:R213
 
     subroutine_subprogram /
     function_subprogram /
@@ -2585,32 +2585,32 @@ grammar Fortran
   end
 
   rule module_subprogram_part
-    # R212
+    # F90:R212
 
     contains_stmt module_subprogram+ <Module_Subprogram_Part>
   end
 
   rule module_stmt
-    # R1105
+    # F90:R1105
 
     label:label? t_module module_name t_newline <Module_Stmt>
   end
 
   rule mult_op
-    # R709
+    # F90:R709
 
     t_star /
     t_slash
   end
 
   rule mult_operand
-    # R705
+    # F90:R705
 
     level_1_expr ( power_op mult_operand )? <T>
   end
 
   rule name
-    # R304
+    # F90:R304
     #
     # Constraint: The maximum length of a name is 31 characters.
 
@@ -2618,13 +2618,13 @@ grammar Fortran
   end
 
   rule named_constant
-    # R307
+    # F90:R307
 
     name
   end
 
   rule named_constant_def
-    # R539
+    # F90:R539
 
     named_constant t_equal initialization_expr <E>
   end
@@ -2643,7 +2643,7 @@ grammar Fortran
   end
 
   rule namelist_group_object
-    # R544
+    # F90:R544
     #
     # Constraint: A namelist_group_object must not be an array dummy argument
     # with a nonconstant bound, a variable with nonconstant character length, an
@@ -2670,34 +2670,34 @@ grammar Fortran
   end
 
   rule namelist_stmt
-    # R543
+    # F90:R543
 
     label:label? t_namelist namelist_group_set namelist_group_sets t_newline
       <Namelist_Stmt>
   end
 
   rule nonblock_do_construct
-    # R826
+    # F90:R826
 
     outer_shared_do_construct /
     action_term_do_construct
   end
 
   rule nonlabel_do_stmt
-    # R820
+    # F90:R820
 
     label:label? do_construct_name_label? t_do loop_control? t_newline
       &{ |e| dolabel_push(:nolabel) } <Nonlabel_Do_Stmt>
   end
 
   rule not_op
-    # R719
+    # F90:R719
 
     ".not." <T>
   end
 
   rule nullify_stmt
-    # R629
+    # F90:R629
     #
     # Constraint: Each pointer_object must have the POINTER attribute.
 
@@ -2706,7 +2706,7 @@ grammar Fortran
   end
 
   rule numeric_expr
-    # R729
+    # F90:R729
     #
     # Constraint: numeric_expr must be of type integer, real or complex.
 
@@ -2732,7 +2732,7 @@ grammar Fortran
   end
 
   rule octal_constant
-    # R409
+    # F90:R409
     #
     # Constraint: digit must have one of the values 0 through 7. Note: 'digit is
     # replaced by 't_octal' here to enforce the constraint.
@@ -2742,7 +2742,7 @@ grammar Fortran
   end
 
   rule only
-    # R1109
+    # F90:R1109
     #
     # Constraint: Each access_id must be a public entity in the module. Each
     # use_name must be the name of a public entity in the module.
@@ -2756,13 +2756,13 @@ grammar Fortran
   end
 
   rule open_stmt
-    # R904
+    # F90:R904
 
     label:label? t_open t_paren_l connect_spec_list t_paren_r t_newline <StmtC>
   end
 
   rule optional_stmt
-    # R520
+    # F90:R520
     #
     # Constraint: An optional_stmt may occur only in the scoping unit of a
     # subprogram of an interface body.
@@ -2772,19 +2772,19 @@ grammar Fortran
   end
 
   rule or_op
-    # R721
+    # F90:R721
 
     ".or." <T>
   end
 
   rule outer_shared_do_construct
-    # R830
+    # F90:R830
 
     label_do_stmt !{ |e| dolabel_dupe? } do_body shared_term_do_construct <E>
   end
 
   rule output_item
-    # R915
+    # F90:R915
 
     io_implied_do /
     expr
@@ -2800,14 +2800,14 @@ grammar Fortran
   end
 
   rule parameter_stmt
-    # R538
+    # F90:R538
 
     label:label? t_parameter t_paren_l named_constant_def_list t_paren_r
       t_newline <StmtC>
   end
 
   rule parent_string
-    # R610
+    # F90:R610
     #
     # Constraint: parent_string must be of type character.
 
@@ -2852,7 +2852,7 @@ grammar Fortran
   end
 
   rule part_ref
-    # R613
+    # F90:R613
     #
     # Constraint: In a part_ref containing a section_subscript_list, the number
     # of section_subscripts must equal the rank of part_name.
@@ -2861,13 +2861,13 @@ grammar Fortran
   end
 
   rule pause_stmt
-    # R844
+    # F90:R844
 
     label:label? t_pause stop_code? t_newline <StmtJ>
   end
 
   rule pointer_assignment_stmt
-    # R736
+    # F90:R736
     #
     # Constraint: The pointer_object must have the POINTER attirbute. The
     # target must be of the same type, type parameters, and rank as the
@@ -2877,7 +2877,7 @@ grammar Fortran
   end
 
   rule pointer_object
-    # R630
+    # F90:R630
 
     structure_component /
     variable_name
@@ -2888,7 +2888,7 @@ grammar Fortran
   end
 
   rule pointer_stmt
-    # R527
+    # F90:R527
     #
     # Constraint: The INTENT attribute must not be specified for an object_name.
     # If the DIMENSION attribute ofr an object_name is specified elsewhere in
@@ -2899,7 +2899,7 @@ grammar Fortran
   end
 
   rule position_spec
-    # R922
+    # F90:R922
     #
     # Constraint: The label in the ERR= specifier must be the statement label
     # of a branch target statement that appears in the same scoping unit as the
@@ -2920,20 +2920,20 @@ grammar Fortran
   end
 
   rule power_op
-    # R708
+    # F90:R708
 
     "**" <T>
   end
 
   rule prefix
-    # R1217
+    # F90:R1217
 
     type_spec t_recursive? <J> /
     t_recursive type_spec? <J>
   end
 
   rule primary
-    # R701
+    # F90:R701
     #
     # Constraint: subobject must be a subobject whose parent is a constant. A
     # variable that is a primary must not be an assumed-size array.
@@ -2948,7 +2948,7 @@ grammar Fortran
   end
 
   rule print_stmt
-    # R911
+    # F90:R911
 
     label:label? t_print format print_stmt_output_item_list? t_newline
       <Print_Stmt>
@@ -2959,7 +2959,7 @@ grammar Fortran
   end
 
   rule private_sequence_stmt
-    # R423
+    # F90:R423
     #
     # Constraint: The same private_sequence_stmt must not appear more than once
     # in a given derived_type_def. If SEQUENCE is present, all derived types
@@ -2989,13 +2989,13 @@ grammar Fortran
   end
 
   rule program_stmt
-    # R1102
+    # F90:R1102
 
     label:label? t_program name:program_name t_newline <Program_Stmt>
   end
 
   rule program_unit
-    # R202
+    # F90:R202
 
     main_program /
     external_subprogram /
@@ -3004,7 +3004,7 @@ grammar Fortran
   end
 
   rule read_stmt
-    # R909
+    # F90:R909
 
     label:label? t_read t_paren_l io_control_spec_list t_paren_r
       input_item_list? t_newline <Read_Stmt_1> /
@@ -3017,7 +3017,7 @@ grammar Fortran
   end
 
   rule real_literal_constant
-    # R413
+    # F90:R413
     #
     # Constraint: If both kind_param and exponent_letter are present,
     # exponent_letter bust be E. The value of kind_param must specify an
@@ -3030,7 +3030,7 @@ grammar Fortran
   end
 
   rule real_part
-    # R418
+    # F90:R418
 
     signed_real_literal_constant /
     signed_int_literal_constant
@@ -3067,7 +3067,7 @@ grammar Fortran
   end
 
   rule rel_op
-    # R714
+    # F90:R714
 
     rel_op_eq /
     rel_op_ne /
@@ -3078,7 +3078,7 @@ grammar Fortran
   end
 
   rule rename
-    # R1108
+    # F90:R1108
 
     local_name t_point use_name <E>
   end
@@ -3116,7 +3116,7 @@ grammar Fortran
   end
 
   rule return_stmt
-    # R1224
+    # F90:R1224
     #
     # Constraint: The return_stmt must be contained in the scoping unit of a
     # function or subroutine subprogram. The scalar_int_expr is allowed only
@@ -3126,7 +3126,7 @@ grammar Fortran
   end
 
   rule rewind_stmt
-    # R921
+    # F90:R921
 
     label:label? t_rewind t_paren_l position_spec_list t_paren_r t_newline
       <StmtC> /
@@ -3134,7 +3134,7 @@ grammar Fortran
   end
 
   rule save_stmt
-    # R523
+    # F90:R523
     #
     # Constraint: If a SAVE statement with an omitted saved entity list occurs
     # in a scoping unit, no other explicit occurrence of the SAVE attribute or
@@ -3148,7 +3148,7 @@ grammar Fortran
   end
 
   rule saved_entity
-    # R524
+    # F90:R524
     #
     # Constraint: An object_name must not be a dummy argument name, a procedure
     # name, a function result name, an automatic data object name, or the name
@@ -3342,7 +3342,7 @@ grammar Fortran
   end
 
   rule section_subscript
-    # R618
+    # F90:R618
 
     subscript_triplet /
     vector_subscript /
@@ -3354,46 +3354,46 @@ grammar Fortran
   end
 
   rule select_case_stmt
-    # R809
+    # F90:R809
 
     label:label? case_construct_name_pair? t_select t_case t_paren_l case_expr
       t_paren_r t_newline <Select_Case_Stmt>
   end
 
   rule shared_term_do_construct
-    # R831
+    # F90:R831
 
     outer_shared_do_construct /
     inner_shared_do_construct
   end
 
   rule sign
-    # R406
+    # F90:R406
 
     t_plus /
     t_minus
   end
 
   rule signed_digit_string
-    # R401
+    # F90:R401
 
     sign? digit_string <T>
   end
 
   rule signed_int_literal_constant
-    # R403
+    # F90:R403
 
     sign? int_literal_constant <T>
   end
 
   rule signed_real_literal_constant
-    # R412
+    # F90:R412
 
     sign? real_literal_constant <T>
   end
 
   rule significand
-    # R414
+    # F90:R414
 
     digit_string t_dot !significand_disallowed digit_string? <T> /
     t_dot digit_string <T>
@@ -3598,7 +3598,7 @@ grammar Fortran
   end
 
   rule specification_expr
-    # R734
+    # F90:R734
     #
     # Constraint: The scalar_int_expr must be a restricted expression (7.1.6.2).
 
@@ -3606,13 +3606,13 @@ grammar Fortran
   end
 
   rule specification_part
-    # R204
+    # F90:R204
 
     use_part implicit_part? declaration_constructs <E>
   end
 
   rule specification_stmt
-    # R214
+    # F90:R214
 
     access_stmt /
     allocatable_stmt /
@@ -3635,13 +3635,13 @@ grammar Fortran
   end
 
   rule stat_variable
-    # R623
+    # F90:R623
 
     scalar_int_variable
   end
 
   rule stmt_function_stmt
-    # R1226
+    # F90:R1226
     #
     # Constraint: The scalar_expr may be composed only of constants (literal and
     # named), references to variables, references to functions and function
@@ -3673,7 +3673,7 @@ grammar Fortran
   end
 
   rule stop_code
-    # R843
+    # F90:R843
     #
     # Constraint: scalar_char_constant must be of type default character.
 
@@ -3682,19 +3682,19 @@ grammar Fortran
   end
 
   rule stop_stmt
-    # R842
+    # F90:R842
 
     label:label? t_stop stop_code? t_newline <StmtJ>
   end
 
   rule stride
-    # R620
+    # F90:R620
 
     scalar_int_expr
   end
 
   rule structure_component
-    # R614
+    # F90:R614
     #
     # Constraint: In a structure_component, there must be more than one part_ref
     # and the rightmost part_ref must be of the form part_name.
@@ -3703,7 +3703,7 @@ grammar Fortran
   end
 
   rule structure_constructor
-    # R430
+    # F90:R430
 
     type_name t_paren_l expr_list t_paren_r <E>
   end
@@ -3715,14 +3715,14 @@ grammar Fortran
   end
 
   rule subroutine_stmt
-    # R1220
+    # F90:R1220
 
     label:label? t_recursive? t_subroutine subroutine_name
       dummy_arg_list_option? t_newline <Subroutine_Stmt>
   end
 
   rule subroutine_subprogram
-    # R1219
+    # F90:R1219
     #
     # Constraint: An internal subroutine must not contain an ENTRY statement. An
     # internal subroutine must not contain an internal_subprogram_part.
@@ -3732,13 +3732,13 @@ grammar Fortran
   end
 
   rule subscript
-    # R617
+    # F90:R617
 
     scalar_int_expr
   end
 
   rule subscript_triplet
-    # R619
+    # F90:R619
     #
     # Constraint: The second subscript must not be omitted from a
     # subscript_triplet in the last dimension of an assumed-size array.
@@ -3747,7 +3747,7 @@ grammar Fortran
   end
 
   rule subobject
-    # R602
+    # F90:R602
 
     array_section /
     array_element /
@@ -3756,13 +3756,13 @@ grammar Fortran
   end
 
   rule substring
-    # R609
+    # F90:R609
 
     parent_string t_paren_l substring_range t_paren_r <T>
   end
 
   rule substring_range
-    # R611
+    # F90:R611
 
     scalar_int_expr? t_colon scalar_int_expr? <T>
   end
@@ -4308,7 +4308,7 @@ grammar Fortran
   end
 
   rule t_underscore
-    # R303
+    # F90:R303
     "_"
   end
 
@@ -4337,7 +4337,7 @@ grammar Fortran
   end
 
   rule target
-    # R737
+    # F90:R737
     #
     # Constraint: The variable must have the TARGET attribute or be a subobject
     # of an object with the TARGET attribute, or it must have the pointer
@@ -4349,7 +4349,7 @@ grammar Fortran
   end
 
   rule target_stmt
-    # R528
+    # F90:R528
     #
     # Constraint: The PARAMETER attribute must not be specified for an
     # object_name.
@@ -4359,7 +4359,7 @@ grammar Fortran
   end
 
   rule type_declaration_stmt
-    # R501
+    # F90:R501
     #
     # Constraint: The same attr_spec must not appear more than once in a given
     # type_declaration_stmt.
@@ -4376,7 +4376,7 @@ grammar Fortran
   end
 
   rule type_param_value
-    # R509
+    # F90:R509
     #
     # Constraint: A function name must not be declared with an asterisk
     # type_param_value if the function is an internal or module function,
@@ -4387,7 +4387,7 @@ grammar Fortran
   end
 
   rule type_spec
-    # R502
+    # F90:R502
 
     type_spec_with_kind_selector /
     type_spec_without_kind_selector
@@ -4412,7 +4412,7 @@ grammar Fortran
   end
 
   rule upper_bound
-    # R515
+    # F90:R515
 
     specification_expr
   end
@@ -4429,7 +4429,7 @@ grammar Fortran
   end
 
   rule use_stmt
-    # R1107
+    # F90:R1107
 
     label:label? t_use module_name rename_list_option? t_newline <Use_Stmt_1> /
     label:label? t_use module_name t_comma t_only t_colon only_list? t_newline
@@ -4437,7 +4437,7 @@ grammar Fortran
   end
 
   rule variable
-    # R601
+    # F90:R601
     #
     # Constraint: scalar_variable_name must not have the PARAMETER attribute.
     # array_variable_name must be the name of a data object that is an array.
@@ -4460,7 +4460,7 @@ grammar Fortran
   end
 
   rule vector_subscript
-    # R621
+    # F90:R621
     #
     # Constraint: A vector_subscript must be an integer array expression of rank
     # one.
@@ -4473,7 +4473,7 @@ grammar Fortran
   end
 
   rule where_construct
-    # R739
+    # F90:R739
     #
     # Constraint: The assignment_stmt must not be a defined assignment.
 
@@ -4482,14 +4482,14 @@ grammar Fortran
   end
 
   rule where_construct_stmt
-    # R740
+    # F90:R740
 
     label:label? t_where t_paren_l mask_expr t_paren_r t_newline
       <Where_Construct_Stmt>
   end
 
   rule where_stmt
-    # R738
+    # F90:R738
     #
     # Constraint: The assignment_stmt must not be a defined assignment.
 
@@ -4498,7 +4498,7 @@ grammar Fortran
   end
 
   rule write_stmt
-    # R910
+    # F90:R910
 
     label:label? t_write t_paren_l io_control_spec_list t_paren_r
       output_item_list? t_newline <Write_Stmt>
