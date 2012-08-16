@@ -1423,7 +1423,8 @@ grammar Fortran
     # F90:R203
 
     subroutine_subprogram /
-    function_subprogram
+    function_subprogram /
+    directive # REMOVE!
   end
 
   rule file_name_expr
