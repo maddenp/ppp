@@ -1543,10 +1543,10 @@ grammar Fortran
     #
     # Constraint: The function_name must be the name of an external function,
     # an intrinsic function, a function dummy procedure, or a statement
-    # function. The initialization_expr_pair must appear if the statement
-    # contains a PARAMETER attribute. If initialization_expr_pair appears, a
+    # function. The = initialization_expr must appear if the statement
+    # contains a PARAMETER attribute. If = initialization_expr appears, a
     # double colon separator must appear before the entity_decl_list. The
-    # initialization_expr_pair must not appear if object_name is a dummy
+    # = initialization_expr must not appear if object_name is a dummy
     # argument, a function result, an object in a named common block unless the
     # type declaration is in a block data program unit, an object in blank
     # common, an allocatable array, a pointer, an external name, an intrinsic
@@ -1570,9 +1570,14 @@ grammar Fortran
     # specified unless it is a function. An array must not have both the
     # ALLOCATABLE and the POINTER attribute. An entity must not be given
     # explicitly any attribute more than once in a scoping unit.
+    #
+    # F95:R504
+    #
+    # Constraint: 
+    # Note: F95 adds the pointer-nullifying option to initialization
 
     object_name entity_decl_array_spec? char_length_pair?
-      initialization_expr_pair? <Entity_Decl> /
+      initialization? <Entity_Decl> /
     function_name char_length_pair? <T>
   end
 
@@ -2002,6 +2007,13 @@ grammar Fortran
     label:label? t_implicit implicit_spec_list t_newline <Implicit_Stmt>
   end
 
+  rule initialization
+    # F95:R505
+
+    t_equal initialization_expr <T> /
+    t_point null_function_ref <T>
+  end
+
   rule initialization_expr
     # F90:R730
     #
@@ -2009,10 +2021,6 @@ grammar Fortran
     # (7.1.6.1).
 
     expr
-  end
-
-  rule initialization_expr_pair
-    t_equal initialization_expr <T>
   end
 
   rule inner_shared_do_construct
