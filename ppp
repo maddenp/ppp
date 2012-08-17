@@ -114,15 +114,11 @@ class PPP
   end
 
   def normalize(s)
-    s=s.gsub(directive,'@\1')                                # hide directives
-    s=NormalizeParser.new.parse(s).to_s                      # normalize & clean
-    s=s.gsub(/^\s*!.*/,'')                                   # clear comment lines
-    s=s.gsub(/\s+$/,'')                                      # no trailing whitespace
-    s=s.gsub(/^\s+/,'')                                      # left-justify lines
-    s=s.gsub(/&$\n&?/,'')                                    # join continuation lines
-    s=s.gsub(/\n\n/,"\n")                                    # no blank lines
-    s << "\n"  unless s[-1]=="\n"                            # ensure final newline
-    s=s.gsub(/^@(.*)/i,'!\1')                                # show directives
+    np=NormalizeParser.new
+    s=s.gsub(directive,'@\1')         # hide directives
+    s=np.parse(np.parse(s).to_s).to_s # two normalize passes
+    s << "\n"  unless s[-1]=="\n"     # ensure final newline
+    s=s.gsub(/^@(.*)/i,'!\1')         # show directives
   end
 
   def parse(s)

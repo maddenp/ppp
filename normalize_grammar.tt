@@ -9,15 +9,15 @@ grammar Normalize
   end
 
   rule directive
-    "@" [^\n]* <Verbatim>
+    "@" [^\n]* <Directive>
   end
 
   rule quoted
-    ( '"' [^"]* '"' / "'" [^']* "'" )+ <Verbatim>
+    ( '"' [^"]* '"' / "'" [^']* "'" )+ <Quoted>
   end
 
   rule sms
-    "@" [^\n]* <Verbatim> # <SMS> & normalize for parsing
+    "@" [^\n]* <SMS>
   end
 
   rule unquoted
