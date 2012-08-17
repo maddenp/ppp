@@ -117,6 +117,7 @@ class PPP
     np=NormalizeParser.new
     s=s.gsub(directive,'@\1')         # hide directives
     s=np.parse(np.parse(s).to_s).to_s # two normalize passes
+    s=s.sub(/\n+/,'')                 # remove leading newlines
     s << "\n"  unless s[-1]=="\n"     # ensure final newline
     s=s.gsub(/^@(.*)/i,'!\1')         # show directives
   end
