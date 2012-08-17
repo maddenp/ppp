@@ -1813,7 +1813,7 @@ grammar Fortran
     t_rec t_equal scalar_int_expr <T> /
     t_size t_equal scalar_default_int_variable <T> /
     t_unit t_equal io_unit <T> /
-    io_unit &t_comma <T>
+    io_unit
   end
 
   rule io_control_spec_list
