@@ -7,7 +7,6 @@ end program p
 
 integer function s() result(r)
   implicit none
-  integer::r
   r=0
   return
   entry a() result(r)
