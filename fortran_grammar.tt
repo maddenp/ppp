@@ -3734,6 +3734,7 @@ grammar Fortran
   end
 
   rule type_spec_without_kind_selector
+    t_integer star_int <Type_Spec> / # NONSTANDARD!
     t_integer "" <Type_Spec> /
     t_real star_int <Type_Spec> / # NONSTANDARD!
     t_real "" <Type_Spec> /
