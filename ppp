@@ -37,7 +37,7 @@ class PPP
       s=parse(s)
     end
     fail "Parse failed." if s.empty?
-    s=wrap(s) unless @normalize or directive?(s)
+    s=wrap(s) unless @normalize
     puts s
   end
 
@@ -167,17 +167,19 @@ class PPP
     a=s.split("\n")
     (0..a.length-1).each do |n|
       e=a[n].chomp
-      if e.length>max
-        e=~/^( *).*$/
-        i=$1.length+2
-        t=''
-        begin
-          r=[max-2,e.length-1].min
-          t+=e[0..r]+"&\n"
-          e=' '*i+'&'+e[r+1..-1]
-        end while e.length>max
-        t+=e
-        a[n]=t
+      unless directive?(e)
+        if e.length>max
+          e=~/^( *).*$/
+          i=$1.length+2
+          t=''
+          begin
+            r=[max-2,e.length-1].min
+            t+=e[0..r]+"&\n"
+            e=' '*i+'&'+e[r+1..-1]
+          end while e.length>max
+          t+=e
+          a[n]=t
+        end
       end
     end
     a.join("\n")
