@@ -37,7 +37,7 @@ class PPP
       s=parse(s)
     end
     fail "Parse failed." if s.empty?
-    s=wrap(s) unless @normalize
+    s=wrap(s) unless @normalize or directive?(s)
     puts s
   end
 
@@ -104,7 +104,11 @@ class PPP
     end
     @directive
   end
-  
+
+  def directive?(s)
+    s=~directive
+  end
+
   def fail(msg)
     $stderr.puts "\n#{msg}\n\n"
     exit 1
