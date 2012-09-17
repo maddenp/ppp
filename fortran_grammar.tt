@@ -1635,7 +1635,7 @@ grammar Fortran
   rule input_item_list
     # F90:9.4.2
 
-    input_item ( t_comma input_item )* <E>
+    input_item ( t_comma input_item )* <T>
   end
 
   rule inquire_spec
