@@ -13,7 +13,7 @@ grammar Normalize
   end
 
   rule quoted
-    ( '"' [^"]* '"' / "'" [^']* "'" )+ <Quoted>
+    ( [\"] [^\"]* [\"] / [\'] [^\']* [\'] )+ <Quoted>
   end
 
   rule sms
@@ -21,7 +21,7 @@ grammar Normalize
   end
 
   rule unquoted
-    [^'"!@]+ <Normalize>
+    [^\'\"!@]+ <Normalize>
   end
 
 end
