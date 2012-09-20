@@ -12,10 +12,6 @@
 
 grammar Fortran
 
-  rule start
-    program_unit+ <Program_Units>
-  end
-
   rule ac_do_variable
     # F90:R435
 
@@ -2397,6 +2393,10 @@ grammar Fortran
     external_subprogram /
     module /
     block_data
+  end
+
+  rule program_units
+    program_unit+ <Program_Units>
   end
 
   rule read_stmt

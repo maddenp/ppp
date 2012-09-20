@@ -23,7 +23,7 @@ class PPP
     fail(usage) unless srcfile=args.pop
     srcfile=File.expand_path(srcfile)
     fail("Cannot read file: #{srcfile}") unless File.readable?(srcfile)
-    psargs(args)
+    unpack(args)
     s=File.open(srcfile,'rb').read
     s=s.gsub(/^\s*!sms\$insert */i,'')                           # process inserts
     s=s.gsub(/^\s*!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
@@ -129,13 +129,14 @@ class PPP
     s=s.gsub(/^@(.*)/i,'!\1')         # show directives
   end
 
-  def parse(s)
-    tree=FortranParser.new.parse(s)
+  def parse(s,root=nil)
+    root||=:program_units
+    tree=FortranParser.new.parse(s,:root=>root)
     p tree if @debug
     tree.to_s
   end
 
-  def psargs(args)
+  def unpack(args)
     @incdirs=['.']
     args.reverse!
     while opt=args.pop
