@@ -15,26 +15,15 @@ include Fortran
 
 class PPP
 
-  def initialize(s,props={},srcfile=nil)
+  def initialize(props={})
     @debug=false
+    @fp=FortranParser.new
     @incdirs=[]
     @normalize=false
-    props.each { |k,v| instance_variable_set("@#{k}".to_sym,v) }
-    s=s.gsub(/^\s*!sms\$insert */i,'')                           # process inserts
-    s=s.gsub(/^\s*!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
-    s=assemble(s,[srcfile])
-    cppcheck(s)
-    puts "normalized:\n\n" if @debug
     @np=NormalizeParser.new
-    s=normalize(s)
-    unless @normalize
-      puts s if @debug
-      puts "\nparsed:\n\n" if @debug
-      s=parse(s)
-    end
-    fail "Parse failed." if s.empty?
-    s=wrap(s) unless @normalize
-    puts s
+    @root=:program_units
+    @srcfile=nil
+    props.each { |k,v| instance_variable_set("@#{k}".to_sym,v) }
   end
 
   def assemble(s,seen)
@@ -119,13 +108,30 @@ class PPP
     s=s.gsub(/^@(.*)/i,'!\1')         # show directives
   end
 
-  def parse(s,root=nil)
-    root||=:program_units
-    tree=FortranParser.new.parse(s,:root=>root)
-    p tree if @debug
-    tree.to_s
+  def out(s,root=:program_units)
+    s=s.gsub(/^\s*!sms\$insert */i,'')                           # process inserts
+    s=s.gsub(/^\s*!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
+    s=assemble(s,[@srcfile])
+    cppcheck(s)
+    puts "normalized:\n\n" if @debug
+    s=normalize(s)
+    unless @normalize
+      puts s if @debug
+      puts "\nparsed:\n\n" if @debug
+      @tree=@fp.parse(s,:root=>root)
+      p @tree if @debug
+      s=@tree.to_s
+      fail "Parse failed." if s.empty?
+      s=wrap(s)
+    end
+    s
   end
 
+  def tree(s,root=:program_units)
+    out(s,root)
+    @tree
+  end
+  
   def wrap(s)
     max=80
     a=s.split("\n")
@@ -156,8 +162,7 @@ def fail(msg)
   exit 1
 end
 
-def unpack(args)
-  props={}
+def unpack(props,args)
   props[:incdirs]=['.']
   args.reverse!
   while opt=args.pop
@@ -190,8 +195,10 @@ if (__FILE__==$0)
   srcfile=File.expand_path(srcfile)
   fail("Cannot read file: #{srcfile}") unless File.readable?(srcfile)
   s=File.open(srcfile,'rb').read
-  props=unpack(ARGV)
-  PPP.new(s,props,srcfile)
+  props={:srcfile=>srcfile}
+  props=unpack(props,ARGV)
+  ppp=PPP.new(props)
+  puts ppp.out(s)
 end
 
 # paul.a.madden@noaa.gov
