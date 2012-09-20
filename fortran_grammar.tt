@@ -1155,7 +1155,7 @@ grammar Fortran
   rule end_program_stmt
     # F90:R1103
 
-    label:label? t_end !end_program_stmt_disallowed t_program? name:program_name? t_newline? <End_Program_Stmt>
+    label:label? t_end !end_program_stmt_disallowed t_program? program_name? t_newline? <End_Program_Stmt>
   end
 
   rule end_program_stmt_disallowed
@@ -2387,7 +2387,7 @@ grammar Fortran
   rule program_stmt
     # F90:R1102
 
-    label:label? t_program name:program_name t_newline <Program_Stmt>
+    label:label? t_program program_name t_newline <Program_Stmt>
   end
 
   rule program_unit

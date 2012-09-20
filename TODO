@@ -23,5 +23,7 @@
 
 - Something's weird with .elements access in e.g. class Module_Subprogram_Part...
 
-x Wrap long lines
+- Would be nice to change 'label:label?' to just label, but Treetop does not
+  currently provide accessors for optional non-terminals (http://goo.gl/Usr9H).
+  Sounds like they'd accept a patch...
 
