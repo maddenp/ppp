@@ -15,18 +15,17 @@ include Fortran
 
 class PPP
 
-  def initialize(args)
+  def initialize(s,props={},srcfile=nil)
     @debug=false
-    fail(usage) unless srcfile=args.pop
-    srcfile=File.expand_path(srcfile)
-    fail("Cannot read file: #{srcfile}") unless File.readable?(srcfile)
-    unpack(args)
-    s=File.open(srcfile,'rb').read
+    @incdirs=[]
+    @normalize=false
+    props.each { |k,v| instance_variable_set("@#{k}".to_sym,v) }
     s=s.gsub(/^\s*!sms\$insert */i,'')                           # process inserts
     s=s.gsub(/^\s*!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
     s=assemble(s,[srcfile])
     cppcheck(s)
     puts "normalized:\n\n" if @debug
+    @np=NormalizeParser.new
     s=normalize(s)
     unless @normalize
       puts s if @debug
@@ -106,21 +105,15 @@ class PPP
     s=~directive
   end
 
-  def fail(msg)
-    $stderr.puts "\n#{msg}\n\n"
-    exit 1
-  end
-
   def incchain(seen,incfile)
     "\n  "+(seen+[incfile]).join(" includes\n  ")
   end
 
   def normalize(s)
-    np=NormalizeParser.new
     s=s.gsub(directive,'@\1')         # hide directives
     s=s.gsub(/^\s+/,'')               # left-justify lines
     s=s.gsub(/^!.*\n/,'')             # remove full-line comments
-    s=np.parse(np.parse(s).to_s).to_s # two normalize passes
+    s=@np.parse(@np.parse(s).to_s).to_s # two normalize passes
     s=s.sub(/^\n+/,'')                # remove leading newlines
     s << "\n"  unless s[-1]=="\n"     # ensure final newline
     s=s.gsub(/^@(.*)/i,'!\1')         # show directives
@@ -131,33 +124,6 @@ class PPP
     tree=FortranParser.new.parse(s,:root=>root)
     p tree if @debug
     tree.to_s
-  end
-
-  def unpack(args)
-    @incdirs=['.']
-    args.reverse!
-    while opt=args.pop
-      case opt
-      when '-I'
-        dirlist=args.pop
-        fail(usage) unless dirlist
-        dirlist.split(':').each do |d|
-          fail("No such directory: #{d}") unless File.directory?(d)
-          @incdirs << d
-        end
-      when 'normalize'
-        @normalize=true
-      when 'debug'
-        @debug=true
-      else
-        fail(usage)
-      end
-    end
-  end
-
-  def usage
-    f=File.basename(__FILE__)
-    "usage: #{f} [-I dir[:dir:...]] source"
   end
 
   def wrap(s)
@@ -185,6 +151,47 @@ class PPP
   
 end
 
-PPP.new(ARGV) if (__FILE__==$0)
+def fail(msg)
+  $stderr.puts "\n#{msg}\n\n"
+  exit 1
+end
+
+def unpack(args)
+  props={}
+  props[:incdirs]=['.']
+  args.reverse!
+  while opt=args.pop
+    case opt
+    when '-I'
+      dirlist=args.pop
+      fail(usage) unless dirlist
+      dirlist.split(':').each do |d|
+        fail("No such directory: #{d}") unless File.directory?(d)
+        props[:incdirs] << d
+      end
+    when 'normalize'
+      props[:normalize]=true
+    when 'debug'
+      props[:debug]=true
+    else
+      fail(usage)
+    end
+  end
+  props
+end
+
+def usage
+  f=File.basename(__FILE__)
+  "usage: #{f} [-I dir[:dir:...]] source"
+end
+
+if (__FILE__==$0)
+  fail(usage) unless srcfile=ARGV.pop
+  srcfile=File.expand_path(srcfile)
+  fail("Cannot read file: #{srcfile}") unless File.readable?(srcfile)
+  s=File.open(srcfile,'rb').read
+  props=unpack(ARGV)
+  PPP.new(s,props,srcfile)
+end
 
 # paul.a.madden@noaa.gov
