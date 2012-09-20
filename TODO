@@ -17,5 +17,11 @@
 
 - Treat 'H' edit descriptor's suffix verbatim (e.g. '100 format (5Hhello)')?
 
-- Wrap long lines
+- space() to take *e argument of items to print spaced out? can replace some sa/sb?
+
+- Collect env during parsing, differentiate stmt-func-stmt from array-ref
+
+- Something's weird with .elements access in e.g. class Module_Subprogram_Part...
+
+x Wrap long lines
 
