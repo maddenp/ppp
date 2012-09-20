@@ -1,9 +1,7 @@
 #!/usr/bin/env ruby
 
 basedir=File.dirname(File.expand_path($0))
-
 ENV['GEM_PATH']=File.join(basedir,'gems')
-
 $: << basedir
 
 require 'rubygems'
@@ -17,8 +15,7 @@ include Fortran
 
 class PPP
 
-  def initialize(basedir,args)
-    @basedir=basedir
+  def initialize(args)
     @debug=false
     fail(usage) unless srcfile=args.pop
     srcfile=File.expand_path(srcfile)
@@ -98,7 +95,7 @@ class PPP
 
   def directive
     unless @directive
-      f=File.join(@basedir,'sentinels')
+      f=File.join(File.dirname(File.expand_path($0)),'sentinels')
       d=File.open(f,'rb').read.gsub(/\$/,'\$').split("\n").<<('sms\$').join('|')
       @directive=Regexp.new("^\s*!((#{d}).*)",true)
     end
@@ -188,6 +185,6 @@ class PPP
   
 end
 
-PPP.new(basedir,ARGV) if (__FILE__==$0)
+PPP.new(ARGV) if (__FILE__==$0)
 
 # paul.a.madden@noaa.gov
