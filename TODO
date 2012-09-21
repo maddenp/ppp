@@ -5,5 +5,3 @@
 
 - Need tests of all R924 possibilities.
 
-- Treat 'H' edit descriptor's suffix verbatim (e.g. '100 format (5Hhello)')?
-
