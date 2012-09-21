@@ -1,9 +1,4 @@
 
-- Rule primary cannot tell the difference between function and array
-  references. Since variable -> subobject -> ( array_section / array_element )
-  precedes function_reference, the latter is recognized as the former. This
-  needs to be fixed with environment analysis.
-
 - Need tests of all R905 possibilities.
 
 - Need tests of all R912 possibilities.

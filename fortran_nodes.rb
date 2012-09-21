@@ -32,7 +32,7 @@ module Fortran
   end
 
   def envget(k)
-    @@env[k.to_s]
+    @@env[k.to_s]||{}
   end
 
   def envset(k,v)

@@ -2343,7 +2343,7 @@ grammar Fortran
   rule primary
     # F90:R701
 
-    function_reference /
+    function_reference !{ |e| envget(e[0].function_name)[:array] } <T> /
     variable /
     constant /
     constant_subobject /
