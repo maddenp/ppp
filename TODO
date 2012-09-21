@@ -7,5 +7,3 @@
 
 - Treat 'H' edit descriptor's suffix verbatim (e.g. '100 format (5Hhello)')?
 
-- space() to take *e argument of items to print spaced out? can replace some sa/sb?
-
