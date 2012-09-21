@@ -4,11 +4,6 @@
   precedes function_reference, the latter is recognized as the former. This
   needs to be fixed with environment analysis.
 
-- Parser can't currently differentiate between some statement function
-  statements and array-assignment statements. See the parse tree for t0229,
-  for example: "i(f)=7" is identified as a stmt_function_stmt, while it is
-  actually an array assignment. Needs to be fixed with environment analysis.
-
 - Need tests of all R905 possibilities.
 
 - Need tests of all R912 possibilities.

@@ -855,7 +855,7 @@ grammar Fortran
     parameter_stmt /
     format_stmt /
     entry_stmt /
-    stmt_function_stmt /
+    stmt_function_stmt !{ |e| envget(e[0].function_name)[:array] } <E> /
     # sms_declarative
     directive
   end
