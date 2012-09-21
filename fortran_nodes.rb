@@ -1,6 +1,6 @@
 module Fortran
 
-  @@attrs={}
+  @@env={}
   @@dolabels=[]
   @@level=0
   @@levelstack=[]
@@ -31,6 +31,14 @@ module Fortran
     @@dolabels.push(label)
   end
 
+  def envget(k)
+    @@env[k]
+  end
+
+  def envset(k,v)
+    @@env[k]=v
+  end
+
   def fail(s)
     puts "\nERROR: "+s+"\n\nbacktrace:\n\n"
     begin
@@ -40,10 +48,6 @@ module Fortran
     end
     puts
     exit(1)
-  end
-
-  def get(k)
-    @@attrs[k]
   end
 
   def indent(s)
@@ -88,10 +92,6 @@ module Fortran
     (e.to_s=='')?(''):(" #{e}")
   end
 
-  def set(k,v)
-    @@attrs[k]=v
-  end
-
   def sms(s)
     "#{e0}#{e1} "+s+"\n"
   end
@@ -113,7 +113,7 @@ module Fortran
     if attr_spec_option.is_a?(Attr_Spec_Option) and attr_spec_option.dimension?
       props.each { |k,v| v[:array]=true }
     end
-    #props.each { |k,v| puts "#{k}=#{v}" }
+    props.each { |k,v| envset(k,v) }
     true
   end
 
