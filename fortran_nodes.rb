@@ -106,12 +106,14 @@ module Fortran
     indent(("#{sa(e0)}"+s.chomp).strip)+"\n"
   end
 
-  # label:label? type_spec attr_spec_option? entity_decl_list t_newline &{ |e| typeinfo(e[0]) } <Type_Declaration_Stmt>
+# label:label? type_spec attr_spec_option? entity_decl_list t_newline &{ |e| typeinfo(e[0]) } <Type_Declaration_Stmt>
   def settypeinfo(type_spec,attr_spec_option,entity_decl_list)
-    # process attr_spec_option!
     props=entity_decl_list.props
     type=type_spec.type
     props.each { |k,v| v[:type]=type }
+#   puts "### #{attr_spec_option.class.name}"
+#   attr_spec_option.dimension?
+#   p attr_spec_option.elements[1]
 #   props.each { |k,v| puts "#{k}=#{v}" }
     true
   end
@@ -189,6 +191,35 @@ module Fortran
     def to_s() stmt("#{e1} #{e2}#{mn(e3,',',' '+e3.to_s)}") end
   end
 
+  class Attr_Spec_Dimension < T
+  end
+
+  class Attr_Spec_List < T
+#   def dimension?()
+#     p self
+#     puts
+#     p e0
+#     puts
+#     p e1
+#     puts
+#     p e2
+#     unless e1.nil?
+#       puts "### TEST"
+#     end
+#     puts e0.is_a?(Attr_Spec_Dimension)
+#   end
+  end
+
+  class Attr_Spec_List_Pair < T
+  end
+
+  class Attr_Spec_List_Pairs < T
+  end
+  
+  class Attr_Spec_Option < T
+    def dimension?() e1.dimension? end
+  end
+
   class Block_Data_Stmt < T
     def to_s() bb(stmt(space)) end
   end
@@ -235,6 +266,9 @@ module Fortran
 
   class Do_Term_Shared_Stmt < T
     def to_s() cat(:be) end
+  end
+
+  class Double_Colon < T
   end
 
   class Else_If_Stmt < T

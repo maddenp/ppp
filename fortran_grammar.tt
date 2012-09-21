@@ -340,7 +340,7 @@ grammar Fortran
     t_parameter /
     access_spec /
     t_allocatable /
-    t_dimension t_paren_l array_spec t_paren_r <T> /
+    t_dimension t_paren_l array_spec t_paren_r <Attr_Spec_Dimension> /
     t_external /
     t_intent t_paren_l intent_spec t_paren_r <T> /
     t_intrinsic /
@@ -351,11 +351,20 @@ grammar Fortran
   end
 
   rule attr_spec_list
-    attr_spec ( t_comma attr_spec )* <T>
+#    attr_spec ( t_comma attr_spec )* <Attr_Spec_List>
+    attr_spec attr_spec_list_pairs <Attr_Spec_List>
+  end
+
+  rule attr_spec_list_pair
+    t_comma attr_spec <Attr_Spec_List_Pair>
+  end
+
+  rule attr_spec_list_pairs
+    attr_spec_list_pair* <Attr_Spec_List_Pairs>
   end
 
   rule attr_spec_option
-    t_comma attr_spec_list double_colon <T> /
+    t_comma attr_spec_list double_colon <Attr_Spec_Option> /
     double_colon
   end
 
@@ -1027,7 +1036,7 @@ grammar Fortran
   end
 
   rule double_colon
-    t_colon t_colon <T>
+    t_colon t_colon <Double_Colon>
   end
 
   rule dummy_arg
@@ -3632,7 +3641,7 @@ grammar Fortran
   rule type_declaration_stmt
     # F90:R501
 
-    label:label? type_spec attr_spec_option:attr_spec_option? entity_decl_list t_newline &{ |e| settypeinfo(e[1],e[2],e[3]) } <Type_Declaration_Stmt>
+    label:label? type_spec attr_spec_option? entity_decl_list t_newline &{ |e| settypeinfo(e[1],e[2],e[3]) } <Type_Declaration_Stmt>
   end
 
   rule type_name
