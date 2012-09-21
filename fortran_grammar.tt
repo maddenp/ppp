@@ -351,7 +351,6 @@ grammar Fortran
   end
 
   rule attr_spec_list
-#    attr_spec ( t_comma attr_spec )* <Attr_Spec_List>
     attr_spec attr_spec_list_pairs <Attr_Spec_List>
   end
 
@@ -3641,7 +3640,7 @@ grammar Fortran
   rule type_declaration_stmt
     # F90:R501
 
-    label:label? type_spec attr_spec_option? entity_decl_list t_newline &{ |e| settypeinfo(e[1],e[2],e[3]) } <Type_Declaration_Stmt>
+    label:label? type_spec attr_spec_option? entity_decl_list t_newline &{ |e| typeinfo(e[1],e[2],e[3]) } <Type_Declaration_Stmt>
   end
 
   rule type_name

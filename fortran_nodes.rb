@@ -106,15 +106,14 @@ module Fortran
     indent(("#{sa(e0)}"+s.chomp).strip)+"\n"
   end
 
-# label:label? type_spec attr_spec_option? entity_decl_list t_newline &{ |e| typeinfo(e[0]) } <Type_Declaration_Stmt>
-  def settypeinfo(type_spec,attr_spec_option,entity_decl_list)
+  def typeinfo(type_spec,attr_spec_option,entity_decl_list)
     props=entity_decl_list.props
     type=type_spec.type
     props.each { |k,v| v[:type]=type }
-#   puts "### #{attr_spec_option.class.name}"
-#   attr_spec_option.dimension?
-#   p attr_spec_option.elements[1]
-#   props.each { |k,v| puts "#{k}=#{v}" }
+    if attr_spec_option.is_a?(Attr_Spec_Option) and attr_spec_option.dimension?
+      props.each { |k,v| v[:array]=true }
+    end
+    #props.each { |k,v| puts "#{k}=#{v}" }
     true
   end
 
@@ -195,25 +194,20 @@ module Fortran
   end
 
   class Attr_Spec_List < T
-#   def dimension?()
-#     p self
-#     puts
-#     p e0
-#     puts
-#     p e1
-#     puts
-#     p e2
-#     unless e1.nil?
-#       puts "### TEST"
-#     end
-#     puts e0.is_a?(Attr_Spec_Dimension)
-#   end
+    def dimension?()
+      e0.is_a?(Attr_Spec_Dimension) or (e1 and e1.dimension?)
+    end
   end
 
   class Attr_Spec_List_Pair < T
+    def dimension?() e1.is_a?(Attr_Spec_Dimension) end
   end
 
   class Attr_Spec_List_Pairs < T
+    def dimension?()
+      elements.each { |e| return true if e.dimension? }
+      false
+    end
   end
   
   class Attr_Spec_Option < T
