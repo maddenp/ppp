@@ -1202,8 +1202,12 @@ grammar Fortran
   rule entity_decl
     # F90:R504 + F95:R504
 
-    object_name entity_decl_array_spec? char_length_pair? initialization? <Entity_Decl> /
-    function_name char_length_pair? <T>
+    object_name entity_decl_array_spec? char_length_pair? initialization? <Entity_Decl_1> /
+    function_name char_length_pair? <Entity_Decl_2>
+  end
+
+  rule entity_decl_array_spec
+    t_paren_l array_spec t_paren_r <T>
   end
 
   rule entity_decl_list
@@ -1216,10 +1220,6 @@ grammar Fortran
 
   rule entity_decl_list_pairs
     entity_decl_list_pair* <Entity_Decl_List_Pairs>
-  end
-
-  rule entity_decl_array_spec
-    t_paren_l array_spec t_paren_r <T>
   end
 
   rule entry_name
@@ -3632,8 +3632,7 @@ grammar Fortran
   rule type_declaration_stmt
     # F90:R501
 
-    label:label? type_spec attr_spec_option? entity_decl_list t_newline <Type_Declaration_Stmt>
-    # &{ |e| m_s_g "type: #{e[1].type}"; m_s_g "names: #{e[3].names.join(' ')}" }
+    label:label? type_spec attr_spec_option:attr_spec_option? entity_decl_list t_newline &{ |e| settypeinfo(e[1],e[2],e[3]) } <Type_Declaration_Stmt>
   end
 
   rule type_name

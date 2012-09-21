@@ -106,6 +106,16 @@ module Fortran
     indent(("#{sa(e0)}"+s.chomp).strip)+"\n"
   end
 
+  # label:label? type_spec attr_spec_option? entity_decl_list t_newline &{ |e| typeinfo(e[0]) } <Type_Declaration_Stmt>
+  def settypeinfo(type_spec,attr_spec_option,entity_decl_list)
+    # process attr_spec_option!
+    props=entity_decl_list.props
+    type=type_spec.type
+    props.each { |k,v| v[:type]=type }
+#   props.each { |k,v| puts "#{k}=#{v}" }
+    true
+  end
+
   # Extension of SyntaxNode class
 
   class Treetop::Runtime::SyntaxNode
@@ -291,20 +301,34 @@ module Fortran
     def to_s() stmt(space,:be) end
   end
 
-  class Entity_Decl < T
-    def name() space(:all) end
+  class Entity_Decl_1 < T
+    def array?() e1.is_a?(Treetop::Runtime::SyntaxNode) end
+    def name() "#{e0}" end
+    def props() {:name=>name,:array=>array?} end
+  end
+
+  class Entity_Decl_2 < T
+    def array?() false end
+    def name() "#{e0}" end
+    def props() {:name=>name,:array=>array?} end
   end
 
   class Entity_Decl_List < T
-    def names() [e0.name]+((e1.nil?)?([]):(e1.names)) end
+    def props
+      x={e0.props[:name]=>e0.props}
+      e1.props.each { |e| x[e[:name]]=e } unless e1.nil?
+      x
+    end
   end
-
+  
   class Entity_Decl_List_Pair < T
+    def array?() e1.array? end
     def name() "#{e1.name}" end
+    def props() e1.props end
   end
 
   class Entity_Decl_List_Pairs < T
-    def names() elements.map { |e| e.name } end
+    def props() elements.inject([]) { |m,e| m << e.props } end
   end
 
   class Entry_Stmt < T
