@@ -14,8 +14,6 @@
 
 - space() to take *e argument of items to print spaced out? can replace some sa/sb?
 
-- Collect env during parsing, differentiate stmt-func-stmt from array-ref
-
 - Something's weird with .elements access in e.g. class Module_Subprogram_Part...
 
 - Would be nice to change 'label:label?' to just label, but Treetop does not
