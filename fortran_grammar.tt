@@ -10,6 +10,10 @@
 # the standard, for correctness. See standards documents for constraint
 # information.
 
+# It would be nice to change 'label:label?' to just label, but Treetop does not
+# currently provide accessors for optional non-terminals (http://goo.gl/Usr9H).
+# Sounds like they'd accept a patch...
+
 grammar Fortran
 
   rule ac_do_variable
