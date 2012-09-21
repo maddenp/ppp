@@ -1440,7 +1440,7 @@ grammar Fortran
   rule function_reference
     # F90:R1209
 
-    function_name t_paren_l parenthesized_args? t_paren_r <T>
+    function_name t_paren_l actual_arg_spec_list? t_paren_r <T>
   end
 
   rule function_stmt
