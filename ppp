@@ -158,8 +158,11 @@ class PPP
 end
 
 def fail(msg)
-  $stderr.puts "\n#{msg}\n\n"
-  exit 1
+  $stderr.puts "\n#{msg}\n"
+  if __FILE__==$0
+    puts("\n")
+    exit 1
+  end
 end
 
 def unpack(props,args)
