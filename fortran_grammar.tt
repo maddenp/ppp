@@ -377,7 +377,7 @@ grammar Fortran
   rule block_data
     # F90:R1110
 
-    block_data_stmt specification_part? end_block_data_stmt <E>
+    block_data_stmt specification_part? end_block_data_stmt <Block_Data>
   end
 
   rule block_data_name
@@ -1678,8 +1678,8 @@ grammar Fortran
   rule interface_body
     # F90:R1204
 
-    subroutine_stmt specification_part? end_subroutine_stmt <E> /
-    function_stmt specification_part? end_function_stmt <E>
+    subroutine_stmt specification_part? end_subroutine_stmt <Interface_Body_1> /
+    function_stmt specification_part? end_function_stmt <Interface_Body_2>
   end
 
   rule interface_stmt
@@ -1989,7 +1989,7 @@ grammar Fortran
   rule main_program
     # F90:R1101
 
-    program_stmt? specification_part? execution_part? internal_subprogram_part? end_program_stmt <E>
+    program_stmt? specification_part? execution_part? internal_subprogram_part? end_program_stmt <Main_Program>
   end
 
   rule mask_expr
@@ -2001,7 +2001,7 @@ grammar Fortran
   rule module
     # F90:R1104
 
-    module_stmt specification_part? module_subprogram_part? end_module_stmt <E>
+    module_stmt specification_part? module_subprogram_part? end_module_stmt <Module>
   end
 
   rule module_name
@@ -2917,7 +2917,7 @@ grammar Fortran
   rule specification_part
     # F90:R204
 
-    use_part implicit_part? declaration_constructs <E>
+    use_part implicit_part? declaration_constructs <Specification_Part>
   end
 
   rule specification_stmt
@@ -3681,8 +3681,8 @@ grammar Fortran
   end
 
   rule use_part
-    # ( use_stmt / sms_declarative )* <E>
-    ( use_stmt / directive )* <E>
+    # ( use_stmt / sms_declarative )* <Use_Part>
+    ( use_stmt / directive )* <Use_Part>
   end
 
   rule use_stmt

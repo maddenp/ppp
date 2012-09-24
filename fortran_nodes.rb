@@ -218,6 +218,9 @@ module Fortran
     def dimension?() e1.dimension? end
   end
 
+  class Block_Data < E
+  end
+
   class Block_Data_Stmt < T
     def to_s() bb(stmt(space)) end
   end
@@ -333,16 +336,17 @@ module Fortran
     def to_s() stmt(space,:be) end
   end
 
-  class Entity_Decl_1 < T
-    def array?() e1.is_a?(Treetop::Runtime::SyntaxNode) end
+  class Entity_Decl < T
     def name() "#{e0}" end
     def props() {:name=>name,:array=>array?} end
   end
 
-  class Entity_Decl_2 < T
+  class Entity_Decl_1 < Entity_Decl
+    def array?() e1.is_a?(Treetop::Runtime::SyntaxNode) end
+  end
+
+  class Entity_Decl_2 < Entity_Decl
     def array?() false end
-    def name() "#{e0}" end
-    def props() {:name=>name,:array=>array?} end
   end
 
   class Entity_Decl_List < T
@@ -395,6 +399,15 @@ module Fortran
     def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{mn(e5,'::',' ')}#{e6}") end
   end
 
+  class Interface_Body < E
+  end
+
+  class Interface_Body_1 < Interface_Body
+  end
+
+  class Interface_Body_2 < Interface_Body
+  end
+
   class Interface_Stmt < T
     def to_s() bb(stmt(space)) end
   end
@@ -403,12 +416,21 @@ module Fortran
     def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}")) end
   end
 
-  class Loop_Control_1 < T
+  class Loop_Control < T
+  end
+
+  class Loop_Control_1 < Loop_Control
     def to_s() "#{mp(e0,'',' ')}#{e1}#{e2}#{e3}#{e4}#{e5}" end
   end
 
-  class Loop_Control_2 < T
+  class Loop_Control_2 < Loop_Control
     def to_s() "#{mp(e0,'',' ')}#{e1} #{e2}#{e3}#{e4}" end
+  end
+
+  class Main_Program < E
+  end
+
+  class Module < E
   end
 
   class Module_Stmt < T
@@ -450,12 +472,15 @@ module Fortran
   class Program_Units < T
     def to_s() elements.reduce('') { |m,e| m << "#{e}\n" }.chomp end
   end
-  
-  class Read_Stmt_1 < T
+
+  class Read_Stmt < T
+  end
+
+  class Read_Stmt_1 < Read_Stmt
     def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5)}") end
   end
 
-  class Read_Stmt_2 < T
+  class Read_Stmt_2 < Read_Stmt
     def to_s() stmt("#{e1} #{e2}#{e3}") end
   end
 
@@ -471,7 +496,11 @@ module Fortran
     def to_s() bb(bb(stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}",:ls))) end
   end
 
+  class Specification_Part < E
+  end
+
   ## SMS ##
+
   class SMS_Distribute_Begin < T
     def to_s() sms("#{e2} #{e3}") end
   end
@@ -539,11 +568,17 @@ module Fortran
     def type() (derived?)?("#{e2}"):("#{e0}") end
   end
 
-  class Use_Stmt_1 < T
+  class Use_Part < E
+  end
+
+  class Use_Stmt < T
+  end
+
+  class Use_Stmt_1 < Use_Stmt
     def to_s() stmt("#{e1} #{e2}#{e3}") end
   end
   
-  class Use_Stmt_2 < T
+  class Use_Stmt_2 < Use_Stmt
     def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{e5}#{e6}") end
   end
   
