@@ -1,3 +1,3 @@
-program p
+program t
   integer*8::i
-end program p
+end program t

@@ -1,4 +1,4 @@
-program p
+program t
   call s(*100)
   print '(a)','bad'
   goto 200
@@ -8,4 +8,4 @@ contains
   subroutine s(*)
     return 1
   end subroutine s
-end program p
+end program t

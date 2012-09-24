@@ -1,4 +1,4 @@
-program p
+program t
   implicit none
   integer::i
   i=f(0)
@@ -9,4 +9,4 @@ contains
     print '(i0)',i
     f=i+1
   end function f
-end program p
+end program t

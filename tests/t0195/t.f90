@@ -1,4 +1,4 @@
-program p
+program t
   implicit none
   integer::i,j
   j=-1
@@ -17,4 +17,4 @@ contains
     endif
     f=i+1
   end function f
-end program p
+end program t

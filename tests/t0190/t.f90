@@ -1,5 +1,5 @@
-program p
-end program p
+program t
+end program t
 
 module a
 end

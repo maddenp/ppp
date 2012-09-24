@@ -1,4 +1,4 @@
-program p
+program t
   call s(2)
 contains
   subroutine s(j)
@@ -6,4 +6,4 @@ contains
     integer::i=1
     print '(i0)',i+j
   end subroutine s
-end program p
+end program t

@@ -1,9 +1,9 @@
-program p
+program t
   implicit none
   integer::s,a
   print '(i0)',s()
   print '(i0)',a()
-end program p
+end program t
 
 integer function s() result(r)
   implicit none

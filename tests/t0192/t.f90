@@ -1,4 +1,4 @@
-program p
+program t
   implicit none
   real,dimension(8)::a=(/1,2,3,4,5,6,7,8/)
   print '(f3.0)',cumm_sum(a)
@@ -15,4 +15,4 @@ contains
       c_sum(n+1:)=c_sum(n)+cumm_sum(array(n+1:))
     endif
   end function cumm_sum
-end program p
+end program t

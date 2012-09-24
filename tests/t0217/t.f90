@@ -1,6 +1,6 @@
-program p
+program t
   call a
-end program p
+end program t
 
 subroutine s
   print '(a)','s'

@@ -1,9 +1,9 @@
-program p
+program t
   common /x/ i,j,k(3)
   do i=i,j
     print '(i0)',k(i)
   enddo
-end program p
+end program t
 
 block data work
   common /x/ i,j,k(3)

@@ -54,6 +54,10 @@ module Fortran
     ' '*2*@@level+s
   end
 
+  def is_array(node)
+    envget(node.function_name)[:array]
+  end
+
   def lr
     @@level=@@levelstack.pop
   end

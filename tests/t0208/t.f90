@@ -1,4 +1,4 @@
-program p
+program t
   implicit none
   integer::f
   call factorial(5,f)
@@ -18,4 +18,4 @@ contains
       f=i*j
     end if
   end subroutine factorial
-end program p
+end program t

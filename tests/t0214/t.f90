@@ -13,9 +13,9 @@ recursive subroutine factorial(i,f)
   end if
 end subroutine factorial
 
-program p
+program t
   implicit none
   integer::f
   call factorial(5,f)
   print '(i0)',f
-end program p
+end program t

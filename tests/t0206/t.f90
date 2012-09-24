@@ -1,4 +1,4 @@
-program p
+program t
   integer::k=-1
   call s(2,k)
   print '(i0)',k
@@ -10,4 +10,4 @@ contains
     print '(i0)',i+j
     k=77
   end subroutine s
-end program p
+end program t

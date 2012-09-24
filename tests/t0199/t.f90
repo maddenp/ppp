@@ -1,4 +1,4 @@
-program p
+program t
   print '(a)',f(1)
 contains
   character(7) function f(i)
@@ -9,4 +9,4 @@ contains
       f='absent'
     endif
   end function f
-end program p
+end program t

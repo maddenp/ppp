@@ -1,5 +1,5 @@
-program p
+program t
 contains
   subroutine s
   end subroutine s
-end program p
+end program t
