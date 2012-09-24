@@ -50,6 +50,15 @@ module Fortran
     exit(1)
   end
 
+  def findabove(node,classes)
+    n=node
+    while p=n.parent
+      return p if classes.any? { |e| p.kind_of?(e) }
+      n=p
+    end
+    nil
+  end
+
   def indent(s)
     ' '*2*@@level+s
   end
@@ -94,6 +103,17 @@ module Fortran
 
   def sb(e)
     (e.to_s=='')?(''):(" #{e}")
+  end
+
+  def scoping_unit(node)
+    scoping_units=[
+      Fortran::Block_Data,
+      Fortran::Function_Subprogram,
+      Fortran::Main_Program,
+      Fortran::Module,
+      Fortran::Subroutine_Subprogram
+    ]
+    findabove(node,scoping_units)
   end
 
   def sms(s)
@@ -375,6 +395,9 @@ module Fortran
     def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7)}")) end
   end
 
+  class Function_Subprogram < E
+  end
+
   class If_Stmt < T
     def to_s() stmt("#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}") end
   end
@@ -550,6 +573,9 @@ module Fortran
   end
   
   ## SMS ##
+
+  class Subroutine_Subprogram < E
+  end
 
   class Subroutine_Stmt < T
     def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}")) end

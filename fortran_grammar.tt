@@ -1438,7 +1438,7 @@ grammar Fortran
   rule function_subprogram
     # F90:R1215
 
-    function_stmt specification_part? execution_part? internal_subprogram_part? end_function_stmt <E>
+    function_stmt specification_part? execution_part? internal_subprogram_part? end_function_stmt <Function_Subprogram>
   end
 
   rule generic_name
@@ -3001,7 +3001,7 @@ grammar Fortran
   rule subroutine_subprogram
     # F90:R1219
 
-    subroutine_stmt specification_part? execution_part? internal_subprogram_part? end_subroutine_stmt <E>
+    subroutine_stmt specification_part? execution_part? internal_subprogram_part? end_subroutine_stmt <Subroutine_Subprogram>
   end
 
   rule subscript
