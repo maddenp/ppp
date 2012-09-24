@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 basedir=File.dirname(File.expand_path($0))
-ENV['GEM_PATH']=File.join(basedir,'gems')
 $: << basedir
+$: << File.join(basedir,'lib')
 
 require 'rubygems'
 require 'treetop'
