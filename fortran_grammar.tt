@@ -843,7 +843,7 @@ grammar Fortran
     parameter_stmt /
     format_stmt /
     entry_stmt /
-    stmt_function_stmt !{ |e| envget(e[0].function_name)[:array] } <E> /
+    stmt_function_stmt !{ |e| is_array?(e[0]) } <E> /
     # sms_declarative
     directive
   end
@@ -2331,7 +2331,7 @@ grammar Fortran
   rule primary
     # F90:R701
 
-    function_reference !{ |e| envget(e[0].function_name)[:array] } <T> /
+    function_reference !{ |e| is_array?(e[0]) } <T> /
     variable /
     constant /
     constant_subobject /
