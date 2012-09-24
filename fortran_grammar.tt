@@ -1400,9 +1400,7 @@ grammar Fortran
   rule format_specification
     # F90:R1002
     #
-    # Note: A vast simplification is made here under the assumption that it is
-    # only necessary to pass a format-specification through verbatim, not to
-    # analyze its contents.
+    # Note: See NOTES file about F90:R1002
 
     t_paren_l format_specification_element+ t_paren_r <T>
   end

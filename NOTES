@@ -32,7 +32,6 @@ verbatim, not to analyze their contents. The grammar needs to be fleshed out
 if/when this assumption breaks down.
 
 The previous statment about passing format specifications through verbatim
-notwithstanding, the H character format edit descriptor (F90:1016) is NOT
-supported. It may work, but the string literal may lose formatting during
-normalization.
+notwithstanding: During normalization, F90:1016 H character format edit
+descriptors are converted to string literals to preserve whitespace and case.
 
