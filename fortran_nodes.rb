@@ -125,6 +125,10 @@ module Fortran
     a.map { |e| e.to_s }.join(' ').strip
   end
 
+  def specification_part(node)
+    scoping_unit(node).elements[1]
+  end
+
   def stmt(s,f=nil)
     send(f) unless f.nil?
     indent(("#{sa(e0)}"+s.chomp).strip)+"\n"
@@ -139,6 +143,14 @@ module Fortran
     end
     props.each { |k,v| envset(k,v) }
     true
+  end
+
+  def use(node,tree)
+    use_part(node).elements << tree
+  end
+
+  def use_part(node)
+    specification_part(node).elements[0]
   end
 
   # Extension of SyntaxNode class
