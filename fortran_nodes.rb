@@ -4,6 +4,17 @@ module Fortran
   @@dolabels=[]
   @@level=0
   @@levelstack=[]
+  @@uses={}
+
+  ### PM ####
+  def use_update_1(module_name,rename_list)
+    true
+  end
+
+  def use_update_2(module_name,only_list)
+    true
+  end
+  ### PM ####
 
   def bb(s)
     @@level+=1
@@ -472,6 +483,9 @@ module Fortran
     def to_s() "#{e0}#{elements[1].elements.reduce('') { |m,e| m << "#{e}" }}" end
   end
 
+  class Name < T
+  end
+
   class Namelist_Group_Set_Pair < T
     def to_s() "#{mp(e0,'',' ')}#{e1}" end
   end
@@ -513,6 +527,26 @@ module Fortran
 
   class Read_Stmt_2 < Read_Stmt
     def to_s() stmt("#{e1} #{e2}#{e3}") end
+  end
+
+  class Rename < E
+    def localname() "#{e0}" end
+    def usename() "#{e2}" end
+  end
+
+  class Rename_List < E
+    def localnames() [e0.localname] end
+    def usenames() [e0.usename] end
+  end
+
+  class Rename_List_Pair < E
+    def localname() e1.localname end
+    def usename() e1.usename end
+  end
+
+  class Rename_List_Option < T
+    def localnames() e1.localnames end
+    def usenames() e1.usenames end
   end
 
   class Save_Stmt < T
@@ -609,10 +643,14 @@ module Fortran
   end
 
   class Use_Stmt_1 < Use_Stmt
+    def modulename() "#{e2}" end
+    def localnames() e3.localnames end
+    def usenames() e3.usenames end
     def to_s() stmt("#{e1} #{e2}#{e3}") end
   end
 
   class Use_Stmt_2 < Use_Stmt
+    def modulename() "#{e2}" end
     def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{e5}#{e6}") end
   end
 

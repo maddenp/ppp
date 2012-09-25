@@ -2056,7 +2056,7 @@ grammar Fortran
   rule name
     # F90:R304
 
-    t_letter alphanumeric_character* <T>
+    t_letter alphanumeric_character* <Name>
   end
 
   rule named_constant
@@ -2462,15 +2462,19 @@ grammar Fortran
   rule rename
     # F90:R1108
 
-    local_name t_point use_name <E>
+    local_name t_point use_name <Rename>
   end
 
   rule rename_list
-    rename ( t_comma rename )* <E>
+    rename rename_list_pair* <Rename_List>
+  end
+
+  rule rename_list_pair
+    t_comma rename <Rename_List_Pair>
   end
 
   rule rename_list_option
-    t_comma rename_list <T>
+    t_comma rename_list <Rename_List_Option>
   end
 
   rule rep_char
@@ -3688,8 +3692,8 @@ grammar Fortran
   rule use_stmt
     # F90:R1107
 
-    label:label? t_use module_name rename_list_option? t_newline <Use_Stmt_1> /
-    label:label? t_use module_name t_comma t_only t_colon only_list? t_newline <Use_Stmt_2>
+    label:label? t_use module_name rename_list_option? t_newline &{ |e| use_update_1(e[2],e[3]) } <Use_Stmt_1> /
+    label:label? t_use module_name t_comma t_only t_colon only_list? t_newline &{ |e| use_update_2(e[2],e[6]) } <Use_Stmt_2>
   end
 
   rule variable
