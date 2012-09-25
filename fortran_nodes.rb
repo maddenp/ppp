@@ -7,13 +7,32 @@ module Fortran
   @@uses={}
 
   ### PM ####
-  def use_update_1(module_name,rename_list)
+
+  def uses?(m,n)
+    @@uses[m].include?(n)
+  end
+
+  def use_update_1(module_name,rename_list_option)
+    m="#{module_name}"
+    if rename_list_option.is_a?(Fortran::Rename_List_Option)
+      u=rename_list_option.usenames
+      if @@uses[m].nil?
+        @@uses[m]=u
+      else
+        unless @@uses[m].include?(:all)
+          u.each { |e| @@uses[m] << e unless @@uses[m].include?(e) }
+        end
+      end
+    else
+      @@uses[m]=[:all]
+    end
     true
   end
 
-  def use_update_2(module_name,only_list)
+  def use_update_2(modulename,onlylist)
     true
   end
+
   ### PM ####
 
   def bb(s)
