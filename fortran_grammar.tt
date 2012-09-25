@@ -1203,7 +1203,7 @@ grammar Fortran
   end
 
   rule entity_decl_array_spec
-    t_paren_l array_spec t_paren_r <T>
+    t_paren_l array_spec t_paren_r <Entity_Decl_Array_Spec>
   end
 
   rule entity_decl_list

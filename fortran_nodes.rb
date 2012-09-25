@@ -381,11 +381,14 @@ module Fortran
   end
 
   class Entity_Decl_1 < Entity_Decl
-    def array?() e1.is_a?(Treetop::Runtime::SyntaxNode) end
+    def array?() e1.is_a?(Fortran::Entity_Decl_Array_Spec) end
   end
 
   class Entity_Decl_2 < Entity_Decl
     def array?() false end
+  end
+
+  class Entity_Decl_Array_Spec < T
   end
 
   class Entity_Decl_List < T
