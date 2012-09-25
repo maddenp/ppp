@@ -35,6 +35,12 @@ module Fortran
   end
 
   def use_update_2(module_name,only_list)
+    m="#{module_name}"
+    if only_list.is_a?(Fortran::Only_List)
+      use_add(m,only_list.usenames)
+    else
+      @@uses[m]=[:all]
+    end
     true
   end
 
@@ -524,6 +530,25 @@ module Fortran
 
   class Nonlabel_Do_Stmt < T
     def to_s() bb(stmt("#{sa(e1)}#{e2}#{e3}")) end
+  end
+
+  class Only < E
+    def localname() (e0.is_a?(Only_Option))?(e0.localname):(usename) end
+    def usename() "#{e1}" end
+  end
+
+  class Only_List < T
+    def localnames() e1.elements.reduce([e0.localname]) { |m,e| m << e.localname } end
+    def usenames() e1.elements.reduce([e0.usename]) { |m,e| m << e.usename } end
+  end
+
+  class Only_List_Pair < T
+    def localname() e1.localname end
+    def usename() e1.usename end
+  end
+
+  class Only_Option < T
+    def localname() "#{e0}" end
   end
 
   class Optional_Stmt < T

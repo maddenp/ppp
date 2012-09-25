@@ -6,4 +6,4 @@ all: $(BINS)
 	RUBYLIB=lib tt -o $@ $<
 
 clean:
-	$(RM) $(BINS) *.mod a.out
+	$(RM) $(BINS) *.mod *.o a.out

@@ -2180,12 +2180,20 @@ grammar Fortran
   rule only
     # F90:R1109
 
-    ( local_name t_point )? use_name <E> /
+    only_option? use_name <Only> /
     access_id
   end
 
   rule only_list
-    only ( t_comma only )* <T>
+    only only_list_pair* <Only_List>
+  end
+
+  rule only_list_pair
+    t_comma only <Only_List_Pair>
+  end
+
+  rule only_option
+    local_name t_point <Only_Option>
   end
 
   rule open_stmt
