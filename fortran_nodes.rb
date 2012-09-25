@@ -8,42 +8,6 @@ module Fortran
 
   ### PM ####
 
-  def uses?(module_name,use_name)
-    @@uses[module_name].include?(use_name)
-  end
-
-  def use_add(module_name,use_names)
-    if @@uses[module_name].nil?
-      @@uses[module_name]=use_names
-    else
-      unless uses?(module_name,:all)
-        use_names.each do |e|
-          @@uses[module_name] << e unless uses?(module_name,e)
-        end
-      end
-    end
-  end
-
-  def use_update_1(module_name,rename_list_option)
-    m="#{module_name}"
-    if rename_list_option.is_a?(Fortran::Rename_List_Option)
-      use_add(m,rename_list_option.usenames)
-    else
-      @@uses[m]=[:all]
-    end
-    true
-  end
-
-  def use_update_2(module_name,only_list)
-    m="#{module_name}"
-    if only_list.is_a?(Fortran::Only_List)
-      use_add(m,only_list.usenames)
-    else
-      @@uses[m]=[:all]
-    end
-    true
-  end
-
   ### PM ####
 
   def bb(s)
@@ -183,8 +147,44 @@ module Fortran
     use_part(node).elements << tree
   end
 
+  def use_add(module_name,use_names)
+    if @@uses[module_name].nil?
+      @@uses[module_name]=use_names
+    else
+      unless uses?(module_name,:all)
+        use_names.each do |e|
+          @@uses[module_name] << e unless uses?(module_name,e)
+        end
+      end
+    end
+  end
+
   def use_part(node)
     specification_part(node).e0
+  end
+
+  def use_update_1(module_name,rename_list_option)
+    m="#{module_name}"
+    if rename_list_option.is_a?(Fortran::Rename_List_Option)
+      use_add(m,rename_list_option.usenames)
+    else
+      @@uses[m]=[:all]
+    end
+    true
+  end
+
+  def use_update_2(module_name,only_list)
+    m="#{module_name}"
+    if only_list.is_a?(Fortran::Only_List)
+      use_add(m,only_list.usenames)
+    else
+      @@uses[m]=[:all]
+    end
+    true
+  end
+
+  def uses?(module_name,use_name)
+    @@uses[module_name].include?(use_name)
   end
 
   # Extension of SyntaxNode class
