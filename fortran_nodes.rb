@@ -22,7 +22,7 @@ module Fortran
   def dolabel_dupe?
     "#{@@dolabels[-1]}"=="#{@@dolabels[-2]}"
   end
-  
+
   def dolabel_pop(label)
     @@dolabels.pop
   end
@@ -78,11 +78,11 @@ module Fortran
   def mn(p,c,v)
     (p.to_s!=c)?(v):(p)
   end
-  
+
   def mp(p,c,v)
     (p.to_s==c)?(v):(p)
   end
-  
+
   def msg(s)
     $stderr.write(">|#{s}|<\n")
   end
@@ -106,14 +106,7 @@ module Fortran
   end
 
   def scoping_unit(node)
-    scoping_units=[
-      Fortran::Block_Data,
-      Fortran::Function_Subprogram,
-      Fortran::Main_Program,
-      Fortran::Module,
-      Fortran::Subroutine_Subprogram
-    ]
-    findabove(node,scoping_units)
+    findabove(node,[Fortran::Scoping_Unit])
   end
 
   def sms(s)
@@ -196,6 +189,9 @@ module Fortran
     end
   end
 
+  class Scoping_Unit < E
+  end
+
   class StmtC < T
     def to_s
       stmt(elements[1..-1].map { |e| e.to_s }.join)
@@ -213,11 +209,11 @@ module Fortran
   class Access_Stmt_Option < T
     def to_s() "#{mn(e0,'::',' ')}#{e1}" end
   end
-  
+
   class Allocatable_Stmt < T
     def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
   end
-  
+
   class Arithmetic_If_Stmt < T
     def to_s() stmt("#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}") end
   end
@@ -245,26 +241,26 @@ module Fortran
       false
     end
   end
-  
+
   class Attr_Spec_Option < T
     def dimension?() e1.dimension? end
   end
 
-  class Block_Data < E
+  class Block_Data < Scoping_Unit
   end
 
   class Block_Data_Stmt < T
     def to_s() bb(stmt(space)) end
   end
-  
+
   class Call_Stmt < T
     def to_s() stmt("#{e1} #{e2}#{e3}") end
   end
-  
+
   class Case_Stmt < T
     def to_s() bb(stmt(space,:be)) end
   end
-  
+
   class Common_Block_Name_And_Object_List < T
     def to_s() "#{mp(e0,'',' ')}#{e1}#{e2}" end
   end
@@ -292,7 +288,7 @@ module Fortran
   class Dimension_Stmt < T
     def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
   end
-  
+
   class Do_Term_Action_Stmt < T
     def to_s() stmt(space,:be) end
   end
@@ -323,7 +319,7 @@ module Fortran
   class End_Block_Data_Stmt < T
     def to_s() stmt(space,:be) end
   end
-  
+
   class End_Do_Stmt < T
     def to_s() stmt(space,:be) end
   end
@@ -331,7 +327,7 @@ module Fortran
   class End_Function_Stmt < T
     def to_s() stmt(space,:be) end
   end
-  
+
   class End_If_Stmt < T
     def to_s() stmt(space,:be) end
   end
@@ -339,7 +335,7 @@ module Fortran
   class End_Interface_Stmt < T
     def to_s() stmt(space,:be) end
   end
-  
+
   class End_Module_Option < T
     def to_s() space(:all) end
   end
@@ -347,7 +343,7 @@ module Fortran
   class End_Module_Stmt < T
     def to_s() stmt(space,:be) end
   end
-  
+
   class End_Program_Stmt < T
     def to_s() stmt("#{e1}#{sb(e3)}#{sb(e4)}",:be) end
   end
@@ -355,11 +351,11 @@ module Fortran
   class End_Select_Stmt < T
     def to_s() stmt(space,:lr) end
   end
-  
+
   class End_Subroutine_Stmt < T
     def to_s() stmt(space,:be) end
   end
-  
+
   class End_Type_Stmt < T
     def to_s() stmt(space,:be) end
   end
@@ -388,7 +384,7 @@ module Fortran
       x
     end
   end
-  
+
   class Entity_Decl_List_Pair < T
     def array?() e1.array? end
     def name() "#{e1.name}" end
@@ -407,7 +403,7 @@ module Fortran
     def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7)}")) end
   end
 
-  class Function_Subprogram < E
+  class Function_Subprogram < Scoping_Unit
   end
 
   class If_Stmt < T
@@ -446,7 +442,7 @@ module Fortran
   class Interface_Stmt < T
     def to_s() bb(stmt(space)) end
   end
-  
+
   class Label_Do_Stmt < T
     def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}")) end
   end
@@ -462,10 +458,10 @@ module Fortran
     def to_s() "#{mp(e0,'',' ')}#{e1} #{e2}#{e3}#{e4}" end
   end
 
-  class Main_Program < E
+  class Main_Program < Scoping_Unit
   end
 
-  class Module < E
+  class Module < Scoping_Unit
   end
 
   class Module_Stmt < T
@@ -491,11 +487,11 @@ module Fortran
   class Optional_Stmt < T
     def to_s() stmt("#{e1}#{mn(e2,'::',' ')}#{e3}") end
   end
-  
+
   class Pointer_Stmt < T
     def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
   end
-  
+
   class Print_Stmt < T
     def to_s() stmt("#{e1} #{e2}#{e3}") end
   end
@@ -526,7 +522,7 @@ module Fortran
   class Save_Stmt_Entity_List < T
     def to_s() "#{mp(e0,'',' ')}#{e1}" end
   end
-  
+
   class Select_Case_Stmt < T
     def to_s() bb(bb(stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}",:ls))) end
   end
@@ -539,54 +535,54 @@ module Fortran
   class SMS_Distribute_Begin < T
     def to_s() sms("#{e2} #{e3}") end
   end
-  
+
   class SMS_Distribute_End < T
     def to_s() sms("#{e2}") end
   end
-  
+
   class SMS_Halo_Comp_Begin < T
     def to_s() sms("#{e2} #{e3}") end
   end
-  
+
   class SMS_Halo_Comp_End < T
     def to_s() sms("#{e2}") end
   end
-  
+
   class SMS_Ignore_Begin < T
     def to_s() sms("#{e2} #{e3}") end
   end
-  
+
   class SMS_Ignore_End < T
     def to_s() sms("#{e2}") end
   end
-  
+
   class SMS_Parallel_Begin < T
     def to_s() sms("#{e2} #{e3}") end
   end
-  
+
   class SMS_Parallel_End < T
     def to_s() sms("#{e2}") end
   end
-  
+
   class SMS_Serial_Begin < T
     def to_s() sms("#{e2} #{e3}") end
   end
-  
+
   class SMS_Serial_End < T
     def to_s() sms("#{e2}") end
   end
-  
+
   class SMS_To_Local_Begin < T
     def to_s() sms("#{e2} #{e3}") end
   end
-  
+
   class SMS_To_Local_End < T
     def to_s() sms("#{e2}") end
   end
-  
+
   ## SMS ##
 
-  class Subroutine_Subprogram < E
+  class Subroutine_Subprogram < Scoping_Unit
   end
 
   class Subroutine_Stmt < T
@@ -596,7 +592,7 @@ module Fortran
   class Target_Stmt < T
     def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
   end
-  
+
   class Type_Declaration_Stmt < T
     def to_s() stmt("#{e1}#{mp(e2,'',mn(e1,',',' '))}#{e3}") end
   end
@@ -615,11 +611,11 @@ module Fortran
   class Use_Stmt_1 < Use_Stmt
     def to_s() stmt("#{e1} #{e2}#{e3}") end
   end
-  
+
   class Use_Stmt_2 < Use_Stmt
     def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{e5}#{e6}") end
   end
-  
+
   class Where_Construct_Stmt < T
     def to_s() bb(stmt("#{e1} #{e2}#{e3}#{e4}")) end
   end
@@ -631,7 +627,7 @@ module Fortran
   class Write_Stmt < T
     def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5)}") end
   end
-  
+
 end
 
 # paul.a.madden@noaa.gov
