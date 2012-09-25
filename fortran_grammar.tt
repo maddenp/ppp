@@ -1197,6 +1197,15 @@ grammar Fortran
 
   rule entity_decl
     # F90:R504 + F95:R504
+    #
+    # Note: Since all but the first element of each component list is optional,
+    # the parser cannot distinguish between, e.g. 'integer::f' where f is an
+    # integer scalar, and 'integer::f' where f is a function. If the function
+    # has an explicit interface, it may be possible to disambiguate after
+    # parsing; if not, it may only be possible to analyze actual uses of the
+    # name to make a determination. If the name is never used, disambiguation
+    # may be impossible, but it probably doesn't matter. Until it proves
+    # problematic, allow uses like the above example to match the first choice.
 
     object_name entity_decl_array_spec? char_length_pair? initialization? <Entity_Decl_1> /
     function_name char_length_pair? <Entity_Decl_2>

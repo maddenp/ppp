@@ -175,8 +175,7 @@ module Fortran
 
     def method_missing(m,*a)
       if m=~/e(\d+)/
-        e=elements[$~[1].to_i]
-        (e.to_s=='')?(nil):(e)
+        elements[$~[1].to_i]
       else
         fail "method_missing cannot find method '#{m}'"
       end
