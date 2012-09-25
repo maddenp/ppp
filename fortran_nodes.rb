@@ -8,21 +8,26 @@ module Fortran
 
   ### PM ####
 
-  def uses?(m,n)
-    @@uses[m].include?(n)
+  def uses?(module_name,use_name)
+    @@uses[module_name].include?(use_name)
+  end
+
+  def use_add(module_name,use_names)
+    if @@uses[module_name].nil?
+      @@uses[module_name]=use_names
+    else
+      unless uses?(module_name,:all)
+        use_names.each do |e|
+          @@uses[module_name] << e unless uses?(module_name,e)
+        end
+      end
+    end
   end
 
   def use_update_1(module_name,rename_list_option)
     m="#{module_name}"
     if rename_list_option.is_a?(Fortran::Rename_List_Option)
-      u=rename_list_option.usenames
-      if @@uses[m].nil?
-        @@uses[m]=u
-      else
-        unless uses?(m,:all)
-          u.each { |e| @@uses[m] << e unless uses?(m,e) }
-        end
-      end
+      use_add(m,rename_list_option.usenames)
     else
       @@uses[m]=[:all]
     end
