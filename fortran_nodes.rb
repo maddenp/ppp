@@ -160,17 +160,9 @@ module Fortran
   # Extension of SyntaxNode class
 
   class Treetop::Runtime::SyntaxNode
+
     def to_s
       ''
-    end
-  end
-
-  # Generic Subclasses
-
-  class T < Treetop::Runtime::SyntaxNode
-
-    def initialize(a='',b=(0..0),c=[])
-      super(a,b,c)
     end
 
     def method_missing(m,*a)
@@ -179,6 +171,16 @@ module Fortran
       else
         fail "method_missing cannot find method '#{m}'"
       end
+    end
+
+  end
+
+  # Generic Subclasses
+
+  class T < Treetop::Runtime::SyntaxNode
+
+    def initialize(a='',b=(0..0),c=[])
+      super(a,b,c)
     end
 
     def to_s
@@ -537,8 +539,8 @@ module Fortran
   end
 
   class Rename_List < E
-    def localnames() [e0.localname] end
-    def usenames() [e0.usename] end
+    def localnames() e1.elements.reduce([e0.localname]) { |m,e| m << e.localname } end
+    def usenames() e1.elements.reduce([e0.usename]) { |m,e| m << e.usename } end
   end
 
   class Rename_List_Pair < E
