@@ -126,7 +126,7 @@ module Fortran
   end
 
   def specification_part(node)
-    scoping_unit(node).elements[1]
+    scoping_unit(node).e1
   end
 
   def stmt(s,f=nil)
@@ -150,7 +150,7 @@ module Fortran
   end
 
   def use_part(node)
-    specification_part(node).elements[0]
+    specification_part(node).e0
   end
 
   # Extension of SyntaxNode class
