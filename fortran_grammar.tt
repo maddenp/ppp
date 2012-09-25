@@ -1460,8 +1460,8 @@ grammar Fortran
     # F90:R1206
 
     generic_name /
-    t_operator t_paren_l defined_operator t_paren_r <T> /
-    t_assignment t_paren_l e_equal t_paren_r <T>
+    t_operator t_paren_l defined_operator t_paren_r <Generic_Spec> /
+    t_assignment t_paren_l t_equal t_paren_r <Generic_Spec>
   end
 
   rule goto_stmt

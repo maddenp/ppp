@@ -1,7 +1,9 @@
 
+- Need tests of F90:R1206 generic_spec (2nd two forms)
+
 - Need tests of all R905 possibilities.
 
-- Need tests of all R912 possibilities.
+- Need tests of all F90:R912 possibilities.
 
-- Need tests of all R924 possibilities.
+- Need tests of all F90:R924 possibilities.
 

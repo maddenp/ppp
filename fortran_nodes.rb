@@ -451,6 +451,11 @@ module Fortran
   class Function_Subprogram < Scoping_Unit
   end
 
+  class Generic_Spec < T
+    def localname() usename end
+    def usename() "#{e2}" end
+  end
+
   class If_Stmt < T
     def to_s() stmt("#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}") end
   end
