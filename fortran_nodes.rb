@@ -19,8 +19,8 @@ module Fortran
       if @@uses[m].nil?
         @@uses[m]=u
       else
-        unless @@uses[m].include?(:all)
-          u.each { |e| @@uses[m] << e unless @@uses[m].include?(e) }
+        unless uses?(m,:all)
+          u.each { |e| @@uses[m] << e unless uses?(m,e) }
         end
       end
     else
@@ -29,7 +29,7 @@ module Fortran
     true
   end
 
-  def use_update_2(modulename,onlylist)
+  def use_update_2(module_name,only_list)
     true
   end
 
