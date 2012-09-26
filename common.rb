@@ -1,10 +1,10 @@
 module Common
 
   require 'treetop'
-  require 'fortran_nodes.rb'
-  require 'fortran_parser.rb'
-  require 'normalize_nodes.rb'
-  require 'normalize_parser.rb'
+  require 'fortran'
+  require 'fortran_parser'
+  require 'normalize'
+  require 'normalize_parser'
 
   include Fortran
 
