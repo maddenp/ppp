@@ -130,20 +130,20 @@ module Fortran
 
   def use(node,module_name,usenames=[])
     unless uses?(module_name,:all)
-      list=[]
-      usenames.each do |e|
-        h=e.is_a?(Hash)
-        localname=(h)?(e.keys.first):(nil)
-        usename=(h)?(e.values.first):(e)
-        unless uses?(module_name,usename)
-          list << (h)?("#{localname}=>#{usename}"):("#{usename}")
+      code="use #{module_name}"
+      unless usenames.empty?
+        list=[]
+        usenames.each do |e|
+          h=e.is_a?(Hash)
+          localname=(h)?(e.keys.first):(nil)
+          usename=(h)?(e.values.first):(e)
+          unless uses?(module_name,usename)
+            list << ((h)?("#{localname}=>#{usename}"):("#{usename}"))
+          end
         end
-        list.join(',')
+        code=((list.empty?)?(nil):("#{code},only:#{list.join(',')}"))
       end
-      code="use #{module_name}"+((list.empty?)?(''):(",only:#{list}"))
-      t=tree(code,:use_stmt)
-      p t
-      use_part(node).elements << t
+      use_part(node).elements << tree(code,:use_stmt) unless code.nil?
     end
   end
 
