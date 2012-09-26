@@ -1,7 +1,3 @@
-basedir=File.dirname(File.expand_path($0))
-$: << basedir
-$: << File.join(basedir,'lib')
-
 module PPP
 
   require 'treetop'

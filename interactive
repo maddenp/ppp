@@ -1,2 +1,0 @@
-load 'ppp.rb'
-include PPP
