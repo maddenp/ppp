@@ -4,13 +4,9 @@ basedir=File.dirname(File.expand_path($0))
 $: << basedir
 $: << File.join(basedir,'lib')
 
-require 'treetop'
-require 'fortran_nodes.rb'
-require 'fortran_parser.rb'
-require 'normalize_nodes.rb'
-require 'normalize_parser.rb'
+require 'common'
 
-include Fortran
+include Common
 
 def unpack(props,args)
   props[:incdirs]=['.']
