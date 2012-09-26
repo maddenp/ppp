@@ -143,8 +143,26 @@ module Fortran
     true
   end
 
-  def use(node,tree)
-    use_part(node).elements << tree
+# def use(node,use_stmt)
+#   use_part(node).elements << use_stmt
+# end
+  def use(node,module_name,usenames=[])
+    unless uses?(module_name,:all)
+      list=[]
+      usenames.each do |e|
+        h=e.is_a?(Hash)
+        localname=(h)?(e.keys.first):(nil)
+        usename=(h)?(e.values.first):(e)
+        unless uses?(module_name,usename)
+          list << (h)?("#{localname}=>#{usename}"):("#{usename}")
+        end
+        list.join(',')
+      end
+      code="use #{module_name}"+((list.empty?)?(''):(",only:#{list}"))
+      t=tree(code,:use_stmt)
+      p t
+      use_part(node).elements << t
+    end
   end
 
   def use_add(module_name,use_names)
@@ -183,8 +201,11 @@ module Fortran
     true
   end
 
+# def uses?(module_name,use_name)
+#   @@uses[module_name].include?(use_name)
+# end
   def uses?(module_name,use_name)
-    @@uses[module_name].include?(use_name)
+    (@@uses[module_name])?(@@uses[module_name].include?(use_name)):(false)
   end
 
   # Extension of SyntaxNode class
@@ -698,18 +719,19 @@ module Fortran
   end
 
   class Use_Stmt < T
+    def modulename() "#{e2}" end
   end
 
   class Use_Stmt_1 < Use_Stmt
-    def modulename() "#{e2}" end
     def localnames() e3.localnames end
-    def usenames() e3.usenames end
     def to_s() stmt("#{e1} #{e2}#{e3}") end
+    def usenames() e3.usenames end
   end
 
   class Use_Stmt_2 < Use_Stmt
-    def modulename() "#{e2}" end
+    def localnames() e6.localnames end
     def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{e5}#{e6}") end
+    def usenames() e6.usenames end
   end
 
   class Where_Construct_Stmt < T
