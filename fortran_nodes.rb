@@ -99,6 +99,27 @@ module Fortran
     s=s.gsub(/^@(.*)/i,'!\1')         # show directives
   end
 
+  def out(s,root=:program_units,props={:debug=>false,:incdirs=>[],:normalize=>false,:srcfile=>nil})
+    debug=props[:debug]
+    fp=FortranParser.new
+    s=s.gsub(/^\s*!sms\$insert */i,'')                           # process inserts
+    s=s.gsub(/^\s*!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
+    s=assemble(s,[props[:srcfile]],props[:incdirs])
+    cppcheck(s)
+    puts "normalized:\n\n" if debug
+    s=normalize(s)
+    unless props[:normalize]
+      puts s if debug
+      puts "\nparsed:\n\n" if debug
+      tree=fp.parse(s,:root=>root)
+      p tree if debug
+      s=tree.to_s
+      fail "Parse failed." if s.empty?
+      s=wrap(s)
+    end
+    [s,tree]
+  end
+
   def tree(s,root=:program_units)
     s,tree=out(s,root)
     tree
