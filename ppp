@@ -4,9 +4,9 @@ basedir=File.dirname(File.expand_path($0))
 $: << basedir
 $: << File.join(basedir,'lib')
 
-require 'common'
+require 'ppp'
 
-include Common
+include PPP
 
 def unpack(props,args)
   props[:incdirs]=['.']
@@ -43,8 +43,7 @@ if (__FILE__==$0)
   s=File.open(srcfile,'rb').read
   props={:srcfile=>srcfile}
   props=unpack(props,ARGV)
-  s,tree=out(s,:program_units,props)
-  puts s
+  puts out(s,:program_units,props)
 end
 
 # paul.a.madden@noaa.gov

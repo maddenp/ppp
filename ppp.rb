@@ -1,4 +1,8 @@
-module Common
+basedir=File.dirname(File.expand_path($0))
+$: << basedir
+$: << File.join(basedir,'lib')
+
+module PPP
 
   require 'treetop'
   require 'fortran'
@@ -63,6 +67,10 @@ module Common
     end
   end
 
+  def defprops
+    {:debug=>false,:incdirs=>[],:normalize=>false,:srcfile=>nil}
+  end
+    
   def directive
     unless @directive
       f=File.join(File.dirname(File.expand_path($0)),'sentinels')
@@ -78,10 +86,7 @@ module Common
 
   def fail(msg)
     $stderr.puts "\n#{msg}\n"
-    if __FILE__==$0
-      puts("\n")
-      exit 1
-    end
+    exit 1 if __FILE__==$0
   end
 
   def incchain(seen,incfile)
@@ -99,7 +104,12 @@ module Common
     s=s.gsub(/^@(.*)/i,'!\1')         # show directives
   end
 
-  def out(s,root=:program_units,props={:debug=>false,:incdirs=>[],:normalize=>false,:srcfile=>nil})
+  def out(s,root=:program_units,props=defprops)
+    s,tree=process(s,root,props)
+    s
+  end
+
+  def process(s,root=:program_units,props=defprops)
     debug=props[:debug]
     fp=FortranParser.new
     s=s.gsub(/^\s*!sms\$insert */i,'')                           # process inserts
@@ -120,8 +130,8 @@ module Common
     [s,tree]
   end
 
-  def tree(s,root=:program_units)
-    s,tree=out(s,root)
+  def tree(s,root=:program_units,props=defprops)
+    s,tree=process(s,root,props)
     tree
   end
   
