@@ -8,6 +8,120 @@ module Fortran
 
   ### PM ####
 
+  def assemble(s,seen,incdirs=[])
+    current=seen.last
+    a=''
+    r=Regexp.new('^\s*include\s*(\'[^\']+\'|\"[^\"]+\").*',true)
+    s.split("\n").each do |line|
+      m=r.match(line)
+      if m
+        incfile=m[1][1..-2]
+        if incfile[0]=='/' or incfile[0]=='.'
+          incfile=File.expand_path(File.join(File.dirname(current),incfile))
+          unless File.exist?(incfile)
+            fail "Could not find included file #{incfile}"
+          end
+        else
+          found=false
+          incdirs.each do |d|
+            maybe=File.expand_path(File.join(d,incfile))
+            if File.exist?(maybe)
+              found=true
+              incfile=maybe
+              break
+            end
+          end
+          unless found
+            fail "Could not find included file #{incfile} on search path"
+          end
+        end
+        if seen.include?(incfile)
+          msg="File #{current} includes #{incfile} recursively:\n"
+          msg+=incchain(seen,incfile)
+          fail(msg)
+        end
+        unless File.readable?(incfile)
+          msg="Could not read file #{incfile} "
+          msg+=incchain(seen,incfile)
+          fail(msg)
+        end
+        a+=assemble(File.open(incfile,'rb').read,seen+[incfile],incdirs)
+      else
+        a+="#{line}\n"
+      end
+    end
+    a
+  end
+
+  def cppcheck(s)
+    r=Regexp.new('^\s*#')
+    i=1
+    s.split("\n").each do |line|
+      m=r.match(line)
+      fail "Detected cpp directive:\n\n#{i}: #{line.strip}" if m
+      i+=1
+    end
+  end
+
+  def directive
+    unless @directive
+      f=File.join(File.dirname(File.expand_path($0)),'sentinels')
+      d=File.open(f,'rb').read.gsub(/\$/,'\$').split("\n").<<('sms\$').join('|')
+      @directive=Regexp.new("^\s*!((#{d}).*)",true)
+    end
+    @directive
+  end
+
+  def directive?(s)
+    s=~directive
+  end
+
+  def fail(msg)
+    $stderr.puts "\n#{msg}\n"
+    if __FILE__==$0
+      puts("\n")
+      exit 1
+    end
+  end
+
+  def incchain(seen,incfile)
+    "\n  "+(seen+[incfile]).join(" includes\n  ")
+  end
+
+  def normalize(s)
+    np=NormalizeParser.new
+    s=s.gsub(directive,'@\1')         # hide directives
+    s=s.gsub(/^\s+/,'')               # left-justify lines
+    s=s.gsub(/^!.*\n/,'')             # remove full-line comments
+    s=np.parse(np.parse(s).to_s).to_s # two normalize passes
+    s=s.sub(/^\n+/,'')                # remove leading newlines
+    s << "\n"  unless s[-1]=="\n"     # ensure final newline
+    s=s.gsub(/^@(.*)/i,'!\1')         # show directives
+  end
+
+  def wrap(s)
+    max=80
+    a=s.split("\n")
+    (0..a.length-1).each do |n|
+      e=a[n].chomp
+      unless directive?(e)
+        if e.length>max
+          e=~/^( *).*$/
+          i=$1.length+2
+          t=''
+          begin
+            r=[max-2,e.length-1].min
+            t+=e[0..r]+"&\n"
+            e=' '*i+'&'+e[r+1..-1]
+          end while e.length>max
+          t+=e
+          a[n]=t
+        end
+      end
+    end
+    a.join("\n")
+  end
+  
   ### PM ####
 
   def bb(s)
@@ -42,17 +156,6 @@ module Fortran
 
   def envset(k,v)
     @@env[k.to_s]=v
-  end
-
-  def fail(s)
-    puts "\nERROR: "+s+"\n\nbacktrace:\n\n"
-    begin
-      raise
-    rescue => e
-      puts e.backtrace
-    end
-    puts
-    exit(1)
   end
 
   def findabove(node,classes)
@@ -111,7 +214,7 @@ module Fortran
   end
 
   def scoping_unit(node)
-    findabove(node,[Fortran::Scoping_Unit])
+    findabove(node,[Scoping_Unit])
   end
 
   def sms(s)
@@ -143,9 +246,6 @@ module Fortran
     true
   end
 
-# def use(node,use_stmt)
-#   use_part(node).elements << use_stmt
-# end
   def use(node,module_name,usenames=[])
     unless uses?(module_name,:all)
       list=[]
@@ -183,7 +283,7 @@ module Fortran
 
   def use_update_1(module_name,rename_list_option)
     m="#{module_name}"
-    if rename_list_option.is_a?(Fortran::Rename_List_Option)
+    if rename_list_option.is_a?(Rename_List_Option)
       use_add(m,rename_list_option.usenames)
     else
       @@uses[m]=[:all]
@@ -193,7 +293,7 @@ module Fortran
 
   def use_update_2(module_name,only_list)
     m="#{module_name}"
-    if only_list.is_a?(Fortran::Only_List)
+    if only_list.is_a?(Only_List)
       use_add(m,only_list.usenames)
     else
       @@uses[m]=[:all]
@@ -201,9 +301,6 @@ module Fortran
     true
   end
 
-# def uses?(module_name,use_name)
-#   @@uses[module_name].include?(use_name)
-# end
   def uses?(module_name,use_name)
     (@@uses[module_name])?(@@uses[module_name].include?(use_name)):(false)
   end
@@ -220,6 +317,12 @@ module Fortran
       if m=~/e(\d+)/
         elements[$~[1].to_i]
       else
+        puts "\nERROR: "+s+"\n\nbacktrace:\n\n"
+        begin
+          raise
+        rescue => e
+          puts e.backtrace
+        end
         fail "method_missing cannot find method '#{m}'"
       end
     end
@@ -433,7 +536,7 @@ module Fortran
   end
 
   class Entity_Decl_1 < Entity_Decl
-    def array?() e1.is_a?(Fortran::Entity_Decl_Array_Spec) end
+    def array?() e1.is_a?(Entity_Decl_Array_Spec) end
   end
 
   class Entity_Decl_2 < Entity_Decl
