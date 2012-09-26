@@ -99,6 +99,11 @@ module Fortran
     s=s.gsub(/^@(.*)/i,'!\1')         # show directives
   end
 
+  def tree(s,root=:program_units)
+    s,tree=out(s,root)
+    tree
+  end
+  
   def wrap(s)
     max=80
     a=s.split("\n")
