@@ -138,12 +138,12 @@ module Fortran
           localname=(h)?(e.keys.first):(nil)
           usename=(h)?(e.values.first):(e)
           unless uses?(module_name,usename)
-            list << ((h)?("#{localname}=>#{usename}"):("#{usename}"))
+            list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
           end
         end
         code=((list.empty?)?(nil):("#{code},only:#{list.join(',')}"))
       end
-      use_part(node).elements << tree(code,:use_stmt) unless code.nil?
+      use_part(node).elements.push(tree(code,:use_stmt)) unless code.nil?
     end
   end
 
@@ -153,7 +153,7 @@ module Fortran
     else
       unless uses?(module_name,:all)
         use_names.each do |e|
-          @@uses[module_name] << e unless uses?(module_name,e)
+          @@uses[module_name].push(e) unless uses?(module_name,e)
         end
       end
     end
@@ -443,7 +443,7 @@ module Fortran
   end
 
   class Entity_Decl_List_Pairs < T
-    def props() elements.inject([]) { |m,e| m << e.props } end
+    def props() elements.inject([]) { |m,e| m.push(e.props) } end
   end
 
   class Entry_Stmt < T
@@ -525,7 +525,7 @@ module Fortran
   end
 
   class Module_Subprogram_Part < T
-    def to_s() "#{e0}#{elements[1].elements.reduce('') { |m,e| m << "#{e}" }}" end
+    def to_s() "#{e0}#{elements[1].elements.reduce('') { |m,e| m+="#{e}" }}" end
   end
 
   class Name < T
@@ -549,8 +549,8 @@ module Fortran
   end
 
   class Only_List < T
-    def localnames() e1.elements.reduce([e0.localname]) { |m,e| m << e.localname } end
-    def usenames() e1.elements.reduce([e0.usename]) { |m,e| m << e.usename } end
+    def localnames() e1.elements.reduce([e0.localname]) { |m,e| m.push(e.localname) } end
+    def usenames() e1.elements.reduce([e0.usename]) { |m,e| m.push(e.usename) } end
   end
 
   class Only_List_Pair < T
@@ -579,7 +579,7 @@ module Fortran
   end
 
   class Program_Units < T
-    def to_s() elements.reduce('') { |m,e| m << "#{e}\n" }.chomp end
+    def to_s() elements.reduce('') { |m,e| m+="#{e}\n" }.chomp end
   end
 
   class Read_Stmt < T
@@ -599,8 +599,8 @@ module Fortran
   end
 
   class Rename_List < E
-    def localnames() e1.elements.reduce([e0.localname]) { |m,e| m << e.localname } end
-    def usenames() e1.elements.reduce([e0.usename]) { |m,e| m << e.usename } end
+    def localnames() e1.elements.reduce([e0.localname]) { |m,e| m.push(e.localname) } end
+    def usenames() e1.elements.reduce([e0.usename]) { |m,e| m.push(e.usename) } end
   end
 
   class Rename_List_Pair < E
