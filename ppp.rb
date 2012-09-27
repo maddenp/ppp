@@ -8,65 +8,10 @@ module PPP
 
   include Fortran
 
-  def assemble(s,seen,incdirs=[])
-    current=seen.last
-    a=''
-    r=Regexp.new('^\s*include\s*(\'[^\']+\'|\"[^\"]+\").*',true)
-    s.split("\n").each do |line|
-      m=r.match(line)
-      if m
-        incfile=m[1][1..-2]
-        if incfile[0]=='/' or incfile[0]=='.'
-          incfile=File.expand_path(File.join(File.dirname(current),incfile))
-          unless File.exist?(incfile)
-            fail "Could not find included file #{incfile}"
-          end
-        else
-          found=false
-          incdirs.each do |d|
-            maybe=File.expand_path(File.join(d,incfile))
-            if File.exist?(maybe)
-              found=true
-              incfile=maybe
-              break
-            end
-          end
-          unless found
-            fail "Could not find included file #{incfile} on search path"
-          end
-        end
-        if seen.include?(incfile)
-          msg="File #{current} includes #{incfile} recursively:\n"
-          msg+=incchain(seen,incfile)
-          fail(msg)
-        end
-        unless File.readable?(incfile)
-          msg="Could not read file #{incfile} "
-          msg+=incchain(seen,incfile)
-          fail(msg)
-        end
-        a+=assemble(File.open(incfile,'rb').read,seen+[incfile],incdirs)
-      else
-        a+="#{line}\n"
-      end
-    end
-    a
-  end
-
-  def cppcheck(s)
-    r=Regexp.new('^\s*#')
-    i=1
-    s.split("\n").each do |line|
-      m=r.match(line)
-      fail "Detected cpp directive:\n\n#{i}: #{line.strip}" if m
-      i+=1
-    end
-  end
-
   def defprops
     {:debug=>false,:incdirs=>[],:normalize=>false,:srcfile=>nil}
   end
-    
+  
   def directive
     unless @directive
       f=File.join(File.dirname(File.expand_path($0)),'sentinels')
@@ -76,17 +21,9 @@ module PPP
     @directive
   end
 
-  def directive?(s)
-    s=~directive
-  end
-
   def fail(msg)
     $stderr.puts "\n#{msg}\n"
     exit 1 if __FILE__==$0
-  end
-
-  def incchain(seen,incfile)
-    "\n  "+(seen+[incfile]).join(" includes\n  ")
   end
 
   def normalize(s)
@@ -106,6 +43,94 @@ module PPP
   end
 
   def process(s,root=:program_units,props=defprops)
+
+    def assemble(s,seen,incdirs=[])
+      current=seen.last
+      a=''
+      r=Regexp.new('^\s*include\s*(\'[^\']+\'|\"[^\"]+\").*',true)
+      s.split("\n").each do |line|
+        m=r.match(line)
+        if m
+          incfile=m[1][1..-2]
+          if incfile[0]=='/' or incfile[0]=='.'
+            incfile=File.expand_path(File.join(File.dirname(current),incfile))
+            unless File.exist?(incfile)
+              fail "Could not find included file #{incfile}"
+            end
+          else
+            found=false
+            incdirs.each do |d|
+              maybe=File.expand_path(File.join(d,incfile))
+              if File.exist?(maybe)
+                found=true
+                incfile=maybe
+                break
+              end
+            end
+            unless found
+              fail "Could not find included file #{incfile} on search path"
+            end
+          end
+          if seen.include?(incfile)
+            msg="File #{current} includes #{incfile} recursively:\n"
+            msg+=incchain(seen,incfile)
+            fail(msg)
+          end
+          unless File.readable?(incfile)
+            msg="Could not read file #{incfile} "
+            msg+=incchain(seen,incfile)
+            fail(msg)
+          end
+          a+=assemble(File.open(incfile,'rb').read,seen+[incfile],incdirs)
+        else
+          a+="#{line}\n"
+        end
+      end
+      a
+    end
+
+    def cppcheck(s)
+      r=Regexp.new('^\s*#')
+      i=1
+      s.split("\n").each do |line|
+        m=r.match(line)
+        fail "Detected cpp directive:\n\n#{i}: #{line.strip}" if m
+        i+=1
+      end
+    end
+
+    def incchain(seen,incfile)
+      "\n  "+(seen+[incfile]).join(" includes\n  ")
+    end
+
+    def wrap(s)
+
+      def directive?(s)
+        s=~directive
+      end
+
+      max=80
+      a=s.split("\n")
+      (0..a.length-1).each do |n|
+        e=a[n].chomp
+        unless directive?(e)
+          if e.length>max
+            e=~/^( *).*$/
+            i=$1.length+2
+            t=''
+            begin
+              r=[max-2,e.length-1].min
+              t+=e[0..r]+"&\n"
+              e=' '*i+'&'+e[r+1..-1]
+            end while e.length>max
+            t+=e
+            a[n]=t
+          end
+        end
+      end
+      a.join("\n")
+    end
+
     debug=props[:debug]
     fp=FortranParser.new
     s=s.gsub(/^\s*!sms\$insert */i,'')                           # process inserts
@@ -131,29 +156,6 @@ module PPP
     tree
   end
   
-  def wrap(s)
-    max=80
-    a=s.split("\n")
-    (0..a.length-1).each do |n|
-      e=a[n].chomp
-      unless directive?(e)
-        if e.length>max
-          e=~/^( *).*$/
-          i=$1.length+2
-          t=''
-          begin
-            r=[max-2,e.length-1].min
-            t+=e[0..r]+"&\n"
-            e=' '*i+'&'+e[r+1..-1]
-          end while e.length>max
-          t+=e
-          a[n]=t
-        end
-      end
-    end
-    a.join("\n")
-  end
-
 end
 
 # paul.a.madden@noaa.gov
