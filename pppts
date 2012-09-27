@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+threaded=true
+
 require 'fileutils'
 
 def docmd(cmd)
@@ -22,25 +24,34 @@ def fail(msg=nil,cmd=nil)
   exit(1)
 end
 
-tdir='tests'
-tests=(ARGV[0])?(["#{tdir}/#{ARGV[0]}"]):(Dir.glob("#{tdir}/t*").sort)
-exe('make')
-tests.each do |test|
+def test(t)
   print '.'
-  exe("make -C #{test} clean")
-  exe("make -C #{test} bin")
-  stdout=exe("cd #{test} && ./a.out")
-  control=File.open(File.join(test,'control'),"rb").read
+  exe("make -C #{t} clean")
+  exe("make -C #{t} bin")
+  stdout=exe("cd #{t} && ./a.out")
+  control=File.open(File.join(t,'control'),"rb").read
   unless stdout==control
-    msg="#{test} output expected:\n--begin--\n"
+    msg="#{t} output expected:\n--begin--\n"
     msg+=control
-    msg+="-- end --\n#{test} output actual:\n--begin--\n"
+    msg+="-- end --\n#{t} output actual:\n--begin--\n"
     msg+=stdout
     msg+="-- end --"
     fail msg
   end
-  exe("make -C #{test} clean")
+  exe("make -C #{t} clean")
 end
+
+tdir='tests'
+tests=(ARGV[0])?(["#{tdir}/#{ARGV[0]}"]):(Dir.glob("#{tdir}/t*").sort)
+exe('make')
+if threaded
+  threads=[]
+  tests.each { |t| threads.push(Thread.new { test(t) }) }
+  threads.each { |t| t.join }
+else
+  tests.each { |t| test(t) }
+end
+
 puts "\nOK (#{tests.size} tests)"
 
 # paul.a.madden@noaa.gov
