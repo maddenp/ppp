@@ -2846,7 +2846,7 @@ grammar Fortran
   end
 
   rule sms_serial_begin
-    sms_sentinel sms_t_serial sms_parenthesized_args sms_t_begin t_newline <SMS_Serial_Begin>
+    sms_sentinel sms_t_serial sms_parenthesized_args? sms_t_begin t_newline <SMS_Serial_Begin>
   end
 
   rule sms_serial_end

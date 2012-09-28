@@ -685,7 +685,7 @@ module Fortran
   end
 
   class SMS_Serial_Begin < T
-    def to_s() sms("#{e2} #{e3}") end
+    def to_s() sms("#{sa(e2)}#{e3}") end
   end
 
   class SMS_Serial_End < T
