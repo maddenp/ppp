@@ -59,7 +59,9 @@ module Normalize
   class SMS < Treetop::Runtime::SyntaxNode
     def to_s
       t=text_value
-      t=t.gsub(/^\s+/,'') # left-justify lines
+      t=t.gsub(/^\s+/,'')   # left-justify lines
+      t=t.downcase          # make upper-case characters lower-case
+      t=t.gsub(/[ \t]+/,'') # remove tabs & spaces
     end
   end
 

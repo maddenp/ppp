@@ -143,7 +143,12 @@ module Fortran
         end
         code=((list.empty?)?(nil):("#{code},only:#{list.join(',')}"))
       end
-      use_part(node).elements.push(tree(code,:use_stmt)) unless code.nil?
+      unless code.nil?
+        p=use_part(node)
+        t=tree(code,:use_stmt)
+        t.parent=p
+        p.elements.push(t)
+      end
     end
   end
 
@@ -191,9 +196,9 @@ module Fortran
 
   class Treetop::Runtime::SyntaxNode
 
-    def to_s
-      ''
-    end
+    def to_s() '' end
+
+    def translate() elements.each { |e| e.sms } end
 
     def method_missing(m,*a)
       if m=~/e(\d+)/
@@ -214,42 +219,27 @@ module Fortran
   # Generic Subclasses
 
   class T < Treetop::Runtime::SyntaxNode
-
-    def initialize(a='',b=(0..0),c=[])
-      super(a,b,c)
-    end
-
-    def to_s
-      text_value
-    end
-
+    def initialize(a='',b=(0..0),c=[]) super(a,b,c) end
+    def to_s() text_value end
   end
 
   class E < T
-    def to_s
-      cat
-    end
+    def to_s() cat end
   end
 
   class J < T
-    def to_s
-      space(:all)
-    end
+    def to_s() space(:all) end
   end
 
   class Scoping_Unit < E
   end
 
   class StmtC < T
-    def to_s
-      stmt(elements[1..-1].map { |e| e.to_s }.join)
-    end
+    def to_s() stmt(elements[1..-1].map { |e| e.to_s }.join) end
   end
 
   class StmtJ < T
-    def to_s
-      stmt(space)
-    end
+    def to_s() stmt(space) end
   end
 
   # Specific Subclasses
@@ -629,6 +619,11 @@ module Fortran
   end
 
   ## SMS ##
+
+  class SMS_Barrier < T
+#   def to_s() text_value end # DELETE THIS: No nodes of this type should survive to the output phase
+    def to_s() '' end # DELETE THIS: No nodes of this type should survive to the output phase
+  end
 
   class SMS_Distribute_Begin < T
     def to_s() sms("#{e2} #{e3}") end

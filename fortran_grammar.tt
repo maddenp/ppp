@@ -936,8 +936,9 @@ grammar Fortran
 
   rule directive
     # Note: Any "comment" not stripped out during normalization is a directive.
+    # These are non-SMS directives.
 
-    "!" character+ t_newline <T>
+    !sms_sentinel "!" character+ t_newline <T>
   end
 
   rule do_block
@@ -1387,7 +1388,8 @@ grammar Fortran
 
     subroutine_subprogram /
     function_subprogram /
-    directive # REMOVE? If/when sms$ignore disappears, could a directive ever appear here?
+    sms_ignore_begin /
+    sms_ignore_end
   end
 
   rule file_name_expr
@@ -1713,7 +1715,8 @@ grammar Fortran
 
     subroutine_subprogram /
     function_subprogram /
-    directive # REMOVE? If/when sms$ignore disappears, could a directive ever appear here?
+    sms_ignore_begin /
+    sms_ignore_end
   end
 
   rule internal_subprograms
@@ -2033,7 +2036,8 @@ grammar Fortran
 
     subroutine_subprogram /
     function_subprogram /
-    directive # REMOVE? If/when sms$ignore disappears, could a directive ever appear here?
+    sms_ignore_begin /
+    sms_ignore_end
   end
 
   rule module_subprogram_part
@@ -2746,17 +2750,17 @@ grammar Fortran
   ## SMS ##
 
   rule sms_barrier
-    sms_sentinel "barrier" t_newline <T>
+    sms_sentinel "barrier" t_newline <SMS_Barrier>
   end
 
-  #  rule sms_t_begin
-  #    "begin" <T>
-  #  end
-  #
-  #  rule sms_t_end
-  #    "end" <T>
-  #  end
-  #
+  rule sms_t_begin
+    "begin" <T>
+  end
+
+  rule sms_t_end
+    "end" <T>
+  end
+
   #  rule sms_t_compare_var
   #    "compare_var" <T>
   #  end
@@ -2776,11 +2780,11 @@ grammar Fortran
   #  rule sms_t_halo_comp
   #    "halo_comp" <T>
   #  end
-  #
-  #  rule sms_t_ignore
-  #    "ignore" <T>
-  #  end
-  #
+
+  rule sms_t_ignore
+    "ignore" <T>
+  end
+
   #  rule sms_t_parallel
   #    "parallel" <T>
   #  end
@@ -2837,15 +2841,15 @@ grammar Fortran
   #  rule sms_halo_comp_end
   #    sms_sentinel sms_t_halo_comp sms_t_end t_newline <SMS_Halo_Comp_End>
   #  end
-  #
-  #  rule sms_ignore_begin
-  #    sms_sentinel sms_t_ignore sms_junk sms_t_begin t_newline <SMS_Ignore_Begin>
-  #  end
-  #
-  #  rule sms_ignore_end
-  #    sms_sentinel sms_t_ignore sms_t_end t_newline <SMS_Ignore_End>
-  #  end
-  #
+
+  rule sms_ignore_begin
+    sms_sentinel sms_t_ignore sms_t_begin t_newline <SMS_Ignore_Begin>
+  end
+
+  rule sms_ignore_end
+    sms_sentinel sms_t_ignore sms_t_end t_newline <SMS_Ignore_End>
+  end
+
   #  rule sms_parallel_begin
   #    sms_sentinel sms_t_parallel sms_junk sms_t_begin t_newline <SMS_Parallel_Begin>
   #  end
@@ -2903,12 +2907,12 @@ grammar Fortran
   #  end
   
   rule sms_executable
-    sms_barrier #/
+    sms_barrier /
     # sms_compare_var /
     # sms_halo_comp_begin /
     # sms_halo_comp_end /
-    # sms_ignore_begin /
-    # sms_ignore_end /
+    sms_ignore_begin /
+    sms_ignore_end #/
     # sms_parallel_begin /
     # sms_parallel_end /
     # sms_reduce /
