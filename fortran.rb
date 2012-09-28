@@ -637,7 +637,7 @@ module Fortran
   end
 
   class SMS_Compare_Var < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms("#{e2} #{e3}") end
   end
     
   class SMS_Create_Decomp < T
