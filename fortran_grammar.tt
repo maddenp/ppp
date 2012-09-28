@@ -935,8 +935,7 @@ grammar Fortran
   end
 
   rule directive
-    # Note: Any "comment" not stripped out during normalization is assumed to be
-    # a directive.
+    # Note: Any "comment" not stripped out during normalization is a directive.
 
     "!" character+ t_newline <T>
   end
@@ -1288,7 +1287,7 @@ grammar Fortran
     do_construct /
     if_construct /
     where_construct /
-    # sms_executable
+    sms_executable /
     directive
   end
 
@@ -2746,10 +2745,10 @@ grammar Fortran
 
   ## SMS ##
 
-  #  rule sms_barrier
-  #    sms_sentinel "barrier" t_newline <T>
-  #  end
-  #
+  rule sms_barrier
+    sms_sentinel "barrier" t_newline <T>
+  end
+
   #  rule sms_t_begin
   #    "begin" <T>
   #  end
@@ -2887,11 +2886,11 @@ grammar Fortran
   #    char_literal_constant_dq /
   #    char_literal_constant_sq
   #  end
-  #
-  #  rule sms_sentinel
-  #    "!sms$" <T>
-  #  end
-  #
+
+  rule sms_sentinel
+    "!sms$" <T>
+  end
+
   #  rule sms_declarative
   #    # Note: Eventually, we do not want the 'ignore' directive in
   #    # specification_part, if at all.
@@ -2902,24 +2901,24 @@ grammar Fortran
   #    sms_ignore_begin /
   #    sms_ignore_end
   #  end
-  #
-  #  rule sms_executable
-  #    sms_barrier /
-  #    sms_compare_var /
-  #    sms_halo_comp_begin /
-  #    sms_halo_comp_end /
-  #    sms_ignore_begin /
-  #    sms_ignore_end /
-  #    sms_parallel_begin /
-  #    sms_parallel_end /
-  #    sms_reduce /
-  #    sms_serial_begin /
-  #    sms_serial_end /
-  #    sms_set_communicator /
-  #    sms_to_local_begin /
-  #    sms_to_local_end /
-  #    sms_unstructured_grid
-  #  end
+  
+  rule sms_executable
+    sms_barrier #/
+    # sms_compare_var /
+    # sms_halo_comp_begin /
+    # sms_halo_comp_end /
+    # sms_ignore_begin /
+    # sms_ignore_end /
+    # sms_parallel_begin /
+    # sms_parallel_end /
+    # sms_reduce /
+    # sms_serial_begin /
+    # sms_serial_end /
+    # sms_set_communicator /
+    # sms_to_local_begin /
+    # sms_to_local_end /
+    # sms_unstructured_grid
+  end
 
   ## SMS ##
 
@@ -3702,7 +3701,7 @@ grammar Fortran
   end
 
   rule use_part
-    # ( use_stmt / sms_declarative )* <Use_Part>
+    # ( use_stmt / sms_declarative / directive )* <Use_Part>
     ( use_stmt / directive )* <Use_Part>
   end
 
