@@ -2761,7 +2761,7 @@ grammar Fortran
   end
 
   rule sms_create_decomp
-    sms_sentinel sms_t_create_decomp character* t_newline <SMS_Create_Decomp>
+    sms_sentinel sms_t_create_decomp character+ t_newline <SMS_Create_Decomp>
   end
 
   rule sms_declarative
