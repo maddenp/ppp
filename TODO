@@ -1,7 +1,7 @@
 
-- Remove sms$ignore and all the places it appears in the grammar.
+- REMOVE sms$ignore and all the places it appears in the grammar.
 
-- Remove sms_declarative from incorrct places after sms$ignore is gone.
+- REMOVE sms_declarative from incorrct places after sms$ignore is gone.
 
 - Need tests of F90:R1206 generic_spec (2nd two forms).
 
