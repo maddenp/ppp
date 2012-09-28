@@ -844,7 +844,7 @@ grammar Fortran
     format_stmt /
     entry_stmt /
     stmt_function_stmt !{ |e| is_array?(e[0]) } <E> /
-    # sms_declarative
+    sms_declarative /
     directive
   end
 
@@ -1533,7 +1533,8 @@ grammar Fortran
     # and the availibility of 3rd-party syntax-checking compilers, it is not
     # enforced here.
 
-    implicit_part_stmt+ <E>
+    implicit_part_stmt+ <E> /
+    sms_declarative
   end
 
   rule implicit_part_stmt
@@ -2810,7 +2811,7 @@ grammar Fortran
   #  end
   #
   #  rule sms_junk
-  #    # GET RID OF THIS!
+  #    # REMOVE!
   #    t_paren_l (!t_paren_r character)* t_paren_r <T>
   #  end
   #
@@ -2895,16 +2896,16 @@ grammar Fortran
     "!sms$" <T>
   end
 
-  #  rule sms_declarative
-  #    # Note: Eventually, we do not want the 'ignore' directive in
-  #    # specification_part, if at all.
-  #
-  #    sms_create_decomp /
-  #    sms_distribute_begin /
-  #    sms_distribute_end /
-  #    sms_ignore_begin /
-  #    sms_ignore_end
-  #  end
+  rule sms_declarative
+    # Note: Eventually, we do not want the 'ignore' directive in
+    # specification_part, if at all.
+
+    # sms_create_decomp /
+    # sms_distribute_begin /
+    # sms_distribute_end /
+    sms_ignore_begin /
+    sms_ignore_end
+  end
   
   rule sms_executable
     sms_barrier /
@@ -3705,8 +3706,7 @@ grammar Fortran
   end
 
   rule use_part
-    # ( use_stmt / sms_declarative / directive )* <Use_Part>
-    ( use_stmt / directive )* <Use_Part>
+    ( use_stmt / sms_declarative / directive )* <Use_Part>
   end
 
   rule use_stmt

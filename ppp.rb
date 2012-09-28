@@ -23,7 +23,10 @@ module PPP
 
   def fail(msg)
     $stderr.puts "\n#{msg}\n"
-    exit 1 if __FILE__==$0
+    unless __FILE__=="(irb)"
+      puts "\n"
+      exit 1
+    end
   end
 
   def normalize(s)
@@ -147,13 +150,13 @@ module PPP
         puts "\nRAW TREE\n\n"
         p raw_tree
       end
+      fail "PARSE FAILED" if raw_tree.nil?
       translated_tree=raw_tree.translate
       if debug
         puts "\nTRANSLATED TREE\n\n"
         p translated_tree
       end
       s=translated_tree.to_s
-      fail "PARSE FAILED" if s.empty?
       s=wrap(s)
       puts "\nTRANSLATED SOURCE\n\n" if debug
     end
