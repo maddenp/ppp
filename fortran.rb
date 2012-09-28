@@ -631,7 +631,7 @@ module Fortran
 
   class SMS_Barrier < T
     def translate
-      sub(raw("call ppp_barrier(ppp_status)",:call_stmt))
+      sub(raw("call ppp_barrier(ppp__status)",:call_stmt))
       use(self,"nnt_types_module")
     end
   end
