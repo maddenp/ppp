@@ -2781,7 +2781,7 @@ grammar Fortran
   end
 
   rule sms_exchange
-    sms_sentinel sms_t_exchange character* t_newline <SMS_Exchange>
+    sms_sentinel sms_t_exchange character+ t_newline <SMS_Exchange>
   end
 
   rule sms_executable

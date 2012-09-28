@@ -17,7 +17,7 @@ grammar Normalize
   end
 
   rule sms
-    "@" [^\n]* <SMS>
+    "@" [sS] [mM] [sS] "$" [^\n]* <SMS>
   end
 
   rule unquoted

@@ -653,7 +653,7 @@ module Fortran
   end
     
   class SMS_Exchange < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms(e2.elements.map { |e| e.text_value }.join) end
   end
     
   class SMS_Halo_Comp_Begin < T
@@ -661,7 +661,7 @@ module Fortran
   end
     
   class SMS_Halo_Comp_End < T
-    def to_s() sms("#{e2}}") end
+    def to_s() sms("#{e2}") end
   end
     
   class SMS_Ignore_Begin < T
