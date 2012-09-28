@@ -1387,7 +1387,7 @@ grammar Fortran
 
     subroutine_subprogram /
     function_subprogram /
-    directive # REMOVE!
+    directive # REMOVE? If/when sms$ignore disappears, could a directive ever appear here?
   end
 
   rule file_name_expr
@@ -1713,7 +1713,7 @@ grammar Fortran
 
     subroutine_subprogram /
     function_subprogram /
-    directive # REMOVE!
+    directive # REMOVE? If/when sms$ignore disappears, could a directive ever appear here?
   end
 
   rule internal_subprograms
@@ -2033,7 +2033,7 @@ grammar Fortran
 
     subroutine_subprogram /
     function_subprogram /
-    directive # REMOVE!
+    directive # REMOVE? If/when sms$ignore disappears, could a directive ever appear here?
   end
 
   rule module_subprogram_part
