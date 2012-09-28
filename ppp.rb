@@ -38,7 +38,7 @@ module PPP
   end
 
   def out(s,root=:program_units,props=defprops)
-    s,tree=process(s,root,props)
+    s,raw_tree,final_tree=process(s,root,props)
     s
   end
 
@@ -141,21 +141,33 @@ module PPP
     s=normalize(s)
     unless props[:normalize]
       puts s if debug
-      puts "\nparsed:\n\n" if debug
-      tree=fp.parse(s,:root=>root)
-      p tree if debug
-      s=tree.to_s
+      raw_tree=fp.parse(s,:root=>root)
+      if debug
+        puts "\nraw tree:\n\n"
+        p raw_tree
+      end
+      final_tree=raw_tree.translate
+      if debug
+        puts "\nfinal tree:\n\n"
+        p final_tree
+      end
+      s=final_tree.to_s
       fail "Parse failed." if s.empty?
       s=wrap(s)
     end
-    [s,tree]
+    [s,raw_tree,final_tree]
+  end
+
+  def raw(s,root=:program_units,props=defprops)
+    s,raw_tree,final_tree=process(s,root,props)
+    raw_tree
   end
 
   def tree(s,root=:program_units,props=defprops)
-    s,tree=process(s,root,props)
-    tree
+    s,raw_tree,final_tree=process(s,root,props)
+    final_tree
   end
-  
+
 end
 
 # paul.a.madden@noaa.gov

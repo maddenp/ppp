@@ -198,7 +198,10 @@ module Fortran
 
     def to_s() '' end
 
-    def translate() elements.each { |e| e.sms } end
+    def translate()
+      elements.each { |e| e.translate } unless elements.nil?
+      self
+    end
 
     def method_missing(m,*a)
       if m=~/e(\d+)/
@@ -621,8 +624,10 @@ module Fortran
   ## SMS ##
 
   class SMS_Barrier < T
-#   def to_s() text_value end # DELETE THIS: No nodes of this type should survive to the output phase
-    def to_s() '' end # DELETE THIS: No nodes of this type should survive to the output phase
+    def to_s() text_value end # DELETE THIS: No nodes of this type should survive to the output phase
+#   def translate
+#     puts "### SMS_Barrier"
+#   end
   end
 
   class SMS_Distribute_Begin < T
