@@ -38,8 +38,8 @@ module PPP
   end
 
   def out(s,root=:program_units,props=defprops)
-    s,raw_tree,final_tree=process(s,root,props)
-    s
+    translated_source,raw_tree,translated_tree=process(s,root,props)
+    translated_source
   end
 
   def process(s,root=:program_units,props=defprops)
@@ -137,35 +137,37 @@ module PPP
     s=s.gsub(/^\s*!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
     s=assemble(s,[props[:srcfile]],props[:incdirs])
     cppcheck(s)
-    puts "normalized:\n\n" if debug
+    puts "RAW SOURCE\n\n#{s}\n" if debug
+    puts "NORMALIZED SOURCE\n\n" if debug
     s=normalize(s)
     unless props[:normalize]
       puts s if debug
       raw_tree=fp.parse(s,:root=>root)
       if debug
-        puts "\nraw tree:\n\n"
+        puts "\nRAW TREE\n\n"
         p raw_tree
       end
-      final_tree=raw_tree.translate
+      translated_tree=raw_tree.translate
       if debug
-        puts "\nfinal tree:\n\n"
-        p final_tree
+        puts "\nTRANSLATED TREE\n\n"
+        p translated_tree
       end
-      s=final_tree.to_s
-      fail "Parse failed." if s.empty?
+      s=translated_tree.to_s
+      fail "PARSE FAILED" if s.empty?
       s=wrap(s)
+      puts "\nTRANSLATED SOURCE\n\n" if debug
     end
-    [s,raw_tree,final_tree]
+    [s,raw_tree,translated_tree]
   end
 
   def raw(s,root=:program_units,props=defprops)
-    s,raw_tree,final_tree=process(s,root,props)
+    s,raw_tree,translated_tree=process(s,root,props)
     raw_tree
   end
 
   def tree(s,root=:program_units,props=defprops)
-    s,raw_tree,final_tree=process(s,root,props)
-    final_tree
+    s,raw_tree,translated_tree=process(s,root,props)
+    translated_tree
   end
 
 end
