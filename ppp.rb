@@ -8,6 +8,9 @@ module PPP
 
   include Fortran
 
+  @@fp=nil # fortran parser
+  @@np=nil # normalize parser
+
   def defprops
     {:debug=>false,:incdirs=>[],:normalize=>false,:srcfile=>nil}
   end
@@ -30,11 +33,11 @@ module PPP
   end
 
   def normalize(s)
-    np=NormalizeParser.new
+    @@np||=NormalizeParser.new
     s=s.gsub(directive,'@\1')         # hide directives
     s=s.gsub(/^\s+/,'')               # left-justify lines
     s=s.gsub(/^!.*\n/,'')             # remove full-line comments
-    s=np.parse(np.parse(s).to_s).to_s # two normalize passes
+    s=@@np.parse(@@np.parse(s).to_s).to_s # two normalize passes
     s=s.sub(/^\n+/,'')                # remove leading newlines
     s+="\n"  unless s[-1]=="\n"       # ensure final newline
     s=s.gsub(/^@(.*)/i,'!\1')         # show directives
@@ -135,7 +138,7 @@ module PPP
     end
 
     debug=props[:debug]
-    fp=FortranParser.new
+    @@fp||=FortranParser.new
     s=s.gsub(/^\s*!sms\$insert */i,'')                           # process inserts
     s=s.gsub(/^\s*!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
     s=assemble(s,[props[:srcfile]],props[:incdirs])
@@ -145,7 +148,7 @@ module PPP
     s=normalize(s)
     unless props[:normalize]
       puts s if debug
-      raw_tree=fp.parse(s,:root=>root)
+      raw_tree=@@fp.parse(s,:root=>root)
       if debug
         puts "\nRAW TREE\n\n"
         p raw_tree
