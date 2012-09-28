@@ -2757,7 +2757,7 @@ grammar Fortran
   end
 
   rule sms_compare_var
-    sms_sentinel sms_t_compare_var character+ t_newline <SMS_Compare_Var>
+    sms_sentinel sms_t_compare_var parenthesized_args t_newline <SMS_Compare_Var>
   end
 
   rule sms_create_decomp
