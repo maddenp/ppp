@@ -159,8 +159,7 @@ module PPP
         puts "\nTRANSLATED TREE\n\n"
         p translated_tree
       end
-      s=translated_tree.to_s
-      s=wrap(s)
+      s=wrap(translated_tree.to_s)
       puts "\nTRANSLATED SOURCE\n\n" if debug
     end
     [s,raw_tree,translated_tree]
