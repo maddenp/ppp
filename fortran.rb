@@ -197,6 +197,7 @@ module Fortran
   class Treetop::Runtime::SyntaxNode
 
     def sub(tree)
+      tree.parent=parent
       block=parent.elements
       block[block.index(self)]=tree
     end
