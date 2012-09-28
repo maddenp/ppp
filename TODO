@@ -1,4 +1,6 @@
 
+- REMOVE sms_passthrough from grammar, etc.
+
 - REMOVE sms$ignore and all the places it appears in the grammar.
 
 - REMOVE sms_declarative from incorrct places after sms$ignore is gone.

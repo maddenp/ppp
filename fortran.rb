@@ -636,51 +636,11 @@ module Fortran
     end
   end
 
-  class SMS_Distribute_Begin < T
-    def to_s() sms("#{e2} #{e3}") end
-  end
-
-  class SMS_Distribute_End < T
-    def to_s() sms("#{e2}") end
-  end
-
-  class SMS_Halo_Comp_Begin < T
-    def to_s() sms("#{e2} #{e3}") end
-  end
-
-  class SMS_Halo_Comp_End < T
-    def to_s() sms("#{e2}") end
-  end
-
   class SMS_Ignore_Begin < T
-    def to_s() sms("#{e2} #{e3}") end
+    def to_s() sms("#{e2}") end
   end
 
   class SMS_Ignore_End < T
-    def to_s() sms("#{e2}") end
-  end
-
-  class SMS_Parallel_Begin < T
-    def to_s() sms("#{e2} #{e3}") end
-  end
-
-  class SMS_Parallel_End < T
-    def to_s() sms("#{e2}") end
-  end
-
-  class SMS_Serial_Begin < T
-    def to_s() sms("#{e2} #{e3}") end
-  end
-
-  class SMS_Serial_End < T
-    def to_s() sms("#{e2}") end
-  end
-
-  class SMS_To_Local_Begin < T
-    def to_s() sms("#{e2} #{e3}") end
-  end
-
-  class SMS_To_Local_End < T
     def to_s() sms("#{e2}") end
   end
 

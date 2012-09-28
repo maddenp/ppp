@@ -61,7 +61,7 @@ module Normalize
       t=text_value
       t=t.gsub(/^\s+/,'') # left-justify lines
       # REMOVE this HACK when all sms directives are being translated
-      re=Regexp.new('@sms\$(barrier|ignore)')
+      re=Regexp.new('@sms\$(barrier|ignore)',true)
       if re.match(t)
         t=t.downcase          # make upper-case characters lower-case
         t=t.gsub(/[ \t]+/,'') # remove tabs & spaces
