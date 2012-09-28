@@ -2757,11 +2757,11 @@ grammar Fortran
   end
 
   rule sms_compare_var
-    sms_sentinel sms_t_compare_var character* t_newline <T>
+    sms_sentinel sms_t_compare_var character* t_newline <SMS_Compare_Var>
   end
 
   rule sms_create_decomp
-    sms_sentinel sms_t_create_decomp character* t_newline <T>
+    sms_sentinel sms_t_create_decomp character* t_newline <SMS_Create_Decomp>
   end
 
   rule sms_declarative
@@ -2773,15 +2773,15 @@ grammar Fortran
   end
   
   rule sms_distribute_begin
-    sms_sentinel sms_t_distribute sms_junk sms_t_begin t_newline <T>
+    sms_sentinel sms_t_distribute sms_parenthesized_args sms_t_begin t_newline <SMS_Distribute_Begin>
   end
 
   rule sms_distribute_end
-    sms_sentinel sms_t_distribute sms_t_end t_newline <T>
+    sms_sentinel sms_t_distribute sms_t_end t_newline <SMS_Distribute_End>
   end
 
   rule sms_exchange
-    sms_sentinel sms_t_exchange character* t_newline <T>
+    sms_sentinel sms_t_exchange character* t_newline <SMS_Exchange>
   end
 
   rule sms_executable
@@ -2791,32 +2791,32 @@ grammar Fortran
   end
 
   rule sms_halo_comp_begin
-    sms_sentinel sms_t_halo_comp sms_junk sms_t_begin t_newline <T>
+    sms_sentinel sms_t_halo_comp sms_parenthesized_args sms_t_begin t_newline <SMS_Halo_Comp_Begin>
   end
 
   rule sms_halo_comp_end
-    sms_sentinel sms_t_halo_comp sms_t_end t_newline <T>
+    sms_sentinel sms_t_halo_comp sms_t_end t_newline <SMS_Halo_Comp_End>
   end
 
   rule sms_ignore_begin
-    sms_sentinel sms_t_ignore sms_t_begin t_newline <T>
+    sms_sentinel sms_t_ignore sms_t_begin t_newline <SMS_Ignore_Begin>
   end
 
   rule sms_ignore_end
-    sms_sentinel sms_t_ignore sms_t_end t_newline <T>
+    sms_sentinel sms_t_ignore sms_t_end t_newline <SMS_Ignore_End>
   end
 
-  rule sms_junk
-    # REMOVE!
+  rule sms_parenthesized_args
+    # REMOVE
     t_paren_l (!t_paren_r character)* t_paren_r <T>
   end
 
   rule sms_parallel_begin
-    sms_sentinel sms_t_parallel sms_junk sms_t_begin t_newline <T>
+    sms_sentinel sms_t_parallel sms_parenthesized_args sms_t_begin t_newline <SMS_Parallel_Begin>
   end
 
   rule sms_parallel_end
-    sms_sentinel sms_t_parallel sms_t_end t_newline <T>
+    sms_sentinel sms_t_parallel sms_t_end t_newline <SMS_Parallel_End>
   end
 
   rule sms_passthrough
@@ -2838,7 +2838,7 @@ grammar Fortran
   end
 
   rule sms_reduce
-    sms_sentinel sms_t_reduce sms_junk t_newline <T>
+    sms_sentinel sms_t_reduce sms_parenthesized_args t_newline <SMS_Reduce>
   end
 
   rule sms_sentinel
@@ -2846,15 +2846,15 @@ grammar Fortran
   end
 
   rule sms_serial_begin
-    sms_sentinel sms_t_serial sms_junk sms_t_begin t_newline <T>
+    sms_sentinel sms_t_serial sms_parenthesized_args sms_t_begin t_newline <SMS_Serial_Begin>
   end
 
   rule sms_serial_end
-    sms_sentinel sms_t_serial sms_t_end t_newline <T>
+    sms_sentinel sms_t_serial sms_t_end t_newline <SMS_Serial_End>
   end
 
   rule sms_set_communicator
-    sms_sentinel sms_t_set_communicator sms_junk t_newline <T>
+    sms_sentinel sms_t_set_communicator sms_parenthesized_args t_newline <SMS_Set_Communicator>
   end
 
   rule sms_string
@@ -2919,15 +2919,15 @@ grammar Fortran
   end
 
   rule sms_to_local_begin
-    sms_sentinel sms_t_to_local sms_junk sms_t_begin t_newline <T>
+    sms_sentinel sms_t_to_local sms_parenthesized_args sms_t_begin t_newline <SMS_To_Local_Begin>
   end
 
   rule sms_to_local_end
-    sms_sentinel sms_t_to_local sms_t_end t_newline <T>
+    sms_sentinel sms_t_to_local sms_t_end t_newline <SMS_To_Local_End>
   end
 
   rule sms_unstructured_grid
-    sms_sentinel sms_t_unstructured_grid sms_junk t_newline <T>
+    sms_sentinel sms_t_unstructured_grid sms_parenthesized_args t_newline <SMS_Unstructured_Grid>
   end
 
   ## SMS ##
