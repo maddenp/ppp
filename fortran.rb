@@ -196,6 +196,11 @@ module Fortran
 
   class Treetop::Runtime::SyntaxNode
 
+    def sub(tree)
+      block=parent.elements
+      block[block.index(self)]=tree
+    end
+
     def to_s() '' end
 
     def translate()
@@ -624,10 +629,10 @@ module Fortran
   ## SMS ##
 
   class SMS_Barrier < T
-    def to_s() text_value end # DELETE THIS: No nodes of this type should survive to the output phase
-#   def translate
-#     puts "### SMS_Barrier"
-#   end
+    def translate
+      sub(raw("call ppp_barrier(ppp_status)",:call_stmt))
+      use(self,"nnt_types_module")
+    end
   end
 
   class SMS_Distribute_Begin < T
