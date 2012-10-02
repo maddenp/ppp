@@ -632,7 +632,7 @@ module Fortran
   class SMS_Barrier < T
     def translate
       sub(raw("call ppp_barrier(ppp__status)",:call_stmt))
-      use(self,"nnt_types_module")
+      #use(self,"nnt_types_module") # needed, but old ppp chokes on it
     end
   end
 
