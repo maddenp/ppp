@@ -117,6 +117,17 @@ module Fortran
     indent(("#{sa(e0)}"+s.chomp).strip)+"\n"
   end
 
+  def sub(tree)
+    tree.parent=parent
+    block=parent.elements
+    block[block.index(self)]=tree
+  end
+
+  def translate()
+    elements.each { |e| e.translate } unless elements.nil?
+    self
+  end
+
   def typeinfo(type_spec,attr_spec_option,entity_decl_list)
     props=entity_decl_list.props
     type=type_spec.type
@@ -196,18 +207,7 @@ module Fortran
 
   class Treetop::Runtime::SyntaxNode
 
-    def sub(tree)
-      tree.parent=parent
-      block=parent.elements
-      block[block.index(self)]=tree
-    end
-
     def to_s() '' end
-
-    def translate()
-      elements.each { |e| e.translate } unless elements.nil?
-      self
-    end
 
     def method_missing(m,*a)
       if m=~/e(\d+)/
