@@ -43,7 +43,7 @@ module Fortran
   def findabove(node,classes)
     n=node
     while p=n.parent
-      return p if classes.any? { |e| p.kind_of?(e) }
+      return p if classes.any? { |e| p.is_a?(e) }
       n=p
     end
     nil
