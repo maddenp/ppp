@@ -23,11 +23,11 @@ module Normalize
       t=text_value
       t=t.gsub(/&$(\n&?)?/,'') # join continuation lines
       t=t.gsub(/\s*;\s*/,"\n") # split semicolon-delimited statement lines
-      # Convert instances of F90:1016 char-string-edit-desc to quoted strings to
-      # preserve case and whitespace.
       a=t.split("\n")
       a.each_index do |i|
         l=a[i]
+        # Convert instances of F90:1016 char-string-edit-desc to quoted strings
+        # to preserve case and whitespace.
         h=false
         p="\(.*?[0-9]{1,5}[ \t]format[ \t]*\\(.*?\)\([0-9]+\)[ \t]*[hH]\(.*?\)\\)\(.*\)"
         r=Regexp.new(p,true)
