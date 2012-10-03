@@ -34,13 +34,13 @@ module PPP
 
   def normalize(s)
     @@np||=NormalizeParser.new
-    s=s.gsub(directive,'@\1')         # hide directives
-    s=s.gsub(/^\s+/,'')               # left-justify lines
-    s=s.gsub(/^!.*\n/,'')             # remove full-line comments
+    s=s.gsub(directive,'@\1')             # hide directives
+    s=s.gsub(/^\s+/,'')                   # left-justify lines
+    s=s.gsub(/^!.*\n/,'')                 # remove full-line comments
     s=@@np.parse(@@np.parse(s).to_s).to_s # two normalize passes
-    s=s.sub(/^\n+/,'')                # remove leading newlines
-    s+="\n"  unless s[-1]=="\n"       # ensure final newline
-    s=s.gsub(/^@(.*)/i,'!\1')         # show directives
+    s=s.sub(/^\n+/,'')                    # remove leading newlines
+    s+="\n"  unless s[-1]=="\n"           # ensure final newline
+    s=s.gsub(/^@(.*)/i,'!\1')             # show directives
   end
 
   def out(s,root=:program_units,props=defprops)
