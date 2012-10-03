@@ -22,6 +22,8 @@ module Normalize
   class Normalize < Treetop::Runtime::SyntaxNode
     def to_s
       t=text_value
+      t=t.gsub(/;/,"\n")    # split semicolon-delimited statement lines
+      t=t.gsub(/&$\n&?/,'') # join continuation lines
       # Convert instances of F90:1016 char-string-edit-desc to quoted strings to
       # preserve case and whitespace.
       h=false
@@ -41,8 +43,6 @@ module Normalize
         t=t.downcase          # make upper-case characters lower-case
         t=t.gsub(/[ \t]+/,'') # remove tabs & spaces
       end
-      t=t.gsub(/;/,"\n")      # split semicolon-delimited statement lines
-      t=t.gsub(/&$\n&?/,'')   # join continuation lines
       t=t.gsub(/\n\n+/,"\n")  # no blank lines
     end
   end
