@@ -1,5 +1,6 @@
 program t
-100 format ( 12 H Hello World)
+100 format ( 12 H Hello &
+      &World)
 200 format (2hA )
 300 format (2h B)
 400 format (a,1HC)
