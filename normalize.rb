@@ -14,15 +14,14 @@ module Normalize
 
   class Directive < Treetop::Runtime::SyntaxNode
     def to_s
-      t=text_value
-      t=t.gsub(/^\s+/,'') # left-justify lines
+      text_value
     end
   end
 
   class Normalize < Treetop::Runtime::SyntaxNode
     def to_s
       t=text_value
-      t=t.gsub(/&\s*$(\n\s*&?)?/,'') # join continuation lines
+      t=t.gsub(/&$(\n&?)?/,'') # join continuation lines
       t=t.gsub(/\s*;\s*/,"\n") # split semicolon-delimited statement lines
       # Convert instances of F90:1016 char-string-edit-desc to quoted strings to
       # preserve case and whitespace.
@@ -65,7 +64,6 @@ module Normalize
   class SMS < Treetop::Runtime::SyntaxNode
     def to_s
       t=text_value
-      t=t.gsub(/^\s+/,'')   # left-justify lines
       t=t.downcase          # make upper-case characters lower-case
       t=t.gsub(/[ \t]+/,'') # remove tabs & spaces
       t="\n"+t
