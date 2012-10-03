@@ -29,9 +29,9 @@ module Normalize
       r=Regexp.new(p,Regexp::IGNORECASE|Regexp::MULTILINE)
       while m=r.match(t)
         h=true
-        a=m[3][0..m[2].to_i-1]
-        b=m[3].sub(/^#{a}/,'')
-        t="#{m[1]}'#{a}'#{b})#{m[4]}"
+        p1=m[3][0..m[2].to_i-1]
+        p2=m[3].sub(/^#{p1}/,'')
+        t="#{m[1]}'#{p1}'#{p2})#{m[4]}"
       end
       # If a F90:1016 conversion occurred, quoted strings have been introduced
       # and it is no longer safe to change case or whitespace. Note, though,
