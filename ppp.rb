@@ -35,7 +35,8 @@ module PPP
   def normalize(s)
     @@np||=NormalizeParser.new
     s=s.gsub(directive,'@\1')             # hide directives
-    s=s.gsub(/^\s+/,'')                   # left-justify lines
+    s=s.gsub(/^\s+/,'')                   # remove leading whitespace
+    s=s.gsub(/\s+$/,'')                   # remove trailing whitespace
     s=s.gsub(/^!.*\n/,'')                 # remove full-line comments
     s=@@np.parse(@@np.parse(s).to_s).to_s # two normalize passes
     s=s.sub(/^\n+/,'')                    # remove leading newlines
