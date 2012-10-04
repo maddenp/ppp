@@ -22,8 +22,13 @@ module Normalize
   class Normalize < Treetop::Runtime::SyntaxNode
     def to_s
       t=text_value
-      t=t.gsub(/&$(\n&?)?/,'') # join continuation lines
-      t=t.gsub(/\s*;\s*/,"\n") # split semicolon-delimited statement lines
+      # Join continuation lines
+      t=t.gsub(/&$(\n&?)?/,'')
+      # Split semicolon-delimited statement lines
+      t=t.gsub(/\s*;\s*/,"\n")
+      # Attempting a multiline match of the regular expression below on a string
+      # representing a huge source file is incredibly slow. Breaking the string
+      # into lines improves performance significantly. 
       a=t.split("\n")
       a.each_index do |i|
         l=a[i]
@@ -43,13 +48,16 @@ module Normalize
         # that these conversions can only happen in the first normalization pass,
         # so that the second pass can normalize case and whitespace.
         unless h
-          l=l.downcase # make upper-case characters lower-case
-          l=l.gsub(/[ \t]+/,'') # remove tabs & spaces
+          # Make upper-case characters lower-case
+          l=l.downcase
+          # Remove tabs & spaces
+          l=l.gsub(/[ \t]+/,'')
         end
         a[i]=l
       end
       t=a.join("\n")
-      t=t.gsub(/\n\n+/,"\n"); # no blank lines
+      # Remove blank lines
+      t=t.gsub(/\n\n+/,"\n")
     end
   end
 
