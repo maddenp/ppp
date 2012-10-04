@@ -14,7 +14,8 @@ module Normalize
 
   class Directive < Treetop::Runtime::SyntaxNode
     def to_s
-      text_value
+      t=text_value
+      t="\n"+t
     end
   end
 
