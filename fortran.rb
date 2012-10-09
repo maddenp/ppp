@@ -296,35 +296,26 @@ module Fortran
     def to_s() stmt("#{e1} #{e2}#{mn(e3,',',' '+e3.to_s)}") end
   end
 
-# class Attr_Spec_Base < T
-# end
+  class Attr_Spec_Base < T
+    def dimension?() chkattr(:dimension?) end
+    def private?() chkattr(:private?) end
+    def public?() chkattr(:public?) end
+  end
 
   class Attr_Spec_Dimension < T
     def dimension?() true end
   end
 
-  class Attr_Spec_List < T
-    def dimension?() chkattr(:dimension?) end
-    def private?() chkattr(:private?) end
-    def public?() chkattr(:public?) end
+  class Attr_Spec_List < Attr_Spec_Base
   end
 
-  class Attr_Spec_List_Pair < T
-    def dimension?() chkattr(:dimension?) end
-    def private?() chkattr(:private?) end
-    def public?() chkattr(:public?) end
+  class Attr_Spec_List_Pair < Attr_Spec_Base
   end
 
-  class Attr_Spec_List_Pairs < T
-    def dimension?() chkattr(:dimension?) end
-    def private?() chkattr(:private?) end
-    def public?() chkattr(:public?) end
+  class Attr_Spec_List_Pairs < Attr_Spec_Base
   end
 
-  class Attr_Spec_Option < T
-    def dimension?() e1.dimension? end
-    def private?() e1.private? end
-    def public?() e1.public? end
+  class Attr_Spec_Option < Attr_Spec_Base
   end
 
   class Block_Data < Scoping_Unit
