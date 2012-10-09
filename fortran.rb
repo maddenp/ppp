@@ -5,7 +5,7 @@ module Fortran
   @@dolabels=[]
   @@level=0
   @@levelstack=[]
-  @@private=false
+  @@private=nil
   @@uses={}
 
   def attrany(attr)
@@ -43,11 +43,11 @@ module Fortran
   end
 
   def envget(k)
-    @@env[k.to_s]||{}
+    @@env[k]||{}
   end
 
   def envset(k,v)
-    @@env[k.to_s]=v
+    @@env[k]=v
   end
 
   def findabove(node,classes)
@@ -64,7 +64,7 @@ module Fortran
   end
 
   def is_array?(node)
-    varget(node.function_name)[:array]
+    varget(node.function_name)['array']
   end
 
   def lr
@@ -98,24 +98,30 @@ module Fortran
   end
 
   def proc_access_stmt(access_spec,access_stmt_option)
+    p=(access_spec.private?)?(true):(false)
+    if access_stmt_option.is_a?(Access_Stmt_Option)
+      access_stmt_option.names.each { |e| varset(e,'private',p) }
+    else
+      @@private=p
+      varsetall('private',p)
+    end
     true
   end
 
   def proc_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
-    vars=entity_decl_list.vars
-    type=type_spec.type
-    vars.each { |k,v| v[:type]=type }
+    varprops=entity_decl_list.varprops
+    varprops.each { |v,p| p['type']=type_spec.type }
     if attrchk(attr_spec_option,:dimension?)
-      vars.each { |k,v| v[:array]=true }
+      varprops.each { |v,p| p['array']=true }
     end
     if attrchk(attr_spec_option,:private?)
-      vars.each { |k,v| v[:private]=true }
+      varprops.each { |v,p| p['private']=true }
     elsif attrchk(attr_spec_option,:public?)
-      vars.each { |k,v| v[:private]=false }
+      varprops.each { |v,p| p['private']=false }
     else
-      vars.each { |k,v| v[:private]=((@@private)?(true):(false)) }
+      varprops.each { |v,p| p['private']=@@private }
     end
-    vars.each { |k,v| varset(k,v) }
+    varprops.each { |v,p| varinit(v,p) }
     true
   end
 
@@ -224,12 +230,24 @@ module Fortran
     (@@uses[module_name])?(@@uses[module_name].include?(use_name)):(false)
   end
 
-  def varget(k)
-    @@env[:vars][k.to_s]||{}
+  def varget(n)
+    vars[n]||{}
   end
 
-  def varset(k,v)
-    @@env[:vars][k.to_s]=v
+  def varinit(n,props={})
+    vars[n]=props
+  end
+
+  def vars
+    @@env[:vars]
+  end
+
+  def varset(n,k,v)
+    vars[n][k]=v
+  end
+
+  def varsetall(k,v)
+    vars.each { |n,h| varset(n,k,v) }
   end
 
   # Extension of SyntaxNode class
@@ -282,6 +300,14 @@ module Fortran
 
   # Specific Subclasses
 
+  class Access_Id_List < T
+    def names() [e0.name]+e1.elements.inject([]) { |m,e| m.push(e.name) } end
+  end
+
+  class Access_Id_List_Pair < T
+    def name() "#{e1}" end
+  end
+
   class Access_Spec < T
     def private?() "#{e0}"=="private" end
     def public?() "#{e0}"=="public" end
@@ -291,6 +317,7 @@ module Fortran
   end
 
   class Access_Stmt_Option < T
+    def names() e1.names end
     def to_s() "#{mn(e0,'::',' ')}#{e1}" end
   end
 
@@ -448,7 +475,7 @@ module Fortran
 
   class Entity_Decl < T
     def name() "#{e0}" end
-    def props() {:name=>name,:array=>array?} end
+    def props() {name=>{'array'=>array?}} end
   end
 
   class Entity_Decl_1 < Entity_Decl
@@ -463,10 +490,8 @@ module Fortran
   end
 
   class Entity_Decl_List < T
-    def vars
-      x={e0.props[:name]=>e0.props}
-      e1.props.each { |e| x[e[:name]]=e } unless e1.nil?
-      x
+    def varprops
+      e0.props.merge(e1.props)
     end
   end
 
@@ -477,7 +502,7 @@ module Fortran
   end
 
   class Entity_Decl_List_Pairs < T
-    def props() elements.inject([]) { |m,e| m.push(e.props) } end
+    def props() elements.reduce({}) { |m,e| m.merge(e.props) } end
   end
 
   class Entry_Stmt < T
@@ -493,6 +518,7 @@ module Fortran
 
   class Generic_Spec < T
     def localname() usename end
+    def name() usename end
     def usename() "#{e2}" end
   end
 
@@ -563,6 +589,7 @@ module Fortran
   end
 
   class Name < T
+    def name() self.to_s end
   end
 
   class Namelist_Group_Set_Pair < T
@@ -674,31 +701,31 @@ module Fortran
   class SMS_Compare_Var < T
     def to_s() sms("#{e2}") end
   end
-    
+  
   class SMS_Create_Decomp < T
     def to_s() sms(e2.elements.map { |e| e.text_value }.join) end
   end
-    
+  
   class SMS_Distribute_Begin < T
     def to_s() sms("#{e2} #{e3}") end
   end
-    
+  
   class SMS_Distribute_End < T
     def to_s() sms("#{e2}") end
   end
-    
+  
   class SMS_Exchange < T
     def to_s() sms(e2.elements.map { |e| e.text_value }.join) end
   end
-    
+  
   class SMS_Halo_Comp_Begin < T
     def to_s() sms("#{e2} #{e3}") end
   end
-    
+  
   class SMS_Halo_Comp_End < T
     def to_s() sms("#{e2}") end
   end
-    
+  
   class SMS_Ignore_Begin < T
     def to_s() sms("#{e2}") end
   end

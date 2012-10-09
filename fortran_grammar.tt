@@ -37,7 +37,11 @@ grammar Fortran
   end
 
   rule access_id_list
-    access_id ( t_comma access_id )* <T>
+    access_id access_id_pair* <Access_Id_List>
+  end
+
+  rule access_id_pair
+    t_comma access_id <Access_Id_List_Pair>
   end
 
   rule access_spec
