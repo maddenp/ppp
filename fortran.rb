@@ -7,6 +7,14 @@ module Fortran
   @@levelstack=[]
   @@uses={}
 
+  def attrany(attr)
+    elements.reduce(false) { |m,e| m||=attrchk(e,attr) }
+  end
+
+  def attrchk(node,attr)
+    node.respond_to?(attr) && node.send(attr)
+  end
+
   def bb(s)
     @@level+=1
     s
@@ -19,10 +27,6 @@ module Fortran
   def cat(f=nil)
     send(f) unless f.nil?
     self.elements.map { |e| e.to_s }.join
-  end
-
-  def chkattr(attr)
-    elements.reduce(false) { |m,e| m||=(e.respond_to?(attr)&&e.send(attr)) }
   end
 
   def dolabel_dupe?
@@ -134,22 +138,18 @@ module Fortran
   end
 
   def typeinfo(type_spec,attr_spec_option,entity_decl_list)
-    props=entity_decl_list.props
+    vars=entity_decl_list.vars
     type=type_spec.type
-    props.each { |k,v| v[:type]=type }
-    if attr_spec_option.is_a?(Attr_Spec_Option)
-      if attr_spec_option.dimension?
-        props.each { |k,v| v[:array]=true }
-      end
-#     if attr_spec_option.private?
-#       # mark vars explicitly private
-#       puts "HELP 1"; exit 1
-#     elsif attr_spec_option.public?
-#       # mark vars explicitly public
-#       puts "HELP 2"; exit 2
-#     end
+    vars.each { |k,v| v[:type]=type }
+    if attrchk(attr_spec_option,:dimension?)
+      vars.each { |k,v| v[:array]=true }
     end
-    props.each { |k,v| varset(k,v) }
+    if attrchk(attr_spec_option,:private?)
+      vars.each { |k,v| v[:private]=true }
+    elsif attrchk(attr_spec_option,:public?)
+      vars.each { |k,v| v[:private]=false }
+    end
+    vars.each { |k,v| varset(k,v) }
     true
   end
 
@@ -297,9 +297,9 @@ module Fortran
   end
 
   class Attr_Spec_Base < T
-    def dimension?() chkattr(:dimension?) end
-    def private?() chkattr(:private?) end
-    def public?() chkattr(:public?) end
+    def dimension?() attrany(:dimension?) end
+    def private?() attrany(:private?) end
+    def public?() attrany(:public?) end
   end
 
   class Attr_Spec_Dimension < T
@@ -453,7 +453,7 @@ module Fortran
   end
 
   class Entity_Decl_List < T
-    def props
+    def vars
       x={e0.props[:name]=>e0.props}
       e1.props.each { |e| x[e[:name]]=e } unless e1.nil?
       x
@@ -462,7 +462,7 @@ module Fortran
 
   class Entity_Decl_List_Pair < T
     def array?() e1.array? end
-    def name() "#{e1.name}" end
+    def name() e1.name end
     def props() e1.props end
   end
 
