@@ -21,6 +21,10 @@ module Fortran
     self.elements.map { |e| e.to_s }.join
   end
 
+  def chkattr(attr)
+    elements.reduce(false) { |m,e| m||=(e.respond_to?(attr)&&e.send(attr)) }
+  end
+
   def dolabel_dupe?
     "#{@@dolabels[-1]}"=="#{@@dolabels[-2]}"
   end
@@ -297,9 +301,9 @@ module Fortran
   end
 
   class Attr_Spec_List < T
-    def dimension?() elements.reduce(false) { |m,e| m||=(e.respond_to?(:dimension?)&&e.dimension?) } end
-    def private?() elements.reduce(false) { |m,e| m||=(e.respond_to?(:private?)&&e.private?) } end
-    def public?() elements.reduce(false) { |m,e| m||=(e.respond_to?(:public?)&&e.public?) } end
+    def dimension?() chkattr(:dimension?) end
+    def private?() chkattr(:private?) end
+    def public?() chkattr(:public?) end
   end
 
   class Attr_Spec_List_Pair < T
