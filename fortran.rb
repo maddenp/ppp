@@ -64,7 +64,7 @@ module Fortran
   end
 
   def is_array?(node)
-    varget(node.function_name)['array']
+    varget(node.function_name,'array')
   end
 
   def lr
@@ -230,12 +230,13 @@ module Fortran
     (@@uses[module_name])?(@@uses[module_name].include?(use_name)):(false)
   end
 
-  def varget(n)
-    vars[n]||{}
+  def varget(n,k)
+    return nil unless vars["#{n}"]
+    vars["#{n}"]["#{k}"]||nil
   end
 
   def varinit(n,props={})
-    vars[n]=props
+    vars["#{n}"]=props
   end
 
   def vars
@@ -243,7 +244,7 @@ module Fortran
   end
 
   def varset(n,k,v)
-    vars[n][k]=v
+    vars["#{n}"]["#{k}"]=v
   end
 
   def varsetall(k,v)
@@ -589,7 +590,7 @@ module Fortran
   end
 
   class Name < T
-    def name() self.to_s end
+    def name() to_s end
   end
 
   class Namelist_Group_Set_Pair < T
