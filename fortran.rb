@@ -108,6 +108,11 @@ module Fortran
     true
   end
 
+  def proc_end_module_stmt
+    @@private=nil
+    true
+  end
+
   def proc_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
     varprops=entity_decl_list.varprops
     varprops.each { |v,p| p['type']=type_spec.type }

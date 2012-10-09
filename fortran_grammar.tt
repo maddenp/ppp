@@ -1146,7 +1146,7 @@ grammar Fortran
   rule end_module_stmt
     # F90:R1106
 
-    label:label? t_end end_module_option? t_newline <End_Module_Stmt>
+    label:label? t_end end_module_option? t_newline &{ |e| proc_end_module_stmt } <End_Module_Stmt>
   end
 
   rule end_program_stmt
