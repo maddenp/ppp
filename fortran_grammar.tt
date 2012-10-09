@@ -3493,7 +3493,7 @@ grammar Fortran
   end
 
   rule t_private
-    "private" <T>
+    "private" <Access_Spec>
   end
 
   rule t_procedure
@@ -3505,7 +3505,7 @@ grammar Fortran
   end
 
   rule t_public
-    "public" <T>
+    "public" <Access_Spec>
   end
 
   rule t_quotemark

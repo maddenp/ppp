@@ -133,8 +133,17 @@ module Fortran
     props=entity_decl_list.props
     type=type_spec.type
     props.each { |k,v| v[:type]=type }
-    if attr_spec_option.is_a?(Attr_Spec_Option) and attr_spec_option.dimension?
-      props.each { |k,v| v[:array]=true }
+    if attr_spec_option.is_a?(Attr_Spec_Option)
+      if attr_spec_option.dimension?
+        props.each { |k,v| v[:array]=true }
+      end
+#     if attr_spec_option.private?
+#       # mark vars explicitly private
+#       puts "HELP 1"; exit 1
+#     elsif attr_spec_option.public?
+#       # mark vars explicitly public
+#       puts "HELP 2"; exit 2
+#     end
     end
     props.each { |k,v| varset(k,v) }
     true
@@ -262,6 +271,11 @@ module Fortran
 
   # Specific Subclasses
 
+  class Access_Spec < T
+    def private?() "#{e0}"=="private" end
+    def public?() "#{e0}"=="public" end
+  end
+
   class Access_Stmt_Option < T
     def to_s() "#{mn(e0,'::',' ')}#{e1}" end
   end
@@ -279,16 +293,19 @@ module Fortran
   end
 
   class Attr_Spec_Dimension < T
+    def dimension?() true end
   end
 
   class Attr_Spec_List < T
-    def dimension?()
-      e0.is_a?(Attr_Spec_Dimension) or (e1 and e1.dimension?)
-    end
+    def dimension?() elements.reduce(false) { |m,e| m||=(e.respond_to?(:dimension?)&&e.dimension?) } end
+    def private?() elements.reduce(false) { |m,e| m||=(e.respond_to?(:private?)&&e.private?) } end
+    def public?() elements.reduce(false) { |m,e| m||=(e.respond_to?(:public?)&&e.public?) } end
   end
 
   class Attr_Spec_List_Pair < T
     def dimension?() e1.is_a?(Attr_Spec_Dimension) end
+    def private?() nil end
+    def public?() nil end
   end
 
   class Attr_Spec_List_Pairs < T
@@ -296,10 +313,14 @@ module Fortran
       elements.each { |e| return true if e.dimension? }
       false
     end
+    def private?() nil end
+    def public?() nil end
   end
 
   class Attr_Spec_Option < T
     def dimension?() e1.dimension? end
+    def private?() e1.private? end
+    def public?() e1.public? end
   end
 
   class Block_Data < Scoping_Unit
