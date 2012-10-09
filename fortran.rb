@@ -64,7 +64,7 @@ module Fortran
   end
 
   def is_array?(node)
-    varget(node.function_name,'array')
+    vargetprop(node.function_name,'array')
   end
 
   def lr
@@ -100,7 +100,7 @@ module Fortran
   def proc_access_stmt(access_spec,access_stmt_option)
     p=(access_spec.private?)?(true):(false)
     if access_stmt_option.is_a?(Access_Stmt_Option)
-      access_stmt_option.names.each { |e| varset(e,'private',p) }
+      access_stmt_option.names.each { |e| varsetprop(e,'private',p) }
     else
       @@private=p
       varsetall('private',p)
@@ -230,7 +230,7 @@ module Fortran
     (@@uses[module_name])?(@@uses[module_name].include?(use_name)):(false)
   end
 
-  def varget(n,k)
+  def vargetprop(n,k)
     return nil unless vars["#{n}"]
     vars["#{n}"]["#{k}"]||nil
   end
@@ -243,12 +243,12 @@ module Fortran
     @@env[:vars]
   end
 
-  def varset(n,k,v)
+  def varsetprop(n,k,v)
     vars["#{n}"]["#{k}"]=v
   end
 
   def varsetall(k,v)
-    vars.each { |n,h| varset(n,k,v) }
+    vars.each { |n,h| varsetprop(n,k,v) }
   end
 
   # Extension of SyntaxNode class
