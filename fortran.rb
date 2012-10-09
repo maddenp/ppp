@@ -1,6 +1,7 @@
 module Fortran
 
   @@env={}
+  @@env[:vars]={}
   @@dolabels=[]
   @@level=0
   @@levelstack=[]
@@ -54,7 +55,7 @@ module Fortran
   end
 
   def is_array?(node)
-    envget(node.function_name)[:array]
+    varget(node.function_name)[:array]
   end
 
   def lr
@@ -135,7 +136,7 @@ module Fortran
     if attr_spec_option.is_a?(Attr_Spec_Option) and attr_spec_option.dimension?
       props.each { |k,v| v[:array]=true }
     end
-    props.each { |k,v| envset(k,v) }
+    props.each { |k,v| varset(k,v) }
     true
   end
 
@@ -201,6 +202,14 @@ module Fortran
 
   def uses?(module_name,use_name)
     (@@uses[module_name])?(@@uses[module_name].include?(use_name)):(false)
+  end
+
+  def varget(k)
+    @@env[:vars][k.to_s]||{}
+  end
+
+  def varset(k,v)
+    @@env[:vars][k.to_s]=v
   end
 
   # Extension of SyntaxNode class
