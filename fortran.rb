@@ -5,6 +5,7 @@ module Fortran
   @@dolabels=[]
   @@level=0
   @@levelstack=[]
+  @@private=false
   @@uses={}
 
   def attrany(attr)
@@ -96,6 +97,28 @@ module Fortran
     @@dolabels.pop if nonblock_do_end?(node)
   end
 
+  def proc_access_stmt(access_spec,access_stmt_option)
+    true
+  end
+
+  def proc_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
+    vars=entity_decl_list.vars
+    type=type_spec.type
+    vars.each { |k,v| v[:type]=type }
+    if attrchk(attr_spec_option,:dimension?)
+      vars.each { |k,v| v[:array]=true }
+    end
+    if attrchk(attr_spec_option,:private?)
+      vars.each { |k,v| v[:private]=true }
+    elsif attrchk(attr_spec_option,:public?)
+      vars.each { |k,v| v[:private]=false }
+    else
+      vars.each { |k,v| v[:private]=((@@private)?(true):(false)) }
+    end
+    vars.each { |k,v| varset(k,v) }
+    true
+  end
+
   def sa(e)
     (e.to_s=='')?(''):("#{e} ")
   end
@@ -135,22 +158,6 @@ module Fortran
   def translate()
     elements.each { |e| e.translate } unless elements.nil?
     self
-  end
-
-  def typeinfo(type_spec,attr_spec_option,entity_decl_list)
-    vars=entity_decl_list.vars
-    type=type_spec.type
-    vars.each { |k,v| v[:type]=type }
-    if attrchk(attr_spec_option,:dimension?)
-      vars.each { |k,v| v[:array]=true }
-    end
-    if attrchk(attr_spec_option,:private?)
-      vars.each { |k,v| v[:private]=true }
-    elsif attrchk(attr_spec_option,:public?)
-      vars.each { |k,v| v[:private]=false }
-    end
-    vars.each { |k,v| varset(k,v) }
-    true
   end
 
   def use(node,module_name,usenames=[])
@@ -278,6 +285,9 @@ module Fortran
   class Access_Spec < T
     def private?() "#{e0}"=="private" end
     def public?() "#{e0}"=="public" end
+  end
+
+  class Access_Stmt < StmtC
   end
 
   class Access_Stmt_Option < T
