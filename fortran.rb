@@ -8,8 +8,8 @@ module Fortran
   @@levelstack=[]
   @@uses={}
 
-  def attrany(attr)
-    elements.reduce(false) { |m,e| m||=attrchk(e,attr) }
+  def attrany(attr,elements=nil)
+    (elements||self.elements).reduce(false) { |m,e| m||=attrchk(e,attr) }
   end
 
   def attrchk(node,attr)
@@ -64,7 +64,7 @@ module Fortran
   end
 
   def is_array?(node)
-    vargetprop(node.function_name,'array')
+    vargetprop(node.function_name,'rank')=='array'
   end
 
   def lr
@@ -109,12 +109,16 @@ module Fortran
       access_stmt_option.names.each { |e| varsetprop(e,'access',p) }
     else
       @@access=p
-      varsetall('access',p)
+      vars.each do |n,h|
+        varsetprop(n,'access',p) if vargetprop(n,'access')=='default'
+      end
     end
     true
   end
 
-  def proc_end_module_stmt
+  def proc_module(module_stmt)
+    module_name=module_stmt.name
+#   puts YAML.dump(vars)
     @@access='default'
     true
   end
@@ -123,7 +127,7 @@ module Fortran
     varprops=entity_decl_list.varprops
     varprops.each { |v,p| p['type']=type_spec.type }
     if attrchk(attr_spec_option,:dimension?)
-      varprops.each { |v,p| p['array']=true }
+      varprops.each { |v,p| p['rank']='array' }
     end
     if attrchk(attr_spec_option,:private?)
       varprops.each { |v,p| p['access']='private' }
@@ -258,10 +262,6 @@ module Fortran
     vars["#{n}"]["#{k}"]=v
   end
 
-  def varsetall(k,v)
-    vars.each { |n,h| varsetprop(n,k,v) }
-  end
-
   # Extension of SyntaxNode class
 
   class Treetop::Runtime::SyntaxNode
@@ -321,8 +321,8 @@ module Fortran
   end
 
   class Access_Spec < T
-    def private?() "#{e0}"=="private" end
-    def public?() "#{e0}"=="public" end
+    def private?() "#{text_value}"=="private" end
+    def public?() "#{text_value}"=="public" end
   end
 
   class Access_Stmt < StmtC
@@ -362,6 +362,9 @@ module Fortran
   end
 
   class Attr_Spec_List_Pairs < Attr_Spec_Base
+    def dimension?() (e0)?(attrany(:dimension?,e0.elements)):(false) end
+    def private?() (e0)?(attrany(:private?,e0.elements)):(false) end
+    def public?() (e0)?(attrany(:public?,e0.elements)):(false) end
   end
 
   class Attr_Spec_Option < Attr_Spec_Base
@@ -487,7 +490,7 @@ module Fortran
 
   class Entity_Decl < T
     def name() "#{e0}" end
-    def props() {name=>{'array'=>array?}} end
+    def props() {name=>{'rank'=>((array?)?('array'):('scalar'))}} end
   end
 
   class Entity_Decl_1 < Entity_Decl
@@ -495,7 +498,7 @@ module Fortran
   end
 
   class Entity_Decl_2 < Entity_Decl
-    def array?() false end
+    def array?() false end # need to determine array/scalar spec of named function here?
   end
 
   class Entity_Decl_Array_Spec < T
@@ -593,6 +596,7 @@ module Fortran
   end
 
   class Module_Stmt < T
+    def name() "#{e2}" end
     def to_s() bb(stmt(space)) end
   end
 

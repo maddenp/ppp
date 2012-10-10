@@ -5,6 +5,7 @@ module PPP
   require 'fortran_parser'
   require 'normalize'
   require 'normalize_parser'
+  require 'yaml'
 
   include Fortran
 
