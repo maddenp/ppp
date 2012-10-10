@@ -1,11 +1,11 @@
 module Fortran
 
+  @@access='default'
+  @@dolabels=[]
   @@env={}
   @@env[:vars]={}
-  @@dolabels=[]
   @@level=0
   @@levelstack=[]
-  @@private=nil
   @@uses={}
 
   def attrany(attr)
@@ -98,18 +98,24 @@ module Fortran
   end
 
   def proc_access_stmt(access_spec,access_stmt_option)
-    p=(access_spec.private?)?(true):(false)
-    if access_stmt_option.is_a?(Access_Stmt_Option)
-      access_stmt_option.names.each { |e| varsetprop(e,'private',p) }
+    if access_spec.private?
+      p='private'
+    elsif access_spec.public?
+      p='public'
     else
-      @@private=p
-      varsetall('private',p)
+      p='default'
+    end
+    if access_stmt_option.is_a?(Access_Stmt_Option)
+      access_stmt_option.names.each { |e| varsetprop(e,'access',p) }
+    else
+      @@access=p
+      varsetall('access',p)
     end
     true
   end
 
   def proc_end_module_stmt
-    @@private=nil
+    @@access='default'
     true
   end
 
@@ -120,11 +126,11 @@ module Fortran
       varprops.each { |v,p| p['array']=true }
     end
     if attrchk(attr_spec_option,:private?)
-      varprops.each { |v,p| p['private']=true }
+      varprops.each { |v,p| p['access']='private' }
     elsif attrchk(attr_spec_option,:public?)
-      varprops.each { |v,p| p['private']=false }
+      varprops.each { |v,p| p['access']='public' }
     else
-      varprops.each { |v,p| p['private']=@@private }
+      varprops.each { |v,p| p['access']=@@access }
     end
     varprops.each { |v,p| varinit(v,p) }
     true
