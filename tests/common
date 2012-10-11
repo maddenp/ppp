@@ -22,7 +22,7 @@ default:
 bin: $(BIN)
 
 clean:
-	$(RM) $(BIN) $(TMPFILE) $(TRANSLATION) *.mod
+	$(RM) $(BIN) $(TMPFILE) $(TRANSLATION) *.mod *.sms
 
 control: $(TEST)
 ifdef MAKE_CONTROL_DISABLED

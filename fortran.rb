@@ -118,7 +118,7 @@ module Fortran
 
   def proc_module(module_stmt)
     module_name=module_stmt.name
-#   puts YAML.dump(vars)
+    File.open("#{module_name}.sms",'w') { |f| f.write(YAML.dump(vars)) }
     @@access='default'
     true
   end
