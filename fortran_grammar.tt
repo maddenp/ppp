@@ -393,7 +393,7 @@ grammar Fortran
   rule block_data_stmt
     # F90:R1111
 
-    label:label? t_block t_data block_data_name? t_newline <Block_Data_Stmt>
+    label:label? t_block t_data block_data_name? t_newline &{ |e| proc_block_data_stmt } <Block_Data_Stmt>
   end
 
   rule block_do_construct
@@ -1097,7 +1097,7 @@ grammar Fortran
   rule end_block_data_stmt
     # F90:R1112
 
-    label:label? t_end end_block_data_option? t_newline <End_Block_Data_Stmt>
+    label:label? t_end end_block_data_option? t_newline &{ |e| proc_end_block_data_stmt } <End_Block_Data_Stmt>
   end
 
   rule end_do
@@ -1124,7 +1124,7 @@ grammar Fortran
   rule end_function_stmt
     # F90:R1218
 
-    label:label? t_end end_function_option? t_newline <End_Function_Stmt>
+    label:label? t_end end_function_option? t_newline &{ |e| proc_end_function_stmt } <End_Function_Stmt>
   end
 
   rule end_if_stmt
@@ -1174,7 +1174,7 @@ grammar Fortran
   rule end_subroutine_stmt
     # F90:R1222
 
-    label:label? t_end end_subroutine_option? t_newline <End_Subroutine_Stmt>
+    label:label? t_end end_subroutine_option? t_newline &{ |e| proc_end_subroutine_stmt } <End_Subroutine_Stmt>
   end
 
   rule end_subroutine_option
@@ -1448,7 +1448,7 @@ grammar Fortran
   rule function_stmt
     # F90:R1216
 
-    label:label? prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r result_option? t_newline <Function_Stmt>
+    label:label? prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r result_option? t_newline &{ |e| proc_function_stmt } <Function_Stmt>
   end
 
   rule function_subprogram
@@ -3030,7 +3030,7 @@ grammar Fortran
   rule subroutine_stmt
     # F90:R1220
 
-    label:label? t_recursive? t_subroutine subroutine_name dummy_arg_list_option? t_newline <Subroutine_Stmt>
+    label:label? t_recursive? t_subroutine subroutine_name dummy_arg_list_option? t_newline &{ |e| proc_subroutine_stmt } <Subroutine_Stmt>
   end
 
   rule subroutine_subprogram

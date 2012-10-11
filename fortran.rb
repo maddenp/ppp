@@ -127,12 +127,27 @@ module Fortran
     true
   end
 
+  def proc_end_block_data_stmt
+    envpop
+    true
+  end
+
+  def proc_end_function_stmt
+    envpop
+    true
+  end
+
   def proc_end_module_stmt
     envpop
     true
   end
 
   def proc_end_program_stmt
+    envpop
+    true
+  end
+
+  def proc_end_subroutine_stmt
     envpop
     true
   end
@@ -144,12 +159,27 @@ module Fortran
     true
   end
 
+  def proc_block_data_stmt
+    envpush
+    true
+  end
+
+  def proc_function_stmt
+    envpush
+    true
+  end
+
   def proc_module_stmt
     envpush
     true
   end
 
   def proc_program_stmt
+    envpush
+    true
+  end
+
+  def proc_subroutine_stmt
     envpush
     true
   end
