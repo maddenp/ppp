@@ -256,15 +256,15 @@ grammar Fortran
   end
 
   rule array_name_and_spec
-    array_name t_paren_l array_spec t_paren_r <E>
+    array_name t_paren_l array_spec t_paren_r <Array_Name_And_Spec>
   end
 
   rule array_name_and_spec_pair
-    t_comma array_name_and_spec <E>
+    t_comma array_name_and_spec <Array_Name_And_Spec_Pair>
   end
 
   rule array_names_and_specs
-    array_name_and_spec array_name_and_spec_pair* <T>
+    array_name_and_spec array_name_and_spec_pair* <Array_Names_And_Specs>
   end
 
   rule array_section
@@ -936,7 +936,7 @@ grammar Fortran
   rule dimension_stmt
     # F90:R525
 
-    label:label? t_dimension double_colon? array_names_and_specs t_newline <Dimension_Stmt>
+    label:label? t_dimension double_colon? array_names_and_specs t_newline &{ |e| proc_dimension_stmt(e[3]) } <Dimension_Stmt>
   end
 
   rule directive

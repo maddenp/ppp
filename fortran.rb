@@ -127,6 +127,11 @@ module Fortran
     true
   end
 
+  def proc_dimension_stmt(array_names_and_specs)
+    array_names_and_specs.names.each { |x| varsetprop(x,'rank','array') }
+    true
+  end
+
   def proc_end_block_data_stmt
     envpop
     true
@@ -393,6 +398,18 @@ module Fortran
 
   class Arithmetic_If_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}#{e[6]}#{e[7]}#{e[8]}#{e[9]}") end
+  end
+
+  class Array_Name_And_Spec < E
+    def name() "#{e[0]}" end
+  end
+
+  class Array_Name_And_Spec_Pair < E
+    def name() e[1].name end
+  end
+
+  class Array_Names_And_Specs < T
+    def names() [e[0].name]+e[1].e.inject([]) { |m,x| m.push(x.name) } end
   end
 
   class Assigned_Goto_Stmt < T
