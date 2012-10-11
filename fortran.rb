@@ -8,8 +8,8 @@ module Fortran
   @@levelstack=[]
   @@uses={}
 
-  def attrany(attr,elements=nil)
-    (elements||self.elements).reduce(false) { |m,e| m||=attrchk(e,attr) }
+  def attrany(attr,e=nil)
+    (e||self.e).reduce(false) { |m,x| m||=attrchk(x,attr) }
   end
 
   def attrchk(node,attr)
@@ -27,7 +27,7 @@ module Fortran
 
   def cat(f=nil)
     send(f) unless f.nil?
-    self.elements.map { |e| e.to_s }.join
+    self.e.map { |x| x.to_s }.join
   end
 
   def dolabel_dupe?
@@ -153,31 +153,31 @@ module Fortran
   end
 
   def sms(s)
-    "#{e0}#{e1} "+s+"\n"
+    "#{e[0]}#{e[1]} "+s+"\n"
   end
 
-  def space(x=nil)
-    a=(x.nil?)?(self.elements[1..-1]):(self.elements)
-    a.map { |e| e.to_s }.join(' ').strip
+  def space(all=false)
+    a=(all)?(self.e):(self.e[1..-1])
+    a.map { |x| x.to_s }.join(' ').strip
   end
 
   def specification_part(node)
-    scoping_unit(node).e1
+    scoping_unit(node).e[1]
   end
 
   def stmt(s,f=nil)
     send(f) unless f.nil?
-    indent(("#{sa(e0)}"+s.chomp).strip)+"\n"
+    indent(("#{sa(e[0])}"+s.chomp).strip)+"\n"
   end
 
   def sub(tree)
     tree.parent=parent
-    block=parent.elements
+    block=parent.e
     block[block.index(self)]=tree
   end
 
   def translate()
-    elements.each { |e| e.translate } unless elements.nil?
+    e.each { |x| x.translate } unless e.nil?
     self
   end
 
@@ -200,7 +200,7 @@ module Fortran
         p=use_part(node)
         t=tree(code,:use_stmt)
         t.parent=p
-        p.elements.push(t)
+        p.e.push(t)
       end
     end
   end
@@ -218,7 +218,7 @@ module Fortran
   end
 
   def use_part(node)
-    specification_part(node).e0
+    specification_part(node).e[0]
   end
 
   def use_update_1(module_name,rename_list_option)
@@ -267,21 +267,9 @@ module Fortran
 
   class Treetop::Runtime::SyntaxNode
 
-    def to_s() '' end
+    alias e elements
 
-    def method_missing(m,*a)
-      if m=~/e(\d+)/
-        elements[$~[1].to_i]
-      else
-        puts "\nERROR: "+s+"\n\nbacktrace:\n\n"
-        begin
-          raise
-        rescue => e
-          puts e.backtrace
-        end
-        fail "method_missing cannot find method '#{m}'"
-      end
-    end
+    def to_s() '' end
 
   end
 
@@ -297,14 +285,14 @@ module Fortran
   end
 
   class J < T
-    def to_s() space(:all) end
+    def to_s() space(true) end
   end
 
   class Scoping_Unit < E
   end
 
   class StmtC < T
-    def to_s() stmt(elements[1..-1].map { |e| e.to_s }.join) end
+    def to_s() stmt(e[1..-1].map { |x| x.to_s }.join) end
   end
 
   class StmtJ < T
@@ -314,11 +302,11 @@ module Fortran
   # Specific Subclasses
 
   class Access_Id_List < T
-    def names() [e0.name]+e1.elements.inject([]) { |m,e| m.push(e.name) } end
+    def names() [e[0].name]+e[1].e.inject([]) { |m,x| m.push(x.name) } end
   end
 
   class Access_Id_List_Pair < T
-    def name() "#{e1}" end
+    def name() "#{e[1]}" end
   end
 
   class Access_Spec < T
@@ -330,20 +318,20 @@ module Fortran
   end
 
   class Access_Stmt_Option < T
-    def names() e1.names end
-    def to_s() "#{mn(e0,'::',' ')}#{e1}" end
+    def names() e[1].names end
+    def to_s() "#{mn(e[0],'::',' ')}#{e[1]}" end
   end
 
   class Allocatable_Stmt < T
-    def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
+    def to_s() stmt("#{e[1]}#{mp(e[2],'',' ')}#{e[3]}") end
   end
 
   class Arithmetic_If_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{e3}#{e4} #{e5}#{e6}#{e7}#{e8}#{e9}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}#{e[6]}#{e[7]}#{e[8]}#{e[9]}") end
   end
 
   class Assigned_Goto_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{mn(e3,',',' '+e3.to_s)}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{mn(e[3],',',' '+e[3].to_s)}") end
   end
 
   class Attr_Spec_Base < T
@@ -363,9 +351,9 @@ module Fortran
   end
 
   class Attr_Spec_List_Pairs < Attr_Spec_Base
-    def dimension?() (e0)?(attrany(:dimension?,e0.elements)):(false) end
-    def private?() (e0)?(attrany(:private?,e0.elements)):(false) end
-    def public?() (e0)?(attrany(:public?,e0.elements)):(false) end
+    def dimension?() (e[0])?(attrany(:dimension?,e[0].e)):(false) end
+    def private?() (e[0])?(attrany(:private?,e[0].e)):(false) end
+    def public?() (e[0])?(attrany(:public?,e[0].e)):(false) end
   end
 
   class Attr_Spec_Option < Attr_Spec_Base
@@ -379,7 +367,7 @@ module Fortran
   end
 
   class Call_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{e3}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
   end
 
   class Case_Stmt < T
@@ -387,19 +375,19 @@ module Fortran
   end
 
   class Common_Block_Name_And_Object_List < T
-    def to_s() "#{mp(e0,'',' ')}#{e1}#{e2}" end
+    def to_s() "#{mp(e[0],'',' ')}#{e[1]}#{e[2]}" end
   end
 
   class Common_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{e3}#{e4}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
   end
 
   class Component_Def_Stmt < T
-    def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
+    def to_s() stmt("#{e[1]}#{mp(e[2],'',' ')}#{e[3]}") end
   end
 
   class Computed_Goto_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{mp(e5,'',' ')}#{e6}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{mp(e[5],'',' ')}#{e[6]}") end
   end
 
   class Contains_Stmt < T
@@ -407,11 +395,11 @@ module Fortran
   end
 
   class Derived_Type_Stmt < T
-    def to_s() bb(stmt("#{e1}#{sb(e2)} #{e3}")) end
+    def to_s() bb(stmt("#{e[1]}#{sb(e[2])} #{e[3]}")) end
   end
 
   class Dimension_Stmt < T
-    def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
+    def to_s() stmt("#{e[1]}#{mp(e[2],'',' ')}#{e[3]}") end
   end
 
   class Do_Term_Action_Stmt < T
@@ -426,7 +414,7 @@ module Fortran
   end
 
   class Else_If_Stmt < T
-    def to_s() bb(stmt("#{e1} #{e2}#{e3}#{e4} #{e5}",:be)) end
+    def to_s() bb(stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}",:be)) end
   end
 
   class Else_Stmt < T
@@ -438,7 +426,7 @@ module Fortran
   end
 
   class End_Block_Data_Option < T
-    def to_s() space(:all) end
+    def to_s() space(true) end
   end
 
   class End_Block_Data_Stmt < T
@@ -462,7 +450,7 @@ module Fortran
   end
 
   class End_Module_Option < T
-    def to_s() space(:all) end
+    def to_s() space(true) end
   end
 
   class End_Module_Stmt < T
@@ -470,7 +458,7 @@ module Fortran
   end
 
   class End_Program_Stmt < T
-    def to_s() stmt("#{e1}#{sb(e3)}#{sb(e4)}",:be) end
+    def to_s() stmt("#{e[1]}#{sb(e[3])}#{sb(e[4])}",:be) end
   end
 
   class End_Select_Stmt < T
@@ -490,12 +478,12 @@ module Fortran
   end
 
   class Entity_Decl < T
-    def name() "#{e0}" end
+    def name() "#{e[0]}" end
     def props() {name=>{'rank'=>((array?)?('array'):('scalar'))}} end
   end
 
   class Entity_Decl_1 < Entity_Decl
-    def array?() e1.is_a?(Entity_Decl_Array_Spec) end
+    def array?() e[1].is_a?(Entity_Decl_Array_Spec) end
   end
 
   class Entity_Decl_2 < Entity_Decl
@@ -507,26 +495,26 @@ module Fortran
 
   class Entity_Decl_List < T
     def varprops
-      e0.props.merge(e1.props)
+      e[0].props.merge(e[1].props)
     end
   end
 
   class Entity_Decl_List_Pair < T
-    def array?() e1.array? end
-    def name() e1.name end
-    def props() e1.props end
+    def array?() e[1].array? end
+    def name() e[1].name end
+    def props() e[1].props end
   end
 
   class Entity_Decl_List_Pairs < T
-    def props() elements.reduce({}) { |m,e| m.merge(e.props) } end
+    def props() e.reduce({}) { |m,x| m.merge(x.props) } end
   end
 
   class Entry_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{e3}#{sb(e4)}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{sb(e[4])}") end
   end
 
   class Function_Stmt < T
-    def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}#{e5}#{e6}#{sb(e7)}")) end
+    def to_s() bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")) end
   end
 
   class Function_Subprogram < Scoping_Unit
@@ -535,15 +523,15 @@ module Fortran
   class Generic_Spec < T
     def localname() usename end
     def name() usename end
-    def usename() "#{e2}" end
+    def usename() "#{e[2]}" end
   end
 
   class If_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{e3}#{e4} #{e5.to_s.strip}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5].to_s.strip}") end
   end
 
   class If_Then_Stmt < T
-    def to_s() bb(stmt("#{e1} #{e2} #{e3}#{e4}#{e5} #{e6}")) end
+    def to_s() bb(stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")) end
   end
 
   class Implicit_None_Stmt < E
@@ -559,7 +547,7 @@ module Fortran
   end
 
   class Intent_Stmt < T
-    def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{mn(e5,'::',' ')}#{e6}") end
+    def to_s() stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{mn(e[5],'::',' ')}#{e[6]}") end
   end
 
   class Interface_Body < E
@@ -576,18 +564,18 @@ module Fortran
   end
 
   class Label_Do_Stmt < T
-    def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}")) end
+    def to_s() bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")) end
   end
 
   class Loop_Control < T
   end
 
   class Loop_Control_1 < Loop_Control
-    def to_s() "#{mp(e0,'',' ')}#{e1}#{e2}#{e3}#{e4}#{e5}" end
+    def to_s() "#{mp(e[0],'',' ')}#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{e[5]}" end
   end
 
   class Loop_Control_2 < Loop_Control
-    def to_s() "#{mp(e0,'',' ')}#{e1} #{e2}#{e3}#{e4}" end
+    def to_s() "#{mp(e[0],'',' ')}#{e[1]} #{e[2]}#{e[3]}#{e[4]}" end
   end
 
   class Main_Program < Scoping_Unit
@@ -597,12 +585,12 @@ module Fortran
   end
 
   class Module_Stmt < T
-    def name() "#{e2}" end
+    def name() "#{e[2]}" end
     def to_s() bb(stmt(space)) end
   end
 
   class Module_Subprogram_Part < T
-    def to_s() "#{e0}#{elements[1].elements.reduce('') { |m,e| m+="#{e}" }}" end
+    def to_s() "#{e[0]}#{e[1].e.reduce('') { |m,x| m+="#{x}" } }" end
   end
 
   class Name < T
@@ -610,46 +598,46 @@ module Fortran
   end
 
   class Namelist_Group_Set_Pair < T
-    def to_s() "#{mp(e0,'',' ')}#{e1}" end
+    def to_s() "#{mp(e[0],'',' ')}#{e[1]}" end
   end
 
   class Namelist_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{e3}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
   end
 
   class Nonlabel_Do_Stmt < T
-    def to_s() bb(stmt("#{sa(e1)}#{e2}#{e3}")) end
+    def to_s() bb(stmt("#{sa(e[1])}#{e[2]}#{e[3]}")) end
   end
 
   class Only < E
-    def localname() (e0.is_a?(Only_Option))?(e0.localname):(usename) end
-    def usename() "#{e1}" end
+    def localname() (e[0].is_a?(Only_Option))?(e[0].localname):(usename) end
+    def usename() "#{e[1]}" end
   end
 
   class Only_List < T
-    def localnames() e1.elements.reduce([e0.localname]) { |m,e| m.push(e.localname) } end
-    def usenames() e1.elements.reduce([e0.usename]) { |m,e| m.push(e.usename) } end
+    def localnames() e[1].e.reduce([e[0].localname]) { |m,x| m.push(x.localname) } end
+    def usenames() e[1].e.reduce([e[0].usename]) { |m,x| m.push(x.usename) } end
   end
 
   class Only_List_Pair < T
-    def localname() e1.localname end
-    def usename() e1.usename end
+    def localname() e[1].localname end
+    def usename() e[1].usename end
   end
 
   class Only_Option < T
-    def localname() "#{e0}" end
+    def localname() "#{e[0]}" end
   end
 
   class Optional_Stmt < T
-    def to_s() stmt("#{e1}#{mn(e2,'::',' ')}#{e3}") end
+    def to_s() stmt("#{e[1]}#{mn(e[2],'::',' ')}#{e[3]}") end
   end
 
   class Pointer_Stmt < T
-    def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
+    def to_s() stmt("#{e[1]}#{mp(e[2],'',' ')}#{e[3]}") end
   end
 
   class Print_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{e3}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
   end
 
   class Program_Stmt < T
@@ -657,50 +645,50 @@ module Fortran
   end
 
   class Program_Units < T
-    def to_s() elements.reduce('') { |m,e| m+="#{e}\n" }.chomp end
+    def to_s() e.reduce('') { |m,x| m+="#{x}\n" }.chomp end
   end
 
   class Read_Stmt < T
   end
 
   class Read_Stmt_1 < Read_Stmt
-    def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5)}") end
+    def to_s() stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
   end
 
   class Read_Stmt_2 < Read_Stmt
-    def to_s() stmt("#{e1} #{e2}#{e3}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
   end
 
   class Rename < E
-    def localname() "#{e0}" end
-    def usename() "#{e2}" end
+    def localname() "#{e[0]}" end
+    def usename() "#{e[2]}" end
   end
 
   class Rename_List < E
-    def localnames() e1.elements.reduce([e0.localname]) { |m,e| m.push(e.localname) } end
-    def usenames() e1.elements.reduce([e0.usename]) { |m,e| m.push(e.usename) } end
+    def localnames() e[1].e.reduce([e[0].localname]) { |m,x| m.push(x.localname) } end
+    def usenames() e[1].e.reduce([e[0].usename]) { |m,x| m.push(x.usename) } end
   end
 
   class Rename_List_Pair < E
-    def localname() e1.localname end
-    def usename() e1.usename end
+    def localname() e[1].localname end
+    def usename() e[1].usename end
   end
 
   class Rename_List_Option < T
-    def localnames() e1.localnames end
-    def usenames() e1.usenames end
+    def localnames() e[1].localnames end
+    def usenames() e[1].usenames end
   end
 
   class Save_Stmt < T
-    def to_s() stmt("#{e1}#{e2}") end
+    def to_s() stmt("#{e[1]}#{e[2]}") end
   end
 
   class Save_Stmt_Entity_List < T
-    def to_s() "#{mp(e0,'',' ')}#{e1}" end
+    def to_s() "#{mp(e[0],'',' ')}#{e[1]}" end
   end
 
   class Select_Case_Stmt < T
-    def to_s() bb(bb(stmt("#{sa(e1)}#{e2} #{e3} #{e4}#{e5}#{e6}",:ls))) end
+    def to_s() bb(bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]} #{e[4]}#{e[5]}#{e[6]}",:ls))) end
   end
 
   class Specification_Part < E
@@ -716,75 +704,75 @@ module Fortran
   end
 
   class SMS_Compare_Var < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms("#{e[2]}") end
   end
   
   class SMS_Create_Decomp < T
-    def to_s() sms(e2.elements.map { |e| e.text_value }.join) end
+    def to_s() sms(e[2].e.map { |x| x.text_value }.join) end
   end
   
   class SMS_Distribute_Begin < T
-    def to_s() sms("#{e2} #{e3}") end
+    def to_s() sms("#{e[2]} #{e[3]}") end
   end
   
   class SMS_Distribute_End < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms("#{e[2]}") end
   end
   
   class SMS_Exchange < T
-    def to_s() sms(e2.elements.map { |e| e.text_value }.join) end
+    def to_s() sms(e[2].e.map { |x| x.text_value }.join) end
   end
   
   class SMS_Halo_Comp_Begin < T
-    def to_s() sms("#{e2} #{e3}") end
+    def to_s() sms("#{e[2]} #{e[3]}") end
   end
   
   class SMS_Halo_Comp_End < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms("#{e[2]}") end
   end
   
   class SMS_Ignore_Begin < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms("#{e[2]}") end
   end
 
   class SMS_Ignore_End < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms("#{e[2]}") end
   end
 
   class SMS_Parallel_Begin < T
-    def to_s() sms("#{e2} #{e3}") end
+    def to_s() sms("#{e[2]} #{e[3]}") end
   end
 
   class SMS_Parallel_End < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms("#{e[2]}") end
   end
 
   class SMS_Reduce < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms("#{e[2]}") end
   end
 
   class SMS_Serial_Begin < T
-    def to_s() sms("#{sa(e2)}#{e3}") end
+    def to_s() sms("#{sa(e[2])}#{e[3]}") end
   end
 
   class SMS_Serial_End < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms("#{e[2]}") end
   end
 
   class SMS_Set_Communicator < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms("#{e[2]}") end
   end
 
   class SMS_To_Local_Begin < T
-    def to_s() sms("#{e2} #{e3}") end
+    def to_s() sms("#{e[2]} #{e[3]}") end
   end
 
   class SMS_To_Local_End < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms("#{e[2]}") end
   end
 
   class SMS_Unstructured_Grid < T
-    def to_s() sms("#{e2}") end
+    def to_s() sms("#{e[2]}") end
   end
 
   ## SMS ##
@@ -793,51 +781,51 @@ module Fortran
   end
 
   class Subroutine_Stmt < T
-    def to_s() bb(stmt("#{sa(e1)}#{e2} #{e3}#{e4}")) end
+    def to_s() bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")) end
   end
 
   class Target_Stmt < T
-    def to_s() stmt("#{e1}#{mp(e2,'',' ')}#{e3}") end
+    def to_s() stmt("#{e[1]}#{mp(e[2],'',' ')}#{e[3]}") end
   end
 
   class Type_Declaration_Stmt < T
-    def to_s() stmt("#{e1}#{mp(e2,'',mn(e1,',',' '))}#{e3}") end
+    def to_s() stmt("#{e[1]}#{mp(e[2],'',mn(e[1],',',' '))}#{e[3]}") end
   end
 
   class Type_Spec < E
-    def derived?() "#{e0}"=="type" end
-    def type() (derived?)?("#{e2}"):("#{e0}") end
+    def derived?() "#{e[0]}"=="type" end
+    def type() (derived?)?("#{e[2]}"):("#{e[0]}") end
   end
 
   class Use_Part < E
   end
 
   class Use_Stmt < T
-    def modulename() "#{e2}" end
+    def modulename() "#{e[2]}" end
   end
 
   class Use_Stmt_1 < Use_Stmt
-    def localnames() e3.localnames end
-    def to_s() stmt("#{e1} #{e2}#{e3}") end
-    def usenames() e3.usenames end
+    def localnames() e[3].localnames end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
+    def usenames() e[3].usenames end
   end
 
   class Use_Stmt_2 < Use_Stmt
-    def localnames() e6.localnames end
-    def to_s() stmt("#{e1} #{e2}#{e3}#{e4}#{e5}#{e6}") end
-    def usenames() e6.usenames end
+    def localnames() e[6].localnames end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}") end
+    def usenames() e[6].usenames end
   end
 
   class Where_Construct_Stmt < T
-    def to_s() bb(stmt("#{e1} #{e2}#{e3}#{e4}")) end
+    def to_s() bb(stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")) end
   end
 
   class Where_Stmt < T
-    def to_s() stmt("#{e1} #{e2}#{e3}#{e4} #{e6.to_s.strip}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[6].to_s.strip}") end
   end
 
   class Write_Stmt < T
-    def to_s() stmt("#{e1}#{e2}#{e3}#{e4}#{sb(e5)}") end
+    def to_s() stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
   end
 
 end
