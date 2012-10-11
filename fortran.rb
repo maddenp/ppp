@@ -2,7 +2,7 @@ module Fortran
 
   @@access='default'
   @@dolabels=[]
-  @@envstack=[{}]
+  @@envstack=[]
   @@level=0
   @@levelstack=[]
   @@uses={}
@@ -54,7 +54,7 @@ module Fortran
   end
 
   def envpush
-    @@envstack.push(env)
+    @@envstack.push((env.nil?)?({}):(env.dup))
   end
 
   def envset(k,v)
@@ -138,7 +138,9 @@ module Fortran
   end
 
   def proc_end_module_stmt
+#puts "### end module";p @@envstack #PM#
     envpop
+#p @@envstack #PM#
     true
   end
 
@@ -148,7 +150,9 @@ module Fortran
   end
 
   def proc_end_subroutine_stmt
+#puts "### end subroutine";p @@envstack #PM#
     envpop
+#p @@envstack #PM#
     true
   end
 
@@ -170,7 +174,9 @@ module Fortran
   end
 
   def proc_module_stmt
+#puts "### module";p @@envstack #PM#
     envpush
+#p @@envstack #PM#
     true
   end
 
@@ -180,7 +186,9 @@ module Fortran
   end
 
   def proc_subroutine_stmt
+#puts "### subroutine";p @@envstack #PM#
     envpush
+#p @@envstack #PM#
     true
   end
 
