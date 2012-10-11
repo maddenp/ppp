@@ -2,8 +2,7 @@ module Fortran
 
   @@access='default'
   @@dolabels=[]
-  @@env={}
-  @@env[:vars]={}
+  @@envstack=[{}]
   @@level=0
   @@levelstack=[]
   @@uses={}
@@ -42,12 +41,22 @@ module Fortran
     @@dolabels.push(label)
   end
 
+  def env
+    @@envstack.last
+  end
+
   def envget(k)
-    @@env[k]||{}
+    env[k]||{}
+  end
+
+  def envpop
+  end
+
+  def envpush
   end
 
   def envset(k,v)
-    @@env[k]=v
+    env[k]=v
   end
 
   def findabove(node,classes)
@@ -109,7 +118,7 @@ module Fortran
       access_stmt_option.names.each { |x| varsetprop(x,'access',p) }
     else
       @@access=p
-      vars.each do |n,h|
+      env.each do |n,h|
         varsetprop(n,'access',p) if vargetprop(n,'access')=='default'
       end
     end
@@ -118,7 +127,7 @@ module Fortran
 
   def proc_module(module_stmt)
     module_name=module_stmt.name
-    File.open("#{module_name}.sms",'w') { |f| f.write(YAML.dump(vars)) }
+    File.open("#{module_name}.sms",'w') { |f| f.write(YAML.dump(env)) }
     @@access='default'
     true
   end
@@ -246,21 +255,17 @@ module Fortran
   end
 
   def vargetprop(n,k)
-    return nil unless vars["#{n}"]
-    vars["#{n}"]["#{k}"]||nil
+    return nil unless env["#{n}"]
+    env["#{n}"]["#{k}"]||nil
   end
 
   def varinit(n,props={})
-    vars["#{n}"]=props
-  end
-
-  def vars
-    @@env[:vars]
+    env["#{n}"]=props
   end
 
   def varsetprop(n,k,v)
-    vars["#{n}"]||={}
-    vars["#{n}"]["#{k}"]=v
+    env["#{n}"]||={}
+    env["#{n}"]["#{k}"]=v
   end
 
   # Extension of SyntaxNode class
