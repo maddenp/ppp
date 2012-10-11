@@ -50,9 +50,11 @@ module Fortran
   end
 
   def envpop
+    @@envstack.pop
   end
 
   def envpush
+    @@envstack.push(env)
   end
 
   def envset(k,v)
@@ -125,10 +127,30 @@ module Fortran
     true
   end
 
+  def proc_end_module_stmt
+    envpop
+    true
+  end
+
+  def proc_end_program_stmt
+    envpop
+    true
+  end
+
   def proc_module(module_stmt)
     module_name=module_stmt.name
     File.open("#{module_name}.sms",'w') { |f| f.write(YAML.dump(env)) }
     @@access='default'
+    true
+  end
+
+  def proc_module_stmt
+    envpush
+    true
+  end
+
+  def proc_program_stmt
+    envpush
     true
   end
 

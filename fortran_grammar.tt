@@ -1146,13 +1146,13 @@ grammar Fortran
   rule end_module_stmt
     # F90:R1106
 
-    label:label? t_end end_module_option? t_newline <End_Module_Stmt>
+    label:label? t_end end_module_option? t_newline &{ |e| proc_end_module_stmt } <End_Module_Stmt>
   end
 
   rule end_program_stmt
     # F90:R1103
 
-    label:label? t_end !end_program_stmt_disallowed t_program? program_name? t_newline? <End_Program_Stmt>
+    label:label? t_end !end_program_stmt_disallowed t_program? program_name? t_newline? &{ |e| proc_end_program_stmt } <End_Program_Stmt>
   end
 
   rule end_program_stmt_disallowed
@@ -2056,7 +2056,7 @@ grammar Fortran
   rule module_stmt
     # F90:R1105
 
-    label:label? t_module module_name t_newline <Module_Stmt>
+    label:label? t_module module_name t_newline &{ |e| proc_module_stmt } <Module_Stmt>
   end
 
   rule mult_op
@@ -2404,7 +2404,7 @@ grammar Fortran
   rule program_stmt
     # F90:R1102
 
-    label:label? t_program program_name t_newline <Program_Stmt>
+    label:label? t_program program_name t_newline &{ |e| proc_program_stmt } <Program_Stmt>
   end
 
   rule program_unit
