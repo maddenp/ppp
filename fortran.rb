@@ -259,6 +259,7 @@ module Fortran
   end
 
   def varsetprop(n,k,v)
+    vars["#{n}"]||={}
     vars["#{n}"]["#{k}"]=v
   end
 
