@@ -53,7 +53,7 @@ module Fortran
   def findabove(node,classes)
     n=node
     while p=n.parent
-      return p if classes.any? { |e| p.is_a?(e) }
+      return p if classes.any? { |x| p.is_a?(x) }
       n=p
     end
     nil
@@ -106,7 +106,7 @@ module Fortran
       p='default'
     end
     if access_stmt_option.is_a?(Access_Stmt_Option)
-      access_stmt_option.names.each { |e| varsetprop(e,'access',p) }
+      access_stmt_option.names.each { |x| varsetprop(x,'access',p) }
     else
       @@access=p
       vars.each do |n,h|
@@ -186,10 +186,10 @@ module Fortran
       code="use #{module_name}"
       unless usenames.empty?
         list=[]
-        usenames.each do |e|
-          h=e.is_a?(Hash)
-          localname=(h)?(e.keys.first):(nil)
-          usename=(h)?(e.values.first):(e)
+        usenames.each do |x|
+          h=x.is_a?(Hash)
+          localname=(h)?(x.keys.first):(nil)
+          usename=(h)?(x.values.first):(x)
           unless uses?(module_name,usename)
             list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
           end
@@ -210,8 +210,8 @@ module Fortran
       @@uses[module_name]=use_names
     else
       unless uses?(module_name,:all)
-        use_names.each do |e|
-          @@uses[module_name].push(e) unless uses?(module_name,e)
+        use_names.each do |x|
+          @@uses[module_name].push(x) unless uses?(module_name,x)
         end
       end
     end
