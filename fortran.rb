@@ -51,6 +51,7 @@ module Fortran
 
   def envpop
     @@envstack.pop
+    @@envstack=[{}] if @@envstack.empty?
   end
 
   def envpush
