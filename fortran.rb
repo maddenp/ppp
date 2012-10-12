@@ -2,7 +2,7 @@ module Fortran
 
   @@access='default'
   @@dolabels=[]
-  @@envstack=[]
+  @@envstack=[{}]
   @@level=0
   @@levelstack=[]
   @@uses={}
@@ -54,7 +54,7 @@ module Fortran
   end
 
   def envpush
-    @@envstack.push((env.nil?)?({}):(env.dup))
+    @@envstack.push(env.dup)
   end
 
   def envset(k,v)
@@ -198,7 +198,6 @@ module Fortran
   end
 
   def proc_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
-    return false if env.nil?
     varprops=entity_decl_list.varprops
     varprops.each { |v,p| p['type']=type_spec.type }
     if attrchk(attr_spec_option,:dimension?)

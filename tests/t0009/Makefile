@@ -1,2 +1,2 @@
-MAKE_CONTROL_DISABLED=1
+DISABLE_CONTROL=1
 include ../common

@@ -27,16 +27,20 @@ end
 def test(t)
   print '.'
   exe("make -C #{t} clean")
-  exe("make -C #{t} bin")
-  stdout=exe("cd #{t} && ./a.out")
-  control=File.open(File.join(t,'control'),"rb").read
-  unless stdout==control
-    msg="#{t} output expected:\n--begin--\n"
-    msg+=control
-    msg+="-- end --\n#{t} output actual:\n--begin--\n"
-    msg+=stdout
-    msg+="-- end --"
-    fail msg
+  exe("make -C #{t} exe")
+  e="./a.out"
+  stdout=((File.exists?(File.join(t,e)))?(exe("cd #{t} && #{e}")):(""))
+  f=File.join(t,'control')
+  if File.exists?(f)
+    control=File.open(f,"rb").read
+    unless stdout==control
+      msg="#{t} output expected:\n--begin--\n"
+      msg+=control
+      msg+="-- end --\n#{t} output actual:\n--begin--\n"
+      msg+=stdout
+      msg+="-- end --"
+      fail msg
+    end
   end
   exe("make -C #{t} clean")
 end

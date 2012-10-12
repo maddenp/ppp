@@ -3,13 +3,14 @@
 # not been tested. Set 'FC' appropriately. See http://bit.ly/N6I39Y for more
 # information.
 
-BIN=a.out
+EXE=a.out
 EXT=$(suffix $(TEST))
 FC=gfortran44
 FFLAGS=-w
+OBJ=$(STEM)_ppp.o
 PPP=../../ppp
 STEM=$(basename $(TEST))
-TARGETS=bin clean control translation
+TARGETS=clean control exe obj translation
 TEST=$(wildcard t.f t.f90)
 TMPFILE=tmpfile
 TRANSLATION=$(STEM)_ppp$(EXT)
@@ -19,22 +20,29 @@ TRANSLATION=$(STEM)_ppp$(EXT)
 default:
 	$(error Valid targets are: $(TARGETS))
 
-bin: $(BIN)
-
 clean:
-	$(RM) $(BIN) $(TMPFILE) $(TRANSLATION) *.mod *.sms
+	$(RM) $(EXE) $(TMPFILE) $(TRANSLATION) *.mod *.o *.sms
 
 control: $(TEST)
-ifdef MAKE_CONTROL_DISABLED
-	$(info Auto-generation of 'control' is disabled for test $(TEST), investigate...)
+ifdef DISABLE_CONTROL
+	$(info Generation of 'control' is disabled for this test.)
 else
 	$(FC) $(FFLAGS) $(INCFLAG) $^ && a.out >control 2>&1 && $(RM) a.out
 endif
 
+exe: $(EXE)
+
+obj: $(OBJ)
+
 translation: $(TRANSLATION)
 
-$(BIN): $(TRANSLATION)
-	$(FC) $(FFLAGS) $(TRANSLATION)
+$(EXE): $(OBJ)
+ifndef DISABLE_EXE
+	$(FC) $(FFLAGS) $(OBJ)
+endif
+
+$(OBJ): $(TRANSLATION)
+	$(FC) $(FFLAGS) -c $(TRANSLATION)
 
 $(TRANSLATION): $(TEST)
 	$(PPP) $(INCFLAG) $(TEST) > $(TRANSLATION)
