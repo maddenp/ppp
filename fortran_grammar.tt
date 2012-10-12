@@ -2757,7 +2757,7 @@ grammar Fortran
   ## SMS ##
 
   rule sms_barrier
-    sms_sentinel "barrier" t_newline <SMS_Barrier>
+    sms_sentinel sms_t_barrier t_newline <SMS_Barrier>
   end
 
   rule sms_compare_var
@@ -2865,6 +2865,10 @@ grammar Fortran
   rule sms_string
     char_literal_constant_dq /
     char_literal_constant_sq
+  end
+
+  rule sms_t_barrier
+    "barrier" <T>
   end
 
   rule sms_t_begin
