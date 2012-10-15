@@ -13,3 +13,5 @@
 
 - Need tests of all F90:R924 possibilities.
 
+- In declare(), may need to pass in attr options (e.g. dimension, access)
+

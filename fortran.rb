@@ -41,12 +41,12 @@ module Fortran
     @@dolabels.push(label)
   end
 
-  def env
-    @@envstack.last
+  def envget(k)
+    envhere[k]||{}
   end
 
-  def envget(k)
-    env[k]||{}
+  def envhere
+    @@envstack.last
   end
 
   def envpop
@@ -54,16 +54,16 @@ module Fortran
     @@envstack=[{}] if @@envstack.empty?
   end
 
-  def envpush
-    @@envstack.push(env.dup)
+  def envpush(base=envhere.dup)
+    @@envstack.push(base)
   end
 
   def envset(k,v)
-    env[k]=v
+    envhere[k]=v
   end
 
-  def findabove(node,classes)
-    n=node
+  def findabove(classes)
+    n=self
     while p=n.parent
       return p if classes.any? { |x| p.is_a?(x) }
       n=p
@@ -121,7 +121,7 @@ module Fortran
       access_stmt_option.names.each { |x| varsetprop(x,'access',p) }
     else
       @@access=p
-      env.each do |n,h|
+      envhere.each do |n,h|
         varsetprop(n,'access',p) if vargetprop(n,'access')=='default'
       end
     end
@@ -144,9 +144,7 @@ module Fortran
   end
 
   def proc_end_module_stmt
-#puts "### end module";p @@envstack #PM#
     envpop
-#p @@envstack #PM#
     true
   end
 
@@ -156,15 +154,13 @@ module Fortran
   end
 
   def proc_end_subroutine_stmt
-#puts "### end subroutine";p @@envstack #PM#
     envpop
-#p @@envstack #PM#
     true
   end
 
   def proc_module(module_stmt)
     module_name=module_stmt.name
-    File.open("#{module_name}.sms",'w') { |f| f.write(YAML.dump(env)) }
+    File.open("#{module_name}.sms",'w') { |f| f.write(YAML.dump(envhere)) }
     @@access='default'
     true
   end
@@ -180,9 +176,7 @@ module Fortran
   end
 
   def proc_module_stmt
-#puts "### module";p @@envstack #PM#
     envpush
-#p @@envstack #PM#
     true
   end
 
@@ -191,10 +185,13 @@ module Fortran
     true
   end
 
+  def proc_sms_executable(sms_executable)
+    sms_executable.env=envhere
+    true
+  end
+
   def proc_subroutine_stmt
-#puts "### subroutine";p @@envstack #PM#
     envpush
-#p @@envstack #PM#
     true
   end
 
@@ -223,8 +220,8 @@ module Fortran
     (e.to_s=='')?(''):(" #{e}")
   end
 
-  def scoping_unit(node)
-    findabove(node,[Scoping_Unit])
+  def scoping_unit
+    findabove([Scoping_Unit])
   end
 
   def sms(s)
@@ -236,8 +233,8 @@ module Fortran
     a.map { |x| x.to_s }.join(' ').strip
   end
 
-  def specification_part(node)
-    scoping_unit(node).e[1]
+  def specification_part
+    scoping_unit.e[1]
   end
 
   def stmt(s,f=nil)
@@ -245,10 +242,10 @@ module Fortran
     indent(("#{sa(e[0])}"+s.chomp).strip)+"\n"
   end
 
-  def sub(tree)
-    tree.parent=parent
-    block=parent.e
-    block[block.index(self)]=tree
+  def sub(node,tree)
+    tree.parent=node.parent
+    block=node.parent.e
+    block[block.index(node)]=tree
   end
 
   def translate()
@@ -256,7 +253,34 @@ module Fortran
     self
   end
 
-  def use(node,module_name,usenames=[])
+  #PM#
+
+  def declaration_constructs
+    specification_part.e[2]
+  end
+
+  def declare(type,name)
+    unless env.object_id==envhere.object_id
+      envpop
+      envpush(env)
+    end
+    v=envhere[name]
+    if v.nil?
+      code="#{type}::#{name}"
+      t=tree(code,:type_declaration_stmt)
+      p=declaration_constructs
+      t.parent=p
+      p.e.push(t)
+    else
+      if v['type']!=type
+        fail "#{name} is already declared with type #{v['type']}"
+      end
+    end
+  end
+
+  #PM#
+
+  def use(module_name,usenames=[])
     unless uses?(module_name,:all)
       code="use #{module_name}"
       unless usenames.empty?
@@ -272,8 +296,8 @@ module Fortran
         code=((list.empty?)?(nil):("#{code},only:#{list.join(',')}"))
       end
       unless code.nil?
-        p=use_part(node)
         t=tree(code,:use_stmt)
+        p=use_part
         t.parent=p
         p.e.push(t)
       end
@@ -292,8 +316,8 @@ module Fortran
     end
   end
 
-  def use_part(node)
-    specification_part(node).e[0]
+  def use_part
+    specification_part.e[0]
   end
 
   def use_update_1(module_name,rename_list_option)
@@ -321,17 +345,17 @@ module Fortran
   end
 
   def vargetprop(n,k)
-    return nil unless env["#{n}"]
-    env["#{n}"]["#{k}"]||nil
+    return nil unless envhere["#{n}"]
+    envhere["#{n}"]["#{k}"]||nil
   end
 
   def varinit(n,props={})
-    env["#{n}"]=props
+    envhere["#{n}"]=props
   end
 
   def varsetprop(n,k,v)
-    env["#{n}"]||={}
-    env["#{n}"]["#{k}"]=v
+    envhere["#{n}"]||={}
+    envhere["#{n}"]["#{k}"]=v
   end
 
   # Extension of SyntaxNode class
@@ -347,6 +371,7 @@ module Fortran
   # Generic Subclasses
 
   class T < Treetop::Runtime::SyntaxNode
+    attr_accessor :env
     def initialize(a='',b=(0..0),c=[]) super(a,b,c) end
     def to_s() text_value end
   end
@@ -781,8 +806,8 @@ module Fortran
 
   class SMS_Barrier < T
     def translate
-      sub(raw("call ppp_barrier(ppp__status)",:call_stmt))
-      #use(self,"nnt_types_module") # needed, but old ppp chokes on it
+      declare("integer","sms__status")
+      sub(parent,raw("call ppp_barrier(sms__status)",:call_stmt))
     end
   end
 
