@@ -29,6 +29,26 @@ module Fortran
     self.e.map { |x| x.to_s }.join
   end
 
+  def declaration_constructs
+    specification_part.e[2]
+  end
+
+  def declare(type,name)
+    envensure
+    v=env[name]
+    if v.nil?
+      code="#{type}::#{name}"
+      t=tree(code,:type_declaration_stmt)
+      p=declaration_constructs
+      t.parent=p
+      p.e.push(t)
+    else
+      if v['type']!=type
+        fail "#{name} is already declared with type #{v['type']}"
+      end
+    end
+  end
+
   def dolabel_dupe?
     "#{@@dolabels[-1]}"=="#{@@dolabels[-2]}"
   end
@@ -41,11 +61,15 @@ module Fortran
     @@dolabels.push(label)
   end
 
-  def envget(k)
-    envhere[k]||{}
+  def envensure
+    envswap(myenv) unless myenv.object_id==env.object_id
   end
 
-  def envhere
+  def envget(k)
+    env[k]||{}
+  end
+
+  def env
     @@envstack.last
   end
 
@@ -54,12 +78,17 @@ module Fortran
     @@envstack=[{}] if @@envstack.empty?
   end
 
-  def envpush(base=envhere.dup)
+  def envpush(base=env.dup)
     @@envstack.push(base)
   end
 
   def envset(k,v)
-    envhere[k]=v
+    env[k]=v
+  end
+
+  def envswap(new)
+    @@envstack.pop
+    @@envstack.push(new)
   end
 
   def findabove(classes)
@@ -121,7 +150,7 @@ module Fortran
       access_stmt_option.names.each { |x| varsetprop(x,'access',p) }
     else
       @@access=p
-      envhere.each do |n,h|
+      env.each do |n,h|
         varsetprop(n,'access',p) if vargetprop(n,'access')=='default'
       end
     end
@@ -160,7 +189,7 @@ module Fortran
 
   def proc_module(module_stmt)
     module_name=module_stmt.name
-    File.open("#{module_name}.sms",'w') { |f| f.write(YAML.dump(envhere)) }
+    File.open("#{module_name}.sms",'w') { |f| f.write(YAML.dump(env)) }
     @@access='default'
     true
   end
@@ -186,7 +215,7 @@ module Fortran
   end
 
   def proc_sms_executable(sms_executable)
-    sms_executable.env=envhere
+    sms_executable.myenv=env
     true
   end
 
@@ -253,33 +282,6 @@ module Fortran
     self
   end
 
-  #PM#
-
-  def declaration_constructs
-    specification_part.e[2]
-  end
-
-  def declare(type,name)
-    unless env.object_id==envhere.object_id
-      envpop
-      envpush(env)
-    end
-    v=envhere[name]
-    if v.nil?
-      code="#{type}::#{name}"
-      t=tree(code,:type_declaration_stmt)
-      p=declaration_constructs
-      t.parent=p
-      p.e.push(t)
-    else
-      if v['type']!=type
-        fail "#{name} is already declared with type #{v['type']}"
-      end
-    end
-  end
-
-  #PM#
-
   def use(module_name,usenames=[])
     unless uses?(module_name,:all)
       code="use #{module_name}"
@@ -345,17 +347,17 @@ module Fortran
   end
 
   def vargetprop(n,k)
-    return nil unless envhere["#{n}"]
-    envhere["#{n}"]["#{k}"]||nil
+    return nil unless env["#{n}"]
+    env["#{n}"]["#{k}"]||nil
   end
 
   def varinit(n,props={})
-    envhere["#{n}"]=props
+    env["#{n}"]=props
   end
 
   def varsetprop(n,k,v)
-    envhere["#{n}"]||={}
-    envhere["#{n}"]["#{k}"]=v
+    env["#{n}"]||={}
+    env["#{n}"]["#{k}"]=v
   end
 
   # Extension of SyntaxNode class
@@ -371,7 +373,7 @@ module Fortran
   # Generic Subclasses
 
   class T < Treetop::Runtime::SyntaxNode
-    attr_accessor :env
+    attr_accessor :myenv
     def initialize(a='',b=(0..0),c=[]) super(a,b,c) end
     def to_s() text_value end
   end
