@@ -41,7 +41,7 @@ module Fortran
       t=tree(code,:type_declaration_stmt)
       p=declaration_constructs
       t.parent=p
-      p.e.push(t)
+      p.e.insert(0,t) # prefer 'p.e.push(t)' -- see TODO
     else
       if v['type']!=type
         fail "#{name} is already declared with type #{v['type']}"
