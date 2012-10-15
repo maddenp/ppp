@@ -1295,7 +1295,8 @@ grammar Fortran
     where_construct /
     directive /
     sms_passthrough /
-    sms_executable &{ |e| proc_sms_executable(e[0]) }
+#    sms_executable &{ |e| proc_sms_executable(e[0]) }
+    sms_executable
   end
 
   rule executable_construct_action_stmt
@@ -2789,7 +2790,7 @@ grammar Fortran
   end
 
   rule sms_executable
-    sms_barrier /
+    sms_barrier &{ |e| proc_sms_executable(e[0]) } /
     sms_ignore_begin /
     sms_ignore_end
   end

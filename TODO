@@ -15,3 +15,6 @@
 
 - In declare(), may need to pass in attr options (e.g. dimension, access)
 
+- Move proc_sms_executable call from sms_executable : sms_barrier to
+  executable_construct : sms_executable once sms$ignore begin/end are gone.
+
