@@ -1394,8 +1394,7 @@ grammar Fortran
 
     subroutine_subprogram /
     function_subprogram /
-    sms_ignore_begin /
-    sms_ignore_end
+    sms_passthrough
   end
 
   rule file_name_expr
@@ -1540,7 +1539,7 @@ grammar Fortran
     # enforced here.
 
     implicit_part_stmt+ <E> /
-    sms_declarative
+    sms_passthrough
   end
 
   rule implicit_part_stmt
@@ -1722,8 +1721,7 @@ grammar Fortran
 
     subroutine_subprogram /
     function_subprogram /
-    sms_ignore_begin /
-    sms_ignore_end
+    sms_passthrough
   end
 
   rule internal_subprograms
@@ -2043,8 +2041,7 @@ grammar Fortran
 
     subroutine_subprogram /
     function_subprogram /
-    sms_ignore_begin /
-    sms_ignore_end
+    sms_passthrough
   end
 
   rule module_subprogram_part
@@ -2769,13 +2766,13 @@ grammar Fortran
   end
 
   rule sms_declarative
-    # Note: Eventually, we do not want the 'ignore' directive in
-    # specification_part, if at all.
-
-    sms_ignore_begin /
-    sms_ignore_end
+    sms_distribute
   end
-  
+
+  rule sms_distribute
+    sms_distribute_begin "NEED SOMETHING HERE" sms_distribute_end <E>
+  end
+
   rule sms_distribute_begin
     sms_sentinel sms_t_distribute sms_parenthesized_args sms_t_begin t_newline <SMS_Distribute_Begin>
   end
@@ -2826,11 +2823,13 @@ grammar Fortran
   rule sms_passthrough
     sms_compare_var /
     sms_create_decomp /
-    sms_distribute_begin /
-    sms_distribute_end /
+sms_distribute_begin /
+sms_distribute_end /
     sms_exchange /
     sms_halo_comp_begin /
     sms_halo_comp_end /
+    sms_ignore_begin /
+    sms_ignore_end /
     sms_parallel_begin /
     sms_parallel_end /
     sms_reduce /
@@ -3720,7 +3719,7 @@ grammar Fortran
   end
 
   rule use_part
-    ( use_stmt / directive / sms_passthrough / sms_declarative )* <Use_Part>
+    ( use_stmt / directive / sms_passthrough )* <Use_Part>
   end
 
   rule use_stmt
