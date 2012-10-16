@@ -2787,8 +2787,7 @@ grammar Fortran
 
   rule sms_executable
     sms_barrier &{ |e| proc_sms_executable(e[0]) } / # prefer just 'sms_barrier /' -- see TODO
-    sms_ignore_begin /
-    sms_ignore_end
+    sms_passthrough
   end
 
   rule sms_halo_comp_begin
