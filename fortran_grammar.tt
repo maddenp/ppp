@@ -2454,7 +2454,7 @@ grammar Fortran
 
   rule rel_op_gt
     ".gt." <T> /
-    ">" <T>
+    t_gt
   end
 
   rule rel_op_le
@@ -2464,7 +2464,7 @@ grammar Fortran
 
   rule rel_op_lt
     ".lt." <T> /
-    "<" <T>
+    t_lt
   end
 
   rule rel_op_ne
@@ -2769,17 +2769,64 @@ grammar Fortran
     sms_distribute
   end
 
+  #PM#
+
+  rule sms_decomp_name
+    name
+  end
+
   rule sms_distribute
-    sms_distribute_begin "NEED SOMETHING HERE" sms_distribute_end <E>
+    sms_distribute_begin type_declaration_stmt* sms_distribute_end <SMS_Distribute>
   end
 
   rule sms_distribute_begin
-    sms_sentinel sms_t_distribute sms_parenthesized_args sms_t_begin t_newline <SMS_Distribute_Begin>
+    sms_sentinel sms_t_distribute t_paren_l sms_decomp_name sms_distribute_nest? t_comma sms_distribute_tag_list_set sms_distribute_tac? t_paren_r sms_t_begin t_newline <SMS_Distribute_Begin>
   end
 
   rule sms_distribute_end
     sms_sentinel sms_t_distribute sms_t_end t_newline <SMS_Distribute_End>
   end
+
+  rule sms_distribute_nest
+    t_paren_l expr t_paren_r <T>
+  end
+
+  rule sms_distribute_tac
+    t_colon "treat_as_complex" <T>
+  end
+
+  rule sms_distribute_tag
+    variable_name /
+    scalar_int_literal_constant
+  end
+
+  rule sms_distribute_tag_list
+    t_lt sms_distribute_tag sms_distribute_tag_pair* t_gt <T> /
+    sms_distribute_tag <T>
+  end
+
+  rule sms_distribute_tag_list_set
+    sms_distribute_tag_list_1 sms_distribute_tag_list_2? <T> /
+    sms_distribute_tag_list_2 <T>
+  end
+
+  rule sms_distribute_tag_list_1
+    sms_distribute_tag_list
+  end
+
+  rule sms_distribute_tag_list_2
+    t_comma sms_distribute_tag_list sms_distribute_tag_list_3? <T>
+  end
+
+  rule sms_distribute_tag_list_3
+    t_comma sms_distribute_tag_list <T>
+  end
+
+  rule sms_distribute_tag_pair
+    t_comma sms_distribute_tag <T>
+  end
+
+  #PM#
 
   rule sms_exchange
     sms_sentinel sms_t_exchange character+ t_newline <SMS_Exchange>
@@ -2822,8 +2869,6 @@ grammar Fortran
   rule sms_passthrough
     sms_compare_var /
     sms_create_decomp /
-sms_distribute_begin /
-sms_distribute_end /
     sms_exchange /
     sms_halo_comp_begin /
     sms_halo_comp_end /
@@ -3318,6 +3363,10 @@ sms_distribute_end /
     "goto" <T>
   end
 
+  rule t_gt
+    ">" <T>
+  end
+
   rule t_if
     "if" <T>
   end
@@ -3376,6 +3425,10 @@ sms_distribute_end /
 
   rule t_logical
     "logical" <T>
+  end
+
+  rule t_lt
+    "<" <T>
   end
 
   rule t_minus

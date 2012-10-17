@@ -820,9 +820,13 @@ module Fortran
   class SMS_Create_Decomp < T
     def to_s() sms(e[2].e.map { |x| x.text_value }.join) end
   end
-  
+
+  class SMS_Distribute < T
+    def to_s() "#{e[0]}#{e[1].e.reduce('') { |m,x| m+=x.to_s }}#{e[2]}" end
+  end
+
   class SMS_Distribute_Begin < T
-    def to_s() sms("#{e[2]} #{e[3]}") end
+    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}#{e[8]} #{e[9]}") end
   end
   
   class SMS_Distribute_End < T
