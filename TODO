@@ -1,9 +1,7 @@
 
-- REMOVE sms_passthrough from grammar, etc.
+- REMOVE sms_passthrough and everything related to it.
 
-- REMOVE sms$ignore and all the places it appears in the grammar.
-
-- REMOVE sms_declarative from incorrct places after sms$ignore is gone.
+- REMOVE sms$ignore* and everything related to it.
 
 - Need tests of F90:R1206 generic_spec (2nd two forms).
 
