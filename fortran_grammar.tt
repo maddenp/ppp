@@ -2802,12 +2802,12 @@ grammar Fortran
 
   rule sms_distribute_tag_list
     t_lt sms_distribute_tag sms_distribute_tag_pair* t_gt <T> /
-    sms_distribute_tag <T>
+    sms_distribute_tag
   end
 
   rule sms_distribute_tag_list_set
     sms_distribute_tag_list_1 sms_distribute_tag_list_2? <T> /
-    sms_distribute_tag_list_2 <T>
+    sms_distribute_tag_list_2
   end
 
   rule sms_distribute_tag_list_1
