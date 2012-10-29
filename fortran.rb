@@ -220,13 +220,13 @@ module Fortran
   def proc_sms_distribute_begin(sms_decomp_name,sms_distribute_tag_lists)
     @@distribute={:decomp=>"#{sms_decomp_name}",:dim=>[]}
     sms_distribute_tag_lists.taglists.each { |x| @@distribute[:dim].push(x) }
-#   p @@distribute
+#p @@distribute
     true
   end
 
   def proc_sms_distribute_end
     @@distribute=nil
-#   p @@distribute
+#p @@distribute
     true
   end
 
@@ -243,7 +243,7 @@ module Fortran
   def proc_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
     varprops=entity_decl_list.varprops
     varprops.each { |v,p| p['type']=type_spec.type }
-    if attrchk(attr_spec_option,:dimension?)
+    if array_spec=attrchk(attr_spec_option,:dimension?)
       varprops.each { |v,p| p['rank']='array' }
     end
     if attrchk(attr_spec_option,:private?)
@@ -493,7 +493,7 @@ module Fortran
   end
 
   class Attr_Spec_Dimension < T
-    def dimension?() true end
+    def dimension?() e[2] end
   end
 
   class Attr_Spec_List < Attr_Spec_Base
