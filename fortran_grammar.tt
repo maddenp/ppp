@@ -2780,19 +2780,11 @@ grammar Fortran
   end
 
   rule sms_distribute_begin
-    sms_sentinel sms_t_distribute t_paren_l sms_decomp_name sms_distribute_nest? t_comma sms_distribute_tag_list_set sms_distribute_tac? t_paren_r sms_t_begin t_newline <SMS_Distribute_Begin>
+    sms_sentinel sms_t_distribute t_paren_l sms_decomp_name t_comma sms_distribute_tag_lists t_paren_r sms_t_begin t_newline &{ |e| proc_sms_distribute_begin(e[3],e[5]) } <SMS_Distribute_Begin>
   end
 
   rule sms_distribute_end
-    sms_sentinel sms_t_distribute sms_t_end t_newline <SMS_Distribute_End>
-  end
-
-  rule sms_distribute_nest
-    t_paren_l expr t_paren_r <T>
-  end
-
-  rule sms_distribute_tac
-    t_colon "treat_as_complex" <T>
+    sms_sentinel sms_t_distribute sms_t_end t_newline &{ |e| proc_sms_distribute_end } <SMS_Distribute_End>
   end
 
   rule sms_distribute_tag
@@ -2801,29 +2793,18 @@ grammar Fortran
   end
 
   rule sms_distribute_tag_list
-    t_lt sms_distribute_tag sms_distribute_tag_pair* t_gt <T> /
-    sms_distribute_tag
+    t_lt sms_distribute_tag sms_distribute_tag_pair* t_gt <SMS_Distribute_Tag_List_1> /
+    sms_distribute_tag "" <SMS_Distribute_Tag_List_2>
   end
 
-  rule sms_distribute_tag_list_set
-    sms_distribute_tag_list_1 sms_distribute_tag_list_2? <T> /
-    sms_distribute_tag_list_2
-  end
-
-  rule sms_distribute_tag_list_1
-    sms_distribute_tag_list
-  end
-
-  rule sms_distribute_tag_list_2
-    t_comma sms_distribute_tag_list sms_distribute_tag_list_3? <T>
-  end
-
-  rule sms_distribute_tag_list_3
-    t_comma sms_distribute_tag_list <T>
+  rule sms_distribute_tag_lists
+    sms_distribute_tag_list t_comma sms_distribute_tag_list <SMS_Distribute_Tag_Lists_2> /
+    t_comma sms_distribute_tag_list <SMS_Distribute_Tag_Lists_3> /
+    sms_distribute_tag_list "" <SMS_Distribute_Tag_Lists_1>
   end
 
   rule sms_distribute_tag_pair
-    t_comma sms_distribute_tag <T>
+    t_comma sms_distribute_tag <SMS_Distribute_Tag_Pair>
   end
 
   #PM#

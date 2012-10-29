@@ -1,6 +1,7 @@
 module Fortran
 
   @@access='default'
+  @@distribute=nil
   @@dolabels=[]
   @@envstack=[{}]
   @@level=0
@@ -211,6 +212,19 @@ module Fortran
 
   def proc_program_stmt
     envpush
+    true
+  end
+
+  def proc_sms_distribute_begin(sms_decomp_name,sms_distribute_tag_lists)
+    @@distribute={:decomp=>"#{sms_decomp_name}",:dim=>[]}
+    sms_distribute_tag_lists.taglists.each { |x| @@distribute[:dim].push(x) }
+#   p @@distribute
+    true
+  end
+
+  def proc_sms_distribute_end
+    @@distribute=nil
+#   p @@distribute
     true
   end
 
@@ -832,7 +846,31 @@ module Fortran
   class SMS_Distribute_End < T
     def to_s() sms("#{e[2]}") end
   end
-  
+
+  class SMS_Distribute_Tag_List_1 < T
+    def taglist() ["#{e[1]}"]+e[2].e.reduce([]) { |m,x| m.push(x.tag) } end
+  end
+
+  class SMS_Distribute_Tag_List_2 < T
+    def taglist() ["#{e[0]}"] end
+  end
+
+  class SMS_Distribute_Tag_Lists_1 < T
+    def taglists() [e[0].taglist,nil] end
+  end
+
+  class SMS_Distribute_Tag_Lists_2 < T
+    def taglists() [e[0].taglist,e[2].taglist] end
+  end
+
+  class SMS_Distribute_Tag_Lists_3 < T
+    def taglists() [nil,e[1].taglist] end
+  end
+
+  class SMS_Distribute_Tag_Pair < T
+    def tag() "#{e[1]}" end
+  end
+
   class SMS_Exchange < T
     def to_s() sms(e[2].e.map { |x| x.text_value }.join) end
   end
