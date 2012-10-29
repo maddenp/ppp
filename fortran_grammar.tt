@@ -313,17 +313,25 @@ grammar Fortran
   rule assumed_shape_spec
     # F90:R516
 
-    lower_bound? t_colon <T>
+    lower_bound? t_colon <Assumed_Shape_Spec>
+  end
+
+  rule assumed_shape_spec_list
+    assumed_shape_spec assumed_shape_spec_list_pair* <Assumed_Shape_Spec_List>
+  end
+
+  rule assumed_shape_spec_list_pair
+    t_comma assumed_shape_spec <Assumed_Shape_Spec_List_Pair>
   end
 
   rule assumed_size_spec
     # F90:R518
 
-    ( explicit_shape_spec_list t_comma )? lower_bound_pair? t_star <T>
+    assumed_size_spec_pair? lower_bound_pair? t_star <Assumed_Size_Spec>
   end
 
-  rule assumed_shape_spec_list
-    assumed_shape_spec ( t_comma assumed_shape_spec )* <T>
+  rule assumed_size_spec_pair
+    explicit_shape_spec_list t_comma <Assumed_Size_Spec_Pair>
   end
 
   rule attr_spec
@@ -884,11 +892,15 @@ grammar Fortran
   rule deferred_shape_spec
     # F90:R517
 
-    t_colon
+    t_colon "" <Deferred_Shape_Spec>
   end
 
   rule deferred_shape_spec_list
-    deferred_shape_spec ( t_comma deferred_shape_spec )* <T>
+    deferred_shape_spec deferred_shape_spec_list_pair* <Deferred_Shape_Spec_List>
+  end
+
+  rule deferred_shape_spec_list_pair
+    t_comma deferred_shape_spec <Deferred_Shape_Spec_List_Pair>
   end
 
   rule defined_binary_op
@@ -1329,11 +1341,15 @@ grammar Fortran
   rule explicit_shape_spec
     # F90:R513
 
-    lower_bound_pair? upper_bound <T>
+    lower_bound_pair? upper_bound <Explicit_Shape_Spec>
   end
 
   rule explicit_shape_spec_list
-    explicit_shape_spec ( t_comma explicit_shape_spec )* <T>
+    explicit_shape_spec explicit_shape_spec_list_pair* <Explicit_Shape_Spec_List>
+  end
+
+  rule explicit_shape_spec_list_pair
+    t_comma explicit_shape_spec <Explicit_Shape_Spec_List_Pair>
   end
 
   rule exponent
@@ -1999,7 +2015,7 @@ grammar Fortran
   end
 
   rule lower_bound_pair
-    lower_bound t_colon <T>
+    lower_bound t_colon <Lower_Bound_Pair>
   end
 
   rule main_program
@@ -2272,7 +2288,7 @@ grammar Fortran
   end
 
   rule parenthesized_explicit_shape_spec_list
-    t_paren_l explicit_shape_spec_list t_paren_r <T>
+    t_paren_l explicit_shape_spec_list t_paren_r <Parenthesized_Explicit_Shape_Spec_List>
   end
 
   rule parenthesized_expr
@@ -3742,7 +3758,7 @@ grammar Fortran
   rule upper_bound
     # F90:R515
 
-    specification_expr
+    specification_expr "" <Upper_Bound>
   end
 
   rule use_name

@@ -159,7 +159,9 @@ module Fortran
   end
 
   def proc_dimension_stmt(array_names_and_specs)
-    array_names_and_specs.names.each { |x| varsetprop(x,'rank','array') }
+    array_names_and_specs.names.each do |x|
+      varsetprop(x,'rank','array')
+    end
     true
   end
 
@@ -458,6 +460,32 @@ module Fortran
     def to_s() stmt("#{e[1]} #{e[2]}#{mn(e[3],',',' '+e[3].to_s)}") end
   end
 
+  class Assumed_Shape_Spec < T
+    def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
+    def lb() (e[0].respond_to?(:lb))?(e[0].lb):("1") end
+    def ub() :assumed end
+  end
+
+  class Assumed_Shape_Spec_List < T
+    def boundslist() e[1].e.reduce([e[0].bounds]) { |m,x| m.push(x.bounds) } end
+  end
+
+  class Assumed_Shape_Spec_List_Pair < T
+    def bounds() e[1].bounds end
+  end
+
+  class Assumed_Size_Spec < T
+    def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
+    def boundslist() ex+[bounds] end
+    def ex() (e[0].respond_to?(:boundslist))?(e[0].boundslist):([]) end
+    def lb() ("#{e[1]}".empty?)?("1"):(e[1].lb) end
+    def ub() :assumed end
+  end
+
+  class Assumed_Size_Spec_Pair < T
+    def boundslist() e[0].boundslist end
+  end
+
   class Attr_Spec_Base < T
     def dimension?() attrany(:dimension?) end
     def private?() attrany(:private?) end
@@ -516,6 +544,20 @@ module Fortran
 
   class Contains_Stmt < T
     def to_s() bb(stmt(space,:be)) end
+  end
+
+  class Deferred_Shape_Spec < T
+    def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
+    def lb() :deferred end
+    def ub() :deferred end
+  end
+
+  class Deferred_Shape_Spec_List < T
+    def boundslist() e[1].e.reduce([e[0].bounds]) { |m,x| m.push(x.bounds) } end
+  end
+
+  class Deferred_Shape_Spec_List_Pair < T
+    def bounds() e[1].bounds end
   end
 
   class Derived_Type_Stmt < T
@@ -637,6 +679,20 @@ module Fortran
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{sb(e[4])}") end
   end
 
+  class Explicit_Shape_Spec < T
+    def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
+    def lb() ("#{e[0]}".empty?)?("1"):(e[0].lb) end
+    def ub() e[1].ub end
+  end
+
+  class Explicit_Shape_Spec_List < T
+    def boundslist() e[1].e.reduce([e[0].bounds]) { |m,x| m.push(x.bounds) } end
+  end
+
+  class Explicit_Shape_Spec_List_Pair < T
+    def bounds() e[1].bounds end
+  end
+
   class Function_Stmt < T
     def to_s() bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")) end
   end
@@ -702,6 +758,10 @@ module Fortran
     def to_s() "#{mp(e[0],'',' ')}#{e[1]} #{e[2]}#{e[3]}#{e[4]}" end
   end
 
+  class Lower_Bound_Pair < T
+    def lb() "#{e[0]}" end
+  end
+
   class Main_Program < Scoping_Unit
   end
 
@@ -754,6 +814,10 @@ module Fortran
 
   class Optional_Stmt < T
     def to_s() stmt("#{e[1]}#{mn(e[2],'::',' ')}#{e[3]}") end
+  end
+
+  class Parenthesized_Explicit_Shape_Spec_List < T
+    def boundslist() e[1].boundslist end
   end
 
   class Pointer_Stmt < T
@@ -840,7 +904,7 @@ module Fortran
   end
 
   class SMS_Distribute_Begin < T
-    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}#{e[8]} #{e[9]}") end
+    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[9]}") end
   end
   
   class SMS_Distribute_End < T
@@ -947,6 +1011,10 @@ module Fortran
   class Type_Spec < E
     def derived?() "#{e[0]}"=="type" end
     def type() (derived?)?("#{e[2]}"):("#{e[0]}") end
+  end
+
+  class Upper_Bound < T
+    def ub() "#{e[0]}" end
   end
 
   class Use_Part < E
