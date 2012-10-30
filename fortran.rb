@@ -220,13 +220,11 @@ module Fortran
   def proc_sms_distribute_begin(sms_decomp_name,sms_distribute_tag_lists)
     @@distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
     sms_distribute_tag_lists.taglists.each { |x| @@distribute["dim"].push(x) }
-#p @@distribute
     true
   end
 
   def proc_sms_distribute_end
     @@distribute=nil
-#p @@distribute
     true
   end
 
@@ -268,8 +266,7 @@ module Fortran
       varprops.each { |v,p| p["access"]=@@access }
     end
     varprops.each { |v,p| varinit(v,p) }
-#   p varprops
-#   puts YAML::dump(varprops)
+#puts YAML::dump(varprops)
     true
   end
 

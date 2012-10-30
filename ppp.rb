@@ -20,7 +20,7 @@ module PPP
   def directive
     unless @directive
       f=File.join(File.dirname(File.expand_path($0)),"sentinels")
-      d=File.open(f,"rb").read.gsub(/\$/,"\$").split("\n").push("sms\$").join("|")
+      d=File.open(f,"rb").read.gsub(/\$/,"\$").split("\n").push('sms\$').join("|")
       @directive=Regexp.new("^\s*!((#{d}).*)",true)
     end
     @directive
@@ -36,14 +36,14 @@ module PPP
 
   def normalize(s)
     @@np||=NormalizeParser.new
-    s=s.gsub(directive,"@\1")             # hide directives
+    s=s.gsub(directive,'@\1')             # hide directives
     s=s.gsub(/^\s+/,"")                   # remove leading whitespace
     s=s.gsub(/\s+$/,"")                   # remove trailing whitespace
     s=s.gsub(/^!.*\n/,"")                 # remove full-line comments
     s=@@np.parse(@@np.parse(s).to_s).to_s # two normalize passes
     s=s.sub(/^\n+/,"")                    # remove leading newlines
     s+="\n"  unless s[-1]=="\n"           # ensure final newline
-    s=s.gsub(/^@(.*)/i,"!\1")             # show directives
+    s=s.gsub(/^@(.*)/i,'!\1')             # show directives
   end
 
   def out(s,root=:program_units,props=defprops)
