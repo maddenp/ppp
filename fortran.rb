@@ -218,8 +218,8 @@ module Fortran
   end
 
   def proc_sms_distribute_begin(sms_decomp_name,sms_distribute_tag_lists)
-    @@distribute={:decomp=>"#{sms_decomp_name}",:dim=>[]}
-    sms_distribute_tag_lists.taglists.each { |x| @@distribute[:dim].push(x) }
+    @@distribute={'decomp'=>"#{sms_decomp_name}",'dim'=>[]}
+    sms_distribute_tag_lists.taglists.each { |x| @@distribute['dim'].push(x) }
 #p @@distribute
     true
   end
@@ -244,7 +244,21 @@ module Fortran
     varprops=entity_decl_list.varprops
     varprops.each { |v,p| p['type']=type_spec.type }
     if array_spec=attrchk(attr_spec_option,:dimension?)
-      varprops.each { |v,p| p['rank']='array' }
+      varprops.each do |v,p|
+        p['rank']='array'
+        if @@distribute
+          array_spec.boundslist.each_index do |i|
+            bounds=array_spec.boundslist[i]
+            @@distribute['dim'][i].each do |x|
+              d=i+1
+              if (x=="#{d}"||x==bounds.ub) and bounds.lb=='1'
+                p['decomp']=@@distribute['decomp']
+                p["dim#{d}"]="#{d}"
+              end
+            end
+          end
+        end
+      end
     end
     if attrchk(attr_spec_option,:private?)
       varprops.each { |v,p| p['access']='private' }
@@ -254,6 +268,8 @@ module Fortran
       varprops.each { |v,p| p['access']=@@access }
     end
     varprops.each { |v,p| varinit(v,p) }
+#   p varprops
+#   puts YAML::dump(varprops)
     true
   end
 
@@ -920,7 +936,7 @@ module Fortran
   end
 
   class SMS_Distribute_Tag_Lists_1 < T
-    def taglists() [e[0].taglist,nil] end
+    def taglists() [e[0].taglist,[]] end
   end
 
   class SMS_Distribute_Tag_Lists_2 < T
@@ -928,7 +944,7 @@ module Fortran
   end
 
   class SMS_Distribute_Tag_Lists_3 < T
-    def taglists() [nil,e[1].taglist] end
+    def taglists() [[],e[1].taglist] end
   end
 
   class SMS_Distribute_Tag_Pair < T
