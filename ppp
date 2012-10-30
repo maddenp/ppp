@@ -2,27 +2,27 @@
 
 basedir=File.dirname(File.expand_path($0))
 $: << basedir
-$: << File.join(basedir,'lib')
+$: << File.join(basedir,"lib")
 
-require 'ppp'
+require "ppp"
 
 include PPP
 
 def unpack(props,args)
-  props[:incdirs]=['.']
+  props[:incdirs]=["."]
   args.reverse!
   while opt=args.pop
     case opt
-    when '-I'
+    when "-I"
       dirlist=args.pop
       fail(usage) unless dirlist
-      dirlist.split(':').each do |d|
+      dirlist.split(":").each do |d|
         fail("No such directory: #{d}") unless File.directory?(d)
         props[:incdirs] << d
       end
-    when 'normalize'
+    when "normalize"
       props[:normalize]=true
-    when 'debug'
+    when "debug"
       props[:debug]=true
     else
       fail(usage)
@@ -40,7 +40,7 @@ if (__FILE__==$0)
   fail(usage) unless srcfile=ARGV.pop
   srcfile=File.expand_path(srcfile)
   fail("Cannot read file: #{srcfile}") unless File.readable?(srcfile)
-  s=File.open(srcfile,'rb').read
+  s=File.open(srcfile,"rb").read
   props={:srcfile=>srcfile}
   props=unpack(props,ARGV)
   puts out(s,:program_units,props)

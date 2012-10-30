@@ -2,13 +2,13 @@ module Normalize
 
   class Text < Treetop::Runtime::SyntaxNode
     def to_s
-      elements.reduce('') { |s,e| s+="#{e}" }
+      elements.reduce("") { |s,e| s+="#{e}" }
     end
   end
 
   class Delete < Treetop::Runtime::SyntaxNode
     def to_s
-      ''
+      ""
     end
   end
 
@@ -23,7 +23,7 @@ module Normalize
     def to_s
       t=text_value
       # Join continuation lines
-      t=t.gsub(/&$(\n&?)?/,'')
+      t=t.gsub(/&$(\n&?)?/,"")
       # Split semicolon-delimited statement lines
       t=t.gsub(/\s*;\s*/,"\n")
       # Attempting a multiline match of the regular expression below on a string
@@ -40,7 +40,7 @@ module Normalize
         while m=r.match(l)
           h=true
           p1=m[3][0..m[2].to_i-1]
-          p2=m[3].sub(/^#{p1}/,'')
+          p2=m[3].sub(/^#{p1}/,"")
           l="#{m[1]}'#{p1}'#{p2})#{m[4]}"
         end
         # If a F90:1016 conversion occurred, quoted strings have been introduced
@@ -51,7 +51,7 @@ module Normalize
           # Make upper-case characters lower-case
           l=l.downcase
           # Remove tabs & spaces
-          l=l.gsub(/[ \t]+/,'')
+          l=l.gsub(/[ \t]+/,"")
         end
         a[i]=l
       end
@@ -64,9 +64,9 @@ module Normalize
   class Quoted < Treetop::Runtime::SyntaxNode
     def to_s
       t=text_value
-      t=t.gsub(/^!.*/,'')    # no comment lines
+      t=t.gsub(/^!.*/,"")    # no comment lines
       t=t.gsub(/\n\n+/,"\n") # no blank lines
-      t=t.gsub(/&$\n&?/,'')  # join continuation lines
+      t=t.gsub(/&$\n&?/,"")  # join continuation lines
     end
   end
 
@@ -74,7 +74,7 @@ module Normalize
     def to_s
       t=text_value
       t=t.downcase          # make upper-case characters lower-case
-      t=t.gsub(/[ \t]+/,'') # remove tabs & spaces
+      t=t.gsub(/[ \t]+/,"") # remove tabs & spaces
       t="\n"+t
     end
   end

@@ -2,10 +2,10 @@
 
 threaded=true
 
-require 'fileutils'
+require "fileutils"
 
 def docmd(cmd)
-  out=IO.popen(cmd+' 2>&1') { |x| x.readlines.reduce('') { |s,e| s+=e } }
+  out=IO.popen(cmd+" 2>&1") { |x| x.readlines.reduce("") { |s,e| s+=e } }
   [($?.exitstatus==0)?(true):(false),out]
 end
 
@@ -25,12 +25,12 @@ def fail(msg=nil,cmd=nil)
 end
 
 def test(t)
-  print '.'
+  print "."
   exe("make -C #{t} clean")
   exe("make -C #{t} exe")
   e="./a.out"
   stdout=((File.exists?(File.join(t,e)))?(exe("cd #{t} && #{e}")):(""))
-  f=File.join(t,'control')
+  f=File.join(t,"control")
   if File.exists?(f)
     control=File.open(f,"rb").read
     unless stdout==control
@@ -45,9 +45,9 @@ def test(t)
   exe("make -C #{t} clean")
 end
 
-tdir='tests'
+tdir="tests"
 tests=(ARGV[0])?(["#{tdir}/#{ARGV[0]}"]):(Dir.glob("#{tdir}/t*").sort)
-exe('make')
+exe("make")
 if threaded
   threads=[]
   tests.each { |t| threads.push(Thread.new { test(t) }) }

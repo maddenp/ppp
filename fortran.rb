@@ -1,6 +1,6 @@
 module Fortran
 
-  @@access='default'
+  @@access="default"
   @@distribute=nil
   @@dolabels=[]
   @@envstack=[{}]
@@ -42,9 +42,9 @@ module Fortran
       t=tree(code,:type_declaration_stmt)
       p=declaration_constructs
       t.parent=p
-      p.e.insert(0,t) # prefer 'p.e.push(t)' -- see TODO
+      p.e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
     else
-      if v['type']!=type
+      if v["type"]!=type
         fail "#{name} is already declared with type #{v['type']}"
       end
     end
@@ -102,11 +102,11 @@ module Fortran
   end
 
   def indent(s)
-    ' '*2*@@level+s
+    " "*2*@@level+s
   end
 
   def is_array?(node)
-    vargetprop(node.function_name,'rank')=='array'
+    vargetprop(node.function_name,"rank")=="array"
   end
 
   def lr
@@ -141,18 +141,18 @@ module Fortran
 
   def proc_access_stmt(access_spec,access_stmt_option)
     if access_spec.private?
-      p='private'
+      p="private"
     elsif access_spec.public?
-      p='public'
+      p="public"
     else
-      p='default'
+      p="default"
     end
     if access_stmt_option.is_a?(Access_Stmt_Option)
-      access_stmt_option.names.each { |x| varsetprop(x,'access',p) }
+      access_stmt_option.names.each { |x| varsetprop(x,"access",p) }
     else
       @@access=p
       env.each do |n,h|
-        varsetprop(n,'access',p) if vargetprop(n,'access')=='default'
+        varsetprop(n,"access",p) if vargetprop(n,"access")=="default"
       end
     end
     true
@@ -160,7 +160,7 @@ module Fortran
 
   def proc_dimension_stmt(array_names_and_specs)
     array_names_and_specs.names.each do |x|
-      varsetprop(x,'rank','array')
+      varsetprop(x,"rank","array")
     end
     true
   end
@@ -192,8 +192,8 @@ module Fortran
 
   def proc_module(module_stmt)
     module_name=module_stmt.name
-    File.open("#{module_name}.sms",'w') { |f| f.write(YAML.dump(env)) }
-    @@access='default'
+    File.open("#{module_name}.sms","w") { |f| f.write(YAML.dump(env)) }
+    @@access="default"
     true
   end
 
@@ -218,8 +218,8 @@ module Fortran
   end
 
   def proc_sms_distribute_begin(sms_decomp_name,sms_distribute_tag_lists)
-    @@distribute={'decomp'=>"#{sms_decomp_name}",'dim'=>[]}
-    sms_distribute_tag_lists.taglists.each { |x| @@distribute['dim'].push(x) }
+    @@distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
+    sms_distribute_tag_lists.taglists.each { |x| @@distribute["dim"].push(x) }
 #p @@distribute
     true
   end
@@ -242,17 +242,17 @@ module Fortran
 
   def proc_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
     varprops=entity_decl_list.varprops
-    varprops.each { |v,p| p['type']=type_spec.type }
+    varprops.each { |v,p| p["type"]=type_spec.type }
     if array_spec=attrchk(attr_spec_option,:dimension?)
       varprops.each do |v,p|
-        p['rank']='array'
+        p["rank"]="array"
         if @@distribute
           array_spec.boundslist.each_index do |i|
             bounds=array_spec.boundslist[i]
-            @@distribute['dim'][i].each do |x|
+            @@distribute["dim"][i].each do |x|
               d=i+1
-              if (x=="#{d}"||x==bounds.ub) and bounds.lb=='1'
-                p['decomp']=@@distribute['decomp']
+              if (x=="#{d}"||x==bounds.ub) and bounds.lb=="1"
+                p["decomp"]=@@distribute["decomp"]
                 p["dim#{d}"]="#{d}"
               end
             end
@@ -261,11 +261,11 @@ module Fortran
       end
     end
     if attrchk(attr_spec_option,:private?)
-      varprops.each { |v,p| p['access']='private' }
+      varprops.each { |v,p| p["access"]="private" }
     elsif attrchk(attr_spec_option,:public?)
-      varprops.each { |v,p| p['access']='public' }
+      varprops.each { |v,p| p["access"]="public" }
     else
-      varprops.each { |v,p| p['access']=@@access }
+      varprops.each { |v,p| p["access"]=@@access }
     end
     varprops.each { |v,p| varinit(v,p) }
 #   p varprops
@@ -274,11 +274,11 @@ module Fortran
   end
 
   def sa(e)
-    (e.to_s=='')?(''):("#{e} ")
+    (e.to_s=="")?(""):("#{e} ")
   end
 
   def sb(e)
-    (e.to_s=='')?(''):(" #{e}")
+    (e.to_s=="")?(""):(" #{e}")
   end
 
   def scoping_unit
@@ -291,7 +291,7 @@ module Fortran
 
   def space(all=false)
     a=(all)?(self.e):(self.e[1..-1])
-    a.map { |x| x.to_s }.join(' ').strip
+    a.map { |x| x.to_s }.join(" ").strip
   end
 
   def specification_part
@@ -398,7 +398,7 @@ module Fortran
 
     alias e elements
 
-    def to_s() '' end
+    def to_s() "" end
 
   end
 
@@ -406,7 +406,7 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
     attr_accessor :myenv
-    def initialize(a='',b=(0..0),c=[]) super(a,b,c) end
+    def initialize(a="",b=(0..0),c=[]) super(a,b,c) end
     def to_s() text_value end
   end
 
@@ -661,7 +661,7 @@ module Fortran
 
   class Entity_Decl < T
     def name() "#{e[0]}" end
-    def props() {name=>{'rank'=>((array?)?('array'):('scalar'))}} end
+    def props() {name=>{"rank"=>((array?)?("array"):("scalar"))}} end
   end
 
   class Entity_Decl_1 < Entity_Decl
@@ -849,7 +849,7 @@ module Fortran
   end
 
   class Program_Units < T
-    def to_s() e.reduce('') { |m,x| m+="#{x}\n" }.chomp end
+    def to_s() e.reduce("") { |m,x| m+="#{x}\n" }.chomp end
   end
 
   class Read_Stmt < T

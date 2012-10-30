@@ -1,12 +1,12 @@
 module PPP
 
-  require 'treetop'
-  require 'fortran'
-  require 'fortran_parser'
-  require 'normalize'
-  require 'normalize_parser'
-  require 'ostruct'
-  require 'yaml'
+  require "treetop"
+  require "fortran"
+  require "fortran_parser"
+  require "normalize"
+  require "normalize_parser"
+  require "ostruct"
+  require "yaml"
 
   include Fortran
 
@@ -19,8 +19,8 @@ module PPP
   
   def directive
     unless @directive
-      f=File.join(File.dirname(File.expand_path($0)),'sentinels')
-      d=File.open(f,'rb').read.gsub(/\$/,'\$').split("\n").push('sms\$').join('|')
+      f=File.join(File.dirname(File.expand_path($0)),"sentinels")
+      d=File.open(f,"rb").read.gsub(/\$/,"\$").split("\n").push("sms\$").join("|")
       @directive=Regexp.new("^\s*!((#{d}).*)",true)
     end
     @directive
@@ -36,14 +36,14 @@ module PPP
 
   def normalize(s)
     @@np||=NormalizeParser.new
-    s=s.gsub(directive,'@\1')             # hide directives
-    s=s.gsub(/^\s+/,'')                   # remove leading whitespace
-    s=s.gsub(/\s+$/,'')                   # remove trailing whitespace
-    s=s.gsub(/^!.*\n/,'')                 # remove full-line comments
+    s=s.gsub(directive,"@\1")             # hide directives
+    s=s.gsub(/^\s+/,"")                   # remove leading whitespace
+    s=s.gsub(/\s+$/,"")                   # remove trailing whitespace
+    s=s.gsub(/^!.*\n/,"")                 # remove full-line comments
     s=@@np.parse(@@np.parse(s).to_s).to_s # two normalize passes
-    s=s.sub(/^\n+/,'')                    # remove leading newlines
+    s=s.sub(/^\n+/,"")                    # remove leading newlines
     s+="\n"  unless s[-1]=="\n"           # ensure final newline
-    s=s.gsub(/^@(.*)/i,'!\1')             # show directives
+    s=s.gsub(/^@(.*)/i,"!\1")             # show directives
   end
 
   def out(s,root=:program_units,props=defprops)
@@ -55,13 +55,13 @@ module PPP
 
     def assemble(s,seen,incdirs=[])
       current=seen.last
-      a=''
-      r=Regexp.new('^\s*include\s*(\'[^\']+\'|\"[^\"]+\").*',true)
+      a=""
+      r=Regexp.new("^\s*include\s*(\'[^\']+\'|\"[^\"]+\").*",true)
       s.split("\n").each do |line|
         m=r.match(line)
         if m
           incfile=m[1][1..-2]
-          if incfile[0]=='/' or incfile[0]=='.'
+          if incfile[0]=="/" or incfile[0]=="."
             incfile=File.expand_path(File.join(File.dirname(current),incfile))
             unless File.exist?(incfile)
               fail "Could not find included file #{incfile}"
@@ -90,7 +90,7 @@ module PPP
             msg+=incchain(seen,incfile)
             fail(msg)
           end
-          a+=assemble(File.open(incfile,'rb').read,seen+[incfile],incdirs)
+          a+=assemble(File.open(incfile,"rb").read,seen+[incfile],incdirs)
         else
           a+="#{line}\n"
         end
@@ -99,7 +99,7 @@ module PPP
     end
 
     def cppcheck(s)
-      r=Regexp.new('^\s*#')
+      r=Regexp.new("^\s*#")
       i=1
       s.split("\n").each do |line|
         m=r.match(line)
@@ -126,11 +126,11 @@ module PPP
           if e.length>max
             e=~/^( *).*$/
             i=$1.length+2
-            t=''
+            t=""
             begin
               r=[max-2,e.length-1].min
               t+=e[0..r]+"&\n"
-              e=' '*i+'&'+e[r+1..-1]
+              e=" "*i+"&"+e[r+1..-1]
             end while e.length>max
             t+=e
             a[n]=t
@@ -142,8 +142,8 @@ module PPP
 
     debug=props[:debug]
     @@fp||=FortranParser.new
-    s=s.gsub(/^\s*!sms\$insert */i,'')                           # process inserts
-    s=s.gsub(/^\s*!sms\$remove +begin.*?!sms\$remove +end/im,'') # process removes
+    s=s.gsub(/^\s*!sms\$insert */i,"")                           # process inserts
+    s=s.gsub(/^\s*!sms\$remove +begin.*?!sms\$remove +end/im,"") # process removes
     s=assemble(s,[props[:srcfile]],props[:incdirs])
     cppcheck(s)
     puts "RAW SOURCE\n\n#{s}\n" if debug
