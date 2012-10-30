@@ -248,10 +248,10 @@ module Fortran
           array_spec.boundslist.each_index do |i|
             bounds=array_spec.boundslist[i]
             @@distribute["dim"][i].each do |x|
-              d=i+1
-              if (x=="#{d}"||x==bounds.ub) and bounds.lb=="1"
+              dim=i+1
+              if (x=="#{dim}"||x==bounds.ub) and bounds.lb=="1"
                 p["decomp"]=@@distribute["decomp"]
-                p["dim#{d}"]="#{d}"
+                p["dim#{dim}"]="#{dim}"
               end
             end
           end
