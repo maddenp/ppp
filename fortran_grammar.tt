@@ -2796,31 +2796,21 @@ grammar Fortran
   end
 
   rule sms_distribute_begin
-    sms_sentinel sms_t_distribute t_paren_l sms_decomp_name t_comma sms_distribute_tag_lists t_paren_r sms_t_begin t_newline &{ |e| proc_sms_distribute_begin(e[3],e[5]) } <SMS_Distribute_Begin>
+    sms_sentinel sms_t_distribute t_paren_l sms_decomp_name t_comma sms_distribute_dims t_paren_r sms_t_begin t_newline &{ |e| proc_sms_distribute_begin(e[3],e[5]) } <SMS_Distribute_Begin>
+  end
+
+  rule sms_distribute_dim
+    scalar_int_literal_constant
+  end
+
+  rule sms_distribute_dims
+    sms_distribute_dim t_comma sms_distribute_dim <SMS_Distribute_Dims_1> /
+    t_comma sms_distribute_dim <SMS_Distribute_Dims_2> /
+    sms_distribute_dim "" <SMS_Distribute_Dims_3>
   end
 
   rule sms_distribute_end
     sms_sentinel sms_t_distribute sms_t_end t_newline &{ |e| proc_sms_distribute_end } <SMS_Distribute_End>
-  end
-
-  rule sms_distribute_tag
-    variable_name /
-    scalar_int_literal_constant
-  end
-
-  rule sms_distribute_tag_list
-    t_lt sms_distribute_tag sms_distribute_tag_pair* t_gt <SMS_Distribute_Tag_List_1> /
-    sms_distribute_tag "" <SMS_Distribute_Tag_List_2>
-  end
-
-  rule sms_distribute_tag_lists
-    sms_distribute_tag_list t_comma sms_distribute_tag_list <SMS_Distribute_Tag_Lists_2> /
-    t_comma sms_distribute_tag_list <SMS_Distribute_Tag_Lists_3> /
-    sms_distribute_tag_list "" <SMS_Distribute_Tag_Lists_1>
-  end
-
-  rule sms_distribute_tag_pair
-    t_comma sms_distribute_tag <SMS_Distribute_Tag_Pair>
   end
 
   #PM#

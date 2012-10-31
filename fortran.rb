@@ -217,9 +217,9 @@ module Fortran
     true
   end
 
-  def proc_sms_distribute_begin(sms_decomp_name,sms_distribute_tag_lists)
+  def proc_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
     @@distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
-    sms_distribute_tag_lists.taglists.each { |x| @@distribute["dim"].push(x) }
+    sms_distribute_dims.dims.each { |x| @@distribute["dim"].push(x) }
     true
   end
 
@@ -246,15 +246,10 @@ module Fortran
         p["rank"]="array"
         if @@distribute
           array_spec.boundslist.each_index do |i|
-            bounds=array_spec.boundslist[i]
-            if @@distribute["dim"][i]
-              @@distribute["dim"][i].each do |x|
-                dim=i+1
-                if (x=="#{dim}"||x==bounds.ub) and bounds.lb=="1"
-                  p["decomp"]=@@distribute["decomp"]
-                  p["dim#{dim}"]="#{dim}"
-                end
-              end
+            arrdim=i+1
+            if decdim=@@distribute["dim"].index(arrdim)
+              p["decomp"]=@@distribute["decomp"]
+              p["dim#{arrdim}"]=decdim+1
             end
           end
         end
@@ -926,28 +921,16 @@ module Fortran
     def to_s() sms("#{e[2]}") end
   end
 
-  class SMS_Distribute_Tag_List_1 < T
-    def taglist() ["#{e[1]}"]+e[2].e.reduce([]) { |m,x| m.push(x.tag) } end
+  class SMS_Distribute_Dims_1 < T
+    def dims() ["#{e[0]}".to_i,"#{e[2]}".to_i] end
   end
 
-  class SMS_Distribute_Tag_List_2 < T
-    def taglist() ["#{e[0]}"] end
+  class SMS_Distribute_Dims_2 < T
+    def dims() [nil,"#{e[1]}".to_i] end
   end
 
-  class SMS_Distribute_Tag_Lists_1 < T
-    def taglists() [e[0].taglist,[]] end
-  end
-
-  class SMS_Distribute_Tag_Lists_2 < T
-    def taglists() [e[0].taglist,e[2].taglist] end
-  end
-
-  class SMS_Distribute_Tag_Lists_3 < T
-    def taglists() [[],e[1].taglist] end
-  end
-
-  class SMS_Distribute_Tag_Pair < T
-    def tag() "#{e[1]}" end
+  class SMS_Distribute_Dims_3 < T
+    def dims() ["#{e[0]}".to_i,nil] end
   end
 
   class SMS_Exchange < T
