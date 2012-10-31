@@ -247,11 +247,13 @@ module Fortran
         if @@distribute
           array_spec.boundslist.each_index do |i|
             bounds=array_spec.boundslist[i]
-            @@distribute["dim"][i].each do |x|
-              dim=i+1
-              if (x=="#{dim}"||x==bounds.ub) and bounds.lb=="1"
-                p["decomp"]=@@distribute["decomp"]
-                p["dim#{dim}"]="#{dim}"
+            if @@distribute["dim"][i]
+              @@distribute["dim"][i].each do |x|
+                dim=i+1
+                if (x=="#{dim}"||x==bounds.ub) and bounds.lb=="1"
+                  p["decomp"]=@@distribute["decomp"]
+                  p["dim#{dim}"]="#{dim}"
+                end
               end
             end
           end
