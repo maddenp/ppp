@@ -523,11 +523,11 @@ grammar Fortran
   end
 
   rule char_literal_constant_dq
-    t_quotemark (!t_quotemark rep_char)* t_quotemark <T>
+    t_quotemark ( !t_quotemark rep_char )* t_quotemark <T>
   end
 
   rule char_literal_constant_sq
-    t_apostrophe (!t_apostrophe rep_char)* t_apostrophe <T>
+    t_apostrophe ( !t_apostrophe rep_char )* t_apostrophe <T>
   end
 
   rule char_selector
@@ -1439,7 +1439,7 @@ grammar Fortran
   rule format_specification_element
     format_specification /
     char_literal_constant /
-    ( !( t_paren_l / t_paren_r ) character)+ <T>
+    ( !( t_paren_l / t_paren_r / t_apostrophe / t_quotemark ) character )+ <T>
   end
 
   rule format_stmt
