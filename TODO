@@ -21,3 +21,7 @@
   ppp breaks (fim:cnuity.F90) with the declaration at the end -- can't see
   the break between declaration and execution.
 
+- When the legacy ppp is removed from the build chain, remove the sms$ignore
+  region being inserted by use(), which is only an interim shim to keep legacy
+  ppp from freaking out.
+

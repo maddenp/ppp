@@ -324,10 +324,20 @@ module Fortran
         code=((list.empty?)?(nil):("#{code},only:#{list.join(',')}"))
       end
       unless code.nil?
-        t=tree(code,:use_stmt)
         p=use_part
+# hack start
+        t=tree("!sms$ignore begin",:sms_ignore_begin)
         t.parent=p
         p.e.push(t)
+# hack end
+        t=tree(code,:use_stmt)
+        t.parent=p
+        p.e.push(t)
+# hack start
+        t=tree("!sms$ignore end",:sms_ignore_end)
+        t.parent=p
+        p.e.push(t)
+# hack end
       end
     end
   end
@@ -896,8 +906,8 @@ module Fortran
 
   class SMS_Barrier < T
     def translate
-      declare("integer","sms__status")
-      sub(parent,raw("call ppp_barrier(sms__status)",:call_stmt))
+      use("nnt_types_module")
+      sub(parent,raw("call ppp_barrier(ppp__status)",:call_stmt))
     end
   end
 
