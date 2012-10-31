@@ -917,7 +917,7 @@ module Fortran
   end
 
   class SMS_Distribute_Begin < T
-    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[9]}") end
+    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}") end
   end
   
   class SMS_Distribute_End < T
