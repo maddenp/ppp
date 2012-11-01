@@ -72,9 +72,10 @@ module Fortran
 
   def envensure
     if x=nearest([SMS])
-      return envswap(x.myenv) unless x.myenv.object_id==env.object_id
+      envswap(x.myenv) unless x.myenv.object_id==env.object_id
+    else
+      envinit
     end
-    envinit
   end
 
   def envget(k)
@@ -263,13 +264,18 @@ module Fortran
       varprops.each do |v,p|
         p["rank"]="array"
         if @@distribute
+          dims=0
           array_spec.boundslist.each_index do |i|
             arrdim=i+1
+            p["lb#{arrdim}"]=bounds=array_spec.boundslist[i].lb
+            p["ub#{arrdim}"]=bounds=array_spec.boundslist[i].ub
             if decdim=@@distribute["dim"].index(arrdim)
               p["decomp"]=@@distribute["decomp"]
               p["dim#{arrdim}"]=decdim+1
             end
+            dims+=1
           end
+          p["dims"]=dims
         end
       end
     end
@@ -299,6 +305,21 @@ module Fortran
 
   def sms(s)
     "#{e[0]}#{e[1]} "+s+"\n"
+  end
+
+  def smstype(fortran_type)
+    case fortran_type
+    when "integer"
+      "nnt_integer"
+    when "real"
+      "nnt_real"
+    when "doubleprecision"
+      "nnt_doubleprecision"
+    when "complex"
+      "nnt_complex"
+    when "logical"
+      "nnt_logical"
+    end
   end
 
   def space(all=false)
@@ -500,8 +521,8 @@ module Fortran
 
   class Assumed_Shape_Spec < T
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
-    def lb() (e[0].respond_to?(:lb))?(e[0].lb):(:default) end
-    def ub() :assumed end
+    def lb() (e[0].respond_to?(:lb))?(e[0].lb):("_default_") end
+    def ub() "_assumed_" end
   end
 
   class Assumed_Shape_Spec_List < T
@@ -516,8 +537,8 @@ module Fortran
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
     def boundslist() ex+[bounds] end
     def ex() (e[0].respond_to?(:boundslist))?(e[0].boundslist):([]) end
-    def lb() ("#{e[1]}".empty?)?(:default):(e[1].lb) end
-    def ub() :assumed end
+    def lb() ("#{e[1]}".empty?)?("_default_"):(e[1].lb) end
+    def ub() "_assumed_" end
   end
 
   class Assumed_Size_Spec_Pair < T
@@ -586,8 +607,8 @@ module Fortran
 
   class Deferred_Shape_Spec < T
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
-    def lb() :deferred end
-    def ub() :deferred end
+    def lb() "_deferred_" end
+    def ub() "_deferred_" end
   end
 
   class Deferred_Shape_Spec_List < T
@@ -719,7 +740,7 @@ module Fortran
 
   class Explicit_Shape_Spec < T
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
-    def lb() ("#{e[0]}".empty?)?(:default):(e[0].lb) end
+    def lb() ("#{e[0]}".empty?)?("_default_"):(e[0].lb) end
     def ub() e[1].ub end
   end
 
@@ -943,7 +964,25 @@ module Fortran
   end
 
   class SMS_Compare_Var < SMS
-    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}") end
+#   def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}") end
+    def translate()
+      use("module_decomp")
+      use("nnt_types_module")
+      envensure
+      var="#{e[3]}"
+      varenv=env[var]
+      if decomp=varenv['decomp']
+        dims=varenv["dims"]
+        msg="#{e[5]}"
+        type=smstype(varenv['type'])
+        gllbs="(/"+(1..7).map { |i| (i>dims)?(1):((varenv["lb#{i}"]=="_default_")?(1):(varenv["lb#{i}"])) }.join(",")+"/)"
+        glubs="(/"+(1..7).map { |i| (i>dims)?(1):(varenv["ub#{i}"]) }.join(",")+"/)"
+        perms="(/"+(1..7).map { |i| (varenv["dim#{i}"])?(1):(0) }.join(",")+"/)"
+#       code="if (sms_debugging_on()) call ppp_compare_var(#{decomp}(dh__nestlevel),#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},msg,ppp__status)"
+        puts "### #{code}"
+      end
+#     sub(parent,raw(code),
+    end
   end
   
   class SMS_Create_Decomp < SMS
