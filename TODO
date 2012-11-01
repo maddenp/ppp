@@ -32,3 +32,5 @@
 - declare() is naive. What about declaring an array with the same type as an
   already-declared scalar? Need more flexibility...
 
+- error needed when compare_var variable is not distributed or no mod info
+
