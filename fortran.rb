@@ -838,16 +838,16 @@ module Fortran
 
   class Name < T
     def name() to_s end
-    def translate()
-      if inside?([Entity_Decl])
-        envensure
-        if me=env[self.to_s]
-          if me['decomp']
+#   def translate()
+#     if inside?([Entity_Decl])
+#       envensure
+#       if me=env[self.to_s]
+#         if me['decomp']
 #           puts "### var #{to_s} env #{me}"
-          end
-        end
-      end
-    end
+#         end
+#       end
+#     end
+#   end
   end
 
   class Namelist_Group_Set_Pair < T
@@ -978,10 +978,11 @@ module Fortran
         gllbs="(/"+(1..7).map { |i| (i>dims)?(1):((varenv["lb#{i}"]=="_default_")?(1):(varenv["lb#{i}"])) }.join(",")+"/)"
         glubs="(/"+(1..7).map { |i| (i>dims)?(1):(varenv["ub#{i}"]) }.join(",")+"/)"
         perms="(/"+(1..7).map { |i| (varenv["dim#{i}"])?(1):(0) }.join(",")+"/)"
-#       code="if (sms_debugging_on()) call ppp_compare_var(#{decomp}(dh__nestlevel),#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},msg,ppp__status)"
-        puts "### #{code}"
+        code="if (sms_debugging_on()) call ppp_compare_var(#{decomp}(dh__nestlevel),#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}','#{msg}',ppp__status)"
+#       puts "### #{code}"
       end
-#     sub(parent,raw(code),
+#     sub(parent,raw(code,:if_stmt))
+#     p raw(code,:if_stmt)
     end
   end
   
