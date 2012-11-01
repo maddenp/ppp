@@ -16,6 +16,9 @@
 - Move proc_sms_executable call from sms_executable : sms_barrier to
   executable_construct : sms_executable once sms$ignore begin/end are gone.
 
+- Move proc_sms_declarative call from sms_declarative : sms_distribute to
+  declaration_construct : sms_declarative once sms$ignore begin/end are gone.
+
 - In declare(), use push(tree) instead of insert(0,tree) to insert new
   declarations at the END of the declarations list. Unfortunately, the old
   ppp breaks (fim:cnuity.F90) with the declaration at the end -- can't see
@@ -24,4 +27,7 @@
 - When the legacy ppp is removed from the build chain, remove the sms$ignore
   region being inserted by use(), which is only an interim shim to keep legacy
   ppp from freaking out.
+
+- declare() is naive. What about declaring an array with the same type as an
+  already-declared scalar? Need more flexibility...
 

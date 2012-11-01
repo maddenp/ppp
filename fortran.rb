@@ -62,21 +62,32 @@ module Fortran
     @@dolabels.push(label)
   end
 
-  def envensure
-    envswap(myenv) unless myenv.object_id==env.object_id
-  end
-
-  def envget(k)
-    env[k]||{}
+  def enclosing(classes)
+    nearest(classes,self.parent)
   end
 
   def env
     @@envstack.last
   end
 
+  def envensure
+    if x=nearest([SMS])
+      return envswap(x.myenv) unless x.myenv.object_id==env.object_id
+    end
+    envinit
+  end
+
+  def envget(k)
+    env[k]||{}
+  end
+
+  def envinit
+    @@envstack=[{}]
+  end
+
   def envpop
     @@envstack.pop
-    @@envstack=[{}] if @@envstack.empty?
+    envinit if @@envstack.empty?
   end
 
   def envpush(base=env.dup)
@@ -92,17 +103,19 @@ module Fortran
     @@envstack.push(new)
   end
 
-  def findabove(classes)
-    n=self
-    while p=n.parent
-      return p if classes.any? { |x| p.is_a?(x) }
-      n=p
-    end
-    nil
-  end
-
   def indent(s)
     " "*2*@@level+s
+  end
+
+  def inside?(classes)
+    (enclosing(classes))?(true):(false)
+  end
+
+  def nearest(classes,n=self)
+    begin
+      return n if classes.any? { |x| n.is_a?(x) }
+    end while n=n.parent
+    nil
   end
 
   def is_array?(node)
@@ -228,6 +241,11 @@ module Fortran
     true
   end
 
+  def proc_sms_declarative(sms_declarative)
+    sms_declarative.myenv=env
+    true
+  end
+
   def proc_sms_executable(sms_executable)
     sms_executable.myenv=env
     true
@@ -276,7 +294,7 @@ module Fortran
   end
 
   def scoping_unit
-    findabove([Scoping_Unit])
+    enclosing([Scoping_Unit])
   end
 
   def sms(s)
@@ -482,7 +500,7 @@ module Fortran
 
   class Assumed_Shape_Spec < T
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
-    def lb() (e[0].respond_to?(:lb))?(e[0].lb):("1") end
+    def lb() (e[0].respond_to?(:lb))?(e[0].lb):(:default) end
     def ub() :assumed end
   end
 
@@ -498,7 +516,7 @@ module Fortran
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
     def boundslist() ex+[bounds] end
     def ex() (e[0].respond_to?(:boundslist))?(e[0].boundslist):([]) end
-    def lb() ("#{e[1]}".empty?)?("1"):(e[1].lb) end
+    def lb() ("#{e[1]}".empty?)?(:default):(e[1].lb) end
     def ub() :assumed end
   end
 
@@ -701,7 +719,7 @@ module Fortran
 
   class Explicit_Shape_Spec < T
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
-    def lb() ("#{e[0]}".empty?)?("1"):(e[0].lb) end
+    def lb() ("#{e[0]}".empty?)?(:default):(e[0].lb) end
     def ub() e[1].ub end
   end
 
@@ -799,6 +817,16 @@ module Fortran
 
   class Name < T
     def name() to_s end
+    def translate()
+      if inside?([Entity_Decl])
+        envensure
+        if me=env[self.to_s]
+          if me['decomp']
+#           puts "### var #{to_s} env #{me}"
+          end
+        end
+      end
+    end
   end
 
   class Namelist_Group_Set_Pair < T
@@ -904,98 +932,105 @@ module Fortran
 
   ## SMS ##
 
-  class SMS_Barrier < T
+  class SMS < T
+  end
+
+  class SMS_Barrier < SMS
     def translate
       use("nnt_types_module")
       sub(parent,raw("call ppp_barrier(ppp__status)",:call_stmt))
     end
   end
 
-  class SMS_Compare_Var < T
+  class SMS_Compare_Var < SMS
     def to_s() sms("#{e[2]}") end
   end
   
-  class SMS_Create_Decomp < T
+  class SMS_Create_Decomp < SMS
     def to_s() sms(e[2].e.map { |x| x.text_value }.join) end
   end
 
-  class SMS_Distribute < T
+  class SMS_Distribute < SMS
     def to_s() "#{e[0]}#{e[1].e.reduce('') { |m,x| m+=x.to_s }}#{e[2]}" end
+#   def translate()
+#     envensure
+#     self
+#   end
   end
 
-  class SMS_Distribute_Begin < T
+  class SMS_Distribute_Begin < SMS
     def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}") end
   end
   
-  class SMS_Distribute_End < T
+  class SMS_Distribute_End < SMS
     def to_s() sms("#{e[2]}") end
   end
 
-  class SMS_Distribute_Dims_1 < T
+  class SMS_Distribute_Dims_1 < SMS
     def dims() ["#{e[0]}".to_i,"#{e[2]}".to_i] end
   end
 
-  class SMS_Distribute_Dims_2 < T
+  class SMS_Distribute_Dims_2 < SMS
     def dims() [nil,"#{e[1]}".to_i] end
   end
 
-  class SMS_Distribute_Dims_3 < T
+  class SMS_Distribute_Dims_3 < SMS
     def dims() ["#{e[0]}".to_i,nil] end
   end
 
-  class SMS_Exchange < T
+  class SMS_Exchange < SMS
     def to_s() sms(e[2].e.map { |x| x.text_value }.join) end
   end
   
-  class SMS_Halo_Comp_Begin < T
+  class SMS_Halo_Comp_Begin < SMS
     def to_s() sms("#{e[2]} #{e[3]}") end
   end
   
-  class SMS_Halo_Comp_End < T
+  class SMS_Halo_Comp_End < SMS
     def to_s() sms("#{e[2]}") end
   end
   
-  class SMS_Ignore_Begin < T
+  class SMS_Ignore_Begin < SMS
     def to_s() sms("#{e[2]}") end
   end
 
-  class SMS_Ignore_End < T
+  class SMS_Ignore_End < SMS
     def to_s() sms("#{e[2]}") end
   end
 
-  class SMS_Parallel_Begin < T
+  class SMS_Parallel_Begin < SMS
     def to_s() sms("#{e[2]} #{e[3]}") end
   end
 
-  class SMS_Parallel_End < T
+  class SMS_Parallel_End < SMS
     def to_s() sms("#{e[2]}") end
   end
 
-  class SMS_Reduce < T
+  class SMS_Reduce < SMS
     def to_s() sms("#{e[2]}") end
   end
 
-  class SMS_Serial_Begin < T
+  class SMS_Serial_Begin < SMS
     def to_s() sms("#{sa(e[2])}#{e[3]}") end
   end
 
-  class SMS_Serial_End < T
+  class SMS_Serial_End < SMS
     def to_s() sms("#{e[2]}") end
   end
 
-  class SMS_Set_Communicator < T
+  class SMS_Set_Communicator < SMS
     def to_s() sms("#{e[2]}") end
   end
 
-  class SMS_To_Local_Begin < T
+  class SMS_To_Local_Begin < SMS
     def to_s() sms("#{e[2]} #{e[3]}") end
   end
 
-  class SMS_To_Local_End < T
+  class SMS_To_Local_End < SMS
     def to_s() sms("#{e[2]}") end
   end
 
-  class SMS_Unstructured_Grid < T
+  class SMS_Unstructured_Grid < SMS
     def to_s() sms("#{e[2]}") end
   end
 

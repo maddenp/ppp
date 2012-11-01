@@ -858,7 +858,7 @@ grammar Fortran
     stmt_function_stmt !{ |e| is_array?(e[0]) } <E> /
     directive /
     sms_passthrough /
-    sms_declarative
+    sms_declarative # prefer "sms_declarative &{ |e| proc_sms_declarative(e[0]) }" -- see TODO
   end
 
   rule declaration_constructs
@@ -2782,7 +2782,7 @@ grammar Fortran
   end
 
   rule sms_declarative
-    sms_distribute
+    sms_distribute &{ |e| proc_sms_declarative(e[0]) } <E>
   end
 
   rule sms_decomp_name
