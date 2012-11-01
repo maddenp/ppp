@@ -943,7 +943,7 @@ module Fortran
   end
 
   class SMS_Compare_Var < SMS
-    def to_s() sms("#{e[2]}") end
+    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}") end
   end
   
   class SMS_Create_Decomp < SMS
@@ -952,10 +952,6 @@ module Fortran
 
   class SMS_Distribute < SMS
     def to_s() "#{e[0]}#{e[1].e.reduce('') { |m,x| m+=x.to_s }}#{e[2]}" end
-#   def translate()
-#     envensure
-#     self
-#   end
   end
 
   class SMS_Distribute_Begin < SMS

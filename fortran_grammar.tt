@@ -2774,7 +2774,7 @@ grammar Fortran
   end
 
   rule sms_compare_var
-    sms_sentinel sms_t_compare_var parenthesized_args t_newline <SMS_Compare_Var>
+    sms_sentinel sms_t_compare_var t_paren_l variable_name t_comma char_literal_constant t_paren_r t_newline <SMS_Compare_Var>
   end
 
   rule sms_create_decomp
@@ -2816,7 +2816,8 @@ grammar Fortran
   end
 
   rule sms_executable
-    sms_barrier &{ |e| proc_sms_executable(e[0]) } / # prefer just "sms_barrier /" -- see TODO
+    sms_barrier &{ |e| proc_sms_executable(e[0]) } <E> /     # prefer just "sms_barrier /" -- see TODO
+    sms_compare_var &{ |e| proc_sms_executable(e[0]) } <E> / # prefer just "sms_compare_var /" -- see TODO
     sms_passthrough
   end
 
@@ -2850,7 +2851,6 @@ grammar Fortran
   end
 
   rule sms_passthrough
-    sms_compare_var /
     sms_create_decomp /
     sms_exchange /
     sms_halo_comp_begin /

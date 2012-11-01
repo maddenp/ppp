@@ -15,6 +15,7 @@
 
 - Move proc_sms_executable call from sms_executable : sms_barrier to
   executable_construct : sms_executable once sms$ignore begin/end are gone.
+  Also: sms_compare_var.
 
 - Move proc_sms_declarative call from sms_declarative : sms_distribute to
   declaration_construct : sms_declarative once sms$ignore begin/end are gone.
