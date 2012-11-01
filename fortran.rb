@@ -971,6 +971,7 @@ module Fortran
       envensure
       var="#{e[3]}"
       varenv=env[var]
+      return unless varenv # HACK until modules are being loaded into env
       if decomp=varenv['decomp']
         dims=varenv["dims"]
         msg="#{e[5]}"

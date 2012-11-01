@@ -32,5 +32,8 @@
 - declare() is naive. What about declaring an array with the same type as an
   already-declared scalar? Need more flexibility...
 
-- error needed when compare_var variable is not distributed or no mod info
+- Error needed when compare_var variable is not distributed or no mod info
+
+- Remove HACK from SMS_Compare_Var::translate() when modules are being loaded
+  into env. No sense in looking up env information for use'd variables.
 
