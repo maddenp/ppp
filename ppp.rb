@@ -13,7 +13,7 @@ module PPP
   @@fp=nil # fortran parser
   @@np=nil # normalize parser
 
-  def defprops
+  def default_props
     {:debug=>false,:incdirs=>[],:normalize=>false,:srcfile=>nil}
   end
   
@@ -46,12 +46,12 @@ module PPP
     s=s.gsub(/^@(.*)/i,'!\1')             # show directives
   end
 
-  def out(s,root=:program_units,props=defprops)
+  def out(s,root=:program_units,props=default_props)
     translated_source,raw_tree,translated_tree=process(s,root,props)
     translated_source
   end
 
-  def process(s,root=:program_units,props=defprops)
+  def process(s,root=:program_units,props=default_props)
 
     def assemble(s,seen,incdirs=[])
       current=seen.last
@@ -151,6 +151,7 @@ module PPP
     s=normalize(s)
     unless props[:normalize]
       puts s if debug
+      @@incdirs=props[:incdirs]
       raw_tree=@@fp.parse(s,:root=>root)
       if debug
         puts "\nRAW TREE\n\n"
@@ -168,12 +169,12 @@ module PPP
     [s,raw_tree,translated_tree]
   end
 
-  def raw(s,root=:program_units,props=defprops)
+  def raw(s,root=:program_units,props=default_props)
     s,raw_tree,translated_tree=process(s,root,props)
     raw_tree
   end
 
-  def tree(s,root=:program_units,props=defprops)
+  def tree(s,root=:program_units,props=default_props)
     s,raw_tree,translated_tree=process(s,root,props)
     translated_tree
   end

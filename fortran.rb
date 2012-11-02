@@ -4,6 +4,7 @@ module Fortran
   @@distribute=nil
   @@dolabels=[]
   @@envstack=[{}]
+  @@incdirs=[]
   @@level=0
   @@levelstack=[]
   @@uses={}
@@ -35,7 +36,7 @@ module Fortran
   end
 
   def declare(type,name)
-    envget
+    envset
     v=env[name]
     if v.nil?
       code="#{type}::#{name}"
@@ -70,7 +71,7 @@ module Fortran
     @@envstack.last
   end
 
-  def envget
+  def envset
     if x=nearest([SMS])
       envswap(x.myenv) unless x.myenv.object_id==env.object_id
     else
@@ -352,19 +353,19 @@ module Fortran
       end
       unless code.nil?
         p=use_part
-# hack start
+# HACK start
         t=tree("!sms$ignore begin",:sms_ignore_begin)
         t.parent=p
         p.e.push(t)
-# hack end
+# HACK end
         t=tree(code,:use_stmt)
         t.parent=p
         p.e.push(t)
-# hack start
+# HACK start
         t=tree("!sms$ignore end",:sms_ignore_end)
         t.parent=p
         p.e.push(t)
-# hack end
+# HACK end
       end
     end
   end
@@ -828,7 +829,7 @@ module Fortran
     def name() to_s end
 #   def translate()
 #     if inside?([Entity_Decl])
-#       envget
+#       envset
 #       if me=env[self.to_s]
 #         if me['decomp']
 #           puts "### var #{to_s} env #{me}"
@@ -956,7 +957,7 @@ module Fortran
     def translate()
       use("module_decomp")
       use("nnt_types_module")
-      envget
+      envset
       var="#{e[3]}"
       varenv=env[var]
       return unless varenv # HACK until modules are being loaded into env
