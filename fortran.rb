@@ -303,8 +303,8 @@ module Fortran
     modenv(m).each do |x|
       varname=x[0]
       varprop=x[1]
-      if @@uses[m]==:all or @@uses[m].include?(varname)
-        env[varname]=varprop
+      if @@uses[m].include?(:all) or @@uses[m].include?(varname)
+        env[varname]=varprop unless varprop["access"]=="private"
       end
     end
     true
