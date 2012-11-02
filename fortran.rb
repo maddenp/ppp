@@ -293,25 +293,15 @@ module Fortran
     true
   end
 
-  def proc_use_stmt_1(module_name,rename_list_option)
+  def proc_use_stmt(module_name,list)
     m="#{module_name}"
-    if rename_list_option.is_a?(Rename_List_Option)
-      use_add(m,rename_list_option.usenames)
+#   if list.is_a?(Only_List) or list.is_a?(Rename_List_Option)
+    if list.respond_to?(:usenames)
+      use_add(m,list.usenames)
     else
       @@uses[m]=[:all]
     end
-#p modenv(m)
-    true
-  end
-
-  def proc_use_stmt_2(module_name,only_list)
-    m="#{module_name}"
-    if only_list.is_a?(Only_List)
-      use_add(m,only_list.usenames)
-    else
-      @@uses[m]=[:all]
-    end
-#p modenv(m)
+#   modenv(m).each { |x| p x }
     true
   end
 

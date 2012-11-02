@@ -3760,8 +3760,8 @@ grammar Fortran
   rule use_stmt
     # F90:R1107
 
-    label:label? t_use module_name rename_list_option? t_newline &{ |e| proc_use_stmt_1(e[2],e[3]) } <Use_Stmt_1> /
-    label:label? t_use module_name t_comma t_only t_colon only_list? t_newline &{ |e| proc_use_stmt_2(e[2],e[6]) } <Use_Stmt_2>
+    label:label? t_use module_name rename_list_option? t_newline &{ |e| proc_use_stmt(e[2],e[3]) } <Use_Stmt_1> /
+    label:label? t_use module_name t_comma t_only t_colon only_list? t_newline &{ |e| proc_use_stmt(e[2],e[6]) } <Use_Stmt_2>
   end
 
   rule variable
