@@ -295,13 +295,18 @@ module Fortran
 
   def proc_use_stmt(module_name,list)
     m="#{module_name}"
-#   if list.is_a?(Only_List) or list.is_a?(Rename_List_Option)
     if list.respond_to?(:usenames)
       use_add(m,list.usenames)
     else
       @@uses[m]=[:all]
     end
-#   modenv(m).each { |x| p x }
+    modenv(m).each do |x|
+      varname=x[0]
+      varprop=x[1]
+      if @@uses[m]==:all or @@uses[m].include?(varname)
+        env[varname]=varprop
+      end
+    end
     true
   end
 
