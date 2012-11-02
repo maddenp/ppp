@@ -323,7 +323,7 @@ module Fortran
   end
 
   def sms(s)
-    "#{e[0]}#{e[1]} "+s+"\n"
+    "#{e[0]}#{e[1]} #{s}\n"
   end
 
   def smsfile(m,d=".")
