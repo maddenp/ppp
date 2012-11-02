@@ -132,6 +132,19 @@ module Fortran
     (p.to_s==c)?(v):(p)
   end
 
+  def modenv(m)
+    if d=@@incdirs.find_all { |x| File.exist?(smsfile(m,x)) }[0]
+      f=smsfile(m,d)
+      begin
+        return YAML.load(File.open(f))
+      rescue Exception=>ex
+        ex.backtrace.each { |x| puts x }
+        fail "Error reading #{f}"
+      end
+    end
+    {}
+  end
+
   def msg(s)
     $stderr.write(">|#{s}|<\n")
   end
@@ -194,7 +207,7 @@ module Fortran
 
   def proc_module(_module)
     module_name=_module.e[0].name
-    File.open("#{module_name}.sms","w") { |f| f.write(YAML.dump(env)) }
+    File.open(smsfile(module_name),"w") { |f| f.write(YAML.dump(env)) }
     envpop
     @@access="default"
     true
@@ -280,6 +293,28 @@ module Fortran
     true
   end
 
+  def proc_use_stmt_1(module_name,rename_list_option)
+    m="#{module_name}"
+    if rename_list_option.is_a?(Rename_List_Option)
+      use_add(m,rename_list_option.usenames)
+    else
+      @@uses[m]=[:all]
+    end
+#p modenv(m)
+    true
+  end
+
+  def proc_use_stmt_2(module_name,only_list)
+    m="#{module_name}"
+    if only_list.is_a?(Only_List)
+      use_add(m,only_list.usenames)
+    else
+      @@uses[m]=[:all]
+    end
+#p modenv(m)
+    true
+  end
+
   def sa(e)
     (e.to_s=="")?(""):("#{e} ")
   end
@@ -294,6 +329,10 @@ module Fortran
 
   def sms(s)
     "#{e[0]}#{e[1]} "+s+"\n"
+  end
+
+  def smsfile(m,d=".")
+    File.join(File.expand_path(d),"#{m}.sms")
   end
 
   def smstype(fortran_type)
@@ -384,26 +423,6 @@ module Fortran
 
   def use_part
     specification_part.e[0]
-  end
-
-  def use_update_1(module_name,rename_list_option)
-    m="#{module_name}"
-    if rename_list_option.is_a?(Rename_List_Option)
-      use_add(m,rename_list_option.usenames)
-    else
-      @@uses[m]=[:all]
-    end
-    true
-  end
-
-  def use_update_2(module_name,only_list)
-    m="#{module_name}"
-    if only_list.is_a?(Only_List)
-      use_add(m,only_list.usenames)
-    else
-      @@uses[m]=[:all]
-    end
-    true
   end
 
   def uses?(module_name,use_name)

@@ -29,9 +29,9 @@ def test(t)
   exe("make -C #{t} clean")
   exe("make -C #{t} exe")
   e="./a.out"
-  stdout=((File.exists?(File.join(t,e)))?(exe("cd #{t} && #{e}")):(""))
+  stdout=((File.exist?(File.join(t,e)))?(exe("cd #{t} && #{e}")):(""))
   f=File.join(t,"control")
-  if File.exists?(f)
+  if File.exist?(f)
     control=File.open(f,"rb").read
     unless stdout==control
       msg="#{t} output expected:\n--begin--\n"
