@@ -1158,7 +1158,7 @@ grammar Fortran
   rule end_module_stmt
     # F90:R1106
 
-    label:label? t_end end_module_option? t_newline &{ |e| proc_end_module_stmt } <End_Module_Stmt>
+    label:label? t_end end_module_option? t_newline <End_Module_Stmt>
   end
 
   rule end_program_stmt
@@ -2033,7 +2033,7 @@ grammar Fortran
   rule module
     # F90:R1104
 
-    module_stmt specification_part? module_subprogram_part? end_module_stmt &{ |e| proc_module(e[0]) } <Module>
+    module_stmt specification_part? module_subprogram_part? end_module_stmt <Module>
   end
 
   rule module_name
@@ -2052,6 +2052,12 @@ grammar Fortran
     module_procedure_stmt* <E>
   end
 
+  rule module_stmt
+    # F90:R1105
+
+    label:label? t_module module_name t_newline &{ |e| proc_module_stmt } <Module_Stmt>
+  end
+
   rule module_subprogram
     # F90:R213
 
@@ -2064,12 +2070,6 @@ grammar Fortran
     # F90:R212
 
     contains_stmt module_subprogram+ <Module_Subprogram_Part>
-  end
-
-  rule module_stmt
-    # F90:R1105
-
-    label:label? t_module module_name t_newline &{ |e| proc_module_stmt } <Module_Stmt>
   end
 
   rule mult_op
@@ -2424,7 +2424,7 @@ grammar Fortran
     # F90:R202
 
     external_subprogram /
-    module /
+    module &{ |e| proc_module(e[0]) } <E> /
     block_data /
     main_program
   end

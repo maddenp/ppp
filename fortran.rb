@@ -35,7 +35,7 @@ module Fortran
   end
 
   def declare(type,name)
-    envensure
+    envget
     v=env[name]
     if v.nil?
       code="#{type}::#{name}"
@@ -70,16 +70,12 @@ module Fortran
     @@envstack.last
   end
 
-  def envensure
+  def envget
     if x=nearest([SMS])
       envswap(x.myenv) unless x.myenv.object_id==env.object_id
     else
       envinit
     end
-  end
-
-  def envget(k)
-    env[k]||{}
   end
 
   def envinit
@@ -93,10 +89,6 @@ module Fortran
 
   def envpush(base=env.dup)
     @@envstack.push(base)
-  end
-
-  def envset(k,v)
-    env[k]=v
   end
 
   def envswap(new)
@@ -189,11 +181,6 @@ module Fortran
     true
   end
 
-  def proc_end_module_stmt
-    envpop
-    true
-  end
-
   def proc_end_program_stmt
     envpop
     true
@@ -204,9 +191,10 @@ module Fortran
     true
   end
 
-  def proc_module(module_stmt)
-    module_name=module_stmt.name
+  def proc_module(_module)
+    module_name=_module.e[0].name
     File.open("#{module_name}.sms","w") { |f| f.write(YAML.dump(env)) }
+    envpop
     @@access="default"
     true
   end
@@ -840,7 +828,7 @@ module Fortran
     def name() to_s end
 #   def translate()
 #     if inside?([Entity_Decl])
-#       envensure
+#       envget
 #       if me=env[self.to_s]
 #         if me['decomp']
 #           puts "### var #{to_s} env #{me}"
@@ -968,7 +956,7 @@ module Fortran
     def translate()
       use("module_decomp")
       use("nnt_types_module")
-      envensure
+      envget
       var="#{e[3]}"
       varenv=env[var]
       return unless varenv # HACK until modules are being loaded into env
