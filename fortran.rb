@@ -206,8 +206,8 @@ module Fortran
   end
 
   def proc_module(_module)
-    module_name=_module.e[0].name
-    File.open(smsfile(module_name),"w") { |f| f.write(YAML.dump(env)) }
+    modulename=_module.e[0].name
+    File.open(smsfile(modulename),"w") { |f| f.write(YAML.dump(env)) }
     envpop
     @@access="default"
     true
@@ -293,18 +293,19 @@ module Fortran
     true
   end
 
-  def proc_use_stmt(module_name,list)
-    m="#{module_name}"
+  def proc_use_stmt(modulename,list)
+    m="#{modulename}"
     if list.respond_to?(:usenames)
-      use_add(m,list.usenames)
+      use_add(m,list.usenames,list.localnames)
     else
       @@uses[m]=[:all]
     end
     modenv(m).each do |x|
       varname=x[0]
       varprop=x[1]
-      if @@uses[m].include?(:all) or @@uses[m].include?(varname)
-        env[varname]=varprop unless varprop["access"]=="private"
+      localname=use_localname(m,varname)
+      if uses?(m,:all) or uses?(m,localname)
+        env[localname]=varprop unless varprop["access"]=="private"
       end
     end
     true
@@ -370,16 +371,16 @@ module Fortran
     self
   end
 
-  def use(module_name,usenames=[])
-    unless uses?(module_name,:all)
-      code="use #{module_name}"
+  def use(modulename,usenames=[])
+    unless uses?(modulename,:all)
+      code="use #{modulename}"
       unless usenames.empty?
         list=[]
         usenames.each do |x|
           h=x.is_a?(Hash)
           localname=(h)?(x.keys.first):(nil)
           usename=(h)?(x.values.first):(x)
-          unless uses?(module_name,usename)
+          unless uses?(modulename,usename)
             list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
           end
         end
@@ -404,24 +405,40 @@ module Fortran
     end
   end
 
-  def use_add(module_name,use_names)
-    if @@uses[module_name].nil?
-      @@uses[module_name]=use_names
+  def use_add(modulename,usenames,localnames)
+    names=localnames.zip(usenames)
+    if @@uses[modulename].nil?
+      @@uses[modulename]=names
     else
-      unless uses?(module_name,:all)
-        use_names.each do |x|
-          @@uses[module_name].push(x) unless uses?(module_name,x)
+      unless uses?(modulename,:all)
+        names.each do |x|
+          @@uses[modulename].push(x) unless uses?(modulename,x)
         end
       end
     end
+  end
+
+  def use_localname(modulename,usename)
+    if i=use_usenames(modulename).index(usename)
+      return use_localnames(modulename)[i]
+    end
+    return usename
+  end
+
+  def use_localnames(modulename)
+    @@uses[modulename].map { |x| x[0] }
+  end
+
+  def use_usenames(modulename)
+    @@uses[modulename].map { |x| x[1] }
   end
 
   def use_part
     specification_part.e[0]
   end
 
-  def uses?(module_name,use_name)
-    (@@uses[module_name])?(@@uses[module_name].include?(use_name)):(false)
+  def uses?(modulename,usename)
+    (@@uses[modulename])?(use_localnames(modulename).include?(usename)):(false)
   end
 
   def vargetprop(n,k)
