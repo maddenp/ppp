@@ -63,10 +63,10 @@ module Fortran
             _props["decomp"]=@@distribute["decomp"]
             _props["dim#{arrdim}"]=decdim+1
           end
-          dims+=1
         end
+        dims+=1
       end
-      _props["dims"]=dims
+      _props["dims"]||=dims
     end
   end
 
