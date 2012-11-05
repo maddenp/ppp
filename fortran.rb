@@ -68,6 +68,7 @@ module Fortran
       end
       _props["dims"]||=dims
     end
+    _props
   end
 
   def dolabel_dupe?
@@ -198,9 +199,12 @@ module Fortran
   end
 
   def proc_dimension_stmt(array_names_and_specs)
-    array_names_and_specs.names.each do |x|
-      varsetprop(x,"rank","array")
+    array_names_and_specs.e.each do |x|
+      if x.is_a?(Array_Name_And_Spec)
+        env["#{x.e[0]}"].merge!(decomp_props(x.e[2],{}))
+      end
     end
+    array_names_and_specs.names.each { |x|varsetprop(x,"rank","array") }
     true
   end
 

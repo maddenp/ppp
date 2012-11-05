@@ -2790,7 +2790,7 @@ grammar Fortran
   end
 
   rule sms_distribute
-    sms_distribute_begin type_declaration_stmt* sms_distribute_end <SMS_Distribute>
+    sms_distribute_begin ( type_declaration_stmt / dimension_stmt )* sms_distribute_end <SMS_Distribute>
   end
 
   rule sms_distribute_begin
