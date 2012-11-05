@@ -31,26 +31,6 @@ module Fortran
     self.e.map { |x| x.to_s }.join
   end
 
-  def declaration_constructs
-    specification_part.e[2]
-  end
-
-  def declare(type,name)
-    envset
-    v=env[name]
-    if v.nil?
-      code="#{type}::#{name}"
-      t=tree(code,:type_declaration_stmt)
-      p=declaration_constructs
-      t.parent=p
-      p.e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
-    else
-      if v["type"]!=type
-        fail "#{name} is already declared with type #{v['type']}"
-      end
-    end
-  end
-
   def decomp_props(array_spec,_props)
     if @@distribute
       dims=0
@@ -83,20 +63,8 @@ module Fortran
     @@dolabels.push(label)
   end
 
-  def enclosing(classes)
-    nearest(classes,self.parent)
-  end
-
   def env
     @@envstack.last
-  end
-
-  def envset
-    if x=nearest([SMS])
-      envswap(x.myenv) unless x.myenv.object_id==env.object_id
-    else
-      envinit
-    end
   end
 
   def envinit
@@ -119,17 +87,6 @@ module Fortran
 
   def indent(s)
     " "*2*@@level+s
-  end
-
-  def inside?(classes)
-    (enclosing(classes))?(true):(false)
-  end
-
-  def nearest(classes,n=self)
-    begin
-      return n if classes.any? { |x| n.is_a?(x) }
-    end while n=n.parent
-    nil
   end
 
   def is_array?(node)
@@ -329,10 +286,6 @@ module Fortran
     (e.to_s=="")?(""):(" #{e}")
   end
 
-  def scoping_unit
-    enclosing([Scoping_Unit])
-  end
-
   def sms(s)
     "#{e[0]}#{e[1]} #{s}\n"
   end
@@ -341,28 +294,9 @@ module Fortran
     File.join(File.expand_path(d),"#{m}.sms")
   end
 
-  def smstype(fortran_type)
-    case fortran_type
-    when "integer"
-      "nnt_integer"
-    when "real"
-      "nnt_real"
-    when "doubleprecision"
-      "nnt_doubleprecision"
-    when "complex"
-      "nnt_complex"
-    when "logical"
-      "nnt_logical"
-    end
-  end
-
   def space(all=false)
     a=(all)?(self.e):(self.e[1..-1])
     a.map { |x| x.to_s }.join(" ").strip
-  end
-
-  def specification_part
-    scoping_unit.e[1]
   end
 
   def stmt(s,f=nil)
@@ -370,49 +304,9 @@ module Fortran
     indent(("#{sa(e[0])}"+s.chomp).strip)+"\n"
   end
 
-  def sub(node,tree)
-    tree.parent=node.parent
-    block=node.parent.e
-    block[block.index(node)]=tree
-  end
-
   def translate()
     e.each { |x| x.translate } unless e.nil?
     self
-  end
-
-  def use(modulename,usenames=[])
-    unless uses?(modulename,:all)
-      code="use #{modulename}"
-      unless usenames.empty?
-        list=[]
-        usenames.each do |x|
-          h=x.is_a?(Hash)
-          localname=(h)?(x.keys.first):(nil)
-          usename=(h)?(x.values.first):(x)
-          unless uses?(modulename,usename)
-            list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
-          end
-        end
-        code=((list.empty?)?(nil):("#{code},only:#{list.join(',')}"))
-      end
-      unless code.nil?
-        p=use_part
-# HACK start
-        t=tree("!sms$ignore begin",:sms_ignore_begin)
-        t.parent=p
-        p.e.push(t)
-# HACK end
-        t=tree(code,:use_stmt)
-        t.parent=p
-        p.e.push(t)
-# HACK start
-        t=tree("!sms$ignore end",:sms_ignore_end)
-        t.parent=p
-        p.e.push(t)
-# HACK end
-      end
-    end
   end
 
   def use_add(modulename,usenames,localnames)
@@ -478,9 +372,123 @@ module Fortran
   # Generic Subclasses
 
   class T < Treetop::Runtime::SyntaxNode
+
     attr_accessor :myenv
-    def initialize(a="",b=(0..0),c=[]) super(a,b,c) end
-    def to_s() text_value end
+
+    def initialize(a="",b=(0..0),c=[])
+      super(a,b,c)
+    end
+
+    def declaration_constructs
+      specification_part.e[2]
+    end
+
+    def declare(type,name)
+      envset
+      v=env[name]
+      if v.nil?
+        code="#{type}::#{name}"
+        t=tree(code,:type_declaration_stmt)
+        p=declaration_constructs
+        t.parent=p
+        p.e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
+      else
+        if v["type"]!=type
+          fail "#{name} is already declared with type #{v['type']}"
+        end
+      end
+    end
+
+    def enclosing(classes)
+      nearest(classes,self.parent)
+    end
+
+    def envset
+      if x=nearest([SMS])
+        envswap(x.myenv) unless x.myenv.object_id==env.object_id
+      else
+        envinit
+      end
+    end
+
+    def inside?(classes)
+      (enclosing(classes))?(true):(false)
+    end
+
+    def nearest(classes,n=self)
+      begin
+        return n if classes.any? { |x| n.is_a?(x) }
+      end while n=n.parent
+      nil
+    end
+
+    def scoping_unit
+      enclosing([Scoping_Unit])
+    end
+
+    def smstype(fortran_type)
+      case fortran_type
+      when "integer"
+        "nnt_integer"
+      when "real"
+        "nnt_real"
+      when "doubleprecision"
+        "nnt_doubleprecision"
+      when "complex"
+        "nnt_complex"
+      when "logical"
+        "nnt_logical"
+      end
+    end
+
+    def specification_part
+      scoping_unit.e[1]
+    end
+
+    def sub(node,tree)
+      tree.parent=node.parent
+      block=node.parent.e
+      block[block.index(node)]=tree
+    end
+
+    def use(modulename,usenames=[])
+      unless uses?(modulename,:all)
+        code="use #{modulename}"
+        unless usenames.empty?
+          list=[]
+          usenames.each do |x|
+            h=x.is_a?(Hash)
+            localname=(h)?(x.keys.first):(nil)
+            usename=(h)?(x.values.first):(x)
+            unless uses?(modulename,usename)
+              list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
+            end
+          end
+          code=((list.empty?)?(nil):("#{code},only:#{list.join(',')}"))
+        end
+        unless code.nil?
+          p=use_part
+# HACK start
+          t=tree("!sms$ignore begin",:sms_ignore_begin)
+          t.parent=p
+          p.e.push(t)
+# HACK end
+          t=tree(code,:use_stmt)
+          t.parent=p
+          p.e.push(t)
+# HACK start
+          t=tree("!sms$ignore end",:sms_ignore_end)
+          t.parent=p
+          p.e.push(t)
+# HACK end
+        end
+      end
+    end
+
+    def to_s()
+      text_value
+    end
+
   end
 
   class E < T
