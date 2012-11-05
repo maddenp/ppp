@@ -1001,21 +1001,21 @@ module Fortran
   end
 
   class SMS_Compare_Var < SMS
-#   def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}") end
+    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}") end
     def translate()
       use("module_decomp")
       use("nnt_types_module")
       envset
       var="#{e[3]}"
       varenv=env[var]
-      return unless varenv # HACK until modules are being loaded into env
+#     return unless varenv # HACK until modules are being loaded into env
       if decomp=varenv['decomp']
         dims=varenv["dims"]
         msg="#{e[5]}"
         type=smstype(varenv['type'])
         gllbs="(/"+(1..7).map { |i| (i>dims)?(1):((varenv["lb#{i}"]=="_default_")?(1):(varenv["lb#{i}"])) }.join(",")+"/)"
         glubs="(/"+(1..7).map { |i| (i>dims)?(1):(varenv["ub#{i}"]) }.join(",")+"/)"
-        perms="(/"+(1..7).map { |i| (varenv["dim#{i}"])?(1):(0) }.join(",")+"/)"
+        perms="(/"+(1..7).map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
         code="if (sms_debugging_on()) call ppp_compare_var(#{decomp}(dh__nestlevel),#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}','#{msg}',ppp__status)"
 #       puts "### #{code}"
       end
