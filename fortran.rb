@@ -262,15 +262,15 @@ module Fortran
   def proc_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
     varprops=entity_decl_list.varprops
     varprops.each { |v,p| p["type"]=type_spec.type }
-    if array_spec=attrchk(attr_spec_option,:dimension?)
+    if dimension_stmt_array_spec=attrchk(attr_spec_option,:dimension?)
       varprops.each do |v,p|
         p["rank"]="array"
         if @@distribute
           dims=0
-          array_spec.boundslist.each_index do |i|
+          dimension_stmt_array_spec.boundslist.each_index do |i|
             arrdim=i+1
-            p["lb#{arrdim}"]=bounds=array_spec.boundslist[i].lb
-            p["ub#{arrdim}"]=bounds=array_spec.boundslist[i].ub
+            p["lb#{arrdim}"]=bounds=dimension_stmt_array_spec.boundslist[i].lb
+            p["ub#{arrdim}"]=bounds=dimension_stmt_array_spec.boundslist[i].ub
             if decdim=@@distribute["dim"].index(arrdim)
               p["decomp"]=@@distribute["decomp"]
               p["dim#{arrdim}"]=decdim+1
@@ -724,7 +724,30 @@ module Fortran
 
   class Entity_Decl < T
     def name() "#{e[0]}" end
-    def props() {name=>{"rank"=>((array?)?("array"):("scalar"))}} end
+    def props()
+      _props={name=>{}}
+      if e[1].is_a?(Entity_Decl_Array_Spec) 
+        array_spec=e[1].e[1]
+### DUPLICATION BEGIN (REFACTOR!)
+        if @@distribute
+          dims=0
+          array_spec.boundslist.each_index do |i|
+            arrdim=i+1
+            _props[name]["lb#{arrdim}"]=bounds=array_spec.boundslist[i].lb
+            _props[name]["ub#{arrdim}"]=bounds=array_spec.boundslist[i].ub
+            if decdim=@@distribute["dim"].index(arrdim)
+              _props[name]["decomp"]=@@distribute["decomp"]
+              _props[name]["dim#{arrdim}"]=decdim+1
+            end
+            dims+=1
+          end
+          _props[name]["dims"]=dims
+        end
+### DUPLICATION END (REFACTOR!)
+      end
+      _props[name]["rank"]=((array?)?("array"):("scalar"))
+      _props
+    end
   end
 
   class Entity_Decl_1 < Entity_Decl
