@@ -51,6 +51,25 @@ module Fortran
     end
   end
 
+  def decomp_props(array_spec,_props)
+    if @@distribute
+      dims=0
+      array_spec.boundslist.each_index do |i|
+        unless _props["decomp"]
+          arrdim=i+1
+          _props["lb#{arrdim}"]=bounds=array_spec.boundslist[i].lb
+          _props["ub#{arrdim}"]=bounds=array_spec.boundslist[i].ub
+          if decdim=@@distribute["dim"].index(arrdim)
+            _props["decomp"]=@@distribute["decomp"]
+            _props["dim#{arrdim}"]=decdim+1
+          end
+          dims+=1
+        end
+      end
+      _props["dims"]=dims
+    end
+  end
+
   def dolabel_dupe?
     "#{@@dolabels[-1]}"=="#{@@dolabels[-2]}"
   end
@@ -262,23 +281,10 @@ module Fortran
   def proc_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
     varprops=entity_decl_list.varprops
     varprops.each { |v,p| p["type"]=type_spec.type }
-    if dimension_stmt_array_spec=attrchk(attr_spec_option,:dimension?)
+    if array_spec=attrchk(attr_spec_option,:dimension?)
       varprops.each do |v,p|
         p["rank"]="array"
-        if @@distribute
-          dims=0
-          dimension_stmt_array_spec.boundslist.each_index do |i|
-            arrdim=i+1
-            p["lb#{arrdim}"]=bounds=dimension_stmt_array_spec.boundslist[i].lb
-            p["ub#{arrdim}"]=bounds=dimension_stmt_array_spec.boundslist[i].ub
-            if decdim=@@distribute["dim"].index(arrdim)
-              p["decomp"]=@@distribute["decomp"]
-              p["dim#{arrdim}"]=decdim+1
-            end
-            dims+=1
-          end
-          p["dims"]=dims
-        end
+        decomp_props(array_spec,p)
       end
     end
     if attrchk(attr_spec_option,:private?)
@@ -725,28 +731,12 @@ module Fortran
   class Entity_Decl < T
     def name() "#{e[0]}" end
     def props()
-      _props={name=>{}}
+      _props={}
       if e[1].is_a?(Entity_Decl_Array_Spec) 
-        array_spec=e[1].e[1]
-### DUPLICATION BEGIN (REFACTOR!)
-        if @@distribute
-          dims=0
-          array_spec.boundslist.each_index do |i|
-            arrdim=i+1
-            _props[name]["lb#{arrdim}"]=bounds=array_spec.boundslist[i].lb
-            _props[name]["ub#{arrdim}"]=bounds=array_spec.boundslist[i].ub
-            if decdim=@@distribute["dim"].index(arrdim)
-              _props[name]["decomp"]=@@distribute["decomp"]
-              _props[name]["dim#{arrdim}"]=decdim+1
-            end
-            dims+=1
-          end
-          _props[name]["dims"]=dims
-        end
-### DUPLICATION END (REFACTOR!)
+        decomp_props(array_spec=e[1].e[1],_props)
       end
-      _props[name]["rank"]=((array?)?("array"):("scalar"))
-      _props
+      _props["rank"]=((array?)?("array"):("scalar"))
+      {name=>_props}
     end
   end
 
