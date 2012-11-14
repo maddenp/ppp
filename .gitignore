@@ -1,4 +1,5 @@
 *.mod
+*.o
 *.sms
 a.out
 fortran_parser.rb
