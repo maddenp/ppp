@@ -1065,7 +1065,7 @@ grammar Fortran
   end
 
   rule dummy_arg_name_list
-    dummy_arg_name ( t_comma dummy_arg_name )* <T>
+    dummy_arg_name ( t_comma dummy_arg_name )* <Dummy_Arg_Name_List>
   end
 
   rule else_construct

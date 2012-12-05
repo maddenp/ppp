@@ -210,6 +210,11 @@ module Fortran
 
   def proc_function_stmt(dummy_arg_name_list)
     envpush
+    if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
+      first=dummy_arg_name_list.e[0].e[0]
+      rest=dummy_arg_name_list.e[1].elements
+      env['args']=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+    end
     true
   end
 
@@ -697,6 +702,9 @@ module Fortran
   end
 
   class Double_Colon < T
+  end
+
+  class Dummy_Arg_Name_List < T
   end
 
   class Else_If_Stmt < T
