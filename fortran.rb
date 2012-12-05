@@ -1,6 +1,7 @@
 module Fortran
 
   @@access="default"
+  @@current_name=nil
   @@distribute=nil
   @@dolabels=[]
   @@envstack=[{}]
@@ -156,6 +157,7 @@ module Fortran
   end
 
   def proc_assumed_shape_spec_list(assumed_shape_spec_list)
+    return false unless env['args'] and env['args'].include?(@@current_name)
     true
   end
 
@@ -206,13 +208,18 @@ module Fortran
     true
   end
 
-  def proc_function_stmt
+  def proc_function_stmt(dummy_arg_name_list)
     envpush
     true
   end
 
   def proc_module_stmt
     envpush
+    true
+  end
+
+  def proc_name(first,rest)
+    @@current_name="#{first}"+rest.elements.reduce("") { |m,x| m+="#{x}" }
     true
   end
 
@@ -242,8 +249,14 @@ module Fortran
     true
   end
 
-  def proc_subroutine_stmt
+  def proc_subroutine_stmt(dummy_arg_list_option)
     envpush
+    if dummy_arg_list_option.elements
+      dummy_arg_list=dummy_arg_list_option.e[1]
+      first=dummy_arg_list.e[0].e[0]
+      rest=dummy_arg_list.e[1].elements
+      env['args']=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+    end
     true
   end
 

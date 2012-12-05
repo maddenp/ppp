@@ -1054,14 +1054,14 @@ grammar Fortran
     dummy_arg ( t_comma dummy_arg )* <T>
   end
 
+  rule dummy_arg_list_option
+    t_paren_l dummy_arg_list? t_paren_r <E>
+  end
+
   rule dummy_arg_name
     # Multiple uses (not explicitly defined)
 
     name
-  end
-
-  rule dummy_arg_list_option
-    t_paren_l dummy_arg_list? t_paren_r <E>
   end
 
   rule dummy_arg_name_list
@@ -1463,7 +1463,7 @@ grammar Fortran
   rule function_stmt
     # F90:R1216
 
-    label:label? prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r result_option? t_newline &{ |e| proc_function_stmt } <Function_Stmt>
+    label:label? prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r result_option? t_newline &{ |e| proc_function_stmt(e[5]) } <Function_Stmt>
   end
 
   rule function_subprogram
@@ -2088,7 +2088,7 @@ grammar Fortran
   rule name
     # F90:R304
 
-    t_letter alphanumeric_character* <Name>
+    t_letter alphanumeric_character* &{ |e| proc_name(e[0],e[1]) } <Name>
   end
 
   rule named_constant
@@ -3060,7 +3060,7 @@ grammar Fortran
   rule subroutine_stmt
     # F90:R1220
 
-    label:label? t_recursive? t_subroutine subroutine_name dummy_arg_list_option? t_newline &{ |e| proc_subroutine_stmt } <Subroutine_Stmt>
+    label:label? t_recursive? t_subroutine subroutine_name dummy_arg_list_option? t_newline &{ |e| proc_subroutine_stmt(e[4]) } <Subroutine_Stmt>
   end
 
   rule subroutine_subprogram
