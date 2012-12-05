@@ -277,8 +277,8 @@ grammar Fortran
     # F90:R512
 
     explicit_shape_spec_list /
-    assumed_shape_spec_list /
-    deferred_shape_spec_list /
+    assumed_shape_spec_list &{ |e| proc_assumed_shape_spec_list(e[0]) } /
+    deferred_shape_spec_list &{ |e| proc_deferred_shape_spec_list(e[0]) } /
     assumed_size_spec
   end
 

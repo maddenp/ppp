@@ -155,6 +155,14 @@ module Fortran
     true
   end
 
+  def proc_assumed_shape_spec_list(assumed_shape_spec_list)
+    true
+  end
+
+  def proc_deferred_shape_spec_list(deferred_shape_spec_list)
+    true
+  end
+
   def proc_dimension_stmt(array_names_and_specs)
     array_names_and_specs.e.each do |x|
       if x.is_a?(Array_Name_And_Spec)
@@ -559,6 +567,8 @@ module Fortran
 
   class Assumed_Shape_Spec < T
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
+    def boundslist() ex+[bounds] end
+    def ex() (e[0].respond_to?(:boundslist))?(e[0].boundslist):([]) end
     def lb() (e[0].respond_to?(:lb))?(e[0].lb):("_default_") end
     def ub() "_assumed_" end
   end
@@ -744,8 +754,8 @@ module Fortran
     def name() "#{e[0]}" end
     def props()
       _props={}
-      if e[1].is_a?(Entity_Decl_Array_Spec) 
-        decomp_props(array_spec=e[1].e[1],_props)
+      if e[1].is_a?(Entity_Decl_Array_Spec)
+        decomp_props(e[1].e[1].e[0],_props)
       end
       _props["rank"]=((array?)?("array"):("scalar"))
       {name=>_props}
@@ -1031,7 +1041,7 @@ module Fortran
 #     p raw(code,:if_stmt)
     end
   end
-  
+
   class SMS_Create_Decomp < SMS
     def to_s() sms(e[2].e.map { |x| x.text_value }.join) end
   end
@@ -1043,7 +1053,7 @@ module Fortran
   class SMS_Distribute_Begin < SMS
     def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}") end
   end
-  
+
   class SMS_Distribute_End < SMS
     def to_s() sms("#{e[2]}") end
   end
@@ -1063,15 +1073,15 @@ module Fortran
   class SMS_Exchange < SMS
     def to_s() sms(e[2].e.map { |x| x.text_value }.join) end
   end
-  
+
   class SMS_Halo_Comp_Begin < SMS
     def to_s() sms("#{e[2]} #{e[3]}") end
   end
-  
+
   class SMS_Halo_Comp_End < SMS
     def to_s() sms("#{e[2]}") end
   end
-  
+
   class SMS_Ignore_Begin < SMS
     def to_s() sms("#{e[2]}") end
   end
