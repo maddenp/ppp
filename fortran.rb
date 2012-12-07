@@ -168,7 +168,10 @@ module Fortran
   def proc_dimension_stmt(array_names_and_specs)
     array_names_and_specs.e.each do |x|
       if x.is_a?(Array_Name_And_Spec)
-        env["#{x.e[0]}"].merge!(decomp_props(x.e[2],{}))
+        key="#{x.e[0]}"
+        array_spec=x.e[2].e[0]
+        env[key]||={}
+        env[key].merge!(decomp_props(array_spec,{}))
       end
     end
     array_names_and_specs.names.each { |x|varsetprop(x,"rank","array") }
@@ -281,8 +284,11 @@ module Fortran
     else
       varprops.each { |v,p| p["access"]=@@access }
     end
-    varprops.each { |v,p| varinit(v,p) }
-#puts YAML::dump(varprops)
+    varprops.each do |v,p|
+      varenv=env["#{v}"]||={}
+      ["access","rank"].each { |x| p.delete(x) if varenv.include?(x) }
+      varenv.merge!(p)
+    end
     true
   end
 
@@ -374,10 +380,6 @@ module Fortran
   def vargetprop(n,k)
     return nil unless env["#{n}"]
     env["#{n}"]["#{k}"]||nil
-  end
-
-  def varinit(n,props={})
-    env["#{n}"]=props
   end
 
   def varsetprop(n,k,v)

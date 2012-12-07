@@ -37,3 +37,5 @@
 - Remove HACK from SMS_Compare_Var::translate() when modules are being loaded
   into env. No sense in looking up env information for use'd variables.
 
+- WHERE may need (automatic?) parallel treatment.
+
