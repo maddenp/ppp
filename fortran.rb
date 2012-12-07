@@ -200,7 +200,10 @@ module Fortran
 
   def proc_module(_module)
     modulename=_module.e[0].name
-    File.open(smsfile(modulename),"w") { |f| f.write(YAML.dump(env)) }
+    modinfo=env.delete_if { |k,v| v["access"]=="private" }
+    unless modinfo.empty?
+      File.open(smsfile(modulename),"w") { |f| f.write(YAML.dump(modinfo)) }
+    end
     envpop
     @@access="default"
     true
@@ -304,7 +307,7 @@ module Fortran
       varprop=x[1]
       localname=use_localname(m,varname)
       if uses?(m,:all) or uses?(m,localname)
-        env[localname]=varprop unless varprop["access"]=="private"
+        env[localname]=varprop
       end
     end
     true
