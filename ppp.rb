@@ -157,7 +157,9 @@ module PPP
         puts "\nRAW TREE\n\n"
         p raw_tree
       end
-      fail "PARSE FAILED" if raw_tree.nil?
+      re=Regexp.new("^(.+?):in `([^\']*)'$")
+      srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
+      fail "PARSE FAILED#{srcmsg}" if raw_tree.nil?
       translated_tree=raw_tree.translate
       if debug
         puts "\nTRANSLATED TREE\n\n"
