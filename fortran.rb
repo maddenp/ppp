@@ -137,7 +137,23 @@ module Fortran
     @@dolabels.pop if nonblock_do_end?(node)
   end
 
-  def proc_access_stmt(access_spec,access_stmt_option)
+  def sa(e)
+    (e.to_s=="")?(""):("#{e} ")
+  end
+
+  def sb(e)
+    (e.to_s=="")?(""):(" #{e}")
+  end
+
+  def sms(s)
+    "#{e[0]}#{e[1]} #{s}\n"
+  end
+
+  def smsfile(m,d=".")
+    File.join(File.expand_path(d),"#{m}.sms")
+  end
+
+  def sp_access_stmt(access_spec,access_stmt_option)
     if access_spec.private?
       p="private"
     elsif access_spec.public?
@@ -156,16 +172,21 @@ module Fortran
     true
   end
 
-  def proc_assumed_shape_spec_list(assumed_shape_spec_list)
+  def sp_assumed_shape_spec_list(assumed_shape_spec_list)
     return false unless env['args'] and env['args'].include?(@@current_name)
     true
   end
 
-  def proc_deferred_shape_spec_list(deferred_shape_spec_list)
+  def sp_block_data_stmt
+    envpush
     true
   end
 
-  def proc_dimension_stmt(array_names_and_specs)
+  def sp_deferred_shape_spec_list(deferred_shape_spec_list)
+    true
+  end
+
+  def sp_dimension_stmt(array_names_and_specs)
     array_names_and_specs.e.each do |x|
       if x.is_a?(Array_Name_And_Spec)
         key="#{x.e[0]}"
@@ -178,27 +199,37 @@ module Fortran
     true
   end
 
-  def proc_end_block_data_stmt
+  def sp_end_block_data_stmt
     envpop
     true
   end
 
-  def proc_end_function_stmt
+  def sp_end_function_stmt
     envpop
     true
   end
 
-  def proc_end_program_stmt
+  def sp_end_program_stmt
     envpop
     true
   end
 
-  def proc_end_subroutine_stmt
+  def sp_end_subroutine_stmt
     envpop
     true
   end
 
-  def proc_module(_module)
+  def sp_function_stmt(dummy_arg_name_list)
+    envpush
+    if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
+      first=dummy_arg_name_list.e[0].e[0]
+      rest=dummy_arg_name_list.e[1].elements
+      env['args']=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+    end
+    true
+  end
+
+  def sp_module(_module)
     modulename=_module.e[0].name
     modinfo=env.delete_if { |k,v| v["access"]=="private" }
     unless modinfo.empty?
@@ -209,58 +240,43 @@ module Fortran
     true
   end
 
-  def proc_block_data_stmt
+  def sp_module_stmt
     envpush
     true
   end
 
-  def proc_function_stmt(dummy_arg_name_list)
-    envpush
-    if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
-      first=dummy_arg_name_list.e[0].e[0]
-      rest=dummy_arg_name_list.e[1].elements
-      env['args']=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
-    end
-    true
-  end
-
-  def proc_module_stmt
-    envpush
-    true
-  end
-
-  def proc_name(first,rest)
+  def sp_name(first,rest)
     @@current_name="#{first}"+rest.elements.reduce("") { |m,x| m+="#{x}" }
     true
   end
 
-  def proc_program_stmt
+  def sp_program_stmt
     envpush
     true
   end
 
-  def proc_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
+  def sp_sms_declarative(sms_declarative)
+    sms_declarative.myenv=env
+    true
+  end
+
+  def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
     @@distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
     sms_distribute_dims.dims.each { |x| @@distribute["dim"].push(x) }
     true
   end
 
-  def proc_sms_distribute_end
+  def sp_sms_distribute_end
     @@distribute=nil
     true
   end
 
-  def proc_sms_declarative(sms_declarative)
-    sms_declarative.myenv=env
-    true
-  end
-
-  def proc_sms_executable(sms_executable)
+  def sp_sms_executable(sms_executable)
     sms_executable.myenv=env
     true
   end
 
-  def proc_subroutine_stmt(dummy_arg_list_option)
+  def sp_subroutine_stmt(dummy_arg_list_option)
     envpush
     if dummy_arg_list_option.elements
       dummy_arg_list=dummy_arg_list_option.e[1]
@@ -271,7 +287,7 @@ module Fortran
     true
   end
 
-  def proc_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
+  def sp_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
     varprops=entity_decl_list.varprops
     varprops.each { |v,p| p["type"]=type_spec.type }
     if array_spec=attrchk(attr_spec_option,:dimension?)
@@ -295,7 +311,7 @@ module Fortran
     true
   end
 
-  def proc_use_stmt(modulename,list)
+  def sp_use_stmt(modulename,list)
     m="#{modulename}"
     if list.respond_to?(:usenames)
       use_add(m,list.usenames,list.localnames)
@@ -311,22 +327,6 @@ module Fortran
       end
     end
     true
-  end
-
-  def sa(e)
-    (e.to_s=="")?(""):("#{e} ")
-  end
-
-  def sb(e)
-    (e.to_s=="")?(""):(" #{e}")
-  end
-
-  def sms(s)
-    "#{e[0]}#{e[1]} #{s}\n"
-  end
-
-  def smsfile(m,d=".")
-    File.join(File.expand_path(d),"#{m}.sms")
   end
 
   def space(all=false)

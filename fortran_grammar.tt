@@ -54,7 +54,7 @@ grammar Fortran
   rule access_stmt
     # F90:R521
 
-    label:label? access_spec access_stmt_option? t_newline &{ |e| proc_access_stmt(e[1],e[2]) } <Access_Stmt>
+    label:label? access_spec access_stmt_option? t_newline &{ |e| sp_access_stmt(e[1],e[2]) } <Access_Stmt>
   end
 
   rule access_stmt_option
@@ -277,8 +277,8 @@ grammar Fortran
     # F90:R512
 
     explicit_shape_spec_list /
-    assumed_shape_spec_list &{ |e| proc_assumed_shape_spec_list(e[0]) } /
-    deferred_shape_spec_list &{ |e| proc_deferred_shape_spec_list(e[0]) } /
+    assumed_shape_spec_list &{ |e| sp_assumed_shape_spec_list(e[0]) } /
+    deferred_shape_spec_list &{ |e| sp_deferred_shape_spec_list(e[0]) } /
     assumed_size_spec
   end
 
@@ -401,7 +401,7 @@ grammar Fortran
   rule block_data_stmt
     # F90:R1111
 
-    label:label? t_block t_data block_data_name? t_newline &{ |e| proc_block_data_stmt } <Block_Data_Stmt>
+    label:label? t_block t_data block_data_name? t_newline &{ |e| sp_block_data_stmt } <Block_Data_Stmt>
   end
 
   rule block_do_construct
@@ -858,7 +858,7 @@ grammar Fortran
     stmt_function_stmt !{ |e| is_array?(e[0]) } <E> /
     directive /
     sms_passthrough /
-    sms_declarative # prefer "sms_declarative &{ |e| proc_sms_declarative(e[0]) }" -- see TODO
+    sms_declarative # prefer "sms_declarative &{ |e| sp_sms_declarative(e[0]) }" -- see TODO
   end
 
   rule declaration_constructs
@@ -948,7 +948,7 @@ grammar Fortran
   rule dimension_stmt
     # F90:R525
 
-    label:label? t_dimension double_colon? array_names_and_specs t_newline &{ |e| proc_dimension_stmt(e[3]) } <Dimension_Stmt>
+    label:label? t_dimension double_colon? array_names_and_specs t_newline &{ |e| sp_dimension_stmt(e[3]) } <Dimension_Stmt>
   end
 
   rule directive
@@ -1109,7 +1109,7 @@ grammar Fortran
   rule end_block_data_stmt
     # F90:R1112
 
-    label:label? t_end end_block_data_option? t_newline &{ |e| proc_end_block_data_stmt } <End_Block_Data_Stmt>
+    label:label? t_end end_block_data_option? t_newline &{ |e| sp_end_block_data_stmt } <End_Block_Data_Stmt>
   end
 
   rule end_do
@@ -1136,7 +1136,7 @@ grammar Fortran
   rule end_function_stmt
     # F90:R1218
 
-    label:label? t_end end_function_option? t_newline &{ |e| proc_end_function_stmt } <End_Function_Stmt>
+    label:label? t_end end_function_option? t_newline &{ |e| sp_end_function_stmt } <End_Function_Stmt>
   end
 
   rule end_if_stmt
@@ -1164,7 +1164,7 @@ grammar Fortran
   rule end_program_stmt
     # F90:R1103
 
-    label:label? t_end !end_program_stmt_disallowed t_program? program_name? t_newline? &{ |e| proc_end_program_stmt } <End_Program_Stmt>
+    label:label? t_end !end_program_stmt_disallowed t_program? program_name? t_newline? &{ |e| sp_end_program_stmt } <End_Program_Stmt>
   end
 
   rule end_program_stmt_disallowed
@@ -1186,7 +1186,7 @@ grammar Fortran
   rule end_subroutine_stmt
     # F90:R1222
 
-    label:label? t_end end_subroutine_option? t_newline &{ |e| proc_end_subroutine_stmt } <End_Subroutine_Stmt>
+    label:label? t_end end_subroutine_option? t_newline &{ |e| sp_end_subroutine_stmt } <End_Subroutine_Stmt>
   end
 
   rule end_subroutine_option
@@ -1307,7 +1307,7 @@ grammar Fortran
     where_construct /
     directive /
     sms_passthrough /
-    sms_executable # prefer "sms_executable &{ |e| proc_sms_executable(e[0]) }" -- see TODO
+    sms_executable # prefer "sms_executable &{ |e| sp_sms_executable(e[0]) }" -- see TODO
   end
 
   rule executable_construct_action_stmt
@@ -1463,7 +1463,7 @@ grammar Fortran
   rule function_stmt
     # F90:R1216
 
-    label:label? prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r result_option? t_newline &{ |e| proc_function_stmt(e[5]) } <Function_Stmt>
+    label:label? prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r result_option? t_newline &{ |e| sp_function_stmt(e[5]) } <Function_Stmt>
   end
 
   rule function_subprogram
@@ -2055,7 +2055,7 @@ grammar Fortran
   rule module_stmt
     # F90:R1105
 
-    label:label? t_module module_name t_newline &{ |e| proc_module_stmt } <Module_Stmt>
+    label:label? t_module module_name t_newline &{ |e| sp_module_stmt } <Module_Stmt>
   end
 
   rule module_subprogram
@@ -2088,7 +2088,7 @@ grammar Fortran
   rule name
     # F90:R304
 
-    t_letter alphanumeric_character* &{ |e| proc_name(e[0],e[1]) } <Name>
+    t_letter alphanumeric_character* &{ |e| sp_name(e[0],e[1]) } <Name>
   end
 
   rule named_constant
@@ -2417,14 +2417,14 @@ grammar Fortran
   rule program_stmt
     # F90:R1102
 
-    label:label? t_program program_name t_newline &{ |e| proc_program_stmt } <Program_Stmt>
+    label:label? t_program program_name t_newline &{ |e| sp_program_stmt } <Program_Stmt>
   end
 
   rule program_unit
     # F90:R202
 
     external_subprogram /
-    module &{ |e| proc_module(e[0]) } <E> /
+    module &{ |e| sp_module(e[0]) } <E> /
     block_data /
     main_program
   end
@@ -2782,7 +2782,7 @@ grammar Fortran
   end
 
   rule sms_declarative
-    sms_distribute &{ |e| proc_sms_declarative(e[0]) } <E>
+    sms_distribute &{ |e| sp_sms_declarative(e[0]) } <E>
   end
 
   rule sms_decomp_name
@@ -2794,7 +2794,7 @@ grammar Fortran
   end
 
   rule sms_distribute_begin
-    sms_sentinel sms_t_distribute t_paren_l sms_decomp_name t_comma sms_distribute_dims t_paren_r sms_t_begin t_newline &{ |e| proc_sms_distribute_begin(e[3],e[5]) } <SMS_Distribute_Begin>
+    sms_sentinel sms_t_distribute t_paren_l sms_decomp_name t_comma sms_distribute_dims t_paren_r sms_t_begin t_newline &{ |e| sp_sms_distribute_begin(e[3],e[5]) } <SMS_Distribute_Begin>
   end
 
   rule sms_distribute_dim
@@ -2808,7 +2808,7 @@ grammar Fortran
   end
 
   rule sms_distribute_end
-    sms_sentinel sms_t_distribute sms_t_end t_newline &{ |e| proc_sms_distribute_end } <SMS_Distribute_End>
+    sms_sentinel sms_t_distribute sms_t_end t_newline &{ |e| sp_sms_distribute_end } <SMS_Distribute_End>
   end
 
   rule sms_exchange
@@ -2816,8 +2816,8 @@ grammar Fortran
   end
 
   rule sms_executable
-    sms_barrier &{ |e| proc_sms_executable(e[0]) } <E> /     # prefer just "sms_barrier /" -- see TODO
-    sms_compare_var &{ |e| proc_sms_executable(e[0]) } <E> / # prefer just "sms_compare_var /" -- see TODO
+    sms_barrier &{ |e| sp_sms_executable(e[0]) } <E> /     # prefer just "sms_barrier /" -- see TODO
+    sms_compare_var &{ |e| sp_sms_executable(e[0]) } <E> / # prefer just "sms_compare_var /" -- see TODO
     sms_passthrough
   end
 
@@ -3060,7 +3060,7 @@ grammar Fortran
   rule subroutine_stmt
     # F90:R1220
 
-    label:label? t_recursive? t_subroutine subroutine_name dummy_arg_list_option? t_newline &{ |e| proc_subroutine_stmt(e[4]) } <Subroutine_Stmt>
+    label:label? t_recursive? t_subroutine subroutine_name dummy_arg_list_option? t_newline &{ |e| sp_subroutine_stmt(e[4]) } <Subroutine_Stmt>
   end
 
   rule subroutine_subprogram
@@ -3699,7 +3699,7 @@ grammar Fortran
   rule type_declaration_stmt
     # F90:R501
 
-    label:label? type_spec attr_spec_option? entity_decl_list t_newline &{ |e| proc_type_declaration_stmt(e[1],e[2],e[3]) } <Type_Declaration_Stmt>
+    label:label? type_spec attr_spec_option? entity_decl_list t_newline &{ |e| sp_type_declaration_stmt(e[1],e[2],e[3]) } <Type_Declaration_Stmt>
   end
 
   rule type_name
@@ -3760,8 +3760,8 @@ grammar Fortran
   rule use_stmt
     # F90:R1107
 
-    label:label? t_use module_name rename_list_option? t_newline &{ |e| proc_use_stmt(e[2],e[3]) } <Use_Stmt_1> /
-    label:label? t_use module_name t_comma t_only t_colon only_list? t_newline &{ |e| proc_use_stmt(e[2],e[6]) } <Use_Stmt_2>
+    label:label? t_use module_name rename_list_option? t_newline &{ |e| sp_use_stmt(e[2],e[3]) } <Use_Stmt_1> /
+    label:label? t_use module_name t_comma t_only t_colon only_list? t_newline &{ |e| sp_use_stmt(e[2],e[6]) } <Use_Stmt_2>
   end
 
   rule variable
