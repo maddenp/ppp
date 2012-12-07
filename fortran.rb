@@ -1045,27 +1045,35 @@ module Fortran
   end
 
   class SMS_Compare_Var < SMS
+
+    def fixbound(b,v,d,x)
+      # [b]ound, [v]ariable, [d]imension, x is [:l]ower or [:u]pper
+      fail "Bad upper bound: #{b}" if b=="_default_" and x==:u
+      return 1 if b=="_default_" and x==:l
+      return "#{x}bound(#{v},#{d})" if ["_assumed_","_deferred_"].include?(b)
+      bound
+    end
+
     def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}") end
+
     def translate()
       use("module_decomp")
       use("nnt_types_module")
       envset
       var="#{e[3]}"
       varenv=env[var]
-#     return unless varenv # HACK until modules are being loaded into env
       if decomp=varenv['decomp']
         dims=varenv["dims"]
         msg="#{e[5]}"
         type=smstype(varenv['type'])
-        gllbs="(/"+(1..7).map { |i| (i>dims)?(1):((varenv["lb#{i}"]=="_default_")?(1):(varenv["lb#{i}"])) }.join(",")+"/)"
-        glubs="(/"+(1..7).map { |i| (i>dims)?(1):(varenv["ub#{i}"]) }.join(",")+"/)"
+        gllbs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv["lb#{i}"],var,i,:l)) }.join(",")+"/)"
+        glubs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv["ub#{i}"],var,i,:u)) }.join(",")+"/)"
         perms="(/"+(1..7).map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
         code="if (sms_debugging_on()) call ppp_compare_var(#{decomp}(dh__nestlevel),#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}','#{msg}',ppp__status)"
-#       puts "### #{code}"
       end
-#     sub(parent,raw(code,:if_stmt))
-#     p raw(code,:if_stmt)
+      sub(parent,raw(code,:if_stmt))
     end
+
   end
 
   class SMS_Create_Decomp < SMS
