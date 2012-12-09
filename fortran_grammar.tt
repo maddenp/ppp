@@ -1051,7 +1051,7 @@ grammar Fortran
   end
 
   rule dummy_arg_list
-    dummy_arg ( t_comma dummy_arg )* <T>
+    dummy_arg ( t_comma dummy_arg )* <Dummy_Arg_List>
   end
 
   rule dummy_arg_list_option

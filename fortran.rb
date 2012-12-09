@@ -283,10 +283,12 @@ module Fortran
   def sp_subroutine_stmt(dummy_arg_list_option)
     envpush
     if dummy_arg_list_option.elements
-      dummy_arg_list=dummy_arg_list_option.e[1]
-      first=dummy_arg_list.e[0].e[0]
-      rest=dummy_arg_list.e[1].elements
-      env['args']=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+      if dummy_arg_list_option.e[1].is_a?(Dummy_Arg_List)
+        dummy_arg_list=dummy_arg_list_option.e[1]
+        first=dummy_arg_list.e[0].e[0]
+        rest=dummy_arg_list.e[1].elements
+        env['args']=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+      end
     end
     true
   end
@@ -711,6 +713,9 @@ module Fortran
   end
 
   class Double_Colon < T
+  end
+
+  class Dummy_Arg_List < T
   end
 
   class Dummy_Arg_Name_List < T
