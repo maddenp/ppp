@@ -2,7 +2,7 @@ BINS=$(addsuffix _parser.rb,fortran normalize)
 
 all: $(BINS)
 
-%_parser.rb: %_grammar.tt %.rb
+%_parser.rb: %_grammar.tt
 	RUBYLIB=lib tt -o $@ $<
 
 clean:
