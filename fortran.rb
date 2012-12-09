@@ -219,6 +219,10 @@ module Fortran
     true
   end
 
+  def sp_explicit_shape_spec_list(explicit_shape_spec_list)
+    true
+  end
+
   def sp_function_stmt(dummy_arg_name_list)
     envpush
     if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
@@ -821,8 +825,8 @@ module Fortran
 
   class Explicit_Shape_Spec < T
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
-    def lb() ("#{e[0]}".empty?)?("_default_"):(e[0].lb) end
-    def ub() e[1].ub end
+    def lb() "_explicit_" end
+    def ub() "_explicit_" end
   end
 
   class Explicit_Shape_Spec_List < T
@@ -1050,8 +1054,10 @@ module Fortran
       # [b]ound, [v]ariable, [d]imension, x is [:l]ower or [:u]pper
       fail "Bad upper bound: #{b}" if b=="_default_" and x==:u
       return 1 if b=="_default_" and x==:l
-      return "#{x}bound(#{v},#{d})" if ["_assumed_","_deferred_"].include?(b)
-      bound
+      if ["_assumed_","_deferred_","_explicit_"].include?(b)
+        return "#{x}bound(#{v},#{d})"
+      end
+      b
     end
 
     def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}") end
@@ -1071,7 +1077,7 @@ module Fortran
         perms="(/"+(1..7).map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
         code="if (sms_debugging_on()) call ppp_compare_var(#{decomp}(dh__nestlevel),#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}','#{msg}',ppp__status)"
       end
-      sub(parent,raw(code,:if_stmt))
+#     sub(parent,raw(code,:if_stmt))
     end
 
   end
