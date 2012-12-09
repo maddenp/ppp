@@ -39,3 +39,14 @@
 
 - WHERE may need (automatic?) parallel treatment.
 
+- Are distributed array assignments e.g.
+    !sms$distribute (dh,1) begin
+    integer::a(100)
+    !sms$distribute end
+    a=0
+  supported?
+
+- Need to check for erroneous placement of executable sms construct in
+  declaration section, and vice versa, as compiler will not help with
+  this. Maybe this is already being done via grammar.
+
