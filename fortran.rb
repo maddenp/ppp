@@ -322,7 +322,7 @@ module Fortran
     if list.respond_to?(:usenames)
       use_add(m,list.usenames,list.localnames)
     else
-      @@uses[m]=[:all]
+      @@uses[m]=[[:all]]
     end
     modenv(m).each do |x|
       varname=x[0]
@@ -1072,7 +1072,7 @@ module Fortran
       use("nnt_types_module")
       envset
       var="#{e[3]}"
-      varenv=env[var]
+      fail "'#{var}' not found in environment"unless varenv=env[var]
       if decomp=varenv['decomp']
         dims=varenv["dims"]
         msg="#{e[5]}"
