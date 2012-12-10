@@ -296,7 +296,8 @@ module Fortran
   def sp_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
     varprops=entity_decl_list.varprops
     varprops.each { |v,p| p["type"]=type_spec.type }
-    if array_spec=attrchk(attr_spec_option,:dimension?)
+    if x=attrchk(attr_spec_option,:dimension?)
+      array_spec=x.e[0]
       varprops.each do |v,p|
         p["rank"]="array"
         decomp_props(array_spec,p)
