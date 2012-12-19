@@ -1082,8 +1082,10 @@ module Fortran
         glubs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv["ub#{i}"],var,i,:u)) }.join(",")+"/)"
         perms="(/"+(1..7).map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
         code="if (sms_debugging_on()) call ppp_compare_var(#{decomp}(dh__nestlevel),#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}','#{msg}',ppp__status)"
+        sub(parent,raw(code,:if_stmt))
+      else
+        fail "No decomposition found for '#{var}'"
       end
-#     sub(parent,raw(code,:if_stmt))
     end
 
   end
