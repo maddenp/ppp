@@ -5,7 +5,7 @@
 
 EXE=a.out
 EXT=$(suffix $(TEST))
-FC=gfortran44
+FC=gfortran
 FFLAGS=-w
 OBJ=$(STEM)_ppp.o
 PPP=../../ppp
