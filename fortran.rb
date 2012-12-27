@@ -36,14 +36,12 @@ module Fortran
     if @@distribute
       dims=0
       array_spec.boundslist.each_index do |i|
-        unless _props["decomp"]
-          arrdim=i+1
-          _props["lb#{arrdim}"]=bounds=array_spec.boundslist[i].lb
-          _props["ub#{arrdim}"]=bounds=array_spec.boundslist[i].ub
-          if decdim=@@distribute["dim"].index(arrdim)
-            _props["decomp"]=@@distribute["decomp"]
-            _props["dim#{arrdim}"]=decdim+1
-          end
+        arrdim=i+1
+        _props["lb#{arrdim}"]=bounds=array_spec.boundslist[i].lb
+        _props["ub#{arrdim}"]=bounds=array_spec.boundslist[i].ub
+        if decompdim=@@distribute["dim"].index(arrdim)
+          _props["decomp"]=@@distribute["decomp"]
+          _props["dim#{arrdim}"]=decompdim+1
         end
         dims+=1
       end
