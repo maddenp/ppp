@@ -52,5 +52,6 @@
 
 - Stop tracking kind. Pass only *type* to MPI-calling SMS routines and, in the
   latter, use mpi_sizeof() + mpi_type_match_size() in the library to make a
-  run-time determination of MPI type to use.
+  run-time determination of MPI type to use. Get rid of related kind() methods
+  in fortran.rb.
 
