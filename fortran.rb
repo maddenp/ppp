@@ -10,6 +10,22 @@ module Fortran
   @@levelstack=[]
   @@uses={}
 
+  def array_props(array_spec,_props)
+    dims=0
+    array_spec.boundslist.each_index do |i|
+      arrdim=i+1
+      _props["lb#{arrdim}"]=bounds=array_spec.boundslist[i].lb
+      _props["ub#{arrdim}"]=bounds=array_spec.boundslist[i].ub
+      if @@distribute and decompdim=@@distribute["dim"].index(arrdim)
+        _props["decomp"]=@@distribute["decomp"]
+        _props["dim#{arrdim}"]=decompdim+1
+      end
+      dims+=1
+    end
+    _props["dims"]||=dims
+    _props
+  end
+
   def attrany(attr,e=nil)
     (e||self.e).reduce(false) { |m,x| m||=attrchk(x,attr) }
   end
@@ -30,24 +46,6 @@ module Fortran
   def cat(f=nil)
     send(f) unless f.nil?
     self.e.map { |x| x.to_s }.join
-  end
-
-  def decomp_props(array_spec,_props)
-    if @@distribute
-      dims=0
-      array_spec.boundslist.each_index do |i|
-        arrdim=i+1
-        _props["lb#{arrdim}"]=bounds=array_spec.boundslist[i].lb
-        _props["ub#{arrdim}"]=bounds=array_spec.boundslist[i].ub
-        if decompdim=@@distribute["dim"].index(arrdim)
-          _props["decomp"]=@@distribute["decomp"]
-          _props["dim#{arrdim}"]=decompdim+1
-        end
-        dims+=1
-      end
-      _props["dims"]||=dims
-    end
-    _props
   end
 
   def dolabel_dupe?
@@ -171,7 +169,7 @@ module Fortran
   end
 
   def sp_assumed_shape_spec_list(assumed_shape_spec_list)
-    return false unless env['args'] and env['args'].include?(@@current_name)
+    return false unless env["args"] and env["args"].include?(@@current_name)
     true
   end
 
@@ -190,7 +188,7 @@ module Fortran
         key="#{x.e[0]}"
         array_spec=x.e[2].e[0]
         env[key]||={}
-        env[key].merge!(decomp_props(array_spec,{}))
+        env[key].merge!(array_props(array_spec,{}))
       end
     end
     array_names_and_specs.names.each { |x|varsetprop(x,"rank","array") }
@@ -226,7 +224,7 @@ module Fortran
     if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
       first=dummy_arg_name_list.e[0].e[0]
       rest=dummy_arg_name_list.e[1].elements
-      env['args']=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+      env["args"]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
     end
     true
   end
@@ -285,7 +283,7 @@ module Fortran
         dummy_arg_list=dummy_arg_list_option.e[1]
         first=dummy_arg_list.e[0].e[0]
         rest=dummy_arg_list.e[1].elements
-        env['args']=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+        env["args"]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
       end
     end
     true
@@ -293,12 +291,15 @@ module Fortran
 
   def sp_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
     varprops=entity_decl_list.varprops
-    varprops.each { |v,p| p["type"]=type_spec.type }
+    varprops.each do |v,p|
+      p["type"]=type_spec.type
+      p["kind"]=type_spec.kind
+    end
     if x=attrchk(attr_spec_option,:dimension?)
       array_spec=x.e[0]
       varprops.each do |v,p|
         p["rank"]="array"
-        decomp_props(array_spec,p)
+        array_props(array_spec,p)
       end
     end
     if attrchk(attr_spec_option,:private?)
@@ -420,7 +421,7 @@ module Fortran
     end
 
     def declare(type,name)
-      envset
+      getenv
       v=env[name]
       if v.nil?
         code="#{type}::#{name}"
@@ -430,7 +431,7 @@ module Fortran
         p.e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
       else
         if v["type"]!=type
-          fail "#{name} is already declared with type #{v['type']}"
+          fail "#{name} is already declared with type #{v["type"]}"
         end
       end
     end
@@ -439,7 +440,7 @@ module Fortran
       nearest(classes,self.parent)
     end
 
-    def envset
+    def getenv
       if x=nearest([SMS])
         envswap(x.myenv) unless x.myenv.object_id==env.object_id
       else
@@ -462,18 +463,18 @@ module Fortran
       enclosing([Scoping_Unit])
     end
 
-    def smstype(fortran_type)
-      case fortran_type
+    def smstype(type,kind)
+      case type
       when "integer"
-        "nnt_integer"
+        (kind)?("nnt_i#{kind}"):("nnt_integer")
       when "real"
-        "nnt_real"
+        (kind)?("nnt_r#{kind}"):("nnt_real")
       when "doubleprecision"
         "nnt_doubleprecision"
       when "complex"
-        "nnt_complex"
+        (kind)?("nnt_c#{kind}"):("nnt_complex")
       when "logical"
-        "nnt_logical"
+        (kind)?("nnt_l#{kind}"):("nnt_logical")
       end
     end
 
@@ -500,7 +501,7 @@ module Fortran
               list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
             end
           end
-          code=((list.empty?)?(nil):("#{code},only:#{list.join(',')}"))
+          code=((list.empty?)?(nil):("#{code},only:#{list.join(",")}"))
         end
         unless code.nil?
           p=use_part
@@ -566,11 +567,11 @@ module Fortran
 
   class Access_Stmt_Option < T
     def names() e[1].names end
-    def to_s() "#{mn(e[0],'::',' ')}#{e[1]}" end
+    def to_s() "#{mn(e[0],"::"," ")}#{e[1]}" end
   end
 
   class Allocatable_Stmt < T
-    def to_s() stmt("#{e[1]}#{mp(e[2],'',' ')}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{mp(e[2],""," ")}#{e[3]}") end
   end
 
   class Arithmetic_If_Stmt < T
@@ -590,7 +591,7 @@ module Fortran
   end
 
   class Assigned_Goto_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{mn(e[3],',',' '+e[3].to_s)}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{mn(e[3],","," "+e[3].to_s)}") end
   end
 
   class Assumed_Shape_Spec < T
@@ -662,7 +663,7 @@ module Fortran
   end
 
   class Common_Block_Name_And_Object_List < T
-    def to_s() "#{mp(e[0],'',' ')}#{e[1]}#{e[2]}" end
+    def to_s() "#{mp(e[0],""," ")}#{e[1]}#{e[2]}" end
   end
 
   class Common_Stmt < T
@@ -670,11 +671,11 @@ module Fortran
   end
 
   class Component_Def_Stmt < T
-    def to_s() stmt("#{e[1]}#{mp(e[2],'',' ')}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{mp(e[2],""," ")}#{e[3]}") end
   end
 
   class Computed_Goto_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{mp(e[5],'',' ')}#{e[6]}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{mp(e[5],""," ")}#{e[6]}") end
   end
 
   class Contains_Stmt < T
@@ -700,7 +701,7 @@ module Fortran
   end
 
   class Dimension_Stmt < T
-    def to_s() stmt("#{e[1]}#{mp(e[2],'',' ')}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{mp(e[2],""," ")}#{e[3]}") end
   end
 
   class Do_Term_Action_Stmt < T
@@ -789,7 +790,7 @@ module Fortran
     def props()
       _props={}
       if e[1].is_a?(Entity_Decl_Array_Spec)
-        decomp_props(e[1].e[1].e[0],_props)
+        array_props(e[1].e[1].e[0],_props)
       end
       _props["rank"]=((array?)?("array"):("scalar"))
       {name=>_props}
@@ -875,7 +876,7 @@ module Fortran
   end
 
   class Intent_Stmt < T
-    def to_s() stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{mn(e[5],'::',' ')}#{e[6]}") end
+    def to_s() stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{mn(e[5],"::"," ")}#{e[6]}") end
   end
 
   class Interface_Body < E
@@ -891,6 +892,10 @@ module Fortran
     def to_s() bb(stmt(space)) end
   end
 
+  class Kind_Selector < T
+    def kind() "#{e[2]}" end
+  end
+
   class Label_Do_Stmt < T
     def to_s() bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")) end
   end
@@ -899,11 +904,11 @@ module Fortran
   end
 
   class Loop_Control_1 < Loop_Control
-    def to_s() "#{mp(e[0],'',' ')}#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{e[5]}" end
+    def to_s() "#{mp(e[0],""," ")}#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{e[5]}" end
   end
 
   class Loop_Control_2 < Loop_Control
-    def to_s() "#{mp(e[0],'',' ')}#{e[1]} #{e[2]}#{e[3]}#{e[4]}" end
+    def to_s() "#{mp(e[0],""," ")}#{e[1]} #{e[2]}#{e[3]}#{e[4]}" end
   end
 
   class Lower_Bound_Pair < T
@@ -922,16 +927,16 @@ module Fortran
   end
 
   class Module_Subprogram_Part < T
-    def to_s() "#{e[0]}#{e[1].e.reduce('') { |m,x| m+="#{x}" } }" end
+    def to_s() "#{e[0]}#{e[1].e.reduce("") { |m,x| m+="#{x}" } }" end
   end
 
   class Name < T
     def name() to_s end
 #   def translate()
 #     if inside?([Entity_Decl])
-#       envset
+#       getenv
 #       if me=env[self.to_s]
-#         if me['decomp']
+#         if me["decomp"]
 #           puts "### var #{to_s} env #{me}"
 #         end
 #       end
@@ -940,7 +945,7 @@ module Fortran
   end
 
   class Namelist_Group_Set_Pair < T
-    def to_s() "#{mp(e[0],'',' ')}#{e[1]}" end
+    def to_s() "#{mp(e[0],""," ")}#{e[1]}" end
   end
 
   class Namelist_Stmt < T
@@ -971,7 +976,7 @@ module Fortran
   end
 
   class Optional_Stmt < T
-    def to_s() stmt("#{e[1]}#{mn(e[2],'::',' ')}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{mn(e[2],"::"," ")}#{e[3]}") end
   end
 
   class Parenthesized_Explicit_Shape_Spec_List < T
@@ -979,7 +984,7 @@ module Fortran
   end
 
   class Pointer_Stmt < T
-    def to_s() stmt("#{e[1]}#{mp(e[2],'',' ')}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{mp(e[2],""," ")}#{e[3]}") end
   end
 
   class Print_Stmt < T
@@ -1030,7 +1035,7 @@ module Fortran
   end
 
   class Save_Stmt_Entity_List < T
-    def to_s() "#{mp(e[0],'',' ')}#{e[1]}" end
+    def to_s() "#{mp(e[0],""," ")}#{e[1]}" end
   end
 
   class Select_Case_Stmt < T
@@ -1054,14 +1059,19 @@ module Fortran
 
   class SMS_Compare_Var < SMS
 
-    def fixbound(b,v,d,x)
-      # [b]ound, [v]ariable, [d]imension, x is [:l]ower or [:u]pper
-      fail "Bad upper bound: #{b}" if b=="_default_" and x==:u
-      return 1 if b=="_default_" and x==:l
-      if ["_assumed_","_deferred_","_explicit_"].include?(b)
-        return "#{x}bound(#{v},#{d})"
+    def fixbound(varenv,var,dim,x)
+      bound=varenv["#{x}b#{dim}"]
+      fail "Bad upper bound: #{bound}" if bound=="_default_" and x==:u
+      return 1 if bound=="_default_" and x==:l
+      if ["_assumed_","_deferred_","_explicit_"].include?(bound)
+        if decdim=varenv["dim#{dim}"] 
+          lu=(x==:l)?("Low"):("Upper")
+          return "dh__#{lu}Bounds(#{decdim},dh__NestLevel)"
+        else
+          return "#{x}bound(#{var},#{dim})"
+        end
       end
-      b
+      bound
     end
 
     def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}") end
@@ -1069,21 +1079,23 @@ module Fortran
     def translate()
       use("module_decomp")
       use("nnt_types_module")
-      envset
+      declare("logical","sms_debugging_on")
+      getenv
       var="#{e[3]}"
       fail "'#{var}' not found in environment"unless varenv=env[var]
-      if decomp=varenv['decomp']
-        dims=varenv["dims"]
-        msg="#{e[5]}"
-        type=smstype(varenv['type'])
-        gllbs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv["lb#{i}"],var,i,:l)) }.join(",")+"/)"
-        glubs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv["ub#{i}"],var,i,:u)) }.join(",")+"/)"
-        perms="(/"+(1..7).map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
-        code="if (sms_debugging_on()) call ppp_compare_var(#{decomp}(dh__nestlevel),#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}','#{msg}',ppp__status)"
-        sub(parent,raw(code,:if_stmt))
+      dims=varenv["dims"]
+      msg="#{e[5]}"
+      type=smstype(varenv["type"],varenv["kind"])
+      gllbs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:l)) }.join(",")+"/)"
+      glubs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:u)) }.join(",")+"/)"
+      perms="(/"+(1..7).map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
+      if decomp=varenv["decomp"]
+        decomp="#{decomp}(dh__nestlevel)"
       else
-        fail "No decomposition found for '#{var}'"
+        decomp="ppp_not_decomposed"
       end
+      code="if (sms_debugging_on()) call ppp_compare_var(#{decomp},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{msg},ppp__status)"
+      sub(parent,raw(code,:if_stmt))
     end
 
   end
@@ -1093,7 +1105,7 @@ module Fortran
   end
 
   class SMS_Distribute < SMS
-    def to_s() "#{e[0]}#{e[1].e.reduce('') { |m,x| m+=x.to_s }}#{e[2]}" end
+    def to_s() "#{e[0]}#{e[1].e.reduce("") { |m,x| m+=x.to_s }}#{e[2]}" end
   end
 
   class SMS_Distribute_Begin < SMS
@@ -1174,6 +1186,10 @@ module Fortran
 
   ## SMS ##
 
+  class Star_Int < T
+    def kind() "#{e[1]}" end
+  end
+
   class Subroutine_Subprogram < Scoping_Unit
   end
 
@@ -1182,15 +1198,16 @@ module Fortran
   end
 
   class Target_Stmt < T
-    def to_s() stmt("#{e[1]}#{mp(e[2],'',' ')}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{mp(e[2],""," ")}#{e[3]}") end
   end
 
   class Type_Declaration_Stmt < T
-    def to_s() stmt("#{e[1]}#{mp(e[2],'',mn(e[1],',',' '))}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{mp(e[2],"",mn(e[1],","," "))}#{e[3]}") end
   end
 
   class Type_Spec < E
     def derived?() "#{e[0]}"=="type" end
+    def kind() return (e[1].respond_to?(:kind))?(e[1].kind):(nil) end
     def type() (derived?)?("#{e[2]}"):("#{e[0]}") end
   end
 

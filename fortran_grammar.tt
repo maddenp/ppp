@@ -1855,7 +1855,7 @@ grammar Fortran
   rule kind_selector
     # F90:R505
 
-    t_paren_l kind_pair? scalar_int_initialization_expr t_paren_r <T>
+    t_paren_l kind_pair? scalar_int_initialization_expr t_paren_r <Kind_Selector>
   end
 
   rule label
@@ -3005,7 +3005,7 @@ grammar Fortran
   end
 
   rule star_int
-    t_star int_literal_constant <T>
+    t_star int_literal_constant <Star_Int>
   end
 
   rule stat_variable
