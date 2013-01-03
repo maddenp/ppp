@@ -223,7 +223,7 @@ module Fortran
     envpush
     if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
       first=dummy_arg_name_list.e[0].e[0]
-      rest=dummy_arg_name_list.e[1].elements
+      rest=dummy_arg_name_list.e[1].e
       env["args"]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
     end
     true
@@ -246,7 +246,7 @@ module Fortran
   end
 
   def sp_name(first,rest)
-    @@current_name="#{first}"+rest.elements.reduce("") { |m,x| m+="#{x}" }
+    @@current_name="#{first}"+rest.e.reduce("") { |m,x| m+="#{x}" }
     true
   end
 
@@ -278,11 +278,11 @@ module Fortran
 
   def sp_subroutine_stmt(dummy_arg_list_option)
     envpush
-    if dummy_arg_list_option.elements
+    if dummy_arg_list_option.e
       if dummy_arg_list_option.e[1].is_a?(Dummy_Arg_List)
         dummy_arg_list=dummy_arg_list_option.e[1]
         first=dummy_arg_list.e[0].e[0]
-        rest=dummy_arg_list.e[1].elements
+        rest=dummy_arg_list.e[1].e
         env["args"]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
       end
     end
@@ -1129,7 +1129,7 @@ module Fortran
   end
 
   class SMS_Exchange < SMS
-    def to_s() sms(e[2].e.map { |x| x.text_value }.join) end
+    def to_s() sms("#{e[2]}#{e[3]}#{e[4].e.reduce("") { |m,x| m+="#{x.e[0]}#{x.e[1]}" }}#{e[5]}") end
   end
 
   class SMS_Halo_Comp_Begin < SMS
