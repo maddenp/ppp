@@ -1069,8 +1069,8 @@ module Fortran
       return 1 if bound=="_default_" and x==:l
       if ["_assumed_","_deferred_","_explicit_"].include?(bound)
         if decdim=varenv["dim#{dim}"] 
-          lu=(x==:l)?("Low"):("Upper")
-          return "dh__#{lu}Bounds(#{decdim},dh__NestLevel)"
+          lu=(x==:l)?("low"):("upper")
+          return "dh__#{lu}bounds(#{decdim},dh__nestlevel)"
         else
           return "#{x}bound(#{var},#{dim})"
         end
@@ -1156,6 +1156,8 @@ module Fortran
     def translate
       use("module_decomp")
       use("nnt_types_module")
+      tag="ppp__tag_#{@@tag+=1}"
+      declare("integer",tag,["save"])
       envget
       v=vars
       if v.size==1
@@ -1172,8 +1174,8 @@ module Fortran
         halou="(/"+(1..7).map { |i| (i>dims)?(0):("dh__halosize(1,dh__nestlevel)") }.join(",")+"/)"
         perms="(/"+(1..7).map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
         decomp="#{dh}(dh__nestlevel)"
-        code="ppp_exchange_1(,#{gllbs},#{glubs},#{gllbs},#{glubs},#{halol},#{halou},#{cornerdepth},#{dectype},#{type},ppp__status,#{var},'#{var}')"
-#       sub(parent,raw(code,:if_stmt))
+        code="call ppp_exchange_1(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectype},#{type},ppp__status,#{var},'#{var}')"
+        sub(parent,raw(code,:call_stmt))
       end
     end
 
