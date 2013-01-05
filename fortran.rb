@@ -1,6 +1,6 @@
 module Fortran
 
-  @@access="default"
+  @@access="_default_"
   @@current_name=nil
   @@distribute=nil
   @@dolabels=[]
@@ -8,6 +8,7 @@ module Fortran
   @@incdirs=[]
   @@level=0
   @@levelstack=[]
+  @@tag=-1
   @@uses={}
 
   def array_props(array_spec,_props)
@@ -155,14 +156,14 @@ module Fortran
     elsif access_spec.public?
       p="public"
     else
-      p="default"
+      p="_default_"
     end
     if access_stmt_option.is_a?(Access_Stmt_Option)
       access_stmt_option.names.each { |x| varsetprop(x,"access",p) }
     else
       @@access=p
       env.each do |n,h|
-        varsetprop(n,"access",p) if vargetprop(n,"access")=="default"
+        varsetprop(n,"access",p) if vargetprop(n,"access")=="_default_"
       end
     end
     true
@@ -236,7 +237,7 @@ module Fortran
       File.open(smsfile(modulename),"w") { |f| f.write(YAML.dump(modinfo)) }
     end
     envpop
-    @@access="default"
+    @@access="_default_"
     true
   end
 
@@ -420,19 +421,19 @@ module Fortran
       specification_part.e[2]
     end
 
-    def declare(type,name)
-      getenv
+    def declare(type,name,attrs=[])
+      envget
       v=env[name]
-      if v.nil?
-        code="#{type}::#{name}"
+      if v
+        fail "Variable #{name} is already defined" unless v["pppvar"]
+      else
+        attrs=(attrs.empty?)?(""):(",#{attrs.join(",")}")
+        code="#{type}#{attrs}::#{name}"
         t=tree(code,:type_declaration_stmt)
         p=declaration_constructs
         t.parent=p
         p.e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
-      else
-        if v["type"]!=type
-          fail "#{name} is already declared with type #{v["type"]}"
-        end
+        env[name]["pppvar"]=true
       end
     end
 
@@ -440,7 +441,7 @@ module Fortran
       nearest(classes,self.parent)
     end
 
-    def getenv
+    def envget
       if x=nearest([SMS])
         envswap(x.myenv) unless x.myenv.object_id==env.object_id
       else
@@ -464,6 +465,7 @@ module Fortran
     end
 
     def smstype(type,kind)
+      kind=nil if kind=="_default_"
       case type
       when "integer"
         (kind)?("nnt_i#{kind}"):("nnt_integer")
@@ -590,6 +592,10 @@ module Fortran
     def names() [e[0].name]+e[1].e.inject([]) { |m,x| m.push(x.name) } end
   end
 
+  class Array_Section < E
+    def name() e[0].name end
+  end
+
   class Assigned_Goto_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{mn(e[3],","," "+e[3].to_s)}") end
   end
@@ -680,6 +686,10 @@ module Fortran
 
   class Contains_Stmt < T
     def to_s() bb(stmt(space,:be)) end
+  end
+
+  class Data_Ref < T
+    def name() (e[1].e.empty?)?(e[0].name):(e[1].e[-1].e[1].name) end
   end
 
   class Deferred_Shape_Spec < T
@@ -934,7 +944,7 @@ module Fortran
     def name() to_s end
 #   def translate()
 #     if inside?([Entity_Decl])
-#       getenv
+#       envget
 #       if me=env[self.to_s]
 #         if me["decomp"]
 #           puts "### var #{to_s} env #{me}"
@@ -981,6 +991,10 @@ module Fortran
 
   class Parenthesized_Explicit_Shape_Spec_List < T
     def boundslist() e[1].boundslist end
+  end
+
+  class Part_Ref < T
+    def name() e[0].name end
   end
 
   class Pointer_Stmt < T
@@ -1048,16 +1062,6 @@ module Fortran
   ## SMS ##
 
   class SMS < T
-  end
-
-  class SMS_Barrier < SMS
-    def translate
-      use("nnt_types_module")
-      sub(parent,raw("call ppp_barrier(ppp__status)",:call_stmt))
-    end
-  end
-
-  class SMS_Compare_Var < SMS
 
     def fixbound(varenv,var,dim,x)
       bound=varenv["#{x}b#{dim}"]
@@ -1074,23 +1078,38 @@ module Fortran
       bound
     end
 
-    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}") end
+  end
 
-    def translate()
+  class SMS_Barrier < SMS
+
+    def translate
+      use("nnt_types_module")
+      sub(parent,raw("call ppp_barrier(ppp__status)",:call_stmt))
+    end
+
+  end
+
+  class SMS_Compare_Var < SMS
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}")
+    end
+
+    def translate
       use("module_decomp")
       use("nnt_types_module")
       declare("logical","sms_debugging_on")
-      getenv
-      var="#{e[3]}"
-      fail "'#{var}' not found in environment"unless varenv=env[var]
+      envget
+      var="#{e[3].name}"
+      fail "'#{var}' not found in environment" unless varenv=env[var]
       dims=varenv["dims"]
       msg="#{e[5]}"
       type=smstype(varenv["type"],varenv["kind"])
       gllbs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:l)) }.join(",")+"/)"
       glubs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:u)) }.join(",")+"/)"
       perms="(/"+(1..7).map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
-      if decomp=varenv["decomp"]
-        decomp="#{decomp}(dh__nestlevel)"
+      if dh=varenv["decomp"]
+        decomp="#{dh}(dh__nestlevel)"
       else
         decomp="ppp_not_decomposed"
       end
@@ -1129,7 +1148,39 @@ module Fortran
   end
 
   class SMS_Exchange < SMS
-    def to_s() sms("#{e[2]}#{e[3]}#{e[4].e.reduce("") { |m,x| m+="#{x.e[0]}#{x.e[1]}" }}#{e[5]}") end
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4].e.reduce("") { |m,x| m+="#{x.e[0]}#{x.e[1]}" }}#{e[5]}")
+    end
+
+    def translate
+      use("module_decomp")
+      use("nnt_types_module")
+      envget
+      v=vars
+      if v.size==1
+        var=v[0].name
+        fail "'#{var}' not found in environment" unless varenv=env[var]
+        dh=varenv["decomp"]
+        dims=varenv["dims"]
+        type=smstype(varenv["type"],varenv["kind"])
+        cornerdepth="(/9999/)"
+        dectype="(/#{dh}(dh__nestlevel)/)"
+        gllbs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:l)) }.join(",")+"/)"
+        glubs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:u)) }.join(",")+"/)"
+        halol="(/"+(1..7).map { |i| (i>dims)?(0):("dh__halosize(1,dh__nestlevel)") }.join(",")+"/)"
+        halou="(/"+(1..7).map { |i| (i>dims)?(0):("dh__halosize(1,dh__nestlevel)") }.join(",")+"/)"
+        perms="(/"+(1..7).map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
+        decomp="#{dh}(dh__nestlevel)"
+        code="ppp_exchange_1(,#{gllbs},#{glubs},#{gllbs},#{glubs},#{halol},#{halou},#{cornerdepth},#{dectype},#{type},ppp__status,#{var},'#{var}')"
+#       sub(parent,raw(code,:if_stmt))
+      end
+    end
+
+    def vars
+      [e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
+    end
+
   end
 
   class SMS_Halo_Comp_Begin < SMS
@@ -1197,6 +1248,10 @@ module Fortran
     def to_s() bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")) end
   end
 
+  class Substring < T
+    def name() e[0].name end
+  end
+
   class Target_Stmt < T
     def to_s() stmt("#{e[1]}#{mp(e[2],""," ")}#{e[3]}") end
   end
@@ -1207,7 +1262,7 @@ module Fortran
 
   class Type_Spec < E
     def derived?() "#{e[0]}"=="type" end
-    def kind() return (e[1].respond_to?(:kind))?(e[1].kind):(nil) end
+    def kind() return (e[1].respond_to?(:kind))?(e[1].kind):("_default_") end
     def type() (derived?)?("#{e[2]}"):("#{e[0]}") end
   end
 

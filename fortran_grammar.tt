@@ -270,7 +270,7 @@ grammar Fortran
   rule array_section
     # F90:R616
 
-    data_ref substring_range_triplet? <E>
+    data_ref substring_range_triplet? <Array_Section>
   end
 
   rule array_spec
@@ -771,7 +771,7 @@ grammar Fortran
   rule data_ref
     # F90:R612
 
-    part_ref ( t_percent part_ref )* <T>
+    part_ref ( t_percent part_ref )* <Data_Ref>
   end
 
   rule data_stmt
@@ -2308,7 +2308,7 @@ grammar Fortran
   rule part_ref
     # F90:R613
 
-    part_name parenthesized_section_subscript_list? <T>
+    part_name parenthesized_section_subscript_list? <Part_Ref>
   end
 
   rule pause_stmt
@@ -2774,7 +2774,7 @@ grammar Fortran
   end
 
   rule sms_compare_var
-    sms_sentinel sms_t_compare_var t_paren_l variable_name t_comma char_literal_constant t_paren_r t_newline <SMS_Compare_Var>
+    sms_sentinel sms_t_compare_var t_paren_l variable t_comma char_literal_constant t_paren_r t_newline <SMS_Compare_Var>
   end
 
   rule sms_create_decomp
@@ -2812,12 +2812,13 @@ grammar Fortran
   end
 
   rule sms_exchange
-    sms_sentinel sms_t_exchange t_paren_l variable_name ( t_comma variable_name )* t_paren_r t_newline <SMS_Exchange>
+    sms_sentinel sms_t_exchange t_paren_l variable ( t_comma variable )* t_paren_r t_newline <SMS_Exchange>
   end
 
   rule sms_executable
     sms_barrier &{ |e| sp_sms_executable(e[0]) } <E> /     # prefer just "sms_barrier /" -- see TODO
-    sms_compare_var &{ |e| sp_sms_executable(e[0]) } <E> / # prefer just "sms_compare_var /" -- see TODO
+    sms_compare_var &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_exchange &{ |e| sp_sms_executable(e[0]) } <E> /    # ditto
     sms_passthrough
   end
 
@@ -2852,7 +2853,6 @@ grammar Fortran
 
   rule sms_passthrough
     sms_create_decomp /
-    sms_exchange /
     sms_halo_comp_begin /
     sms_halo_comp_end /
     sms_ignore_begin /
@@ -3093,7 +3093,7 @@ grammar Fortran
   rule substring
     # F90:R609
 
-    parent_string t_paren_l substring_range t_paren_r <T>
+    parent_string t_paren_l substring_range t_paren_r <Substring>
   end
 
   rule substring_range
