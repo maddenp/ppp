@@ -1096,10 +1096,10 @@ module Fortran
     end
 
     def translate
+      envget
       use("module_decomp")
       use("nnt_types_module")
       declare("logical","sms_debugging_on")
-      envget
       var="#{e[3].name}"
       fail "'#{var}' not found in environment" unless varenv=env[var]
       dims=varenv["dims"]
@@ -1154,33 +1154,50 @@ module Fortran
     end
 
     def translate
+      envget
       use("module_decomp")
       use("nnt_types_module")
       tag="ppp__tag_#{@@tag+=1}"
       declare("integer",tag,["save"])
-      envget
-      v=vars
-      if v.size==1
-        var=v[0].name
-        fail "'#{var}' not found in environment" unless varenv=env[var]
-        dh=varenv["decomp"]
-        dims=varenv["dims"]
-        type=smstype(varenv["type"],varenv["kind"])
-        cornerdepth="(/9999/)"
-        dectype="(/#{dh}(dh__nestlevel)/)"
-        gllbs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:l)) }.join(",")+"/)"
-        glubs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:u)) }.join(",")+"/)"
-        halol="(/"+(1..7).map { |i| (i>dims)?(0):("dh__halosize(1,dh__nestlevel)") }.join(",")+"/)"
-        halou="(/"+(1..7).map { |i| (i>dims)?(0):("dh__halosize(1,dh__nestlevel)") }.join(",")+"/)"
-        perms="(/"+(1..7).map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
-        decomp="#{dh}(dh__nestlevel)"
-        code="call ppp_exchange_1(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectype},#{type},ppp__status,#{var},'#{var}')"
+      v=[e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
+      nvars=v.size
+      vars=v.reduce([]) { |m,x| m.push("#{x}") }.join(",")
+      names=v.reduce([]) { |m,x| m.push("'#{x}'") }.join(",")
+      cornerdepth=[]
+      dectypes=[]
+      gllbs=[]
+      glubs=[]
+      halol=[]
+      halou=[]
+      perms=[]
+      types=[]
+      varenv=nil
+      if nvars==1 or nvars==2
+        (0..nvars-1).each do |i|
+          var=v[i].name
+          fail "'#{var}' not found in environment" unless varenv=env[var]
+          dims=varenv["dims"]
+          dh=varenv["decomp"]
+          dectypes.push("#{dh}(dh__nestlevel)")
+          cornerdepth.push("9999")
+          (1..7).each { |j| gllbs.push((j>dims)?(1):(fixbound(varenv,var,j,:l))) }
+          (1..7).each { |j| glubs.push((j>dims)?(1):(fixbound(varenv,var,j,:u))) }
+          (1..7).each { |j| halol.push((j>dims)?(0):("dh__halosize(1,dh__nestlevel)")) }
+          (1..7).each { |j| halou.push((j>dims)?(0):("dh__halosize(1,dh__nestlevel)")) }
+          (1..7).each { |j| perms.push(varenv["dim#{j}"]||0) }
+          types.push(smstype(varenv["type"],varenv["kind"]))
+        end
+        cornerdepth="(/#{cornerdepth.join(",")}/)"
+        dectypes="(/#{dectypes.join(",")}/)"
+        gllbs="reshape((/"+gllbs.join(",")+"/),(/#{nvars},7/))"
+        glubs="reshape((/"+glubs.join(",")+"/),(/#{nvars},7/))"
+        halol="reshape((/"+halol.join(",")+"/),(/#{nvars},7/))"
+        halou="reshape((/"+halou.join(",")+"/),(/#{nvars},7/))"
+        perms="reshape((/"+perms.join(",")+"/),(/#{nvars},7/))"
+        types="(/#{types.join(",")}/)"
+        code="call ppp_exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},ppp__status,#{vars},#{names})"
         sub(parent,raw(code,:call_stmt))
       end
-    end
-
-    def vars
-      [e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
     end
 
   end
