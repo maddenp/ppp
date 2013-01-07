@@ -1172,32 +1172,30 @@ module Fortran
       perms=[]
       types=[]
       varenv=nil
-      if nvars==1 or nvars==2
-        (0..nvars-1).each do |i|
-          var=v[i].name
-          fail "'#{var}' not found in environment" unless varenv=env[var]
-          dims=varenv["dims"]
-          dh=varenv["decomp"]
-          dectypes.push("#{dh}(dh__nestlevel)")
-          cornerdepth.push("9999")
-          (1..7).each { |j| gllbs.push((j>dims)?(1):(fixbound(varenv,var,j,:l))) }
-          (1..7).each { |j| glubs.push((j>dims)?(1):(fixbound(varenv,var,j,:u))) }
-          (1..7).each { |j| halol.push((j>dims)?(0):("dh__halosize(1,dh__nestlevel)")) }
-          (1..7).each { |j| halou.push((j>dims)?(0):("dh__halosize(1,dh__nestlevel)")) }
-          (1..7).each { |j| perms.push(varenv["dim#{j}"]||0) }
-          types.push(smstype(varenv["type"],varenv["kind"]))
-        end
-        cornerdepth="(/#{cornerdepth.join(",")}/)"
-        dectypes="(/#{dectypes.join(",")}/)"
-        gllbs="reshape((/"+gllbs.join(",")+"/),(/#{nvars},7/))"
-        glubs="reshape((/"+glubs.join(",")+"/),(/#{nvars},7/))"
-        halol="reshape((/"+halol.join(",")+"/),(/#{nvars},7/))"
-        halou="reshape((/"+halou.join(",")+"/),(/#{nvars},7/))"
-        perms="reshape((/"+perms.join(",")+"/),(/#{nvars},7/))"
-        types="(/#{types.join(",")}/)"
-        code="call ppp_exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},ppp__status,#{vars},#{names})"
-        sub(parent,raw(code,:call_stmt))
+      (0..nvars-1).each do |i|
+        var=v[i].name
+        fail "'#{var}' not found in environment" unless varenv=env[var]
+        dims=varenv["dims"]
+        dh=varenv["decomp"]
+        dectypes.push("#{dh}(dh__nestlevel)")
+        cornerdepth.push("9999")
+        (1..7).each { |j| gllbs.push((j>dims)?(1):(fixbound(varenv,var,j,:l))) }
+        (1..7).each { |j| glubs.push((j>dims)?(1):(fixbound(varenv,var,j,:u))) }
+        (1..7).each { |j| halol.push((j>dims)?(0):("dh__halosize(1,dh__nestlevel)")) }
+        (1..7).each { |j| halou.push((j>dims)?(0):("dh__halosize(1,dh__nestlevel)")) }
+        (1..7).each { |j| perms.push(varenv["dim#{j}"]||0) }
+        types.push(smstype(varenv["type"],varenv["kind"]))
       end
+      cornerdepth="(/#{cornerdepth.join(",")}/)"
+      dectypes="(/#{dectypes.join(",")}/)"
+      gllbs="reshape((/"+gllbs.join(",")+"/),(/#{nvars},7/))"
+      glubs="reshape((/"+glubs.join(",")+"/),(/#{nvars},7/))"
+      halol="reshape((/"+halol.join(",")+"/),(/#{nvars},7/))"
+      halou="reshape((/"+halou.join(",")+"/),(/#{nvars},7/))"
+      perms="reshape((/"+perms.join(",")+"/),(/#{nvars},7/))"
+      types="(/#{types.join(",")}/)"
+      code="call ppp_exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},ppp__status,#{vars},#{names})"
+      sub(parent,raw(code,:call_stmt))
     end
 
   end
