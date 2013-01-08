@@ -57,3 +57,5 @@
 
 - Check for and clean up any unused rules (especially sms_* rules)
 
+- It might be better to prefix in-class method calls with 'self.' for clarity.
+
