@@ -8,6 +8,7 @@ module Fortran
   @@incdirs=[]
   @@level=0
   @@levelstack=[]
+  @@parallel=false
   @@tag=-1
   @@uses={}
 
@@ -170,7 +171,7 @@ module Fortran
   end
 
   def sp_assumed_shape_spec_list(assumed_shape_spec_list)
-    return false unless env["args"] and env["args"].include?(@@current_name)
+    return false unless env["_args_"] and env["_args_"].include?(@@current_name)
     true
   end
 
@@ -225,7 +226,7 @@ module Fortran
     if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
       first=dummy_arg_name_list.e[0].e[0]
       rest=dummy_arg_name_list.e[1].e
-      env["args"]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+      env["_args_"]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
     end
     true
   end
@@ -248,6 +249,11 @@ module Fortran
 
   def sp_name(first,rest)
     @@current_name="#{first}"+rest.e.reduce("") { |m,x| m+="#{x}" }
+    true
+  end
+
+  def sp_nonlabel_do_stmt(nonlabel_do_stmt)
+    nonlabel_do_stmt.myenv=env if @@parallel
     true
   end
 
@@ -277,6 +283,17 @@ module Fortran
     true
   end
 
+  def sp_sms_parallel_begin(sms_decomp_name,variable_name)
+    env["_parallel_"]=OpenStruct.new({:dh=>"#{sms_decomp_name}",:var=>"#{variable_name}"})
+    @@parallel=true
+    true
+  end
+
+  def sp_sms_parallel_end
+    @@parallel=false
+    true
+  end
+
   def sp_subroutine_stmt(dummy_arg_list_option)
     envpush
     if dummy_arg_list_option.e
@@ -284,7 +301,7 @@ module Fortran
         dummy_arg_list=dummy_arg_list_option.e[1]
         first=dummy_arg_list.e[0].e[0]
         rest=dummy_arg_list.e[1].e
-        env["args"]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+        env["_args_"]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
       end
     end
     true
@@ -442,7 +459,7 @@ module Fortran
     end
 
     def envget
-      if x=nearest([SMS])
+      if x=(self.myenv)?(self):(nearest([SMS]))
         envswap(x.myenv) unless x.myenv.object_id==env.object_id
       else
         envinit
@@ -963,7 +980,18 @@ module Fortran
   end
 
   class Nonlabel_Do_Stmt < T
-    def to_s() bb(stmt("#{sa(e[1])}#{e[2]}#{e[3]}")) end
+
+    def to_s
+      bb(stmt("#{sa(e[1])}#{e[2]}#{e[3]}"))
+    end
+
+    def translate
+      envget
+      if parallel=env["_parallel_"]
+#       puts "### PARALLEL LOOP!"
+      end
+    end
+
   end
 
   class Only < E
@@ -1059,8 +1087,6 @@ module Fortran
   class Specification_Part < E
   end
 
-  ## SMS ##
-
   class SMS < T
 
     def fixbound(varenv,var,dim,x)
@@ -1076,6 +1102,10 @@ module Fortran
         end
       end
       bound
+    end
+
+    def ranks
+      (1..7)
     end
 
   end
@@ -1103,17 +1133,17 @@ module Fortran
       var="#{e[3].name}"
       fail "'#{var}' not found in environment" unless varenv=env[var]
       dims=varenv["dims"]
-      msg="#{e[5]}"
+      str="#{e[5]}"
       type=smstype(varenv["type"],varenv["kind"])
-      gllbs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:l)) }.join(",")+"/)"
-      glubs="(/"+(1..7).map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:u)) }.join(",")+"/)"
-      perms="(/"+(1..7).map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
+      gllbs="(/"+ranks.map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:l)) }.join(",")+"/)"
+      glubs="(/"+ranks.map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:u)) }.join(",")+"/)"
+      perms="(/"+ranks.map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
       if dh=varenv["decomp"]
         decomp="#{dh}(dh__nestlevel)"
       else
         decomp="ppp_not_decomposed"
       end
-      code="if (sms_debugging_on()) call ppp_compare_var(#{decomp},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{msg},ppp__status)"
+      code="if (sms_debugging_on()) call ppp_compare_var(#{decomp},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},ppp__status)"
       sub(parent,raw(code,:if_stmt))
     end
 
@@ -1179,20 +1209,20 @@ module Fortran
         dh=varenv["decomp"]
         dectypes.push("#{dh}(dh__nestlevel)")
         cornerdepth.push("9999")
-        (1..7).each { |j| gllbs.push((j>dims)?(1):(fixbound(varenv,var,j,:l))) }
-        (1..7).each { |j| glubs.push((j>dims)?(1):(fixbound(varenv,var,j,:u))) }
-        (1..7).each { |j| halol.push((j>dims)?(0):("dh__halosize(1,dh__nestlevel)")) }
-        (1..7).each { |j| halou.push((j>dims)?(0):("dh__halosize(1,dh__nestlevel)")) }
-        (1..7).each { |j| perms.push(varenv["dim#{j}"]||0) }
+        ranks.each { |j| gllbs.push((j>dims)?(1):(fixbound(varenv,var,j,:l))) }
+        ranks.each { |j| glubs.push((j>dims)?(1):(fixbound(varenv,var,j,:u))) }
+        ranks.each { |j| halol.push((j>dims)?(0):("dh__halosize(1,dh__nestlevel)")) }
+        ranks.each { |j| halou.push((j>dims)?(0):("dh__halosize(1,dh__nestlevel)")) }
+        ranks.each { |j| perms.push(varenv["dim#{j}"]||0) }
         types.push(smstype(varenv["type"],varenv["kind"]))
       end
       cornerdepth="(/#{cornerdepth.join(",")}/)"
       dectypes="(/#{dectypes.join(",")}/)"
-      gllbs="reshape((/"+gllbs.join(",")+"/),(/#{nvars},7/))"
-      glubs="reshape((/"+glubs.join(",")+"/),(/#{nvars},7/))"
-      halol="reshape((/"+halol.join(",")+"/),(/#{nvars},7/))"
-      halou="reshape((/"+halou.join(",")+"/),(/#{nvars},7/))"
-      perms="reshape((/"+perms.join(",")+"/),(/#{nvars},7/))"
+      gllbs="reshape((/#{gllbs.join(",")}/),(/#{nvars},7/))"
+      glubs="reshape((/#{glubs.join(",")}/),(/#{nvars},7/))"
+      halol="reshape((/#{halol.join(",")}/),(/#{nvars},7/))"
+      halou="reshape((/#{halou.join(",")}/),(/#{nvars},7/))"
+      perms="reshape((/#{perms.join(",")}/),(/#{nvars},7/))"
       types="(/#{types.join(",")}/)"
       code="call ppp_exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},ppp__status,#{vars},#{names})"
       sub(parent,raw(code,:call_stmt))
@@ -1217,7 +1247,7 @@ module Fortran
   end
 
   class SMS_Parallel_Begin < SMS
-    def to_s() sms("#{e[2]} #{e[3]}") end
+    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}") end
   end
 
   class SMS_Parallel_End < SMS
@@ -1251,8 +1281,6 @@ module Fortran
   class SMS_Unstructured_Grid < SMS
     def to_s() sms("#{e[2]}") end
   end
-
-  ## SMS ##
 
   class Star_Int < T
     def kind() "#{e[1]}" end
