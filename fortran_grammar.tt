@@ -2005,7 +2005,7 @@ grammar Fortran
   end
 
   rule loop_control_pair
-    t_comma scalar_numeric_expr <T>
+    t_comma scalar_numeric_expr <Loop_Control_Pair>
   end
 
   rule lower_bound

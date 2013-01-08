@@ -934,6 +934,10 @@ module Fortran
     def to_s() "#{mp(e[0],""," ")}#{e[1]} #{e[2]}#{e[3]}#{e[4]}" end
   end
 
+  class Loop_Control_Pair < T
+    def value() e[1] end
+  end
+
   class Lower_Bound_Pair < T
     def lb() "#{e[0]}" end
   end
@@ -984,7 +988,15 @@ module Fortran
     def translate
       envget
       if parallel=env["_parallel_"]
-#       puts "### PARALLEL LOOP!"
+        loop_control=e[3]
+        if loop_control.is_a?(Loop_Control_1)
+          lo=raw("dh__s1(#{loop_control.e[3]},0,dh__nestlevel)",:scalar_numeric_expr)
+          lo.parent=loop_control
+          hi=raw(",dh__e1(#{loop_control.e[4].value},0,dh__nestlevel)",:loop_control_pair)
+          hi.parent=loop_control
+          loop_control.e[3]=lo
+          loop_control.e[4]=hi
+        end
       end
     end
 
@@ -1243,11 +1255,27 @@ module Fortran
   end
 
   class SMS_Parallel_Begin < SMS
-    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}") end
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
+    end
+
+    def translate
+      self.parent.e.delete(self)
+    end
+
   end
 
   class SMS_Parallel_End < SMS
-    def to_s() sms("#{e[2]}") end
+
+    def to_s
+      sms("#{e[2]}")
+    end
+
+    def translate
+      self.parent.e.delete(self)
+    end
+
   end
 
   class SMS_Reduce < SMS
