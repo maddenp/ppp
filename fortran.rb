@@ -66,13 +66,9 @@ module Fortran
     @@envstack.last
   end
 
-  def envinit
-    @@envstack=[{}]
-  end
-
   def envpop
     @@envstack.pop
-    envinit if @@envstack.empty?
+    @@envstack=[{}] if @@envstack.empty?
   end
 
   def envpush(base=env.dup)
@@ -284,6 +280,7 @@ module Fortran
   end
 
   def sp_sms_parallel_begin(sms_decomp_name,variable_name)
+    envpush
     env["_parallel_"]=OpenStruct.new({:dh=>"#{sms_decomp_name}",:var=>"#{variable_name}"})
     @@parallel=true
     true
@@ -291,6 +288,7 @@ module Fortran
 
   def sp_sms_parallel_end
     @@parallel=false
+    envpop
     true
   end
 
@@ -432,6 +430,7 @@ module Fortran
 
     def initialize(a="",b=(0..0),c=[])
       super(a,b,c)
+      @myenv=env
     end
 
     def declaration_constructs
@@ -439,7 +438,8 @@ module Fortran
     end
 
     def declare(type,name,attrs=[])
-      envget
+      p=declaration_constructs
+      envget(p)
       v=env[name]
       if v
         fail "Variable #{name} is already defined" unless v["pppvar"]
@@ -447,23 +447,19 @@ module Fortran
         attrs=(attrs.empty?)?(""):(",#{attrs.join(",")}")
         code="#{type}#{attrs}::#{name}"
         t=tree(code,:type_declaration_stmt)
-        p=declaration_constructs
         t.parent=p
         p.e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
         env[name]["pppvar"]=true
       end
+      envget
     end
 
     def enclosing(classes)
       nearest(classes,self.parent)
     end
 
-    def envget
-      if x=(self.myenv)?(self):(nearest([SMS]))
-        envswap(x.myenv) unless x.myenv.object_id==env.object_id
-      else
-        envinit
-      end
+    def envget(node=self)
+      envswap(node.myenv) unless node.myenv.object_id==env.object_id
     end
 
     def inside?(classes)
