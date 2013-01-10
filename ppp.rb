@@ -14,7 +14,7 @@ module PPP
   @@np=nil # normalize parser
 
   def default_props
-    {:debug=>false,:incdirs=>[],:newline=>true,:normalize=>false,:srcfile=>nil}
+    {:debug=>false,:incdirs=>[],:nl=>true,:normalize=>false,:srcfile=>nil}
   end
   
   def directive
@@ -150,7 +150,7 @@ module PPP
     cppcheck(s)
     puts "RAW SOURCE\n\n#{s}\n" if debug
     puts "NORMALIZED SOURCE\n\n" if debug
-    s=normalize(s,props[:newline])
+    s=normalize(s,props[:nl])
     unless props[:normalize]
       puts s if debug
       @@incdirs=props[:incdirs]
