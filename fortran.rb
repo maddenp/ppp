@@ -981,9 +981,9 @@ module Fortran
         loop_control=e[3]
         loop_var=loop_control.e[1]
         if loop_control.is_a?(Loop_Control_1) and "#{loop_var}"==parallel.var
-          lo=raw("dh__s1(#{loop_control.e[3]},0,dh__nestlevel)",:scalar_numeric_expr,{:nl=>true})
+          lo=raw("dh__s1(#{loop_control.e[3]},0,dh__nestlevel)",:scalar_numeric_expr,{:nl=>false})
           lo.parent=loop_control
-          hi=raw(",dh__e1(#{loop_control.e[4].value},0,dh__nestlevel)",:loop_control_pair,{:nl=>true})
+          hi=raw(",dh__e1(#{loop_control.e[4].value},0,dh__nestlevel)",:loop_control_pair,{:nl=>false})
           hi.parent=loop_control
           loop_control.e[3]=lo
           loop_control.e[4]=hi
