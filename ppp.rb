@@ -14,7 +14,7 @@ module PPP
   @@np=nil # normalize parser
 
   def default_props
-    {:debug=>false,:incdirs=>[],:normalize=>false,:srcfile=>nil}
+    {:debug=>false,:incdirs=>[],:newline=>true,:normalize=>false,:srcfile=>nil}
   end
   
   def directive
@@ -34,7 +34,7 @@ module PPP
     end
   end
 
-  def normalize(s)
+  def normalize(s,newline)
     @@np||=NormalizeParser.new
     s=s.gsub(directive,'@\1')             # hide directives
     s=s.gsub(/^\s+/,"")                   # remove leading whitespace
@@ -42,16 +42,17 @@ module PPP
     s=s.gsub(/^!.*\n/,"")                 # remove full-line comments
     s=@@np.parse(@@np.parse(s).to_s).to_s # two normalize passes
     s=s.sub(/^\n+/,"")                    # remove leading newlines
-    s+="\n" if s[-1]!="\n"                # ensure final newline
+    s+="\n" if s[-1]!="\n" and newline    # ensure final newline
     s=s.gsub(/^@(.*)/i,'!\1')             # show directives
   end
 
-  def out(s,root=:program_units,props=default_props)
+  def out(s,root=:program_units,override={})
+    props=default_props.merge(override)
     translated_source,raw_tree,translated_tree=process(s,root,props)
     translated_source
   end
 
-  def process(s,root=:program_units,props=default_props)
+  def process(s,root=:program_units,override={})
 
     def assemble(s,seen,incdirs=[])
       current=seen.last
@@ -140,6 +141,7 @@ module PPP
       a.join("\n")
     end
 
+    props=default_props.merge(override)
     debug=props[:debug]
     @@fp||=FortranParser.new
     s=s.gsub(/^\s*!sms\$insert */i,"")                           # process inserts
@@ -148,7 +150,7 @@ module PPP
     cppcheck(s)
     puts "RAW SOURCE\n\n#{s}\n" if debug
     puts "NORMALIZED SOURCE\n\n" if debug
-    s=normalize(s)
+    s=normalize(s,props[:newline])
     unless props[:normalize]
       puts s if debug
       @@incdirs=props[:incdirs]
@@ -171,12 +173,14 @@ module PPP
     [s,raw_tree,translated_tree]
   end
 
-  def raw(s,root=:program_units,props=default_props)
+  def raw(s,root=:program_units,override={})
+    props=default_props.merge(override)
     s,raw_tree,translated_tree=process(s,root,props)
     raw_tree
   end
 
-  def tree(s,root=:program_units,props=default_props)
+  def tree(s,root=:program_units,override={})
+    props=default_props.merge(override)
     s,raw_tree,translated_tree=process(s,root,props)
     translated_tree
   end
