@@ -58,6 +58,7 @@ module Normalize
       t=a.join("\n")
       # Remove blank lines
       t=t.gsub(/\n\n+/,"\n")
+      t
     end
   end
 
@@ -67,6 +68,7 @@ module Normalize
       t=t.gsub(/^!.*/,"")    # no comment lines
       t=t.gsub(/\n\n+/,"\n") # no blank lines
       t=t.gsub(/&$\n&?/,"")  # join continuation lines
+      t
     end
   end
 
@@ -76,6 +78,7 @@ module Normalize
       t=t.downcase          # make upper-case characters lower-case
       t=t.gsub(/[ \t]+/,"") # remove tabs & spaces
       t="\n"+t
+      t
     end
   end
 
