@@ -959,16 +959,6 @@ module Fortran
 
   class Name < T
     def name() to_s end
-#   def translate()
-#     if inside?([Entity_Decl])
-#       envget
-#       if me=env[self.to_s]
-#         if me["decomp"]
-#           puts "### var #{to_s} env #{me}"
-#         end
-#       end
-#     end
-#   end
   end
 
   class Namelist_Group_Set_Pair < T
@@ -989,7 +979,8 @@ module Fortran
       envget
       if parallel=env["_parallel_"]
         loop_control=e[3]
-        if loop_control.is_a?(Loop_Control_1)
+        loop_var=loop_control.e[1]
+        if loop_control.is_a?(Loop_Control_1) and "#{loop_var}"==parallel.var
           lo=raw("dh__s1(#{loop_control.e[3]},0,dh__nestlevel)",:scalar_numeric_expr)
           lo.parent=loop_control
           hi=raw(",dh__e1(#{loop_control.e[4].value},0,dh__nestlevel)",:loop_control_pair)

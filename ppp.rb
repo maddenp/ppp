@@ -34,15 +34,15 @@ module PPP
     end
   end
 
-  def normalize(s,newline)
+  def normalize(s)
     @@np||=NormalizeParser.new
     s=s.gsub(directive,'@\1')             # hide directives
     s=s.gsub(/^\s+/,"")                   # remove leading whitespace
-    s=s.gsub(/\s+$/,"")                   # remove trailing whitespace
+    s=s.gsub(/[ \t]+$/,"")                # remove trailing whitespace
     s=s.gsub(/^!.*\n/,"")                 # remove full-line comments
     s=@@np.parse(@@np.parse(s).to_s).to_s # two normalize passes
     s=s.sub(/^\n+/,"")                    # remove leading newlines
-    s+="\n" if s[-1]!="\n" and newline    # ensure final newline
+    s+="\n" if s[-1]!="\n"                # ensure final newline
     s=s.gsub(/^@(.*)/i,'!\1')             # show directives
   end
 
@@ -148,7 +148,7 @@ module PPP
     cppcheck(s)
     puts "RAW SOURCE\n\n#{s}\n" if debug
     puts "NORMALIZED SOURCE\n\n" if debug
-    s=normalize(s,root==:program_units)
+    s=normalize(s)
     unless props[:normalize]
       puts s if debug
       @@incdirs=props[:incdirs]
