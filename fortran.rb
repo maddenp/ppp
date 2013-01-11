@@ -228,26 +228,6 @@ module Fortran
     true
   end
 
-  def sp_sms_halo_comp_begin(halo_comp_pairs)
-    envpush
-    dim1=halo_comp_pairs.e[0]
-    dim2=(halo_comp_pairs.e[1].e.nil?)?(nil):(halo_comp_pairs.e[1].e[1])
-    dim3=(halo_comp_pairs.e[2].e.nil?)?(nil):(halo_comp_pairs.e[2].e[1])
-    env["_halocomp_"]=[dim1,dim2,dim3].reduce([]) do |m,x|
-      lo=(x.is_a?(SMS_Halo_Comp_Pair))?(x.lo):(nil)
-      up=(x.is_a?(SMS_Halo_Comp_Pair))?(x.up):(nil)
-      m.push(OpenStruct.new({:lo=>lo,:up=>up}))
-    end
-    @@halocomp=true
-    true
-  end
-
-  def sp_sms_halo_comp_end
-    @@halocomp=true
-    envpop
-    true
-  end
-
   def sp_module(_module)
     modulename=_module.e[0].name
     modinfo=env.delete_if { |k,v| v["access"]=="private" }
@@ -297,6 +277,27 @@ module Fortran
 
   def sp_sms_executable(sms_executable)
     sms_executable.myenv=env
+    true
+  end
+
+  def sp_sms_halo_comp_begin(halo_comp_pairs)
+    fail "Halo computation invalid outside parallel region" unless @@parallel
+    envpush
+    dim1=halo_comp_pairs.e[0]
+    dim2=(halo_comp_pairs.e[1].e.nil?)?(nil):(halo_comp_pairs.e[1].e[1])
+    dim3=(halo_comp_pairs.e[2].e.nil?)?(nil):(halo_comp_pairs.e[2].e[1])
+    env["_halocomp_"]=[dim1,dim2,dim3].reduce([]) do |m,x|
+      lo=(x.is_a?(SMS_Halo_Comp_Pair))?(x.lo):(nil)
+      up=(x.is_a?(SMS_Halo_Comp_Pair))?(x.up):(nil)
+      m.push(OpenStruct.new({:lo=>lo,:up=>up}))
+    end
+    @@halocomp=true
+    true
+  end
+
+  def sp_sms_halo_comp_end
+    @@halocomp=true
+    envpop
     true
   end
 
@@ -996,21 +997,21 @@ module Fortran
       bb(stmt("#{sa(e[1])}#{e[2]}#{e[3]}"))
     end
 
-    def translate
-      envget
-      if parallel=env["_parallel_"]
-        loop_control=e[3]
-        loop_var=loop_control.e[1]
-        if loop_control.is_a?(Loop_Control_1) and "#{loop_var}"==parallel.var
-          lo=raw("dh__s1(#{loop_control.e[3]},0,dh__nestlevel)",:scalar_numeric_expr,{:nl=>false})
-          lo.parent=loop_control
-          hi=raw(",dh__e1(#{loop_control.e[4].value},0,dh__nestlevel)",:loop_control_pair,{:nl=>false})
-          hi.parent=loop_control
-          loop_control.e[3]=lo
-          loop_control.e[4]=hi
-        end
-      end
-    end
+#   def translate
+#     envget
+#     if parallel=env["_parallel_"]
+#       loop_control=e[3]
+#       loop_var=loop_control.e[1]
+#       if loop_control.is_a?(Loop_Control_1) and "#{loop_var}"==parallel.var
+#         lo=raw("dh__s1(#{loop_control.e[3]},0,dh__nestlevel)",:scalar_numeric_expr,{:nl=>false})
+#         lo.parent=loop_control
+#         hi=raw(",dh__e1(#{loop_control.e[4].value},0,dh__nestlevel)",:loop_control_pair,{:nl=>false})
+#         hi.parent=loop_control
+#         loop_control.e[3]=lo
+#         loop_control.e[4]=hi
+#       end
+#     end
+#   end
 
   end
 
@@ -1251,11 +1252,27 @@ module Fortran
   end
 
   class SMS_Halo_Comp_Begin < SMS
-    def to_s() sms("#{e[2]}#{e[3]}#{e[4]} #{e[5]}") end
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]} #{e[5]}")
+    end
+
+#   def translate
+#     self.parent.e.delete(self)
+#   end
+
   end
 
   class SMS_Halo_Comp_End < SMS
-    def to_s() sms("#{e[2]}") end
+
+    def to_s
+      sms("#{e[2]}")
+    end
+
+#   def translate
+#     self.parent.e.delete(self)
+#   end
+
   end
 
   class SMS_Halo_Comp_Pair < E
@@ -1288,9 +1305,9 @@ module Fortran
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
-    def translate
-      self.parent.e.delete(self)
-    end
+#   def translate
+#     self.parent.e.delete(self)
+#   end
 
   end
 
@@ -1300,9 +1317,9 @@ module Fortran
       sms("#{e[2]}")
     end
 
-    def translate
-      self.parent.e.delete(self)
-    end
+#   def translate
+#     self.parent.e.delete(self)
+#   end
 
   end
 
