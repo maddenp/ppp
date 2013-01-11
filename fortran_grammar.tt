@@ -2816,20 +2816,26 @@ grammar Fortran
   end
 
   rule sms_executable
-    sms_barrier        &{ |e| sp_sms_executable(e[0]) } <E> / # prefer just "sms_barrier /" -- see TODO
-    sms_compare_var    &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_exchange       &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_parallel_begin &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_parallel_end   &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_barrier         &{ |e| sp_sms_executable(e[0]) } <E> / # prefer just "sms_barrier /" -- see TODO
+    sms_compare_var     &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_exchange        &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_halo_comp_begin &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_halo_comp_end   &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_parallel_begin  &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_parallel_end    &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
     sms_passthrough
   end
 
   rule sms_halo_comp_begin
-    sms_sentinel sms_t_halo_comp sms_parenthesized_args sms_t_begin t_newline <SMS_Halo_Comp_Begin>
+    sms_sentinel sms_t_halo_comp t_paren_l sms_halo_comp_pair sms_halo_comp_pair? sms_halo_comp_pair? t_paren_r sms_t_begin t_newline &{ |e| sp_sms_halo_comp_begin(e[3],e[4],e[5]) } <SMS_Halo_Comp_Begin>
   end
 
   rule sms_halo_comp_end
     sms_sentinel sms_t_halo_comp sms_t_end t_newline <SMS_Halo_Comp_End>
+  end
+
+  rule sms_halo_comp_pair
+    t_lt expr t_comma expr t_gt <SMS_Halo_Comp_Pair>
   end
 
   rule sms_ignore_begin
@@ -2855,8 +2861,6 @@ grammar Fortran
 
   rule sms_passthrough
     sms_create_decomp /
-    sms_halo_comp_begin /
-    sms_halo_comp_end /
     sms_ignore_begin /
     sms_ignore_end /
     sms_reduce /

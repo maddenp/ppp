@@ -227,6 +227,10 @@ module Fortran
     true
   end
 
+  def sp_sms_halo_comp_begin(dim1,dim2,dim3)
+    true
+  end
+
   def sp_module(_module)
     modulename=_module.e[0].name
     modinfo=env.delete_if { |k,v| v["access"]=="private" }
@@ -1230,11 +1234,17 @@ module Fortran
   end
 
   class SMS_Halo_Comp_Begin < SMS
-    def to_s() sms("#{e[2]} #{e[3]}") end
+    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}") end
+    def decdim(d) OpenStruct.new((e[d+1].is_a?(SMS_Halo_Comp_Pair))?({:lo=>e[d+2].lo,:up=>e[d+2].up}):({:lo=>nil,:up=>nil})) end
   end
 
   class SMS_Halo_Comp_End < SMS
     def to_s() sms("#{e[2]}") end
+  end
+
+  class SMS_Halo_Comp_Pair < E
+    def lo() "#{e[1]}" end
+    def up() "#{e[3]}" end
   end
 
   class SMS_Ignore_Begin < SMS
