@@ -2827,15 +2827,19 @@ grammar Fortran
   end
 
   rule sms_halo_comp_begin
-    sms_sentinel sms_t_halo_comp t_paren_l sms_halo_comp_pair sms_halo_comp_pair? sms_halo_comp_pair? t_paren_r sms_t_begin t_newline &{ |e| sp_sms_halo_comp_begin(e[3],e[4],e[5]) } <SMS_Halo_Comp_Begin>
+    sms_sentinel sms_t_halo_comp t_paren_l sms_halo_comp_pairs t_paren_r sms_t_begin t_newline &{ |e| sp_sms_halo_comp_begin(e[3]) } <SMS_Halo_Comp_Begin>
   end
 
   rule sms_halo_comp_end
-    sms_sentinel sms_t_halo_comp sms_t_end t_newline <SMS_Halo_Comp_End>
+    sms_sentinel sms_t_halo_comp sms_t_end t_newline &{ |e| sp_sms_halo_comp_end } <SMS_Halo_Comp_End>
   end
 
   rule sms_halo_comp_pair
     t_lt expr t_comma expr t_gt <SMS_Halo_Comp_Pair>
+  end
+
+  rule sms_halo_comp_pairs
+    sms_halo_comp_pair (t_comma sms_halo_comp_pair)? (t_comma sms_halo_comp_pair)? <SMS_Halo_Comp_Pairs>
   end
 
   rule sms_ignore_begin
