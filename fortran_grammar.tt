@@ -2856,11 +2856,26 @@ grammar Fortran
   end
 
   rule sms_parallel_begin
-    sms_sentinel sms_t_parallel t_paren_l sms_decomp_name t_comma variable_name t_paren_r sms_t_begin t_newline &{ |e| sp_sms_parallel_begin(e[3],e[5]) } <SMS_Parallel_Begin>
+    sms_sentinel sms_t_parallel t_paren_l sms_decomp_name t_comma sms_parallel_var_lists t_paren_r sms_t_begin t_newline &{ |e| sp_sms_parallel_begin(e[3],e[5]) } <SMS_Parallel_Begin>
   end
 
   rule sms_parallel_end
     sms_sentinel sms_t_parallel sms_t_end t_newline &{ |e| sp_sms_parallel_end } <SMS_Parallel_End>
+  end
+
+  rule sms_parallel_var_list
+    t_lt variable_name ( t_comma variable_name )* t_gt <SMS_Parallel_Var_List_1> /
+    variable_name "" <SMS_Parallel_Var_List_2>
+  end
+
+  rule sms_parallel_var_lists
+    t_comma t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_001> /
+    t_comma sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_011> /
+    t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_010> /
+    sms_parallel_var_list t_comma sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_111> /
+    sms_parallel_var_list t_comma t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_101> /
+    sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_110> /
+    sms_parallel_var_list "" <SMS_Parallel_Var_Lists_100>
   end
 
   rule sms_passthrough

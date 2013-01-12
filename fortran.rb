@@ -1323,6 +1323,42 @@ module Fortran
 
   end
 
+  class SMS_Parallel_Var_List_1 < E
+
+    def to_s
+      s=""
+      s+="#{e[0]}#{e[1]}"
+      s+=e[2].e.reduce("") { |m,x| m+="#{x.e[1]}" } if e[2].e
+      s+="#{e[3]}"
+    end
+
+  end
+
+  class SMS_Parallel_Var_List_2 < E
+    def to_s() "#{e[0]}" end
+  end
+
+  class SMS_Parallel_Var_Lists_001 < T
+  end
+
+  class SMS_Parallel_Var_Lists_010 < T
+  end
+
+  class SMS_Parallel_Var_Lists_011 < T
+  end
+
+  class SMS_Parallel_Var_Lists_100 < T
+  end
+
+  class SMS_Parallel_Var_Lists_101 < T
+  end
+
+  class SMS_Parallel_Var_Lists_110 < T
+  end
+
+  class SMS_Parallel_Var_Lists_111 < T
+  end
+
   class SMS_Reduce < SMS
     def to_s() sms("#{e[2]}") end
   end
