@@ -296,14 +296,15 @@ module Fortran
   end
 
   def sp_sms_halo_comp_end
-    @@halocomp=true
+    fail "Not inside halo-computation region" unless @@halocomp
+    @@halocomp=false
     envpop
     true
   end
 
-  def sp_sms_parallel_begin(sms_decomp_name,variable_name)
+  def sp_sms_parallel_begin(sms_decomp_name,sms_parallel_var_lists)
     envpush
-    env["_parallel_"]=OpenStruct.new({:dh=>"#{sms_decomp_name}",:var=>"#{variable_name}"})
+    env["_parallel_"]=OpenStruct.new({:dh=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
     @@parallel=true
     true
   end
@@ -997,21 +998,37 @@ module Fortran
       bb(stmt("#{sa(e[1])}#{e[2]}#{e[3]}"))
     end
 
-#   def translate
-#     envget
-#     if parallel=env["_parallel_"]
-#       loop_control=e[3]
-#       loop_var=loop_control.e[1]
-#       if loop_control.is_a?(Loop_Control_1) and "#{loop_var}"==parallel.var
-#         lo=raw("dh__s1(#{loop_control.e[3]},0,dh__nestlevel)",:scalar_numeric_expr,{:nl=>false})
-#         lo.parent=loop_control
-#         hi=raw(",dh__e1(#{loop_control.e[4].value},0,dh__nestlevel)",:loop_control_pair,{:nl=>false})
-#         hi.parent=loop_control
-#         loop_control.e[3]=lo
-#         loop_control.e[4]=hi
-#       end
-#     end
-#   end
+    def translate
+      envget
+      if parallel=env["_parallel_"]
+        loop_control=e[3]
+        loop_var="#{loop_control.e[1]}"
+        decdim=nil
+        [0,1,2].each do |i|
+          if parallel.vars[i].include?(loop_var)
+            decdim=i
+            break
+          end
+        end
+        if decdim
+          halo_lo=0
+          halo_up=0
+          if halocomp=env["_halocomp_"]
+            offsets=halocomp[decdim]
+            halo_lo=offsets.lo
+            halo_up=offsets.up
+          end
+          if loop_control.is_a?(Loop_Control_1)
+            lo=raw("dh__s1(#{loop_control.e[3]},#{halo_lo},dh__nestlevel)",:scalar_numeric_expr,{:nl=>false})
+            lo.parent=loop_control
+            up=raw(",dh__e1(#{loop_control.e[4].value},#{halo_up},dh__nestlevel)",:loop_control_pair,{:nl=>false})
+            up.parent=loop_control
+            loop_control.e[3]=lo
+            loop_control.e[4]=up
+          end
+        end
+      end
+    end
 
   end
 
@@ -1257,9 +1274,9 @@ module Fortran
       sms("#{e[2]}#{e[3]}#{e[4]} #{e[5]}")
     end
 
-#   def translate
-#     self.parent.e.delete(self)
-#   end
+    def translate
+      self.parent.e.delete(self)
+    end
 
   end
 
@@ -1269,9 +1286,9 @@ module Fortran
       sms("#{e[2]}")
     end
 
-#   def translate
-#     self.parent.e.delete(self)
-#   end
+    def translate
+      self.parent.e.delete(self)
+    end
 
   end
 
@@ -1305,9 +1322,9 @@ module Fortran
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
-#   def translate
-#     self.parent.e.delete(self)
-#   end
+    def translate
+      self.parent.e.delete(self)
+    end
 
   end
 
@@ -1317,9 +1334,9 @@ module Fortran
       sms("#{e[2]}")
     end
 
-#   def translate
-#     self.parent.e.delete(self)
-#   end
+    def translate
+      self.parent.e.delete(self)
+    end
 
   end
 
@@ -1332,31 +1349,50 @@ module Fortran
       s+="#{e[3]}"
     end
 
+    def vars
+      ["#{e[1]}"]+((e[2].e)?(e[2].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
+    end
+
   end
 
   class SMS_Parallel_Var_List_2 < E
-    def to_s() "#{e[0]}" end
+
+    def to_s
+      "#{e[0]}"
+    end
+
+    def vars
+      ["#{e[0]}"]
+    end
+
   end
 
   class SMS_Parallel_Var_Lists_001 < T
+    def vars() [[],[],e[2].vars] end
   end
 
   class SMS_Parallel_Var_Lists_010 < T
+    def vars() [[],e[1].vars,[]] end
   end
 
   class SMS_Parallel_Var_Lists_011 < T
+    def vars() [[],e[1].vars,e[3].vars] end
   end
 
   class SMS_Parallel_Var_Lists_100 < T
+    def vars() [e[0].vars,[],[]] end
   end
 
   class SMS_Parallel_Var_Lists_101 < T
+    def vars() [e[0].vars,[],e[3].vars] end
   end
 
   class SMS_Parallel_Var_Lists_110 < T
+    def vars() [e[0].vars,e[2].vars,[]] end
   end
 
   class SMS_Parallel_Var_Lists_111 < T
+    def vars() [e[0].vars,e[2].vars,e[4].vars] end
   end
 
   class SMS_Reduce < SMS
