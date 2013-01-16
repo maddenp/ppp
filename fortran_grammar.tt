@@ -2900,11 +2900,11 @@ grammar Fortran
   end
 
   rule sms_serial_begin
-    sms_sentinel sms_t_serial sms_parenthesized_args? sms_t_begin t_newline <SMS_Serial_Begin>
+    sms_sentinel sms_t_serial sms_parenthesized_args? sms_t_begin t_newline &{ |e| sp_sms_serial_begin } <SMS_Serial_Begin>
   end
 
   rule sms_serial_end
-    sms_sentinel sms_t_serial sms_t_end t_newline <SMS_Serial_End>
+    sms_sentinel sms_t_serial sms_t_end t_newline &{ |e| sp_sms_serial_end } <SMS_Serial_End>
   end
 
   rule sms_set_communicator

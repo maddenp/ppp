@@ -10,6 +10,7 @@ module Fortran
   @@level=0
   @@levelstack=[]
   @@parallel=false
+  @@serial=false
   @@tag=-1
   @@uses={}
 
@@ -282,6 +283,7 @@ module Fortran
 
   def sp_sms_halo_comp_begin(halo_comp_pairs)
     fail "Halo computation invalid outside parallel region" unless @@parallel
+    fail "Already inside halo-computation region" if @@halocomp
     envpush
     dim1=halo_comp_pairs.e[0]
     dim2=(halo_comp_pairs.e[1].e.nil?)?(nil):(halo_comp_pairs.e[1].e[1])
@@ -303,6 +305,7 @@ module Fortran
   end
 
   def sp_sms_parallel_begin(sms_decomp_name,sms_parallel_var_lists)
+    fail "Already inside parallel region" if @@parallel
     envpush
     env["_parallel_"]=OpenStruct.new({:dh=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
     @@parallel=true
@@ -310,7 +313,23 @@ module Fortran
   end
 
   def sp_sms_parallel_end
+    fail "Not inside parallel region" unless @@parallel
     @@parallel=false
+    envpop
+    true
+  end
+
+  def sp_sms_serial_begin
+    fail "Already inside serial region" if @@serial
+    envpush
+    env["_serial_"]=true
+    @@serial=true
+    true
+  end
+
+  def sp_sms_serial_end
+    fail "Not inside serial region" unless @@serial
+    @@serial=false
     envpop
     true
   end
@@ -1000,31 +1019,33 @@ module Fortran
 
     def translate
       envget
-      if parallel=env["_parallel_"]
-        loop_control=e[3]
-        loop_var="#{loop_control.e[1]}"
-        decdim=nil
-        [0,1,2].each do |i|
-          if parallel.vars[i].include?(loop_var)
-            decdim=i
-            break
+      unless env["_serial_"]
+        if parallel=env["_parallel_"]
+          loop_control=e[3]
+          loop_var="#{loop_control.e[1]}"
+          decdim=nil
+          [0,1,2].each do |i|
+            if parallel.vars[i].include?(loop_var)
+              decdim=i
+              break
+            end
           end
-        end
-        if decdim
-          halo_lo=0
-          halo_up=0
-          if halocomp=env["_halocomp_"]
-            offsets=halocomp[decdim]
-            halo_lo=offsets.lo
-            halo_up=offsets.up
-          end
-          if loop_control.is_a?(Loop_Control_1)
-            lo=raw("dh__s1(#{loop_control.e[3]},#{halo_lo},dh__nestlevel)",:scalar_numeric_expr,{:nl=>false})
-            lo.parent=loop_control
-            up=raw(",dh__e1(#{loop_control.e[4].value},#{halo_up},dh__nestlevel)",:loop_control_pair,{:nl=>false})
-            up.parent=loop_control
-            loop_control.e[3]=lo
-            loop_control.e[4]=up
+          if decdim
+            halo_lo=0
+            halo_up=0
+            if halocomp=env["_halocomp_"]
+              offsets=halocomp[decdim]
+              halo_lo=offsets.lo
+              halo_up=offsets.up
+            end
+            if loop_control.is_a?(Loop_Control_1)
+              lo=raw("dh__s1(#{loop_control.e[3]},#{halo_lo},dh__nestlevel)",:scalar_numeric_expr,{:nl=>false})
+              lo.parent=loop_control
+              up=raw(",dh__e1(#{loop_control.e[4].value},#{halo_up},dh__nestlevel)",:loop_control_pair,{:nl=>false})
+              up.parent=loop_control
+              loop_control.e[3]=lo
+              loop_control.e[4]=up
+            end
           end
         end
       end
