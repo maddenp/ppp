@@ -2864,7 +2864,7 @@ grammar Fortran
   end
 
   rule sms_parallel_var_list
-    t_lt variable_name ( t_comma variable_name ( t_comma variable_name )? )? t_gt <SMS_Parallel_Var_List_1> /
+    t_lt variable_name ( t_comma variable_name )* t_gt <SMS_Parallel_Var_List_1> /
     variable_name "" <SMS_Parallel_Var_List_2>
   end
 
