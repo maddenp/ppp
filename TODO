@@ -59,3 +59,6 @@
 
 - It might be better to prefix in-class method calls with 'self.' for clarity.
 
+- Why does sms$parallel require positional variable lists, while sms$to_local
+  requires numbered lists? This should be harmonized. The latter is better.
+

@@ -334,6 +334,14 @@ module Fortran
     true
   end
 
+  def sp_sms_to_local_begin
+    true
+  end
+
+  def sp_sms_to_local_end
+    true
+  end
+
   def sp_subroutine_stmt(dummy_arg_list_option)
     envpush
     if dummy_arg_list_option.e
@@ -1364,14 +1372,18 @@ module Fortran
   class SMS_Parallel_Var_List_1 < E
 
     def to_s
-      s=""
-      s+="#{e[0]}#{e[1]}"
-      s+=e[2].e.reduce("") { |m,x| m+="#{x.e[1]}" } if e[2].e
-      s+="#{e[3]}"
+      "#{e[0]}#{vars.join(",")}#{e[3]}"
     end
 
     def vars
-      ["#{e[1]}"]+((e[2].e)?(e[2].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
+      v=["#{e[1]}"]
+      if opt1=e[2].e
+        v.push("#{opt1[1]}")
+        if opt2=opt1[2].e
+          v.push("#{opt2[1]}")
+        end
+      end
+      v
     end
 
   end

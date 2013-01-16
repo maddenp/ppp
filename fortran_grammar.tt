@@ -2767,8 +2767,6 @@ grammar Fortran
     "or."
   end
 
-  ## SMS ##
-
   rule sms_barrier
     sms_sentinel sms_t_barrier t_newline <SMS_Barrier>
   end
@@ -2823,6 +2821,8 @@ grammar Fortran
     sms_halo_comp_end   &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
     sms_parallel_begin  &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
     sms_parallel_end    &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_to_local_begin  &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_to_local_end    &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
     sms_passthrough
   end
 
@@ -2864,7 +2864,7 @@ grammar Fortran
   end
 
   rule sms_parallel_var_list
-    t_lt variable_name ( t_comma variable_name )* t_gt <SMS_Parallel_Var_List_1> /
+    t_lt variable_name ( t_comma variable_name ( t_comma variable_name )? )? t_gt <SMS_Parallel_Var_List_1> /
     variable_name "" <SMS_Parallel_Var_List_2>
   end
 
@@ -2886,8 +2886,6 @@ grammar Fortran
     sms_serial_begin /
     sms_serial_end /
     sms_set_communicator /
-    sms_to_local_begin /
-    sms_to_local_end /
     sms_unstructured_grid
   end
 
@@ -2977,18 +2975,25 @@ grammar Fortran
   end
 
   rule sms_to_local_begin
-    sms_sentinel sms_t_to_local sms_parenthesized_args sms_t_begin t_newline <SMS_To_Local_Begin>
+    sms_sentinel sms_t_to_local t_paren_l sms_decomp_name t_colon sms_to_local_lists t_paren_r sms_t_begin t_newline &{ |e| sp_sms_to_local_begin } <SMS_To_Local_Begin>
   end
 
   rule sms_to_local_end
-    sms_sentinel sms_t_to_local sms_t_end t_newline <SMS_To_Local_End>
+    sms_sentinel sms_t_to_local sms_t_end t_newline &{ |e| sp_sms_to_local_end } <SMS_To_Local_End>
+  end
+
+  rule sms_to_local_list
+    t_lt sms_distribute_dim t_comma sms_var_list t_gt <SMS_To_Local_List>
+  end
+
+  rule sms_to_local_lists
+    sms_to_local_list ( t_comma sms_to_local_list ( t_comma sms_to_local_list )? )? <SMS_To_Local_Lists>
   end
 
   rule sms_unstructured_grid
     sms_sentinel sms_t_unstructured_grid sms_parenthesized_args t_newline <SMS_Unstructured_Grid>
   end
 
-  ## SMS ##
 
   rule special_character
     # F90:3.1.4
