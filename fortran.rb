@@ -523,6 +523,10 @@ module Fortran
       nil
     end
 
+    def remove
+      self.parent.e.delete(self)
+    end
+
     def scoping_unit
       enclosing([Scoping_Unit])
     end
@@ -1304,7 +1308,7 @@ module Fortran
     end
 
     def translate
-      self.parent.e.delete(self)
+      remove
     end
 
   end
@@ -1316,7 +1320,7 @@ module Fortran
     end
 
     def translate
-      self.parent.e.delete(self)
+      remove
     end
 
   end
@@ -1352,7 +1356,7 @@ module Fortran
     end
 
     def translate
-      self.parent.e.delete(self)
+      remove
     end
 
   end
@@ -1364,7 +1368,7 @@ module Fortran
     end
 
     def translate
-      self.parent.e.delete(self)
+      remove
     end
 
   end
@@ -1440,11 +1444,27 @@ module Fortran
   end
 
   class SMS_To_Local_Begin < SMS
-    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}") end
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
+    end
+
+    def translate
+      remove
+    end
+
   end
 
   class SMS_To_Local_End < SMS
-    def to_s() sms("#{e[2]}") end
+
+    def to_s
+      sms("#{e[2]}")
+    end
+
+    def translate
+      remove
+    end
+
   end
 
   class SMS_To_Local_List < E
