@@ -1369,6 +1369,32 @@ module Fortran
 
   end
 
+  class SMS_Parallel_Var_List_1 < E
+
+    def to_s
+      s="#{e[0]}#{e[1]}"
+      s+=e[2].e.reduce("") { |m,x| m+="#{x.e[1]}" } if e[2].e
+      s+="#{e[3]}"
+    end
+
+    def vars
+      ["#{e[1]}"]+((e[2].e)?(e[2].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
+    end
+
+  end
+
+  class SMS_Parallel_Var_List_2 < E
+
+    def to_s
+      "#{e[0]}"
+    end
+
+    def vars
+      ["#{e[0]}"]
+    end
+
+  end
+
   class SMS_Parallel_Var_Lists_001 < T
     def vars() [[],[],e[2].vars] end
   end
@@ -1414,42 +1440,66 @@ module Fortran
   end
 
   class SMS_To_Local_Begin < SMS
-    def to_s() sms("#{e[2]} #{e[3]}") end
+    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}") end
   end
 
   class SMS_To_Local_End < SMS
     def to_s() sms("#{e[2]}") end
   end
 
+  class SMS_To_Local_List < E
+    def dim() "#{e[1]}" end
+    def key() "#{e[5]}" end
+    def idx() dim.to_i end
+    def vars() e[3].vars end
+  end
+
+  class SMS_To_Local_Lists < T
+
+    def to_s
+      s="#{e[0]}"
+      if p=e[1].e
+        s+="#{p[0]}#{p[1]}"
+        if p=p[2].e
+          s+="#{p[0]}#{p[1]}"
+        end
+      end
+      s
+    end
+
+    def vars
+      v=[]
+      list=e[0]
+      v[list.idx]=list.vars
+      if p=e[1].e
+        list=p[1]
+        v[list.idx]=list.vars
+        if p=p[2].e
+          list=p[1]
+          v[list.idx]=list.vars
+        end
+      end
+      v
+    end
+
+  end
+
+  class SMS_Var_List < E
+
+    def to_s
+      v=["#{e[0]}"]
+      e[1].e.reduce(v) { |m,x| m.push("#{x.e[1]}") } if e[1].e
+      v.join(",")
+    end
+
+    def vars
+      ["#{e[0]}"]+((e[1].e)?(e[1].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
+    end
+
+  end
+
   class SMS_Unstructured_Grid < SMS
     def to_s() sms("#{e[2]}") end
-  end
-
-  class SMS_Var_List_1 < E
-
-    def to_s
-      s=""
-      s+="#{e[0]}#{e[1]}"
-      s+=e[2].e.reduce("") { |m,x| m+="#{x.e[1]}" } if e[2].e
-      s+="#{e[3]}"
-    end
-
-    def vars
-      ["#{e[1]}"]+((e[2].e)?(e[2].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
-    end
-
-  end
-
-  class SMS_Var_List_2 < E
-
-    def to_s
-      "#{e[0]}"
-    end
-
-    def vars
-      ["#{e[0]}"]
-    end
-
   end
 
   class Star_Int < T

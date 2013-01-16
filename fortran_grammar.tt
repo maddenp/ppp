@@ -2863,14 +2863,19 @@ grammar Fortran
     sms_sentinel sms_t_parallel sms_t_end t_newline &{ |e| sp_sms_parallel_end } <SMS_Parallel_End>
   end
 
+  rule sms_parallel_var_list
+    t_lt variable_name ( t_comma variable_name )* t_gt <SMS_Parallel_Var_List_1> /
+    variable_name "" <SMS_Parallel_Var_List_2>
+  end
+
   rule sms_parallel_var_lists
-    t_comma t_comma sms_var_list <SMS_Parallel_Var_Lists_001> /
-    t_comma sms_var_list t_comma sms_var_list <SMS_Parallel_Var_Lists_011> /
-    t_comma sms_var_list <SMS_Parallel_Var_Lists_010> /
-    sms_var_list t_comma sms_var_list t_comma sms_var_list <SMS_Parallel_Var_Lists_111> /
-    sms_var_list t_comma t_comma sms_var_list <SMS_Parallel_Var_Lists_101> /
-    sms_var_list t_comma sms_var_list <SMS_Parallel_Var_Lists_110> /
-    sms_var_list "" <SMS_Parallel_Var_Lists_100>
+    t_comma t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_001> /
+    t_comma sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_011> /
+    t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_010> /
+    sms_parallel_var_list t_comma sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_111> /
+    sms_parallel_var_list t_comma t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_101> /
+    sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_110> /
+    sms_parallel_var_list "" <SMS_Parallel_Var_Lists_100>
   end
 
   rule sms_passthrough
@@ -2945,6 +2950,10 @@ grammar Fortran
     "ignore" <T>
   end
 
+  rule sms_t_lbound
+    "lbound" <T>
+  end
+
   rule sms_t_parallel
     "parallel" <T>
   end
@@ -2965,6 +2974,10 @@ grammar Fortran
     "to_local" <T>
   end
 
+  rule sms_t_ubound
+    "ubound" <T>
+  end
+
   rule sms_t_unstructured_grid
     "unstructured_grid" <T>
   end
@@ -2977,8 +2990,13 @@ grammar Fortran
     sms_sentinel sms_t_to_local sms_t_end t_newline &{ |e| sp_sms_to_local_end } <SMS_To_Local_End>
   end
 
+  rule sms_to_local_key
+    sms_t_lbound /
+    sms_t_ubound
+  end
+
   rule sms_to_local_list
-    t_lt sms_distribute_dim t_comma sms_var_list t_gt <SMS_To_Local_List>
+    t_lt sms_distribute_dim t_comma sms_var_list t_colon sms_to_local_key t_gt <SMS_To_Local_List>
   end
 
   rule sms_to_local_lists
@@ -2990,8 +3008,7 @@ grammar Fortran
   end
 
   rule sms_var_list
-    t_lt variable_name ( t_comma variable_name )* t_gt <SMS_Var_List_1> /
-    variable_name "" <SMS_Var_List_2>
+    variable_name ( t_comma variable_name )* <SMS_Var_List>
   end
 
   rule special_character
