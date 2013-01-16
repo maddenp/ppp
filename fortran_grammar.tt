@@ -2863,19 +2863,14 @@ grammar Fortran
     sms_sentinel sms_t_parallel sms_t_end t_newline &{ |e| sp_sms_parallel_end } <SMS_Parallel_End>
   end
 
-  rule sms_parallel_var_list
-    t_lt variable_name ( t_comma variable_name )* t_gt <SMS_Parallel_Var_List_1> /
-    variable_name "" <SMS_Parallel_Var_List_2>
-  end
-
   rule sms_parallel_var_lists
-    t_comma t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_001> /
-    t_comma sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_011> /
-    t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_010> /
-    sms_parallel_var_list t_comma sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_111> /
-    sms_parallel_var_list t_comma t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_101> /
-    sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_110> /
-    sms_parallel_var_list "" <SMS_Parallel_Var_Lists_100>
+    t_comma t_comma sms_var_list <SMS_Parallel_Var_Lists_001> /
+    t_comma sms_var_list t_comma sms_var_list <SMS_Parallel_Var_Lists_011> /
+    t_comma sms_var_list <SMS_Parallel_Var_Lists_010> /
+    sms_var_list t_comma sms_var_list t_comma sms_var_list <SMS_Parallel_Var_Lists_111> /
+    sms_var_list t_comma t_comma sms_var_list <SMS_Parallel_Var_Lists_101> /
+    sms_var_list t_comma sms_var_list <SMS_Parallel_Var_Lists_110> /
+    sms_var_list "" <SMS_Parallel_Var_Lists_100>
   end
 
   rule sms_passthrough
@@ -2994,6 +2989,10 @@ grammar Fortran
     sms_sentinel sms_t_unstructured_grid sms_parenthesized_args t_newline <SMS_Unstructured_Grid>
   end
 
+  rule sms_var_list
+    t_lt variable_name ( t_comma variable_name )* t_gt <SMS_Var_List_1> /
+    variable_name "" <SMS_Var_List_2>
+  end
 
   rule special_character
     # F90:3.1.4

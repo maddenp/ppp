@@ -1369,33 +1369,6 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_List_1 < E
-
-    def to_s
-      s=""
-      s+="#{e[0]}#{e[1]}"
-      s+=e[2].e.reduce("") { |m,x| m+="#{x.e[1]}" } if e[2].e
-      s+="#{e[3]}"
-    end
-
-    def vars
-      ["#{e[1]}"]+((e[2].e)?(e[2].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
-    end
-
-  end
-
-  class SMS_Parallel_Var_List_2 < E
-
-    def to_s
-      "#{e[0]}"
-    end
-
-    def vars
-      ["#{e[0]}"]
-    end
-
-  end
-
   class SMS_Parallel_Var_Lists_001 < T
     def vars() [[],[],e[2].vars] end
   end
@@ -1450,6 +1423,33 @@ module Fortran
 
   class SMS_Unstructured_Grid < SMS
     def to_s() sms("#{e[2]}") end
+  end
+
+  class SMS_Var_List_1 < E
+
+    def to_s
+      s=""
+      s+="#{e[0]}#{e[1]}"
+      s+=e[2].e.reduce("") { |m,x| m+="#{x.e[1]}" } if e[2].e
+      s+="#{e[3]}"
+    end
+
+    def vars
+      ["#{e[1]}"]+((e[2].e)?(e[2].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
+    end
+
+  end
+
+  class SMS_Var_List_2 < E
+
+    def to_s
+      "#{e[0]}"
+    end
+
+    def vars
+      ["#{e[0]}"]
+    end
+
   end
 
   class Star_Int < T
