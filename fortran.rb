@@ -1449,9 +1449,9 @@ module Fortran
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
-    def translate
-      remove
-    end
+#   def translate
+#     remove
+#   end
 
   end
 
