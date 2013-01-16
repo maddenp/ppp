@@ -1372,18 +1372,14 @@ module Fortran
   class SMS_Parallel_Var_List_1 < E
 
     def to_s
-      "#{e[0]}#{vars.join(",")}#{e[3]}"
+      s=""
+      s+="#{e[0]}#{e[1]}"
+      s+=e[2].e.reduce("") { |m,x| m+="#{x.e[1]}" } if e[2].e
+      s+="#{e[3]}"
     end
 
     def vars
-      v=["#{e[1]}"]
-      if opt1=e[2].e
-        v.push("#{opt1[1]}")
-        if opt2=opt1[2].e
-          v.push("#{opt2[1]}")
-        end
-      end
-      v
+      ["#{e[1]}"]+((e[2].e)?(e[2].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
     end
 
   end
