@@ -119,7 +119,7 @@ module PPP
         s=~directive
       end
 
-      max=80
+      max=132
       a=s.split("\n")
       (0..a.length-1).each do |n|
         e=a[n].chomp

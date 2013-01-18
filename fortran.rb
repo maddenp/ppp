@@ -1461,9 +1461,9 @@ module Fortran
       sms("#{e[2]}")
     end
 
-    def translate
-      remove
-    end
+#   def translate
+#     remove
+#   end
 
   end
 
