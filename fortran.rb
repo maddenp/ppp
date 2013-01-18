@@ -507,7 +507,7 @@ module Fortran
       else
         attrs=(attrs.empty?)?(""):(",#{attrs.join(",")}")
         code="#{type}#{attrs}::#{name}"
-        t=tree(code,:type_declaration_stmt)
+        t=raw(code,:type_declaration_stmt)
         t.parent=p
         p.e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
         env[name]["pppvar"]=true
@@ -586,15 +586,15 @@ module Fortran
         unless code.nil?
           p=use_part
 # HACK start
-          t=tree("!sms$ignore begin",:sms_ignore_begin)
+          t=raw("!sms$ignore begin",:sms_ignore_begin)
           t.parent=p
           p.e.push(t)
 # HACK end
-          t=tree(code,:use_stmt)
+          t=raw(code,:use_stmt)
           t.parent=p
           p.e.push(t)
 # HACK start
-          t=tree("!sms$ignore end",:sms_ignore_end)
+          t=raw("!sms$ignore end",:sms_ignore_end)
           t.parent=p
           p.e.push(t)
 # HACK end
@@ -930,6 +930,9 @@ module Fortran
     def bounds() e[1].bounds end
   end
 
+  class Function_Reference < T
+  end
+
   class Function_Stmt < T
     def to_s() bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")) end
   end
@@ -1023,7 +1026,27 @@ module Fortran
   end
 
   class Name < T
-    def name() to_s end
+
+    def name
+      to_s
+    end
+
+#   def translate
+#     envget
+#     if tolocal=env[:tolocal] and p=tolocal[name]
+#       dh=p.dh
+#       case p.key
+#       when "lbound"
+#         se="s1"
+#       when "ubound"
+#         se="e1"
+#       else
+#         fail "Unrecognized SMS$TO_LOCAL key: #{p.key}"
+#       end
+#       code="#{dh}__#{se}(#{name},0,#{dh}__nestlevel)"
+#     end
+#   end
+
   end
 
   class Namelist_Group_Set_Pair < T

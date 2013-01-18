@@ -14,7 +14,14 @@ module PPP
   @@np=nil # normalize parser
 
   def default_props
-    {:debug=>false,:incdirs=>[],:nl=>true,:normalize=>false,:srcfile=>nil}
+    {
+      :debug=>false,
+      :incdirs=>[],
+      :nl=>true,
+      :normalize=>false,
+      :srcfile=>nil,
+      :translate=>true
+    }
   end
   
   def directive
@@ -162,7 +169,7 @@ module PPP
       re=Regexp.new("^(.+?):in `([^\']*)'$")
       srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
       fail "PARSE FAILED#{srcmsg}" if raw_tree.nil?
-      translated_tree=raw_tree.translate
+      translated_tree=(props[:translate])?(raw_tree.translate):(nil)
       if debug
         puts "\nTRANSLATED TREE\n\n"
         p translated_tree
@@ -175,13 +182,14 @@ module PPP
 
   def raw(s,root=:program_units,override={})
     props=default_props.merge(override)
-    s,raw_tree,translated_tree=process(s,root,props)
+    props[:translate]=false
+    translated_source,raw_tree,translated_tree=process(s,root,props)
     raw_tree
   end
 
   def tree(s,root=:program_units,override={})
     props=default_props.merge(override)
-    s,raw_tree,translated_tree=process(s,root,props)
+    translated_source,raw_tree,translated_tree=process(s,root,props)
     translated_tree
   end
 

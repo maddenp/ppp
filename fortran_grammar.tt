@@ -1457,7 +1457,7 @@ grammar Fortran
   rule function_reference
     # F90:R1209
 
-    function_name t_paren_l actual_arg_spec_list? t_paren_r <T>
+    function_name t_paren_l actual_arg_spec_list? t_paren_r !{ |e| sp_is_array?(e[0]) } <Function_Reference>
   end
 
   rule function_stmt
@@ -2369,7 +2369,7 @@ grammar Fortran
   rule primary
     # F90:R701
 
-    function_reference !{ |e| sp_is_array?(e[0]) } <T> /
+    function_reference /
     variable /
     constant /
     constant_subobject /
