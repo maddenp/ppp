@@ -1,6 +1,6 @@
 module Fortran
 
-  @@access="_default_"
+  @@access="_default"
   @@current_name=nil
   @@distribute=nil
   @@dolabels=[]
@@ -156,21 +156,21 @@ module Fortran
     elsif access_spec.public?
       p="public"
     else
-      p="_default_"
+      p="_default"
     end
     if access_stmt_option.is_a?(Access_Stmt_Option)
       access_stmt_option.names.each { |x| varsetprop(x,"access",p) }
     else
       @@access=p
       env.each do |n,h|
-        varsetprop(n,"access",p) if vargetprop(n,"access")=="_default_"
+        varsetprop(n,"access",p) if vargetprop(n,"access")=="_default"
       end
     end
     true
   end
 
   def sp_assumed_shape_spec_list(assumed_shape_spec_list)
-    return false unless env["_args_"] and env["_args_"].include?(@@current_name)
+    return false unless env[:args] and env[:args].include?(@@current_name)
     true
   end
 
@@ -225,7 +225,7 @@ module Fortran
     if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
       first=dummy_arg_name_list.e[0].e[0]
       rest=dummy_arg_name_list.e[1].e
-      env["_args_"]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+      env[:args]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
     end
     true
   end
@@ -237,7 +237,7 @@ module Fortran
       File.open(smsfile(modulename),"w") { |f| f.write(YAML.dump(modinfo)) }
     end
     envpop
-    @@access="_default_"
+    @@access="_default"
     true
   end
 
@@ -289,7 +289,7 @@ module Fortran
     dim1=halo_comp_pairs.e[0]
     dim2=(halo_comp_pairs.e[1].e.nil?)?(nil):(halo_comp_pairs.e[1].e[1])
     dim3=(halo_comp_pairs.e[2].e.nil?)?(nil):(halo_comp_pairs.e[2].e[1])
-    env["_halocomp_"]=[dim1,dim2,dim3].reduce([]) do |m,x|
+    env[:halocomp]=[dim1,dim2,dim3].reduce([]) do |m,x|
       lo=(x.is_a?(SMS_Halo_Comp_Pair))?(x.lo):(nil)
       up=(x.is_a?(SMS_Halo_Comp_Pair))?(x.up):(nil)
       m.push(OpenStruct.new({:lo=>lo,:up=>up}))
@@ -308,7 +308,7 @@ module Fortran
   def sp_sms_parallel_begin(sms_decomp_name,sms_parallel_var_lists)
     fail "Already inside parallel region" if @@parallel
     envpush
-    env["_parallel_"]=OpenStruct.new({:dh=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
+    env[:parallel]=OpenStruct.new({:dh=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
     @@parallel=true
     true
   end
@@ -323,7 +323,7 @@ module Fortran
   def sp_sms_serial_begin
     fail "Already inside serial region" if @@serial
     envpush
-    env["_serial_"]=true
+    env[:serial]=true
     @@serial=true
     true
   end
@@ -338,7 +338,7 @@ module Fortran
   def sp_sms_to_local_begin(sms_decomp_name,sms_to_local_lists)
     fail "Already inside to_local region" if @@tolocal
     envpush
-    env["_tolocal_"]=sms_to_local_lists.vars.each do |var,props|
+    env[:tolocal]=sms_to_local_lists.vars.each do |var,props|
       props.dh="#{sms_decomp_name}"
     end
     @@tolocal=true
@@ -359,7 +359,7 @@ module Fortran
         dummy_arg_list=dummy_arg_list_option.e[1]
         first=dummy_arg_list.e[0].e[0]
         rest=dummy_arg_list.e[1].e
-        env["_args_"]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+        env[:args]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
       end
     end
     true
@@ -542,7 +542,7 @@ module Fortran
     end
 
     def smstype(type,kind)
-      kind=nil if kind=="_default_"
+      kind=nil if kind=="_default"
       case type
       when "integer"
         (kind)?("nnt_i#{kind}"):("nnt_integer")
@@ -681,8 +681,8 @@ module Fortran
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
     def boundslist() ex+[bounds] end
     def ex() (e[0].respond_to?(:boundslist))?(e[0].boundslist):([]) end
-    def lb() (e[0].respond_to?(:lb))?(e[0].lb):("_default_") end
-    def ub() "_assumed_" end
+    def lb() (e[0].respond_to?(:lb))?(e[0].lb):("_default") end
+    def ub() "_assumed" end
   end
 
   class Assumed_Shape_Spec_List < T
@@ -697,8 +697,8 @@ module Fortran
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
     def boundslist() ex+[bounds] end
     def ex() (e[0].respond_to?(:boundslist))?(e[0].boundslist):([]) end
-    def lb() ("#{e[1]}".empty?)?("_default_"):(e[1].lb) end
-    def ub() "_assumed_" end
+    def lb() ("#{e[1]}".empty?)?("_default"):(e[1].lb) end
+    def ub() "_assumed" end
   end
 
   class Assumed_Size_Spec_Pair < T
@@ -771,8 +771,8 @@ module Fortran
 
   class Deferred_Shape_Spec < T
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
-    def lb() "_deferred_" end
-    def ub() "_deferred_" end
+    def lb() "_deferred" end
+    def ub() "_deferred" end
   end
 
   class Deferred_Shape_Spec_List < T
@@ -917,8 +917,8 @@ module Fortran
 
   class Explicit_Shape_Spec < T
     def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
-    def lb() "_explicit_" end
-    def ub() "_explicit_" end
+    def lb() "_explicit" end
+    def ub() "_explicit" end
   end
 
   class Explicit_Shape_Spec_List < T
@@ -1041,8 +1041,8 @@ module Fortran
 
     def translate
       envget
-      unless env["_serial_"]
-        if parallel=env["_parallel_"]
+      unless env[:serial]
+        if parallel=env[:parallel]
           loop_control=e[3]
           loop_var="#{loop_control.e[1]}"
           decdim=nil
@@ -1055,7 +1055,7 @@ module Fortran
           if decdim
             halo_lo=0
             halo_up=0
-            if halocomp=env["_halocomp_"]
+            if halocomp=env[:halocomp]
               offsets=halocomp[decdim]
               halo_lo=offsets.lo
               halo_up=offsets.up
@@ -1172,9 +1172,9 @@ module Fortran
 
     def fixbound(varenv,var,dim,x)
       bound=varenv["#{x}b#{dim}"]
-      fail "Bad upper bound: #{bound}" if bound=="_default_" and x==:u
-      return 1 if bound=="_default_" and x==:l
-      if ["_assumed_","_deferred_","_explicit_"].include?(bound)
+      fail "Bad upper bound: #{bound}" if bound=="_default" and x==:u
+      return 1 if bound=="_default" and x==:l
+      if ["_assumed","_deferred","_explicit"].include?(bound)
         if decdim=varenv["dim#{dim}"] 
           lu=(x==:l)?("low"):("upper")
           return "dh__#{lu}bounds(#{decdim},dh__nestlevel)"
@@ -1557,7 +1557,7 @@ module Fortran
 
   class Type_Spec < E
     def derived?() "#{e[0]}"=="type" end
-    def kind() return (e[1].respond_to?(:kind))?(e[1].kind):("_default_") end
+    def kind() return (e[1].respond_to?(:kind))?(e[1].kind):("_default") end
     def type() (derived?)?("#{e[2]}"):("#{e[0]}") end
   end
 
