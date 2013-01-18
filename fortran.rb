@@ -227,7 +227,8 @@ module Fortran
   end
 
   def sp_is_array?(node)
-    vargetprop(node.function_name,"rank")=="array"
+    return false unless node.respond_to?(:name)
+    vargetprop(node.name,"rank")=="array"
   end
 
   def sp_module(_module)

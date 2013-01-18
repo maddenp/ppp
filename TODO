@@ -63,7 +63,11 @@
   requires numbered lists? This should be harmonized. The latter is better.
 
 - rule variable is broken: See parse tree for program 'i=1\nend'. 'i' is parsed
-  as an array_section. It seems that some mechanism to differentiate between
-  user-defined and intrinsic types is needed. Also, probably user-defined type
+  as data_ref. It seems that some mechanism to differentiate between user-
+  defined and intrinsic types is needed. Also, probably user-defined type
   information  needs to be in the environment, written to .sms mod files, etc.
+
+- Structure constructor recognition is broken, is parsed as function reference.
+  See t0151. May also be related to need to track, store, load user-defined type
+  info.
 
