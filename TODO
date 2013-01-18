@@ -71,3 +71,7 @@
   See t0151. May also be related to need to track, store, load user-defined type
   info.
 
+- Make implicit none mandatory! Parsing is weird w/o it.
+
+- write-stmt seems to parse wrong, too: 'write' recognized as Data_Ref.
+
