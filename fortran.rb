@@ -87,10 +87,6 @@ module Fortran
     " "*2*@@level+s
   end
 
-  def is_array?(node)
-    vargetprop(node.function_name,"rank")=="array"
-  end
-
   def lr
     @@level=@@levelstack.pop
   end
@@ -228,6 +224,10 @@ module Fortran
       env[:args]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
     end
     true
+  end
+
+  def sp_is_array?(node)
+    vargetprop(node.function_name,"rank")=="array"
   end
 
   def sp_module(_module)

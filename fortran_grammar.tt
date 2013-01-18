@@ -855,7 +855,7 @@ grammar Fortran
     parameter_stmt /
     format_stmt /
     entry_stmt /
-    stmt_function_stmt !{ |e| is_array?(e[0]) } <E> /
+    stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <E> /
     directive /
     sms_passthrough /
     sms_declarative # prefer "sms_declarative &{ |e| sp_sms_declarative(e[0]) }" -- see TODO
@@ -2369,7 +2369,7 @@ grammar Fortran
   rule primary
     # F90:R701
 
-    function_reference !{ |e| is_array?(e[0]) } <T> /
+    function_reference !{ |e| sp_is_array?(e[0]) } <T> /
     variable /
     constant /
     constant_subobject /
