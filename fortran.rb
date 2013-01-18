@@ -11,6 +11,7 @@ module Fortran
   @@levelstack=[]
   @@parallel=false
   @@serial=false
+  @@tolocal=false
   @@tag=-1
   @@uses={}
 
@@ -334,11 +335,20 @@ module Fortran
     true
   end
 
-  def sp_sms_to_local_begin
+  def sp_sms_to_local_begin(sms_decomp_name,sms_to_local_lists)
+    fail "Already inside to_local region" if @@tolocal
+    envpush
+    env["_tolocal_"]=sms_to_local_lists.vars.each do |var,props|
+      props.dh="#{sms_decomp_name}"
+    end
+    @@tolocal=true
     true
   end
 
   def sp_sms_to_local_end
+    fail "Not inside to_local region" unless @@tolocal
+    @@tolocal=false
+    envpop
     true
   end
 
@@ -1468,9 +1478,9 @@ module Fortran
   end
 
   class SMS_To_Local_List < E
-    def dim() "#{e[1]}" end
+    def decdim() "#{e[1]}" end
     def key() "#{e[5]}" end
-    def idx() dim.to_i end
+    def idx() decdim.to_i end
     def vars() e[3].vars end
   end
 
@@ -1488,16 +1498,16 @@ module Fortran
     end
 
     def vars
-      v=[]
-      list=e[0]
-      v[list.idx]=list.vars
-      if p=e[1].e
-        list=p[1]
-        v[list.idx]=list.vars
-        if p=p[2].e
-          list=p[1]
-          v[list.idx]=list.vars
+      def rec(list,v)
+        list.vars.each do |x|
+          v[x]=OpenStruct.new({:decdim=>list.idx,:key=>list.key})
         end
+      end
+      v={}
+      rec(e[0],v)
+      if p=e[1].e
+        rec(p[1],v)
+        rec(p[1],v) if p=p[2].e
       end
       v
     end

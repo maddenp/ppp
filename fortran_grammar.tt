@@ -2983,7 +2983,7 @@ grammar Fortran
   end
 
   rule sms_to_local_begin
-    sms_sentinel sms_t_to_local t_paren_l sms_decomp_name t_colon sms_to_local_lists t_paren_r sms_t_begin t_newline &{ |e| sp_sms_to_local_begin } <SMS_To_Local_Begin>
+    sms_sentinel sms_t_to_local t_paren_l sms_decomp_name t_colon sms_to_local_lists t_paren_r sms_t_begin t_newline &{ |e| sp_sms_to_local_begin(e[3],e[5]) } <SMS_To_Local_Begin>
   end
 
   rule sms_to_local_end
