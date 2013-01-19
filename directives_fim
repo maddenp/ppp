@@ -1,0 +1,21 @@
+TODO
+
+!sms$create_decomp
+!sms$distribute
+!sms$ignore
+!sms$reduce
+!sms$reduce begin/end
+!sms$serial
+!sms$set_communicator
+!sms$to_local
+!sms$unstructured_grid
+
+DONE
+
+!sms$barrier
+!sms$compare_var
+!sms$exchange
+!sms$halo_comp begin/end
+!sms$insert
+!sms$parallel begin/end
+!sms$remove
