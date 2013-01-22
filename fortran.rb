@@ -287,14 +287,12 @@ module Fortran
     fail "Halo computation invalid outside parallel region" unless @@parallel
     fail "Already inside halo-computation region" if @@halocomp
     envpush
-    dim1=halo_comp_pairs.e[0]
-    dim2=(halo_comp_pairs.e[1].e.nil?)?(nil):(halo_comp_pairs.e[1].e[1])
-    dim3=(halo_comp_pairs.e[2].e.nil?)?(nil):(halo_comp_pairs.e[2].e[1])
-    env[:halocomp]=[dim1,dim2,dim3].reduce([]) do |m,x|
-      lo=(x.is_a?(SMS_Halo_Comp_Pair))?(x.lo):(nil)
-      up=(x.is_a?(SMS_Halo_Comp_Pair))?(x.up):(nil)
-      m.push(OpenStruct.new({:lo=>lo,:up=>up}))
-    end
+    dims={}
+    dims[1]=halo_comp_pairs.e[0]
+    dims[2]=halo_comp_pairs.e[1].e[1] unless halo_comp_pairs.e[1].e.nil?
+    dims[3]=halo_comp_pairs.e[2].e[1] unless halo_comp_pairs.e[2].e.nil?
+    env[:halocomp]={}
+    dims.each { |k,v| env[:halocomp][k]=OpenStruct.new({:lo=>v.lo,:up=>v.up}) }
     @@halocomp=true
     true
   end
@@ -523,6 +521,27 @@ module Fortran
       envswap(node.myenv) unless node.myenv.object_id==env.object_id
     end
 
+    def graft(tree)
+      node=self
+      while "#{node.parent}"=="#{node}"
+        node=node.parent
+      end
+      tree.parent=node.parent
+      block=node.parent.e
+      block[block.index(node)]=tree
+    end
+
+    def halo_offsets(decdim)
+      halo_lo=0
+      halo_up=0
+      if halocomp=env[:halocomp]
+        offsets=halocomp[decdim]
+        halo_lo=offsets.lo
+        halo_up=offsets.up
+      end
+      OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
+    end
+
     def inside?(classes)
       (enclosing(classes))?(true):(false)
     end
@@ -560,12 +579,6 @@ module Fortran
 
     def specification_part
       scoping_unit.e[1]
-    end
-
-    def sub(node,tree)
-      tree.parent=node.parent
-      block=node.parent.e
-      block[block.index(node)]=tree
     end
 
     def use(modulename,usenames=[])
@@ -1034,16 +1047,18 @@ module Fortran
 #   def translate
 #     envget
 #     if tolocal=env[:tolocal] and p=tolocal[name]
-#       dh=p.dh
 #       case p.key
 #       when "lbound"
-#         se="s1"
+#         se="s#{p.decdim}"
+#         halo_offset=halo_offsets(p.decdim).lo
 #       when "ubound"
-#         se="e1"
+#         se="e#{p.decdim}"
+#         halo_offset=halo_offsets(p.decdim).up
 #       else
 #         fail "Unrecognized SMS$TO_LOCAL key: #{p.key}"
 #       end
-#       code="#{dh}__#{se}(#{name},0,#{dh}__nestlevel)"
+#       code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
+#       graft(raw(code,:expr,{:nl=>false}))
 #     end
 #   end
 
@@ -1072,22 +1087,17 @@ module Fortran
           decdim=nil
           [0,1,2].each do |i|
             if parallel.vars[i].include?(loop_var)
-              decdim=i
+              decdim=i+1
               break
             end
           end
           if decdim
-            halo_lo=0
-            halo_up=0
-            if halocomp=env[:halocomp]
-              offsets=halocomp[decdim]
-              halo_lo=offsets.lo
-              halo_up=offsets.up
-            end
+            halo_lo=halo_offsets(decdim).lo
+            halo_up=halo_offsets(decdim).up
             if loop_control.is_a?(Loop_Control_1)
-              lo=raw("dh__s1(#{loop_control.e[3]},#{halo_lo},dh__nestlevel)",:scalar_numeric_expr,{:nl=>false})
+              lo=raw("dh__s#{decdim}(#{loop_control.e[3]},#{halo_lo},dh__nestlevel)",:scalar_numeric_expr,{:nl=>false})
               lo.parent=loop_control
-              up=raw(",dh__e1(#{loop_control.e[4].value},#{halo_up},dh__nestlevel)",:loop_control_pair,{:nl=>false})
+              up=raw(",dh__e#{decdim}(#{loop_control.e[4].value},#{halo_up},dh__nestlevel)",:loop_control_pair,{:nl=>false})
               up.parent=loop_control
               loop_control.e[3]=lo
               loop_control.e[4]=up
@@ -1219,7 +1229,8 @@ module Fortran
 
     def translate
       use("nnt_types_module")
-      sub(parent,raw("call ppp_barrier(ppp__status)",:call_stmt))
+      code="call ppp_barrier(ppp__status)"
+      graft(raw(code,:call_stmt))
     end
 
   end
@@ -1249,7 +1260,7 @@ module Fortran
         decomp="ppp_not_decomposed"
       end
       code="if (sms_debugging_on()) call ppp_compare_var(#{decomp},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},ppp__status)"
-      sub(parent,raw(code,:if_stmt))
+      graft(raw(code,:if_stmt))
     end
 
   end
@@ -1330,7 +1341,7 @@ module Fortran
       perms="reshape((/#{perms.join(",")}/),(/#{nvars},7/))"
       types="(/#{types.join(",")}/)"
       code="call ppp_exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},ppp__status,#{vars},#{names})"
-      sub(parent,raw(code,:call_stmt))
+      graft(raw(code,:call_stmt))
     end
 
   end
@@ -1483,9 +1494,9 @@ module Fortran
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
-#   def translate
+    def translate
 #     remove
-#   end
+    end
 
   end
 
@@ -1495,9 +1506,9 @@ module Fortran
       sms("#{e[2]}")
     end
 
-#   def translate
+    def translate
 #     remove
-#   end
+    end
 
   end
 
