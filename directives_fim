@@ -1,3 +1,4 @@
+
 TODO
 
 !sms$create_decomp
@@ -7,7 +8,6 @@ TODO
 !sms$reduce begin/end
 !sms$serial
 !sms$set_communicator
-!sms$to_local
 !sms$unstructured_grid
 
 DONE
@@ -19,3 +19,5 @@ DONE
 !sms$insert
 !sms$parallel begin/end
 !sms$remove
+!sms$to_local begin/end
+

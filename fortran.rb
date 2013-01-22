@@ -1044,23 +1044,23 @@ module Fortran
       to_s
     end
 
-#   def translate
-#     envget
-#     if tolocal=env[:tolocal] and p=tolocal[name]
-#       case p.key
-#       when "lbound"
-#         se="s#{p.decdim}"
-#         halo_offset=halo_offsets(p.decdim).lo
-#       when "ubound"
-#         se="e#{p.decdim}"
-#         halo_offset=halo_offsets(p.decdim).up
-#       else
-#         fail "Unrecognized SMS$TO_LOCAL key: #{p.key}"
-#       end
-#       code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
-#       graft(raw(code,:expr,{:nl=>false}))
-#     end
-#   end
+    def translate
+      envget
+      if tolocal=env[:tolocal] and p=tolocal[name]
+        case p.key
+        when "lbound"
+          se="s#{p.decdim}"
+          halo_offset=halo_offsets(p.decdim).lo
+        when "ubound"
+          se="e#{p.decdim}"
+          halo_offset=halo_offsets(p.decdim).up
+        else
+          fail "Unrecognized SMS$TO_LOCAL key: #{p.key}"
+        end
+        code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
+        graft(raw(code,:expr,{:nl=>false}))
+      end
+    end
 
   end
 
@@ -1495,7 +1495,7 @@ module Fortran
     end
 
     def translate
-#     remove
+      remove
     end
 
   end
@@ -1507,7 +1507,7 @@ module Fortran
     end
 
     def translate
-#     remove
+      remove
     end
 
   end
