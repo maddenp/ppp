@@ -75,3 +75,6 @@
 
 - write-stmt seems to parse wrong, too: 'write' recognized as Data_Ref.
 
+- Change all 'print *' to print/write with format list in tests. Otherwise,
+  output may vary with processor (gfortran, ifort, etc.).
+
