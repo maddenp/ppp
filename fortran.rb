@@ -1485,7 +1485,17 @@ module Fortran
   end
 
   class SMS_Set_Communicator < SMS
-    def to_s() sms("#{e[2]}") end
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]}")
+    end
+
+    def translate
+      use("nnt_types_module")
+      code="call sms_set_communicator(#{e[3]},ppp__status)"
+      graft(raw(code,:call_stmt))
+    end
+
   end
 
   class SMS_To_Local_Begin < SMS

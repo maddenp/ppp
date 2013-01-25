@@ -6,8 +6,7 @@ TODO
 !sms$ignore
 !sms$reduce
 !sms$reduce begin/end
-!sms$serial
-!sms$set_communicator
+!sms$serial begin/end
 !sms$unstructured_grid
 
 DONE
@@ -19,5 +18,6 @@ DONE
 !sms$insert
 !sms$parallel begin/end
 !sms$remove
+!sms$set_communicator
 !sms$to_local begin/end
 
