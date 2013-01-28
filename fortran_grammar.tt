@@ -2814,16 +2814,17 @@ grammar Fortran
   end
 
   rule sms_executable
-    sms_barrier          &{ |e| sp_sms_executable(e[0]) } <E> / # prefer just "sms_barrier /" -- see TODO
-    sms_compare_var      &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_exchange         &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_halo_comp_begin  &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_halo_comp_end    &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_parallel_begin   &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_parallel_end     &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_to_local_begin   &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_to_local_end     &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_set_communicator &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_barrier           &{ |e| sp_sms_executable(e[0]) } <E> / # prefer just "sms_barrier /" -- see TODO
+    sms_compare_var       &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_exchange          &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_halo_comp_begin   &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_halo_comp_end     &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_parallel_begin    &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_parallel_end      &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_to_local_begin    &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_to_local_end      &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_set_communicator  &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_unstructured_grid &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
     sms_passthrough
   end
 
@@ -2885,8 +2886,7 @@ grammar Fortran
     sms_ignore_end /
     sms_reduce /
     sms_serial_begin /
-    sms_serial_end /
-    sms_unstructured_grid
+    sms_serial_end
   end
 
   rule sms_reduce
@@ -3004,7 +3004,7 @@ grammar Fortran
   end
 
   rule sms_unstructured_grid
-    sms_sentinel sms_t_unstructured_grid sms_parenthesized_args t_newline <SMS_Unstructured_Grid>
+    sms_sentinel sms_t_unstructured_grid t_paren_l variable_name t_paren_r t_newline <SMS_Unstructured_Grid>
   end
 
   rule sms_var_list

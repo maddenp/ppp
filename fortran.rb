@@ -499,9 +499,9 @@ module Fortran
     def declare(type,name,attrs=[])
       p=declaration_constructs
       envget(p)
-      v=env[name]
-      if v
-        fail "Variable #{name} is already defined" unless v["pppvar"]
+      varenv=env[name]
+      if varenv
+        fail "Variable #{name} is already defined" unless varenv["pppvar"]
       else
         attrs=(attrs.empty?)?(""):(",#{attrs.join(",")}")
         code="#{type}#{attrs}::#{name}"
@@ -521,14 +521,8 @@ module Fortran
       envswap(node.myenv) unless node.myenv.object_id==env.object_id
     end
 
-    def graft(tree)
-      node=self
-      while "#{node.parent}"=="#{node}"
-        node=node.parent
-      end
-      tree.parent=node.parent
-      block=node.parent.e
-      block[block.index(node)]=tree
+    def execution_part
+      scoping_unit.e[2]
     end
 
     def halo_offsets(decdim)
@@ -540,6 +534,14 @@ module Fortran
         halo_up=offsets.up
       end
       OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
+    end
+
+    def insert_statement(code,rule,predecessor)
+      tree=raw(code,rule)
+      tree.parent=predecessor.parent
+      block=predecessor.parent.e
+      block.insert(block.index(predecessor),tree)
+      tree
     end
 
     def inside?(classes)
@@ -555,6 +557,28 @@ module Fortran
 
     def remove
       self.parent.e.delete(self)
+    end
+
+    def replace_element(code,rule)
+      tree=raw(code,rule,{:nl=>false})
+      node=self
+      node=node.parent while "#{node}"=="#{node.parent}"
+      tree.parent=node.parent
+      block=node.parent.e
+      block[block.index(node)]=tree
+    end
+
+    def replace_statement(code,rule)
+      tree=raw(code,rule)
+      tree.parent=self.parent
+      block=self.parent.e
+      block[block.index(self)]=tree
+    end
+
+    def replace_statements(stmt_pairs)
+      p=stmt_pairs.shift
+      s=replace_statement(p[0],p[1])
+      stmt_pairs.each { |p| s=insert_statement(p[0],p[1],s) }
     end
 
     def scoping_unit
@@ -1058,7 +1082,7 @@ module Fortran
           fail "Unrecognized SMS$TO_LOCAL key: #{p.key}"
         end
         code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
-        graft(raw(code,:expr,{:nl=>false}))
+        replace_element(code,:expr)
       end
     end
 
@@ -1230,7 +1254,7 @@ module Fortran
     def translate
       use("nnt_types_module")
       code="call ppp_barrier(ppp__status)"
-      graft(raw(code,:call_stmt))
+      replace_statement(code,:call_stmt)
     end
 
   end
@@ -1260,7 +1284,7 @@ module Fortran
         decomp="ppp_not_decomposed"
       end
       code="if (sms_debugging_on()) call ppp_compare_var(#{decomp},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},ppp__status)"
-      graft(raw(code,:if_stmt))
+      replace_statement(code,:if_stmt)
     end
 
   end
@@ -1341,7 +1365,7 @@ module Fortran
       perms="reshape((/#{perms.join(",")}/),(/#{nvars},7/))"
       types="(/#{types.join(",")}/)"
       code="call ppp_exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},ppp__status,#{vars},#{names})"
-      graft(raw(code,:call_stmt))
+      replace_statement(code,:call_stmt)
     end
 
   end
@@ -1493,7 +1517,7 @@ module Fortran
     def translate
       use("nnt_types_module")
       code="call sms_set_communicator(#{e[3]},ppp__status)"
-      graft(raw(code,:call_stmt))
+      replace_statement(code,:call_stmt)
     end
 
   end
@@ -1574,7 +1598,21 @@ module Fortran
   end
 
   class SMS_Unstructured_Grid < SMS
-    def to_s() sms("#{e[2]}") end
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]}")
+    end
+
+    def translate
+#     envget
+#     var="#{e[3]}"
+#     fail "No module info found for variable '#{var}'" unless varenv=env[var]
+#     fail "No decomp info found for variable '#{var}'" unless dh=varenv["decomp"]
+#     use("nnt_types_module")
+#     code="call sms_unstructuredgrid(#{dh},size(#{var},1),#{var})"
+#     replace_statement(code,:call_stmt)
+    end
+
   end
 
   class Star_Int < T
