@@ -1317,7 +1317,7 @@ grammar Fortran
   rule execution_part
     # F90:R208
 
-    executable_construct execution_part_construct <E>
+    executable_construct execution_part_construct <Execution_Part>
   end
 
   rule execution_part_disallowed

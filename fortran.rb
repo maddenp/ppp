@@ -540,7 +540,7 @@ module Fortran
       tree=raw(code,rule)
       tree.parent=predecessor.parent
       block=predecessor.parent.e
-      block.insert(block.index(predecessor),tree)
+      block.insert(block.index(predecessor)+1,tree)
       tree
     end
 
@@ -951,6 +951,9 @@ module Fortran
 
   class Entry_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{sb(e[4])}") end
+  end
+
+  class Execution_Part < E
   end
 
   class Explicit_Shape_Spec < T
@@ -1604,13 +1607,17 @@ module Fortran
     end
 
     def translate
-#     envget
-#     var="#{e[3]}"
-#     fail "No module info found for variable '#{var}'" unless varenv=env[var]
-#     fail "No decomp info found for variable '#{var}'" unless dh=varenv["decomp"]
-#     use("nnt_types_module")
-#     code="call sms_unstructuredgrid(#{dh},size(#{var},1),#{var})"
-#     replace_statement(code,:call_stmt)
+      envget
+      var="#{e[3]}"
+      fail "No module info found for variable '#{var}'" unless varenv=env[var]
+      fail "No decomp info found for variable '#{var}'" unless dh=varenv["decomp"]
+      use("nnt_types_module")
+      stmts=[]
+      stmts.push(["call sms_unstructuredgrid(#{dh},size(#{var},1),#{var})",:call_stmt])
+      stmts.push(["call ppp_get_collapsed_halo_size(#{dh}(#{dh}__nestlevel),1,1,#{dh}__localhalosize,ppp__status)",:call_stmt])
+      stmts.push(["#{dh}__s1(1,1,#{dh}__nestlevel)=#{dh}__s1(1,0,#{dh}__nestlevel)",:assignment_stmt])
+      stmts.push(["#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),1,#{dh}__nestlevel)=#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),0,#{dh}__nestlevel)+#{dh}__localhalosize",:assignment_stmt])
+      replace_statements(stmts)
     end
 
   end
