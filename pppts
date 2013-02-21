@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
 
-threaded=true
+threads=8
 
 require "fileutils"
+require 'thread'
 
 def docmd(cmd)
   out=IO.popen(cmd+" 2>&1") { |x| x.readlines.reduce("") { |s,e| s+=e } }
@@ -22,6 +23,10 @@ def fail(msg=nil,cmd=nil)
   puts msg if msg
   puts "FAIL"
   exit(1)
+end
+
+def run(q)
+  test(q.deq) until q.empty?
 end
 
 def test(t)
@@ -45,17 +50,13 @@ def test(t)
   exe("make -C #{t} clean")
 end
 
+fail "Need at least one thread to run tests" unless threads>0
+exe("make")
 tdir="tests"
 tests=(ARGV[0])?(["#{tdir}/#{ARGV[0]}"]):(Dir.glob("#{tdir}/t*").sort)
-exe("make")
-if threaded
-  threads=[]
-  tests.each { |t| threads.push(Thread.new { test(t) }) }
-  threads.each { |t| t.join }
-else
-  tests.each { |t| test(t) }
-end
-
+q=Queue.new
+tests.each { |e| q.enq(e) }
+(1..threads).reduce([]) { |m,e| m << Thread.new { run(q) } }.each { |e| e.join }
 puts "\nOK (#{tests.size} tests)"
 
 # paul.a.madden@noaa.gov
