@@ -252,18 +252,8 @@ module Fortran
     true
   end
 
-  def sp_nonlabel_do_stmt(nonlabel_do_stmt)
-    nonlabel_do_stmt.myenv=env if @@parallel
-    true
-  end
-
   def sp_program_stmt
     envpush
-    true
-  end
-
-  def sp_sms_declarative(sms_declarative)
-    sms_declarative.myenv=env
     true
   end
 
@@ -275,11 +265,6 @@ module Fortran
 
   def sp_sms_distribute_end
     @@distribute=nil
-    true
-  end
-
-  def sp_sms_executable(sms_executable)
-    sms_executable.myenv=env
     true
   end
 
@@ -421,7 +406,10 @@ module Fortran
   end
 
   def translate()
-    e.each { |x| x.translate } unless e.nil?
+    if e
+      e.each { |x| x.translate }
+      e.compact!
+    end
     self
   end
 
@@ -556,7 +544,7 @@ module Fortran
     end
 
     def remove
-      self.parent.e.delete(self)
+      self.parent.e[self.parent.e.index(self)]=nil
     end
 
     def replace_element(code,rule)

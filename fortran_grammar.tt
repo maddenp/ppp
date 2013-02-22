@@ -858,7 +858,7 @@ grammar Fortran
     stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <E> /
     directive /
     sms_passthrough /
-    sms_declarative # prefer "sms_declarative &{ |e| sp_sms_declarative(e[0]) }" -- see TODO
+    sms_declarative
   end
 
   rule declaration_constructs
@@ -991,7 +991,7 @@ grammar Fortran
     # F90:R818
 
     label_do_stmt /
-    nonlabel_do_stmt &{ |e| sp_nonlabel_do_stmt(e[0]) } <E>
+    nonlabel_do_stmt
   end
 
   rule do_term_action_stmt
@@ -1307,7 +1307,7 @@ grammar Fortran
     where_construct /
     directive /
     sms_passthrough /
-    sms_executable # prefer "sms_executable &{ |e| sp_sms_executable(e[0]) }" -- see TODO
+    sms_executable
   end
 
   rule executable_construct_action_stmt
@@ -2780,7 +2780,7 @@ grammar Fortran
   end
 
   rule sms_declarative
-    sms_distribute &{ |e| sp_sms_declarative(e[0]) } <E>
+    sms_distribute
   end
 
   rule sms_decomp_name
@@ -2814,17 +2814,17 @@ grammar Fortran
   end
 
   rule sms_executable
-    sms_barrier           &{ |e| sp_sms_executable(e[0]) } <E> / # prefer just "sms_barrier /" -- see TODO
-    sms_compare_var       &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_exchange          &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_halo_comp_begin   &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_halo_comp_end     &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_parallel_begin    &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_parallel_end      &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_to_local_begin    &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_to_local_end      &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_set_communicator  &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
-    sms_unstructured_grid &{ |e| sp_sms_executable(e[0]) } <E> / # ditto
+    sms_barrier /
+    sms_compare_var /
+    sms_exchange /
+    sms_halo_comp_begin /
+    sms_halo_comp_end /
+    sms_parallel_begin /
+    sms_parallel_end /
+    sms_to_local_begin /
+    sms_to_local_end /
+    sms_set_communicator /
+    sms_unstructured_grid /
     sms_passthrough
   end
 
