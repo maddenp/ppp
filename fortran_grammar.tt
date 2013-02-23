@@ -2780,15 +2780,12 @@ grammar Fortran
   end
 
   rule sms_declarative
-    sms_distribute
+    sms_distribute_begin /
+    sms_distribute_end
   end
 
   rule sms_decomp_name
     name
-  end
-
-  rule sms_distribute
-    sms_distribute_begin ( type_declaration_stmt / dimension_stmt )* sms_distribute_end <SMS_Distribute>
   end
 
   rule sms_distribute_begin
