@@ -258,12 +258,14 @@ module Fortran
   end
 
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
+    fail "Already inside distribute region" if @@distribute
     @@distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
     sms_distribute_dims.dims.each { |x| @@distribute["dim"].push(x) }
     true
   end
 
   def sp_sms_distribute_end
+    fail "Not inside distribute region" unless @@distribute
     @@distribute=nil
     true
   end
