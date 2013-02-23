@@ -49,7 +49,7 @@ module Fortran
   end
 
   def cat(f=nil)
-    send(f) unless f.nil?
+    send(f) if f
     self.e.map { |x| x.to_s }.join
   end
 
@@ -274,8 +274,8 @@ module Fortran
     envpush
     dims={}
     dims[1]=halo_comp_pairs.e[0]
-    dims[2]=halo_comp_pairs.e[1].e[1] unless halo_comp_pairs.e[1].e.nil?
-    dims[3]=halo_comp_pairs.e[2].e[1] unless halo_comp_pairs.e[2].e.nil?
+    dims[2]=halo_comp_pairs.e[1].e[1] if halo_comp_pairs.e[1].e
+    dims[3]=halo_comp_pairs.e[2].e[1] if halo_comp_pairs.e[2].e
     env[:halocomp]={}
     dims.each { |k,v| env[:halocomp][k]=OpenStruct.new({:lo=>v.lo,:up=>v.up}) }
     @@halocomp=true
@@ -401,7 +401,7 @@ module Fortran
   end
 
   def stmt(s,f=nil)
-    send(f) unless f.nil?
+    send(f) if f
     indent(("#{sa(e[0])}"+s.chomp).strip)+"\n"
   end
 
@@ -415,7 +415,7 @@ module Fortran
 
   def use_add(modulename,usenames,localnames)
     names=localnames.zip(usenames)
-    if @@uses[modulename].nil?
+    unless @@uses[modulename]
       @@uses[modulename]=names
     else
       unless uses?(modulename,:all)
@@ -608,7 +608,7 @@ module Fortran
           end
           code=((list.empty?)?(nil):("#{code},only:#{list.join(",")}"))
         end
-        unless code.nil?
+        if code
           p=use_part
 # HACK start
           t=raw("!sms$ignore begin",:sms_ignore_begin)
