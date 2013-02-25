@@ -503,8 +503,9 @@ module Fortran
       envget
     end
 
-    def enclosing(classes)
-      nearest(classes,self.parent)
+    def enclosing(class_or_classes)
+      class_or_classes=[class_or_classes] unless class_or_classes.is_a?(Array)
+      nearest(class_or_classes,self.parent)
     end
 
     def envget(node=self)
@@ -572,7 +573,7 @@ module Fortran
     end
 
     def scoping_unit
-      enclosing([Scoping_Unit])
+      enclosing(Scoping_Unit)
     end
 
     def smstype(type,kind)
@@ -800,6 +801,7 @@ module Fortran
   end
 
   class Attr_Spec_Option < Attr_Spec_Base
+    def dimension?() e[1].dimension? end
   end
 
   class Block_Data < Scoping_Unit
@@ -977,18 +979,35 @@ module Fortran
       {name=>_props}
     end
 
+  end
+
+  class Entity_Decl_1 < Entity_Decl
+
+    def array?
+      e[1].is_a?(Entity_Decl_Array_Spec)
+    end
+
     def translate
       envget
       object_name="#{e[0]}"
       fail "'#{object_name}' not found in environment" unless (varenv=env[object_name])
       if varenv["rank"]=="array"
+        if e[1].is_a?(Entity_Decl_Array_Spec)
+          # array due to post-identifier array spec
+        else
+          type_declaration_stmt=enclosing(Type_Declaration_Stmt)
+          attr_spec_option=type_declaration_stmt.e[2]
+          if attr_spec_option.is_a?(Attr_Spec_Option) and (d=attr_spec_option.dimension?)
+            # array due to dimension attribute
+          else
+            # array due to dimension statement
+          end
+        end
+      else
+        # scalar
       end
     end
 
-  end
-
-  class Entity_Decl_1 < Entity_Decl
-    def array?() e[1].is_a?(Entity_Decl_Array_Spec) end
   end
 
   class Entity_Decl_2 < Entity_Decl
