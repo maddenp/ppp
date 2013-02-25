@@ -19,9 +19,9 @@ module Fortran
     dims=0
     array_spec.boundslist.each_index do |i|
       arrdim=i+1
-      _props["lb#{arrdim}"]=bounds=array_spec.boundslist[i].lb
-      _props["ub#{arrdim}"]=bounds=array_spec.boundslist[i].ub
-      if @@distribute and decompdim=@@distribute["dim"].index(arrdim)
+      _props["lb#{arrdim}"]=array_spec.boundslist[i].lb
+      _props["ub#{arrdim}"]=array_spec.boundslist[i].ub
+      if @@distribute and (decompdim=@@distribute["dim"].index(arrdim))
         _props["decomp"]=@@distribute["decomp"]
         _props["dim#{arrdim}"]=decompdim+1
       end
