@@ -276,10 +276,10 @@ grammar Fortran
   rule array_spec
     # F90:R512
 
-    explicit_shape_spec_list &{ |e| sp_explicit_shape_spec_list(e[0]) } /
-    assumed_shape_spec_list &{ |e| sp_assumed_shape_spec_list(e[0]) } /
-    deferred_shape_spec_list &{ |e| sp_deferred_shape_spec_list(e[0]) } /
-    assumed_size_spec
+    explicit_shape_spec_list &{ |e| sp_explicit_shape_spec_list(e[0]) } <Array_Spec> /
+    assumed_shape_spec_list &{ |e| sp_assumed_shape_spec_list(e[0]) } <Array_Spec> /
+    deferred_shape_spec_list &{ |e| sp_deferred_shape_spec_list(e[0]) } <Array_Spec> /
+    assumed_size_spec "" <Array_Spec>
   end
 
   rule array_variable_name

@@ -17,10 +17,10 @@ module Fortran
 
   def array_props(array_spec,_props)
     dims=0
-    array_spec.boundslist.each_index do |i|
+    array_spec.abstract_boundslist.each_index do |i|
       arrdim=i+1
-      _props["lb#{arrdim}"]=array_spec.boundslist[i].lb
-      _props["ub#{arrdim}"]=array_spec.boundslist[i].ub
+      _props["lb#{arrdim}"]=array_spec.abstract_boundslist[i].abstract_lb
+      _props["ub#{arrdim}"]=array_spec.abstract_boundslist[i].abstract_ub
       if @@distribute and (decompdim=@@distribute["dim"].index(arrdim))
         _props["decomp"]=@@distribute["decomp"]
         _props["dim#{arrdim}"]=decompdim+1
@@ -407,7 +407,7 @@ module Fortran
     indent(("#{sa(e[0])}"+s.chomp).strip)+"\n"
   end
 
-  def translate()
+  def translate
     if e
       e.each { |x| x.translate }
       e.compact!
@@ -629,7 +629,7 @@ module Fortran
       end
     end
 
-    def to_s()
+    def to_s
       text_value
     end
 
@@ -701,36 +701,80 @@ module Fortran
     def name() e[0].name end
   end
 
+  class Array_Spec < T
+    def spec() e[0] end
+  end
+
   class Assigned_Goto_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{mn(e[3],","," "+e[3].to_s)}") end
   end
 
   class Assumed_Shape_Spec < T
-    def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
-    def boundslist() ex+[bounds] end
-    def ex() (e[0].respond_to?(:boundslist))?(e[0].boundslist):([]) end
-    def lb() (e[0].respond_to?(:lb))?(e[0].lb):("_default") end
-    def ub() "_assumed" end
+
+    def abstract_bounds
+      OpenStruct.new({:abstract_lb=>abstract_lb,:abstract_ub=>abstract_ub})
+    end
+
+    def abstract_boundslist
+      abstract_bounds
+    end
+
+    def abstract_lb
+      (e[0].respond_to?(:abstract_lb))?(e[0].abstract_lb):("_default")
+    end
+
+    def abstract_ub
+      "_assumed"
+    end
+
   end
 
-  class Assumed_Shape_Spec_List < T
-    def boundslist() e[1].e.reduce([e[0].bounds]) { |m,x| m.push(x.bounds) } end
+  class Assumed_Shape_Spec_List < Array_Spec
+
+    def abstract_boundslist
+      e[1].e.reduce([e[0].abstract_bounds]) { |m,x| m.push(x.abstract_bounds) }
+    end
+
   end
 
   class Assumed_Shape_Spec_List_Pair < T
-    def bounds() e[1].bounds end
+
+    def abstract_bounds
+      e[1].abstract_bounds
+    end
+
   end
 
-  class Assumed_Size_Spec < T
-    def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
-    def boundslist() ex+[bounds] end
-    def ex() (e[0].respond_to?(:boundslist))?(e[0].boundslist):([]) end
-    def lb() ("#{e[1]}".empty?)?("_default"):(e[1].lb) end
-    def ub() "_assumed" end
+  class Assumed_Size_Spec < Array_Spec
+
+    def abstract_bounds
+      OpenStruct.new({:abstract_lb=>abstract_lb,:abstract_ub=>abstract_ub})
+    end
+
+    def abstract_boundslist
+      abstract_explicit_boundslist+[abstract_bounds]
+    end
+
+    def abstract_explicit_boundslist
+      (e[0].respond_to?(:abstract_boundslist))?(e[0].abstract_boundslist):([])
+    end
+
+    def abstract_lb
+      ("#{e[1]}".empty?)?("_default"):(e[1].abstract_lb)
+    end
+
+    def abstract_ub
+      "_assumed"
+    end
+
   end
 
   class Assumed_Size_Spec_Pair < T
-    def boundslist() e[0].boundslist end
+
+    def abstract_boundslist
+      e[0].abstract_boundslist
+    end
+
   end
 
   class Attr_Spec_Base < T
@@ -798,17 +842,35 @@ module Fortran
   end
 
   class Deferred_Shape_Spec < T
-    def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
-    def lb() "_deferred" end
-    def ub() "_deferred" end
+
+    def abstract_bounds
+      OpenStruct.new({:abstract_lb=>abstract_lb,:abstract_ub=>abstract_ub})
+    end
+
+    def abstract_lb
+      "_deferred"
+    end
+
+    def abstract_ub
+      "_deferred"
+    end
+
   end
 
-  class Deferred_Shape_Spec_List < T
-    def boundslist() e[1].e.reduce([e[0].bounds]) { |m,x| m.push(x.bounds) } end
+  class Deferred_Shape_Spec_List < Array_Spec
+
+    def abstract_boundslist
+      e[1].e.reduce([e[0].abstract_bounds]) { |m,x| m.push(x.abstract_bounds) }
+    end
+
   end
 
   class Deferred_Shape_Spec_List_Pair < T
-    def bounds() e[1].bounds end
+
+    def abstract_bounds
+      e[1].abstract_bounds
+    end
+
   end
 
   class Derived_Type_Stmt < T
@@ -901,8 +963,12 @@ module Fortran
   end
 
   class Entity_Decl < T
-    def name() "#{e[0]}" end
-    def props()
+
+    def name
+      "#{e[0]}"
+    end
+
+    def props
       _props={}
       if e[1].is_a?(Entity_Decl_Array_Spec)
         array_props(e[1].e[1].e[0],_props)
@@ -910,6 +976,22 @@ module Fortran
       _props["rank"]=((array?)?("array"):("scalar"))
       {name=>_props}
     end
+
+#   def translate
+#     envget
+#     object_name="#{e[0]}"
+#     fail "'#{var}' not found in environment" unless (varenv=env[object_name])
+#p varenv
+#     if varenv["rank"]=="array"
+#       entity_decl_array_spec=e[1]
+#       array_spec=entity_decl_array_spec.e[1]
+#       spec=array_spec.spec
+#       if spec.is_a?(Explicit_Shape_Spec_List)
+#
+#       end
+#     end
+#   end
+
   end
 
   class Entity_Decl_1 < Entity_Decl
@@ -947,17 +1029,35 @@ module Fortran
   end
 
   class Explicit_Shape_Spec < T
-    def bounds() OpenStruct.new({:lb=>lb,:ub=>ub}) end
-    def lb() "_explicit" end
-    def ub() "_explicit" end
+
+    def abstract_bounds
+      OpenStruct.new({:abstract_lb=>abstract_lb,:abstract_ub=>abstract_ub})
+    end
+
+    def abstract_lb
+      "_explicit"
+    end
+
+    def abstract_ub
+      "_explicit"
+    end
+
   end
 
-  class Explicit_Shape_Spec_List < T
-    def boundslist() e[1].e.reduce([e[0].bounds]) { |m,x| m.push(x.bounds) } end
+  class Explicit_Shape_Spec_List < Array_Spec
+
+    def abstract_boundslist
+      e[1].e.reduce([e[0].abstract_bounds]) { |m,x| m.push(x.abstract_bounds) }
+    end
+
   end
 
   class Explicit_Shape_Spec_List_Pair < T
-    def bounds() e[1].bounds end
+
+    def abstract_bounds
+      e[1].abstract_bounds
+    end
+
   end
 
   class Function_Reference < T
@@ -1037,7 +1137,7 @@ module Fortran
   end
 
   class Lower_Bound_Pair < T
-    def lb() "#{e[0]}" end
+    def abstract_lb() "#{e[0]}" end
   end
 
   class Main_Program < Scoping_Unit
@@ -1150,7 +1250,7 @@ module Fortran
   end
 
   class Parenthesized_Explicit_Shape_Spec_List < T
-    def boundslist() e[1].boundslist end
+    def abstract_boundslist() e[1].abstract_boundslist end
   end
 
   class Part_Ref < T
@@ -1226,7 +1326,7 @@ module Fortran
       fail "Bad upper bound: #{bound}" if bound=="_default" and x==:u
       return 1 if bound=="_default" and x==:l
       if ["_assumed","_deferred","_explicit"].include?(bound)
-        if decdim=varenv["dim#{dim}"] 
+        if decdim=varenv["dim#{dim}"]
           lu=(x==:l)?("low"):("upper")
           return "dh__#{lu}bounds(#{decdim},dh__nestlevel)"
         else
@@ -1264,7 +1364,7 @@ module Fortran
       use("nnt_types_module")
       declare("logical","sms_debugging_on")
       var="#{e[3].name}"
-      fail "'#{var}' not found in environment" unless varenv=env[var]
+      fail "'#{var}' not found in environment" unless (varenv=env[var])
       dims=varenv["dims"]
       str="#{e[5]}"
       type=smstype(varenv["type"],varenv["kind"])
@@ -1333,7 +1433,7 @@ module Fortran
       varenv=nil
       (0..nvars-1).each do |i|
         var=v[i].name
-        fail "'#{var}' not found in environment" unless varenv=env[var]
+        fail "'#{var}' not found in environment" unless (varenv=env[var])
         dims=varenv["dims"]
         dh=varenv["decomp"]
         dectypes.push("#{dh}(dh__nestlevel)")
@@ -1595,8 +1695,8 @@ module Fortran
     def translate
       envget
       var="#{e[3]}"
-      fail "No module info found for variable '#{var}'" unless varenv=env[var]
-      fail "No decomp info found for variable '#{var}'" unless dh=varenv["decomp"]
+      fail "No module info found for variable '#{var}'" unless (varenv=env[var])
+      fail "No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
       use("nnt_types_module")
       stmts=[]
       stmts.push(["call sms_unstructuredgrid(#{dh},size(#{var},1),#{var})",:call_stmt])
@@ -1638,7 +1738,7 @@ module Fortran
   end
 
   class Upper_Bound < T
-    def ub() "#{e[0]}" end
+    def abstract_ub() "#{e[0]}" end
   end
 
   class Use_Part < E
