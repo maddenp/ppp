@@ -233,7 +233,7 @@ module Fortran
 
   def sp_module(_module)
     modulename=_module.e[0].name
-    modinfo=env.delete_if { |k,v| v["access"]=="private" }
+    modinfo=env.dup.delete_if { |k,v| v["access"]=="private" }
     unless modinfo.empty?
       File.open(smsfile(modulename),"w") { |f| f.write(YAML.dump(modinfo)) }
     end
@@ -977,20 +977,13 @@ module Fortran
       {name=>_props}
     end
 
-#   def translate
-#     envget
-#     object_name="#{e[0]}"
-#     fail "'#{var}' not found in environment" unless (varenv=env[object_name])
-#p varenv
-#     if varenv["rank"]=="array"
-#       entity_decl_array_spec=e[1]
-#       array_spec=entity_decl_array_spec.e[1]
-#       spec=array_spec.spec
-#       if spec.is_a?(Explicit_Shape_Spec_List)
-#
-#       end
-#     end
-#   end
+    def translate
+      envget
+      object_name="#{e[0]}"
+      fail "'#{object_name}' not found in environment" unless (varenv=env[object_name])
+      if varenv["rank"]=="array"
+      end
+    end
 
   end
 
@@ -1042,6 +1035,18 @@ module Fortran
       "_explicit"
     end
 
+    def concrete_bounds
+      OpenStruct.new({:concrete_lb=>concrete_lb,:concrete_ub=>concrete_ub})
+    end
+
+    def concrete_lb
+      (e[0].respond_to?(:concrete_lb))?(e[0].concrete_lb):("1")
+    end
+
+    def concrete_ub
+      e[1].concrete_ub
+    end
+
   end
 
   class Explicit_Shape_Spec_List < Array_Spec
@@ -1050,12 +1055,20 @@ module Fortran
       e[1].e.reduce([e[0].abstract_bounds]) { |m,x| m.push(x.abstract_bounds) }
     end
 
+    def concrete_boundslist
+      e[1].e.reduce([e[0].concrete_bounds]) { |m,x| m.push(x.concrete_bounds) }
+    end
+
   end
 
   class Explicit_Shape_Spec_List_Pair < T
 
     def abstract_bounds
       e[1].abstract_bounds
+    end
+
+    def concrete_bounds
+      e[1].concrete_bounds
     end
 
   end
@@ -1137,7 +1150,8 @@ module Fortran
   end
 
   class Lower_Bound_Pair < T
-    def abstract_lb() "#{e[0]}" end
+    def abstract_lb() concrete_lb end
+    def concreate_lb() "#{e[0]}" end
   end
 
   class Main_Program < Scoping_Unit
@@ -1738,7 +1752,8 @@ module Fortran
   end
 
   class Upper_Bound < T
-    def abstract_ub() "#{e[0]}" end
+    def abstract_ub() concrete_ub end
+    def concrete_ub() "#{e[0]}" end
   end
 
   class Use_Part < E
