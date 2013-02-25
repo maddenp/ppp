@@ -81,3 +81,8 @@
 - translate() on SMS_Unstructured_Grid cannot possibly be correct in the general
   case, right?
 
+- Get rid of @@distribute, @@parallel et al and use env[:distribute] etc.? The
+  way env stack changes may be a problem, e.g. distribute begin/end causes an
+  env stack push/pop, so distribute info for a variable declared in that block
+  isn't available outside the block, while when it is added to @@distribute, it
+  always is.
