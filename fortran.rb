@@ -992,43 +992,6 @@ module Fortran
       e[1].is_a?(Entity_Decl_Array_Spec)
     end
 
-#   def translate
-#     envget
-#     object_name="#{e[0]}"
-#     fail "'#{object_name}' not found in environment" unless (varenv=env[object_name])
-#     if varenv["rank"]=="array" and (dh=varenv["decomp"])
-#       if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
-#         # array due to post-identifier array spec
-#         spec=entity_decl_array_spec.e[1].spec
-#         if spec.is_a?(Explicit_Shape_Spec_List)
-#           cb=spec.concrete_boundslist
-#           newbounds=[]
-#           cb.each_index do |i|
-#             b=cb[i]
-#             arrdim=i+1
-#             if (decdim=varenv["dim#{arrdim}"])
-#               s="#{dh}__local_lb(#{decdim},dh__nestlevel):#{dh}__local_ub(#{decdim},dh__nestlevel)"
-#             else
-#               s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
-#             end
-#             newbounds.push(s)
-#           end
-#           code=newbounds.join(",")
-#           replace_element(code,:array_spec,spec)
-#         end
-#       else
-#         attr_spec_option=enclosing(Type_Declaration_Stmt).e[2]
-#         if attr_spec_option.is_a?(Attr_Spec_Option) and (d=attr_spec_option.dimension?)
-#           # array due to dimension attribute
-#         else
-#           # array due to dimension statement
-#         end
-#       end
-#     else
-#       # scalar
-#     end
-#   end
-
     def translate
       envget
       var="#{e[0]}"
