@@ -88,19 +88,25 @@ module Fortran
   end
 
   def lr
+    # level reset
     @@level=@@levelstack.pop
   end
 
   def ls
+    # level set
     @@levelstack.push(@@level)
   end
 
-  def mn(p,c,v)
-    (p.to_s!=c)?(v):(p)
+  def ik(e,c,a)
+    # identity keep: If the [e]lement's string form equals the [c]ontrol string,
+    # return the element itself; otherwise return the [a]lternate.
+    (e.to_s==c)?(e):(a)
   end
 
-  def mp(p,c,v)
-    (p.to_s==c)?(v):(p)
+  def ir(e,c,a)
+    # identity replace: If the [e]lement's string form equals the [c]ontrol
+    # string, return the [a]lternate; otherwise return the element itself.
+    (e.to_s==c)?(a):(e)
   end
 
   def modenv(m)
@@ -131,10 +137,14 @@ module Fortran
   end
 
   def sa(e)
+    # space after: If the [e]lement's string form is empty, return that; else
+    # return its string form with a trailing space appended.
     (e.to_s=="")?(""):("#{e} ")
   end
 
   def sb(e)
+    # space before: If the [e]lement's string form is empty, return that; else
+    # return its string form with a prepended space.
     (e.to_s=="")?(""):(" #{e}")
   end
 
@@ -696,11 +706,11 @@ module Fortran
 
   class Access_Stmt_Option < T
     def names() e[1].names end
-    def to_s() "#{mn(e[0],"::"," ")}#{e[1]}" end
+    def to_s() "#{ik(e[0],"::"," ")}#{e[1]}" end
   end
 
   class Allocatable_Stmt < T
-    def to_s() stmt("#{e[1]}#{mp(e[2],""," ")}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
   end
 
   class Arithmetic_If_Stmt < T
@@ -740,7 +750,7 @@ module Fortran
   end
 
   class Assigned_Goto_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{mn(e[3],","," "+e[3].to_s)}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{ik(e[3],","," "+e[3].to_s)}") end
   end
 
   class Assumed_Shape_Spec < T
@@ -857,7 +867,7 @@ module Fortran
   end
 
   class Common_Block_Name_And_Object_List < T
-    def to_s() "#{mp(e[0],""," ")}#{e[1]}#{e[2]}" end
+    def to_s() "#{ir(e[0],""," ")}#{e[1]}#{e[2]}" end
   end
 
   class Common_Stmt < T
@@ -865,11 +875,11 @@ module Fortran
   end
 
   class Component_Def_Stmt < T
-    def to_s() stmt("#{e[1]}#{mp(e[2],""," ")}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
   end
 
   class Computed_Goto_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{mp(e[5],""," ")}#{e[6]}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{ir(e[5],""," ")}#{e[6]}") end
   end
 
   class Contains_Stmt < T
@@ -919,7 +929,7 @@ module Fortran
   end
 
   class Dimension_Stmt < T
-    def to_s() stmt("#{e[1]}#{mp(e[2],""," ")}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
   end
 
   class Do_Term_Action_Stmt < T
@@ -1175,7 +1185,7 @@ module Fortran
   end
 
   class Intent_Stmt < T
-    def to_s() stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{mn(e[5],"::"," ")}#{e[6]}") end
+    def to_s() stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{ik(e[5],"::"," ")}#{e[6]}") end
   end
 
   class Interface_Body < E
@@ -1203,11 +1213,11 @@ module Fortran
   end
 
   class Loop_Control_1 < Loop_Control
-    def to_s() "#{mp(e[0],""," ")}#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{e[5]}" end
+    def to_s() "#{ir(e[0],""," ")}#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{e[5]}" end
   end
 
   class Loop_Control_2 < Loop_Control
-    def to_s() "#{mp(e[0],""," ")}#{e[1]} #{e[2]}#{e[3]}#{e[4]}" end
+    def to_s() "#{ir(e[0],""," ")}#{e[1]} #{e[2]}#{e[3]}#{e[4]}" end
   end
 
   class Loop_Control_Pair < T
@@ -1270,7 +1280,7 @@ module Fortran
   end
 
   class Namelist_Group_Set_Pair < T
-    def to_s() "#{mp(e[0],""," ")}#{e[1]}" end
+    def to_s() "#{ir(e[0],""," ")}#{e[1]}" end
   end
 
   class Namelist_Stmt < T
@@ -1334,7 +1344,7 @@ module Fortran
   end
 
   class Optional_Stmt < T
-    def to_s() stmt("#{e[1]}#{mn(e[2],"::"," ")}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{ik(e[2],"::"," ")}#{e[3]}") end
   end
 
   class Parenthesized_Explicit_Shape_Spec_List < T
@@ -1346,7 +1356,7 @@ module Fortran
   end
 
   class Pointer_Stmt < T
-    def to_s() stmt("#{e[1]}#{mp(e[2],""," ")}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
   end
 
   class Print_Stmt < T
@@ -1397,7 +1407,7 @@ module Fortran
   end
 
   class Save_Stmt_Entity_List < T
-    def to_s() "#{mp(e[0],""," ")}#{e[1]}" end
+    def to_s() "#{ir(e[0],""," ")}#{e[1]}" end
   end
 
   class Select_Case_Stmt < T
@@ -1812,11 +1822,11 @@ module Fortran
   end
 
   class Target_Stmt < T
-    def to_s() stmt("#{e[1]}#{mp(e[2],""," ")}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
   end
 
   class Type_Declaration_Stmt < T
-    def to_s() stmt("#{e[1]}#{mp(e[2],"",mn(e[1],","," "))}#{e[3]}") end
+    def to_s() stmt("#{e[1]}#{ir(e[2],"",ik(e[1],","," "))}#{e[3]}") end
   end
 
   class Type_Spec < E
