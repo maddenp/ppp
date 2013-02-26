@@ -702,7 +702,7 @@ module Fortran
     def name() e[0].name end
   end
 
-  class Array_Spec < T
+  class Array_Spec< T
     def spec() e[0] end
   end
 
@@ -991,12 +991,33 @@ module Fortran
       envget
       object_name="#{e[0]}"
       fail "'#{object_name}' not found in environment" unless (varenv=env[object_name])
-      if varenv["rank"]=="array"
-        if e[1].is_a?(Entity_Decl_Array_Spec)
+      if varenv["rank"]=="array" and (dh=varenv["decomp"])
+        if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
           # array due to post-identifier array spec
+#p varenv
+          spec=entity_decl_array_spec.e[1].spec
+          if spec.is_a?(Explicit_Shape_Spec_List)
+            cb=spec.concrete_boundslist
+            newbounds=[]
+            cb.each_index do |i|
+              bounds=cb[i]
+              arrdim=i+1
+              if (decdim=varenv["dim#{arrdim}"])
+                s="#{dh}__local_lb(#{decdim},dh__nestlevel):#{dh}__local_ub(#{decdim},dh__nestlevel)"
+              else
+                if bounds.concrete_lb=="1"
+                  s=bounds.concrete_ub
+                else
+                  s="#{bounds.concrete_lb}:#{bounds.concrete_ub}"
+                end
+              end
+              newbounds.push(s)
+            end
+            code=newbounds.join(",")
+#           puts "### #{code}"
+          end
         else
-          type_declaration_stmt=enclosing(Type_Declaration_Stmt)
-          attr_spec_option=type_declaration_stmt.e[2]
+          attr_spec_option=enclosing(Type_Declaration_Stmt).e[2]
           if attr_spec_option.is_a?(Attr_Spec_Option) and (d=attr_spec_option.dimension?)
             # array due to dimension attribute
           else
@@ -1170,7 +1191,7 @@ module Fortran
 
   class Lower_Bound_Pair < T
     def abstract_lb() concrete_lb end
-    def concreate_lb() "#{e[0]}" end
+    def concrete_lb() "#{e[0]}" end
   end
 
   class Main_Program < Scoping_Unit
