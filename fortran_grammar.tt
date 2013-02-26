@@ -3731,10 +3731,23 @@ grammar Fortran
     expr
   end
 
+  rule target_object
+    array_name_and_spec /
+    variable_name
+  end
+
+  rule target_object_list
+    target_object target_object_list_pair* <Target_Object_List>
+  end
+
+  rule target_object_list_pair
+    t_comma target_object <Target_Object_List_Pair>
+  end
+
   rule target_stmt
     # F90:R528
 
-    label:label? t_target double_colon? array_names_and_specs t_newline <Target_Stmt>
+    label:label? t_target double_colon? target_object_list t_newline &{ |e| sp_target_stmt(e[3]) } <Target_Stmt>
   end
 
   rule type_declaration_stmt
