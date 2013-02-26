@@ -550,9 +550,8 @@ module Fortran
       self.parent.e[self.parent.e.index(self)]=nil
     end
 
-    def replace_element(code,rule)
+    def replace_element(code,rule,node=self)
       tree=raw(code,rule,{:nl=>false})
-      node=self
       node=node.parent while "#{node}"=="#{node.parent}"
       tree.parent=node.parent
       block=node.parent.e
@@ -1014,7 +1013,7 @@ module Fortran
               newbounds.push(s)
             end
             code=newbounds.join(",")
-#           puts "### #{code}"
+#           replace_element(code,:explicit_shape_spec_list,spec)
           end
         else
           attr_spec_option=enclosing(Type_Declaration_Stmt).e[2]
