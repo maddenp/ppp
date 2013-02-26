@@ -19,8 +19,8 @@ module Fortran
     dims=0
     array_spec.abstract_boundslist.each_index do |i|
       arrdim=i+1
-      _props["lb#{arrdim}"]=array_spec.abstract_boundslist[i].abstract_lb
-      _props["ub#{arrdim}"]=array_spec.abstract_boundslist[i].abstract_ub
+      _props["lb#{arrdim}"]=array_spec.abstract_boundslist[i].alb
+      _props["ub#{arrdim}"]=array_spec.abstract_boundslist[i].aub
       if @@distribute and (decompdim=@@distribute["dim"].index(arrdim))
         _props["decomp"]=@@distribute["decomp"]
         _props["dim#{arrdim}"]=decompdim+1
@@ -712,18 +712,20 @@ module Fortran
   class Assumed_Shape_Spec < T
 
     def abstract_bounds
-      OpenStruct.new({:abstract_lb=>abstract_lb,:abstract_ub=>abstract_ub})
+      OpenStruct.new({:alb=>alb,:aub=>aub})
     end
 
     def abstract_boundslist
       abstract_bounds
     end
 
-    def abstract_lb
-      (e[0].respond_to?(:abstract_lb))?(e[0].abstract_lb):("_default")
+    def alb
+      # abstract lower bound
+      (e[0].respond_to?(:alb))?(e[0].alb):("_default")
     end
 
-    def abstract_ub
+    def aub
+      # abstract upper bound
       "_assumed"
     end
 
@@ -748,7 +750,7 @@ module Fortran
   class Assumed_Size_Spec < Array_Spec
 
     def abstract_bounds
-      OpenStruct.new({:abstract_lb=>abstract_lb,:abstract_ub=>abstract_ub})
+      OpenStruct.new({:alb=>alb,:aub=>aub})
     end
 
     def abstract_boundslist
@@ -759,11 +761,13 @@ module Fortran
       (e[0].respond_to?(:abstract_boundslist))?(e[0].abstract_boundslist):([])
     end
 
-    def abstract_lb
-      ("#{e[1]}".empty?)?("_default"):(e[1].abstract_lb)
+    def alb
+      # abstract lower bound
+      ("#{e[1]}".empty?)?("_default"):(e[1].alb)
     end
 
-    def abstract_ub
+    def aub
+      # abstract upper bound
       "_assumed"
     end
 
@@ -777,13 +781,13 @@ module Fortran
 
   end
 
-  class Attr_Spec_Base < T
+  class Attr_Spec_Base < E
     def dimension?() attrany(:dimension?) end
     def private?() attrany(:private?) end
     def public?() attrany(:public?) end
   end
 
-  class Attr_Spec_Dimension < T
+  class Attr_Spec_Dimension < E
     def dimension?() e[2] end
   end
 
@@ -845,14 +849,16 @@ module Fortran
   class Deferred_Shape_Spec < T
 
     def abstract_bounds
-      OpenStruct.new({:abstract_lb=>abstract_lb,:abstract_ub=>abstract_ub})
+      OpenStruct.new({:alb=>alb,:aub=>aub})
     end
 
-    def abstract_lb
+    def alb
+      # abstract lower bound
       "_deferred"
     end
 
-    def abstract_ub
+    def aub
+      # abstract upper bound
       "_deferred"
     end
 
@@ -963,7 +969,7 @@ module Fortran
     def to_s() stmt(space,:be) end
   end
 
-  class Entity_Decl < T
+  class Entity_Decl < E
 
     def name
       "#{e[0]}"
@@ -986,45 +992,81 @@ module Fortran
       e[1].is_a?(Entity_Decl_Array_Spec)
     end
 
+#   def translate
+#     envget
+#     object_name="#{e[0]}"
+#     fail "'#{object_name}' not found in environment" unless (varenv=env[object_name])
+#     if varenv["rank"]=="array" and (dh=varenv["decomp"])
+#       if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
+#         # array due to post-identifier array spec
+#         spec=entity_decl_array_spec.e[1].spec
+#         if spec.is_a?(Explicit_Shape_Spec_List)
+#           cb=spec.concrete_boundslist
+#           newbounds=[]
+#           cb.each_index do |i|
+#             b=cb[i]
+#             arrdim=i+1
+#             if (decdim=varenv["dim#{arrdim}"])
+#               s="#{dh}__local_lb(#{decdim},dh__nestlevel):#{dh}__local_ub(#{decdim},dh__nestlevel)"
+#             else
+#               s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
+#             end
+#             newbounds.push(s)
+#           end
+#           code=newbounds.join(",")
+#           replace_element(code,:array_spec,spec)
+#         end
+#       else
+#         attr_spec_option=enclosing(Type_Declaration_Stmt).e[2]
+#         if attr_spec_option.is_a?(Attr_Spec_Option) and (d=attr_spec_option.dimension?)
+#           # array due to dimension attribute
+#         else
+#           # array due to dimension statement
+#         end
+#       end
+#     else
+#       # scalar
+#     end
+#   end
+
     def translate
       envget
-      object_name="#{e[0]}"
-      fail "'#{object_name}' not found in environment" unless (varenv=env[object_name])
+      var="#{e[0]}"
+      fail "'#{var}' not found in environment" unless (varenv=env[var])
+      spec=nil
+      # Arrays are declared in three ways: Using an entity_decl_array_spec, e.g.
+      # '(1)' in 'real::x(1)'; using a dimension attribute e.g. 'dimension(1)'
+      # in 'real,dimension(1)::x'; or using a separate dimension statement, e.g.
+      # 'dimension::x(1)'. The first two cases are detected and translated here.
       if varenv["rank"]=="array" and (dh=varenv["decomp"])
         if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
-          # array due to post-identifier array spec
-#p varenv
+          # entity_decl_array_spec case
           spec=entity_decl_array_spec.e[1].spec
-          if spec.is_a?(Explicit_Shape_Spec_List)
-            cb=spec.concrete_boundslist
-            newbounds=[]
-            cb.each_index do |i|
-              bounds=cb[i]
-              arrdim=i+1
-              if (decdim=varenv["dim#{arrdim}"])
-                s="#{dh}__local_lb(#{decdim},dh__nestlevel):#{dh}__local_ub(#{decdim},dh__nestlevel)"
-              else
-                if bounds.concrete_lb=="1"
-                  s=bounds.concrete_ub
-                else
-                  s="#{bounds.concrete_lb}:#{bounds.concrete_ub}"
-                end
-              end
-              newbounds.push(s)
-            end
-            code=newbounds.join(",")
-#           replace_element(code,:explicit_shape_spec_list,spec)
-          end
         else
           attr_spec_option=enclosing(Type_Declaration_Stmt).e[2]
-          if attr_spec_option.is_a?(Attr_Spec_Option) and (d=attr_spec_option.dimension?)
-            # array due to dimension attribute
-          else
-            # array due to dimension statement
+          if attr_spec_option.is_a?(Attr_Spec_Option)
+            if (d=attr_spec_option.dimension?)
+              # dimension attribute case
+              spec=d.spec
+            end
           end
         end
-      else
-        # scalar
+      end
+      if spec and spec.is_a?(Explicit_Shape_Spec_List)
+        cb=spec.concrete_boundslist
+        newbounds=[]
+        cb.each_index do |i|
+          b=cb[i]
+          arrdim=i+1
+          if (decdim=varenv["dim#{arrdim}"])
+            s="#{dh}__local_lb(#{decdim},dh__nestlevel):#{dh}__local_ub(#{decdim},dh__nestlevel)"
+          else
+            s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
+          end
+          newbounds.push(s)
+        end
+        code=newbounds.join(",")
+#       replace_element(code,:array_spec,spec)
       end
     end
 
@@ -1034,10 +1076,10 @@ module Fortran
     def array?() false end # need to determine array/scalar spec of named function here?
   end
 
-  class Entity_Decl_Array_Spec < T
+  class Entity_Decl_Array_Spec < E
   end
 
-  class Entity_Decl_List < T
+  class Entity_Decl_List < E
     def varprops
       e[0].props.merge(e[1].props)
     end
@@ -1063,27 +1105,29 @@ module Fortran
   class Explicit_Shape_Spec < T
 
     def abstract_bounds
-      OpenStruct.new({:abstract_lb=>abstract_lb,:abstract_ub=>abstract_ub})
+      OpenStruct.new({:alb=>alb,:aub=>aub})
     end
 
-    def abstract_lb
+    def alb
+      # abstract lower bound
       "_explicit"
     end
 
-    def abstract_ub
+    def aub
+      # abstract upperbound
       "_explicit"
     end
 
     def concrete_bounds
-      OpenStruct.new({:concrete_lb=>concrete_lb,:concrete_ub=>concrete_ub})
+      OpenStruct.new({:clb=>clb,:cub=>cub})
     end
 
-    def concrete_lb
-      (e[0].respond_to?(:concrete_lb))?(e[0].concrete_lb):("1")
+    def clb
+      (e[0].respond_to?(:clb))?(e[0].clb):("1")
     end
 
-    def concrete_ub
-      e[1].concrete_ub
+    def cub
+      e[1].cub
     end
 
   end
@@ -1189,8 +1233,17 @@ module Fortran
   end
 
   class Lower_Bound_Pair < T
-    def abstract_lb() concrete_lb end
-    def concrete_lb() "#{e[0]}" end
+
+    def alb
+      # abstract lower bound
+      clb
+    end
+
+    def clb
+      # concrete lower bound
+      "#{e[0]}"
+    end
+
   end
 
   class Main_Program < Scoping_Unit
@@ -1791,8 +1844,17 @@ module Fortran
   end
 
   class Upper_Bound < T
-    def abstract_ub() concrete_ub end
-    def concrete_ub() "#{e[0]}" end
+
+    def aub
+      # abstract upper bound
+      cub
+    end
+
+    def cub
+      # concrete upper bound
+      "#{e[0]}"
+    end
+
   end
 
   class Use_Part < E
