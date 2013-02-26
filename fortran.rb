@@ -503,6 +503,28 @@ module Fortran
       envget
     end
 
+    def distribute_array_bounds(spec,varenv)
+      if (dh=varenv["decomp"])
+        if spec and spec.is_a?(Explicit_Shape_Spec_List)
+          cb=spec.concrete_boundslist
+          newbounds=[]
+          cb.each_index do |i|
+            b=cb[i]
+            arrdim=i+1
+            if (decdim=varenv["dim#{arrdim}"])
+              s="#{dh}__local_lb(#{decdim},dh__nestlevel):"+
+                "#{dh}__local_ub(#{decdim},dh__nestlevel)"
+            else
+              s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
+            end
+            newbounds.push(s)
+          end
+          code=newbounds.join(",")
+#         replace_element(code,:array_spec,spec)
+        end
+      end
+    end
+
     def enclosing(class_or_classes)
       class_or_classes=[class_or_classes] unless class_or_classes.is_a?(Array)
       nearest(class_or_classes,self.parent)
@@ -686,14 +708,26 @@ module Fortran
   end
 
   class Array_Name_And_Spec < E
-    def name() "#{e[0]}" end
+
+    def name
+      "#{e[0]}"
+    end
+
+    def translate
+      envget
+      var="#{e[0]}"
+      spec=e[2].spec
+      varenv=env[var]
+      distribute_array_bounds(spec,varenv)
+    end
+
   end
 
   class Array_Name_And_Spec_Pair < E
     def name() e[1].name end
   end
 
-  class Array_Names_And_Specs < T
+  class Array_Names_And_Specs < E
     def names() [e[0].name]+e[1].e.inject([]) { |m,x| m.push(x.name) } end
   end
 
@@ -701,7 +735,7 @@ module Fortran
     def name() e[0].name end
   end
 
-  class Array_Spec< T
+  class Array_Spec < T
     def spec() e[0] end
   end
 
@@ -1001,7 +1035,7 @@ module Fortran
       # '(1)' in 'real::x(1)'; using a dimension attribute e.g. 'dimension(1)'
       # in 'real,dimension(1)::x'; or using a separate dimension statement, e.g.
       # 'dimension::x(1)'. The first two cases are detected and translated here.
-      if varenv["rank"]=="array" and (dh=varenv["decomp"])
+      if varenv["rank"]=="array"
         if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
           # entity_decl_array_spec case
           spec=entity_decl_array_spec.e[1].spec
@@ -1015,22 +1049,7 @@ module Fortran
           end
         end
       end
-      if spec and spec.is_a?(Explicit_Shape_Spec_List)
-        cb=spec.concrete_boundslist
-        newbounds=[]
-        cb.each_index do |i|
-          b=cb[i]
-          arrdim=i+1
-          if (decdim=varenv["dim#{arrdim}"])
-            s="#{dh}__local_lb(#{decdim},dh__nestlevel):#{dh}__local_ub(#{decdim},dh__nestlevel)"
-          else
-            s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
-          end
-          newbounds.push(s)
-        end
-        code=newbounds.join(",")
-#       replace_element(code,:array_spec,spec)
-      end
+      distribute_array_bounds(spec,varenv)
     end
 
   end
