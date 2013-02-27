@@ -5,8 +5,15 @@ $: << basedir
 $: << File.join(basedir,"lib")
 
 require "translator"
-
 include Translator
+
+module Translator
+  def prep(s)
+    s=s.gsub(/^\s*!sms\$insert */i,"")                           # process inserts
+    s=s.gsub(/^\s*!sms\$remove +begin.*?!sms\$remove +end/im,"") # process removes
+    s
+  end
+end
 
 def unpack(props,args)
   props[:incdirs]=["."]
