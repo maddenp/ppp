@@ -27,7 +27,7 @@ module Translator
   def directive
     unless @directive
       f=File.join(File.dirname(File.expand_path($0)),"sentinels")
-      d=File.open(f,"rb").read.gsub(/\$/,'\$').split("\n").push('sms\$').join("|")
+      d=File.open(f,"rb").read.gsub(/\$/,'\$').split("\n").join("|")
       @directive=Regexp.new("^\s*!((#{d}).*)",true)
     end
     @directive
