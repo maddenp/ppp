@@ -1,9 +1,9 @@
-BINS=$(addsuffix _parser.rb,fortran normalize)
+BINS=$(addsuffix _parser.rb,fortran normfree)
 
 all: $(BINS)
 
-%_parser.rb: %_grammar.tt
+%_parser.rb: %.tt
 	RUBYLIB=lib tt -o $@ $<
 
 clean:
-	$(RM) $(BINS) *.mod *.o a.out
+	$(RM) $(BINS) *.mod *.o *.sms a.out

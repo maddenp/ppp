@@ -3,8 +3,8 @@ module PPP
   require "treetop"
   require "fortran"
   require "fortran_parser"
-  require "normalize"
-  require "normalize_parser"
+  require "normfree"
+  require "normfree_parser"
   require "ostruct"
   require "yaml"
 
