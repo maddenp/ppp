@@ -192,13 +192,13 @@ module Fortran
   def sp_dimension_stmt(array_names_and_specs)
     array_names_and_specs.e.each do |x|
       if x.is_a?(Array_Name_And_Spec)
-        key="#{x.e[0]}"
-        array_spec=x.e[2].e[0]
-        env[key]||={}
-        env[key].merge!(array_props(array_spec,{}))
+        var=x.name
+        array_spec=x.spec.e[0]
+        env[var]||={}
+        env[var].merge!(array_props(array_spec,{}))
       end
     end
-    array_names_and_specs.names.each { |x|varsetprop(x,"rank","array") }
+    array_names_and_specs.names.each { |x| varsetprop(x,"rank","array") }
     true
   end
 
@@ -362,6 +362,12 @@ module Fortran
   end
 
   def sp_target_stmt(target_object_list)
+    target_object_list.objects.each do |x|
+      if x.is_a?(Array_Name_And_Spec)
+        var=x.name
+        varsetprop(var,"rank","array")
+      end
+    end
     true
   end
 
@@ -725,6 +731,10 @@ module Fortran
 
     def name
       "#{e[0]}"
+    end
+
+    def spec
+      e[2]
     end
 
     def translate
@@ -1827,7 +1837,15 @@ module Fortran
   end
 
   class Target_Object_List < T
-    def to_s() e[1].e.reduce("#{e[0]}") { |m,x| m+"#{x}" } end
+
+    def objects
+      e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
+    end
+
+    def to_s
+      e[1].e.reduce("#{e[0]}") { |m,x| m+"#{x}" }
+    end
+
   end
 
   class Target_Object_List_Pair < T
