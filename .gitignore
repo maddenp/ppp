@@ -1,7 +1,7 @@
+*.f90
 *.mod
 *.o
 *.sms
 a.out
 fortran_parser.rb
-normalize_parser.rb
-p.f90
+normfree_parser.rb

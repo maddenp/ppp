@@ -1,4 +1,4 @@
-module PPP
+module Translator
 
   require "treetop"
   require "fortran"

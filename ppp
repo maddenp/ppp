@@ -4,9 +4,9 @@ basedir=File.dirname(File.expand_path($0))
 $: << basedir
 $: << File.join(basedir,"lib")
 
-require "ppp"
+require "translator"
 
-include PPP
+include Translator
 
 def unpack(props,args)
   props[:incdirs]=["."]
