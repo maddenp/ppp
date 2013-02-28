@@ -90,3 +90,7 @@
 
 - Add output to no-output tests to make sure code is not deleted in translation
   (e.g. reveiw t0160 changes)
+
+- Server mode more suitable for running under JRuby? i.e. clients specify input
+  filenames & arguments, worker thread (process) does translation. Could
+  eliminate JRuby startup overhead issues.
