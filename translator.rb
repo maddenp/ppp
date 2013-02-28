@@ -151,10 +151,10 @@ module Translator
     props=default_props.merge(override)
     debug=props[:debug]
     @@fp||=FortranParser.new
+    s=prepsrc(s) if defined? prepsrc
     s=assemble(s,[props[:srcfile]],props[:incdirs])
     cppcheck(s)
     puts "RAW SOURCE\n\n#{s}\n" if debug
-    s=prep(s) if defined? prep
     puts "NORMALIZED SOURCE\n\n" if debug
     s=normalize(s,props[:nl])
     unless props[:normalize]

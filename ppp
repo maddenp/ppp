@@ -4,16 +4,12 @@ basedir=File.dirname(File.expand_path($0))
 $: << basedir
 $: << File.join(basedir,"lib")
 
-require "translator"
-include Translator
+# order of requires matters
 
-module Translator
-  def prep(s)
-    s=s.gsub(/^\s*!sms\$insert */i,"")                           # process inserts
-    s=s.gsub(/^\s*!sms\$remove +begin.*?!sms\$remove +end/im,"") # process removes
-    s
-  end
-end
+require "translator"
+require "sms"
+
+include Translator
 
 def unpack(props,args)
   props[:incdirs]=["."]
