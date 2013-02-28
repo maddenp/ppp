@@ -2,7 +2,6 @@ module Translator
 
   require "treetop"
   require "fortran"
-  require "fortran_parser"
   require "normfree"
   require "normfree_parser"
   require "ostruct"
@@ -39,6 +38,16 @@ module Translator
       puts "\n"
       exit 1
     end
+  end
+
+  def go
+    fail(usage) unless srcfile=ARGV.pop
+    srcfile=File.expand_path(srcfile)
+    fail("Cannot read file: #{srcfile}") unless File.readable?(srcfile)
+    s=File.open(srcfile,"rb").read
+    props={:srcfile=>srcfile}
+    props=unpack(props,ARGV)
+    puts out(s,:program_units,props)
   end
 
   def normalize(s,newline)
@@ -190,6 +199,34 @@ module Translator
     props=default_props.merge(override)
     translated_source,raw_tree,translated_tree=process(s,root,props)
     translated_tree
+  end
+
+  def unpack(props,args)
+    props[:incdirs]=["."]
+    args.reverse!
+    while opt=args.pop
+      case opt
+      when "-I"
+        dirlist=args.pop
+        fail(usage) unless dirlist
+        dirlist.split(":").each do |d|
+          fail("No such directory: #{d}") unless File.directory?(d)
+          props[:incdirs] << d
+        end
+      when "normalize"
+        props[:normalize]=true
+      when "debug"
+        props[:debug]=true
+      else
+        fail(usage)
+      end
+    end
+    props
+  end
+
+  def usage
+    f=File.basename(__FILE__)
+    "usage: #{f} [-I dir[:dir:...]] source"
   end
 
 end

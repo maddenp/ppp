@@ -856,9 +856,7 @@ grammar Fortran
     format_stmt /
     entry_stmt /
     stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <E> /
-    directive /
-    sms_passthrough /
-    sms_declarative
+    directive
   end
 
   rule declaration_constructs

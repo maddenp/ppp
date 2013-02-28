@@ -1,3 +1,5 @@
+require 'sms_parser'
+
 module Fortran
 
   def sms(s)

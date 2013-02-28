@@ -1,0 +1,21 @@
+require 'fortran_parser.rb'
+
+grammar Fortran
+
+  rule declaration_construct
+    # F90:R207
+
+    derived_type_def /
+    interface_block /
+    type_declaration_stmt /
+    specification_stmt /
+    parameter_stmt /
+    format_stmt /
+    entry_stmt /
+    stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <E> /
+    directive /
+    sms_passthrough /
+    sms_declarative
+  end
+
+end
