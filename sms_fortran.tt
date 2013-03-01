@@ -1,4 +1,4 @@
-require 'fortran_parser.rb'
+require 'fortran_parser'
 
 grammar Fortran
 
@@ -49,7 +49,7 @@ grammar Fortran
   rule implicit_part
     # F90:R205
     #
-    # Note: The standard requires that the last statement in implicit_part be
+    # Note: The standard demands that the last statement in implicit_part be
     # an implicit_stmt but, given that this seems unlikely to affect parsing,
     # and the availibility of 3rd-party syntax-checking compilers, it is not
     # enforced here.

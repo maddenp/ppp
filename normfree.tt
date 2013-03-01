@@ -1,7 +1,7 @@
-grammar Normalize
+grammar Normfree
 
   rule text
-    ( sms / directive / comment / quoted / unquoted )* <Text>
+    ( directive / comment / quoted / unquoted )* <Text>
   end
 
   rule comment
@@ -14,10 +14,6 @@ grammar Normalize
 
   rule quoted
     ( [\"] [^\"]* [\"] / [\'] [^\']* [\'] )+ <Quoted>
-  end
-
-  rule sms
-    "@" [sS] [mM] [sS] "$" [^\n\'\"]* <SMS>
   end
 
   rule unquoted
