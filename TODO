@@ -1,3 +1,25 @@
+- directives to do
+
+  !sms$create_decomp
+  !sms$distribute
+  !sms$ignore begin/end
+  !sms$reduce
+  !sms$reduce begin/end
+  !sms$serial begin/end
+
+x directives done
+
+  !sms$barrier
+  !sms$compare_var
+  !sms$exchange
+  !sms$halo_comp begin/end
+  !sms$insert
+  !sms$parallel begin/end
+  !sms$remove
+  !sms$set_communicator
+  !sms$to_local begin/end
+  !sms$unstructured_grid
+
 - REMOVE sms_passthrough and everything related to it.
 
 - REMOVE sms$ignore* and everything related to it.
@@ -94,3 +116,9 @@
 - Server mode more suitable for running under JRuby? i.e. clients specify input
   filenames & arguments, worker thread (process) does translation. Could
   eliminate JRuby startup overhead issues.
+
+- Sort envfile output for easy xxdiff comparison.
+
+- Does the envfile from a module that uses another module contain the info from
+  the other module? Should it?
+

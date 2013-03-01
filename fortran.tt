@@ -951,9 +951,8 @@ grammar Fortran
 
   rule directive
     # Note: Any "comment" not stripped out during normalization is a directive.
-    # These are non-SMS directives.
 
-    !sms_sentinel "!" character+ t_newline <T>
+    "!" character+ t_newline <T>
   end
 
   rule do_block
@@ -1303,9 +1302,7 @@ grammar Fortran
     do_construct /
     if_construct /
     where_construct /
-    directive /
-    sms_passthrough /
-    sms_executable
+    directive
   end
 
   rule executable_construct_action_stmt
@@ -1407,8 +1404,7 @@ grammar Fortran
     # F90:R203
 
     subroutine_subprogram /
-    function_subprogram /
-    sms_passthrough
+    function_subprogram
   end
 
   rule file_name_expr
@@ -1552,8 +1548,7 @@ grammar Fortran
     # and the availibility of 3rd-party syntax-checking compilers, it is not
     # enforced here.
 
-    implicit_part_stmt+ <E> /
-    sms_passthrough
+    implicit_part_stmt+ <E>
   end
 
   rule implicit_part_stmt
@@ -1734,8 +1729,7 @@ grammar Fortran
     # F90:R211
 
     subroutine_subprogram /
-    function_subprogram /
-    sms_passthrough
+    function_subprogram
   end
 
   rule internal_subprograms
@@ -2060,8 +2054,7 @@ grammar Fortran
     # F90:R213
 
     subroutine_subprogram /
-    function_subprogram /
-    sms_passthrough
+    function_subprogram
   end
 
   rule module_subprogram_part
@@ -2763,247 +2756,6 @@ grammar Fortran
 
     "and." /
     "or."
-  end
-
-  rule sms_barrier
-    sms_sentinel sms_t_barrier t_newline <SMS_Barrier>
-  end
-
-  rule sms_compare_var
-    sms_sentinel sms_t_compare_var t_paren_l variable t_comma sms_string t_paren_r t_newline <SMS_Compare_Var>
-  end
-
-  rule sms_create_decomp
-    sms_sentinel sms_t_create_decomp character+ t_newline <SMS_Create_Decomp>
-  end
-
-  rule sms_declarative
-    sms_distribute_begin /
-    sms_distribute_end
-  end
-
-  rule sms_decomp_name
-    name
-  end
-
-  rule sms_distribute_begin
-    sms_sentinel sms_t_distribute t_paren_l sms_decomp_name t_comma sms_distribute_dims t_paren_r sms_t_begin t_newline &{ |e| sp_sms_distribute_begin(e[3],e[5]) } <SMS_Distribute_Begin>
-  end
-
-  rule sms_distribute_dim
-    scalar_int_literal_constant
-  end
-
-  rule sms_distribute_dims
-    sms_distribute_dim t_comma sms_distribute_dim <SMS_Distribute_Dims_1> /
-    t_comma sms_distribute_dim <SMS_Distribute_Dims_2> /
-    sms_distribute_dim "" <SMS_Distribute_Dims_3>
-  end
-
-  rule sms_distribute_end
-    sms_sentinel sms_t_distribute sms_t_end t_newline &{ |e| sp_sms_distribute_end } <SMS_Distribute_End>
-  end
-
-  rule sms_exchange
-    sms_sentinel sms_t_exchange t_paren_l variable ( t_comma variable )* t_paren_r t_newline <SMS_Exchange>
-  end
-
-  rule sms_executable
-    sms_barrier /
-    sms_compare_var /
-    sms_exchange /
-    sms_halo_comp_begin /
-    sms_halo_comp_end /
-    sms_parallel_begin /
-    sms_parallel_end /
-    sms_to_local_begin /
-    sms_to_local_end /
-    sms_set_communicator /
-    sms_unstructured_grid /
-    sms_passthrough
-  end
-
-  rule sms_halo_comp_begin
-    sms_sentinel sms_t_halo_comp t_paren_l sms_halo_comp_pairs t_paren_r sms_t_begin t_newline &{ |e| sp_sms_halo_comp_begin(e[3]) } <SMS_Halo_Comp_Begin>
-  end
-
-  rule sms_halo_comp_end
-    sms_sentinel sms_t_halo_comp sms_t_end t_newline &{ |e| sp_sms_halo_comp_end } <SMS_Halo_Comp_End>
-  end
-
-  rule sms_halo_comp_pair
-    t_lt expr t_comma expr t_gt <SMS_Halo_Comp_Pair>
-  end
-
-  rule sms_halo_comp_pairs
-    sms_halo_comp_pair (t_comma sms_halo_comp_pair)? (t_comma sms_halo_comp_pair)? <SMS_Halo_Comp_Pairs>
-  end
-
-  rule sms_ignore_begin
-    sms_sentinel sms_t_ignore sms_t_begin t_newline <SMS_Ignore_Begin>
-  end
-
-  rule sms_ignore_end
-    sms_sentinel sms_t_ignore sms_t_end t_newline <SMS_Ignore_End>
-  end
-
-  rule sms_parenthesized_args
-    # REMOVE
-    t_paren_l (!t_paren_r character)* t_paren_r <T>
-  end
-
-  rule sms_parallel_begin
-    sms_sentinel sms_t_parallel t_paren_l sms_decomp_name t_comma sms_parallel_var_lists t_paren_r sms_t_begin t_newline &{ |e| sp_sms_parallel_begin(e[3],e[5]) } <SMS_Parallel_Begin>
-  end
-
-  rule sms_parallel_end
-    sms_sentinel sms_t_parallel sms_t_end t_newline &{ |e| sp_sms_parallel_end } <SMS_Parallel_End>
-  end
-
-  rule sms_parallel_var_list
-    t_lt variable_name ( t_comma variable_name )* t_gt <SMS_Parallel_Var_List_1> /
-    variable_name "" <SMS_Parallel_Var_List_2>
-  end
-
-  rule sms_parallel_var_lists
-    t_comma t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_001> /
-    t_comma sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_011> /
-    t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_010> /
-    sms_parallel_var_list t_comma sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_111> /
-    sms_parallel_var_list t_comma t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_101> /
-    sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_110> /
-    sms_parallel_var_list "" <SMS_Parallel_Var_Lists_100>
-  end
-
-  rule sms_passthrough
-    sms_create_decomp /
-    sms_ignore_begin /
-    sms_ignore_end /
-    sms_reduce /
-    sms_serial_begin /
-    sms_serial_end
-  end
-
-  rule sms_reduce
-    sms_sentinel sms_t_reduce sms_parenthesized_args t_newline <SMS_Reduce>
-  end
-
-  rule sms_sentinel
-    "!sms$" <T>
-  end
-
-  rule sms_serial_begin
-    sms_sentinel sms_t_serial sms_parenthesized_args? sms_t_begin t_newline &{ |e| sp_sms_serial_begin } <SMS_Serial_Begin>
-  end
-
-  rule sms_serial_end
-    sms_sentinel sms_t_serial sms_t_end t_newline &{ |e| sp_sms_serial_end } <SMS_Serial_End>
-  end
-
-  rule sms_set_communicator
-    sms_sentinel sms_t_set_communicator t_paren_l variable_name t_paren_r t_newline <SMS_Set_Communicator>
-  end
-
-  rule sms_string
-    char_literal_constant_dq /
-    char_literal_constant_sq
-  end
-
-  rule sms_t_barrier
-    "barrier" <T>
-  end
-
-  rule sms_t_begin
-    "begin" <T>
-  end
-
-  rule sms_t_compare_var
-    "compare_var" <T>
-  end
-
-  rule sms_t_create_decomp
-    "create_decomp" <T>
-  end
-
-  rule sms_t_distribute
-    "distribute" <T>
-  end
-
-  rule sms_t_end
-    "end" <T>
-  end
-
-  rule sms_t_exchange
-    "exchange" <T>
-  end
-
-  rule sms_t_halo_comp
-    "halo_comp" <T>
-  end
-
-  rule sms_t_ignore
-    "ignore" <T>
-  end
-
-  rule sms_t_lbound
-    "lbound" <T>
-  end
-
-  rule sms_t_parallel
-    "parallel" <T>
-  end
-
-  rule sms_t_reduce
-    "reduce" <T>
-  end
-
-  rule sms_t_serial
-    "serial" <T>
-  end
-
-  rule sms_t_set_communicator
-    "set_communicator" <T>
-  end
-
-  rule sms_t_to_local
-    "to_local" <T>
-  end
-
-  rule sms_t_ubound
-    "ubound" <T>
-  end
-
-  rule sms_t_unstructured_grid
-    "unstructured_grid" <T>
-  end
-
-  rule sms_to_local_begin
-    sms_sentinel sms_t_to_local t_paren_l sms_decomp_name t_colon sms_to_local_lists t_paren_r sms_t_begin t_newline &{ |e| sp_sms_to_local_begin(e[3],e[5]) } <SMS_To_Local_Begin>
-  end
-
-  rule sms_to_local_end
-    sms_sentinel sms_t_to_local sms_t_end t_newline &{ |e| sp_sms_to_local_end } <SMS_To_Local_End>
-  end
-
-  rule sms_to_local_key
-    sms_t_lbound /
-    sms_t_ubound
-  end
-
-  rule sms_to_local_list
-    t_lt sms_distribute_dim t_comma sms_var_list t_colon sms_to_local_key t_gt <SMS_To_Local_List>
-  end
-
-  rule sms_to_local_lists
-    sms_to_local_list ( t_comma sms_to_local_list ( t_comma sms_to_local_list )? )? <SMS_To_Local_Lists>
-  end
-
-  rule sms_unstructured_grid
-    sms_sentinel sms_t_unstructured_grid t_paren_l variable_name t_paren_r t_newline <SMS_Unstructured_Grid>
-  end
-
-  rule sms_var_list
-    variable_name ( t_comma variable_name )* <SMS_Var_List>
   end
 
   rule special_character
@@ -3806,7 +3558,7 @@ grammar Fortran
   end
 
   rule use_part
-    ( use_stmt / directive / sms_passthrough )* <Use_Part>
+    ( use_stmt / directive )* <Use_Part>
   end
 
   rule use_stmt

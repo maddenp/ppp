@@ -263,46 +263,6 @@ module Fortran
     true
   end
 
-  def sp_sms_distribute_begin(*args)
-    true
-  end
-
-  def sp_sms_distribute_end
-    true
-  end
-
-  def sp_sms_halo_comp_begin(*args)
-    true
-  end
-
-  def sp_sms_halo_comp_end
-    true
-  end
-
-  def sp_sms_parallel_begin(*args)
-    true
-  end
-
-  def sp_sms_parallel_end
-    true
-  end
-
-  def sp_sms_serial_begin
-    true
-  end
-
-  def sp_sms_serial_end
-    true
-  end
-
-  def sp_sms_to_local_begin(*args)
-    true
-  end
-
-  def sp_sms_to_local_end
-    true
-  end
-
   def sp_subroutine_stmt(dummy_arg_list_option)
     envpush
     if dummy_arg_list_option.e
@@ -571,19 +531,9 @@ module Fortran
         end
         if code
           p=use_part
-# HACK start
-          t=raw("!sms$ignore begin",:sms_ignore_begin)
-          t.parent=p
-          p.e.push(t)
-# HACK end
           t=raw(code,:use_stmt)
           t.parent=p
           p.e.push(t)
-# HACK start
-          t=raw("!sms$ignore end",:sms_ignore_end)
-          t.parent=p
-          p.e.push(t)
-# HACK end
         end
       end
     end
@@ -1265,117 +1215,6 @@ module Fortran
   end
 
   class Specification_Part < E
-  end
-
-  class SMS < T
-  end
-
-  class SMS_Barrier < SMS
-  end
-
-  class SMS_Compare_Var < SMS
-  end
-
-  class SMS_Create_Decomp < SMS
-  end
-
-  class SMS_Distribute_Begin < SMS
-  end
-
-  class SMS_Distribute_End < SMS
-  end
-
-  class SMS_Distribute_Dims_1 < SMS
-  end
-
-  class SMS_Distribute_Dims_2 < SMS
-  end
-
-  class SMS_Distribute_Dims_3 < SMS
-  end
-
-  class SMS_Exchange < SMS
-  end
-
-  class SMS_Halo_Comp_Begin < SMS
-  end
-
-  class SMS_Halo_Comp_End < SMS
-  end
-
-  class SMS_Halo_Comp_Pair < E
-  end
-
-  class SMS_Halo_Comp_Pairs < E
-  end
-
-  class SMS_Ignore_Begin < SMS
-  end
-
-  class SMS_Ignore_End < SMS
-  end
-
-  class SMS_Parallel_Begin < SMS
-  end
-
-  class SMS_Parallel_End < SMS
-  end
-
-  class SMS_Parallel_Var_List_1 < E
-  end
-
-  class SMS_Parallel_Var_List_2 < E
-  end
-
-  class SMS_Parallel_Var_Lists_001 < T
-  end
-
-  class SMS_Parallel_Var_Lists_010 < T
-  end
-
-  class SMS_Parallel_Var_Lists_011 < T
-  end
-
-  class SMS_Parallel_Var_Lists_100 < T
-  end
-
-  class SMS_Parallel_Var_Lists_101 < T
-  end
-
-  class SMS_Parallel_Var_Lists_110 < T
-  end
-
-  class SMS_Parallel_Var_Lists_111 < T
-  end
-
-  class SMS_Reduce < SMS
-  end
-
-  class SMS_Serial_Begin < SMS
-  end
-
-  class SMS_Serial_End < SMS
-  end
-
-  class SMS_Set_Communicator < SMS
-  end
-
-  class SMS_To_Local_Begin < SMS
-  end
-
-  class SMS_To_Local_End < SMS
-  end
-
-  class SMS_To_Local_List < E
-  end
-
-  class SMS_To_Local_Lists < T
-  end
-
-  class SMS_Var_List < E
-  end
-
-  class SMS_Unstructured_Grid < SMS
   end
 
   class Star_Int < T

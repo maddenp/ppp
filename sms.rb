@@ -87,21 +87,21 @@ module Fortran
     true
   end
 
-    def smstype(type,kind)
-      kind=nil if kind=="_default"
-      case type
-      when "integer"
-        (kind)?("nnt_i#{kind}"):("nnt_integer")
-      when "real"
-        (kind)?("nnt_r#{kind}"):("nnt_real")
-      when "doubleprecision"
-        "nnt_doubleprecision"
-      when "complex"
-        (kind)?("nnt_c#{kind}"):("nnt_complex")
-      when "logical"
-        (kind)?("nnt_l#{kind}"):("nnt_logical")
-      end
+  def smstype(type,kind)
+    kind=nil if kind=="_default"
+    case type
+    when "integer"
+      (kind)?("nnt_i#{kind}"):("nnt_integer")
+    when "real"
+      (kind)?("nnt_r#{kind}"):("nnt_real")
+    when "doubleprecision"
+      "nnt_doubleprecision"
+    when "complex"
+      (kind)?("nnt_c#{kind}"):("nnt_complex")
+    when "logical"
+      (kind)?("nnt_l#{kind}"):("nnt_logical")
     end
+  end
 
   class Array_Name_And_Spec < E
 
@@ -610,6 +610,40 @@ module Fortran
           end
           code=newbounds.join(",")
 #         replace_element(code,:array_spec,spec)
+        end
+      end
+    end
+
+    def use(modulename,usenames=[])
+      unless uses?(modulename,:all)
+        code="use #{modulename}"
+        unless usenames.empty?
+          list=[]
+          usenames.each do |x|
+            h=x.is_a?(Hash)
+            localname=(h)?(x.keys.first):(nil)
+            usename=(h)?(x.values.first):(x)
+            unless uses?(modulename,usename)
+              list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
+            end
+          end
+          code=((list.empty?)?(nil):("#{code},only:#{list.join(",")}"))
+        end
+        if code
+          p=use_part
+# HACK start
+          t=raw("!sms$ignore begin",:sms_ignore_begin)
+          t.parent=p
+          p.e.push(t)
+# HACK end
+          t=raw(code,:use_stmt)
+          t.parent=p
+          p.e.push(t)
+# HACK start
+          t=raw("!sms$ignore end",:sms_ignore_end)
+          t.parent=p
+          p.e.push(t)
+# HACK end
         end
       end
     end
