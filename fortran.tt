@@ -1404,7 +1404,8 @@ grammar Fortran
     # F90:R203
 
     subroutine_subprogram /
-    function_subprogram
+    function_subprogram /
+    directive
   end
 
   rule file_name_expr
@@ -1548,7 +1549,8 @@ grammar Fortran
     # and the availibility of 3rd-party syntax-checking compilers, it is not
     # enforced here.
 
-    implicit_part_stmt+ <E>
+    implicit_part_stmt+ <E> /
+    directive
   end
 
   rule implicit_part_stmt
@@ -1729,7 +1731,8 @@ grammar Fortran
     # F90:R211
 
     subroutine_subprogram /
-    function_subprogram
+    function_subprogram /
+    directive
   end
 
   rule internal_subprograms
@@ -2054,7 +2057,8 @@ grammar Fortran
     # F90:R213
 
     subroutine_subprogram /
-    function_subprogram
+    function_subprogram /
+    directive
   end
 
   rule module_subprogram_part
