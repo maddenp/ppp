@@ -1100,6 +1100,9 @@ module Fortran
     def to_s() "#{e[0]}#{e[1].e.reduce("") { |m,x| m+="#{x}" } }" end
   end
 
+  class Mult_Operand < T
+  end
+
   class Name < T
 
     def name

@@ -2077,7 +2077,7 @@ grammar Fortran
   rule mult_operand
     # F90:R705
 
-    level_1_expr ( power_op mult_operand )? <T>
+    level_1_expr ( power_op mult_operand )? <Mult_Operand>
   end
 
   rule name
