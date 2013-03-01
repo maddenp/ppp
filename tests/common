@@ -3,12 +3,12 @@
 # not been tested. Set 'FC' appropriately. See http://bit.ly/N6I39Y for more
 # information.
 
+BIN=../../ppp
 EXE=a.out
 EXT=$(suffix $(TEST))
 FC=gfortran
 FFLAGS=-w
 OBJ=$(STEM)_ppp.o
-PPP=../../ppp
 STEM=$(basename $(TEST))
 TARGETS=clean control exe obj translation
 TEST=$(wildcard t.f t.f90)
@@ -45,4 +45,4 @@ $(OBJ): $(TRANSLATION)
 	$(FC) $(FFLAGS) -c $(TRANSLATION)
 
 $(TRANSLATION): $(TEST)
-	$(PPP) $(INCFLAG) $(TEST) > $(TRANSLATION)
+	$(BIN) $(INCFLAG) $(TEST) > $(TRANSLATION)
