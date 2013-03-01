@@ -1583,8 +1583,8 @@ grammar Fortran
   rule initialization
     # F95:R505
 
-    t_equal initialization_expr <T> /
-    t_point null_function_ref <T>
+    t_equal initialization_expr <Initialization_1> /
+    t_point null_function_ref <Initialization_2>
   end
 
   rule initialization_expr
@@ -2351,7 +2351,7 @@ grammar Fortran
   rule power_op
     # F90:R708
 
-    "**" <T>
+    "**" <Power_Op>
   end
 
   rule prefix
@@ -2380,7 +2380,7 @@ grammar Fortran
   end
 
   rule print_stmt_output_item_list
-    t_comma output_item_list <T>
+    t_comma output_item_list <Print_Stmt_Output_Item_List>
   end
 
   rule private_sequence_stmt

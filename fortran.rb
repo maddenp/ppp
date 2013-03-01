@@ -470,8 +470,8 @@ module Fortran
       tree
     end
 
-    def inside?(classes)
-      (enclosing(classes))?(true):(false)
+    def inside?(class_or_classes)
+      (enclosing(class_or_classes))?(true):(false)
     end
 
     def nearest(classes,n=self)
@@ -1027,6 +1027,16 @@ module Fortran
     def to_s() stmt(space) end
   end
 
+  class Initialization < T
+    def to_s() "#{e[0]}#{e[1]}" end
+  end
+
+  class Initialization_1 < Initialization
+  end
+
+  class Initialization_2 < Initialization
+  end
+
   class Inner_Shared_Do_Construct < T
     def to_s() cat(:be) end
   end
@@ -1162,8 +1172,15 @@ module Fortran
     def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
   end
 
+  class Power_Op < T
+  end
+
   class Print_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
+  end
+
+  class Print_Stmt_Output_Item_List < T
+    def to_s() "#{e[0]}#{e[1]}" end
   end
 
   class Program_Stmt < T
