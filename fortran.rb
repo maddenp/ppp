@@ -663,16 +663,18 @@ module Fortran
       e[1].e.reduce([e[0].abstract_bounds]) { |m,x| m.push(x.abstract_bounds) }
     end
 
-#   def post
-#     envget
-##p env
-#     array_name=self.ancestor(Entity_Decl).name
-#     p1=(env[:args] and env[:args].include?(array_name))?(true):(false)
-#     unless p1
-#       code="#{self}"
-#       replace_element(code,:deferred_shape_spec_list)
-#     end
-#   end
+    def post
+# NEED TO HANDLE DIMENSION STMT & DIMENSTION ATTR TOO !!!
+      envget
+      if (entity_decl=self.ancestor(Entity_Decl))
+        array_name=entity_decl.name
+        p1=(env[:args] and env[:args].include?(array_name))?(true):(false)
+        unless p1
+          code="#{self}"
+          replace_element(code,:deferred_shape_spec_list)
+        end
+      end
+    end
 
   end
 
