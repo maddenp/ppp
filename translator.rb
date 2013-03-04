@@ -166,6 +166,7 @@ module Translator
       puts s if debug
       @@incdirs=props[:incdirs]
       raw_tree=@@fp.parse(s,:root=>root)
+      raw_tree=raw_tree.post # post-process raw tree
       if debug
         puts "\nRAW TREE\n\n"
         p raw_tree

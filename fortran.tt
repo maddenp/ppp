@@ -147,7 +147,7 @@ grammar Fortran
   rule allocatable_stmt
     # F90:R526
 
-    label:label? t_allocatable double_colon? array_names_and_deferred_shape_spec_lists t_newline <Allocatable_Stmt>
+    label:label? t_allocatable double_colon? array_names_and_deferred_shape_spec_lists t_newline &{ |e| sp_allocatable_stmt(e[3]) } <Allocatable_Stmt>
   end
 
   rule allocate_lower_bound
@@ -252,7 +252,7 @@ grammar Fortran
   end
 
   rule array_names_and_deferred_shape_spec_lists
-    array_name_and_deferred_shape_spec_list array_name_and_deferred_shape_spec_list_pair* <T>
+    array_name_and_deferred_shape_spec_list array_name_and_deferred_shape_spec_list_pair* <Array_Names_And_Deferred_Shape_Spec_Lists>
   end
 
   rule array_name_and_spec
@@ -275,10 +275,14 @@ grammar Fortran
 
   rule array_spec
     # F90:R512
+    #
+    # Note: A deferred_shape_spec_list will be (incorrectly) recognized as an
+    # assumed_shape_spec_list, as it's (apparently) impossible to differentiate
+    # all cases with only information encountered so far. This is corrected in
+    # tree post-processing.
 
-    explicit_shape_spec_list &{ |e| sp_explicit_shape_spec_list(e[0]) } <Array_Spec> /
-    assumed_shape_spec_list &{ |e| sp_assumed_shape_spec_list(e[0]) } <Array_Spec> /
-    deferred_shape_spec_list &{ |e| sp_deferred_shape_spec_list(e[0]) } <Array_Spec> /
+    explicit_shape_spec_list "" <Array_Spec> /
+    assumed_shape_spec_list "" <Array_Spec> /
     assumed_size_spec "" <Array_Spec>
   end
 
@@ -860,7 +864,7 @@ grammar Fortran
   end
 
   rule declaration_constructs
-    declaration_construct* <E>
+    declaration_construct* "" <Declaration_Constructs>
   end
 
   rule default_char_variable
@@ -2083,7 +2087,7 @@ grammar Fortran
   rule name
     # F90:R304
 
-    t_letter alphanumeric_character* &{ |e| sp_name(e[0],e[1]) } <Name>
+    t_letter alphanumeric_character* <Name>
   end
 
   rule named_constant

@@ -133,7 +133,7 @@ module Fortran
           # entity_decl_array_spec case
           spec=entity_decl_array_spec.e[1].spec
         else
-          attr_spec_option=enclosing(Type_Declaration_Stmt).e[2]
+          attr_spec_option=ancestor(Type_Declaration_Stmt).e[2]
           if attr_spec_option.is_a?(Attr_Spec_Option)
             if (d=attr_spec_option.dimension?)
               # dimension attribute case

@@ -1,7 +1,6 @@
 module Fortran
 
   @@access="_default"
-  @@current_name=nil
   @@distribute=nil
   @@dolabels=[]
   @@envstack=[{}]
@@ -40,15 +39,18 @@ module Fortran
   end
 
   def bb(s)
+    # block begin
     @@level+=1
     s
   end
 
   def be
+    # block end
     @@level-=1 if @@level>0
   end
 
   def cat(f=nil)
+    # concatenate elements' string representations
     send(f) if f
     self.e.map { |x| x.to_s }.join
   end
@@ -140,6 +142,14 @@ module Fortran
     @@dolabels.pop if nonblock_do_end?(node)
   end
 
+  def post
+    if e
+      e.each { |x| x.post }
+      e.compact!
+    end
+    self
+  end
+
   def sa(e)
     # space after: If the [e]lement's string form is empty, return that; else
     # return its string form with a trailing space appended.
@@ -171,17 +181,12 @@ module Fortran
     true
   end
 
-  def sp_assumed_shape_spec_list(assumed_shape_spec_list)
-    return false unless env[:args] and env[:args].include?(@@current_name)
+  def sp_allocatable_stmt(array_names_and_deferred_shape_spec_lists)
     true
   end
 
   def sp_block_data_stmt
     envpush
-    true
-  end
-
-  def sp_deferred_shape_spec_list(deferred_shape_spec_list)
     true
   end
 
@@ -218,10 +223,6 @@ module Fortran
     true
   end
 
-  def sp_explicit_shape_spec_list(explicit_shape_spec_list)
-    true
-  end
-
   def sp_function_stmt(dummy_arg_name_list)
     envpush
     if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
@@ -250,11 +251,6 @@ module Fortran
 
   def sp_module_stmt
     envpush
-    true
-  end
-
-  def sp_name(first,rest)
-    @@current_name="#{first}"+rest.e.reduce("") { |m,x| m+="#{x}" }
     true
   end
 
@@ -402,7 +398,18 @@ module Fortran
 
     alias e elements
 
-    def to_s() "" end
+    def descendants(class_or_classes)
+      c=(class_or_classes.is_a?(Array))?(class_or_classes):([class_or_classes])
+      if self.e
+        mine=self.e.find_all { |x| c.include?(x.class) }
+        return self.e.reduce(mine) { |m,x| m+x.descendants(c) }
+      end
+      []
+    end
+
+    def to_s
+      ""
+    end
 
   end
 
@@ -415,6 +422,15 @@ module Fortran
     def initialize(a="",b=(0..0),c=[])
       super(a,b,c)
       @myenv=env
+    end
+
+    def ancestor(class_or_classes)
+      c=(class_or_classes.is_a?(Array))?(class_or_classes):([class_or_classes])
+      n=self
+      begin
+        return n if c.any? { |x| n.is_a?(x) }
+      end while n=n.parent
+      nil
     end
 
     def declaration_constructs
@@ -437,11 +453,6 @@ module Fortran
         env[name]["pppvar"]=true
       end
       envget
-    end
-
-    def enclosing(class_or_classes)
-      class_or_classes=[class_or_classes] unless class_or_classes.is_a?(Array)
-      nearest(class_or_classes,self.parent)
     end
 
     def envget(node=self)
@@ -472,14 +483,7 @@ module Fortran
     end
 
     def inside?(class_or_classes)
-      (enclosing(class_or_classes))?(true):(false)
-    end
-
-    def nearest(classes,n=self)
-      begin
-        return n if classes.any? { |x| n.is_a?(x) }
-      end while n=n.parent
-      nil
+      (ancestor(class_or_classes))?(true):(false)
     end
 
     def remove
@@ -508,7 +512,7 @@ module Fortran
     end
 
     def scoping_unit
-      enclosing(Scoping_Unit)
+      ancestor(Scoping_Unit)
     end
 
     def specification_part
@@ -611,6 +615,10 @@ module Fortran
     def name() e[1].name end
   end
 
+  class Array_Names_And_Deferred_Shape_Spec_Lists < T
+    def names() end
+  end
+
   class Array_Names_And_Specs < E
     def names() [e[0].name]+e[1].e.inject([]) { |m,x| m.push(x.name) } end
   end
@@ -654,6 +662,17 @@ module Fortran
     def abstract_boundslist
       e[1].e.reduce([e[0].abstract_bounds]) { |m,x| m.push(x.abstract_bounds) }
     end
+
+#   def post
+#     envget
+##p env
+#     array_name=self.ancestor(Entity_Decl).name
+#     p1=(env[:args] and env[:args].include?(array_name))?(true):(false)
+#     unless p1
+#       code="#{self}"
+#       replace_element(code,:deferred_shape_spec_list)
+#     end
+#   end
 
   end
 
@@ -762,6 +781,10 @@ module Fortran
 
   class Data_Ref < T
     def name() (e[1].e.empty?)?(e[0].name):(e[1].e[-1].e[1].name) end
+  end
+
+  class Declaration_Constructs < T
+    def to_s() e[0].e.reduce("") { |m,x| m+"#{x}" } end
   end
 
   class Deferred_Shape_Spec < T
