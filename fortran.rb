@@ -691,7 +691,7 @@ module Fortran
 
     def alb
       # abstract lower bound
-      (e[0].respond_to?(:alb))?(e[0].alb):("_default")
+      ("#{e[0]}".empty?)?("_assumed"):("_offset")
     end
 
     def aub
