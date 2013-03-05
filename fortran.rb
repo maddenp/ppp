@@ -182,7 +182,9 @@ module Fortran
   end
 
   def sp_allocatable_stmt(array_names_and_deferred_shape_spec_lists)
+    env[:allocatable]||=[]
     array_names_and_deferred_shape_spec_lists.names.each do |x|
+      env[:allocatable].push(x)
       varsetprop(x,"rank","array")
       env[x].keys.each { |k| env[x][k]="_deferred" if k=~/[lu]b\d+/ }
     end
@@ -244,7 +246,10 @@ module Fortran
 
   def sp_module(_module)
     modulename=_module.e[0].name
+    # Do not export info on private objects
     modinfo=env.dup.delete_if { |k,v| v["access"]=="private" }
+    # Do not export symbol keys, which are for internal purposes only
+    modinfo.delete_if { |k,v| k.is_a?(Symbol) }
     unless modinfo.empty?
       File.open(envfile(modulename),"w") { |f| f.write(YAML.dump(modinfo)) }
     end
@@ -288,10 +293,6 @@ module Fortran
 
   def sp_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
     varprops=entity_decl_list.varprops
-    varprops.each do |v,p|
-      p["type"]=type_spec.type
-      p["kind"]=type_spec.kind
-    end
     if x=attrchk(attr_spec_option,:dimension?)
       array_spec=x.e[0]
       varprops.each do |v,p|
@@ -307,8 +308,13 @@ module Fortran
       varprops.each { |v,p| p["access"]=@@access }
     end
     varprops.each do |v,p|
-      varenv=env["#{v}"]||={}
+      varenv=env[v]||={}
       ["access","rank"].each { |x| p.delete(x) if varenv.include?(x) }
+      p["type"]=type_spec.type
+      p["kind"]=type_spec.kind
+      if env[:allocatable] and env[:allocatable].include?(v)
+        p.keys.each { |k| p[k]="_deferred" if k=~/[lu]b\d+/ }
+      end
       varenv.merge!(p)
     end
     true
