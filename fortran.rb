@@ -182,6 +182,10 @@ module Fortran
   end
 
   def sp_allocatable_stmt(array_names_and_deferred_shape_spec_lists)
+    array_names_and_deferred_shape_spec_lists.names.each do |x|
+      varsetprop(x,"rank","array")
+      env[x].keys.each { |k| env[x][k]="_deferred" if k=~/[lu]b\d+/ }
+    end
     true
   end
 
@@ -616,7 +620,15 @@ module Fortran
   end
 
   class Array_Names_And_Deferred_Shape_Spec_Lists < T
-    def names() end
+
+    def items
+      e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
+    end
+
+    def names
+      e[1].e.reduce(["#{e[0].e[0]}"]) { |m,x| m.push("#{x.e[1].e[0]}") }
+    end
+
   end
 
   class Array_Names_And_Specs < E

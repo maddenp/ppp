@@ -123,11 +123,6 @@ module Fortran
       var="#{e[0]}"
       fail "'#{var}' not found in environment" unless (varenv=env[var])
       spec=nil
-      # Arrays are declared in four ways: Using an entity_decl_array_spec, e.g.
-      # '(1)' in 'real::x(1)'; using a dimension attribute e.g. 'dimension(1)'
-      # in 'real,dimension(1)::x'; or using a separate dimension statement, e.g.
-      # 'dimension::x(1)' or target stmt, e.g. 'target:x(1)'. The first two
-      # cases are detected and translated here.
       if varenv["rank"]=="array"
         if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
           # entity_decl_array_spec case
