@@ -447,7 +447,7 @@ module Fortran
 
     def ancestor(class_or_classes)
       c=(class_or_classes.is_a?(Array))?(class_or_classes):([class_or_classes])
-      n=self
+      n=self.parent
       begin
         return n if c.any? { |x| n.is_a?(x) }
       end while n=n.parent
@@ -470,7 +470,7 @@ module Fortran
         code="#{type}#{attrs}::#{name}"
         t=raw(code,:type_declaration_stmt)
         t.parent=p
-        p.e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
+        p.e[0].e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
         env[name]["pppvar"]=true
       end
       envget
