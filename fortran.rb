@@ -182,11 +182,22 @@ module Fortran
   end
 
   def sp_allocatable_stmt(array_names_and_deferred_shape_spec_lists)
+    a=array_names_and_deferred_shape_spec_lists
     env[:allocatable]||=[]
-    array_names_and_deferred_shape_spec_lists.names.each do |x|
-      env[:allocatable].push(x)
-      varsetprop(x,"rank","array")
-      env[x].keys.each { |k| env[x][k]="_deferred" if k=~/[lu]b\d+/ }
+    a.names.each do |var|
+      # Record that this var has been marked allocatable, which means that it
+      # must be an array with deferred bounds.
+      env[:allocatable].push(var)
+      varsetprop(var,"rank","array")
+      # Correct for the case where this array has already been seen and its
+      # bounds incorrectly marked as assumed. 
+      env[var].keys.each { |k| env[var][k]="_deferred" if k=~/[lu]b\d+/ }
+    end
+    # In case this array has not previously been seen, record its array specs.
+    a.items.each do |x|
+      if x.array_spec
+        env[x.name].merge!(array_props(x.array_spec,{}))
+      end
     end
     true
   end
@@ -623,6 +634,21 @@ module Fortran
 
   class Array_Name_And_Spec_Pair < E
     def name() e[1].name end
+  end
+
+  class Array_Name_And_Deferred_Shape_Spec_List < E
+
+    def array_spec
+      (e[1].respond_to?(:array_spec))?(e[1].array_spec):(nil)
+    end
+
+    def name
+      "#{e[0]}"
+    end
+
+  end
+
+  class Array_Name_And_Deferred_Shape_Spec_List_Pair < E
   end
 
   class Array_Names_And_Deferred_Shape_Spec_Lists < T
@@ -1202,6 +1228,18 @@ module Fortran
 
   class Optional_Stmt < T
     def to_s() stmt("#{e[1]}#{ik(e[2],"::"," ")}#{e[3]}") end
+  end
+
+  class Parenthesized_Deferred_Shape_Spec_List < T
+
+    def abstract_boundslist
+      e[1].abstract_boundslist
+    end
+
+    def array_spec
+      e[1]
+    end
+
   end
 
   class Parenthesized_Explicit_Shape_Spec_List < T

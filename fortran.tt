@@ -244,11 +244,11 @@ grammar Fortran
   end
 
   rule array_name_and_deferred_shape_spec_list
-    array_name parenthesized_deferred_shape_spec_list? <E>
+    array_name parenthesized_deferred_shape_spec_list? <Array_Name_And_Deferred_Shape_Spec_List>
   end
 
   rule array_name_and_deferred_shape_spec_list_pair
-    t_comma array_name_and_deferred_shape_spec_list <E>
+    t_comma array_name_and_deferred_shape_spec_list <Array_Name_And_Deferred_Shape_Spec_List_Pair>
   end
 
   rule array_names_and_deferred_shape_spec_lists
@@ -2283,7 +2283,7 @@ grammar Fortran
   end
 
   rule parenthesized_deferred_shape_spec_list
-    t_paren_l deferred_shape_spec_list t_paren_r <T>
+    t_paren_l deferred_shape_spec_list t_paren_r <Parenthesized_Deferred_Shape_Spec_List>
   end
 
   rule parenthesized_explicit_shape_spec_list
