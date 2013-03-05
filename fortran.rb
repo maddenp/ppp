@@ -257,10 +257,10 @@ module Fortran
 
   def sp_module(_module)
     modulename=_module.e[0].name
-    # Do not export info on private objects
-    modinfo=env.dup.delete_if { |k,v| v["access"]=="private" }
     # Do not export symbol keys, which are for internal purposes only
-    modinfo.delete_if { |k,v| k.is_a?(Symbol) }
+    modinfo=env.dup.delete_if { |k,v| k.is_a?(Symbol) }
+    # Do not export info on private objects
+    modinfo.delete_if { |k,v| v["access"]=="private" }
     unless modinfo.empty?
       File.open(envfile(modulename),"w") { |f| f.write(YAML.dump(modinfo)) }
     end
@@ -592,7 +592,7 @@ module Fortran
   # Specific Subclasses
 
   class Access_Id_List < T
-    def names() [e[0].name]+e[1].e.inject([]) { |m,x| m.push(x.name) } end
+    def names() [e[0].name]+e[1].e.reduce([]) { |m,x| m.push(x.name) } end
   end
 
   class Access_Id_List_Pair < T
@@ -664,7 +664,15 @@ module Fortran
   end
 
   class Array_Names_And_Specs < E
-    def names() [e[0].name]+e[1].e.inject([]) { |m,x| m.push(x.name) } end
+
+    def items
+      e[1].e.reduce([e[0]]) { |m,x| m.push(x) }
+    end
+
+    def names
+      e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
+    end
+
   end
 
   class Array_Section < E
@@ -708,15 +716,18 @@ module Fortran
     end
 
     def post
-# NEED TO HANDLE DIMENSION STMT & DIMENSTION ATTR TOO !!!
       envget
+      ok=true
       if (entity_decl=self.ancestor(Entity_Decl))
         array_name=entity_decl.name
-        p1=(env[:args] and env[:args].include?(array_name))?(true):(false)
-        unless p1
-          code="#{self}"
-          replace_element(code,:deferred_shape_spec_list)
-        end
+        ok=(env[:args] and env[:args].include?(array_name))?(true):(false)
+      elsif (entity_decl=self.ancestor(Array_Name_And_Spec))
+        array_name=entity_decl.name
+        ok=(env[array_name]["lb1"]=="_deferred")?(false):(true)
+      end
+      unless ok
+        code="#{self}"
+        replace_element(code,:deferred_shape_spec_list)
       end
     end
 
