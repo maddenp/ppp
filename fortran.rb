@@ -459,7 +459,7 @@ module Fortran
     end
 
     def declare(type,name,attrs=[])
-      attrs=[attrs] unless attrs.is_a?(Array)
+      attrs=(attrs.is_a?(Array))?(attrs):([attrs])
       p=declaration_constructs
       envget(p)
       varenv=env[name]

@@ -295,7 +295,7 @@ module Fortran
       use("module_decomp")
       use("nnt_types_module")
       tag="ppp__tag_#{@@tag+=1}"
-      declare("integer",tag,["save"])
+      declare("integer",tag,"save")
       v=[e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
       nvars=v.size
       vars=v.reduce([]) { |m,x| m.push("#{x}") }.join(",")
