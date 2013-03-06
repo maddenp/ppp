@@ -591,6 +591,26 @@ module Fortran
 
   # Specific Subclasses
 
+  class AC_Implied_Do_Control < T
+
+    def to_s
+      s="#{e[0]}#{e[1]}#{e[2]}"
+      s+="#{e[3].e[0]}#{e[3].e[1]}" if e[3].e
+      s
+    end
+
+  end
+
+  class AC_Value_List < T
+
+    def to_s
+      s="#{e[0]}"
+      s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
+      s
+    end
+
+  end
+
   class Access_Id_List < T
     def names() [e[0].name]+e[1].e.reduce([]) { |m,x| m.push(x.name) } end
   end
@@ -610,6 +630,14 @@ module Fortran
   class Access_Stmt_Option < T
     def names() e[1].names end
     def to_s() "#{ik(e[0],"::"," ")}#{e[1]}" end
+  end
+
+  class Add_Operand < T
+
+    def to_s
+      "#{e[0]}"+((e[1].e)?("#{e[1].e[0]}#{e[1].e[1]}"):(""))
+    end
+
   end
 
   class Allocatable_Stmt < T
@@ -1076,6 +1104,14 @@ module Fortran
 
   end
 
+  class Expr < T
+
+    def to_s
+      "#{e[0]}"+((e[1].e)?("#{e[1].e[0]}#{e[1].e[1]}"):(""))
+    end
+
+  end
+
   class Function_Reference < T
   end
 
@@ -1192,6 +1228,11 @@ module Fortran
   end
 
   class Mult_Operand < T
+
+    def to_s
+      "#{e[0]}"+((e[1].e)?("#{e[1].e[0]}#{e[1].e[1]}"):(""))
+    end
+
   end
 
   class Name < T

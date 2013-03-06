@@ -15,18 +15,18 @@ grammar Fortran
   rule ac_implied_do_control
     # F90:R434
 
-    ac_do_variable t_equal scalar_int_expr ( t_comma scalar_int_expr )? <E>
+    ac_do_variable t_equal scalar_int_expr ( t_comma scalar_int_expr )? <AC_Implied_Do_Control>
   end
 
   rule ac_value
     # F90:R432
 
-    expr !t_equal /
-    ac_implied_do
+    ac_implied_do /
+    expr !t_equal <E>
   end
 
   rule ac_value_list
-    ac_value ( t_comma ac_value )* <E>
+    ac_value ( t_comma ac_value )* <AC_Value_List>
   end
 
   rule access_id
@@ -135,7 +135,7 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( add_operand mult_op)? mult_operand
 
-    mult_operand ( mult_op add_operand )? <T>
+    mult_operand ( mult_op add_operand )? <Add_Operand>
   end
 
   rule and_op
@@ -1267,7 +1267,7 @@ grammar Fortran
   rule equiv_operand
     # F90:R715
 
-    not_op? level_4_expr <T>
+    not_op? level_4_expr <E>
   end
 
   rule equivalence_object
@@ -1369,7 +1369,7 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( expr defined_binary_op )? level_5_expr
 
-    level_5_expr ( defined_binary_op expr )? <T>
+    level_5_expr ( defined_binary_op expr )? <Expr>
   end
 
   rule expr_list
@@ -1898,7 +1898,7 @@ grammar Fortran
   rule level_1_expr
     # F90:R703
 
-    defined_unary_op? primary <T>
+    defined_unary_op? primary <E>
   end
 
   rule level_2_expr
@@ -1907,7 +1907,7 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_2_expr? add_op )? add_operand
 
-    add_op? add_operand level_2_expr? <T>
+    add_op? add_operand level_2_expr? <E>
   end
 
   rule level_3_expr
@@ -1916,11 +1916,11 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_3_expr concat_op )? level_2_expr
 
-    level_2_expr level_3_expr_option? <T>
+    level_2_expr level_3_expr_option? <E>
   end
 
   rule level_3_expr_option
-    concat_op level_3_expr <T>
+    concat_op level_3_expr <E>
   end
 
   rule level_4_expr
@@ -1929,11 +1929,11 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_3_expr rel_op )? level_3_expr
 
-    level_3_expr level_4_expr_option? <T>
+    level_3_expr level_4_expr_option? <E>
   end
 
   rule level_4_expr_option
-    rel_op level_3_expr <T>
+    rel_op level_3_expr <E>
   end
 
   rule level_5_expr
@@ -1942,7 +1942,7 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_5_expr equiv_op)? equiv_operand
 
-    equiv_operand level_5_expr_option? <T>
+    equiv_operand level_5_expr_option? <E>
   end
 
   rule level_5_expr_option
