@@ -142,14 +142,6 @@ module Fortran
     @@dolabels.pop if nonblock_do_end?(node)
   end
 
-  def post
-    if e
-      e.each { |x| x.post }
-      e.compact!
-    end
-    self
-  end
-
   def sa(e)
     # space after: If the [e]lement's string form is empty, return that; else
     # return its string form with a trailing space appended.
@@ -359,14 +351,6 @@ module Fortran
     indent(("#{sa(e[0])}"+s.chomp).strip)+"\n"
   end
 
-  def translate
-    if e
-      e.each { |x| x.translate }
-      e.compact!
-    end
-    self
-  end
-
   def use_add(modulename,usenames,localnames)
     names=localnames.zip(usenames)
     unless @@uses[modulename]
@@ -417,8 +401,6 @@ module Fortran
 
   class Treetop::Runtime::SyntaxNode
 
-    alias e elements
-
     def descendants(class_or_classes)
       c=(class_or_classes.is_a?(Array))?(class_or_classes):([class_or_classes])
       if self.e
@@ -428,9 +410,29 @@ module Fortran
       []
     end
 
+    def post_children
+      if e
+        e.each { |x| x.post }
+        e.compact!
+      end
+      self
+    end
+
     def to_s
       ""
     end
+
+    def translate_children
+      if e
+        e.each { |x| x.translate }
+        e.compact!
+      end
+      self
+    end
+
+    alias e elements
+    alias post post_children
+    alias translate translate_children
 
   end
 
@@ -757,6 +759,7 @@ module Fortran
         code="#{self}"
         replace_element(code,:deferred_shape_spec_list)
       end
+      post_children
     end
 
   end

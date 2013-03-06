@@ -112,6 +112,7 @@ module Fortran
       spec=e[2].spec
       varenv=env[var]
       distribute_array_bounds(spec,varenv)
+      translate_children
     end
 
   end
@@ -138,6 +139,7 @@ module Fortran
         end
       end
       distribute_array_bounds(spec,varenv)
+      translate_children
     end
 
   end
@@ -160,6 +162,7 @@ module Fortran
         code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
         replace_element(code,:expr)
       end
+      translate_children
     end
 
   end
@@ -193,6 +196,7 @@ module Fortran
           end
         end
       end
+      translate_children
     end
 
   end

@@ -2291,7 +2291,7 @@ grammar Fortran
   end
 
   rule parenthesized_expr
-    t_paren_l expr t_paren_r <T>
+    t_paren_l expr t_paren_r <E>
   end
 
   rule parenthesized_section_subscript_list
