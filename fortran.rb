@@ -243,9 +243,9 @@ module Fortran
   def sp_function_stmt(dummy_arg_name_list)
     envpush
     if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
-      first=dummy_arg_name_list.e[0].e[0]
+      first="#{dummy_arg_name_list.e[0]}"
       rest=dummy_arg_name_list.e[1].e
-      env[:args]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+      env[:args]=rest.reduce([first]) { |m,x| m.push("#{x.e[1]}") }
     end
     true
   end
@@ -284,9 +284,9 @@ module Fortran
     if dummy_arg_list_option.e
       if dummy_arg_list_option.e[1].is_a?(Dummy_Arg_List)
         dummy_arg_list=dummy_arg_list_option.e[1]
-        first=dummy_arg_list.e[0].e[0]
+        first="#{dummy_arg_list.e[0]}"
         rest=dummy_arg_list.e[1].e
-        env[:args]=["#{first}"]+rest.reduce([]) { |m,x| m.push("#{x.e[1]}") }
+        env[:args]=rest.reduce([first]) { |m,x| m.push("#{x.e[1]}") }
       end
     end
     true
