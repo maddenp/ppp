@@ -756,6 +756,7 @@ module Fortran
     end
 
     def post
+      post_children
       envget
       ok=true
       if (entity_decl=self.ancestor(Entity_Decl))
@@ -769,7 +770,6 @@ module Fortran
         code="#{self}"
         replace_element(code,:deferred_shape_spec_list)
       end
-      post_children
     end
 
   end
