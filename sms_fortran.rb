@@ -107,12 +107,12 @@ module Fortran
   class Array_Name_And_Spec < E
 
     def translate
+      translate_children
       envget
       var="#{e[0]}"
       spec=e[2].spec
       varenv=env[var]
       distribute_array_bounds(spec,varenv)
-      translate_children
     end
 
   end
@@ -120,6 +120,7 @@ module Fortran
   class Entity_Decl_1 < Entity_Decl
 
     def translate
+      translate_children
       envget
       var="#{e[0]}"
       fail "'#{var}' not found in environment" unless (varenv=env[var])
@@ -139,7 +140,6 @@ module Fortran
         end
       end
       distribute_array_bounds(spec,varenv)
-      translate_children
     end
 
   end
@@ -147,6 +147,7 @@ module Fortran
   class Name < T
 
     def translate
+      translate_children
       envget
       if tolocal=env[:tolocal] and p=tolocal[name]
         case p.key
@@ -162,7 +163,6 @@ module Fortran
         code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
         replace_element(code,:expr)
       end
-      translate_children
     end
 
   end
@@ -170,6 +170,7 @@ module Fortran
   class Nonlabel_Do_Stmt < T
 
     def translate
+      translate_children
       envget
       unless env[:serial]
         if parallel=env[:parallel]
@@ -196,7 +197,6 @@ module Fortran
           end
         end
       end
-      translate_children
     end
 
   end
