@@ -1798,7 +1798,7 @@ grammar Fortran
   rule io_implied_do
     # F90:R916
 
-    t_paren_l io_implied_do_object_list t_comma io_implied_do_control t_paren_r <T>
+    t_paren_l io_implied_do_object_list t_comma io_implied_do_control t_paren_r <E>
   end
 
   rule io_implied_do_control
@@ -1810,12 +1810,12 @@ grammar Fortran
   rule io_implied_do_object
     # F90:R917
 
-    output_item !t_equal <T> /
-    input_item !t_equal <T>
+    output_item !t_equal <E> /
+    input_item !t_equal <E>
   end
 
   rule io_implied_do_object_list
-    io_implied_do_object ( t_comma io_implied_do_object )* <T>
+    io_implied_do_object ( t_comma io_implied_do_object )* <IO_Implied_Do_Object_List>
   end
 
   rule io_unit

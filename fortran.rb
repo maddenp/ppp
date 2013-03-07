@@ -1188,6 +1188,16 @@ module Fortran
     def to_s() bb(stmt(space)) end
   end
 
+  class IO_Implied_Do_Object_List < T
+
+    def to_s
+      s="#{e[0]}"
+      s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
+      s
+    end
+
+  end
+
   class Kind_Selector < T
     def kind() "#{e[2]}" end
   end
