@@ -1295,6 +1295,16 @@ module Fortran
     def to_s() stmt("#{e[1]}#{ik(e[2],"::"," ")}#{e[3]}") end
   end
 
+  class Output_Item_List < T
+
+    def to_s
+      s="#{e[0]}"
+      s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
+      s
+    end
+
+  end
+
   class Parenthesized_Deferred_Shape_Spec_List < T
 
     def abstract_boundslist
