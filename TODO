@@ -128,3 +128,6 @@ x directives done
   directives that appear outside any declarative or executable context),
   'directive' appears in rule positions where it should not eventually be
   necessary.
+
+- After replacing an element or statement, walk up tree replacing text_value
+  with new version while ancestor text_value = *old* replaced node's text_value?
