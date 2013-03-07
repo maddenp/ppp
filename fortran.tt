@@ -115,11 +115,11 @@ grammar Fortran
   rule actual_arg_spec
     # F90:R1211
 
-    keyword_option actual_arg <T>
+    keyword_option actual_arg <E>
   end
 
   rule actual_arg_spec_list
-    actual_arg_spec ( t_comma actual_arg_spec )* <T>
+    actual_arg_spec ( t_comma actual_arg_spec )* <Actual_Arg_Spec_List>
   end
 
   rule add_op

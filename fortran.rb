@@ -634,6 +634,16 @@ module Fortran
     def to_s() "#{ik(e[0],"::"," ")}#{e[1]}" end
   end
 
+  class Actual_Arg_Spec_List < T
+
+    def to_s
+      s="#{e[0]}"
+      s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
+      s
+    end
+
+  end
+
   class Add_Operand < T
 
     def to_s
@@ -1115,7 +1125,7 @@ module Fortran
 
   end
 
-  class Function_Reference < T
+  class Function_Reference < E
   end
 
   class Function_Stmt < T
