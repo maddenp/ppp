@@ -2816,7 +2816,7 @@ grammar Fortran
   rule stmt_function_stmt
     # F90:R1226
 
-    label:label? function_name t_paren_l dummy_arg_name_list? t_paren_r t_equal scalar_expr t_newline <StmtC>
+    label:label? function_name t_paren_l dummy_arg_name_list? t_paren_r t_equal scalar_expr t_newline <Stmt_Function_Stmt>
   end
 
   rule stop_code

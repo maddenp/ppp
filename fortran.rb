@@ -1378,6 +1378,10 @@ module Fortran
     def kind() "#{e[1]}" end
   end
 
+  class Stmt_Function_Stmt < StmtC
+    def name() "#{e[1]}" end
+  end
+
   class Subroutine_Subprogram < Scoping_Unit
   end
 
