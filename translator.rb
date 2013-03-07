@@ -166,14 +166,14 @@ module Translator
       puts s if debug
       @@incdirs=props[:incdirs]
       raw_tree=@@fp.parse(s,:root=>root)
-      raw_tree=raw_tree.post # post-process raw tree
+      raw_tree=raw_tree.post if raw_tree # post-process raw tree
       if debug
         puts "\nRAW TREE\n\n"
         p raw_tree
       end
       re=Regexp.new("^(.+?):in `([^\']*)'$")
       srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
-      fail "PARSE FAILED#{srcmsg}" if raw_tree.nil?
+      fail "PARSE FAILED#{srcmsg}" unless raw_tree
       translated_tree=(props[:translate])?(raw_tree.translate):(nil)
       if debug
         puts "\nTRANSLATED TREE\n\n"
