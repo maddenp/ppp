@@ -461,21 +461,10 @@ module Fortran
     end
 
     def declare(type,name,attrs=[])
-      attrs=(attrs.is_a?(Array))?(attrs):([attrs])
-      p=declaration_constructs
-      envget(p)
-      varenv=env[name]
-      if varenv
-        fail "Variable #{name} is already defined" unless varenv["pppvar"]
-      else
-        attrs=(attrs.empty?)?(""):(",#{attrs.join(",")}")
-        code="#{type}#{attrs}::#{name}"
-        t=raw(code,:type_declaration_stmt)
-        t.parent=p
-        p.e[0].e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
-        env[name]["pppvar"]=true
-      end
-      envget
+      # Override in *_fortran.rb, restrictions on allowable definitions may
+      # differ between applications. It may be acceptable to simply ignore
+      # a request to define an already-defined variable, in which case a single
+      # method suitable for all applications could be defined here.
     end
 
     def envget(node=self)

@@ -104,6 +104,28 @@ module Fortran
     end
   end
 
+  class T < Treetop::Runtime::SyntaxNode
+
+    def declare(type,name,attrs=[])
+      attrs=(attrs.is_a?(Array))?(attrs):([attrs])
+      p=declaration_constructs
+      envget(p)
+      varenv=env[name]
+      if varenv
+        fail "Variable #{name} is already defined" unless varenv["pppvar"]
+      else
+        attrs=(attrs.empty?)?(""):(",#{attrs.join(",")}")
+        code="#{type}#{attrs}::#{name}"
+        t=raw(code,:type_declaration_stmt)
+        t.parent=p
+        p.e[0].e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
+        env[name]["pppvar"]=true
+      end
+      envget
+    end
+
+  end
+
   class Array_Name_And_Spec < E
 
     def translate
