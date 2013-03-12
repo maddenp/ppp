@@ -498,6 +498,12 @@ module Fortran
       (ancestor(class_or_classes))?(true):(false)
     end
 
+    def list_to_s
+      s="#{e[0]}"
+      s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
+      s
+    end
+    
     def remove
       self.parent.e[self.parent.e.index(self)]=nil
     end
@@ -593,13 +599,7 @@ module Fortran
   end
 
   class AC_Value_List < T
-
-    def to_s
-      s="#{e[0]}"
-      s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
-      s
-    end
-
+    def to_s() list_to_s end
   end
 
   class Access_Id_List < T
@@ -624,13 +624,7 @@ module Fortran
   end
 
   class Actual_Arg_Spec_List < T
-
-    def to_s
-      s="#{e[0]}"
-      s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
-      s
-    end
-
+    def to_s() list_to_s end
   end
 
   class Add_Operand < T
@@ -643,6 +637,18 @@ module Fortran
 
   class Allocatable_Stmt < T
     def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
+  end
+
+  class Allocate_Object_List < T
+    def to_s() list_to_s end
+  end
+
+  class Allocate_Shape_Spec_List < T
+    def to_s() list_to_s end
+  end
+
+  class Allocation_List < T
+    def to_s() list_to_s end
   end
 
   class Arithmetic_If_Stmt < T
@@ -846,12 +852,28 @@ module Fortran
     def to_s() bb(stmt(space,:be)) end
   end
 
+  class Case_Value_Range_List < T
+    def to_s() list_to_s end
+  end
+
+  class Close_Spec_List < T
+    def to_s() list_to_s end
+  end
+
   class Common_Block_Name_And_Object_List < T
     def to_s() "#{ir(e[0],""," ")}#{e[1]}#{e[2]}" end
   end
 
   class Common_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+  end
+
+  class Component_Attr_Spec_List < T
+    def to_s() list_to_s end
+  end
+
+  class Component_Decl_List < T
+    def to_s() list_to_s end
   end
 
   class Component_Def_Stmt < T
@@ -862,12 +884,28 @@ module Fortran
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{ir(e[5],""," ")}#{e[6]}") end
   end
 
+  class Connect_Spec_List < T
+    def to_s() list_to_s end
+  end
+
   class Contains_Stmt < T
     def to_s() bb(stmt(space,:be)) end
   end
 
+  class Data_I_Do_Object_List < T
+    def to_s() list_to_s end
+  end
+
   class Data_Ref < T
     def name() (e[1].e.empty?)?(e[0].name):(e[1].e[-1].e[1].name) end
+  end
+
+  class Data_Stmt_Object_List < T
+    def to_s() list_to_s end
+  end
+
+  class Data_Stmt_Value_List < T
+    def to_s() list_to_s end
   end
 
   class Declaration_Constructs < T
@@ -1049,6 +1087,10 @@ module Fortran
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{sb(e[4])}") end
   end
 
+  class Equivalence_Set_List < T
+    def to_s() list_to_s end
+  end
+
   class Execution_Part < E
   end
 
@@ -1114,6 +1156,14 @@ module Fortran
 
   end
 
+  class Expr_List < T
+    def to_s() list_to_s end
+  end
+
+  class External_Name_List < T
+    def to_s() list_to_s end
+  end
+
   class Function_Reference < E
   end
 
@@ -1142,6 +1192,10 @@ module Fortran
     def to_s() stmt(space) end
   end
 
+  class Implicit_Spec_List < T
+    def to_s() list_to_s end
+  end
+
   class Implicit_Stmt < E
     def to_s() stmt(space) end
   end
@@ -1158,6 +1212,14 @@ module Fortran
 
   class Inner_Shared_Do_Construct < T
     def to_s() cat(:be) end
+  end
+
+  class Input_Item_List < T
+    def to_s() list_to_s end
+  end
+
+  class Inquire_Spec_List < T
+    def to_s() list_to_s end
   end
 
   class Intent_Stmt < T
@@ -1177,14 +1239,16 @@ module Fortran
     def to_s() bb(stmt(space)) end
   end
 
+  class Intrinsic_Procedure_Name_List < T
+    def to_s() list_to_s end
+  end
+
+  class IO_Control_Spec_List < T
+    def to_s() list_to_s end
+  end
+
   class IO_Implied_Do_Object_List < T
-
-    def to_s
-      s="#{e[0]}"
-      s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
-      s
-    end
-
+    def to_s() list_to_s end
   end
 
   class Kind_Selector < T
@@ -1193,6 +1257,14 @@ module Fortran
 
   class Label_Do_Stmt < T
     def to_s() bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")) end
+  end
+
+  class Label_List < T
+    def to_s() list_to_s end
+  end
+
+  class Letter_Spec_List < T
+    def to_s() list_to_s end
   end
 
   class Loop_Control < T
@@ -1255,6 +1327,14 @@ module Fortran
 
   end
 
+  class Named_Constant_Def_List < T
+    def to_s() list_to_s end
+  end
+
+  class Namelist_Group_Object_List < T
+    def to_s() list_to_s end
+  end
+
   class Namelist_Group_Set_Pair < T
     def to_s() "#{ir(e[0],""," ")}#{e[1]}" end
   end
@@ -1295,13 +1375,7 @@ module Fortran
   end
 
   class Output_Item_List < T
-
-    def to_s
-      s="#{e[0]}"
-      s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
-      s
-    end
-
+    def to_s() list_to_s end
   end
 
   class Parenthesized_Deferred_Shape_Spec_List < T
@@ -1324,8 +1398,16 @@ module Fortran
     def name() e[0].name end
   end
 
+  class Pointer_Object_List < T
+    def to_s() list_to_s end
+  end
+
   class Pointer_Stmt < T
     def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
+  end
+
+  class Position_Spec_List < T
+    def to_s() list_to_s end
   end
 
   class Power_Op < T
@@ -1337,6 +1419,10 @@ module Fortran
 
   class Print_Stmt_Output_Item_List < T
     def to_s() "#{e[0]}#{e[1]}" end
+  end
+
+  class Procedure_Name_List < T
+    def to_s() list_to_s end
   end
 
   class Program_Stmt < T
@@ -1384,6 +1470,14 @@ module Fortran
 
   class Save_Stmt_Entity_List < T
     def to_s() "#{ir(e[0],""," ")}#{e[1]}" end
+  end
+
+  class Saved_Entity_List < T
+    def to_s() list_to_s end
+  end
+
+  class Section_Subscript_List < T
+    def to_s() list_to_s end
   end
 
   class Select_Case_Stmt < T

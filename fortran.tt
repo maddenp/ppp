@@ -159,12 +159,12 @@ grammar Fortran
   rule allocate_object
     # F90:R625
 
-    !( t_stat t_equal ) structure_component /
-    !( t_stat t_equal ) variable_name
+    !( t_stat t_equal ) structure_component <E> /
+    !( t_stat t_equal ) variable_name <E>
   end
 
   rule allocate_object_list
-    allocate_object ( t_comma allocate_object )* <T>
+    allocate_object ( t_comma allocate_object )* <Allocate_Object_List>
   end
 
   rule allocate_shape_spec
@@ -176,7 +176,7 @@ grammar Fortran
   rule allocate_shape_spec_list
     # F90:6.3.1
 
-    allocate_shape_spec ( t_comma allocate_shape_spec )* <E>
+    allocate_shape_spec ( t_comma allocate_shape_spec )* <Allocate_Shape_Spec_List>
   end
 
   rule allocate_stat_construct
@@ -202,7 +202,7 @@ grammar Fortran
   end
 
   rule allocation_list
-    allocation ( t_comma allocation )* <T>
+    allocation ( t_comma allocation )* <Allocation_List>
   end
 
   rule alphanumeric_character
@@ -493,7 +493,7 @@ grammar Fortran
   end
 
   rule case_value_range_list
-    case_value_range ( t_comma case_value_range )* <T>
+    case_value_range ( t_comma case_value_range )* <Case_Value_Range_List>
   end
 
   rule char_expr
@@ -566,7 +566,7 @@ grammar Fortran
   end
 
   rule close_spec_list
-    close_spec ( t_comma close_spec )* <T>
+    close_spec ( t_comma close_spec )* <Close_Spec_List>
   end
 
   rule close_stmt
@@ -643,7 +643,7 @@ grammar Fortran
   end
 
   rule component_attr_spec_list
-    component_attr_spec ( t_comma component_attr_spec )* <E>
+    component_attr_spec ( t_comma component_attr_spec )* <Component_Attr_Spec_List>
   end
 
   rule component_attr_spec_list_option
@@ -657,7 +657,7 @@ grammar Fortran
   end
 
   rule component_decl_list
-    component_decl ( t_comma component_decl )* <T>
+    component_decl ( t_comma component_decl )* <Component_Decl_List>
   end
 
   rule component_def_stmt
@@ -714,7 +714,7 @@ grammar Fortran
   end
 
   rule connect_spec_list
-    connect_spec ( t_comma connect_spec )* <T>
+    connect_spec ( t_comma connect_spec )* <Connect_Spec_List>
   end
 
   rule constant
@@ -757,7 +757,7 @@ grammar Fortran
   end
 
   rule data_i_do_object_list
-    data_i_do_object ( t_comma data_i_do_object )* <E>
+    data_i_do_object ( t_comma data_i_do_object )* <Data_I_Do_Object_List>
   end
 
   rule data_i_do_variable
@@ -802,7 +802,7 @@ grammar Fortran
   end
 
   rule data_stmt_object_list
-    data_stmt_object ( t_comma data_stmt_object )* <T>
+    data_stmt_object ( t_comma data_stmt_object )* <Data_Stmt_Object_List>
   end
 
   rule data_stmt_repeat
@@ -840,7 +840,7 @@ grammar Fortran
   end
 
   rule data_stmt_value_list
-    data_stmt_value ( t_comma data_stmt_value )* <T>
+    data_stmt_value ( t_comma data_stmt_value )* <Data_Stmt_Value_List>
   end
 
   rule deallocate_stmt
@@ -1289,7 +1289,7 @@ grammar Fortran
   end
 
   rule equivalence_set_list
-    equivalence_set ( t_comma equivalence_set )* <T>
+    equivalence_set ( t_comma equivalence_set )* <Equivalence_Set_List>
   end
 
   rule equivalence_stmt
@@ -1373,7 +1373,7 @@ grammar Fortran
   end
 
   rule expr_list
-    expr ( t_comma expr )* <E>
+    expr ( t_comma expr )* <Expr_List>
   end
 
   rule extended_intrinsic_op
@@ -1395,7 +1395,7 @@ grammar Fortran
   end
 
   rule external_name_list
-    external_name ( t_comma external_name )* <T>
+    external_name ( t_comma external_name )* <External_Name_List>
   end
 
   rule external_stmt
@@ -1574,7 +1574,7 @@ grammar Fortran
   end
 
   rule implicit_spec_list
-    implicit_spec ( t_comma implicit_spec )* <T>
+    implicit_spec ( t_comma implicit_spec )* <Implicit_Spec_List>
   end
 
   rule implicit_stmt
@@ -1613,7 +1613,7 @@ grammar Fortran
   rule input_item_list
     # F90:9.4.2
 
-    input_item ( t_comma input_item )* <T>
+    input_item ( t_comma input_item )* <Input_Item_List>
   end
 
   rule inquire_spec
@@ -1648,7 +1648,7 @@ grammar Fortran
   end
 
   rule inquire_spec_list
-    inquire_spec ( t_comma inquire_spec )* <T>
+    inquire_spec ( t_comma inquire_spec )* <Inquire_Spec_List>
   end
 
   rule inquire_stmt
@@ -1764,7 +1764,7 @@ grammar Fortran
   end
 
   rule intrinsic_procedure_name_list
-    intrinsic_procedure_name ( t_comma intrinsic_procedure_name )* <T>
+    intrinsic_procedure_name ( t_comma intrinsic_procedure_name )* <Intrinsic_Procedure_Name_List>
   end
 
   rule intrinsic_stmt
@@ -1792,7 +1792,7 @@ grammar Fortran
   end
 
   rule io_control_spec_list
-    io_control_spec ( t_comma io_control_spec )* <T>
+    io_control_spec ( t_comma io_control_spec )* <IO_Control_Spec_List>
   end
 
   rule io_implied_do
@@ -1870,7 +1870,7 @@ grammar Fortran
   end
 
   rule label_list
-    label ( t_comma label )* <T>
+    label ( t_comma label )* <Label_List>
   end
 
   rule len_pair
@@ -1892,7 +1892,7 @@ grammar Fortran
   end
 
   rule letter_spec_list
-    letter_spec ( t_comma letter_spec )* <T>
+    letter_spec ( t_comma letter_spec )* <Letter_Spec_List>
   end
 
   rule level_1_expr
@@ -2103,7 +2103,7 @@ grammar Fortran
   end
 
   rule named_constant_def_list
-    named_constant_def ( t_comma named_constant_def )* <T>
+    named_constant_def ( t_comma named_constant_def )* <Named_Constant_Def_List>
   end
 
   rule namelist_group_name
@@ -2119,7 +2119,7 @@ grammar Fortran
   end
 
   rule namelist_group_object_list
-    namelist_group_object ( t_comma namelist_group_object )* <T>
+    namelist_group_object ( t_comma namelist_group_object )* <Namelist_Group_Object_List>
   end
 
   rule namelist_group_set
@@ -2330,7 +2330,7 @@ grammar Fortran
   end
 
   rule pointer_object_list
-    pointer_object ( t_comma pointer_object )* <T>
+    pointer_object ( t_comma pointer_object )* <Pointer_Object_List>
   end
 
   rule pointer_stmt
@@ -2349,7 +2349,7 @@ grammar Fortran
   end
 
   rule position_spec_list
-    position_spec ( t_comma position_spec )* <T>
+    position_spec ( t_comma position_spec )* <Position_Spec_List>
   end
 
   rule power_op
@@ -2404,7 +2404,7 @@ grammar Fortran
   end
 
   rule procedure_name_list
-    procedure_name ( t_comma procedure_name )* <T>
+    procedure_name ( t_comma procedure_name )* <Procedure_Name_List>
   end
 
   rule program_name
@@ -2564,7 +2564,7 @@ grammar Fortran
   end
 
   rule saved_entity_list
-    saved_entity ( t_comma saved_entity )* <T>
+    saved_entity ( t_comma saved_entity )* <Saved_Entity_List>
   end
 
   rule scalar_char_constant
@@ -2705,7 +2705,7 @@ grammar Fortran
   end
 
   rule section_subscript_list
-    section_subscript ( t_comma section_subscript )* <E>
+    section_subscript ( t_comma section_subscript )* <Section_Subscript_List>
   end
 
   rule select_case_stmt
