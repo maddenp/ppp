@@ -182,7 +182,7 @@ module Fortran
       env[:allocatable].push(var)
       varsetprop(var,"rank","array")
       # Correct for the case where this array has already been seen and its
-      # bounds incorrectly marked as assumed. 
+      # bounds incorrectly marked as assumed.
       env[var].keys.each { |k| env[var][k]="_deferred" if k=~/[lu]b\d+/ }
     end
     # In case this array has not previously been seen, record its array specs.
@@ -503,7 +503,7 @@ module Fortran
       s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
       s
     end
-    
+
     def remove
       self.parent.e[self.parent.e.index(self)]=nil
     end
@@ -639,16 +639,72 @@ module Fortran
     def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
   end
 
+  class Allocate_Object < E
+
+    def item
+      e[1]
+    end
+
+    def name
+      puts e[1].name
+    end
+
+  end
+
   class Allocate_Object_List < T
-    def to_s() list_to_s end
+
+    def items
+      e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
+    end
+
+    def names
+      e[1].e.reduce([e[0].name]) { |m,x| m.push(x.e[1].name) }
+    end
+
+    def to_s
+      list_to_s
+    end
+
   end
 
   class Allocate_Shape_Spec_List < T
     def to_s() list_to_s end
   end
 
+  class Allocate_Stmt < StmtC
+
+    def items
+      e[3].items
+    end
+
+    def names
+      e[3].names
+    end
+
+  end
+
+  class Allocation < E
+
+    def name
+      e[0].name
+    end
+
+  end
+
   class Allocation_List < T
-    def to_s() list_to_s end
+
+    def items
+      e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
+    end
+
+    def names
+      e[1].e.reduce([e[0].name]) { |m,x| m.push(x.e[1].name) }
+    end
+
+    def to_s
+      list_to_s
+    end
+
   end
 
   class Arithmetic_If_Stmt < T
@@ -897,7 +953,11 @@ module Fortran
   end
 
   class Data_Ref < T
-    def name() (e[1].e.empty?)?(e[0].name):(e[1].e[-1].e[1].name) end
+
+    def name
+      (e[1].e.empty?)?(e[0].name):(e[1].e[-1].e[1].name)
+    end
+
   end
 
   class Data_Stmt_Object_List < T

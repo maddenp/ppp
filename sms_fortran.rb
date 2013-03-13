@@ -126,6 +126,15 @@ module Fortran
 
   end
 
+  class Allocate_Stmt < StmtC
+
+    def translate
+      translate_children
+      envget
+    end
+
+  end
+
   class Array_Name_And_Spec < E
 
     def translate

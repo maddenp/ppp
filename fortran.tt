@@ -159,8 +159,8 @@ grammar Fortran
   rule allocate_object
     # F90:R625
 
-    !( t_stat t_equal ) structure_component <E> /
-    !( t_stat t_equal ) variable_name <E>
+    !( t_stat t_equal ) structure_component <Allocate_Object> /
+    !( t_stat t_equal ) variable_name <Allocate_Object>
   end
 
   rule allocate_object_list
@@ -186,7 +186,7 @@ grammar Fortran
   rule allocate_stmt
     # F90:R622
 
-    label:label? t_allocate t_paren_l allocation_list allocate_stat_construct? t_paren_r t_newline <StmtC>
+    label:label? t_allocate t_paren_l allocation_list allocate_stat_construct? t_paren_r t_newline <Allocate_Stmt>
   end
 
   rule allocate_upper_bound
@@ -198,7 +198,7 @@ grammar Fortran
   rule allocation
     # F90:R624
 
-    allocate_object parenthesized_allocate_shape_spec_list? <E>
+    allocate_object parenthesized_allocate_shape_spec_list? <Allocation>
   end
 
   rule allocation_list
