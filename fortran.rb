@@ -12,7 +12,6 @@ module Fortran
   @@serial=false
   @@tolocal=false
   @@tag=-1
-  @@uses={}
 
   def array_props(array_spec,_props)
     dims=0
@@ -328,7 +327,8 @@ module Fortran
     if list.respond_to?(:usenames)
       use_add(m,list.usenames,list.localnames)
     else
-      @@uses[m]=[[:all]]
+      env[:uses]||={}
+      env[:uses][m]=[[:all]]
     end
     modenv(m).each do |x|
       varname=x[0]
@@ -352,13 +352,14 @@ module Fortran
   end
 
   def use_add(modulename,usenames,localnames)
+    env[:uses]||={}
     names=localnames.zip(usenames)
-    unless @@uses[modulename]
-      @@uses[modulename]=names
+    unless env[:uses][modulename]
+      env[:uses][modulename]=names
     else
       unless uses?(modulename,:all)
         names.each do |x|
-          @@uses[modulename].push(x) unless uses?(modulename,x)
+          env[:uses][modulename].push(x) unless uses?(modulename,x)
         end
       end
     end
@@ -372,11 +373,13 @@ module Fortran
   end
 
   def use_localnames(modulename)
-    @@uses[modulename].map { |x| x[0] }
+    return [] unless env[:uses]
+    env[:uses][modulename].map { |x| x[0] }
   end
 
   def use_usenames(modulename)
-    @@uses[modulename].map { |x| x[1] }
+    return [] unless env[:uses]
+    env[:uses][modulename].map { |x| x[1] }
   end
 
   def use_part
@@ -384,7 +387,8 @@ module Fortran
   end
 
   def uses?(modulename,usename)
-    (@@uses[modulename])?(use_localnames(modulename).include?(usename)):(false)
+    return false unless env[:uses]
+    (env[:uses][modulename])?(use_localnames(modulename).include?(usename)):(false)
   end
 
   def vargetprop(n,k)
