@@ -54,6 +54,10 @@ module Fortran
     self.e.map { |x| x.to_s }.join
   end
 
+  def deepcopy
+    Marshal.load(Marshal.dump(self))
+  end
+
   def dolabel_dupe?
     "#{@@dolabels[-1]}"=="#{@@dolabels[-2]}"
   end
@@ -79,13 +83,8 @@ module Fortran
     @@envstack=[{}] if @@envstack.empty?
   end
 
-  def envpush(base=env.dup)
-    @@envstack.push(base)
-  end
-
-  def envswap(new)
-    @@envstack.pop
-    @@envstack.push(new)
+  def envpush
+    @@envstack.push(env.deepcopy)
   end
 
   def indent(s)
@@ -249,7 +248,7 @@ module Fortran
   def sp_module(_module)
     modulename=_module.e[0].name
     # Do not export symbol keys, which are for internal purposes only
-    modinfo=env.dup.delete_if { |k,v| k.is_a?(Symbol) }
+    modinfo=env.deepcopy.delete_if { |k,v| k.is_a?(Symbol) }
     # Do not export info on private objects
     modinfo.delete_if { |k,v| v["access"]=="private" }
     unless modinfo.empty?
@@ -472,7 +471,10 @@ module Fortran
     end
 
     def envget(node=self)
-      envswap(node.myenv) unless node.myenv.object_id==env.object_id
+      unless node.myenv.object_id==env.object_id
+        @@envstack.pop
+        @@envstack.push(node.myenv)
+      end
     end
 
     def execution_part
