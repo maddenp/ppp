@@ -128,10 +128,20 @@ module Fortran
 
   class Allocate_Stmt < StmtC
 
-    def translate
-      translate_children
-      envget
-    end
+#   def translate
+#     translate_children
+#     envget
+#     self.items.each do |x|
+#       varenv=env[x.name]
+#       if varenv["decomp"]
+#         (1..varenv["dims"].to_i).each do |dim|
+#           if (decdim=varenv["dim#{dim}"])
+#             arrdim=decdim-1
+#           end
+#         end
+#       end
+#     end
+#   end
 
   end
 

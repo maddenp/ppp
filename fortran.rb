@@ -646,7 +646,7 @@ module Fortran
     end
 
     def name
-      puts e[1].name
+      e[1].name
     end
 
   end
@@ -820,6 +820,8 @@ module Fortran
       unless ok
         code="#{self}"
         replace_element(code,:deferred_shape_spec_list)
+        varenv=env[array_name]
+        varenv.keys.each { |k| varenv[k]="_deferred" if k=~/[lu]b\d+/ }
       end
     end
 
