@@ -131,3 +131,6 @@ x directives done
 
 - After replacing an element or statement, walk up tree replacing text_value
   with new version while ancestor text_value = *old* replaced node's text_value?
+
+- Better vertical whitespace in output (e.g. before & after functions and sub-
+  routines -- maybe all blocks?)
