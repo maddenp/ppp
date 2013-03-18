@@ -1,0 +1,28 @@
+#!/bin/sh
+
+fail()
+{
+  echo $1
+  exit 1
+}
+
+usage()
+{
+  fail "usage: $(basename $0) socket infile outfile [dir[:dir:...]]"
+}
+
+test $# -lt 3 -o $# -gt 4 && usage
+
+socket="$1"
+infile=$(dirname "$2")/$(basename "$2")
+outfile="$3"
+incdirs="$4"
+
+test -S "$socket" || usage
+test -r "$infile" || usage
+
+cmd="$infile\n$incdirs\n$(cat $infile)"
+
+echo -e "$cmd" | nc -U $socket > $outfile
+
+test -s $outfile || fail "$(basename $0): translation failed"

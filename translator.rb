@@ -1,6 +1,8 @@
 module Translator
 
+  require "fileutils"
   require "ostruct"
+  require "socket"
   require "yaml"
 
   include Fortran
@@ -77,7 +79,7 @@ module Translator
           if incfile[0]=="/" or incfile[0]=="."
             incfile=File.expand_path(File.join(File.dirname(current),incfile))
             unless File.exist?(incfile)
-              fail "Could not find included file #{incfile}"
+              fail("Could not find included file #{incfile}")
             end
           else
             found=false
@@ -90,7 +92,7 @@ module Translator
               end
             end
             unless found
-              fail "Could not find included file #{incfile} on search path"
+              fail("Could not find included file #{incfile} on search path")
             end
           end
           if seen.include?(incfile)
@@ -116,7 +118,7 @@ module Translator
       i=1
       s.split("\n").each do |line|
         m=r.match(line)
-        fail "Detected cpp directive:\n\n#{i}: #{line.strip}" if m
+        fail("Detected cpp directive:\n\n#{i}: #{line.strip}") if m
         i+=1
       end
     end
@@ -173,7 +175,7 @@ module Translator
       end
       re=Regexp.new("^(.+?):in `([^\']*)'$")
       srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
-      fail "PARSE FAILED#{srcmsg}" unless raw_tree
+      fail("PARSE FAILED#{srcmsg}") unless raw_tree
       translated_tree=(props[:translate])?(raw_tree.translate):(nil)
       if debug
         puts "\nTRANSLATED TREE\n\n"
@@ -192,6 +194,40 @@ module Translator
     raw_tree
   end
 
+  def server
+#   socket=File.expand_path("/tmp/#{$0}.#{$$}")
+    socket=File.expand_path("/tmp/socket")
+    FileUtils.rm_f(socket)
+    fail("Socket file #{socket} in use, please free it.") if File.exist?(socket)
+    puts "socket=#{socket}"
+    begin
+      UNIXServer.open(socket) do |server|
+        while true
+          props={}
+          client=server.accept
+          message=client.read.split("\n")
+          srcfile=message.shift
+          props[:srcfile]=srcfile
+          dirlist=message.shift
+          props[:incdirs]=["."]
+          dirlist.split(":").each do |d|
+            fail("No such directory: #{d}") unless File.directory?(d)
+            props[:incdirs].push(d)
+          end
+          s=message.join("\n")
+          client.puts(out(s,:program_units,props))
+          client.close
+        end
+      end
+    rescue Interrupt,Exception=>x
+      m=x.message
+      fail(m) unless m.empty?
+      exit(0)
+    ensure
+      FileUtils.rm_f(socket)
+    end
+  end
+
   def tree(s,root=:program_units,override={})
     props=default_props.merge(override)
     translated_source,raw_tree,translated_tree=process(s,root,props)
@@ -208,7 +244,7 @@ module Translator
         fail(usage) unless dirlist
         dirlist.split(":").each do |d|
           fail("No such directory: #{d}") unless File.directory?(d)
-          props[:incdirs] << d
+          props[:incdirs].push(d)
         end
       when "normalize"
         props[:normalize]=true
