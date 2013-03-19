@@ -1,5 +1,5 @@
-require 'normfree'
-require 'sms_normfree_parser'
+require "normfree"
+require "sms_normfree_parser"
 
 module Normfree
 

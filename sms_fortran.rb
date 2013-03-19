@@ -1,5 +1,5 @@
-require 'fortran'
-require 'sms_fortran_parser'
+require "fortran"
+require "sms_fortran_parser"
 
 module Fortran
 
