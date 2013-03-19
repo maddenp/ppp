@@ -200,6 +200,7 @@ module Translator
     FileUtils.rm_f(socket)
     fail("Socket file #{socket} in use, please free it.") if File.exist?(socket)
     puts "socket=#{socket}"
+    trap('INT') { raise Interrupt }
     begin
       UNIXServer.open(socket) do |server|
         while true
@@ -219,7 +220,9 @@ module Translator
           client.close
         end
       end
-    rescue Interrupt,Exception=>x
+    rescue Interrupt=>x
+      exit(0)
+    rescue Exception=>x
       m=x.message
       fail(m) unless m.empty?
       exit(0)
