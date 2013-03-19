@@ -10,6 +10,11 @@ module Translator
   @@fp=nil # fortran parser
   @@np=nil # normalize parser
 
+  def clear_socket(socket)
+    FileUtils.rm_f(socket)
+    fail "Socket file #{socket} in use, please free it" if File.exist?(socket)
+  end
+
   def default_props
     {
       :debug=>false,
@@ -39,9 +44,9 @@ module Translator
   end
 
   def go
-    fail(usage) unless srcfile=ARGV.pop
+    fail usage unless srcfile=ARGV.pop
     srcfile=File.expand_path(srcfile)
-    fail("Cannot read file: #{srcfile}") unless File.readable?(srcfile)
+    fail "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
     s=File.open(srcfile,"rb").read
     props={:srcfile=>srcfile}
     props=unpack(props,ARGV)
@@ -79,7 +84,7 @@ module Translator
           if incfile[0]=="/" or incfile[0]=="."
             incfile=File.expand_path(File.join(File.dirname(current),incfile))
             unless File.exist?(incfile)
-              fail("Could not find included file #{incfile}")
+              fail "Could not find included file #{incfile}"
             end
           else
             found=false
@@ -92,18 +97,18 @@ module Translator
               end
             end
             unless found
-              fail("Could not find included file #{incfile} on search path")
+              fail "Could not find included file #{incfile} on search path"
             end
           end
           if seen.include?(incfile)
             msg="File #{current} includes #{incfile} recursively:\n"
             msg+=incchain(seen,incfile)
-            fail(msg)
+            fail msg
           end
           unless File.readable?(incfile)
             msg="Could not read file #{incfile} "
             msg+=incchain(seen,incfile)
-            fail(msg)
+            fail msg
           end
           a+=assemble(File.open(incfile,"rb").read,seen+[incfile],incdirs)
         else
@@ -118,7 +123,7 @@ module Translator
       i=1
       s.split("\n").each do |line|
         m=r.match(line)
-        fail("Detected cpp directive:\n\n#{i}: #{line.strip}") if m
+        fail "Detected cpp directive:\n\n#{i}: #{line.strip}" if m
         i+=1
       end
     end
@@ -175,7 +180,7 @@ module Translator
       end
       re=Regexp.new("^(.+?):in `([^\']*)'$")
       srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
-      fail("PARSE FAILED#{srcmsg}") unless raw_tree
+      fail "PARSE FAILED#{srcmsg}" unless raw_tree
       translated_tree=(props[:translate])?(raw_tree.translate):(nil)
       if debug
         puts "\nTRANSLATED TREE\n\n"
@@ -194,12 +199,8 @@ module Translator
     raw_tree
   end
 
-  def server
-#   socket=File.expand_path("/tmp/#{$0}.#{$$}")
-    socket=File.expand_path("/tmp/socket")
-    FileUtils.rm_f(socket)
-    fail("Socket file #{socket} in use, please free it.") if File.exist?(socket)
-    puts "socket=#{socket}"
+  def server(socket)
+    clear_socket(socket)
     trap('INT') { raise Interrupt }
     begin
       UNIXServer.open(socket) do |server|
@@ -208,23 +209,26 @@ module Translator
           client=server.accept
           message=client.read.split("\n")
           srcfile=message.shift
+#puts "\n### srcfile: #{srcfile}"
           props[:srcfile]=srcfile
           dirlist=message.shift
+#puts "### dirlist: #{dirlist}"
           props[:incdirs]=["."]
           dirlist.split(":").each do |d|
-            fail("No such directory: #{d}") unless File.directory?(d)
+            fail "No such directory: #{d}" unless File.directory?(d)
             props[:incdirs].push(d)
           end
           s=message.join("\n")
+#puts "###\n#{s}\n###"
           client.puts(out(s,:program_units,props))
           client.close
         end
       end
     rescue Interrupt=>x
-      exit(0)
+      nil
     rescue Exception=>x
       m=x.message
-      fail(m) unless m.empty?
+      fail m unless m.empty?
       exit(0)
     ensure
       FileUtils.rm_f(socket)
@@ -244,9 +248,9 @@ module Translator
       case opt
       when "-I"
         dirlist=args.pop
-        fail(usage) unless dirlist
+        fail usage unless dirlist
         dirlist.split(":").each do |d|
-          fail("No such directory: #{d}") unless File.directory?(d)
+          fail "No such directory: #{d}" unless File.directory?(d)
           props[:incdirs].push(d)
         end
       when "normalize"
@@ -254,7 +258,7 @@ module Translator
       when "debug"
         props[:debug]=true
       else
-        fail(usage)
+        fail usage
       end
     end
     props

@@ -1,9 +1,13 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env jruby
 
-threads=8
+$: << File.dirname(File.expand_path($0))
 
+server_mode=true
+threads=1
+
+require "common"
 require "fileutils"
-require 'thread'
+require "thread"
 
 def docmd(cmd)
   out=IO.popen(cmd+" 2>&1") { |x| x.readlines.reduce("") { |s,e| s+=e } }
@@ -19,20 +23,21 @@ end
 
 def fail(msg=nil,cmd=nil)
   puts
-  puts "Command: #{cmd}" if cmd
   puts msg if msg
+  puts "Command was: #{cmd}" if cmd
   puts "FAIL"
   exit(1)
 end
 
-def run(q)
-  test(q.deq) until q.empty?
+def run(q,socket)
+  test(q.deq,socket) until q.empty?
 end
 
-def test(t)
+def test(t,socket)
   print "."
   exe("make -C #{t} clean")
-  exe("make -C #{t} exe")
+  x=(socket)?(" SOCKET=#{socket} "):(" ")
+  exe("make -C #{t}#{x}exe")
   e="./a.out"
   stdout=((File.exist?(File.join(t,e)))?(exe("cd #{t} && #{e}")):(""))
   f=File.join(t,"control")
@@ -44,19 +49,30 @@ def test(t)
       msg+="-- end --\n#{t} output actual:\n--begin--\n"
       msg+=stdout
       msg+="-- end --"
-      fail msg
+      fail(msg)
     end
   end
   exe("make -C #{t} clean")
 end
 
-fail "Need at least one thread to run tests" unless threads>0
+if server_mode
+  socket=File.expand_path("./socket.#{$$}")
+  clear_socket(socket)
+  server=Thread.new { server(socket) }
+  sleep 1 until File.exist?(socket)
+else
+  socket=nil
+end
+
+fail("Need at least one thread to run tests") unless threads>0
 exe("make")
 tdir="tests"
 tests=(ARGV[0])?(["#{tdir}/#{ARGV[0]}"]):(Dir.glob("#{tdir}/t*").sort)
 q=Queue.new
 tests.each { |e| q.enq(e) }
-(1..threads).reduce([]) { |m,e| m << Thread.new { run(q) } }.each { |e| e.join }
+(1..threads).reduce([]) { |m,e| m << Thread.new { run(q,socket) } }.each { |e| e.join }
 puts "\nOK (#{tests.size} tests)"
+
+server.raise(Interrupt) if server_mode
 
 # paul.a.madden@noaa.gov

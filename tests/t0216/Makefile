@@ -1,2 +1,2 @@
-INCFLAG=-I include
+INCDIRS=include
 include ../common

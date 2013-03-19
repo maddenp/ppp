@@ -3,17 +3,23 @@
 # not been tested. Set 'FC' appropriately. See http://bit.ly/N6I39Y for more
 # information.
 
-BIN=../../ppp
 EXE=a.out
 EXT=$(suffix $(TEST))
 FC=gfortran
 FFLAGS=-w
+INCFLAG=
 OBJ=$(STEM)_ppp.o
+PPP=../../ppp
+PPPC=../../pppc
 STEM=$(basename $(TEST))
 TARGETS=clean control exe obj translation
 TEST=$(wildcard t.f t.f90)
 TMPFILE=tmpfile
 TRANSLATION=$(STEM)_ppp$(EXT)
+
+ifdef INCDIRS
+INCFLAG=-I $(INCDIRS)
+endif
 
 .PHONY: control
 
@@ -21,7 +27,7 @@ default:
 	$(error Valid targets are: $(TARGETS))
 
 clean:
-	$(RM) $(EXE) $(TMPFILE) $(TRANSLATION) *.mod *.o *.sms
+	$(RM) $(EXE) $(TMPFILE) $(TRANSLATION) *.env *.mod *.o
 
 control: $(TEST)
 ifdef DISABLE_CONTROL
@@ -45,4 +51,8 @@ $(OBJ): $(TRANSLATION)
 	$(FC) $(FFLAGS) -c $(TRANSLATION)
 
 $(TRANSLATION): $(TEST)
-	$(BIN) $(INCFLAG) $(TEST) > $(TRANSLATION)
+ifdef SOCKET
+	$(PPPC) $(SOCKET) $(TEST) $(TRANSLATION) $(INCDIRS) 
+else
+	$(PPP) $(INCFLAG) $(TEST) > $(TRANSLATION)
+endif
