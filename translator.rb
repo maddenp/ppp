@@ -50,6 +50,7 @@ module Translator
     s=File.open(srcfile,"rb").read
     props={:srcfile=>srcfile}
     props=unpack(props,ARGV)
+    @@fp.reset
     puts out(s,:program_units,props)
   end
 
@@ -209,17 +210,15 @@ module Translator
           client=server.accept
           message=client.read.split("\n")
           srcfile=message.shift
-#puts "\n### srcfile: #{srcfile}"
           props[:srcfile]=srcfile
           dirlist=message.shift
-#puts "### dirlist: #{dirlist}"
           props[:incdirs]=["."]
           dirlist.split(":").each do |d|
             fail "No such directory: #{d}" unless File.directory?(d)
             props[:incdirs].push(d)
           end
           s=message.join("\n")
-#puts "###\n#{s}\n###"
+          @@fp.reset
           client.puts(out(s,:program_units,props))
           client.close
         end

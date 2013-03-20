@@ -1,18 +1,5 @@
 module Fortran
 
-  @@access="_default"
-  @@distribute=nil
-  @@dolabels=[]
-  @@envstack=[{}]
-  @@halocomp=false
-  @@incdirs=[]
-  @@level=0
-  @@levelstack=[]
-  @@parallel=false
-  @@serial=false
-  @@tolocal=false
-  @@tag=-1
-
   def array_props(array_spec,_props)
     dims=0
     array_spec.abstract_boundslist.each_index do |i|
@@ -138,6 +125,20 @@ module Fortran
 
   def nonblock_do_end!(node)
     @@dolabels.pop if nonblock_do_end?(node)
+  end
+
+  def reset
+    @@access="_default"
+    @@distribute=nil
+    @@dolabels=[]
+    @@envstack=[{}]
+    @@halocomp=false
+    @@incdirs=[]
+    @@level=0
+    @@levelstack=[]
+    @@parallel=false
+    @@serial=false
+    @@tolocal=false
   end
 
   def sa(e)

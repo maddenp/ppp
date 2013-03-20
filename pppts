@@ -1,9 +1,9 @@
-#!/usr/bin/env jruby
+#!/usr/bin/env ruby
 
 $: << File.dirname(File.expand_path($0))
 
-server_mode=true
-threads=1
+server_mode=false
+threads=8
 
 require "common"
 require "fileutils"
