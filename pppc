@@ -18,8 +18,8 @@ infile=$(dirname "$2")/$(basename "$2")
 outfile="$3"
 incdirs="$4"
 
-test -S "$socket" || usage
-test -r "$infile" || usage
+test -S "$socket" || fail "Not a socket: $socket"
+test -r "$infile" || fail "Cannot open input file: $infile"
 
 cmd="$infile\n$incdirs\n$(cat $infile)"
 
