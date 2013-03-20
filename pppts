@@ -7,15 +7,15 @@ server_mode=true
 threads=8
 
 def pppts_fail(msg=nil,cmd=nil)
-  puts
-  puts msg if msg
-  puts "Command was: #{cmd}" if cmd
-  puts "FAIL"
+  s="\nFAIL"
+  s+=": #{cmd}\n" if cmd
+  msg.split("\n").each { |e| s+="      #{e}\n" } if msg
+  puts s
   exit(1)
 end
 
 def pppts_docmd(cmd)
-  out=IO.popen(cmd+" 2>&1") { |x| x.readlines.reduce("") { |s,e| s+=e } }
+  out=IO.popen(cmd+" 2>&1") { |e| e.readlines.reduce("") { |s,e| s+=e } }
   [($?.exitstatus==0)?(true):(false),out]
 end
 
