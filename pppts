@@ -3,15 +3,19 @@
 require "fileutils"
 require "thread"
 
-server_mode=true
-threads=8
+@server_mode=true
+@threads=8
 
 def pppts_fail(msg=nil,cmd=nil)
   s="\nFAIL"
   s+=": #{cmd}\n" if cmd
   msg.split("\n").each { |e| s+="      #{e}\n" } if msg
   puts s
-  exit(1)
+  if @server_mode and @srvr.alive?
+    @srvr.raise(Interrupt)
+  else
+    exit(1)
+  end
 end
 
 def pppts_docmd(cmd)
@@ -33,9 +37,9 @@ end
 def pppts_start_server
   socket=File.expand_path("./socket.#{$$}")
   clear_socket(socket)
-  srvr=Thread.new { server(socket) }
+  s=Thread.new { server(socket) }
   sleep 1 until File.exist?(socket)
-  [srvr,socket]
+  [s,socket]
 end
 
 def pppts_test(t,socket)
@@ -60,16 +64,16 @@ def pppts_test(t,socket)
   pppts_exe("make -C #{t} clean")
 end
 
-pppts_fail("Need at least one thread to run tests") unless threads>0
+pppts_fail("Need at least one thread to run tests") unless @threads>0
 pppts_exe("make")
 load File.join(File.dirname($0),"common.rb")
-srvr,socket=(server_mode)?(pppts_start_server):(nil)
+@srvr,socket=(@server_mode)?(pppts_start_server):(nil)
 tdir="tests"
 tests=(ARGV[0])?(["#{tdir}/#{ARGV[0]}"]):(Dir.glob("#{tdir}/t*").sort)
 q=Queue.new
 tests.each { |e| q.enq(e) }
-(1..threads).reduce([]) { |m,e| m << Thread.new { pppts_run(q,socket) } }.each { |e| e.join }
+(1..@threads).reduce([]) { |m,e| m << Thread.new { pppts_run(q,socket) } }.each { |e| e.join }
 puts "\nOK (#{tests.size} tests)"
-srvr.raise(Interrupt) if server_mode
+@srvr.raise(Interrupt) if @server_mode
 
 # paul.a.madden@noaa.gov

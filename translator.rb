@@ -227,11 +227,11 @@ module Translator
         end
       end
     rescue Interrupt=>x
-      nil
+      exit(1)
     rescue Exception=>x
       m=x.message
       fail m unless m.empty?
-      exit(0)
+      exit(1)
     ensure
       FileUtils.rm_f(socket)
     end
