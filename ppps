@@ -1,7 +1,4 @@
 #!/usr/bin/env jruby
 
-$: << File.dirname(File.expand_path($0))
-
-require "common"
-
+load File.join(File.dirname($0),"common.rb")
 server("/tmp/socket")

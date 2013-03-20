@@ -1,11 +1,13 @@
 #!/usr/bin/env ruby
 
-$: << File.dirname(File.expand_path($0))
+$: << (basedir=File.dirname(File.expand_path($0))) << File.join(basedir,"lib")
 
 server_mode=false
 threads=8
 
-require "common"
+require "treetop"
+require "fortran"
+require "translator"
 require "fileutils"
 require "thread"
 

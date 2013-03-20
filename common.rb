@@ -1,4 +1,4 @@
-$: << File.join(File.dirname(File.expand_path($0)),"lib")
+$: << (basedir=File.dirname($0)) << File.join(basedir,"lib")
 
 require "treetop"
 require "sms_normfree"
