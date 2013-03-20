@@ -2,6 +2,7 @@ module Translator
 
   require "fileutils"
   require "ostruct"
+  require "pathname"
   require "socket"
   require "yaml"
 
@@ -212,8 +213,10 @@ module Translator
           srcfile=message.shift
           props[:srcfile]=srcfile
           dirlist=message.shift
-          props[:incdirs]=[File.dirname(File.expand_path(srcfile))]
+          srcdir=File.dirname(File.expand_path(srcfile))
+          props[:incdirs]=[srcdir]
           dirlist.split(":").each do |d|
+            d=File.join(srcdir,d) if Pathname.new(d).relative?
             fail "No such directory: #{d}" unless File.directory?(d)
             props[:incdirs].push(d)
           end

@@ -3,8 +3,8 @@
 require "fileutils"
 require "thread"
 
-server_mode=false
-threads=8
+server_mode=true
+threads=1
 
 def pppts_fail(msg=nil,cmd=nil)
   puts
