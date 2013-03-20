@@ -212,7 +212,7 @@ module Translator
           srcfile=message.shift
           props[:srcfile]=srcfile
           dirlist=message.shift
-          props[:incdirs]=["."]
+          props[:incdirs]=[File.dirname(File.expand_path(srcfile))]
           dirlist.split(":").each do |d|
             fail "No such directory: #{d}" unless File.directory?(d)
             props[:incdirs].push(d)
