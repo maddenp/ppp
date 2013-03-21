@@ -8,8 +8,9 @@ module Translator
 
   include Fortran
 
-  @@fp=nil # fortran parser
-  @@np=nil # normalize parser
+  @@fp=nil       # fortran parser
+  @@np=nil       # normalize parser
+  @@server=false # operating in server mode?
 
   def clear_socket(socket)
     FileUtils.rm_f(socket)
@@ -37,11 +38,10 @@ module Translator
   end
 
   def fail(msg)
-    msg "\n#{msg}\n"
-    unless __FILE__=="(irb)"
-      msg "\n"
-      exit 1
-    end
+    s="#{msg}"
+    s+=": #{@@srcfile}" if @@server
+    puts s
+    exit(1) unless @@server
   end
 
   def go
@@ -182,7 +182,10 @@ module Translator
       end
       re=Regexp.new("^(.+?):in `([^\']*)'$")
       srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
-      fail "PARSE FAILED#{srcmsg}" unless raw_tree
+      unless raw_tree
+        fail "PARSE FAILED#{srcmsg}"
+        return # if in server mode and did not exit in fail()
+      end
       translated_tree=(props[:translate])?(raw_tree.translate):(nil)
       if debug
         puts "\nTRANSLATED TREE\n\n"
@@ -201,7 +204,8 @@ module Translator
     raw_tree
   end
 
-  def server(socket)
+  def server(socket,quiet=false)
+    @@server=true
     clear_socket(socket)
     trap('INT') { raise Interrupt }
     begin
@@ -210,10 +214,10 @@ module Translator
           props={}
           client=server.accept
           message=client.read.split("\n")
-          srcfile=message.shift
-          props[:srcfile]=srcfile
+          @@srcfile=message.shift
+          props[:srcfile]=@@srcfile
           dirlist=message.shift
-          srcdir=File.dirname(File.expand_path(srcfile))
+          srcdir=File.dirname(File.expand_path(@@srcfile))
           props[:incdirs]=[srcdir]
           dirlist.split(":").each do |d|
             d=File.join(srcdir,d) if Pathname.new(d).relative?
@@ -222,15 +226,17 @@ module Translator
           end
           s=message.join("\n")
           @@fp.reset
+          puts "Translating #{@@srcfile}" unless quiet
           client.puts(out(s,:program_units,props))
           client.close
         end
       end
-    rescue Interrupt=>x
-      exit(1)
-    rescue Exception=>x
-      m=x.message
-      fail m unless m.empty?
+    rescue Interrupt=>ex
+      exit(0)
+    rescue Exception=>ex
+      s="#{ex.message}\n"
+      s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }
+      fail s
       exit(1)
     ensure
       FileUtils.rm_f(socket)

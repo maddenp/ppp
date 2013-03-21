@@ -106,7 +106,10 @@ module Fortran
       begin
         return YAML.load(File.open(f))
       rescue Exception=>ex
-        fail ex.backtrace.reduce("") { |m,x| m+="#{x}\n" }+"Error reading #{f}"
+        s="#{ex.message}\n"
+        s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }
+        s+="Error reading #{f}"
+        fail s
       end
     end
     {}

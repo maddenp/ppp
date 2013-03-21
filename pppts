@@ -37,7 +37,7 @@ end
 def pppts_start_server
   socket=File.expand_path("./socket.#{$$}")
   clear_socket(socket)
-  s=Thread.new { server(socket) }
+  s=Thread.new { server(socket,true) }
   sleep 1 until File.exist?(socket)
   [s,socket]
 end
