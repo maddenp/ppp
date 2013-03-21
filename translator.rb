@@ -37,9 +37,9 @@ module Translator
   end
 
   def fail(msg)
-    $stderr.puts "\n#{msg}\n"
+    msg "\n#{msg}\n"
     unless __FILE__=="(irb)"
-      puts "\n"
+      msg "\n"
       exit 1
     end
   end

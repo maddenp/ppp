@@ -106,15 +106,14 @@ module Fortran
       begin
         return YAML.load(File.open(f))
       rescue Exception=>ex
-        ex.backtrace.each { |x| puts x }
-        fail "Error reading #{f}"
+        fail ex.backtrace.reduce("") { |m,x| m+="#{x}\n" }+"Error reading #{f}"
       end
     end
     {}
   end
 
   def msg(s)
-    $stderr.write(">|#{s}|<\n")
+    $stderr.write(s)
   end
 
   def nonblock_do_end?(node)
