@@ -61,7 +61,8 @@ module Fortran
     @@envstack.last
   end
 
-  def envfile(m,d=".")
+  def envfile(m,d=nil)
+    d=(defined?(@@srcfile))?(File.dirname(@@srcfile)):(".") if d.nil?
     File.join(File.expand_path(d),"#{m}.env")
   end
 
@@ -129,20 +130,6 @@ module Fortran
     @@dolabels.pop if nonblock_do_end?(node)
   end
 
-  def reset
-    @@access="_default"
-    @@distribute=nil
-    @@dolabels=[]
-    @@envstack=[{}]
-    @@halocomp=false
-    @@incdirs=[]
-    @@level=0
-    @@levelstack=[]
-    @@parallel=false
-    @@serial=false
-    @@tolocal=false
-  end
-
   def sa(e)
     # space after: If the [e]lement's string form is empty, return that; else
     # return its string form with a trailing space appended.
@@ -153,6 +140,21 @@ module Fortran
     # space before: If the [e]lement's string form is empty, return that; else
     # return its string form with a prepended space.
     (e.to_s=="")?(""):(" #{e}")
+  end
+
+  def setup(srcfile)
+    @@access="_default"
+    @@distribute=nil
+    @@dolabels=[]
+    @@envstack=[{}]
+    @@halocomp=false
+    @@incdirs=[]
+    @@level=0
+    @@levelstack=[]
+    @@parallel=false
+    @@serial=false
+    @@srcfile=srcfile
+    @@tolocal=false
   end
 
   def sp_access_stmt(access_spec,access_stmt_option)

@@ -39,7 +39,7 @@ module Translator
 
   def fail(msg)
     s="#{msg}"
-    s+=": #{@@srcfile}" if @@server
+    s+=": #{@@src}" if @@server
     puts s
     exit(1) unless @@server
   end
@@ -51,7 +51,7 @@ module Translator
     s=File.open(srcfile,"rb").read
     props={:srcfile=>srcfile}
     props=unpack(props,ARGV)
-    @@fp.reset
+    @@fp.setup(srcfile)
     puts out(s,:program_units,props)
   end
 
@@ -214,10 +214,11 @@ module Translator
           props={}
           client=server.accept
           message=client.read.split("\n")
-          @@srcfile=message.shift
-          props[:srcfile]=@@srcfile
+          @@src=message.shift
+          fail "No such file: #{@@src}" unless File.exist?(@@src)
+          props[:srcfile]=@@src
           dirlist=message.shift
-          srcdir=File.dirname(File.expand_path(@@srcfile))
+          srcdir=File.dirname(File.expand_path(@@src))
           props[:incdirs]=[srcdir]
           dirlist.split(":").each do |d|
             d=File.join(srcdir,d) if Pathname.new(d).relative?
@@ -225,21 +226,21 @@ module Translator
             props[:incdirs].push(d)
           end
           s=message.join("\n")
-          @@fp.reset
-          puts "Translating #{@@srcfile}" unless quiet
+          @@fp.setup(@@src)
+          puts "Translating #{@@src}" unless quiet
           client.puts(out(s,:program_units,props))
           client.close
         end
       end
     rescue Interrupt=>ex
+      FileUtils.rm_f(socket)
       exit(0)
     rescue Exception=>ex
       s="#{ex.message}\n"
       s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }
       fail s
-      exit(1)
-    ensure
       FileUtils.rm_f(socket)
+      exit(1)
     end
   end
 
