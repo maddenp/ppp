@@ -154,6 +154,7 @@ module Fortran
     @@parallel=false
     @@serial=false
     @@srcfile=srcfile
+    @@tag=-1
     @@tolocal=false
   end
 
