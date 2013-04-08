@@ -44,7 +44,8 @@ module Translator
     exit(1) unless @@server
   end
 
-  def go
+  def go(wrapper)
+    @wrapper=wrapper
     fail usage unless srcfile=ARGV.pop
     srcfile=File.expand_path(srcfile)
     fail "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
@@ -274,8 +275,7 @@ module Translator
   end
 
   def usage
-    f=File.basename(__FILE__)
-    "usage: #{f} [-I dir[:dir:...]] source"
+    "usage: #{File.basename(@wrapper)} [-I dir[:dir:...]] source"
   end
 
 end

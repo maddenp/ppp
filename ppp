@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 
 load File.join(File.dirname($0),"common.rb")
-go
+go $0
