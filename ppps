@@ -4,4 +4,4 @@ p=$(readlink $0) || p=$0
 d=$(dirname  $p)
 b=$(basename $p)
 
-cd $d && java -jar jruby.jar $b.rb $@
+cd $d && java -jar jruby.jar $b.rb $0 $@

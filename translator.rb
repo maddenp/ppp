@@ -275,7 +275,7 @@ module Translator
   end
 
   def usage
-    "usage: #{File.basename(@wrapper)} [-I dir[:dir:...]] source"
+    "Usage: #{File.basename(@wrapper)} [-I dir[:dir:...]] source"
   end
 
 end
