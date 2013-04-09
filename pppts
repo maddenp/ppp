@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 p=$(readlink $0) || p=$0
 d=$(dirname  $p)

@@ -208,7 +208,8 @@ module Translator
   def server(socket,quiet=false)
     @@server=true
     clear_socket(socket)
-    trap('INT') { raise Interrupt }
+    trap('INT')  { raise Interrupt }
+    trap('TERM') { raise Interrupt }
     begin
       UNIXServer.open(socket) do |server|
         while true

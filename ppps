@@ -1,7 +1,33 @@
-#!/bin/sh
+#!/bin/bash
+
+fail() { test -n "$1" && echo $1; exit 1; }
+
+# Names of things
 
 p=$(readlink $0) || p=$0
 d=$(dirname  $p)
 b=$(basename $p)
 
-cd $d && java -jar jruby.jar $b.rb $0 $@
+# Command-line arguments
+
+socket=$1
+pidfile=$2
+
+# Sanity checks
+
+test -z "$socket" -o -z "$pidfile" && fail "Usage: $b <socket> <pidfile>"
+test -e $socket && fail "socket $socket exists, aborting..."
+if [ -e $pidfile ]; then test -w $pidfile; else touch $pidfile; fi
+test $? -eq 0 || fail "pidfile $pidfile not writable, aborting..."
+
+# Server startup
+
+java -jar $d/jruby.jar $d/$b.rb $socket &
+echo $! > $pidfile
+disown
+
+# Block until socket is ready
+
+echo -n "PPP server starting up... "
+while [ ! -S $socket ]; do sleep 1; done
+echo "ok"
