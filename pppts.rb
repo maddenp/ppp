@@ -72,6 +72,10 @@ q=Queue.new
 tests.each { |e| q.enq(e) }
 (1..@threads).reduce([]) { |m,e| m << Thread.new { pppts_run(q,socket) } }.each { |e| e.join }
 puts "\nOK (#{tests.size} tests)"
-@srvr.raise(Interrupt) if @server_mode
+#@srvr.raise(Interrupt) if @server_mode
+if @server_mode
+  @srvr.raise(Interrupt)
+  @srvr.join
+end
 
 # paul.a.madden@noaa.gov
