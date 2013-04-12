@@ -207,6 +207,7 @@ module Translator
 
   def server(socket,quiet=false)
     @@server=true
+    @@src='unknown'
     clear_socket(socket)
     trap('INT')  { raise Interrupt }
     trap('TERM') { raise Interrupt }
@@ -214,7 +215,7 @@ module Translator
       UNIXServer.open(socket) do |server|
         while true
           props={}
-          client=IO.new(server.sysaccept)
+          client=server.accept
           @@src=client.gets.chomp
           dirlist=client.gets.chomp
           lensrc=client.gets.chomp.to_i

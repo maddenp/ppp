@@ -28,6 +28,6 @@ disown
 
 # Block until socket is ready
 
-echo -n "PPP server starting up... "
+echo -n "PPP server starting up: "
 while [ ! -S $socket ]; do sleep 1; done
 echo "ok"

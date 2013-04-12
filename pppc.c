@@ -73,7 +73,7 @@ int main (int argc,char **argv)
   digits=(int)log10((double)lensrc);
   if ((lensrcstr=(char*)malloc(digits+2))==NULL) fail("allocating 'lensrcstr'");
 
-  sprintf(lensrcstr,"%d\n",lensrc);
+  sprintf(lensrcstr,"%d\n",lensrc-1);
   status=write(sock,lensrcstr,strlen(lensrcstr));
   if (status<0) fail("sending lensrcstr");
 
