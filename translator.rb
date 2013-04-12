@@ -214,12 +214,13 @@ module Translator
       UNIXServer.open(socket) do |server|
         while true
           props={}
-          client=server.accept
-          message=client.read.split("\n")
-          @@src=message.shift
+          client=IO.new(server.sysaccept)
+          @@src=client.gets.chomp
+          dirlist=client.gets.chomp
+          lensrc=client.gets.chomp.to_i
+          s=client.read(lensrc)
           fail "No such file: #{@@src}" unless File.exist?(@@src)
           props[:srcfile]=@@src
-          dirlist=message.shift
           srcdir=File.dirname(File.expand_path(@@src))
           props[:incdirs]=[srcdir]
           dirlist.split(":").each do |d|
@@ -227,7 +228,6 @@ module Translator
             fail "No such directory: #{d}" unless File.directory?(d)
             props[:incdirs].push(d)
           end
-          s=message.join("\n")
           @@fp.setup(@@src)
           puts "Translating #{@@src}" unless quiet
           client.puts(out(s,:program_units,props))
