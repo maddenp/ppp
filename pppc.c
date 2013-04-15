@@ -24,7 +24,7 @@ void term(int sock)
 int main (int argc,char **argv)
 {
   char c,*fin,*fsock,*inc,*lensrcstr,*src;
-  int fd,digits,lenfin,leninc,lensrc,sock,status;
+  int bytesout,fd,digits,lenfin,leninc,lensrc,sock,status;
   struct sockaddr_un server;
   struct stat fileinfo;
 
@@ -80,7 +80,18 @@ int main (int argc,char **argv)
   status=write(sock,src,lensrc);
   if (status<0) fail("sending src");
 
-  while (read(sock,&c,1)>0) printf("%c",c);
+  bytesout=0;
+  while (read(sock,&c,1)>0)
+  {
+    ++bytesout;
+    printf("%c",c);
+  }
+
+  if (bytesout==0)
+  {
+    printf("no reply received from server");
+    exit(1);
+  }
 
   close(sock);
   return 0;
