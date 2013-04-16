@@ -135,6 +135,9 @@ x directives done
 - Better vertical whitespace in output (e.g. before & after functions and sub-
   routines -- maybe all blocks?)
 
-- IIRS, parsing of allocate_object is broken, in that the variable_name option
+- IIRC, parsing of allocate_object is broken, in that the variable_name option
   (2nd choice) will never be chosen because structure_component always matches.
   Need some more sophisticated logic...
+
+- Should derived types provided by modules appear in .env files (probably!), and
+  how?
