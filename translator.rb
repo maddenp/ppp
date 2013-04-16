@@ -8,9 +8,10 @@ module Translator
 
   include Fortran
 
-  @@fp=nil       # fortran parser
-  @@np=nil       # normalize parser
-  @@server=false # operating in server mode?
+  @@directive=nil # directives we recognize
+  @@fp=nil        # fortran parser
+  @@np=nil        # normalize parser
+  @@server=false  # operating in server mode?
 
   def clear_socket(socket)
     FileUtils.rm_f(socket)
@@ -29,12 +30,12 @@ module Translator
   end
   
   def directive
-    unless @directive
+    unless @@directive
       f=File.join(File.dirname(File.expand_path($0)),"sentinels")
       d=File.open(f,"rb").read.gsub(/\$/,'\$').split("\n").join("|")
-      @directive=Regexp.new("^\s*!((#{d}).*)",true)
+      @@directive=Regexp.new("^\s*!((#{d}).*)",true)
     end
-    @directive
+    @@directive
   end
 
   def fail(msg)
@@ -255,11 +256,10 @@ module Translator
 
   def unpack(props,args)
     props[:incdirs]=["."]
-    args.reverse!
-    while opt=args.pop
+    while opt=args.shift
       case opt
       when "-I"
-        dirlist=args.pop
+        dirlist=args.shift
         fail usage unless dirlist
         dirlist.split(":").each do |d|
           fail "No such directory: #{d}" unless File.directory?(d)
