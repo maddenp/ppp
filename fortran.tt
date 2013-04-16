@@ -846,7 +846,7 @@ grammar Fortran
   rule deallocate_stmt
     # F90:R631
 
-    label:label? t_deallocate t_paren_l allocate_object_list allocate_stat_construct? t_paren_r t_newline <StmtC>
+    label:label? t_deallocate t_paren_l allocate_object_list allocate_stat_construct? t_paren_r t_newline <Deallocate_Stmt>
   end
 
   rule declaration_construct
@@ -2295,7 +2295,7 @@ grammar Fortran
   end
 
   rule parenthesized_section_subscript_list
-    t_paren_l section_subscript_list t_paren_r <T>
+    t_paren_l section_subscript_list t_paren_r <Parenthesized_Section_Subscript_List>
   end
 
   rule part_name

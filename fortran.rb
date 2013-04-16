@@ -972,6 +972,14 @@ module Fortran
       (e[1].e.empty?)?(e[0].name):(e[1].e[-1].e[1].name)
     end
 
+    def rightmost
+      if e[1].e.empty?
+        e[0]
+      else
+        e[1].e[-1].e[1]
+      end
+    end
+
   end
 
   class Data_Stmt_Object_List < T
@@ -980,6 +988,9 @@ module Fortran
 
   class Data_Stmt_Value_List < T
     def to_s() list_to_s end
+  end
+
+  class Deallocate_Stmt < StmtC
   end
 
   class Declaration_Constructs < T
@@ -1468,8 +1479,24 @@ module Fortran
     def abstract_boundslist() e[1].abstract_boundslist end
   end
 
+  class Parenthesized_Section_Subscript_List < T
+
+    def subscript_list
+      e[1].subscript_list
+    end
+
+  end
+
   class Part_Ref < T
-    def name() e[0].name end
+
+    def name
+      e[0].name
+    end
+
+    def subscript_list
+      (e[1].is_a?(Parenthesized_Section_Subscript_List))?(e[1].subscript_list):([])
+    end
+
   end
 
   class Pointer_Object_List < T
@@ -1551,7 +1578,15 @@ module Fortran
   end
 
   class Section_Subscript_List < T
-    def to_s() list_to_s end
+
+    def subscript_list
+      e[1].elements.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
+    end
+
+    def to_s
+      list_to_s
+    end
+
   end
 
   class Select_Case_Stmt < T

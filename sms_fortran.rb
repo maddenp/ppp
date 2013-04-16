@@ -126,22 +126,49 @@ module Fortran
 
   end
 
-  class Allocate_Stmt < StmtC
+  class Allocate_Object < E
 
-#   def translate
-#     translate_children
-#     envget
-#     self.items.each do |x|
-#       varenv=env[x.name]
-#       if varenv["decomp"]
-#         (1..varenv["dims"].to_i).each do |dim|
-#           if (decdim=varenv["dim#{dim}"])
-#             arrdim=decdim-1
-#           end
-#         end
-#       end
-#     end
-#   end
+    def translate
+      translate_children
+      envget
+      if inside?(Allocate_Stmt)
+        allocate_object=e[1]
+        if allocate_object.is_a?(Data_Ref)
+          data_ref=allocate_object
+          part_ref=data_ref.rightmost
+          var=part_ref.name
+# Not sure what to do here yet. Normally we could use the following two lines
+# instead of the two after that, but if we're looking at e.g.
+#   allocate(a%b(nip))
+# then 'b' is not going to be found in the environment. We'd need to find 'a' in
+# the environment and then... Can we have a decomposed array inside a derived
+# type? A decomposed array *of* dervived type, yes -- but the components?
+
+#         fail "'#{var}' not found in environment" unless (varenv=env[var])
+#         if varenv["decomp"]
+
+          varenv=env[var]
+          if varenv and varenv["decomp"]
+            subscript_list=part_ref.subscript_list
+            newdims=[]
+            subscript_list.each_index do |i|
+              arrdim=i+1
+              if (decdim=varenv["dim#{arrdim}"])
+                newdims.push("dh__local_lb(#{decdim},dh__nestlevel):dh__local_ub(#{decdim},dh__nestlevel)")
+              else
+                newdims.push("#{subscript_list[i]}")
+              end
+            end
+            code="#{var}(#{newdims.join(",")})"
+            replace_element(code,:allocate_object)
+          end
+        else
+          fail "Did not expect to parse a variable_name here -- thought it was broken!"
+        end
+      else
+        # Do not translate inside a deallocate_stmt
+      end
+    end
 
   end
 
@@ -310,11 +337,27 @@ module Fortran
   end
 
   class SMS_Distribute_Begin < SMS
-    def to_s() sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}") end
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
+    end
+
+    def translate
+      remove
+    end
+
   end
 
   class SMS_Distribute_End < SMS
-    def to_s() sms("#{e[2]}") end
+
+    def to_s
+      sms("#{e[2]}")
+    end
+
+    def translate
+      remove
+    end
+
   end
 
   class SMS_Distribute_Dims_1 < SMS
@@ -650,7 +693,7 @@ module Fortran
             newbounds.push(s)
           end
           code=newbounds.join(",")
-#         replace_element(code,:array_spec,spec)
+          replace_element(code,:array_spec,spec)
         end
       end
     end
