@@ -693,7 +693,7 @@ module Fortran
             newbounds.push(s)
           end
           code=newbounds.join(",")
-          replace_element(code,:array_spec,spec)
+#         replace_element(code,:array_spec,spec)
         end
       end
     end
