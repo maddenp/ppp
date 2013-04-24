@@ -24,7 +24,6 @@ test $? -eq 0 || fail "pidfile $pidfile not writable, aborting..."
 
 java -jar $d/jruby.jar $d/$b.rb $socket &
 echo $! > $pidfile
-disown
 
 # Block until socket is ready
 
