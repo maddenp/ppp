@@ -1324,6 +1324,12 @@ module Fortran
     def to_s() bb(stmt(space)) end
   end
 
+  class Internal_Subprograms < T
+    def to_s()
+      e.map { |x| "#{x}" }.join
+    end
+  end
+
   class Intrinsic_Procedure_Name_List < T
     def to_s() list_to_s end
   end
@@ -1514,7 +1520,11 @@ module Fortran
   class Power_Op < T
   end
 
-  class Prefix < T
+  class Prefix_Function < T
+    def to_s() e.map { |x| "#{x}" }.join(" ") end
+  end
+
+  class Prefix_Subroutine < T
     def to_s() e.map { |x| "#{x}" }.join(" ") end
   end
 
