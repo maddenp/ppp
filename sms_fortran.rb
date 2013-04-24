@@ -160,7 +160,7 @@ module Fortran
               end
             end
             code="#{var}(#{newdims.join(",")})"
-            replace_element(code,:allocate_object)
+#           replace_element(code,:allocate_object)
           end
         else
           fail "Did not expect to parse a variable_name here -- thought it was broken!"
@@ -342,9 +342,9 @@ module Fortran
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
-    def translate
-      remove
-    end
+#   def translate
+#     remove
+#   end
 
   end
 
@@ -354,9 +354,9 @@ module Fortran
       sms("#{e[2]}")
     end
 
-    def translate
-      remove
-    end
+#   def translate
+#     remove
+#   end
 
   end
 
