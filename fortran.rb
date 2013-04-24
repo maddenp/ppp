@@ -1514,6 +1514,10 @@ module Fortran
   class Power_Op < T
   end
 
+  class Prefix < T
+    def to_s() e.map { |x| "#{x}" }.join(" ") end
+  end
+
   class Print_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
   end

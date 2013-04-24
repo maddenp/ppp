@@ -2359,10 +2359,16 @@ grammar Fortran
   end
 
   rule prefix
-    # F90:R1217
+    # F90:R1217 + F95:1219
 
-    type_spec t_recursive? <J> /
-    t_recursive type_spec? <J>
+    prefix_option+ <Prefix>
+  end
+
+  rule prefix_option
+    type_spec /
+    t_elemental /
+    t_pure /
+    t_recursive
   end
 
   rule primary
@@ -3037,6 +3043,10 @@ grammar Fortran
     "doubleprecision" <T>
   end
 
+  rule t_elemental
+    "elemental" <T>
+  end
+
   rule t_else
     "else" !( "if" / "where" ) <T>
   end
@@ -3347,6 +3357,10 @@ grammar Fortran
 
   rule t_public
     "public" <Access_Spec>
+  end
+
+  rule t_pure
+    "pure" <T>
   end
 
   rule t_quotemark
