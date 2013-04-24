@@ -528,16 +528,16 @@ module Fortran
       block[block.index(node)]=tree
     end
 
-    def replace_statement(code,rule)
+    def replace_statement(code,rule,node=self)
       tree=raw(code,rule)
-      tree.parent=self.parent
-      block=self.parent.e
-      block[block.index(self)]=tree
+      tree.parent=node.parent
+      block=node.parent.e
+      block[block.index(node)]=tree
     end
 
-    def replace_statements(stmt_pairs)
+    def replace_statements(stmt_pairs,node=self)
       p=stmt_pairs.shift
-      s=replace_statement(p[0],p[1])
+      s=replace_statement(p[0],p[1],node)
       stmt_pairs.each { |p| s=insert_statement(p[0],p[1],s) }
     end
 
