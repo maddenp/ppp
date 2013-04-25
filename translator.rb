@@ -212,9 +212,10 @@ module Translator
     clear_socket(socket)
     trap('INT')  { raise Interrupt }
     trap('TERM') { raise Interrupt }
-    begin
-      UNIXServer.open(socket) do |server|
-        while true
+    monitor=Thread.new { server_mon(Process.getpgrp,socket) }
+    UNIXServer.open(socket) do |server|
+      while true
+        begin
           props={}
           client=server.accept
           @@src=client.gets.chomp
@@ -234,18 +235,40 @@ module Translator
           puts "Translating #{@@src}" unless quiet
           client.puts(out(s,:program_units,props))
           client.close
+        rescue Errno::EPIPE
+          # Handle broken pipe (i.e. other end of the socket dies)
+        rescue Interrupt=>ex
+          server_stop(socket,0)
+        rescue SystemExit=>ex
+          monitor.join
+        rescue Exception=>ex
+          s="Caught exception '#{ex.class}':\n"
+          s+="#{ex.message}\n"
+          s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }
+          fail s
+          server_stop(socket,1)
         end
       end
-    rescue Interrupt=>ex
-      FileUtils.rm_f(socket)
-      exit(0)
-    rescue Exception=>ex
-      s="#{ex.message}\n"
-      s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }
-      fail s
-      FileUtils.rm_f(socket)
-      exit(1)
     end
+  end
+
+  def server_mon(psgroup,socket)
+    while true
+      begin
+        # Try to send no-op signal 0 to the process that started the server. If
+        # that process is no longer running, catch the exception informing us so
+        # and shut down the server.
+        Process.kill(0,psgroup)
+      rescue Errno::ESRCH
+        server_stop(socket,0)
+      end
+      sleep 10
+    end
+  end
+
+  def server_stop(socket,status)
+    FileUtils.rm_f(socket)
+    exit(status)
   end
 
   def tree(s,root=:program_units,override={})
