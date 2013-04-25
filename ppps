@@ -8,6 +8,8 @@ p=$(readlink $0) || p=$0
 d=$(dirname  $p)
 b=$(basename $p)
 
+tool=$(echo $b | sed 's/s$//')
+
 # Command-line arguments
 
 socket=$1
@@ -23,10 +25,15 @@ test $? -eq 0 || fail "pidfile $pidfile not writable, aborting..."
 # Server startup
 
 java -jar $d/jruby.jar $d/$b.rb $socket &
-echo $! > $pidfile
+server_pid=$!
+echo $server_pid > $pidfile
 
-# Block until socket is ready
+# Block until server is ready
 
-echo -n "PPP server starting up: "
-while [ ! -S $socket ]; do sleep 1; done
+echo -n "$tool server starting up: "
+while [ ! -S $socket ]
+do
+  ps $server_pid >/dev/null || fail "Failed to start server"
+  sleep 1
+done
 echo "ok"
