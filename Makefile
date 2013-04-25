@@ -1,6 +1,7 @@
-BINS=$(addsuffix _parser.rb,fortran normfree sms_fortran sms_normfree) pppc
+PPPC=pppc
+PARSERS=$(addsuffix _parser.rb,fortran normfree sms_fortran sms_normfree)
 
-all: $(BINS)
+all: $(PARSERS) $(PPPC)
 
 sms_fortran_parser.rb: fortran_parser.rb
 sms_normfree_parser.rb: normfree_parser.rb
@@ -12,4 +13,4 @@ pppc: pppc.c
 	gcc -Wall $^ -lm -o $@
 
 clean:
-	$(RM) $(BINS) *.env *.mod *.o a.out
+	$(RM) $(PPPC) *.env *.mod *.o a.out

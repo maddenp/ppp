@@ -2,6 +2,5 @@
 *.f90
 *.mod
 *.o
-*_parser.rb
 a.out
 pppc
