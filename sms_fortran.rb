@@ -160,7 +160,19 @@ module Fortran
               end
             end
             code="#{var}(#{newdims.join(",")})"
-#           replace_element(code,:allocate_object)
+            replace_element(code,:allocate_object)
+
+# HACK start
+
+            # See comment for class Allocate_Stmt, below. Here we just mark the
+            # parent allocate statemnt to hide later, since it contains at least
+            # one set of translated array bounds.
+
+            allocate_stmt=ancestor(Allocate_Stmt)
+            allocate_stmt.instance_variable_set(:@smsignore,true)
+
+# HACK end
+
           end
         else
           fail "Did not expect to parse a variable_name here -- thought it was broken!"
@@ -171,6 +183,35 @@ module Fortran
     end
 
   end
+
+# HACK start
+
+  # For now, legacy ppp still needs to see sms$distribute directives, so it
+  # may think that it needs to translate allocate statements with distributed
+  # arrays, though the translation will have already been done in class
+  # Allocate_Object, above. So, wrap the allocate statement in an sms$ignore
+  # block, and summarize in a do-block to we can do a one-for-one statement-
+  # tree replacement.
+
+  class Allocate_Stmt < StmtC
+
+    def translate
+      translate_children
+      if self.instance_variable_get(:@smsignore)
+        code=""
+        code+="do\n"
+        code+="!sms$ignore begin\n"
+        code+="#{self}"
+        code+="!sms$ignore end\n"
+        code+="exit\n"
+        code+="enddo"
+        replace_statement(code,:block_do_construct)
+      end
+    end
+
+  end
+
+# HACK end
 
   class Array_Name_And_Spec < E
 
@@ -342,9 +383,15 @@ module Fortran
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
+# HACK start
+
+# Uncomment when legacy ppp doesn't neeed to translate distribute
+
 #   def translate
 #     remove
 #   end
+
+# HACK end
 
   end
 
@@ -354,9 +401,15 @@ module Fortran
       sms("#{e[2]}")
     end
 
+# HACK start
+
+# Uncomment when legacy ppp doesn't neeed to translate distribute
+
 #   def translate
 #     remove
 #   end
+
+# HACK end
 
   end
 
@@ -693,7 +746,15 @@ module Fortran
             newbounds.push(s)
           end
           code=newbounds.join(",")
+
+# HACK start
+
+# Uncomment when legacy ppp doesn't neeed to translate distribute
+
 #         replace_element(code,:array_spec,spec)
+
+# HACK end
+
         end
       end
     end
