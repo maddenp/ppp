@@ -1,7 +1,6 @@
 - directives to do
 
   !sms$create_decomp
-  !sms$distribute
   !sms$ignore begin/end
   !sms$reduce
   !sms$reduce begin/end
@@ -11,6 +10,7 @@ x directives done
 
   !sms$barrier
   !sms$compare_var
+  !sms$distribute
   !sms$exchange
   !sms$halo_comp begin/end
   !sms$insert
@@ -19,6 +19,10 @@ x directives done
   !sms$set_communicator
   !sms$to_local begin/end
   !sms$unstructured_grid
+
+- Translate print, write, namelist stuff, other act-like-serial items.
+
+- Remove various HACKS and deal with any fallout.
 
 - REMOVE sms_passthrough and everything related to it.
 
@@ -141,3 +145,7 @@ x directives done
 
 - Should derived types provided by modules appear in .env files (probably!), and
   how?
+
+- Fortran#replace_statements (plural) may be problematic (i.e. it might modify
+  the tree in unsound ways). It may be better to use the block_do_construct
+  trick, replacing a single statement.
