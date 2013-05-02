@@ -13,4 +13,4 @@ $(CLIENT): $(CLIENT).c
 	gcc -Wall $^ -lm -o $@
 
 clean:
-	$(RM) $(CLIENT) *.env *.mod *.o a.out
+	$(RM) $(CLIENT) $(PARSERS) *.env *.mod *.o a.out
