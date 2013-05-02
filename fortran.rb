@@ -469,7 +469,7 @@ module Fortran
       specification_part.e[2]
     end
 
-    def declare(type,name,attrs=[])
+    def declare(type,name,props={})
       # Override in *_fortran.rb, restrictions on allowable definitions may
       # differ between applications. It may be acceptable to simply ignore
       # a request to define an already-defined variable, in which case a single
@@ -518,6 +518,7 @@ module Fortran
 
     def remove
       self.parent.e[self.parent.e.index(self)]=nil
+#     self.parent.e.compact!
     end
 
     def replace_element(code,rule,node=self)
@@ -566,9 +567,19 @@ module Fortran
         end
         if code
           p=use_part
+# HACK start
+          t=raw("!sms$ignore begin",:sms_ignore_begin)
+          t.parent=p
+          p.e.push(t)
+# HACK end
           t=raw(code,:use_stmt)
           t.parent=p
           p.e.push(t)
+# HACK start
+          t=raw("!sms$ignore end",:sms_ignore_end)
+          t.parent=p
+          p.e.push(t)
+# HACK end
         end
       end
     end
