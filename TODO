@@ -1,6 +1,7 @@
 - directives to do
 
   !sms$create_decomp
+  !sms$declare_decomp
   !sms$ignore begin/end
   !sms$reduce
   !sms$reduce begin/end
@@ -35,8 +36,6 @@ x directives done
 - Need tests of all F90:R912 possibilities.
 
 - Need tests of all F90:R924 possibilities.
-
-- In declare(), may need to pass in attr options (e.g. dimension, access)
 
 - Move proc_sms_executable call from sms_executable : sms_barrier to
   executable_construct : sms_executable once sms$ignore begin/end are gone.
@@ -149,3 +148,11 @@ x directives done
 - Fortran#replace_statements (plural) may be problematic (i.e. it might modify
   the tree in unsound ways). It may be better to use the block_do_construct
   trick, replacing a single statement.
+
+- Fortran#declare needs to insert new declarations at the *bottom* of the decl
+  section, not at the top, so that declare() calls can be made, intuitively, in
+  the required order.
+
+- .env file does not contain items added during translation, e.g.
+  module_decomp.env does not even *exist*, much less contain the items added
+  during translation.
