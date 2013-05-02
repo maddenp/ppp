@@ -630,20 +630,130 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_sms_distribute_begin
+    r1 = _nt_sms_declare_decomp
     if r1
       r0 = r1
     else
-      r2 = _nt_sms_distribute_end
+      r2 = _nt_sms_distribute_begin
       if r2
         r0 = r2
       else
-        @index = i0
-        r0 = nil
+        r3 = _nt_sms_distribute_end
+        if r3
+          r0 = r3
+        else
+          @index = i0
+          r0 = nil
+        end
       end
     end
 
     node_cache[:sms_declarative][start_index] = r0
+
+    r0
+  end
+
+  module SmsDeclareDecomp0
+    def sms_sentinel
+      elements[0]
+    end
+
+    def sms_t_declare_decomp
+      elements[1]
+    end
+
+    def t_paren_l
+      elements[2]
+    end
+
+    def sms_decomp_name
+      elements[3]
+    end
+
+    def t_comma
+      elements[4]
+    end
+
+    def scalar_int_literal_constant
+      elements[5]
+    end
+
+    def t_colon
+      elements[6]
+    end
+
+    def sms_t_unstructured
+      elements[7]
+    end
+
+    def t_paren_r
+      elements[8]
+    end
+
+    def t_newline
+      elements[9]
+    end
+  end
+
+  def _nt_sms_declare_decomp
+    start_index = index
+    if node_cache[:sms_declare_decomp].has_key?(index)
+      cached = node_cache[:sms_declare_decomp][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_sentinel
+    s0 << r1
+    if r1
+      r2 = _nt_sms_t_declare_decomp
+      s0 << r2
+      if r2
+        r3 = _nt_t_paren_l
+        s0 << r3
+        if r3
+          r4 = _nt_sms_decomp_name
+          s0 << r4
+          if r4
+            r5 = _nt_t_comma
+            s0 << r5
+            if r5
+              r6 = _nt_scalar_int_literal_constant
+              s0 << r6
+              if r6
+                r7 = _nt_t_colon
+                s0 << r7
+                if r7
+                  r8 = _nt_sms_t_unstructured
+                  s0 << r8
+                  if r8
+                    r9 = _nt_t_paren_r
+                    s0 << r9
+                    if r9
+                      r10 = _nt_t_newline
+                      s0 << r10
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Declare_Decomp,input, i0...index, s0)
+      r0.extend(SmsDeclareDecomp0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_declare_decomp][start_index] = r0
 
     r0
   end
@@ -2754,6 +2864,30 @@ module Fortran
     r0
   end
 
+  def _nt_sms_t_declare_decomp
+    start_index = index
+    if node_cache[:sms_t_declare_decomp].has_key?(index)
+      cached = node_cache[:sms_t_declare_decomp][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("declare_decomp", false, index)
+      r0 = instantiate_node(T,input, index...(index + 14))
+      @index += 14
+    else
+      terminal_parse_failure("declare_decomp")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_declare_decomp][start_index] = r0
+
+    r0
+  end
+
   def _nt_sms_t_distribute
     start_index = index
     if node_cache[:sms_t_distribute].has_key?(index)
@@ -3038,6 +3172,30 @@ module Fortran
     end
 
     node_cache[:sms_t_ubound][start_index] = r0
+
+    r0
+  end
+
+  def _nt_sms_t_unstructured
+    start_index = index
+    if node_cache[:sms_t_unstructured].has_key?(index)
+      cached = node_cache[:sms_t_unstructured][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("unstructured", false, index)
+      r0 = instantiate_node(T,input, index...(index + 12))
+      @index += 12
+    else
+      terminal_parse_failure("unstructured")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_unstructured][start_index] = r0
 
     r0
   end

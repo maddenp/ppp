@@ -106,16 +106,21 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
-    def declare(type,name,attrs=[])
-      attrs=(attrs.is_a?(Array))?(attrs):([attrs])
+    def declare(type,name,props={})
       p=declaration_constructs
       envget(p)
       varenv=env[name]
       if varenv
         fail "Variable #{name} is already defined" unless varenv["pppvar"]
       else
-        attrs=(attrs.empty?)?(""):(",#{attrs.join(",")}")
+        attrs=props[:attrs]||[]
+        attrs=[attrs] unless attrs.is_a?(Array)
+        attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
         code="#{type}#{attrs}::#{name}"
+        dims=props[:dims]
+        code+="(#{dims.join(',')})" if dims
+        init=props[:init]
+        code+="=#{init}" if init
         t=raw(code,:type_declaration_stmt)
         t.parent=p
         p.e[0].e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
@@ -377,6 +382,53 @@ module Fortran
     def to_s() sms(e[2].e.map { |x| x.text_value }.join) end
   end
 
+  class SMS_Declare_Decomp < SMS
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}#{e[8]}")
+    end
+
+#   def translate
+#
+#     # NOTE: Currently, declare() inserts new declarations at the *top* of the
+#     #       decl section, so that they will appear in the opposite of the
+#     #       order of declare() calls. This is stupid and has to be fixed. For
+#     #       now, take care below that parameters are declared before they are
+#     #       used in specification expressions.
+#
+#     use("nnt_types_module")
+#     decomp="#{e[3]}"
+#     declare("integer","dh__s3",{:attrs=>["allocatable"],:dims=>%w[: : :]})
+#     declare("integer","dh__s2",{:attrs=>["allocatable"],:dims=>%w[: : :]})
+#     declare("integer","dh__s1",{:attrs=>["allocatable"],:dims=>%w[: : :]})
+#     declare("integer","dh__e3",{:attrs=>["allocatable"],:dims=>%w[: : :]})
+#     declare("integer","dh__e2",{:attrs=>["allocatable"],:dims=>%w[: : :]})
+#     declare("integer","dh__e1",{:attrs=>["allocatable"],:dims=>%w[: : :]})
+#     declare("integer","dh__upperbounds", {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
+#     declare("integer","dh__lowbounds",   {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
+#     declare("integer","dh__localsize",   {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
+#     declare("integer","dh__local_ub",    {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
+#     declare("integer","dh__local_lb",    {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
+#     declare("integer","dh__halosize",    {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
+#     declare("integer","dh__globalsize",  {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
+#     declare("integer","dh__boundarytype",{:dims=>%w[ppp_max_decomposed_dims]})
+#     declare("integer","dh__nestlevels",  {:dims=>%w[dh__maxnests]})
+#     declare("integer",decomp,            {:dims=>%w[1]})
+#     declare("integer","dh__nregions")
+#     declare("integer","dh__nestlevel")
+#     declare("integer","dh__localhalosize")
+#     declare("integer","dh__index")
+#     declare("integer","dh__ignore")
+#     declare("character*32","dh__decompname")
+#     # HACK start: Do parameters last so they will appear first
+#     declare("integer","dh__maxnests",{:attrs=>"parameter",:init=>"1"})
+#     declare("integer","dh__ppp_max_regions",{:attrs=>"parameter",:init=>"1"})
+#     # HACK end
+#     remove
+#   end
+
+  end
+
   class SMS_Distribute_Begin < SMS
 
     def to_s
@@ -436,7 +488,7 @@ module Fortran
       use("module_decomp")
       use("nnt_types_module")
       tag="ppp__tag_#{@@tag+=1}"
-      declare("integer",tag,"save")
+      declare("integer",tag,{:attrs=>"save"})
       v=[e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
       nvars=v.size
       vars=v.reduce([]) { |m,x| m.push("#{x}") }.join(",")
@@ -755,40 +807,6 @@ module Fortran
 
 # HACK end
 
-        end
-      end
-    end
-
-    def use(modulename,usenames=[])
-      unless uses?(modulename,:all)
-        code="use #{modulename}"
-        unless usenames.empty?
-          list=[]
-          usenames.each do |x|
-            h=x.is_a?(Hash)
-            localname=(h)?(x.keys.first):(nil)
-            usename=(h)?(x.values.first):(x)
-            unless uses?(modulename,usename)
-              list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
-            end
-          end
-          code=((list.empty?)?(nil):("#{code},only:#{list.join(",")}"))
-        end
-        if code
-          p=use_part
-# HACK start
-          t=raw("!sms$ignore begin",:sms_ignore_begin)
-          t.parent=p
-          p.e.push(t)
-# HACK end
-          t=raw(code,:use_stmt)
-          t.parent=p
-          p.e.push(t)
-# HACK start
-          t=raw("!sms$ignore end",:sms_ignore_end)
-          t.parent=p
-          p.e.push(t)
-# HACK end
         end
       end
     end

@@ -91,8 +91,13 @@ grammar Fortran
   end
 
   rule sms_declarative
+    sms_declare_decomp /
     sms_distribute_begin /
     sms_distribute_end
+  end
+
+  rule sms_declare_decomp
+    sms_sentinel sms_t_declare_decomp t_paren_l sms_decomp_name t_comma scalar_int_literal_constant t_colon sms_t_unstructured t_paren_r t_newline <SMS_Declare_Decomp>
   end
 
   rule sms_decomp_name
@@ -238,6 +243,10 @@ grammar Fortran
     "create_decomp" <T>
   end
 
+  rule sms_t_declare_decomp
+    "declare_decomp" <T>
+  end
+
   rule sms_t_distribute
     "distribute" <T>
   end
@@ -284,6 +293,10 @@ grammar Fortran
 
   rule sms_t_ubound
     "ubound" <T>
+  end
+
+  rule sms_t_unstructured
+    "unstructured" <T>
   end
 
   rule sms_t_unstructured_grid
