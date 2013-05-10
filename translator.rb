@@ -8,11 +8,6 @@ module Translator
 
   include Fortran
 
-  @@directive=nil # directives we recognize
-  @@fp=nil        # fortran parser
-  @@np=nil        # normalize parser
-  @@server=false  # operating in server mode?
-
   def clear_socket(socket)
     FileUtils.rm_f(socket)
     fail "Socket file #{socket} in use, please free it" if File.exist?(socket)
@@ -30,19 +25,19 @@ module Translator
   end
   
   def directive
-    unless @@directive
+    unless @directive
       f=File.join(File.dirname(File.expand_path($0)),"sentinels")
       d=File.open(f,"rb").read.gsub(/\$/,'\$').split("\n").join("|")
-      @@directive=Regexp.new("^\s*!((#{d}).*)",true)
+      @directive=Regexp.new("^\s*!((#{d}).*)",true)
     end
-    @@directive
+    @directive
   end
 
   def fail(msg)
     s="#{msg}"
-    s+=": #{@@src}" if @@server
+    s+=": #{@src}" if @server
     puts s
-    exit(1) unless @@server
+    exit(1) unless @server
   end
 
   def go(wrapper)
@@ -53,20 +48,20 @@ module Translator
     s=File.open(srcfile,"rb").read
     props={:srcfile=>srcfile}
     props=unpack(props,ARGV)
-    @@fp.setup(srcfile)
+    @fp.setup(srcfile)
     puts out(s,:program_units,props)
   end
 
   def normalize(s,newline)
-    @@np||=NormfreeParser.new
-    s=s.gsub(directive,'@\1')             # hide directives
-    s=s.gsub(/^\s+/,"")                   # remove leading whitespace
-    s=s.gsub(/[ \t]+$/,"")                # remove trailing whitespace
-    s=s.gsub(/^!.*\n/,"")                 # remove full-line comments
-    s=@@np.parse(@@np.parse(s).to_s).to_s # two normalize passes
-    s=s.sub(/^\n+/,"")                    # remove leading newlines
-    s+="\n" if s[-1]!="\n" and newline    # ensure final newline
-    s=s.gsub(/^@(.*)/i,'!\1')             # show directives
+    np=NormfreeParser.new
+    s=s.gsub(directive,'@\1')          # hide directives
+    s=s.gsub(/^\s+/,"")                # remove leading whitespace
+    s=s.gsub(/[ \t]+$/,"")             # remove trailing whitespace
+    s=s.gsub(/^!.*\n/,"")              # remove full-line comments
+    s=np.parse(np.parse(s).to_s).to_s  # two normalize passes
+    s=s.sub(/^\n+/,"")                 # remove leading newlines
+    s+="\n" if s[-1]!="\n" and newline # ensure final newline
+    s=s.gsub(/^@(.*)/i,'!\1')          # show directives
   end
 
   def out(s,root=:program_units,override={})
@@ -166,7 +161,7 @@ module Translator
 
     props=default_props.merge(override)
     debug=props[:debug]
-    @@fp||=FortranParser.new
+    @fp=FortranParser.new
     s=prepsrc(s) if defined? prepsrc
     s=assemble(s,[props[:srcfile]],props[:incdirs])
     cppcheck(s)
@@ -175,8 +170,8 @@ module Translator
     s=normalize(s,props[:nl])
     unless props[:normalize]
       puts s if debug
-      @@incdirs=props[:incdirs]
-      raw_tree=@@fp.parse(s,:root=>root)
+      @incdirs=props[:incdirs]
+      raw_tree=@fp.parse(s,:root=>root)
       raw_tree=raw_tree.post if raw_tree # post-process raw tree
       if debug
         puts "\nRAW TREE\n\n"
@@ -207,8 +202,8 @@ module Translator
   end
 
   def server(socket,quiet=false)
-    @@server=true
-    @@src='unknown'
+    @server=true
+    @src='unknown'
     clear_socket(socket)
     trap('INT')  { raise Interrupt }
     trap('TERM') { raise Interrupt }
@@ -218,21 +213,21 @@ module Translator
         begin
           props={}
           client=server.accept
-          @@src=client.gets.chomp
+          @src=client.gets.chomp
           dirlist=client.gets.chomp
           lensrc=client.gets.chomp.to_i
           s=client.read(lensrc)
-          fail "No such file: #{@@src}" unless File.exist?(@@src)
-          props[:srcfile]=@@src
-          srcdir=File.dirname(File.expand_path(@@src))
+          fail "No such file: #{@src}" unless File.exist?(@src)
+          props[:srcfile]=@src
+          srcdir=File.dirname(File.expand_path(@src))
           props[:incdirs]=[srcdir]
           dirlist.split(":").each do |d|
             d=File.join(srcdir,d) if Pathname.new(d).relative?
             fail "No such directory: #{d}" unless File.directory?(d)
             props[:incdirs].push(d)
           end
-          @@fp.setup(@@src)
-          puts "Translating #{@@src}" unless quiet
+          @fp.setup(@src)
+          puts "Translating #{@src}" unless quiet
           client.puts(out(s,:program_units,props))
           client.close
         rescue Errno::EPIPE
