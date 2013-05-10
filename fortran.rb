@@ -1,6 +1,8 @@
 module Fortran
 
   @@envstack=[{}]
+  @@level=0
+  @@levelstack=[]
 
   def array_props(array_spec,_props)
     dims=0
@@ -151,8 +153,6 @@ module Fortran
     @dolabels=[]
     @halocomp=false
     @incdirs=[]
-@@level=0
-@@levelstack=[]
     @serial=false
     @tag=-1
     @tolocal=false
