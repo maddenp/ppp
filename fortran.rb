@@ -154,7 +154,7 @@ module Fortran
 @@level=0
 @@levelstack=[]
     @serial=false
-    @@tag=-1
+    @tag=-1
     @@tolocal=false
   end
 
