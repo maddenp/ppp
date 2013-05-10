@@ -156,3 +156,6 @@ x directives done
 - .env file does not contain items added during translation, e.g.
   module_decomp.env does not even *exist*, much less contain the items added
   during translation.
+
+- In translator.rb, think about 'opts' and what is actually optional. Move
+  requirements into the mandatory argslist.
