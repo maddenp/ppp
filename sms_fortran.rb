@@ -72,18 +72,18 @@ module Fortran
   end
 
   def sp_sms_to_local_begin(sms_decomp_name,sms_to_local_lists)
-    fail "Already inside to_local region" if @@tolocal
+    fail "Already inside to_local region" if @tolocal
     envpush
     env[:tolocal]=sms_to_local_lists.vars.each do |var,props|
       props.dh="#{sms_decomp_name}"
     end
-    @@tolocal=true
+    @tolocal=true
     true
   end
 
   def sp_sms_to_local_end
-    fail "Not inside to_local region" unless @@tolocal
-    @@tolocal=false
+    fail "Not inside to_local region" unless @tolocal
+    @tolocal=false
     envpop
     true
   end

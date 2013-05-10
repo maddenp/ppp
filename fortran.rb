@@ -155,7 +155,7 @@ module Fortran
 @@levelstack=[]
     @serial=false
     @tag=-1
-    @@tolocal=false
+    @tolocal=false
   end
 
   def sp_access_stmt(access_spec,access_stmt_option)
