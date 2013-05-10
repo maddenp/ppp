@@ -149,7 +149,7 @@ module Fortran
     @srcfile=srcfile
     @access="_default"
     @dolabels=[]
-    @@halocomp=false
+    @halocomp=false
     @@incdirs=[]
     @@level=0
     @@levelstack=[]

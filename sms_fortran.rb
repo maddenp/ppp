@@ -22,7 +22,7 @@ module Fortran
 
   def sp_sms_halo_comp_begin(halo_comp_pairs)
     fail "Halo computation invalid outside parallel region" unless @parallel
-    fail "Already inside halo-computation region" if @@halocomp
+    fail "Already inside halo-computation region" if @halocomp
     envpush
     dims={}
     dims[1]=halo_comp_pairs.e[0]
@@ -30,13 +30,13 @@ module Fortran
     dims[3]=halo_comp_pairs.e[2].e[1] if halo_comp_pairs.e[2].e
     env[:halocomp]={}
     dims.each { |k,v| env[:halocomp][k]=OpenStruct.new({:lo=>v.lo,:up=>v.up}) }
-    @@halocomp=true
+    @halocomp=true
     true
   end
 
   def sp_sms_halo_comp_end
-    fail "Not inside halo-computation region" unless @@halocomp
-    @@halocomp=false
+    fail "Not inside halo-computation region" unless @halocomp
+    @halocomp=false
     envpop
     true
   end
