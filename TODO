@@ -159,3 +159,5 @@ x directives done
 
 - In translator.rb, think about 'opts' and what is actually optional. Move
   requirements into the mandatory argslist.
+
+- does pppts in server mode adequately indicate the failed test?
