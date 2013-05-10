@@ -1,16 +1,6 @@
 module Fortran
 
-  @access="_default"
-
-  @@dolabels=[]
   @@envstack=[{}]
-  @@halocomp=false
-  @@incdirs=[]
-  @@level=0
-  @@levelstack=[]
-  @@serial=false
-  @@tag=-1
-  @@tolocal=false
 
   def array_props(array_spec,_props)
     dims=0
@@ -58,15 +48,15 @@ module Fortran
   end
 
   def dolabel_dupe?
-    "#{@@dolabels[-1]}"=="#{@@dolabels[-2]}"
+    "#{@dolabels[-1]}"=="#{@dolabels[-2]}"
   end
 
   def dolabel_pop(label)
-    @@dolabels.pop
+    @dolabels.pop
   end
 
   def dolabel_push(label)
-    @@dolabels.push(label)
+    @dolabels.push(label)
   end
 
   def env
@@ -135,11 +125,11 @@ module Fortran
   def nonblock_do_end?(node)
     return false unless node.respond_to?(:label)
     return false if node.label.to_s.empty?
-    ("#{node.label}"=="#{@@dolabels.last}")?(true):(false)
+    ("#{node.label}"=="#{@dolabels.last}")?(true):(false)
   end
 
   def nonblock_do_end!(node)
-    @@dolabels.pop if nonblock_do_end?(node)
+    @dolabels.pop if nonblock_do_end?(node)
   end
 
   def sa(e)
@@ -157,6 +147,15 @@ module Fortran
   def setup(srcfile)
     @parallel=false
     @srcfile=srcfile
+    @access="_default"
+    @dolabels=[]
+    @@halocomp=false
+    @@incdirs=[]
+    @@level=0
+    @@levelstack=[]
+    @@serial=false
+    @@tag=-1
+    @@tolocal=false
   end
 
   def sp_access_stmt(access_spec,access_stmt_option)
