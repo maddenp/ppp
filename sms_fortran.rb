@@ -134,7 +134,6 @@ module Fortran
   class Allocate_Object < E
 
     def translate
-      translate_children
       envget
       if inside?(Allocate_Stmt)
         allocate_object=e[1]
@@ -201,7 +200,6 @@ module Fortran
   class Allocate_Stmt < StmtC
 
     def translate
-      translate_children
       if self.instance_variable_get(:@smsignore)
         code=""
         code+="do\n"
@@ -221,7 +219,6 @@ module Fortran
   class Array_Name_And_Spec < E
 
     def translate
-      translate_children
       envget
       var="#{e[0]}"
       spec=e[2].spec
@@ -234,7 +231,6 @@ module Fortran
   class Entity_Decl_1 < Entity_Decl
 
     def translate
-      translate_children
       envget
       var="#{e[0]}"
       fail "'#{var}' not found in environment" unless (varenv=env[var])
@@ -261,7 +257,6 @@ module Fortran
   class Name < T
 
     def translate
-      translate_children
       envget
       if tolocal=env[:tolocal] and p=tolocal[name]
         case p.key
@@ -284,7 +279,6 @@ module Fortran
   class Nonlabel_Do_Stmt < T
 
     def translate
-      translate_children
       envget
       unless env[:serial]
         if parallel=env[:parallel]

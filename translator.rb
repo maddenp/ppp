@@ -170,7 +170,7 @@ module Translator
       puts s if debug
       @incdirs=opts[:incdirs]
       raw_tree=fp.parse(s,:root=>root)
-      raw_tree=raw_tree.post if raw_tree # post-process raw tree
+      raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
       if debug
         puts "\nRAW TREE\n\n"
         p raw_tree
@@ -181,7 +181,7 @@ module Translator
         fail "PARSE FAILED#{srcmsg}"
         return # if in server mode and did not exit in fail()
       end
-      translated_tree=(opts[:translate])?(raw_tree.translate):(nil)
+      translated_tree=(opts[:translate])?(raw_tree.translate_top):(nil)
       if debug
         puts "\nTRANSLATED TREE\n\n"
         p translated_tree

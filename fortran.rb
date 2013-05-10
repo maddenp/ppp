@@ -1,6 +1,6 @@
 module Fortran
 
-  @@envstack=[{}]
+  @@envstack=[{:level=>-1}]
   @@level=0
   @@levelstack=[]
 
@@ -419,11 +419,21 @@ module Fortran
       []
     end
 
+    def post_common
+      post_children
+      post if respond_to?(:post)
+    end
+
     def post_children
       if e
-        e.each { |x| x.post }
+        e.each { |x| x.post_common }
         e.compact!
       end
+      self
+    end
+
+    def post_top
+      post_common
       self
     end
 
@@ -431,17 +441,25 @@ module Fortran
       ""
     end
 
+    def translate_common
+      translate_children
+      translate if respond_to?(:translate)
+    end
+
     def translate_children
       if e
-        e.each { |x| x.translate }
+        e.each { |x| x.translate_common }
         e.compact!
       end
       self
     end
 
+    def translate_top
+      translate_common
+      self
+    end
+
     alias e elements
-    alias post post_children
-    alias translate translate_children
 
   end
 
@@ -830,7 +848,6 @@ module Fortran
     end
 
     def post
-      post_children
       envget
       ok=true
       if (entity_decl=self.ancestor(Entity_Decl))
