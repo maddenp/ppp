@@ -1,13 +1,24 @@
 module Fortran
 
+  @@access="_default"
+  @@dolabels=[]
+  @@envstack=[{}]
+  @@halocomp=false
+  @@incdirs=[]
+  @@level=0
+  @@levelstack=[]
+  @@serial=false
+  @@tag=-1
+  @@tolocal=false
+
   def array_props(array_spec,_props)
     dims=0
     array_spec.abstract_boundslist.each_index do |i|
       arrdim=i+1
       _props["lb#{arrdim}"]=array_spec.abstract_boundslist[i].alb
       _props["ub#{arrdim}"]=array_spec.abstract_boundslist[i].aub
-      if @@distribute and (decompdim=@@distribute["dim"].index(arrdim))
-        _props["decomp"]=@@distribute["decomp"]
+      if @distribute and (decompdim=@distribute["dim"].index(arrdim))
+        _props["decomp"]=@distribute["decomp"]
         _props["dim#{arrdim}"]=decompdim+1
       end
       dims+=1
@@ -62,7 +73,7 @@ module Fortran
   end
 
   def envfile(m,d=nil)
-    d=(defined?(@@srcfile))?(File.dirname(@@srcfile)):(".") if d.nil?
+    d=(defined?(@srcfile))?(File.dirname(@srcfile)):(".") if d.nil?
     File.join(File.expand_path(d),"#{m}.env")
   end
 
@@ -143,19 +154,8 @@ module Fortran
   end
 
   def setup(srcfile)
-    @@access="_default"
-    @@distribute=nil
-    @@dolabels=[]
-    @@envstack=[{}]
-    @@halocomp=false
-    @@incdirs=[]
-    @@level=0
-    @@levelstack=[]
-    @@parallel=false
-    @@serial=false
-    @@srcfile=srcfile
-    @@tag=-1
-    @@tolocal=false
+    @parallel=false
+    @srcfile=srcfile
   end
 
   def sp_access_stmt(access_spec,access_stmt_option)
@@ -499,7 +499,7 @@ module Fortran
     end
 
     def insert_statement(code,rule,predecessor)
-      tree=raw(code,rule)
+      tree=raw(code,rule,@srcfile)
       tree.parent=predecessor.parent
       block=predecessor.parent.e
       block.insert(block.index(predecessor)+1,tree)
@@ -522,7 +522,7 @@ module Fortran
     end
 
     def replace_element(code,rule,node=self)
-      tree=raw(code,rule,{:nl=>false})
+      tree=raw(code,rule,@srcfile,{:nl=>false})
       node=node.parent while "#{node}"=="#{node.parent}"
       tree.parent=node.parent
       block=node.parent.e
@@ -530,7 +530,7 @@ module Fortran
     end
 
     def replace_statement(code,rule,node=self)
-      tree=raw(code,rule)
+      tree=raw(code,rule,@srcfile)
       tree.parent=node.parent
       block=node.parent.e
       block[block.index(node)]=tree
@@ -568,15 +568,15 @@ module Fortran
         if code
           p=use_part
 # HACK start
-          t=raw("!sms$ignore begin",:sms_ignore_begin)
+          t=raw("!sms$ignore begin",:sms_ignore_begin,@srcfile)
           t.parent=p
           p.e.push(t)
 # HACK end
-          t=raw(code,:use_stmt)
+          t=raw(code,:use_stmt,@srcfile)
           t.parent=p
           p.e.push(t)
 # HACK start
-          t=raw("!sms$ignore end",:sms_ignore_end)
+          t=raw("!sms$ignore end",:sms_ignore_end,@srcfile)
           t.parent=p
           p.e.push(t)
 # HACK end

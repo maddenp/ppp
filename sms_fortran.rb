@@ -8,20 +8,20 @@ module Fortran
   end
 
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
-    fail "Already inside distribute region" if @@distribute
-    @@distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
-    sms_distribute_dims.dims.each { |x| @@distribute["dim"].push(x) }
+    fail "Already inside distribute region" if @distribute
+    @distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
+    sms_distribute_dims.dims.each { |x| @distribute["dim"].push(x) }
     true
   end
 
   def sp_sms_distribute_end
-    fail "Not inside distribute region" unless @@distribute
-    @@distribute=nil
+    fail "Not inside distribute region" unless @distribute
+    @distribute=nil
     true
   end
 
   def sp_sms_halo_comp_begin(halo_comp_pairs)
-    fail "Halo computation invalid outside parallel region" unless @@parallel
+    fail "Halo computation invalid outside parallel region" unless @parallel
     fail "Already inside halo-computation region" if @@halocomp
     envpush
     dims={}
@@ -42,16 +42,16 @@ module Fortran
   end
 
   def sp_sms_parallel_begin(sms_decomp_name,sms_parallel_var_lists)
-    fail "Already inside parallel region" if @@parallel
+    fail "Already inside parallel region" if @parallel
     envpush
     env[:parallel]=OpenStruct.new({:dh=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
-    @@parallel=true
+    @parallel=true
     true
   end
 
   def sp_sms_parallel_end
-    fail "Not inside parallel region" unless @@parallel
-    @@parallel=false
+    fail "Not inside parallel region" unless @parallel
+    @parallel=false
     envpop
     true
   end
@@ -301,9 +301,9 @@ module Fortran
             halo_lo=halo_offsets(decdim).lo
             halo_up=halo_offsets(decdim).up
             if loop_control.is_a?(Loop_Control_1)
-              lo=raw("dh__s#{decdim}(#{loop_control.e[3]},#{halo_lo},dh__nestlevel)",:scalar_numeric_expr,{:nl=>false})
+              lo=raw("dh__s#{decdim}(#{loop_control.e[3]},#{halo_lo},dh__nestlevel)",:scalar_numeric_expr,"",{:nl=>false})
               lo.parent=loop_control
-              up=raw(",dh__e#{decdim}(#{loop_control.e[4].value},#{halo_up},dh__nestlevel)",:loop_control_pair,{:nl=>false})
+              up=raw(",dh__e#{decdim}(#{loop_control.e[4].value},#{halo_up},dh__nestlevel)",:loop_control_pair,"",{:nl=>false})
               up.parent=loop_control
               loop_control.e[3]=lo
               loop_control.e[4]=up

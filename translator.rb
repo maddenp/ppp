@@ -19,7 +19,6 @@ module Translator
       :incdirs=>[],
       :nl=>true,
       :normalize=>false,
-      :srcfile=>nil,
       :translate=>true
     }
   end
@@ -33,11 +32,11 @@ module Translator
     @directive
   end
 
-  def fail(msg)
+  def fail(msg,die=true,srcfile=nil)
     s="#{msg}"
-    s+=": #{@src}" if @server
+    s+=": #{srcfile}" if srcfile
     puts s
-    exit(1) unless @server
+    exit(1) if die
   end
 
   def go(wrapper)
@@ -46,10 +45,8 @@ module Translator
     srcfile=File.expand_path(srcfile)
     fail "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
     s=File.open(srcfile,"rb").read
-    props={:srcfile=>srcfile}
-    props=unpack(props,ARGV)
-    @fp.setup(srcfile)
-    puts out(s,:program_units,props)
+    props=unpack({},ARGV)
+    puts out(s,:program_units,srcfile,props)
   end
 
   def normalize(s,newline)
@@ -64,13 +61,13 @@ module Translator
     s=s.gsub(/^@(.*)/i,'!\1')          # show directives
   end
 
-  def out(s,root=:program_units,override={})
-    props=default_props.merge(override)
-    translated_source,raw_tree,translated_tree=process(s,root,props)
+  def out(s,root,srcfile,props={})
+    props=default_props.merge(props)
+    translated_source,raw_tree,translated_tree=process(s,root,srcfile,props)
     translated_source
   end
 
-  def process(s,root=:program_units,override={})
+  def process(s,root,srcfile,props={})
 
     def assemble(s,seen,incdirs=[])
       current=seen.last
@@ -159,11 +156,12 @@ module Translator
       a.join("\n")
     end
 
-    props=default_props.merge(override)
+    props=default_props.merge(props)
     debug=props[:debug]
-    @fp=FortranParser.new
+    fp=FortranParser.new
+    fp.setup(srcfile)
     s=prepsrc(s) if defined? prepsrc
-    s=assemble(s,[props[:srcfile]],props[:incdirs])
+    s=assemble(s,[srcfile],props[:incdirs])
     cppcheck(s)
     puts "RAW SOURCE\n\n#{s}\n" if debug
     puts "NORMALIZED SOURCE\n\n" if debug
@@ -171,7 +169,7 @@ module Translator
     unless props[:normalize]
       puts s if debug
       @incdirs=props[:incdirs]
-      raw_tree=@fp.parse(s,:root=>root)
+      raw_tree=fp.parse(s,:root=>root)
       raw_tree=raw_tree.post if raw_tree # post-process raw tree
       if debug
         puts "\nRAW TREE\n\n"
@@ -194,16 +192,15 @@ module Translator
     [s,raw_tree,translated_tree]
   end
 
-  def raw(s,root=:program_units,override={})
-    props=default_props.merge(override)
+  def raw(s,root,srcfile,props={})
+    props=default_props.merge(props)
     props[:translate]=false
-    translated_source,raw_tree,translated_tree=process(s,root,props)
+    translated_source,raw_tree,translated_tree=process(s,root,srcfile,props)
     raw_tree
   end
 
   def server(socket,quiet=false)
-    @server=true
-    @src='unknown'
+    srcfile='unknown'
     clear_socket(socket)
     trap('INT')  { raise Interrupt }
     trap('TERM') { raise Interrupt }
@@ -213,22 +210,24 @@ module Translator
         begin
           props={}
           client=server.accept
-          @src=client.gets.chomp
+          srcfile=client.gets.chomp
           dirlist=client.gets.chomp
           lensrc=client.gets.chomp.to_i
           s=client.read(lensrc)
-          fail "No such file: #{@src}" unless File.exist?(@src)
-          props[:srcfile]=@src
-          srcdir=File.dirname(File.expand_path(@src))
+          unless File.exist?(srcfile)
+            fail("No such file: #{srcfile}",false,srcfile)
+          end
+          srcdir=File.dirname(File.expand_path(srcfile))
           props[:incdirs]=[srcdir]
           dirlist.split(":").each do |d|
             d=File.join(srcdir,d) if Pathname.new(d).relative?
-            fail "No such directory: #{d}" unless File.directory?(d)
+            unless File.directory?(d)
+              fail("No such directory: #{d}",false,srcfile)
+            end
             props[:incdirs].push(d)
           end
-          @fp.setup(@src)
-          puts "Translating #{@src}" unless quiet
-          client.puts(out(s,:program_units,props))
+          puts "Translating #{srcfile}" unless quiet
+          client.puts(out(s,:program_units,srcfile,props))
           client.close
         rescue Errno::EPIPE
           # Handle broken pipe (i.e. other end of the socket dies)
@@ -267,9 +266,9 @@ module Translator
     exit(status)
   end
 
-  def tree(s,root=:program_units,override={})
-    props=default_props.merge(override)
-    translated_source,raw_tree,translated_tree=process(s,root,props)
+  def tree(s,root,srcfile,props={})
+    props=default_props.merge(props)
+    translated_source,raw_tree,translated_tree=process(s,root,srcfile,props)
     translated_tree
   end
 
