@@ -1,6 +1,7 @@
 module Fortran
 
-  @@access="_default"
+  @access="_default"
+
   @@dolabels=[]
   @@envstack=[{}]
   @@halocomp=false
@@ -169,7 +170,7 @@ module Fortran
     if access_stmt_option.is_a?(Access_Stmt_Option)
       access_stmt_option.names.each { |x| varsetprop(x,"access",p) }
     else
-      @@access=p
+      @access=p
       env.each do |n,h|
         varsetprop(n,"access",p) if vargetprop(n,"access")=="_default"
       end
@@ -261,7 +262,7 @@ module Fortran
       File.open(envfile(modulename),"w") { |f| f.write(YAML.dump(modinfo)) }
     end
     envpop
-    @@access="_default"
+    @access="_default"
     true
   end
 
@@ -312,7 +313,7 @@ module Fortran
     elsif attrchk(attr_spec_option,:public?)
       varprops.each { |v,p| p["access"]="public" }
     else
-      varprops.each { |v,p| p["access"]=@@access }
+      varprops.each { |v,p| p["access"]=@access }
     end
     varprops.each do |v,p|
       varenv=env[v]||={}
