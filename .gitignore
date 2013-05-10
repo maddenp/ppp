@@ -1,5 +1,4 @@
 *.env
-*.f90
 *.mod
 *.o
 a.out
