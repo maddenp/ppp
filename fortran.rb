@@ -104,7 +104,7 @@ module Fortran
   end
 
   def modenv(m)
-    if d=@@incdirs.find_all { |x| File.exist?(envfile(m,x)) }[0]
+    if d=@incdirs.find_all { |x| File.exist?(envfile(m,x)) }[0]
       f=envfile(m,d)
       begin
         return YAML.load(File.open(f))
@@ -150,7 +150,7 @@ module Fortran
     @access="_default"
     @dolabels=[]
     @halocomp=false
-    @@incdirs=[]
+    @incdirs=[]
     @@level=0
     @@levelstack=[]
     @@serial=false
