@@ -57,16 +57,16 @@ module Fortran
   end
 
   def sp_sms_serial_begin
-    fail "Already inside serial region" if @@serial
+    fail "Already inside serial region" if @serial
     envpush
     env[:serial]=true
-    @@serial=true
+    @serial=true
     true
   end
 
   def sp_sms_serial_end
-    fail "Not inside serial region" unless @@serial
-    @@serial=false
+    fail "Not inside serial region" unless @serial
+    @serial=false
     envpop
     true
   end
