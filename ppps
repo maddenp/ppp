@@ -24,7 +24,7 @@ test $? -eq 0 || fail "pidfile $pidfile not writable, aborting..."
 
 # Server startup
 
-java -jar $d/jruby.jar $d/$b.rb $socket &
+java -server -jar $d/jruby.jar $d/$b.rb $socket &
 server_pid=$!
 echo $server_pid > $pidfile
 
