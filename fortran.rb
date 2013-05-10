@@ -469,8 +469,8 @@ module Fortran
 
     attr_accessor :myenv
 
-    def initialize(a="",b=(0..0),c=[])
-      super(a,b,c)
+    def initialize(*args)
+      super
       @myenv=env
     end
 
