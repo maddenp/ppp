@@ -1,9 +1,5 @@
 module Fortran
 
-  @@envstack=[{:level=>-1}]
-  @@level=0
-  @@levelstack=[]
-
   def array_props(array_spec,_props)
     dims=0
     array_spec.abstract_boundslist.each_index do |i|
@@ -28,24 +24,15 @@ module Fortran
     node.respond_to?(attr) && node.send(attr)
   end
 
-  def bb(s)
-    # block begin
-    @@level+=1
-    s
-  end
-
-  def be
-    # block end
-    @@level-=1 if @@level>0
-  end
-
-  def cat(f=nil)
+  def cat
     # concatenate elements' string representations
-    send(f) if f
     self.e.map { |x| x.to_s }.join
   end
 
   def deepcopy
+#   e=Marshal.load(Marshal.dump(self))
+#   e[:meta]=self[:meta]
+#   e
     Marshal.load(Marshal.dump(self))
   end
 
@@ -77,20 +64,6 @@ module Fortran
 
   def envpush
     @@envstack.push(env.deepcopy)
-  end
-
-  def indent(s)
-    " "*2*@@level+s
-  end
-
-  def lr
-    # level reset
-    @@level=@@levelstack.pop
-  end
-
-  def ls
-    # level set
-    @@levelstack.push(@@level)
   end
 
   def ik(e,c,a)
@@ -351,9 +324,11 @@ module Fortran
     a.map { |x| x.to_s }.join(" ").strip
   end
 
-  def stmt(s,f=nil)
-    send(f) if f
-    indent(("#{sa(e[0])}"+s.chomp).strip)+"\n"
+  def stmt(s)
+#   l=@myenv[:meta].level
+    l=meta.level
+#   puts "### #{s} level id #{@myenv[:meta].object_id} val #{l}"
+    " "*2*l+(("#{sa(e[0])}"+s.chomp).strip)+"\n"
   end
 
   def use_add(modulename,usenames,localnames)
@@ -482,7 +457,45 @@ module Fortran
       end while n=n.parent
       nil
     end
+###
+#   def indent
+#     @myenv[:meta].level+=1
+#     puts "### #{self.class} now @ #{@myenv[:meta].level}"
+#   end
+    def indent
+      meta.level+=1
+#     puts "### #{self.class} now @ #{meta.level}"
+    end
 
+    def unindent
+      m=meta
+      m.level-=1 if m.level>0
+    end
+
+    def root
+      n=self
+      n=n.parent while n.parent
+      n
+    end
+
+    def meta
+      r=root
+      r.myenv[:meta]=Meta.new unless r.myenv[:meta]
+      r.myenv[:meta]
+    end
+
+#   def parent_level
+#     n=self.parent
+#     begin
+#       if n.respond_to?(:myenv) and (l=n.myenv[:level])
+#         puts "### #{n.class} parent #{self.class} @ #{l}"
+#         return l
+#       end
+#     end while n=n.parent
+#     puts "### #{n.class} -> #{self.class} = 0 (default)"
+#     0
+#   end
+###
     def declaration_constructs
       specification_part.e[2]
     end
@@ -515,6 +528,10 @@ module Fortran
       end
       OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
     end
+
+#   def indent_smt(s)
+#     " "*2*@myenv[:level]+s
+#   end
 
     def insert_statement(code,rule,predecessor)
       tree=raw(code,rule,@srcfile)
@@ -939,7 +956,11 @@ module Fortran
   end
 
   class Block_Data_Stmt < T
-    def to_s() bb(stmt(space)) end
+    def to_s
+      s=stmt(space)
+      indent
+      s
+    end
   end
 
   class Call_Stmt < T
@@ -947,7 +968,12 @@ module Fortran
   end
 
   class Case_Stmt < T
-    def to_s() bb(stmt(space,:be)) end
+    def to_s
+      unindent
+      s=stmt(space)
+      indent
+      s
+    end
   end
 
   class Case_Value_Range_List < T
@@ -987,7 +1013,12 @@ module Fortran
   end
 
   class Contains_Stmt < T
-    def to_s() bb(stmt(space,:be)) end
+    def to_s
+      unindent
+      s=stmt(space)
+      indent
+      s
+    end
   end
 
   class Data_I_Do_Object_List < T
@@ -1060,7 +1091,11 @@ module Fortran
   end
 
   class Derived_Type_Stmt < T
-    def to_s() bb(stmt("#{e[1]}#{sb(e[2])} #{e[3]}")) end
+    def to_s
+      s=stmt("#{e[1]}#{sb(e[2])} #{e[3]}")
+      indent
+      s
+    end
   end
 
   class Dimension_Stmt < T
@@ -1068,11 +1103,17 @@ module Fortran
   end
 
   class Do_Term_Action_Stmt < T
-    def to_s() stmt(space,:be) end
+    def to_s
+      unindent
+      stmt(space)
+    end
   end
 
   class Do_Term_Shared_Stmt < T
-    def to_s() cat(:be) end
+    def to_s
+      unindent
+      cat
+    end
   end
 
   class Double_Colon < T
@@ -1085,15 +1126,30 @@ module Fortran
   end
 
   class Else_If_Stmt < T
-    def to_s() bb(stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}",:be)) end
+    def to_s
+      unindent
+      s=stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}")
+      indent
+      s
+    end
   end
 
   class Else_Stmt < T
-    def to_s() bb(stmt(space,:be)) end
+    def to_s
+      unindent
+      s=stmt(space)
+      indent
+      s
+    end
   end
 
   class Elsewhere_Stmt < T
-    def to_s() bb(stmt(space,:be)) end
+    def to_s
+      unindent
+      s=stmt(space)
+      indent
+      s
+    end
   end
 
   class End_Block_Data_Option < T
@@ -1101,23 +1157,38 @@ module Fortran
   end
 
   class End_Block_Data_Stmt < T
-    def to_s() stmt(space,:be) end
+    def to_s
+      unindent
+      stmt(space)
+    end
   end
 
   class End_Do_Stmt < T
-    def to_s() stmt(space,:be) end
+    def to_s
+      unindent
+      stmt(space)
+    end
   end
 
   class End_Function_Stmt < T
-    def to_s() stmt(space,:be) end
+    def to_s
+      unindent
+      stmt(space)
+    end
   end
 
   class End_If_Stmt < T
-    def to_s() stmt(space,:be) end
+    def to_s
+      unindent
+      stmt(space)
+    end
   end
 
   class End_Interface_Stmt < T
-    def to_s() stmt(space,:be) end
+    def to_s
+      unindent
+      stmt(space)
+    end
   end
 
   class End_Module_Option < T
@@ -1125,27 +1196,46 @@ module Fortran
   end
 
   class End_Module_Stmt < T
-    def to_s() stmt(space,:be) end
+    def to_s
+      unindent
+      stmt(space)
+    end
   end
 
   class End_Program_Stmt < T
-    def to_s() stmt("#{e[1]}#{sb(e[3])}#{sb(e[4])}",:be) end
+    def to_s
+      unindent
+      stmt("#{e[1]}#{sb(e[3])}#{sb(e[4])}")
+    end
   end
 
   class End_Select_Stmt < T
-    def to_s() stmt(space,:lr) end
+    def to_s
+      unindent
+      unindent
+      stmt(space)
+    end
   end
 
   class End_Subroutine_Stmt < T
-    def to_s() stmt(space,:be) end
+    def to_s
+      unindent
+      stmt(space)
+    end
   end
 
   class End_Type_Stmt < T
-    def to_s() stmt(space,:be) end
+    def to_s
+      unindent
+      stmt(space)
+    end
   end
 
   class End_Where_Stmt < T
-    def to_s() stmt(space,:be) end
+    def to_s
+      unindent
+      stmt(space)
+    end
   end
 
   class Entity_Decl < E
@@ -1281,7 +1371,11 @@ module Fortran
   end
 
   class Function_Stmt < T
-    def to_s() bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")) end
+    def to_s
+      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")
+      indent
+      s
+    end
   end
 
   class Function_Subprogram < Scoping_Unit
@@ -1298,7 +1392,11 @@ module Fortran
   end
 
   class If_Then_Stmt < T
-    def to_s() bb(stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")) end
+    def to_s
+      s=stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
+      indent
+      s
+    end
   end
 
   class Implicit_None_Stmt < E
@@ -1324,7 +1422,10 @@ module Fortran
   end
 
   class Inner_Shared_Do_Construct < T
-    def to_s() cat(:be) end
+    def to_s
+      unindent
+      cat
+    end
   end
 
   class Input_Item_List < T
@@ -1349,7 +1450,11 @@ module Fortran
   end
 
   class Interface_Stmt < T
-    def to_s() bb(stmt(space)) end
+    def to_s
+      s=stmt(space)
+      indent
+      s
+    end
   end
 
   class Internal_Subprograms < T
@@ -1375,7 +1480,11 @@ module Fortran
   end
 
   class Label_Do_Stmt < T
-    def to_s() bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")) end
+    def to_s
+      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
+      indent
+      s
+    end
   end
 
   class Label_List < T
@@ -1422,8 +1531,17 @@ module Fortran
   end
 
   class Module_Stmt < T
-    def name() "#{e[2]}" end
-    def to_s() bb(stmt(space)) end
+
+    def name
+      "#{e[2]}"
+    end
+
+    def to_s
+      s=stmt(space)
+      indent
+      s
+    end
+
   end
 
   class Module_Subprogram_Part < T
@@ -1465,7 +1583,9 @@ module Fortran
   class Nonlabel_Do_Stmt < T
 
     def to_s
-      bb(stmt("#{sa(e[1])}#{e[2]}#{e[3]}"))
+      s=stmt("#{sa(e[1])}#{e[2]}#{e[3]}")
+      indent
+      s
     end
 
   end
@@ -1569,7 +1689,11 @@ module Fortran
   end
 
   class Program_Stmt < T
-    def to_s() bb(stmt(space)) end
+    def to_s
+      s=stmt(space)
+      indent
+      s
+    end
   end
 
   class Program_Units < T
@@ -1632,7 +1756,12 @@ module Fortran
   end
 
   class Select_Case_Stmt < T
-    def to_s() bb(bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]} #{e[4]}#{e[5]}#{e[6]}",:ls))) end
+    def to_s
+      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]} #{e[4]}#{e[5]}#{e[6]}")
+      indent
+      indent
+      s
+    end
   end
 
   class Specification_Part < E
@@ -1650,7 +1779,11 @@ module Fortran
   end
 
   class Subroutine_Stmt < T
-    def to_s() bb(stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")) end
+    def to_s
+      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
+      indent
+      s
+    end
   end
 
   class Substring < T
@@ -1720,7 +1853,11 @@ module Fortran
   end
 
   class Where_Construct_Stmt < T
-    def to_s() bb(stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")) end
+    def to_s
+      s=stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+      indent
+      s
+    end
   end
 
   class Where_Stmt < T
@@ -1730,6 +1867,22 @@ module Fortran
   class Write_Stmt < T
     def to_s() stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
   end
+
+  # Other Classes
+
+  class Meta
+
+    attr_accessor :level
+
+    def initialize
+      @level=0
+    end
+
+  end
+
+  # Global Variables
+
+  @@envstack=[{:meta=>Meta.new}]
 
 end
 
