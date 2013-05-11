@@ -30,9 +30,6 @@ module Fortran
   end
 
   def deepcopy
-#   e=Marshal.load(Marshal.dump(self))
-#   e[:meta]=self[:meta]
-#   e
     Marshal.load(Marshal.dump(self))
   end
 
@@ -325,10 +322,7 @@ module Fortran
   end
 
   def stmt(s)
-#   l=@myenv[:meta].level
-    l=meta.level
-#   puts "### #{s} level id #{@myenv[:meta].object_id} val #{l}"
-    " "*2*l+(("#{sa(e[0])}"+s.chomp).strip)+"\n"
+    " "*2*meta.level+(("#{sa(e[0])}"+s.chomp).strip)+"\n"
   end
 
   def use_add(modulename,usenames,localnames)
@@ -457,45 +451,7 @@ module Fortran
       end while n=n.parent
       nil
     end
-###
-#   def indent
-#     @myenv[:meta].level+=1
-#     puts "### #{self.class} now @ #{@myenv[:meta].level}"
-#   end
-    def indent
-      meta.level+=1
-#     puts "### #{self.class} now @ #{meta.level}"
-    end
 
-    def unindent
-      m=meta
-      m.level-=1 if m.level>0
-    end
-
-    def root
-      n=self
-      n=n.parent while n.parent
-      n
-    end
-
-    def meta
-      r=root
-      r.myenv[:meta]=Meta.new unless r.myenv[:meta]
-      r.myenv[:meta]
-    end
-
-#   def parent_level
-#     n=self.parent
-#     begin
-#       if n.respond_to?(:myenv) and (l=n.myenv[:level])
-#         puts "### #{n.class} parent #{self.class} @ #{l}"
-#         return l
-#       end
-#     end while n=n.parent
-#     puts "### #{n.class} -> #{self.class} = 0 (default)"
-#     0
-#   end
-###
     def declaration_constructs
       specification_part.e[2]
     end
@@ -529,9 +485,9 @@ module Fortran
       OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
     end
 
-#   def indent_smt(s)
-#     " "*2*@myenv[:level]+s
-#   end
+    def indent
+      meta.level+=1
+    end
 
     def insert_statement(code,rule,predecessor)
       tree=raw(code,rule,@srcfile)
@@ -549,6 +505,12 @@ module Fortran
       s="#{e[0]}"
       s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
       s
+    end
+
+    def meta
+      r=root
+      r.myenv[:meta]=Meta.new unless r.myenv[:meta]
+      r.myenv[:meta]
     end
 
     def remove
@@ -577,12 +539,23 @@ module Fortran
       stmt_pairs.each { |p| s=insert_statement(p[0],p[1],s) }
     end
 
+    def root
+      n=self
+      n=n.parent while n.parent
+      n
+    end
+
     def scoping_unit
       ancestor(Scoping_Unit)
     end
 
     def specification_part
       scoping_unit.e[1]
+    end
+
+    def unindent
+      m=meta
+      m.level-=1 if m.level>0
     end
 
     def use(modulename,usenames=[])
