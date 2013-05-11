@@ -24,7 +24,7 @@ void term(int sock)
 int main (int argc,char **argv)
 {
   char c,*fin,*fsock,*inc,*lensrcstr,*src;
-  int bytesout,fd,digits,lenfin,lensrc,sock,status;
+  int bytesout,fd,digits,lensrc,sock,status;
   struct sockaddr_un server;
   struct stat fileinfo;
 
@@ -42,7 +42,6 @@ int main (int argc,char **argv)
   if (fstat(fd,&fileinfo)<0) fail("getting infile info");
 
   lensrc=fileinfo.st_size;
-  lenfin=strlen(fin);
 
   if ((src=(char*)malloc(lensrc)+1)==NULL) fail("allocating 'src'");
   if (read(fd,src,lensrc)<0) fail("reading source");
