@@ -1,5 +1,7 @@
 module Fortran
 
+  require "ostruct"
+
   def array_props(array_spec,_props)
     dims=0
     array_spec.abstract_boundslist.each_index do |i|
@@ -1843,11 +1845,12 @@ module Fortran
 
   # Other Classes
 
-  class Meta
+  class Meta < OpenStruct
 
     attr_accessor :level
 
     def initialize
+      super
       @level=0
     end
 

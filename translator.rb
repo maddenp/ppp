@@ -1,7 +1,6 @@
 module Translator
 
   require "fileutils"
-  require "ostruct"
   require "pathname"
   require "socket"
   require "yaml"
