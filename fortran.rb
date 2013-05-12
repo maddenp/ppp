@@ -48,6 +48,7 @@ module Fortran
   end
 
   def env
+    @@envstack||=[{}]
     @@envstack.last
   end
 
@@ -511,7 +512,7 @@ module Fortran
 
     def meta
       r=root
-      r.myenv[:meta]=Meta.new unless r.myenv[:meta]
+      r.myenv[:meta]=OpenStruct.new unless r.myenv[:meta]
       r.myenv[:meta]
     end
 
@@ -1842,23 +1843,6 @@ module Fortran
   class Write_Stmt < T
     def to_s() stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
   end
-
-  # Other Classes
-
-  class Meta < OpenStruct
-
-    attr_accessor :level
-
-    def initialize
-      super
-      @level=0
-    end
-
-  end
-
-  # Global Variables
-
-  @@envstack=[{:meta=>Meta.new}]
 
 end
 
