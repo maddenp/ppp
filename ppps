@@ -1,6 +1,7 @@
 #!/bin/bash
 
-fail() { test -n "$1" && echo $1; exit 1; }
+fail()  { test -n "$1" && echo $1; exit 1; }
+usage() { fail "Usage: $b <socket> <pidfile> [runtime]"; }
 
 # Names of things
 
@@ -19,10 +20,11 @@ engine="$cruby"
 
 socket=$1
 pidfile=$2
+runtime=$3
 
 # Sanity checks
 
-test -z "$socket" -o -z "$pidfile" && fail "Usage: $b <socket> <pidfile>"
+test -z "$socket" -o -z "$pidfile" && usage
 test -e $socket && fail "socket $socket exists, aborting..."
 if [ -e $pidfile ]; then test -w $pidfile; else touch $pidfile; fi
 test $? -eq 0 || fail "pidfile $pidfile not writable, aborting..."
@@ -42,3 +44,11 @@ do
   sleep 1
 done
 echo "ok"
+
+# Note that the server process will automatically shut down shortly after its
+# parent does. This is ideal for use with make, where make starts the server,
+# performs some traslations via the client, then exits: The server will follow
+# suit and exit. For interactive use, the 'runtime' command-line argument keeps
+# the server alive for the requestd number of seconds.
+
+test -n "$runtime" && sleep $runtime
