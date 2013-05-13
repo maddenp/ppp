@@ -129,6 +129,17 @@ module Fortran
       envget
     end
 
+    def halo_offsets(decdim)
+      halo_lo=0
+      halo_up=0
+      if halocomp=env[:halocomp]
+        offsets=halocomp[decdim]
+        halo_lo=offsets.lo
+        halo_up=offsets.up
+      end
+      OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
+    end
+
   end
 
   class Allocate_Object < E
