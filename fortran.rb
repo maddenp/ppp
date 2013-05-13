@@ -48,8 +48,8 @@ module Fortran
   end
 
   def env
-    @@envstack=[{}] if not defined?(@@envstack)
-    @@envstack.last
+    @envstack=[{}] if not defined?(@envstack)
+    @envstack.last
   end
 
   def envfile(m,d=nil)
@@ -58,12 +58,12 @@ module Fortran
   end
 
   def envpop
-    @@envstack.pop
-    @@envstack=[{}] if @@envstack.empty?
+    @envstack.pop
+    @envstack=[{}] if @envstack.empty?
   end
 
   def envpush
-    @@envstack.push(deepcopy(env))
+    @envstack.push(deepcopy(env))
   end
 
   def ik(e,c,a)
