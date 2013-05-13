@@ -108,8 +108,7 @@ module Fortran
 
     def declare(type,name,props={})
       p=declaration_constructs
-      envget(p)
-      varenv=env[name]
+      varenv=p.env[name]
       if varenv
         fail "Variable #{name} is already defined" unless varenv["pppvar"]
       else
@@ -124,15 +123,14 @@ module Fortran
         t=raw(code,:type_declaration_stmt)
         t.parent=p
         p.e[0].e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
-        env[name]["pppvar"]=true
+        varenv["pppvar"]=true
       end
-      envget
     end
 
     def halo_offsets(decdim)
       halo_lo=0
       halo_up=0
-      if halocomp=env[:halocomp]
+      if halocomp=self.env[:halocomp]
         offsets=halocomp[decdim]
         halo_lo=offsets.lo
         halo_up=offsets.up
@@ -145,7 +143,6 @@ module Fortran
   class Allocate_Object < E
 
     def translate
-      envget
       if inside?(Allocate_Stmt)
         allocate_object=e[1]
         if allocate_object.is_a?(Data_Ref)
@@ -159,10 +156,10 @@ module Fortran
 # the environment and then... Can we have a decomposed array inside a derived
 # type? A decomposed array *of* dervived type, yes -- but the components?
 
-#         fail "'#{var}' not found in environment" unless (varenv=env[var])
+#         fail "'#{var}' not found in environment" unless (varenv=self.env[var])
 #         if varenv["decomp"]
 
-          varenv=env[var]
+          varenv=self.env[var]
           if varenv and varenv["decomp"]
             subscript_list=part_ref.subscript_list
             newdims=[]
@@ -230,10 +227,9 @@ module Fortran
   class Array_Name_And_Spec < E
 
     def translate
-      envget
       var="#{e[0]}"
       spec=e[2].spec
-      varenv=env[var]
+      varenv=self.env[var]
       distribute_array_bounds(spec,varenv)
     end
 
@@ -242,9 +238,8 @@ module Fortran
   class Entity_Decl_1 < Entity_Decl
 
     def translate
-      envget
       var="#{e[0]}"
-      fail "'#{var}' not found in environment" unless (varenv=env[var])
+      fail "'#{var}' not found in environment" unless (varenv=self.env[var])
       spec=nil
       if varenv["rank"]=="array"
         if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
@@ -268,8 +263,7 @@ module Fortran
   class Name < T
 
     def translate
-      envget
-      if tolocal=env[:tolocal] and p=tolocal[name]
+      if tolocal=self.env[:tolocal] and p=tolocal[name]
         case p.key
         when "lbound"
           se="s#{p.decdim}"
@@ -290,9 +284,8 @@ module Fortran
   class Nonlabel_Do_Stmt < T
 
     def translate
-      envget
-      unless env[:serial]
-        if parallel=env[:parallel]
+      unless self.env[:serial]
+        if parallel=self.env[:parallel]
           loop_control=e[3]
           loop_var="#{loop_control.e[1]}"
           decdim=nil
@@ -360,12 +353,11 @@ module Fortran
     end
 
     def translate
-      envget
       use("module_decomp")
       use("nnt_types_module")
       declare("logical","sms_debugging_on")
       var="#{e[3].name}"
-      fail "'#{var}' not found in environment" unless (varenv=env[var])
+      fail "'#{var}' not found in environment" unless (varenv=self.env[var])
       dims=varenv["dims"]
       str="#{e[5]}"
       type=smstype(varenv["type"],varenv["kind"])
@@ -489,7 +481,6 @@ module Fortran
     end
 
     def translate
-      envget
       use("module_decomp")
       use("nnt_types_module")
       tag="ppp__tag_#{@tag+=1}"
@@ -509,7 +500,7 @@ module Fortran
       varenv=nil
       (0..nvars-1).each do |i|
         var=v[i].name
-        fail "'#{var}' not found in environment" unless (varenv=env[var])
+        fail "'#{var}' not found in environment" unless (varenv=self.env[var])
         dims=varenv["dims"]
         dh=varenv["decomp"]
         dectypes.push("#{dh}(dh__nestlevel)")
@@ -769,9 +760,8 @@ module Fortran
     end
 
     def translate
-      envget
       var="#{e[3]}"
-      fail "No module info found for variable '#{var}'" unless (varenv=env[var])
+      fail "No module info found for variable '#{var}'" unless (varenv=self.env[var])
       fail "No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
       use("nnt_types_module")
       stmts=[]

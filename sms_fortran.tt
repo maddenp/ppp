@@ -128,8 +128,8 @@ grammar Fortran
 
   rule sms_executable
     sms_barrier /
-    sms_compare_var /
-    sms_exchange /
+    sms_compare_var &{ |e| sp_rec_env(e[0]) } <SMS_Compare_Var> /
+    sms_exchange &{ |e| sp_rec_env(e[0]) } <SMS_Exchange> /
     sms_halo_comp_begin /
     sms_halo_comp_end /
     sms_parallel_begin /
@@ -137,7 +137,7 @@ grammar Fortran
     sms_to_local_begin /
     sms_to_local_end /
     sms_set_communicator /
-    sms_unstructured_grid /
+    sms_unstructured_grid &{ |e| sp_rec_env(e[0]) } <SMS_Unstructured_Grid> /
     sms_passthrough
   end
 

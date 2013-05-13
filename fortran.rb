@@ -48,7 +48,8 @@ module Fortran
   end
 
   def env
-    envstack.last
+    @@envstack=[{}] if not defined?(@@envstack)
+    @@envstack.last
   end
 
   def envfile(m,d=nil)
@@ -57,16 +58,12 @@ module Fortran
   end
 
   def envpop
-    envstack.pop
+    @@envstack.pop
+    @@envstack=[{}] if @@envstack.empty?
   end
 
   def envpush
-    envstack.push(deepcopy(env))
-  end
-
-  def envstack
-    @@envstack=[{}] if not defined?(@@envstack) or @@envstack.empty?
-    @@envstack
+    @@envstack.push(deepcopy(env))
   end
 
   def ik(e,c,a)
@@ -251,6 +248,13 @@ module Fortran
     true
   end
 
+  def sp_rec_env(node)
+    if node.respond_to?(:env)
+      node.env=env
+    end
+    true
+  end
+
   def sp_subroutine_stmt(dummy_arg_list_option)
     envpush
     if dummy_arg_list_option.e
@@ -328,7 +332,8 @@ module Fortran
   end
 
   def stmt(s)
-    " "*2*meta.level+(("#{sa(e[0])}"+s.chomp).strip)+"\n"
+    l=level||0
+    (" "*2*l)+(("#{sa(e[0])}"+s.chomp).strip)+"\n"
   end
 
   def use_add(modulename,usenames,localnames)
@@ -442,11 +447,11 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
-    attr_accessor :myenv
+    attr_accessor :env
 
     def initialize(*args)
       super
-      @myenv=env
+      @env=nil
     end
 
     def ancestor(class_or_classes)
@@ -469,19 +474,14 @@ module Fortran
       # method suitable for all applications could be defined here.
     end
 
-    def envget(node=self)
-      unless node.myenv.object_id==env.object_id
-        envstack.pop
-        envstack.push(node.myenv)
-      end
-    end
-
     def execution_part
       scoping_unit.e[2]
     end
 
     def indent
-      meta.level+=1
+      r=root
+      l=root.level
+      r.instance_variable_set(:@level,l+1)
     end
 
     def insert_statement(code,rule,predecessor)
@@ -496,15 +496,18 @@ module Fortran
       (ancestor(class_or_classes))?(true):(false)
     end
 
+    def level
+      r=root
+      unless r.instance_variable_defined?(:@level)
+        r.instance_variable_set(:@level,0)
+      end
+      r.instance_variable_get(:@level)
+    end
+
     def list_to_s
       s="#{e[0]}"
       s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
       s
-    end
-
-    def meta
-      r=root
-      r.myenv[:meta] or (r.myenv[:meta]=OpenStruct.new)
     end
 
     def remove
@@ -548,8 +551,9 @@ module Fortran
     end
 
     def unindent
-      m=meta
-      m.level-=1 if m.level>0
+      r=root
+      l=root.level
+      r.instance_variable_set(:@level,l-1) if l>0
     end
 
     def use(modulename,usenames=[])
@@ -679,7 +683,7 @@ module Fortran
   class Allocate_Object_List < T
 
     def items
-      e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
+      e[1].e.reduce([e[0].item]) { |m,x| m.push(x.e[1].item) }
     end
 
     def names
@@ -688,6 +692,18 @@ module Fortran
 
     def to_s
       list_to_s
+    end
+
+  end
+
+  class Allocate_Object_List_Pair < T
+
+    def item
+      e[1].item
+    end
+
+    def name
+      e[1].name
     end
 
   end
@@ -734,6 +750,9 @@ module Fortran
 
   class Arithmetic_If_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}#{e[6]}#{e[7]}#{e[8]}#{e[9]}") end
+  end
+
+  class Array_Name < E
   end
 
   class Array_Name_And_Spec < E
@@ -832,19 +851,18 @@ module Fortran
     end
 
     def post
-      envget
       ok=true
       if (entity_decl=self.ancestor(Entity_Decl))
         array_name=entity_decl.name
-        ok=(env[:args] and env[:args].include?(array_name))?(true):(false)
+        ok=(self.env[:args] and self.env[:args].include?(array_name))?(true):(false)
       elsif (entity_decl=self.ancestor(Array_Name_And_Spec))
         array_name=entity_decl.name
-        ok=(env[array_name]["lb1"]=="_deferred")?(false):(true)
+        ok=(self.env[array_name]["lb1"]=="_deferred")?(false):(true)
       end
       unless ok
         code="#{self}"
         replace_element(code,:deferred_shape_spec_list)
-        varenv=env[array_name]
+        varenv=self.env[array_name]
         varenv.keys.each { |k| varenv[k]="_deferred" if k=~/[lu]b\d+/ }
       end
     end
@@ -922,6 +940,9 @@ module Fortran
   class Block_Data < Scoping_Unit
   end
 
+  class Block_Data_Name < E
+  end
+
   class Block_Data_Stmt < T
     def to_s
       s=stmt(space)
@@ -932,6 +953,9 @@ module Fortran
 
   class Call_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
+  end
+
+  class Case_Construct_Name < E
   end
 
   class Case_Stmt < T
@@ -955,6 +979,9 @@ module Fortran
     def to_s() "#{ir(e[0],""," ")}#{e[1]}#{e[2]}" end
   end
 
+  class Common_Block_Name < E
+  end
+
   class Common_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
   end
@@ -969,6 +996,9 @@ module Fortran
 
   class Component_Def_Stmt < T
     def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
+  end
+
+  class Component_Name < E
   end
 
   class Computed_Goto_Stmt < T
@@ -1069,6 +1099,12 @@ module Fortran
     def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
   end
 
+  class Do_Construct_Name < E
+  end
+
+  class Do_Stmt < E
+  end
+
   class Do_Term_Action_Stmt < T
     def to_s
       unindent
@@ -1087,6 +1123,9 @@ module Fortran
   end
 
   class Dummy_Arg_List < T
+  end
+
+  class Dummy_Arg_Name < E
   end
 
   class Dummy_Arg_Name_List < T
@@ -1253,6 +1292,9 @@ module Fortran
     def props() e.reduce({}) { |m,x| m.merge(x.props) } end
   end
 
+  class Entry_Name < E
+  end
+
   class Entry_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{sb(e[4])}") end
   end
@@ -1330,8 +1372,14 @@ module Fortran
     def to_s() list_to_s end
   end
 
+  class External_Name < E
+  end
+
   class External_Name_List < T
     def to_s() list_to_s end
+  end
+
+  class Function_Name < E
   end
 
   class Function_Reference < E
@@ -1348,10 +1396,16 @@ module Fortran
   class Function_Subprogram < Scoping_Unit
   end
 
+  class Generic_Name < E
+  end
+
   class Generic_Spec < T
     def localname() usename end
     def name() usename end
     def usename() "#{e[2]}" end
+  end
+
+  class If_Construct_Name < E
   end
 
   class If_Stmt < T
@@ -1430,6 +1484,9 @@ module Fortran
     end
   end
 
+  class Intrinsic_Procedure_Name < E
+  end
+
   class Intrinsic_Procedure_Name_List < T
     def to_s() list_to_s end
   end
@@ -1460,6 +1517,9 @@ module Fortran
 
   class Letter_Spec_List < T
     def to_s() list_to_s end
+  end
+
+  class Local_Name < E
   end
 
   class Loop_Control < T
@@ -1497,6 +1557,9 @@ module Fortran
   class Module < Scoping_Unit
   end
 
+  class Module_Name < E
+  end
+
   class Module_Stmt < T
 
     def name
@@ -1531,8 +1594,14 @@ module Fortran
 
   end
 
+  class Named_Constant < E
+  end
+
   class Named_Constant_Def_List < T
     def to_s() list_to_s end
+  end
+
+  class Namelist_Group_Name < E
   end
 
   class Namelist_Group_Object_List < T
@@ -1555,6 +1624,9 @@ module Fortran
       s
     end
 
+  end
+
+  class Object_Name < E
   end
 
   class Only < E
@@ -1608,6 +1680,9 @@ module Fortran
 
   end
 
+  class Part_Name < E
+  end
+
   class Part_Ref < T
 
     def name
@@ -1651,8 +1726,14 @@ module Fortran
     def to_s() "#{e[0]}#{e[1]}" end
   end
 
+  class Procedure_Name < E
+  end
+
   class Procedure_Name_List < T
     def to_s() list_to_s end
+  end
+
+  class Program_Name < E
   end
 
   class Program_Stmt < T
@@ -1696,6 +1777,9 @@ module Fortran
   class Rename_List_Option < T
     def localnames() e[1].localnames end
     def usenames() e[1].usenames end
+  end
+
+  class Result_Name < E
   end
 
   class Save_Stmt < T
@@ -1742,6 +1826,9 @@ module Fortran
     def name() "#{e[1]}" end
   end
 
+  class Subroutine_Name < E
+  end
+
   class Subroutine_Subprogram < Scoping_Unit
   end
 
@@ -1755,6 +1842,9 @@ module Fortran
 
   class Substring < T
     def name() e[0].name end
+  end
+
+  class Target_Object_1 < E
   end
 
   class Target_Object_List < T
@@ -1780,6 +1870,9 @@ module Fortran
     def to_s() stmt("#{e[1]}#{ir(e[2],"",ik(e[1],","," "))}#{e[3]}") end
   end
 
+  class Type_Name < E
+  end
+
   class Type_Spec < E
     def derived?() "#{e[0]}"=="type" end
     def kind() return (e[1].respond_to?(:kind))?(e[1].kind):("_default") end
@@ -1800,6 +1893,9 @@ module Fortran
 
   end
 
+  class Use_Name < E
+  end
+
   class Use_Part < E
   end
 
@@ -1817,6 +1913,9 @@ module Fortran
     def localnames() e[6].localnames end
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}") end
     def usenames() e[6].usenames end
+  end
+
+  class Variable_Name < E
   end
 
   class Where_Construct_Stmt < T

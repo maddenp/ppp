@@ -164,7 +164,11 @@ grammar Fortran
   end
 
   rule allocate_object_list
-    allocate_object ( t_comma allocate_object )* <Allocate_Object_List>
+    allocate_object allocate_object_list_pair* &{ |e| sp_rec_env(e[0]) } <Allocate_Object_List>
+  end
+
+  rule allocate_object_list_pair
+    t_comma allocate_object &{ |e| sp_rec_env(e[1]) } <Allocate_Object_List_Pair> 
   end
 
   rule allocate_shape_spec
@@ -198,7 +202,7 @@ grammar Fortran
   rule allocation
     # F90:R624
 
-    allocate_object parenthesized_allocate_shape_spec_list? <Allocation>
+    allocate_object parenthesized_allocate_shape_spec_list? &{ |e| sp_rec_env(e[0]) } <Allocation>
   end
 
   rule allocation_list
@@ -240,7 +244,7 @@ grammar Fortran
   rule array_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Array_Name>
   end
 
   rule array_name_and_deferred_shape_spec_list
@@ -260,11 +264,11 @@ grammar Fortran
   end
 
   rule array_name_and_spec_pair
-    t_comma array_name_and_spec <Array_Name_And_Spec_Pair>
+    t_comma array_name_and_spec &{ |e| sp_rec_env(e[1]) } <Array_Name_And_Spec_Pair>
   end
 
   rule array_names_and_specs
-    array_name_and_spec array_name_and_spec_pair* <Array_Names_And_Specs>
+    array_name_and_spec array_name_and_spec_pair* &{ |e| sp_rec_env(e[0]) } <Array_Names_And_Specs>
   end
 
   rule array_section
@@ -282,7 +286,7 @@ grammar Fortran
     # tree post-processing.
 
     explicit_shape_spec_list "" <Array_Spec> /
-    assumed_shape_spec_list "" <Array_Spec> /
+    assumed_shape_spec_list &{ |e| sp_rec_env(e[0]) } <Array_Spec> /
     assumed_size_spec "" <Array_Spec>
   end
 
@@ -399,7 +403,7 @@ grammar Fortran
   rule block_data_name
     # F90:11.4 (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Block_Data_Name>
   end
 
   rule block_data_stmt
@@ -435,7 +439,7 @@ grammar Fortran
   end
 
   rule case_construct_name
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Case_Construct_Name>
   end
 
   rule case_construct_name_pair
@@ -578,7 +582,7 @@ grammar Fortran
   rule common_block_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Common_Block_Name>
   end
 
   rule common_block_name_and_object_list
@@ -680,7 +684,7 @@ grammar Fortran
   rule component_name
     # F90:4.4.1 (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Component_Name>
   end
 
   rule computed_goto_stmt
@@ -981,7 +985,7 @@ grammar Fortran
   rule do_construct_name
     # F90:8.1.4.1.1 (not explicitly defiend)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Do_Construct_Name>
   end
 
   rule do_construct_name_label
@@ -992,7 +996,7 @@ grammar Fortran
     # F90:R818
 
     label_do_stmt /
-    nonlabel_do_stmt
+    nonlabel_do_stmt &{ |e| sp_rec_env(e[0]) } <Do_Stmt>
   end
 
   rule do_term_action_stmt
@@ -1062,7 +1066,7 @@ grammar Fortran
   rule dummy_arg_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Dummy_Arg_Name>
   end
 
   rule dummy_arg_name_list
@@ -1234,11 +1238,11 @@ grammar Fortran
   end
 
   rule entity_decl_list
-    entity_decl entity_decl_list_pairs <Entity_Decl_List>
+    entity_decl entity_decl_list_pairs &{ |e| sp_rec_env(e[0]) } <Entity_Decl_List>
   end
 
   rule entity_decl_list_pair
-    t_comma entity_decl <Entity_Decl_List_Pair>
+    t_comma entity_decl &{ |e| sp_rec_env(e[1]) } <Entity_Decl_List_Pair>
   end
 
   rule entity_decl_list_pairs
@@ -1248,7 +1252,7 @@ grammar Fortran
   rule entry_name
     # F90:12.5.2.5 (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Entry_Name>
   end
 
   rule entry_stmt
@@ -1391,7 +1395,7 @@ grammar Fortran
   rule external_name
     # F90:12.3.2.2
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <External_Name>
   end
 
   rule external_name_list
@@ -1450,7 +1454,7 @@ grammar Fortran
   rule function_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Function_Name>
   end
 
   rule function_reference
@@ -1474,7 +1478,7 @@ grammar Fortran
   rule generic_name
     # F90:12.3.2.1 (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Generic_Name>
   end
 
   rule generic_spec
@@ -1515,7 +1519,7 @@ grammar Fortran
   rule if_construct_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <If_Construct_Name>
   end
 
   rule if_construct_name_label
@@ -1760,7 +1764,7 @@ grammar Fortran
   rule intrinsic_procedure_name
     # F90:12.3.2.3 (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Intrinsic_Procedure_Name>
   end
 
   rule intrinsic_procedure_name_list
@@ -1969,7 +1973,7 @@ grammar Fortran
   rule local_name
     # F90:11.3.2 (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Local_Name>
   end
 
   rule logical_expr
@@ -2038,7 +2042,7 @@ grammar Fortran
   rule module_name
     # F90:11.3 (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Module_Name>
   end
 
   rule module_procedure_stmt
@@ -2093,7 +2097,7 @@ grammar Fortran
   rule named_constant
     # F90:R307
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Named_Constant>
   end
 
   rule named_constant_def
@@ -2109,7 +2113,7 @@ grammar Fortran
   rule namelist_group_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Namelist_Group_Name>
   end
 
   rule namelist_group_object
@@ -2178,7 +2182,7 @@ grammar Fortran
   rule object_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Object_Name>
   end
 
   rule object_name_and_spec_list
@@ -2301,7 +2305,7 @@ grammar Fortran
   rule part_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Part_Name>
   end
 
   rule part_ref
@@ -2418,7 +2422,7 @@ grammar Fortran
   rule procedure_name
     # F90:12.4.1
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Procedure_Name>
   end
 
   rule procedure_name_list
@@ -2428,7 +2432,7 @@ grammar Fortran
   rule program_name
     # F90:11.1
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Program_Name>
   end
 
   rule program_stmt
@@ -2544,7 +2548,7 @@ grammar Fortran
   rule result_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Result_Name>
   end
 
   rule result_option
@@ -2871,7 +2875,7 @@ grammar Fortran
   rule subroutine_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Subroutine_Name>
   end
 
   rule subroutine_stmt
@@ -3516,7 +3520,7 @@ grammar Fortran
   end
 
   rule target_object
-    array_name_and_spec /
+    array_name_and_spec &{ |e| sp_rec_env(e[0]) } <Target_Object_1> /
     variable_name
   end
 
@@ -3543,7 +3547,7 @@ grammar Fortran
   rule type_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Type_Name>
   end
 
   rule type_param_value
@@ -3588,7 +3592,7 @@ grammar Fortran
   rule use_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Use_Name>
   end
 
   rule use_part
@@ -3613,7 +3617,7 @@ grammar Fortran
   rule variable_name
     # Multiple uses (not explicitly defined)
 
-    name
+    name &{ |e| sp_rec_env(e[0]) } <Variable_Name>
   end
 
   rule vector_subscript

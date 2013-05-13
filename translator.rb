@@ -169,7 +169,6 @@ module Translator
       puts s if debug
       @incdirs=opts[:incdirs]
       raw_tree=fp.parse(s,:root=>root)
-      raw_tree.meta.level=0
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
       if debug
         puts "\nRAW TREE\n\n"
