@@ -31,8 +31,8 @@ module Fortran
     self.e.map { |x| x.to_s }.join
   end
 
-  def deepcopy
-    Marshal.load(Marshal.dump(self))
+  def deepcopy(o)
+    Marshal.load(Marshal.dump(o))
   end
 
   def dolabel_dupe?
@@ -61,7 +61,7 @@ module Fortran
   end
 
   def envpush
-    envstack.push(env.deepcopy)
+    envstack.push(deepcopy(env))
   end
 
   def envstack
@@ -230,7 +230,7 @@ module Fortran
   def sp_module(_module)
     modulename=_module.e[0].name
     # Do not export symbol keys, which are for internal purposes only
-    modinfo=env.deepcopy.delete_if { |k,v| k.is_a?(Symbol) }
+    modinfo=deepcopy(env).delete_if { |k,v| k.is_a?(Symbol) }
     # Do not export info on private objects
     modinfo.delete_if { |k,v| v["access"]=="private" }
     unless modinfo.empty?
