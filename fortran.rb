@@ -48,8 +48,7 @@ module Fortran
   end
 
   def env
-    @@envstack||=[{}]
-    @@envstack.last
+    envstack.last
   end
 
   def envfile(m,d=nil)
@@ -58,12 +57,16 @@ module Fortran
   end
 
   def envpop
-    @@envstack.pop
-    @@envstack=[{}] if @@envstack.empty?
+    envstack.pop
   end
 
   def envpush
-    @@envstack.push(env.deepcopy)
+    envstack.push(env.deepcopy)
+  end
+
+  def envstack
+    @@envstack=[{}] if not defined?(@@envstack) or @@envstack.empty?
+    @@envstack
   end
 
   def ik(e,c,a)
@@ -468,8 +471,8 @@ module Fortran
 
     def envget(node=self)
       unless node.myenv.object_id==env.object_id
-        @@envstack.pop
-        @@envstack.push(node.myenv)
+        envstack.pop
+        envstack.push(node.myenv)
       end
     end
 
@@ -512,8 +515,7 @@ module Fortran
 
     def meta
       r=root
-      r.myenv[:meta]=OpenStruct.new unless r.myenv[:meta]
-      r.myenv[:meta]
+      r.myenv[:meta] or (r.myenv[:meta]=OpenStruct.new)
     end
 
     def remove
