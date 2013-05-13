@@ -48,7 +48,6 @@ module Fortran
   end
 
   def env
-    @envstack=[{}] if not defined?(@envstack)
     @envstack.last
   end
 
@@ -120,13 +119,14 @@ module Fortran
   end
 
   def setup(srcfile)
-    @parallel=false
-    @srcfile=srcfile
     @access="_default"
     @dolabels=[]
+    @envstack=[{}]
     @halocomp=false
     @incdirs=[]
+    @parallel=false
     @serial=false
+    @srcfile=srcfile
     @tag=-1
     @tolocal=false
   end
