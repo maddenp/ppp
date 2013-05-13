@@ -10,6 +10,11 @@ b=$(basename $p)
 
 tool=$(echo $b | sed 's/s$//')
 
+cruby="ruby"
+jruby="java -server -jar $d/jruby.jar"
+
+engine="$cruby"
+
 # Command-line arguments
 
 socket=$1
@@ -24,7 +29,7 @@ test $? -eq 0 || fail "pidfile $pidfile not writable, aborting..."
 
 # Server startup
 
-java -server -jar $d/jruby.jar $d/$b.rb $socket &
+$engine $d/$b.rb $socket &
 server_pid=$!
 echo $server_pid > $pidfile
 

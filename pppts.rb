@@ -1,7 +1,7 @@
 require "fileutils"
 require "thread"
 
-@server_mode=false
+@server_mode=true
 @threads=8
 
 def pppts_fail(msg=nil,cmd=nil)

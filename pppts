@@ -4,4 +4,9 @@ p=$(readlink $0) || p=$0
 d=$(dirname  $p)
 b=$(basename $p)
 
-cd $d && java -jar jruby.jar $b.rb $@
+cruby="ruby"
+jruby="java -server -jar $d/jruby.jar"
+
+engine="$cruby"
+
+cd $d && $engine $b.rb $@
