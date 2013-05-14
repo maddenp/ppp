@@ -12,7 +12,7 @@ b=$(basename $p)
 tool=$(echo $b | sed 's/s$//')
 
 cruby="ruby"
-jruby="java -server -jar $d/jruby.jar"
+jruby="java -Djruby.compile.invokedynamic=true -Djruby.compile.mode=OFF -jar $d/jruby.jar"
 
 engine="$cruby"
 
