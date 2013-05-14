@@ -426,6 +426,9 @@ module Fortran
 
   end
 
+  class SMS_Decomp_Name < E
+  end
+
   class SMS_Distribute_Begin < SMS
 
     def to_s

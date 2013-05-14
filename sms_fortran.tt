@@ -101,7 +101,7 @@ grammar Fortran
   end
 
   rule sms_decomp_name
-    name
+    name &{ |e| sp_rec_env(e[0]) } <SMS_Decomp_Name>
   end
 
   rule sms_distribute_begin

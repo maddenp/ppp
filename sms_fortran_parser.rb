@@ -758,6 +758,13 @@ module Fortran
     r0
   end
 
+  module SmsDecompName0
+    def name
+      elements[0]
+    end
+
+  end
+
   def _nt_sms_decomp_name
     start_index = index
     if node_cache[:sms_decomp_name].has_key?(index)
@@ -769,7 +776,27 @@ module Fortran
       return cached
     end
 
-    r0 = _nt_name
+    i0, s0 = index, []
+    r1 = _nt_name
+    s0 << r1
+    if r1
+      i2 = index
+      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
+      if r3
+        @index = i2
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Decomp_Name,input, i0...index, s0)
+      r0.extend(SmsDecompName0)
+    else
+      @index = i0
+      r0 = nil
+    end
 
     node_cache[:sms_decomp_name][start_index] = r0
 
