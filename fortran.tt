@@ -135,7 +135,7 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( add_operand mult_op)? mult_operand
 
-    mult_operand ( mult_op add_operand )? <Add_Operand>
+    mult_operand ( mult_op add_operand )? &{ |e| sp_rec_env(e[0]) } <Add_Operand>
   end
 
   rule and_op
@@ -2085,7 +2085,7 @@ grammar Fortran
   rule mult_operand
     # F90:R705
 
-    level_1_expr ( power_op mult_operand )? <Mult_Operand>
+    level_1_expr power_op_option? <Mult_Operand>
   end
 
   rule name
@@ -2360,6 +2360,10 @@ grammar Fortran
     # F90:R708
 
     "**" <Power_Op>
+  end
+
+  rule power_op_option
+    power_op mult_operand &{ |e| sp_rec_env(e[1]) } <Power_Op_Option>
   end
 
   rule prefix_function

@@ -583,7 +583,9 @@ module Fortran
         end
         up=use_part
         new_usenames=[[:all]] if new_usenames.empty?
-        up.env[:uses].merge!({modname=>new_usenames})
+        new_uses={modname=>new_usenames}
+        old_uses=up.env[:uses]
+        up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
 # HACK start
         t=raw("!sms$ignore begin",:sms_ignore_begin,@srcfile)
         t.parent=up
@@ -1593,7 +1595,7 @@ module Fortran
   class Mult_Operand < T
 
     def to_s
-      "#{e[0]}"+((e[1].e)?("#{e[1].e[0]}#{e[1].e[1]}"):(""))
+      "#{e[0]}#{e[1]}"
     end
 
   end
@@ -1720,6 +1722,9 @@ module Fortran
   end
 
   class Power_Op < T
+  end
+
+  class Power_Op_Option < E
   end
 
   class Prefix_Function < T

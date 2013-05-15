@@ -1033,6 +1033,17 @@ module Fortran
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
       s0 << r2
+      if r2
+        i6 = index
+        r7 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
+        if r7
+          @index = i6
+          r6 = instantiate_node(SyntaxNode,input, index...index)
+        else
+          r6 = nil
+        end
+        s0 << r6
+      end
     end
     if s0.last
       r0 = instantiate_node(Add_Operand,input, i0...index, s0)
@@ -20648,16 +20659,6 @@ module Fortran
   end
 
   module MultOperand0
-    def power_op
-      elements[0]
-    end
-
-    def mult_operand
-      elements[1]
-    end
-  end
-
-  module MultOperand1
     def level_1_expr
       elements[0]
     end
@@ -20679,20 +20680,7 @@ module Fortran
     r1 = _nt_level_1_expr
     s0 << r1
     if r1
-      i3, s3 = index, []
-      r4 = _nt_power_op
-      s3 << r4
-      if r4
-        r5 = _nt_mult_operand
-        s3 << r5
-      end
-      if s3.last
-        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-        r3.extend(MultOperand0)
-      else
-        @index = i3
-        r3 = nil
-      end
+      r3 = _nt_power_op_option
       if r3
         r2 = r3
       else
@@ -20702,7 +20690,7 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Mult_Operand,input, i0...index, s0)
-      r0.extend(MultOperand1)
+      r0.extend(MultOperand0)
     else
       @index = i0
       r0 = nil
@@ -23466,6 +23454,59 @@ module Fortran
     end
 
     node_cache[:power_op][start_index] = r0
+
+    r0
+  end
+
+  module PowerOpOption0
+    def power_op
+      elements[0]
+    end
+
+    def mult_operand
+      elements[1]
+    end
+
+  end
+
+  def _nt_power_op_option
+    start_index = index
+    if node_cache[:power_op_option].has_key?(index)
+      cached = node_cache[:power_op_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_power_op
+    s0 << r1
+    if r1
+      r2 = _nt_mult_operand
+      s0 << r2
+      if r2
+        i3 = index
+        r4 = lambda { |e| sp_rec_env(e[1]) }.call(s0)
+        if r4
+          @index = i3
+          r3 = instantiate_node(SyntaxNode,input, index...index)
+        else
+          r3 = nil
+        end
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(Power_Op_Option,input, i0...index, s0)
+      r0.extend(PowerOpOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:power_op_option][start_index] = r0
 
     r0
   end
