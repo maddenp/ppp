@@ -2,14 +2,14 @@ module Fortran
 
   require "ostruct"
 
-  def array_props(array_spec,_props)
+  def array_props(array_spec,_props,distribute)
     dims=0
     array_spec.abstract_boundslist.each_index do |i|
       arrdim=i+1
       _props["lb#{arrdim}"]=array_spec.abstract_boundslist[i].alb
       _props["ub#{arrdim}"]=array_spec.abstract_boundslist[i].aub
-      if @distribute and (decompdim=@distribute["dim"].index(arrdim))
-        _props["decomp"]=@distribute["decomp"]
+      if distribute and (decompdim=distribute["dim"].index(arrdim))
+        _props["decomp"]=distribute["decomp"]
         _props["dim#{arrdim}"]=decompdim+1
       end
       dims+=1
@@ -164,7 +164,7 @@ module Fortran
     # In case this array has not previously been seen, record its array specs.
     a.items.each do |x|
       if x.array_spec
-        env[x.name].merge!(array_props(x.array_spec,{}))
+        env[x.name].merge!(array_props(x.array_spec,{},@distribute))
       end
     end
     true
@@ -181,7 +181,7 @@ module Fortran
         var=x.name
         array_spec=x.spec.e[0]
         env[var]||={}
-        env[var].merge!(array_props(array_spec,{}))
+        env[var].merge!(array_props(array_spec,{},@distribute))
       end
     end
     array_names_and_specs.names.each { |x| varsetprop(x,"rank","array") }
@@ -278,12 +278,12 @@ module Fortran
   end
 
   def sp_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
-    varprops=entity_decl_list.varprops
+    varprops=entity_decl_list.varprops(@distribute)
     if x=attrchk(attr_spec_option,:dimension?)
       array_spec=x.e[0]
       varprops.each do |v,p|
         p["rank"]="array"
-        array_props(array_spec,p)
+        array_props(array_spec,p,@distribute)
       end
     end
     if attrchk(attr_spec_option,:private?)
@@ -511,6 +511,13 @@ module Fortran
       s
     end
 
+    def newtag
+      r=root
+      t=0
+      t=r.instance_variable_get(:@tag)+1 if r.instance_variable_defined?(:@tag)
+      r.instance_variable_set(:@tag,t)
+    end
+
     def remove
       self.parent.e[self.parent.e.index(self)]=nil
 #     self.parent.e.compact!
@@ -549,13 +556,6 @@ module Fortran
 
     def specification_part
       scoping_unit.e[1]
-    end
-
-    def tag
-      r=root
-      t=0
-      t=r.instance_variable_get(:@tag)+1 if r.instance_variable_defined?(:@tag)
-      r.instance_variable_set(:@tag,t)
     end
 
     def unindent
@@ -1258,10 +1258,10 @@ module Fortran
       "#{e[0]}"
     end
 
-    def props
+    def props(distribute)
       _props={}
       if e[1].is_a?(Entity_Decl_Array_Spec)
-        array_props(e[1].e[1].e[0],_props)
+        array_props(e[1].e[1].e[0],_props,distribute)
       end
       _props["rank"]=((array?)?("array"):("scalar"))
       {name=>_props}
@@ -1285,19 +1285,21 @@ module Fortran
   end
 
   class Entity_Decl_List < E
-    def varprops
-      e[0].props.merge(e[1].props)
+    def varprops(distribute)
+      e[0].props(distribute).merge(e[1].props(distribute))
     end
   end
 
   class Entity_Decl_List_Pair < T
     def array?() e[1].array? end
     def name() e[1].name end
-    def props() e[1].props end
+    def props(distribute) e[1].props(distribute) end
   end
 
   class Entity_Decl_List_Pairs < T
-    def props() e.reduce({}) { |m,x| m.merge(x.props) } end
+    def props(distribute)
+      e.reduce({}) { |m,x| m.merge(x.props(distribute)) }
+    end
   end
 
   class Entry_Name < E
