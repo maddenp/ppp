@@ -486,7 +486,7 @@ module Fortran
     def translate
       use("module_decomp")
       use("nnt_types_module")
-      tag="ppp__tag_#{@tag+=1}"
+      tag="ppp__tag_#{tag}"
       declare("integer",tag,{:attrs=>"save"})
       v=[e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
       nvars=v.size

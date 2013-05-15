@@ -127,7 +127,6 @@ module Fortran
     @parallel=false
     @serial=false
     @srcfile=srcfile
-    @tag=-1
     @tolocal=false
   end
 
@@ -548,6 +547,13 @@ module Fortran
 
     def specification_part
       scoping_unit.e[1]
+    end
+
+    def tag
+      r=root
+      t=0
+      t=r.instance_variable_get(:@tag)+1 if r.instance_variable_defined?(:@tag)
+      r.instance_variable_set(:@tag,t)
     end
 
     def unindent
