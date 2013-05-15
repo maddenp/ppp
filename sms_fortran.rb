@@ -120,10 +120,10 @@ module Fortran
         code+="(#{dims.join(',')})" if dims
         init=props[:init]
         code+="=#{init}" if init
-        t=raw(code,:type_declaration_stmt)
+        t=raw(code,:type_declaration_stmt,root.srcfile)
         t.parent=p
         p.e[0].e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
-        varenv["pppvar"]=true
+        p.env[name]={"pppvar"=>true}
       end
     end
 
@@ -313,7 +313,7 @@ module Fortran
 
   end
 
-  class SMS < T
+  class SMS < E
 
     def fixbound(varenv,var,dim,x)
       bound=varenv["#{x}b#{dim}"]
@@ -426,7 +426,7 @@ module Fortran
 
   end
 
-  class SMS_Decomp_Name < E
+  class SMS_Decomp_Name < SMS
   end
 
   class SMS_Distribute_Begin < SMS
@@ -503,7 +503,7 @@ module Fortran
       varenv=nil
       (0..nvars-1).each do |i|
         var=v[i].name
-        fail "'#{var}' not found in environment" unless (varenv=self.env[var])
+        fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
         dims=varenv["dims"]
         dh=varenv["decomp"]
         dectypes.push("#{dh}(dh__nestlevel)")
@@ -527,6 +527,9 @@ module Fortran
       replace_statement(code,:call_stmt)
     end
 
+  end
+
+  class SMS_Executable < SMS
   end
 
   class SMS_Halo_Comp_Begin < SMS

@@ -128,8 +128,8 @@ grammar Fortran
 
   rule sms_executable
     sms_barrier /
-    sms_compare_var &{ |e| sp_rec_env(e[0]) } <SMS_Compare_Var> /
-    sms_exchange &{ |e| sp_rec_env(e[0]) } <SMS_Exchange> /
+    sms_compare_var &{ |e| sp_rec_env(e[0]) } <SMS_Executable> /
+    sms_exchange &{ |e| sp_rec_env(e[0]) } <SMS_Executable> /
     sms_halo_comp_begin /
     sms_halo_comp_end /
     sms_parallel_begin /

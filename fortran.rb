@@ -371,8 +371,9 @@ module Fortran
   end
 
   def uses?(modulename,usename)
-    return false unless env[:uses]
-    (env[:uses][modulename])?(use_localnames(modulename).include?(usename)):(false)
+    e=(self.is_a?(Treetop::Runtime::SyntaxNode))?(self.env):(env)
+    return false unless e[:uses]
+    (e[:uses][modulename])?(use_localnames(modulename).include?(usename)):(false)
   end
 
   def vargetprop(n,k)
@@ -446,11 +447,12 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
-    attr_accessor :env
+    attr_accessor :env,:srcfile
 
     def initialize(*args)
       super
       @env=nil
+      @srcfile=nil
     end
 
     def ancestor(class_or_classes)

@@ -1275,7 +1275,7 @@ module Fortran
         s2 << r4
       end
       if s2.last
-        r2 = instantiate_node(SMS_Compare_Var,input, i2...index, s2)
+        r2 = instantiate_node(SMS_Executable,input, i2...index, s2)
         r2.extend(SmsExecutable0)
       else
         @index = i2
@@ -1299,7 +1299,7 @@ module Fortran
           s6 << r8
         end
         if s6.last
-          r6 = instantiate_node(SMS_Exchange,input, i6...index, s6)
+          r6 = instantiate_node(SMS_Executable,input, i6...index, s6)
           r6.extend(SmsExecutable1)
         else
           @index = i6

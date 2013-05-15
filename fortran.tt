@@ -2803,7 +2803,7 @@ grammar Fortran
   rule specification_part
     # F90:R204
 
-    use_part implicit_part? declaration_constructs <Specification_Part>
+    use_part implicit_part? declaration_constructs &{ |e| sp_rec_env(e[2]) } <Specification_Part>
   end
 
   rule specification_stmt

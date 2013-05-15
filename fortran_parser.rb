@@ -26621,6 +26621,7 @@ module Fortran
     def declaration_constructs
       elements[2]
     end
+
   end
 
   def _nt_specification_part
@@ -26648,6 +26649,17 @@ module Fortran
       if r2
         r4 = _nt_declaration_constructs
         s0 << r4
+        if r4
+          i5 = index
+          r6 = lambda { |e| sp_rec_env(e[2]) }.call(s0)
+          if r6
+            @index = i5
+            r5 = instantiate_node(SyntaxNode,input, index...index)
+          else
+            r5 = nil
+          end
+          s0 << r5
+        end
       end
     end
     if s0.last
