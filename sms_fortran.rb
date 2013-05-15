@@ -138,7 +138,52 @@ module Fortran
       OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
     end
 
+# HACK start
+
+# This overrides T#use in fortran.rb to provide sms$ignore wraps for peaceful
+# coexistence with legacy ppp, for now. Remove this HACK when legacy ppp is
+# removed from build chain.
+
+    def use(modname,usenames=[])
+      unless uses?(modname,:all)
+        new_usenames=[]
+        code="use #{modname}"
+        unless usenames.empty?
+          list=[]
+          usenames.each do |x|
+            h=x.is_a?(Hash)
+            localname=(h)?(x.keys.first):(nil)
+            usename=(h)?(x.values.first):(x)
+            unless uses?(modname,usename)
+              list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
+              new_usenames.push([localname||usename,usename])
+            end
+          end
+          code+=((list.empty?)?(""):(",only:#{list.join(",")}"))
+        end
+        up=use_part
+        new_usenames=[[:all]] if new_usenames.empty?
+        new_uses={modname=>new_usenames}
+        old_uses=up.env[:uses]
+        up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
+  # sub HACK start
+        t=raw("!sms$ignore begin",:sms_ignore_begin,@srcfile)
+        t.parent=up
+        up.e.push(t)
+  # sub HACK end
+        t=raw(code,:use_stmt,@srcfile)
+        t.parent=up
+        up.e.push(t)
+  # sub HACK start
+        t=raw("!sms$ignore end",:sms_ignore_end,@srcfile)
+        t.parent=up
+        up.e.push(t)
+  # sub HACK end
+      end
+    end
   end
+
+# HACK end
 
   class Allocate_Object < E
 

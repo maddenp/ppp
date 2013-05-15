@@ -586,19 +586,9 @@ module Fortran
         new_uses={modname=>new_usenames}
         old_uses=up.env[:uses]
         up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
-# HACK start
-        t=raw("!sms$ignore begin",:sms_ignore_begin,@srcfile)
-        t.parent=up
-        up.e.push(t)
-# HACK end
         t=raw(code,:use_stmt,@srcfile)
         t.parent=up
         up.e.push(t)
-# HACK start
-        t=raw("!sms$ignore end",:sms_ignore_end,@srcfile)
-        t.parent=up
-        up.e.push(t)
-# HACK end
       end
     end
 
