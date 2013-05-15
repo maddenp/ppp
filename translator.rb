@@ -34,7 +34,7 @@ module Translator
   def fail(msg,die=true,srcfile=nil)
     s="#{msg}"
     s+=": #{srcfile}" if srcfile
-    puts s
+    $stderr.puts s
     exit(1) if die
   end
 
