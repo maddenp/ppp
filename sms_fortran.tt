@@ -92,7 +92,7 @@ grammar Fortran
 
   rule sms_declarative
     sms_declare_decomp &{ |e| sp_rec_env(e[0]) } <SMS_Declarative> /
-    sms_distribute_begin &{ |e| sp_rec_env(e[0]) } <SMS_Declarative> /
+    sms_distribute_begin /
     sms_distribute_end
   end
 

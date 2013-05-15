@@ -625,13 +625,6 @@ module Fortran
 
   end
 
-  module SmsDeclarative1
-    def sms_distribute_begin
-      elements[0]
-    end
-
-  end
-
   def _nt_sms_declarative
     start_index = index
     if node_cache[:sms_declarative].has_key?(index)
@@ -668,33 +661,13 @@ module Fortran
     if r1
       r0 = r1
     else
-      i5, s5 = index, []
-      r6 = _nt_sms_distribute_begin
-      s5 << r6
-      if r6
-        i7 = index
-        r8 = lambda { |e| sp_rec_env(e[0]) }.call(s5)
-        if r8
-          @index = i7
-          r7 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r7 = nil
-        end
-        s5 << r7
-      end
-      if s5.last
-        r5 = instantiate_node(SMS_Declarative,input, i5...index, s5)
-        r5.extend(SmsDeclarative1)
-      else
-        @index = i5
-        r5 = nil
-      end
+      r5 = _nt_sms_distribute_begin
       if r5
         r0 = r5
       else
-        r9 = _nt_sms_distribute_end
-        if r9
-          r0 = r9
+        r6 = _nt_sms_distribute_end
+        if r6
+          r0 = r6
         else
           @index = i0
           r0 = nil
