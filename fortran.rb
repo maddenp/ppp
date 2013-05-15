@@ -579,16 +579,18 @@ module Fortran
               new_usenames.push([localname||usename,usename])
             end
           end
-          code+=((list.empty?)?(""):(",only:#{list.join(",")}"))
+          code=((list.empty?)?(nil):("#{code},only:#{list.join(",")}"))
         end
-        up=use_part
-        new_usenames=[[:all]] if new_usenames.empty?
-        new_uses={modname=>new_usenames}
-        old_uses=up.env[:uses]
-        up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
-        t=raw(code,:use_stmt,@srcfile)
-        t.parent=up
-        up.e.push(t)
+        if code
+          up=use_part
+          new_usenames=[[:all]] if new_usenames.empty?
+          new_uses={modname=>new_usenames}
+          old_uses=up.env[:uses]
+          up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
+          t=raw(code,:use_stmt,@srcfile)
+          t.parent=up
+          up.e.push(t)
+        end
       end
     end
 
