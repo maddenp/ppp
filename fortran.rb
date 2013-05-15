@@ -106,6 +106,11 @@ module Fortran
     @dolabels.pop if nonblock_do_end?(node)
   end
 
+  def parser_uses?(modname,usename)
+    return false unless env[:uses]
+    (env[:uses][modname])?(use_localnames(modname).include?(usename)):(false)
+  end
+
   def sa(e)
     # space after: If the [e]lement's string form is empty, return that; else
     # return its string form with a trailing space appended.
@@ -247,9 +252,11 @@ module Fortran
     true
   end
 
-  def sp_rec_env(node)
-    if node.respond_to?(:env)
-      node.env=env
+  def sp_rec_env(*nodes)
+    nodes.each do |x|
+      if x.is_a?(T)
+        x.env=env if x.respond_to?(:env)
+      end
     end
     true
   end
@@ -318,7 +325,7 @@ module Fortran
       varname=x[0]
       varprop=x[1]
       localname=use_localname(m,varname)
-      if uses?(m,:all) or uses?(m,localname)
+      if parser_uses?(m,:all) or parser_uses?(m,localname)
         env[localname]=varprop
       end
     end
@@ -341,9 +348,9 @@ module Fortran
     unless env[:uses][modulename]
       env[:uses][modulename]=names
     else
-      unless uses?(modulename,:all)
+      unless parser_uses?(modulename,:all)
         names.each do |x|
-          env[:uses][modulename].push(x) unless uses?(modulename,x)
+          env[:uses][modulename].push(x) unless parser_uses?(modulename,x)
         end
       end
     end
@@ -370,12 +377,6 @@ module Fortran
     specification_part.e[0]
   end
 
-  def uses?(modulename,usename)
-    e=(self.is_a?(Treetop::Runtime::SyntaxNode))?(self.env):(env)
-    return false unless e[:uses]
-    (e[:uses][modulename])?(use_localnames(modulename).include?(usename)):(false)
-  end
-
   def vargetprop(n,k)
     return nil unless env["#{n}"]
     env["#{n}"]["#{k}"]||nil
@@ -390,11 +391,10 @@ module Fortran
 
   class Treetop::Runtime::SyntaxNode
 
-    def descendants(class_or_classes)
-      c=(class_or_classes.is_a?(Array))?(class_or_classes):([class_or_classes])
+    def descendants(*classes)
       if self.e
-        mine=self.e.find_all { |x| c.include?(x.class) }
-        return self.e.reduce(mine) { |m,x| m+x.descendants(c) }
+        mine=self.e.find_all { |x| classes.include?(x.class) }
+        return self.e.reduce(mine) { |m,x| m+x.descendants(classes) }
       end
       []
     end
@@ -455,11 +455,10 @@ module Fortran
       @srcfile=nil
     end
 
-    def ancestor(class_or_classes)
-      c=(class_or_classes.is_a?(Array))?(class_or_classes):([class_or_classes])
+    def ancestor(*classes)
       n=self.parent
       begin
-        return n if c.any? { |x| n.is_a?(x) }
+        return n if classes.any? { |x| n.is_a?(x) }
       end while n=n.parent
       nil
     end
@@ -564,37 +563,45 @@ module Fortran
       r.instance_variable_set(:@level,l-1) if l>0
     end
 
-    def use(modulename,usenames=[])
-      unless uses?(modulename,:all)
-        code="use #{modulename}"
+    def tree_uses?(modname,usename)
+      up=use_part
+      return false unless up.env[:uses]
+      (up.env[:uses][modname])?(use_localnames(modname).include?(usename)):(false)
+    end
+
+    def use(modname,usenames=[])
+      unless tree_uses?(modname,:all)
+        new_usenames=[]
+        code="use #{modname}"
         unless usenames.empty?
           list=[]
           usenames.each do |x|
             h=x.is_a?(Hash)
             localname=(h)?(x.keys.first):(nil)
             usename=(h)?(x.values.first):(x)
-            unless uses?(modulename,usename)
+            unless tree_uses?(modname,usename)
               list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
+              new_usenames.push([localname||usename,usename])
             end
           end
-          code=((list.empty?)?(nil):("#{code},only:#{list.join(",")}"))
+          code+=((list.empty?)?(""):(",only:#{list.join(",")}"))
         end
-        if code
-          p=use_part
+        up=use_part
+        new_usenames=[[:all]] if new_usenames.empty?
+        up.env[:uses].merge!({modname=>new_usenames})
 # HACK start
-          t=raw("!sms$ignore begin",:sms_ignore_begin,@srcfile)
-          t.parent=p
-          p.e.push(t)
+        t=raw("!sms$ignore begin",:sms_ignore_begin,@srcfile)
+        t.parent=up
+        up.e.push(t)
 # HACK end
-          t=raw(code,:use_stmt,@srcfile)
-          t.parent=p
-          p.e.push(t)
+        t=raw(code,:use_stmt,@srcfile)
+        t.parent=up
+        up.e.push(t)
 # HACK start
-          t=raw("!sms$ignore end",:sms_ignore_end,@srcfile)
-          t.parent=p
-          p.e.push(t)
+        t=raw("!sms$ignore end",:sms_ignore_end,@srcfile)
+        t.parent=up
+        up.e.push(t)
 # HACK end
-        end
       end
     end
 

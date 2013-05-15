@@ -26651,7 +26651,7 @@ module Fortran
         s0 << r4
         if r4
           i5 = index
-          r6 = lambda { |e| sp_rec_env(e[2]) }.call(s0)
+          r6 = lambda { |e| sp_rec_env(e[0],e[2]) }.call(s0)
           if r6
             @index = i5
             r5 = instantiate_node(SyntaxNode,input, index...index)

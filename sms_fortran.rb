@@ -107,8 +107,8 @@ module Fortran
   class T < Treetop::Runtime::SyntaxNode
 
     def declare(type,name,props={})
-      p=declaration_constructs
-      varenv=p.env[name]
+      dc=declaration_constructs
+      varenv=dc.env[name]
       if varenv
         fail "Variable #{name} is already defined" unless varenv["pppvar"]
       else
@@ -121,9 +121,9 @@ module Fortran
         init=props[:init]
         code+="=#{init}" if init
         t=raw(code,:type_declaration_stmt,root.srcfile)
-        t.parent=p
-        p.e[0].e.insert(0,t) # prefer "p.e.push(t)" -- see TODO
-        p.env[name]={"pppvar"=>true}
+        t.parent=dc
+        dc.e[0].e.insert(0,t) # prefer "dc.e.push(t)" -- see TODO
+        dc.env[name]={"pppvar"=>true}
       end
     end
 
