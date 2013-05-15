@@ -158,7 +158,7 @@ module Translator
     opts=default_opts.merge(opts)
     debug=opts[:debug]
     fp=FortranParser.new
-    fp.setup(srcfile)
+    fp.setup(srcfile,opts[:incdirs])
     s=prepsrc(s) if defined? prepsrc
     s=assemble(s,[srcfile],opts[:incdirs])
     cppcheck(s)
@@ -167,7 +167,6 @@ module Translator
     s=normalize(s,opts[:nl])
     unless opts[:normalize]
       puts s if debug
-      @incdirs=opts[:incdirs]
       raw_tree=fp.parse(s,:root=>root)
       raw_tree.instance_variable_set(:@srcfile,srcfile)
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree

@@ -156,10 +156,10 @@ module Fortran
 # the environment and then... Can we have a decomposed array inside a derived
 # type? A decomposed array *of* dervived type, yes -- but the components?
 
-#         fail "'#{var}' not found in environment" unless (varenv=self.env[var])
+#         fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
 #         if varenv["decomp"]
 
-          varenv=self.env[var]
+          varenv=self.env["#{var}"]
           if varenv and varenv["decomp"]
             subscript_list=part_ref.subscript_list
             newdims=[]
@@ -229,7 +229,7 @@ module Fortran
     def translate
       var="#{e[0]}"
       spec=e[2].spec
-      varenv=self.env[var]
+      varenv=self.env["#{var}"]
       distribute_array_bounds(spec,varenv)
     end
 
@@ -239,7 +239,7 @@ module Fortran
 
     def translate
       var="#{e[0]}"
-      fail "'#{var}' not found in environment" unless (varenv=self.env[var])
+      fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
       spec=nil
       if varenv["rank"]=="array"
         if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
@@ -357,7 +357,7 @@ module Fortran
       use("nnt_types_module")
       declare("logical","sms_debugging_on")
       var="#{e[3].name}"
-      fail "'#{var}' not found in environment" unless (varenv=self.env[var])
+      fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
       dims=varenv["dims"]
       str="#{e[5]}"
       type=smstype(varenv["type"],varenv["kind"])
@@ -767,7 +767,7 @@ module Fortran
 
     def translate
       var="#{e[3]}"
-      fail "No module info found for variable '#{var}'" unless (varenv=self.env[var])
+      fail "No module info found for variable '#{var}'" unless (varenv=self.env["#{var}"])
       fail "No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
       use("nnt_types_module")
       stmts=[]

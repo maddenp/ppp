@@ -1224,20 +1224,27 @@ module Fortran
   end
 
   module SmsExecutable0
-    def sms_compare_var
+    def sms_barrier
       elements[0]
     end
 
   end
 
   module SmsExecutable1
-    def sms_exchange
+    def sms_compare_var
       elements[0]
     end
 
   end
 
   module SmsExecutable2
+    def sms_exchange
+      elements[0]
+    end
+
+  end
+
+  module SmsExecutable3
     def sms_unstructured_grid
       elements[0]
     end
@@ -1256,113 +1263,133 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_sms_barrier
+    i1, s1 = index, []
+    r2 = _nt_sms_barrier
+    s1 << r2
+    if r2
+      i3 = index
+      r4 = lambda { |e| sp_rec_env(e[0]) }.call(s1)
+      if r4
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r3 = nil
+      end
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(SMS_Executable,input, i1...index, s1)
+      r1.extend(SmsExecutable0)
+    else
+      @index = i1
+      r1 = nil
+    end
     if r1
       r0 = r1
     else
-      i2, s2 = index, []
-      r3 = _nt_sms_compare_var
-      s2 << r3
-      if r3
-        i4 = index
-        r5 = lambda { |e| sp_rec_env(e[0]) }.call(s2)
-        if r5
-          @index = i4
-          r4 = instantiate_node(SyntaxNode,input, index...index)
+      i5, s5 = index, []
+      r6 = _nt_sms_compare_var
+      s5 << r6
+      if r6
+        i7 = index
+        r8 = lambda { |e| sp_rec_env(e[0]) }.call(s5)
+        if r8
+          @index = i7
+          r7 = instantiate_node(SyntaxNode,input, index...index)
         else
-          r4 = nil
+          r7 = nil
         end
-        s2 << r4
+        s5 << r7
       end
-      if s2.last
-        r2 = instantiate_node(SMS_Executable,input, i2...index, s2)
-        r2.extend(SmsExecutable0)
+      if s5.last
+        r5 = instantiate_node(SMS_Executable,input, i5...index, s5)
+        r5.extend(SmsExecutable1)
       else
-        @index = i2
-        r2 = nil
+        @index = i5
+        r5 = nil
       end
-      if r2
-        r0 = r2
+      if r5
+        r0 = r5
       else
-        i6, s6 = index, []
-        r7 = _nt_sms_exchange
-        s6 << r7
-        if r7
-          i8 = index
-          r9 = lambda { |e| sp_rec_env(e[0]) }.call(s6)
-          if r9
-            @index = i8
-            r8 = instantiate_node(SyntaxNode,input, index...index)
+        i9, s9 = index, []
+        r10 = _nt_sms_exchange
+        s9 << r10
+        if r10
+          i11 = index
+          r12 = lambda { |e| sp_rec_env(e[0]) }.call(s9)
+          if r12
+            @index = i11
+            r11 = instantiate_node(SyntaxNode,input, index...index)
           else
-            r8 = nil
+            r11 = nil
           end
-          s6 << r8
+          s9 << r11
         end
-        if s6.last
-          r6 = instantiate_node(SMS_Executable,input, i6...index, s6)
-          r6.extend(SmsExecutable1)
+        if s9.last
+          r9 = instantiate_node(SMS_Executable,input, i9...index, s9)
+          r9.extend(SmsExecutable2)
         else
-          @index = i6
-          r6 = nil
+          @index = i9
+          r9 = nil
         end
-        if r6
-          r0 = r6
+        if r9
+          r0 = r9
         else
-          r10 = _nt_sms_halo_comp_begin
-          if r10
-            r0 = r10
+          r13 = _nt_sms_halo_comp_begin
+          if r13
+            r0 = r13
           else
-            r11 = _nt_sms_halo_comp_end
-            if r11
-              r0 = r11
+            r14 = _nt_sms_halo_comp_end
+            if r14
+              r0 = r14
             else
-              r12 = _nt_sms_parallel_begin
-              if r12
-                r0 = r12
+              r15 = _nt_sms_parallel_begin
+              if r15
+                r0 = r15
               else
-                r13 = _nt_sms_parallel_end
-                if r13
-                  r0 = r13
+                r16 = _nt_sms_parallel_end
+                if r16
+                  r0 = r16
                 else
-                  r14 = _nt_sms_to_local_begin
-                  if r14
-                    r0 = r14
+                  r17 = _nt_sms_to_local_begin
+                  if r17
+                    r0 = r17
                   else
-                    r15 = _nt_sms_to_local_end
-                    if r15
-                      r0 = r15
+                    r18 = _nt_sms_to_local_end
+                    if r18
+                      r0 = r18
                     else
-                      r16 = _nt_sms_set_communicator
-                      if r16
-                        r0 = r16
+                      r19 = _nt_sms_set_communicator
+                      if r19
+                        r0 = r19
                       else
-                        i17, s17 = index, []
-                        r18 = _nt_sms_unstructured_grid
-                        s17 << r18
-                        if r18
-                          i19 = index
-                          r20 = lambda { |e| sp_rec_env(e[0]) }.call(s17)
-                          if r20
-                            @index = i19
-                            r19 = instantiate_node(SyntaxNode,input, index...index)
+                        i20, s20 = index, []
+                        r21 = _nt_sms_unstructured_grid
+                        s20 << r21
+                        if r21
+                          i22 = index
+                          r23 = lambda { |e| sp_rec_env(e[0]) }.call(s20)
+                          if r23
+                            @index = i22
+                            r22 = instantiate_node(SyntaxNode,input, index...index)
                           else
-                            r19 = nil
+                            r22 = nil
                           end
-                          s17 << r19
+                          s20 << r22
                         end
-                        if s17.last
-                          r17 = instantiate_node(SMS_Unstructured_Grid,input, i17...index, s17)
-                          r17.extend(SmsExecutable2)
+                        if s20.last
+                          r20 = instantiate_node(SMS_Unstructured_Grid,input, i20...index, s20)
+                          r20.extend(SmsExecutable3)
                         else
-                          @index = i17
-                          r17 = nil
+                          @index = i20
+                          r20 = nil
                         end
-                        if r17
-                          r0 = r17
+                        if r20
+                          r0 = r20
                         else
-                          r21 = _nt_sms_passthrough
-                          if r21
-                            r0 = r21
+                          r24 = _nt_sms_passthrough
+                          if r24
+                            r0 = r24
                           else
                             @index = i0
                             r0 = nil

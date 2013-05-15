@@ -127,7 +127,7 @@ grammar Fortran
   end
 
   rule sms_executable
-    sms_barrier /
+    sms_barrier &{ |e| sp_rec_env(e[0]) } <SMS_Executable> /
     sms_compare_var &{ |e| sp_rec_env(e[0]) } <SMS_Executable> /
     sms_exchange &{ |e| sp_rec_env(e[0]) } <SMS_Executable> /
     sms_halo_comp_begin /

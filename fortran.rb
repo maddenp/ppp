@@ -118,12 +118,12 @@ module Fortran
     (e.to_s=="")?(""):(" #{e}")
   end
 
-  def setup(srcfile)
+  def setup(srcfile,incdirs)
     @access="_default"
     @dolabels=[]
     @envstack=[{}]
     @halocomp=false
-    @incdirs=[]
+    @incdirs=incdirs
     @parallel=false
     @serial=false
     @srcfile=srcfile
@@ -865,12 +865,12 @@ module Fortran
         ok=(self.env[:args] and self.env[:args].include?(array_name))?(true):(false)
       elsif (entity_decl=self.ancestor(Array_Name_And_Spec))
         array_name=entity_decl.name
-        ok=(self.env[array_name]["lb1"]=="_deferred")?(false):(true)
+        ok=(self.env["#{array_name}"]["lb1"]=="_deferred")?(false):(true)
       end
       unless ok
         code="#{self}"
         replace_element(code,:deferred_shape_spec_list)
-        varenv=self.env[array_name]
+        varenv=self.env["#{array_name}"]
         varenv.keys.each { |k| varenv[k]="_deferred" if k=~/[lu]b\d+/ }
       end
     end
