@@ -106,12 +106,6 @@ module Fortran
     @dolabels.pop if nonblock_do_end?(node)
   end
 
-  def uses?(modname,usename)
-    e=(self.is_a?(T))?(use_part.env):(env)
-    return false unless e[:uses]
-    (e[:uses][modname])?(use_localnames(modname).include?(usename)):(false)
-  end
-
   def sa(e)
     # space after: If the [e]lement's string form is empty, return that; else
     # return its string form with a trailing space appended.
@@ -365,17 +359,25 @@ module Fortran
   end
 
   def use_localnames(modulename)
-    return [] unless env[:uses]
-    env[:uses][modulename].map { |x| x[0] }
+    e=(self.is_a?(T))?(use_part.env):(env)
+    return [] unless e[:uses]
+    e[:uses][modulename].map { |x| x[0] }
   end
 
   def use_usenames(modulename)
-    return [] unless env[:uses]
-    env[:uses][modulename].map { |x| x[1] }
+    e=(self.is_a?(T))?(use_part.env):(env)
+    return [] unless e[:uses]
+    e[:uses][modulename].map { |x| x[1] }
   end
 
   def use_part
     specification_part.e[0]
+  end
+
+  def uses?(modname,usename)
+    e=(self.is_a?(T))?(use_part.env):(env)
+    return false unless e[:uses]
+    (e[:uses][modname])?(use_localnames(modname).include?(usename)):(false)
   end
 
   def vargetprop(n,k)
