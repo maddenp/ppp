@@ -106,9 +106,10 @@ module Fortran
     @dolabels.pop if nonblock_do_end?(node)
   end
 
-  def parser_uses?(modname,usename)
-    return false unless env[:uses]
-    (env[:uses][modname])?(use_localnames(modname).include?(usename)):(false)
+  def uses?(modname,usename)
+    e=(self.is_a?(T))?(use_part.env):(env)
+    return false unless e[:uses]
+    (e[:uses][modname])?(use_localnames(modname).include?(usename)):(false)
   end
 
   def sa(e)
@@ -325,7 +326,7 @@ module Fortran
       varname=x[0]
       varprop=x[1]
       localname=use_localname(m,varname)
-      if parser_uses?(m,:all) or parser_uses?(m,localname)
+      if uses?(m,:all) or uses?(m,localname)
         env[localname]=varprop
       end
     end
@@ -348,9 +349,9 @@ module Fortran
     unless env[:uses][modulename]
       env[:uses][modulename]=names
     else
-      unless parser_uses?(modulename,:all)
+      unless uses?(modulename,:all)
         names.each do |x|
-          env[:uses][modulename].push(x) unless parser_uses?(modulename,x)
+          env[:uses][modulename].push(x) unless uses?(modulename,x)
         end
       end
     end
@@ -563,14 +564,8 @@ module Fortran
       r.instance_variable_set(:@level,l-1) if l>0
     end
 
-    def tree_uses?(modname,usename)
-      up=use_part
-      return false unless up.env[:uses]
-      (up.env[:uses][modname])?(use_localnames(modname).include?(usename)):(false)
-    end
-
     def use(modname,usenames=[])
-      unless tree_uses?(modname,:all)
+      unless uses?(modname,:all)
         new_usenames=[]
         code="use #{modname}"
         unless usenames.empty?
@@ -579,7 +574,7 @@ module Fortran
             h=x.is_a?(Hash)
             localname=(h)?(x.keys.first):(nil)
             usename=(h)?(x.values.first):(x)
-            unless tree_uses?(modname,usename)
+            unless uses?(modname,usename)
               list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
               new_usenames.push([localname||usename,usename])
             end
