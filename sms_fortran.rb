@@ -286,7 +286,7 @@ module Fortran
       var="#{e[0]}"
       fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
       spec=nil
-      if varenv["rank"]=="array"
+      if varenv["rank"]=="_array"
         if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
           # entity_decl_array_spec case
           spec=entity_decl_array_spec.e[1].spec

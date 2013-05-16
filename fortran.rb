@@ -156,7 +156,7 @@ module Fortran
       # Record that this var has been marked allocatable, which means that it
       # must be an array with deferred bounds.
       env[:allocatable].push(var)
-      varsetprop(var,"rank","array")
+      varsetprop(var,"rank","_array")
       # Correct for the case where this array has already been seen and its
       # bounds incorrectly marked as assumed.
       env[var].keys.each { |k| env[var][k]="_deferred" if k=~/[lu]b\d+/ }
@@ -184,7 +184,7 @@ module Fortran
         env[var].merge!(array_props(array_spec,{},@distribute))
       end
     end
-    array_names_and_specs.names.each { |x| varsetprop(x,"rank","array") }
+    array_names_and_specs.names.each { |x| varsetprop(x,"rank","_array") }
     true
   end
 
@@ -220,7 +220,7 @@ module Fortran
 
   def sp_is_array?(node)
     return false unless node.respond_to?(:name)
-    vargetprop(node.name,"rank")=="array"
+    vargetprop(node.name,"rank")=="_array"
   end
 
   def sp_module(_module)
@@ -273,7 +273,7 @@ module Fortran
     target_object_list.objects.each do |x|
       if x.is_a?(Array_Name_And_Spec)
         var=x.name
-        varsetprop(var,"rank","array")
+        varsetprop(var,"rank","_array")
       end
     end
     true
@@ -284,7 +284,7 @@ module Fortran
     if x=attrchk(attr_spec_option,:dimension?)
       array_spec=x.e[0]
       varprops.each do |v,p|
-        p["rank"]="array"
+        p["rank"]="_array"
         array_props(array_spec,p,@distribute)
       end
     end
@@ -1261,7 +1261,7 @@ module Fortran
       if e[1].is_a?(Entity_Decl_Array_Spec)
         array_props(e[1].e[1].e[0],_props,distribute)
       end
-      _props["rank"]=((array?)?("array"):("scalar"))
+      _props["rank"]=((array?)?("_array"):("_scalar"))
       {name=>_props}
     end
 
