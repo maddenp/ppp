@@ -522,7 +522,6 @@ module Fortran
 
     def remove
       self.parent.e[self.parent.e.index(self)]=nil
-#     self.parent.e.compact!
     end
 
     def replace_element(code,rule,node=self)
