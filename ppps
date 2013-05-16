@@ -52,3 +52,5 @@ echo "ok"
 # the server alive for the requestd number of seconds.
 
 test -n "$runtime" && sleep $runtime
+
+exit 0
