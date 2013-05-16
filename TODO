@@ -1,16 +1,17 @@
 - directives to do
 
   !sms$create_decomp
-  !sms$declare_decomp
   !sms$ignore begin/end
   !sms$reduce
   !sms$reduce begin/end
   !sms$serial begin/end
+  directiveless io translations
 
 x directives done
 
   !sms$barrier
   !sms$compare_var
+  !sms$declare_decomp
   !sms$distribute
   !sms$exchange
   !sms$halo_comp begin/end
