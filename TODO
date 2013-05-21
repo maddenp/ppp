@@ -161,4 +161,7 @@ x directives done
 - In translator.rb, think about 'opts' and what is actually optional. Move
   requirements into the mandatory argslist.
 
-- does pppts in server mode adequately indicate the failed test?
+- Does pppts in server mode adequately indicate the failed test?
+
+- To make all of this more useful, build an AST from the parse tree. Then, do
+  translations on and produce final output from the AST.
