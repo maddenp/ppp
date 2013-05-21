@@ -164,10 +164,10 @@ module Translator
     cppcheck(s)
     puts "RAW SOURCE\n\n#{s}\n" if debug
     puts "NORMALIZED SOURCE\n\n" if debug
-    s=normalize(s,opts[:nl])
+    n=normalize(s,opts[:nl])
     unless opts[:normalize]
-      puts s if debug
-      raw_tree=fp.parse(s,:root=>root)
+      puts n if debug
+      raw_tree=fp.parse(n,:root=>root)
       raw_tree.instance_variable_set(:@srcfile,srcfile)
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
       if debug
@@ -177,7 +177,9 @@ module Translator
       re=Regexp.new("^(.+?):in `([^\']*)'$")
       srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
       unless raw_tree
-        fail "PARSE FAILED#{srcmsg}"
+        na=n.split("\n")
+        na.each_index { |i| puts "#{i+1} #{na[i]}" }
+        fail "#{fp.failure_reason}\nPARSE FAILED#{srcmsg}"
         return # if in server mode and did not exit in fail()
       end
       translated_tree=(opts[:translate])?(raw_tree.translate_top):(nil)
@@ -185,10 +187,10 @@ module Translator
         puts "\nTRANSLATED TREE\n\n"
         p translated_tree
       end
-      s=wrap(translated_tree.to_s)
+      t=wrap(translated_tree.to_s)
       puts "\nTRANSLATED SOURCE\n\n" if debug
     end
-    [s,raw_tree,translated_tree]
+    [t,raw_tree,translated_tree]
   end
 
   def raw(s,root,srcfile,opts={})
