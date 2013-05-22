@@ -1,6 +1,8 @@
 CLIENT=pppc
 PARSERS=$(addsuffix _parser.rb,fortran normfree sms_fortran sms_normfree)
 
+.PHONY: clean cleaner
+
 all: $(PARSERS) $(CLIENT)
 
 sms_fortran_parser.rb: fortran_parser.rb
@@ -13,4 +15,7 @@ $(CLIENT): $(CLIENT).c
 	gcc -Wall $^ -lm -o $@
 
 clean:
-	$(RM) $(CLIENT) $(PARSERS) *.env *.mod *.o a.out socket*
+	$(RM) $(CLIENT) *.env *.mod *.o a.out socket*
+
+cleaner: clean
+	$(RM) $(PARSERS)
