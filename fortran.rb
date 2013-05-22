@@ -405,7 +405,7 @@ module Fortran
 
     def translate_children
       if e
-        e.each { |x| x.translate_common }
+        e.each { |x| x.translate_common if x }
         e.compact!
       end
       self
