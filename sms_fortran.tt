@@ -91,7 +91,7 @@ grammar Fortran
   end
 
   rule sms_declarative
-    sms_declare_decomp &{ |e| sp_rec_env(e[0]) } <SMS_Declarative> /
+    sms_declare_decomp /
     sms_distribute_begin /
     sms_distribute_end
   end
@@ -101,7 +101,7 @@ grammar Fortran
   end
 
   rule sms_decomp_name
-    name &{ |e| sp_rec_env(e[0]) } <SMS_Decomp_Name>
+    name "" <SMS_Decomp_Name>
   end
 
   rule sms_distribute_begin
@@ -127,17 +127,17 @@ grammar Fortran
   end
 
   rule sms_executable
-    sms_barrier &{ |e| sp_rec_env(e[0]) } <SMS_Executable> /
-    sms_compare_var &{ |e| sp_rec_env(e[0]) } <SMS_Executable> /
-    sms_exchange &{ |e| sp_rec_env(e[0]) } <SMS_Executable> /
+    sms_barrier /
+    sms_compare_var /
+    sms_exchange /
     sms_halo_comp_begin /
     sms_halo_comp_end /
     sms_parallel_begin /
     sms_parallel_end /
     sms_to_local_begin /
     sms_to_local_end /
-    sms_set_communicator &{ |e| sp_rec_env(e[0]) } <SMS_Executable> /
-    sms_unstructured_grid &{ |e| sp_rec_env(e[0]) } <SMS_Executable> /
+    sms_set_communicator /
+    sms_unstructured_grid /
     sms_passthrough
   end
 
@@ -194,7 +194,7 @@ grammar Fortran
   end
 
   rule sms_passthrough
-    sms_create_decomp &{ |e| sp_rec_env(e[0]) } <SMS_Passthrough> /
+    sms_create_decomp /
     sms_ignore_begin /
     sms_ignore_end /
     sms_reduce /

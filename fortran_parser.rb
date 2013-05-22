@@ -1033,17 +1033,6 @@ module Fortran
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
       s0 << r2
-      if r2
-        i6 = index
-        r7 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-        if r7
-          @index = i6
-          r6 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r6 = nil
-        end
-        s0 << r6
-      end
     end
     if s0.last
       r0 = instantiate_node(Add_Operand,input, i0...index, s0)
@@ -1344,17 +1333,6 @@ module Fortran
       end
       r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
       s0 << r2
-      if r2
-        i4 = index
-        r5 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-        if r5
-          @index = i4
-          r4 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r4 = nil
-        end
-        s0 << r4
-      end
     end
     if s0.last
       r0 = instantiate_node(Allocate_Object_List,input, i0...index, s0)
@@ -1377,7 +1355,6 @@ module Fortran
     def allocate_object
       elements[1]
     end
-
   end
 
   def _nt_allocate_object_list_pair
@@ -1397,17 +1374,6 @@ module Fortran
     if r1
       r2 = _nt_allocate_object
       s0 << r2
-      if r2
-        i3 = index
-        r4 = lambda { |e| sp_rec_env(e[1]) }.call(s0)
-        if r4
-          @index = i3
-          r3 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r3 = nil
-        end
-        s0 << r3
-      end
     end
     if s0.last
       r0 = instantiate_node(Allocate_Object_List_Pair,input, i0...index, s0)
@@ -1748,17 +1714,6 @@ module Fortran
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
       s0 << r2
-      if r2
-        i4 = index
-        r5 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-        if r5
-          @index = i4
-          r4 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r4 = nil
-        end
-        s0 << r4
-      end
     end
     if s0.last
       r0 = instantiate_node(Allocation,input, i0...index, s0)
@@ -2142,12 +2097,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -2361,7 +2315,6 @@ module Fortran
     def array_name_and_spec
       elements[1]
     end
-
   end
 
   def _nt_array_name_and_spec_pair
@@ -2381,17 +2334,6 @@ module Fortran
     if r1
       r2 = _nt_array_name_and_spec
       s0 << r2
-      if r2
-        i3 = index
-        r4 = lambda { |e| sp_rec_env(e[1]) }.call(s0)
-        if r4
-          @index = i3
-          r3 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r3 = nil
-        end
-        s0 << r3
-      end
     end
     if s0.last
       r0 = instantiate_node(Array_Name_And_Spec_Pair,input, i0...index, s0)
@@ -2439,17 +2381,6 @@ module Fortran
       end
       r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
       s0 << r2
-      if r2
-        i4 = index
-        r5 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-        if r5
-          @index = i4
-          r4 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r4 = nil
-        end
-        s0 << r4
-      end
     end
     if s0.last
       r0 = instantiate_node(Array_Names_And_Specs,input, i0...index, s0)
@@ -2578,12 +2509,11 @@ module Fortran
       r5 = _nt_assumed_shape_spec_list
       s4 << r5
       if r5
-        i6 = index
-        r7 = lambda { |e| sp_rec_env(e[0]) }.call(s4)
-        if r7
-          @index = i6
-          r6 = instantiate_node(SyntaxNode,input, index...index)
+        if has_terminal?("", false, index)
+          r6 = instantiate_node(SyntaxNode,input, index...(index + 0))
+          @index += 0
         else
+          terminal_parse_failure("")
           r6 = nil
         end
         s4 << r6
@@ -2598,28 +2528,28 @@ module Fortran
       if r4
         r0 = r4
       else
-        i8, s8 = index, []
-        r9 = _nt_assumed_size_spec
-        s8 << r9
-        if r9
+        i7, s7 = index, []
+        r8 = _nt_assumed_size_spec
+        s7 << r8
+        if r8
           if has_terminal?("", false, index)
-            r10 = instantiate_node(SyntaxNode,input, index...(index + 0))
+            r9 = instantiate_node(SyntaxNode,input, index...(index + 0))
             @index += 0
           else
             terminal_parse_failure("")
-            r10 = nil
+            r9 = nil
           end
-          s8 << r10
+          s7 << r9
         end
-        if s8.last
-          r8 = instantiate_node(Array_Spec,input, i8...index, s8)
-          r8.extend(ArraySpec2)
+        if s7.last
+          r7 = instantiate_node(Array_Spec,input, i7...index, s7)
+          r7.extend(ArraySpec2)
         else
-          @index = i8
-          r8 = nil
+          @index = i7
+          r7 = nil
         end
-        if r8
-          r0 = r8
+        if r7
+          r0 = r7
         else
           @index = i0
           r0 = nil
@@ -3830,12 +3760,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -4162,12 +4091,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -5759,12 +5687,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -6817,12 +6744,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -9757,12 +9683,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -9821,13 +9746,6 @@ module Fortran
     r0
   end
 
-  module DoStmt0
-    def nonlabel_do_stmt
-      elements[0]
-    end
-
-  end
-
   def _nt_do_stmt
     start_index = index
     if node_cache[:do_stmt].has_key?(index)
@@ -9844,27 +9762,7 @@ module Fortran
     if r1
       r0 = r1
     else
-      i2, s2 = index, []
-      r3 = _nt_nonlabel_do_stmt
-      s2 << r3
-      if r3
-        i4 = index
-        r5 = lambda { |e| sp_rec_env(e[0]) }.call(s2)
-        if r5
-          @index = i4
-          r4 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r4 = nil
-        end
-        s2 << r4
-      end
-      if s2.last
-        r2 = instantiate_node(Do_Stmt,input, i2...index, s2)
-        r2.extend(DoStmt0)
-      else
-        @index = i2
-        r2 = nil
-      end
+      r2 = _nt_nonlabel_do_stmt
       if r2
         r0 = r2
       else
@@ -10366,12 +10264,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -10880,7 +10777,6 @@ module Fortran
     def t_newline
       elements[3]
     end
-
   end
 
   def _nt_end_block_data_stmt
@@ -10916,17 +10812,6 @@ module Fortran
         if r4
           r6 = _nt_t_newline
           s0 << r6
-          if r6
-            i7 = index
-            r8 = lambda { |e| sp_end_block_data_stmt }.call(s0)
-            if r8
-              @index = i7
-              r7 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r7 = nil
-            end
-            s0 << r7
-          end
         end
       end
     end
@@ -11169,7 +11054,6 @@ module Fortran
     def t_newline
       elements[3]
     end
-
   end
 
   def _nt_end_function_stmt
@@ -11205,17 +11089,6 @@ module Fortran
         if r4
           r6 = _nt_t_newline
           s0 << r6
-          if r6
-            i7 = index
-            r8 = lambda { |e| sp_end_function_stmt }.call(s0)
-            if r8
-              @index = i7
-              r7 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r7 = nil
-            end
-            s0 << r7
-          end
         end
       end
     end
@@ -11530,17 +11403,6 @@ module Fortran
                 r10 = instantiate_node(SyntaxNode,input, index...index)
               end
               s0 << r10
-              if r10
-                i12 = index
-                r13 = lambda { |e| sp_end_program_stmt }.call(s0)
-                if r13
-                  @index = i12
-                  r12 = instantiate_node(SyntaxNode,input, index...index)
-                else
-                  r12 = nil
-                end
-                s0 << r12
-              end
             end
           end
         end
@@ -11697,7 +11559,6 @@ module Fortran
     def t_newline
       elements[3]
     end
-
   end
 
   def _nt_end_subroutine_stmt
@@ -11733,17 +11594,6 @@ module Fortran
         if r4
           r6 = _nt_t_newline
           s0 << r6
-          if r6
-            i7 = index
-            r8 = lambda { |e| sp_end_subroutine_stmt }.call(s0)
-            if r8
-              @index = i7
-              r7 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r7 = nil
-            end
-            s0 << r7
-          end
         end
       end
     end
@@ -12217,7 +12067,6 @@ module Fortran
     def entity_decl_list_pairs
       elements[1]
     end
-
   end
 
   def _nt_entity_decl_list
@@ -12237,17 +12086,6 @@ module Fortran
     if r1
       r2 = _nt_entity_decl_list_pairs
       s0 << r2
-      if r2
-        i3 = index
-        r4 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-        if r4
-          @index = i3
-          r3 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r3 = nil
-        end
-        s0 << r3
-      end
     end
     if s0.last
       r0 = instantiate_node(Entity_Decl_List,input, i0...index, s0)
@@ -12270,7 +12108,6 @@ module Fortran
     def entity_decl
       elements[1]
     end
-
   end
 
   def _nt_entity_decl_list_pair
@@ -12290,17 +12127,6 @@ module Fortran
     if r1
       r2 = _nt_entity_decl
       s0 << r2
-      if r2
-        i3 = index
-        r4 = lambda { |e| sp_rec_env(e[1]) }.call(s0)
-        if r4
-          @index = i3
-          r3 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r3 = nil
-        end
-        s0 << r3
-      end
     end
     if s0.last
       r0 = instantiate_node(Entity_Decl_List_Pair,input, i0...index, s0)
@@ -12364,12 +12190,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -13508,12 +13333,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -13663,6 +13487,20 @@ module Fortran
     r0
   end
 
+  module ExternalSubprogram0
+    def subroutine_subprogram
+      elements[0]
+    end
+
+  end
+
+  module ExternalSubprogram1
+    def function_subprogram
+      elements[0]
+    end
+
+  end
+
   def _nt_external_subprogram
     start_index = index
     if node_cache[:external_subprogram].has_key?(index)
@@ -13675,17 +13513,57 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_subroutine_subprogram
+    i1, s1 = index, []
+    r2 = _nt_subroutine_subprogram
+    s1 << r2
+    if r2
+      i3 = index
+      r4 = lambda { |e| sp_subroutine_subprogram }.call(s1)
+      if r4
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r3 = nil
+      end
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+      r1.extend(ExternalSubprogram0)
+    else
+      @index = i1
+      r1 = nil
+    end
     if r1
       r0 = r1
     else
-      r2 = _nt_function_subprogram
-      if r2
-        r0 = r2
+      i5, s5 = index, []
+      r6 = _nt_function_subprogram
+      s5 << r6
+      if r6
+        i7 = index
+        r8 = lambda { |e| sp_function_subprogram }.call(s5)
+        if r8
+          @index = i7
+          r7 = instantiate_node(SyntaxNode,input, index...index)
+        else
+          r7 = nil
+        end
+        s5 << r7
+      end
+      if s5.last
+        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+        r5.extend(ExternalSubprogram1)
       else
-        r3 = _nt_directive
-        if r3
-          r0 = r3
+        @index = i5
+        r5 = nil
+      end
+      if r5
+        r0 = r5
+      else
+        r9 = _nt_directive
+        if r9
+          r0 = r9
         else
           @index = i0
           r0 = nil
@@ -13991,12 +13869,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -14291,12 +14168,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -14740,12 +14616,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -17417,6 +17292,20 @@ module Fortran
     r0
   end
 
+  module InternalSubprogram0
+    def subroutine_subprogram
+      elements[0]
+    end
+
+  end
+
+  module InternalSubprogram1
+    def function_subprogram
+      elements[0]
+    end
+
+  end
+
   def _nt_internal_subprogram
     start_index = index
     if node_cache[:internal_subprogram].has_key?(index)
@@ -17429,17 +17318,57 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_subroutine_subprogram
+    i1, s1 = index, []
+    r2 = _nt_subroutine_subprogram
+    s1 << r2
+    if r2
+      i3 = index
+      r4 = lambda { |e| sp_subroutine_subprogram }.call(s1)
+      if r4
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r3 = nil
+      end
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+      r1.extend(InternalSubprogram0)
+    else
+      @index = i1
+      r1 = nil
+    end
     if r1
       r0 = r1
     else
-      r2 = _nt_function_subprogram
-      if r2
-        r0 = r2
+      i5, s5 = index, []
+      r6 = _nt_function_subprogram
+      s5 << r6
+      if r6
+        i7 = index
+        r8 = lambda { |e| sp_function_subprogram }.call(s5)
+        if r8
+          @index = i7
+          r7 = instantiate_node(SyntaxNode,input, index...index)
+        else
+          r7 = nil
+        end
+        s5 << r7
+      end
+      if s5.last
+        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+        r5.extend(InternalSubprogram1)
       else
-        r3 = _nt_directive
-        if r3
-          r0 = r3
+        @index = i5
+        r5 = nil
+      end
+      if r5
+        r0 = r5
+      else
+        r9 = _nt_directive
+        if r9
+          r0 = r9
         else
           @index = i0
           r0 = nil
@@ -17571,12 +17500,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -19792,12 +19720,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -20347,12 +20274,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -20541,6 +20467,20 @@ module Fortran
     r0
   end
 
+  module ModuleSubprogram0
+    def subroutine_subprogram
+      elements[0]
+    end
+
+  end
+
+  module ModuleSubprogram1
+    def function_subprogram
+      elements[0]
+    end
+
+  end
+
   def _nt_module_subprogram
     start_index = index
     if node_cache[:module_subprogram].has_key?(index)
@@ -20553,17 +20493,57 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_subroutine_subprogram
+    i1, s1 = index, []
+    r2 = _nt_subroutine_subprogram
+    s1 << r2
+    if r2
+      i3 = index
+      r4 = lambda { |e| sp_subroutine_subprogram }.call(s1)
+      if r4
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r3 = nil
+      end
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+      r1.extend(ModuleSubprogram0)
+    else
+      @index = i1
+      r1 = nil
+    end
     if r1
       r0 = r1
     else
-      r2 = _nt_function_subprogram
-      if r2
-        r0 = r2
+      i5, s5 = index, []
+      r6 = _nt_function_subprogram
+      s5 << r6
+      if r6
+        i7 = index
+        r8 = lambda { |e| sp_function_subprogram }.call(s5)
+        if r8
+          @index = i7
+          r7 = instantiate_node(SyntaxNode,input, index...index)
+        else
+          r7 = nil
+        end
+        s5 << r7
+      end
+      if s5.last
+        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+        r5.extend(ModuleSubprogram1)
       else
-        r3 = _nt_directive
-        if r3
-          r0 = r3
+        @index = i5
+        r5 = nil
+      end
+      if r5
+        r0 = r5
+      else
+        r9 = _nt_directive
+        if r9
+          r0 = r9
         else
           @index = i0
           r0 = nil
@@ -20770,12 +20750,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -20934,12 +20913,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -21546,12 +21524,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -22834,12 +22811,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -23466,7 +23442,6 @@ module Fortran
     def mult_operand
       elements[1]
     end
-
   end
 
   def _nt_power_op_option
@@ -23486,17 +23461,6 @@ module Fortran
     if r1
       r2 = _nt_mult_operand
       s0 << r2
-      if r2
-        i3 = index
-        r4 = lambda { |e| sp_rec_env(e[1]) }.call(s0)
-        if r4
-          @index = i3
-          r3 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r3 = nil
-        end
-        s0 << r3
-      end
     end
     if s0.last
       r0 = instantiate_node(Power_Op_Option,input, i0...index, s0)
@@ -23928,12 +23892,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -24043,12 +24006,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -24082,7 +24044,6 @@ module Fortran
     def t_newline
       elements[3]
     end
-
   end
 
   def _nt_program_stmt
@@ -24113,17 +24074,6 @@ module Fortran
         if r4
           r5 = _nt_t_newline
           s0 << r5
-          if r5
-            i6 = index
-            r7 = lambda { |e| sp_program_stmt }.call(s0)
-            if r7
-              @index = i6
-              r6 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r6 = nil
-            end
-            s0 << r6
-          end
         end
       end
     end
@@ -24142,6 +24092,20 @@ module Fortran
 
   module ProgramUnit0
     def module
+      elements[0]
+    end
+
+  end
+
+  module ProgramUnit1
+    def block_data
+      elements[0]
+    end
+
+  end
+
+  module ProgramUnit2
+    def main_program
       elements[0]
     end
 
@@ -24187,13 +24151,53 @@ module Fortran
       if r2
         r0 = r2
       else
-        r6 = _nt_block_data
+        i6, s6 = index, []
+        r7 = _nt_block_data
+        s6 << r7
+        if r7
+          i8 = index
+          r9 = lambda { |e| sp_block_data }.call(s6)
+          if r9
+            @index = i8
+            r8 = instantiate_node(SyntaxNode,input, index...index)
+          else
+            r8 = nil
+          end
+          s6 << r8
+        end
+        if s6.last
+          r6 = instantiate_node(E,input, i6...index, s6)
+          r6.extend(ProgramUnit1)
+        else
+          @index = i6
+          r6 = nil
+        end
         if r6
           r0 = r6
         else
-          r7 = _nt_main_program
-          if r7
-            r0 = r7
+          i10, s10 = index, []
+          r11 = _nt_main_program
+          s10 << r11
+          if r11
+            i12 = index
+            r13 = lambda { |e| sp_main_program }.call(s10)
+            if r13
+              @index = i12
+              r12 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r12 = nil
+            end
+            s10 << r12
+          end
+          if s10.last
+            r10 = instantiate_node(E,input, i10...index, s10)
+            r10.extend(ProgramUnit2)
+          else
+            @index = i10
+            r10 = nil
+          end
+          if r10
+            r0 = r10
           else
             @index = i0
             r0 = nil
@@ -25161,12 +25165,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -26662,7 +26665,6 @@ module Fortran
     def declaration_constructs
       elements[2]
     end
-
   end
 
   def _nt_specification_part
@@ -26690,17 +26692,6 @@ module Fortran
       if r2
         r4 = _nt_declaration_constructs
         s0 << r4
-        if r4
-          i5 = index
-          r6 = lambda { |e| sp_rec_env(e[0],e[2]) }.call(s0)
-          if r6
-            @index = i5
-            r5 = instantiate_node(SyntaxNode,input, index...index)
-          else
-            r5 = nil
-          end
-          s0 << r5
-        end
       end
     end
     if s0.last
@@ -27185,12 +27176,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -31623,13 +31613,6 @@ module Fortran
     r0
   end
 
-  module TargetObject0
-    def array_name_and_spec
-      elements[0]
-    end
-
-  end
-
   def _nt_target_object
     start_index = index
     if node_cache[:target_object].has_key?(index)
@@ -31642,33 +31625,13 @@ module Fortran
     end
 
     i0 = index
-    i1, s1 = index, []
-    r2 = _nt_array_name_and_spec
-    s1 << r2
-    if r2
-      i3 = index
-      r4 = lambda { |e| sp_rec_env(e[0]) }.call(s1)
-      if r4
-        @index = i3
-        r3 = instantiate_node(SyntaxNode,input, index...index)
-      else
-        r3 = nil
-      end
-      s1 << r3
-    end
-    if s1.last
-      r1 = instantiate_node(Target_Object_1,input, i1...index, s1)
-      r1.extend(TargetObject0)
-    else
-      @index = i1
-      r1 = nil
-    end
+    r1 = _nt_array_name_and_spec
     if r1
       r0 = r1
     else
-      r5 = _nt_variable_name
-      if r5
-        r0 = r5
+      r2 = _nt_variable_name
+      if r2
+        r0 = r2
       else
         @index = i0
         r0 = nil
@@ -31956,12 +31919,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -32542,12 +32504,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -32845,12 +32806,11 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_rec_env(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2

@@ -424,9 +424,6 @@ module Fortran
     def to_s() sms(e[2].e.map { |x| x.text_value }.join) end
   end
 
-  class SMS_Declarative < SMS
-  end
-
   class SMS_Declare_Decomp < SMS
 
     def to_s
@@ -577,9 +574,6 @@ module Fortran
 
   end
 
-  class SMS_Executable < SMS
-  end
-
   class SMS_Halo_Comp_Begin < SMS
 
     def to_s
@@ -704,9 +698,6 @@ module Fortran
 
   class SMS_Parallel_Var_Lists_111 < T
     def vars() [e[0].vars,e[2].vars,e[4].vars] end
-  end
-
-  class SMS_Passthrough < SMS
   end
 
   class SMS_Reduce < SMS

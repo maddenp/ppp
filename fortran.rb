@@ -58,7 +58,7 @@ module Fortran
 
   def envpop
     @envstack.pop
-    @envstack=[{}] if @envstack.empty?
+    @envstack.push({}) if @envstack.empty?
   end
 
   def envpush
@@ -118,18 +118,6 @@ module Fortran
     (e.to_s=="")?(""):(" #{e}")
   end
 
-  def setup(srcfile,incdirs)
-    @access="_default"
-    @dolabels=[]
-    @envstack=[{}]
-    @halocomp=false
-    @incdirs=incdirs
-    @parallel=false
-    @serial=false
-    @srcfile=srcfile
-    @tolocal=false
-  end
-
   def sp_access_stmt(access_spec,access_stmt_option)
     if access_spec.private?
       p="private"
@@ -170,6 +158,11 @@ module Fortran
     true
   end
 
+  def sp_block_data
+    envpop
+    true
+  end
+
   def sp_block_data_stmt
     envpush
     true
@@ -188,26 +181,6 @@ module Fortran
     true
   end
 
-  def sp_end_block_data_stmt
-    envpop
-    true
-  end
-
-  def sp_end_function_stmt
-    envpop
-    true
-  end
-
-  def sp_end_program_stmt
-    envpop
-    true
-  end
-
-  def sp_end_subroutine_stmt
-    envpop
-    true
-  end
-
   def sp_function_stmt(dummy_arg_name_list)
     envpush
     if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
@@ -218,9 +191,19 @@ module Fortran
     true
   end
 
+  def sp_function_subprogram
+    envpop
+    true
+  end
+
   def sp_is_array?(node)
     return false unless node.respond_to?(:name)
     vargetprop(node.name,"rank")=="_array"
+  end
+
+  def sp_main_program
+    envpop
+    true
   end
 
   def sp_module(_module)
@@ -242,20 +225,6 @@ module Fortran
     true
   end
 
-  def sp_program_stmt
-    envpush
-    true
-  end
-
-  def sp_rec_env(*nodes)
-    nodes.each do |x|
-      if x.is_a?(T)
-        x.env=env if x.respond_to?(:env)
-      end
-    end
-    true
-  end
-
   def sp_subroutine_stmt(dummy_arg_list_option)
     envpush
     if dummy_arg_list_option.e
@@ -266,6 +235,11 @@ module Fortran
         env[:args]=rest.reduce([first]) { |m,x| m.push("#{x.e[1]}") }
       end
     end
+    true
+  end
+
+  def sp_subroutine_subprogram
+    envpop
     true
   end
 
@@ -450,11 +424,11 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
-    attr_accessor :env,:srcfile
+    attr_accessor :envref,:srcfile
 
     def initialize(*args)
-      super
-      @env=nil
+      super(*args)
+      @envref=input.envstack.last
       @srcfile=nil
     end
 
@@ -475,6 +449,10 @@ module Fortran
       # differ between applications. It may be acceptable to simply ignore
       # a request to define an already-defined variable, in which case a single
       # method suitable for all applications could be defined here.
+    end
+
+    def env
+      (su=scoping_unit)?(su.envref):(self.envref)
     end
 
     def execution_part
@@ -867,7 +845,9 @@ module Fortran
       unless ok
         code="#{self}"
         replace_element(code,:deferred_shape_spec_list)
-        varenv=self.env["#{array_name}"]
+        unless (varenv=self.env["#{array_name}"])
+          fail "'#{array_name}' not found in environment"
+        end
         varenv.keys.each { |k| varenv[k]="_deferred" if k=~/[lu]b\d+/ }
       end
     end
@@ -1105,9 +1085,6 @@ module Fortran
   end
 
   class Do_Construct_Name < E
-  end
-
-  class Do_Stmt < E
   end
 
   class Do_Term_Action_Stmt < T
@@ -1852,9 +1829,6 @@ module Fortran
 
   class Substring < T
     def name() e[0].name end
-  end
-
-  class Target_Object_1 < E
   end
 
   class Target_Object_List < T

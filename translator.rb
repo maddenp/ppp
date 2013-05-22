@@ -7,6 +7,45 @@ module Translator
 
   include Fortran
 
+  class XFortranParser < FortranParser
+
+    # Clifford Heath's mechanism (http://goo.gl/62pJ6)
+
+    class InputProxy
+
+      attr_accessor :envstack,:srcfile
+
+      def initialize(input,envstack)
+        @input=input
+        @envstack=envstack
+      end
+
+      def method_missing(method,*args)
+        @input.send(method,*args)
+      end
+
+    end
+
+    def initialize(srcfile,incdirs)
+      super()
+      @access="_default"
+      @dolabels=[]
+      @envstack=[{}]
+      @halocomp=false
+      @incdirs=incdirs
+      @parallel=false
+      @serial=false
+      @srcfile=srcfile
+      @tolocal=false
+    end
+
+    def parse(input,options={})
+      input=InputProxy.new(input,@envstack)
+      super(input,options)
+    end
+
+  end
+
   def clear_socket(socket)
     FileUtils.rm_f(socket)
     fail "Socket file #{socket} in use, please free it" if File.exist?(socket)
@@ -157,8 +196,7 @@ module Translator
 
     opts=default_opts.merge(opts)
     debug=opts[:debug]
-    fp=FortranParser.new
-    fp.setup(srcfile,opts[:incdirs])
+    fp=XFortranParser.new(srcfile,opts[:incdirs])
     s=prepsrc(s) if defined? prepsrc
     s=assemble(s,[srcfile],opts[:incdirs])
     cppcheck(s)
