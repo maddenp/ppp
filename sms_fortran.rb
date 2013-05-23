@@ -494,7 +494,7 @@ module Fortran
       end
       max.times do |i|
         dim=i+1
-        stmts.push(["#{d}__upperbounds(#{dim})=#{d}__globalsize(#{dim},#{n})+#{d}__lowbounds(#{dim},#{n})-1",:assignment_stmt])
+        stmts.push(["#{d}__upperbounds(#{dim},#{n})=#{d}__globalsize(#{dim},#{n})+#{d}__lowbounds(#{dim},#{n})-1",:assignment_stmt])
       end
       max.times do |i|
         dim=i+1
