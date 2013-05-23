@@ -170,3 +170,9 @@ x directives done
   and explaining what the cause & remedy might be.
 
 - Reformulate distribute being/end as distribute region.
+
+- In SMS_Create_Decomp#translate, merge multiple 1..3 loops. They are as they
+  are now to aid in textual comparison to legacy ppp.
+
+- SMS_Create_Decomp#translate is only valid for one decomposed dimension. Extend
+  it to handle three.

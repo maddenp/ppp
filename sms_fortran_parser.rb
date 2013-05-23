@@ -560,8 +560,40 @@ module Fortran
       elements[1]
     end
 
-    def t_newline
+    def t_paren_l
+      elements[2]
+    end
+
+    def sms_decomp_name
       elements[3]
+    end
+
+    def t_comma1
+      elements[4]
+    end
+
+    def sms_create_decomp_global
+      elements[5]
+    end
+
+    def t_comma2
+      elements[6]
+    end
+
+    def sms_create_decomp_halo
+      elements[7]
+    end
+
+    def sms_create_decomp_regionsize
+      elements[8]
+    end
+
+    def t_paren_r
+      elements[9]
+    end
+
+    def t_newline
+      elements[10]
     end
   end
 
@@ -583,25 +615,39 @@ module Fortran
       r2 = _nt_sms_t_create_decomp
       s0 << r2
       if r2
-        s3, i3 = [], index
-        loop do
-          r4 = _nt_character
-          if r4
-            s3 << r4
-          else
-            break
-          end
-        end
-        if s3.empty?
-          @index = i3
-          r3 = nil
-        else
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-        end
+        r3 = _nt_t_paren_l
         s0 << r3
         if r3
-          r5 = _nt_t_newline
-          s0 << r5
+          r4 = _nt_sms_decomp_name
+          s0 << r4
+          if r4
+            r5 = _nt_t_comma
+            s0 << r5
+            if r5
+              r6 = _nt_sms_create_decomp_global
+              s0 << r6
+              if r6
+                r7 = _nt_t_comma
+                s0 << r7
+                if r7
+                  r8 = _nt_sms_create_decomp_halo
+                  s0 << r8
+                  if r8
+                    r9 = _nt_sms_create_decomp_regionsize
+                    s0 << r9
+                    if r9
+                      r10 = _nt_t_paren_r
+                      s0 << r10
+                      if r10
+                        r11 = _nt_t_newline
+                        s0 << r11
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
         end
       end
     end
@@ -614,6 +660,161 @@ module Fortran
     end
 
     node_cache[:sms_create_decomp][start_index] = r0
+
+    r0
+  end
+
+  module SmsCreateDecompGlobal0
+    def t_lt
+      elements[0]
+    end
+
+    def sms_varlist3d
+      elements[1]
+    end
+
+    def t_gt
+      elements[2]
+    end
+  end
+
+  def _nt_sms_create_decomp_global
+    start_index = index
+    if node_cache[:sms_create_decomp_global].has_key?(index)
+      cached = node_cache[:sms_create_decomp_global][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_lt
+    s0 << r1
+    if r1
+      r2 = _nt_sms_varlist3d
+      s0 << r2
+      if r2
+        r3 = _nt_t_gt
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Create_Decomp_Global,input, i0...index, s0)
+      r0.extend(SmsCreateDecompGlobal0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_create_decomp_global][start_index] = r0
+
+    r0
+  end
+
+  module SmsCreateDecompHalo0
+    def t_lt
+      elements[0]
+    end
+
+    def sms_varlist3d
+      elements[1]
+    end
+
+    def t_gt
+      elements[2]
+    end
+  end
+
+  def _nt_sms_create_decomp_halo
+    start_index = index
+    if node_cache[:sms_create_decomp_halo].has_key?(index)
+      cached = node_cache[:sms_create_decomp_halo][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_lt
+    s0 << r1
+    if r1
+      r2 = _nt_sms_varlist3d
+      s0 << r2
+      if r2
+        r3 = _nt_t_gt
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Create_Decomp_Halo,input, i0...index, s0)
+      r0.extend(SmsCreateDecompHalo0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_create_decomp_halo][start_index] = r0
+
+    r0
+  end
+
+  module SmsCreateDecompRegionsize0
+    def t_colon
+      elements[0]
+    end
+
+    def sms_t_regionsize
+      elements[1]
+    end
+
+    def t_equal
+      elements[2]
+    end
+
+    def variable
+      elements[3]
+    end
+  end
+
+  def _nt_sms_create_decomp_regionsize
+    start_index = index
+    if node_cache[:sms_create_decomp_regionsize].has_key?(index)
+      cached = node_cache[:sms_create_decomp_regionsize][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_colon
+    s0 << r1
+    if r1
+      r2 = _nt_sms_t_regionsize
+      s0 << r2
+      if r2
+        r3 = _nt_t_equal
+        s0 << r3
+        if r3
+          r4 = _nt_variable
+          s0 << r4
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Create_Decomp_Regionsize,input, i0...index, s0)
+      r0.extend(SmsCreateDecompRegionsize0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_create_decomp_regionsize][start_index] = r0
 
     r0
   end
@@ -1263,96 +1464,101 @@ module Fortran
       if r2
         r0 = r2
       else
-        r3 = _nt_sms_exchange
+        r3 = _nt_sms_create_decomp
         if r3
           r0 = r3
         else
-          i4, s4 = index, []
-          r5 = _nt_sms_halo_comp
-          s4 << r5
-          if r5
-            i6 = index
-            r7 = lambda { |e| sp_sms_halo_comp }.call(s4)
-            if r7
-              @index = i6
-              r6 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r6 = nil
-            end
-            s4 << r6
-          end
-          if s4.last
-            r4 = instantiate_node(E,input, i4...index, s4)
-            r4.extend(SmsExecutable0)
-          else
-            @index = i4
-            r4 = nil
-          end
+          r4 = _nt_sms_exchange
           if r4
             r0 = r4
           else
-            i8, s8 = index, []
-            r9 = _nt_sms_parallel
-            s8 << r9
-            if r9
-              i10 = index
-              r11 = lambda { |e| sp_sms_parallel }.call(s8)
-              if r11
-                @index = i10
-                r10 = instantiate_node(SyntaxNode,input, index...index)
+            i5, s5 = index, []
+            r6 = _nt_sms_halo_comp
+            s5 << r6
+            if r6
+              i7 = index
+              r8 = lambda { |e| sp_sms_halo_comp }.call(s5)
+              if r8
+                @index = i7
+                r7 = instantiate_node(SyntaxNode,input, index...index)
               else
-                r10 = nil
+                r7 = nil
               end
-              s8 << r10
+              s5 << r7
             end
-            if s8.last
-              r8 = instantiate_node(E,input, i8...index, s8)
-              r8.extend(SmsExecutable1)
+            if s5.last
+              r5 = instantiate_node(E,input, i5...index, s5)
+              r5.extend(SmsExecutable0)
             else
-              @index = i8
-              r8 = nil
+              @index = i5
+              r5 = nil
             end
-            if r8
-              r0 = r8
+            if r5
+              r0 = r5
             else
-              i12, s12 = index, []
-              r13 = _nt_sms_to_local
-              s12 << r13
-              if r13
-                i14 = index
-                r15 = lambda { |e| sp_sms_to_local }.call(s12)
-                if r15
-                  @index = i14
-                  r14 = instantiate_node(SyntaxNode,input, index...index)
+              i9, s9 = index, []
+              r10 = _nt_sms_parallel
+              s9 << r10
+              if r10
+                i11 = index
+                r12 = lambda { |e| sp_sms_parallel }.call(s9)
+                if r12
+                  @index = i11
+                  r11 = instantiate_node(SyntaxNode,input, index...index)
                 else
-                  r14 = nil
+                  r11 = nil
                 end
-                s12 << r14
+                s9 << r11
               end
-              if s12.last
-                r12 = instantiate_node(E,input, i12...index, s12)
-                r12.extend(SmsExecutable2)
+              if s9.last
+                r9 = instantiate_node(E,input, i9...index, s9)
+                r9.extend(SmsExecutable1)
               else
-                @index = i12
-                r12 = nil
+                @index = i9
+                r9 = nil
               end
-              if r12
-                r0 = r12
+              if r9
+                r0 = r9
               else
-                r16 = _nt_sms_set_communicator
-                if r16
-                  r0 = r16
+                i13, s13 = index, []
+                r14 = _nt_sms_to_local
+                s13 << r14
+                if r14
+                  i15 = index
+                  r16 = lambda { |e| sp_sms_to_local }.call(s13)
+                  if r16
+                    @index = i15
+                    r15 = instantiate_node(SyntaxNode,input, index...index)
+                  else
+                    r15 = nil
+                  end
+                  s13 << r15
+                end
+                if s13.last
+                  r13 = instantiate_node(E,input, i13...index, s13)
+                  r13.extend(SmsExecutable2)
                 else
-                  r17 = _nt_sms_unstructured_grid
+                  @index = i13
+                  r13 = nil
+                end
+                if r13
+                  r0 = r13
+                else
+                  r17 = _nt_sms_set_communicator
                   if r17
                     r0 = r17
                   else
-                    r18 = _nt_sms_passthrough
+                    r18 = _nt_sms_unstructured_grid
                     if r18
                       r0 = r18
                     else
-                      @index = i0
-                      r0 = nil
+                      r19 = _nt_sms_passthrough
+                      if r19
+                        r0 = r19
+                      else
+                        @index = i0
+                        r0 = nil
+                      end
                     end
                   end
                 end
@@ -2596,49 +2802,44 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_sms_create_decomp
+    r1 = _nt_sms_ignore_begin
     if r1
       r0 = r1
     else
-      r2 = _nt_sms_ignore_begin
+      r2 = _nt_sms_ignore_end
       if r2
         r0 = r2
       else
-        r3 = _nt_sms_ignore_end
+        r3 = _nt_sms_reduce
         if r3
           r0 = r3
         else
-          r4 = _nt_sms_reduce
+          i4, s4 = index, []
+          r5 = _nt_sms_serial
+          s4 << r5
+          if r5
+            i6 = index
+            r7 = lambda { |e| sp_sms_serial }.call(s4)
+            if r7
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r6 = nil
+            end
+            s4 << r6
+          end
+          if s4.last
+            r4 = instantiate_node(E,input, i4...index, s4)
+            r4.extend(SmsPassthrough0)
+          else
+            @index = i4
+            r4 = nil
+          end
           if r4
             r0 = r4
           else
-            i5, s5 = index, []
-            r6 = _nt_sms_serial
-            s5 << r6
-            if r6
-              i7 = index
-              r8 = lambda { |e| sp_sms_serial }.call(s5)
-              if r8
-                @index = i7
-                r7 = instantiate_node(SyntaxNode,input, index...index)
-              else
-                r7 = nil
-              end
-              s5 << r7
-            end
-            if s5.last
-              r5 = instantiate_node(E,input, i5...index, s5)
-              r5.extend(SmsPassthrough0)
-            else
-              @index = i5
-              r5 = nil
-            end
-            if r5
-              r0 = r5
-            else
-              @index = i0
-              r0 = nil
-            end
+            @index = i0
+            r0 = nil
           end
         end
       end
@@ -3341,6 +3542,30 @@ module Fortran
     r0
   end
 
+  def _nt_sms_t_regionsize
+    start_index = index
+    if node_cache[:sms_t_regionsize].has_key?(index)
+      cached = node_cache[:sms_t_regionsize][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("regionsize", false, index)
+      r0 = instantiate_node(T,input, index...(index + 10))
+      @index += 10
+    else
+      terminal_parse_failure("regionsize")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_regionsize][start_index] = r0
+
+    r0
+  end
+
   def _nt_sms_t_serial
     start_index = index
     if node_cache[:sms_t_serial].has_key?(index)
@@ -3991,6 +4216,253 @@ module Fortran
     end
 
     node_cache[:sms_unstructured_grid][start_index] = r0
+
+    r0
+  end
+
+  module SmsVarlist3d0
+    def variable1
+      elements[0]
+    end
+
+    def t_comma1
+      elements[1]
+    end
+
+    def variable2
+      elements[2]
+    end
+
+    def t_comma2
+      elements[3]
+    end
+
+    def variable3
+      elements[4]
+    end
+  end
+
+  module SmsVarlist3d1
+    def t_comma1
+      elements[0]
+    end
+
+    def variable1
+      elements[1]
+    end
+
+    def t_comma2
+      elements[2]
+    end
+
+    def variable2
+      elements[3]
+    end
+  end
+
+  module SmsVarlist3d2
+    def t_comma1
+      elements[0]
+    end
+
+    def t_comma2
+      elements[1]
+    end
+
+    def variable
+      elements[2]
+    end
+  end
+
+  module SmsVarlist3d3
+    def variable1
+      elements[0]
+    end
+
+    def t_comma
+      elements[1]
+    end
+
+    def variable2
+      elements[2]
+    end
+  end
+
+  module SmsVarlist3d4
+    def t_comma
+      elements[0]
+    end
+
+    def variable
+      elements[1]
+    end
+  end
+
+  module SmsVarlist3d5
+    def variable
+      elements[0]
+    end
+
+  end
+
+  def _nt_sms_varlist3d
+    start_index = index
+    if node_cache[:sms_varlist3d].has_key?(index)
+      cached = node_cache[:sms_varlist3d][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    i1, s1 = index, []
+    r2 = _nt_variable
+    s1 << r2
+    if r2
+      r3 = _nt_t_comma
+      s1 << r3
+      if r3
+        r4 = _nt_variable
+        s1 << r4
+        if r4
+          r5 = _nt_t_comma
+          s1 << r5
+          if r5
+            r6 = _nt_variable
+            s1 << r6
+          end
+        end
+      end
+    end
+    if s1.last
+      r1 = instantiate_node(SMS_Varlist3D_1,input, i1...index, s1)
+      r1.extend(SmsVarlist3d0)
+    else
+      @index = i1
+      r1 = nil
+    end
+    if r1
+      r0 = r1
+    else
+      i7, s7 = index, []
+      r8 = _nt_t_comma
+      s7 << r8
+      if r8
+        r9 = _nt_variable
+        s7 << r9
+        if r9
+          r10 = _nt_t_comma
+          s7 << r10
+          if r10
+            r11 = _nt_variable
+            s7 << r11
+          end
+        end
+      end
+      if s7.last
+        r7 = instantiate_node(SMS_Varlist3D_2,input, i7...index, s7)
+        r7.extend(SmsVarlist3d1)
+      else
+        @index = i7
+        r7 = nil
+      end
+      if r7
+        r0 = r7
+      else
+        i12, s12 = index, []
+        r13 = _nt_t_comma
+        s12 << r13
+        if r13
+          r14 = _nt_t_comma
+          s12 << r14
+          if r14
+            r15 = _nt_variable
+            s12 << r15
+          end
+        end
+        if s12.last
+          r12 = instantiate_node(SMS_Varlist3D_3,input, i12...index, s12)
+          r12.extend(SmsVarlist3d2)
+        else
+          @index = i12
+          r12 = nil
+        end
+        if r12
+          r0 = r12
+        else
+          i16, s16 = index, []
+          r17 = _nt_variable
+          s16 << r17
+          if r17
+            r18 = _nt_t_comma
+            s16 << r18
+            if r18
+              r19 = _nt_variable
+              s16 << r19
+            end
+          end
+          if s16.last
+            r16 = instantiate_node(SMS_Varlist3D_4,input, i16...index, s16)
+            r16.extend(SmsVarlist3d3)
+          else
+            @index = i16
+            r16 = nil
+          end
+          if r16
+            r0 = r16
+          else
+            i20, s20 = index, []
+            r21 = _nt_t_comma
+            s20 << r21
+            if r21
+              r22 = _nt_variable
+              s20 << r22
+            end
+            if s20.last
+              r20 = instantiate_node(SMS_Varlist3D_5,input, i20...index, s20)
+              r20.extend(SmsVarlist3d4)
+            else
+              @index = i20
+              r20 = nil
+            end
+            if r20
+              r0 = r20
+            else
+              i23, s23 = index, []
+              r24 = _nt_variable
+              s23 << r24
+              if r24
+                if has_terminal?("", false, index)
+                  r25 = instantiate_node(SyntaxNode,input, index...(index + 0))
+                  @index += 0
+                else
+                  terminal_parse_failure("")
+                  r25 = nil
+                end
+                s23 << r25
+              end
+              if s23.last
+                r23 = instantiate_node(SMS_Varlist3D_6,input, i23...index, s23)
+                r23.extend(SmsVarlist3d5)
+              else
+                @index = i23
+                r23 = nil
+              end
+              if r23
+                r0 = r23
+              else
+                @index = i0
+                r0 = nil
+              end
+            end
+          end
+        end
+      end
+    end
+
+    node_cache[:sms_varlist3d][start_index] = r0
 
     r0
   end

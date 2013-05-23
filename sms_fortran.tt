@@ -87,7 +87,19 @@ grammar Fortran
   end
 
   rule sms_create_decomp
-    sms_sentinel sms_t_create_decomp character+ t_newline <SMS_Create_Decomp>
+    sms_sentinel sms_t_create_decomp t_paren_l sms_decomp_name t_comma sms_create_decomp_global t_comma sms_create_decomp_halo sms_create_decomp_regionsize t_paren_r t_newline <SMS_Create_Decomp>
+  end
+
+  rule sms_create_decomp_global
+    t_lt sms_varlist3d t_gt <SMS_Create_Decomp_Global>
+  end
+
+  rule sms_create_decomp_halo
+    t_lt sms_varlist3d t_gt <SMS_Create_Decomp_Halo>
+  end
+
+  rule sms_create_decomp_regionsize
+    t_colon sms_t_regionsize t_equal variable <SMS_Create_Decomp_Regionsize>
   end
 
   rule sms_declarative
@@ -133,6 +145,7 @@ grammar Fortran
   rule sms_executable
     sms_barrier /
     sms_compare_var /
+    sms_create_decomp /
     sms_exchange /
     sms_halo_comp &{ |e| sp_sms_halo_comp } <E> /
     sms_parallel &{ |e| sp_sms_parallel } <E> /
@@ -203,7 +216,6 @@ grammar Fortran
   end
 
   rule sms_passthrough
-    sms_create_decomp /
     sms_ignore_begin /
     sms_ignore_end /
     sms_reduce /
@@ -291,6 +303,10 @@ grammar Fortran
     "reduce" <T>
   end
 
+  rule sms_t_regionsize
+    "regionsize" <T>
+  end
+
   rule sms_t_serial
     "serial" <T>
   end
@@ -342,6 +358,15 @@ grammar Fortran
 
   rule sms_unstructured_grid
     sms_sentinel sms_t_unstructured_grid t_paren_l variable_name t_paren_r t_newline <SMS_Unstructured_Grid>
+  end
+
+  rule sms_varlist3d
+    variable t_comma variable t_comma variable <SMS_Varlist3D_1> /
+    t_comma variable t_comma variable <SMS_Varlist3D_2> /
+    t_comma t_comma variable <SMS_Varlist3D_3> /
+    variable t_comma variable <SMS_Varlist3D_4> /
+    t_comma variable <SMS_Varlist3D_5> /
+    variable "" <SMS_Varlist3D_6>
   end
 
   rule sms_var_list

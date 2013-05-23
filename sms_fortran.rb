@@ -436,7 +436,126 @@ module Fortran
   end
 
   class SMS_Create_Decomp < SMS
-    def to_s() sms(e[2].e.map { |x| x.text_value }.join) end
+
+    def decomp
+      e[3]
+    end
+
+    def global
+      e[5].vars
+    end
+
+    def halo
+      e[7].vars
+    end
+
+    def regionsize
+      e[8]
+    end
+
+    def translate
+      max=3
+      d="#{decomp}"
+      n="#{decomp}__nestlevel"
+      use("module_decomp")
+      use("nnt_types_module")
+      declare("integer","ppp__periodicusedupper",{:dims=>%w[ppp_max_decomposed_dims]})
+      declare("integer","ppp__periodicusedlower",{:dims=>%w[ppp_max_decomposed_dims]})
+      stmts=[]
+      stmts.push(["#{n}=1",:assignment_stmt])
+      stmts.push(["#{d}__nregions=1",:assignment_stmt])
+      # See TODO about this multiple-loop HACK. Merge these loops when legacy ppp is gone...
+      # See TODO about this being essentially hardwired to work with FIM
+      max.times do |i|
+        dim=i+1
+        g=global[i]
+        if g
+          stmts.push(["allocate(#{d}__s#{dim}(1:1,0:1,#{d}__maxnests))",:allocate_stmt])
+          stmts.push(["allocate(#{d}__e#{dim}(#{g}:#{g},0:1,#{d}__maxnests))",:allocate_stmt])
+        end
+        stmts.push(["#{d}__globalsize(#{dim},#{n})=#{(g)?(g):(1)}",:assignment_stmt])
+      end
+      max.times do |i|
+        dim=i+1
+        stmts.push(["#{d}__localsize(#{dim},#{n})=0",:assignment_stmt])
+      end
+      max.times do |i|
+        dim=i+1
+        h=halo[i]
+        stmts.push(["#{d}__halosize(#{dim},#{n})=#{(h)?(h):(0)}",:assignment_stmt])
+      end
+      max.times do |i|
+        dim=i+1
+        stmts.push(["#{d}__boundarytype(#{dim})=nnt_nonperiodic_bdy",:assignment_stmt])
+      end
+      max.times do |i|
+        dim=i+1
+        stmts.push(["#{d}__lowbounds(#{dim},#{n})=1",:assignment_stmt])
+      end
+      max.times do |i|
+        dim=i+1
+        stmts.push(["#{d}__upperbounds(#{dim})=#{d}__globalsize(#{dim},#{n})+#{d}__lowbounds(#{dim},#{n})-1",:assignment_stmt])
+      end
+      max.times do |i|
+        dim=i+1
+        g=global[i]
+        if g
+          stmts.push(["ppp__periodicusedlower(:)=#{d}__lowbounds(:,#{dim})",:assignment_stmt])
+          stmts.push(["ppp__periodicusedupper(:)=#{d}__upperbounds(:,#{dim})",:assignment_stmt])
+        end
+      end
+      stmts.push(["#{d}__decompname='#{d}'",:assignment_stmt])
+      args=[
+        "nnt_decomp_1",
+        "#{d}__boundarytype",
+        "#{d}__globalsize(1,#{n})",
+        "#{d}__halosize(1,#{n})",
+        "#{d}__lowbounds(1,#{n})",
+        "ppp_null_decomp",
+        "#{d}__localsize(1,#{n})",
+        "ppp__periodicusedlower(1)",
+        "ppp__periodicusedupper(1)",
+        "#{d}__local_lb(1,#{n})",
+        "#{d}__local_ub(1,#{n})",
+        "#{d}__decompname",
+        "#{d}(#{n})",
+        "ppp_max_decomposed_dims",
+        "sms_unstructured",
+        "regionsize",
+        "ppp__status"
+      ]
+      stmts.push(["call ppp_decomp(#{args.join(',')})",:call_stmt])
+      s=""
+      s+="do #{d}__index=0,0\n"
+      args=[
+        "#{d}(#{n})",
+        "1",
+        "#{d}__halosize(1,#{n})-#{d}__index",
+        "#{d}__s1(1,#{d}__index,#{n})",
+        "#{d}__e1(#{global[0]},#{d}__index,#{n})",
+        "1",
+        "1",
+        "#{d}__nregions",
+        "ppp__status"
+      ]
+      s+="call ppp_loops_op(#{args.join(',')})\n"
+      s+="end do\n"
+      stmts.push([s,:block_do_construct])
+      replace_statements(stmts)
+    end
+
+  end
+
+  class SMS_Create_Decomp_Global < SMS
+    def vars() e[1].vars end
+  end
+
+  class SMS_Create_Decomp_Halo < SMS
+    def vars() e[1].vars end
+  end
+
+  class SMS_Create_Decomp_Regionsize < SMS
+    def regionsize() e[3] end
   end
 
   class SMS_Declare_Decomp < SMS
@@ -851,6 +970,30 @@ module Fortran
       replace_statements(stmts)
     end
 
+  end
+
+  class SMS_Varlist3D_1 < SMS
+    def vars() [e[0],e[2],e[4]] end
+  end
+
+  class SMS_Varlist3D_2 < SMS
+    def vars() [e[1],e[3]] end
+  end
+
+  class SMS_Varlist3D_3 < SMS
+    def vars() [e[2]] end
+  end
+
+  class SMS_Varlist3D_4 < SMS
+    def vars() [e[0],e[2]] end
+  end
+
+  class SMS_Varlist3D_5 < SMS
+    def vars() [e[1]] end
+  end
+
+  class SMS_Varlist3D_6 < SMS
+    def vars() [e[0]] end
   end
 
   class T < Treetop::Runtime::SyntaxNode
