@@ -26,20 +26,20 @@ module Fortran
   end
 
   def sp_sms_halo_comp_begin(halo_comp_pairs)
-    fail "Halo computation invalid outside parallel region" unless env[:parallel]
-    fail "Already inside halo-computation region" if env[:halocomp]
+    fail "Halo computation invalid outside parallel region" unless env[:sms_parallel]
+    fail "Already inside halo-computation region" if env[:sms_halo_comp]
     envpush
     dims={}
     dims[1]=halo_comp_pairs.e[0]
     dims[2]=halo_comp_pairs.e[1].e[1] if halo_comp_pairs.e[1].e
     dims[3]=halo_comp_pairs.e[2].e[1] if halo_comp_pairs.e[2].e
-    env[:halocomp]={}
-    dims.each { |k,v| env[:halocomp][k]=OpenStruct.new({:lo=>v.lo,:up=>v.up}) }
+    env[:sms_halo_comp]={}
+    dims.each { |k,v| env[:sms_halo_comp][k]=OpenStruct.new({:lo=>v.lo,:up=>v.up}) }
     true
   end
 
   def sp_sms_halo_comp_end
-    fail "Not inside halo-computation region" unless env[:halocomp]
+    fail "Not inside halo-computation region" unless env[:sms_halo_comp]
     true
   end
 
@@ -49,14 +49,14 @@ module Fortran
   end
 
   def sp_sms_parallel_begin(sms_decomp_name,sms_parallel_var_lists)
-    fail "Already inside parallel region" if env[:parallel]
+    fail "Already inside parallel region" if env[:sms_parallel]
     envpush
-    env[:parallel]=OpenStruct.new({:dh=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
+    env[:sms_parallel]=OpenStruct.new({:dh=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
     true
   end
 
   def sp_sms_parallel_end
-    fail "Not inside parallel region" unless env[:parallel]
+    fail "Not inside parallel region" unless env[:sms_parallel]
     true
   end
 
@@ -66,14 +66,14 @@ module Fortran
   end
 
   def sp_sms_serial_begin
-    fail "Already inside serial region" if env[:serial]
+    fail "Already inside serial region" if env[:sms_serial]
     envpush
-    env[:serial]=true
+    env[:sms_serial]=true
     true
   end
 
   def sp_sms_serial_end
-    fail "Not inside serial region" unless env[:serial]
+    fail "Not inside serial region" unless env[:sms_serial]
     true
   end
 
@@ -83,16 +83,16 @@ module Fortran
   end
 
   def sp_sms_to_local_begin(sms_decomp_name,sms_to_local_lists)
-    fail "Already inside to_local region" if env[:tolocal]
+    fail "Already inside to_local region" if env[:sms_to_local]
     envpush
-    env[:tolocal]=sms_to_local_lists.vars.each do |var,props|
+    env[:sms_to_local]=sms_to_local_lists.vars.each do |var,props|
       props.dh="#{sms_decomp_name}"
     end
     true
   end
 
   def sp_sms_to_local_end
-    fail "Not inside to_local region" unless env[:tolocal]
+    fail "Not inside to_local region" unless env[:sms_to_local]
     true
   end
 
@@ -142,7 +142,7 @@ module Fortran
     def halo_offsets(decdim)
       halo_lo=0
       halo_up=0
-      if halocomp=self.env[:halocomp]
+      if halocomp=self.env[:sms_halo_comp]
         offsets=halocomp[decdim]
         halo_lo=offsets.lo
         halo_up=offsets.up
@@ -320,7 +320,7 @@ module Fortran
   class Name < T
 
     def translate
-      if tolocal=self.env[:tolocal] and p=tolocal[name]
+      if tolocal=self.env[:sms_to_local] and p=tolocal[name]
         case p.key
         when "lbound"
           se="s#{p.decdim}"
@@ -341,8 +341,8 @@ module Fortran
   class Nonlabel_Do_Stmt < T
 
     def translate
-      unless self.env[:serial]
-        if parallel=self.env[:parallel]
+      unless self.env[:sms_serial]
+        if parallel=self.env[:sms_parallel]
           loop_control=e[3]
           loop_var="#{loop_control.e[1]}"
           decdim=nil
