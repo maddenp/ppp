@@ -31,12 +31,8 @@ module Translator
       @access="_default"
       @dolabels=[]
       @envstack=[{}]
-      @halocomp=false
       @incdirs=incdirs
-      @parallel=false
-      @serial=false
       @srcfile=srcfile
-      @tolocal=false
     end
 
     def parse(input,options={})
@@ -217,7 +213,7 @@ module Translator
       unless raw_tree
         na=n.split("\n")
         na.each_index { |i| puts "#{i+1} #{na[i]}" }
-        fail "#{fp.failure_reason}\nPARSE FAILED#{srcmsg}"
+        fail "#{fp.failure_reason.split("\n")[0]}\nPARSE FAILED#{srcmsg}"
         return # if in server mode and did not exit in fail()
       end
       translated_tree=(opts[:translate])?(raw_tree.translate_top):(nil)

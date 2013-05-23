@@ -104,6 +104,10 @@ grammar Fortran
     name "" <SMS_Decomp_Name>
   end
 
+#  rule sms_distribute
+#    sms_distribute_begin declaration_constructs sms_distribute_end <SMS_Distribute>
+#  end
+
   rule sms_distribute_begin
     sms_sentinel sms_t_distribute t_paren_l sms_decomp_name t_comma sms_distribute_dims t_paren_r sms_t_begin t_newline &{ |e| sp_sms_distribute_begin(e[3],e[5]) } <SMS_Distribute_Begin>
   end
@@ -130,15 +134,16 @@ grammar Fortran
     sms_barrier /
     sms_compare_var /
     sms_exchange /
-    sms_halo_comp_begin /
-    sms_halo_comp_end /
-    sms_parallel_begin /
-    sms_parallel_end /
-    sms_to_local_begin /
-    sms_to_local_end /
+    sms_halo_comp &{ |e| sp_sms_halo_comp } <E> /
+    sms_parallel &{ |e| sp_sms_parallel } <E> /
+    sms_to_local &{ |e| sp_sms_to_local } <E> /
     sms_set_communicator /
     sms_unstructured_grid /
     sms_passthrough
+  end
+
+  rule sms_halo_comp
+    sms_halo_comp_begin block sms_halo_comp_end <SMS_Halo_Comp>
   end
 
   rule sms_halo_comp_begin
@@ -170,6 +175,10 @@ grammar Fortran
     t_paren_l (!t_paren_r character)* t_paren_r <T>
   end
 
+  rule sms_parallel
+    sms_parallel_begin block sms_parallel_end <SMS_Parallel>
+  end
+
   rule sms_parallel_begin
     sms_sentinel sms_t_parallel t_paren_l sms_decomp_name t_comma sms_parallel_var_lists t_paren_r sms_t_begin t_newline &{ |e| sp_sms_parallel_begin(e[3],e[5]) } <SMS_Parallel_Begin>
   end
@@ -198,8 +207,7 @@ grammar Fortran
     sms_ignore_begin /
     sms_ignore_end /
     sms_reduce /
-    sms_serial_begin /
-    sms_serial_end
+    sms_serial &{ |e| sp_sms_serial } <E> 
   end
 
   rule sms_reduce
@@ -208,6 +216,10 @@ grammar Fortran
 
   rule sms_sentinel
     "!sms$" <T>
+  end
+
+  rule sms_serial
+    sms_serial_begin block sms_serial_end <SMS_Serial>
   end
 
   rule sms_serial_begin
@@ -301,6 +313,10 @@ grammar Fortran
 
   rule sms_t_unstructured_grid
     "unstructured_grid" <T>
+  end
+
+  rule sms_to_local
+    sms_to_local_begin block sms_to_local_end <SMS_To_Local>
   end
 
   rule sms_to_local_begin

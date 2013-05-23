@@ -452,7 +452,7 @@ module Fortran
     end
 
     def env
-      (su=scoping_unit)?(su.envref):(self.envref)
+      (envsrc=scoping_unit)?(envsrc.envref):(self.envref)
     end
 
     def execution_part
