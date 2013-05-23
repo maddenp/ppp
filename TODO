@@ -168,3 +168,5 @@ x directives done
 
 - Make a single method for complaining about not-found-in-environment symbols
   and explaining what the cause & remedy might be.
+
+- Reformulate distribute being/end as distribute region.
