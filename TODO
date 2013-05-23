@@ -1,34 +1,9 @@
-- directives to do
+- directives still to do
 
-  !sms$create_decomp
-  !sms$ignore begin/end
   !sms$reduce
-  !sms$reduce begin/end
   !sms$serial begin/end
   directiveless io translations
-
-x directives done
-
-  !sms$barrier
-  !sms$compare_var
-  !sms$declare_decomp
-  !sms$distribute
-  !sms$exchange
-  !sms$halo_comp begin/end
-  !sms$insert
-  !sms$parallel begin/end
-  !sms$remove
-  !sms$set_communicator
-  !sms$to_local begin/end
-  !sms$unstructured_grid
-
-- Translate print, write, namelist stuff, other act-like-serial items.
-
-- Remove various HACKS and deal with any fallout.
-
-- REMOVE sms_passthrough and everything related to it.
-
-- REMOVE sms$ignore* and everything related to it.
+  !sms$ignore begin/end
 
 - Need tests of F90:R1206 generic_spec (2nd two forms).
 
@@ -38,12 +13,9 @@ x directives done
 
 - Need tests of all F90:R924 possibilities.
 
-- Move proc_sms_executable call from sms_executable : sms_barrier to
-  executable_construct : sms_executable once sms$ignore begin/end are gone.
-  Also: sms_compare_var.
+- Remove various HACKS and deal with any fallout.
 
-- Move proc_sms_declarative call from sms_declarative : sms_distribute to
-  declaration_construct : sms_declarative once sms$ignore begin/end are gone.
+- REMOVE sms_passthrough and everything related to it.
 
 - In declare(), use push(tree) instead of insert(0,tree) to insert new
   declarations at the END of the declarations list. Unfortunately, the old
@@ -59,9 +31,6 @@ x directives done
 
 - Error needed when compare_var variable is not distributed or no mod info
 
-- Remove HACK from SMS_Compare_Var::translate() when modules are being loaded
-  into env. No sense in looking up env information for use'd variables.
-
 - WHERE may need (automatic?) parallel treatment.
 
 - Are distributed array assignments e.g.
@@ -70,10 +39,6 @@ x directives done
     !sms$distribute end
     a=0
   supported?
-
-- Need to check for erroneous placement of executable sms construct in
-  declaration section, and vice versa, as compiler will not help with
-  this. Maybe this is already being done via grammar.
 
 - Stop tracking kind. Pass only *type* to MPI-calling SMS routines and, in the
   latter, use mpi_sizeof() + mpi_type_match_size() in the library to make a
@@ -98,7 +63,8 @@ x directives done
 
 - Make implicit none mandatory! Parsing is weird w/o it.
 
-- write-stmt seems to parse wrong, too: 'write' recognized as Data_Ref.
+- write-stmt seems to parse wrong, 'write' recognized as Data_Ref. This could be
+  a problem re: implicit translation of write io statements.
 
 - Change all 'print *' to print/write with format list in tests. Otherwise,
   output may vary with processor (gfortran, ifort, etc.).
@@ -106,20 +72,8 @@ x directives done
 - translate() on SMS_Unstructured_Grid cannot possibly be correct in the general
   case, right?
 
-- Get rid of @@distribute, @@parallel et al and use env[:distribute] etc.? The
-  way env stack changes may be a problem, e.g. distribute begin/end causes an
-  env stack push/pop, so distribute info for a variable declared in that block
-  isn't available outside the block, while when it is added to @@distribute, it
-  always is.
-
-- Can we get rid of leading underscores in key names e.g. _explicit ?
-
 - Add output to no-output tests to make sure code is not deleted in translation
   (e.g. reveiw t0160 changes)
-
-- Server mode more suitable for running under JRuby? i.e. clients specify input
-  filenames & arguments, worker thread (process) does translation. Could
-  eliminate JRuby startup overhead issues.
 
 - Sort envfile output for easy xxdiff comparison.
 
@@ -148,7 +102,7 @@ x directives done
 
 - Fortran#replace_statements (plural) may be problematic (i.e. it might modify
   the tree in unsound ways). It may be better to use the block_do_construct
-  trick, replacing a single statement.
+  trick (do\n...exit\nend do", replacing a single statement.
 
 - Fortran#declare needs to insert new declarations at the *bottom* of the decl
   section, not at the top, so that declare() calls can be made, intuitively, in
@@ -176,3 +130,7 @@ x directives done
 
 - SMS_Create_Decomp#translate is only valid for one decomposed dimension. Extend
   it to handle three.
+
+- Do we need block sms$reduce?
+
+- Define new API, document, bring translator up-to-spec.
