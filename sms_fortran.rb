@@ -453,6 +453,10 @@ module Fortran
       e[8]
     end
 
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}#{e[8]}#{e[9]}")
+    end
+
     def translate
       max=3
       d="#{decomp}"
@@ -843,7 +847,34 @@ module Fortran
   end
 
   class SMS_Reduce < SMS
-    def to_s() sms("#{e[2]}") end
+
+    def op
+      e[5]
+    end
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}")
+    end
+
+#   def translate
+#   end
+
+    def vars
+      e[3]
+    end
+
+  end
+
+  class SMS_Reduce_Varlist < SMS
+
+    def vars
+      list_to_s.split(",")
+    end
+
+    def to_s
+      list_to_s
+    end
+
   end
 
   class SMS_Serial < SMS_Region

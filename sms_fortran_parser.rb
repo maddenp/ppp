@@ -1520,44 +1520,49 @@ module Fortran
               if r9
                 r0 = r9
               else
-                i13, s13 = index, []
-                r14 = _nt_sms_to_local
-                s13 << r14
-                if r14
-                  i15 = index
-                  r16 = lambda { |e| sp_sms_to_local }.call(s13)
-                  if r16
-                    @index = i15
-                    r15 = instantiate_node(SyntaxNode,input, index...index)
-                  else
-                    r15 = nil
-                  end
-                  s13 << r15
-                end
-                if s13.last
-                  r13 = instantiate_node(E,input, i13...index, s13)
-                  r13.extend(SmsExecutable2)
-                else
-                  @index = i13
-                  r13 = nil
-                end
+                r13 = _nt_sms_reduce
                 if r13
                   r0 = r13
                 else
-                  r17 = _nt_sms_set_communicator
-                  if r17
-                    r0 = r17
+                  r14 = _nt_sms_set_communicator
+                  if r14
+                    r0 = r14
                   else
-                    r18 = _nt_sms_unstructured_grid
-                    if r18
-                      r0 = r18
+                    i15, s15 = index, []
+                    r16 = _nt_sms_to_local
+                    s15 << r16
+                    if r16
+                      i17 = index
+                      r18 = lambda { |e| sp_sms_to_local }.call(s15)
+                      if r18
+                        @index = i17
+                        r17 = instantiate_node(SyntaxNode,input, index...index)
+                      else
+                        r17 = nil
+                      end
+                      s15 << r17
+                    end
+                    if s15.last
+                      r15 = instantiate_node(E,input, i15...index, s15)
+                      r15.extend(SmsExecutable2)
                     else
-                      r19 = _nt_sms_passthrough
+                      @index = i15
+                      r15 = nil
+                    end
+                    if r15
+                      r0 = r15
+                    else
+                      r19 = _nt_sms_unstructured_grid
                       if r19
                         r0 = r19
                       else
-                        @index = i0
-                        r0 = nil
+                        r20 = _nt_sms_passthrough
+                        if r20
+                          r0 = r20
+                        else
+                          @index = i0
+                          r0 = nil
+                        end
                       end
                     end
                   end
@@ -2810,37 +2815,32 @@ module Fortran
       if r2
         r0 = r2
       else
-        r3 = _nt_sms_reduce
+        i3, s3 = index, []
+        r4 = _nt_sms_serial
+        s3 << r4
+        if r4
+          i5 = index
+          r6 = lambda { |e| sp_sms_serial }.call(s3)
+          if r6
+            @index = i5
+            r5 = instantiate_node(SyntaxNode,input, index...index)
+          else
+            r5 = nil
+          end
+          s3 << r5
+        end
+        if s3.last
+          r3 = instantiate_node(E,input, i3...index, s3)
+          r3.extend(SmsPassthrough0)
+        else
+          @index = i3
+          r3 = nil
+        end
         if r3
           r0 = r3
         else
-          i4, s4 = index, []
-          r5 = _nt_sms_serial
-          s4 << r5
-          if r5
-            i6 = index
-            r7 = lambda { |e| sp_sms_serial }.call(s4)
-            if r7
-              @index = i6
-              r6 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r6 = nil
-            end
-            s4 << r6
-          end
-          if s4.last
-            r4 = instantiate_node(E,input, i4...index, s4)
-            r4.extend(SmsPassthrough0)
-          else
-            @index = i4
-            r4 = nil
-          end
-          if r4
-            r0 = r4
-          else
-            @index = i0
-            r0 = nil
-          end
+          @index = i0
+          r0 = nil
         end
       end
     end
@@ -2859,12 +2859,28 @@ module Fortran
       elements[1]
     end
 
-    def sms_parenthesized_args
+    def t_paren_l
       elements[2]
     end
 
-    def t_newline
+    def sms_reduce_varlist
       elements[3]
+    end
+
+    def t_comma
+      elements[4]
+    end
+
+    def sms_reduce_op
+      elements[5]
+    end
+
+    def t_paren_r
+      elements[6]
+    end
+
+    def t_newline
+      elements[7]
     end
   end
 
@@ -2886,11 +2902,27 @@ module Fortran
       r2 = _nt_sms_t_reduce
       s0 << r2
       if r2
-        r3 = _nt_sms_parenthesized_args
+        r3 = _nt_t_paren_l
         s0 << r3
         if r3
-          r4 = _nt_t_newline
+          r4 = _nt_sms_reduce_varlist
           s0 << r4
+          if r4
+            r5 = _nt_t_comma
+            s0 << r5
+            if r5
+              r6 = _nt_sms_reduce_op
+              s0 << r6
+              if r6
+                r7 = _nt_t_paren_r
+                s0 << r7
+                if r7
+                  r8 = _nt_t_newline
+                  s0 << r8
+                end
+              end
+            end
+          end
         end
       end
     end
@@ -2903,6 +2935,195 @@ module Fortran
     end
 
     node_cache[:sms_reduce][start_index] = r0
+
+    r0
+  end
+
+  module SmsReduceVarlist0
+    def t_comma
+      elements[0]
+    end
+
+    def variable
+      elements[1]
+    end
+
+  end
+
+  module SmsReduceVarlist1
+    def variable
+      elements[0]
+    end
+
+  end
+
+  def _nt_sms_reduce_varlist
+    start_index = index
+    if node_cache[:sms_reduce_varlist].has_key?(index)
+      cached = node_cache[:sms_reduce_varlist][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_variable
+    s0 << r1
+    if r1
+      s2, i2 = [], index
+      loop do
+        i3, s3 = index, []
+        r4 = _nt_t_comma
+        s3 << r4
+        if r4
+          r5 = _nt_variable
+          s3 << r5
+          if r5
+            i6 = index
+            r7 = _nt_t_paren_r
+            if r7
+              r6 = nil
+            else
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            end
+            s3 << r6
+          end
+        end
+        if s3.last
+          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+          r3.extend(SmsReduceVarlist0)
+        else
+          @index = i3
+          r3 = nil
+        end
+        if r3
+          s2 << r3
+        else
+          break
+        end
+      end
+      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Reduce_Varlist,input, i0...index, s0)
+      r0.extend(SmsReduceVarlist1)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_reduce_varlist][start_index] = r0
+
+    r0
+  end
+
+  def _nt_sms_reduce_op
+    start_index = index
+    if node_cache[:sms_reduce_op].has_key?(index)
+      cached = node_cache[:sms_reduce_op][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    r1 = _nt_sms_t_max
+    if r1
+      r0 = r1
+    else
+      r2 = _nt_sms_t_min
+      if r2
+        r0 = r2
+      else
+        r3 = _nt_sms_t_sum
+        if r3
+          r0 = r3
+        else
+          @index = i0
+          r0 = nil
+        end
+      end
+    end
+
+    node_cache[:sms_reduce_op][start_index] = r0
+
+    r0
+  end
+
+  def _nt_sms_t_max
+    start_index = index
+    if node_cache[:sms_t_max].has_key?(index)
+      cached = node_cache[:sms_t_max][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("max", false, index)
+      r0 = instantiate_node(T,input, index...(index + 3))
+      @index += 3
+    else
+      terminal_parse_failure("max")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_max][start_index] = r0
+
+    r0
+  end
+
+  def _nt_sms_t_min
+    start_index = index
+    if node_cache[:sms_t_min].has_key?(index)
+      cached = node_cache[:sms_t_min][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("min", false, index)
+      r0 = instantiate_node(T,input, index...(index + 3))
+      @index += 3
+    else
+      terminal_parse_failure("min")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_min][start_index] = r0
+
+    r0
+  end
+
+  def _nt_sms_t_sum
+    start_index = index
+    if node_cache[:sms_t_sum].has_key?(index)
+      cached = node_cache[:sms_t_sum][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("sum", false, index)
+      r0 = instantiate_node(T,input, index...(index + 3))
+      @index += 3
+    else
+      terminal_parse_failure("sum")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_sum][start_index] = r0
 
     r0
   end

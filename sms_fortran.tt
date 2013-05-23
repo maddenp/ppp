@@ -149,8 +149,9 @@ grammar Fortran
     sms_exchange /
     sms_halo_comp &{ |e| sp_sms_halo_comp } <E> /
     sms_parallel &{ |e| sp_sms_parallel } <E> /
-    sms_to_local &{ |e| sp_sms_to_local } <E> /
+    sms_reduce /
     sms_set_communicator /
+    sms_to_local &{ |e| sp_sms_to_local } <E> /
     sms_unstructured_grid /
     sms_passthrough
   end
@@ -218,13 +219,38 @@ grammar Fortran
   rule sms_passthrough
     sms_ignore_begin /
     sms_ignore_end /
-    sms_reduce /
     sms_serial &{ |e| sp_sms_serial } <E> 
   end
 
+  #PM#
+
   rule sms_reduce
-    sms_sentinel sms_t_reduce sms_parenthesized_args t_newline <SMS_Reduce>
+    sms_sentinel sms_t_reduce t_paren_l sms_reduce_varlist t_comma sms_reduce_op t_paren_r t_newline <SMS_Reduce>
   end
+
+  rule sms_reduce_varlist
+    variable ( t_comma variable !t_paren_r )* <SMS_Reduce_Varlist>
+  end
+
+  rule sms_reduce_op
+    sms_t_max /
+    sms_t_min /
+    sms_t_sum
+  end
+
+  rule sms_t_max
+    "max" <T>
+  end
+
+  rule sms_t_min
+    "min" <T>
+  end
+
+  rule sms_t_sum
+    "sum" <T>
+  end
+
+  #PM#
 
   rule sms_sentinel
     "!sms$" <T>
