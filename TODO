@@ -165,3 +165,6 @@ x directives done
 
 - To make all of this more useful, build an AST from the parse tree. Then, do
   translations on and produce final output from the AST.
+
+- Make a single method for complaining about not-found-in-environment symbols
+  and explaining what the cause & remedy might be.
