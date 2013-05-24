@@ -2939,6 +2939,41 @@ module Fortran
     r0
   end
 
+  def _nt_sms_reduce_op
+    start_index = index
+    if node_cache[:sms_reduce_op].has_key?(index)
+      cached = node_cache[:sms_reduce_op][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    r1 = _nt_sms_t_max
+    if r1
+      r0 = r1
+    else
+      r2 = _nt_sms_t_min
+      if r2
+        r0 = r2
+      else
+        r3 = _nt_sms_t_sum
+        if r3
+          r0 = r3
+        else
+          @index = i0
+          r0 = nil
+        end
+      end
+    end
+
+    node_cache[:sms_reduce_op][start_index] = r0
+
+    r0
+  end
+
   module SmsReduceVarlist0
     def t_comma
       elements[0]
@@ -3017,113 +3052,6 @@ module Fortran
     end
 
     node_cache[:sms_reduce_varlist][start_index] = r0
-
-    r0
-  end
-
-  def _nt_sms_reduce_op
-    start_index = index
-    if node_cache[:sms_reduce_op].has_key?(index)
-      cached = node_cache[:sms_reduce_op][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0 = index
-    r1 = _nt_sms_t_max
-    if r1
-      r0 = r1
-    else
-      r2 = _nt_sms_t_min
-      if r2
-        r0 = r2
-      else
-        r3 = _nt_sms_t_sum
-        if r3
-          r0 = r3
-        else
-          @index = i0
-          r0 = nil
-        end
-      end
-    end
-
-    node_cache[:sms_reduce_op][start_index] = r0
-
-    r0
-  end
-
-  def _nt_sms_t_max
-    start_index = index
-    if node_cache[:sms_t_max].has_key?(index)
-      cached = node_cache[:sms_t_max][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    if has_terminal?("max", false, index)
-      r0 = instantiate_node(T,input, index...(index + 3))
-      @index += 3
-    else
-      terminal_parse_failure("max")
-      r0 = nil
-    end
-
-    node_cache[:sms_t_max][start_index] = r0
-
-    r0
-  end
-
-  def _nt_sms_t_min
-    start_index = index
-    if node_cache[:sms_t_min].has_key?(index)
-      cached = node_cache[:sms_t_min][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    if has_terminal?("min", false, index)
-      r0 = instantiate_node(T,input, index...(index + 3))
-      @index += 3
-    else
-      terminal_parse_failure("min")
-      r0 = nil
-    end
-
-    node_cache[:sms_t_min][start_index] = r0
-
-    r0
-  end
-
-  def _nt_sms_t_sum
-    start_index = index
-    if node_cache[:sms_t_sum].has_key?(index)
-      cached = node_cache[:sms_t_sum][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    if has_terminal?("sum", false, index)
-      r0 = instantiate_node(T,input, index...(index + 3))
-      @index += 3
-    else
-      terminal_parse_failure("sum")
-      r0 = nil
-    end
-
-    node_cache[:sms_t_sum][start_index] = r0
 
     r0
   end
@@ -3715,6 +3643,54 @@ module Fortran
     r0
   end
 
+  def _nt_sms_t_max
+    start_index = index
+    if node_cache[:sms_t_max].has_key?(index)
+      cached = node_cache[:sms_t_max][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("max", false, index)
+      r0 = instantiate_node(T,input, index...(index + 3))
+      @index += 3
+    else
+      terminal_parse_failure("max")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_max][start_index] = r0
+
+    r0
+  end
+
+  def _nt_sms_t_min
+    start_index = index
+    if node_cache[:sms_t_min].has_key?(index)
+      cached = node_cache[:sms_t_min][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("min", false, index)
+      r0 = instantiate_node(T,input, index...(index + 3))
+      @index += 3
+    else
+      terminal_parse_failure("min")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_min][start_index] = r0
+
+    r0
+  end
+
   def _nt_sms_t_parallel
     start_index = index
     if node_cache[:sms_t_parallel].has_key?(index)
@@ -3831,6 +3807,30 @@ module Fortran
     end
 
     node_cache[:sms_t_set_communicator][start_index] = r0
+
+    r0
+  end
+
+  def _nt_sms_t_sum
+    start_index = index
+    if node_cache[:sms_t_sum].has_key?(index)
+      cached = node_cache[:sms_t_sum][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("sum", false, index)
+      r0 = instantiate_node(T,input, index...(index + 3))
+      @index += 3
+    else
+      terminal_parse_failure("sum")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_sum][start_index] = r0
 
     r0
   end

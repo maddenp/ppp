@@ -856,11 +856,45 @@ module Fortran
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}")
     end
 
-#   def translate
-#   end
+    def translate
+      use("module_decomp")
+      declare("integer","globalsize",{:dims=>%w[ppp_max_reduce_vars]})
+      declare("integer","datatypes",{:dims=>%w[ppp_max_reduce_vars]})
+      stmts=[]
+      stmts.push(["globalsizes=1",:assignment_stmt])
+      vars.size.times do |i|
+        var=vars[i]
+        fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
+        type=varenv["type"]
+        kind=varenv["kind"]
+        if kind=="_default"
+          nnt_type="nnt_#{type}"
+        else
+          case type
+          when "integer"
+            type_letter="i"
+          when "real"
+            type_letter="r"
+          when "complex"
+            type_letter="c"
+          else
+            fail "No type_letter defined for type '#{type}'"
+          end
+          case kind
+          when "8"
+            nnt_type="nnt_#{type_letter}#{kind}"
+          else
+            fail "No nnt_type defined for '#{type_letter}#{kind}'"
+          end
+        end
+        stmts.push(["datatypes(#{i+1})=#{nnt_type}",:assignment_stmt])
+      end
+      stmts.push(["call ppp_reduce_#{vars.size}(globalsizes,datatypes,nnt_#{op},ppp__status,#{vars.join(',')})",:call_stmt])
+      replace_statements(stmts)
+    end
 
     def vars
-      e[3]
+      e[3].vars
     end
 
   end
