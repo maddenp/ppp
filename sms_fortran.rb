@@ -857,12 +857,14 @@ module Fortran
     end
 
     def translate
+      nvars=vars.size
+      fail "SMS$REDUCE supports reduction of 25 variables max" if nvars>25
       use("module_decomp")
-      declare("integer","globalsize",{:dims=>%w[ppp_max_reduce_vars]})
+      declare("integer","globalsizes",{:dims=>%w[ppp_max_reduce_vars]})
       declare("integer","datatypes",{:dims=>%w[ppp_max_reduce_vars]})
       stmts=[]
       stmts.push(["globalsizes=1",:assignment_stmt])
-      vars.size.times do |i|
+      nvars.times do |i|
         var=vars[i]
         fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
         type=varenv["type"]
@@ -889,7 +891,7 @@ module Fortran
         end
         stmts.push(["datatypes(#{i+1})=#{nnt_type}",:assignment_stmt])
       end
-      stmts.push(["call ppp_reduce_#{vars.size}(globalsizes,datatypes,nnt_#{op},ppp__status,#{vars.join(',')})",:call_stmt])
+      stmts.push(["call ppp_reduce_#{nvars}(globalsizes,datatypes,nnt_#{op},ppp__status,#{vars.join(',')})",:call_stmt])
       replace_statements(stmts)
     end
 
