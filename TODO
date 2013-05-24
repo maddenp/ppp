@@ -134,3 +134,11 @@
 - Do we need block sms$reduce?
 
 - Define new API, document, bring translator up-to-spec.
+
+- Use ppp__status in calls into sms library to abort on error.
+
+- Can we replace env with OpenStruct? What does that look like serialized to
+  YAML? Is it human readable/writeable?
+
+- In SMS_Reduce#translate, build out case statement for the other supported
+  nnt_* types.
