@@ -1,6 +1,5 @@
 - directives still to do
 
-  !sms$reduce
   !sms$serial begin/end
   directiveless io translations
   !sms$ignore begin/end
