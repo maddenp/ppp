@@ -960,7 +960,7 @@ module Fortran
     end
 
     def vars_in
-      e[1].vars_int
+      e[1].vars_in
     end
 
     def vars_out
@@ -1047,11 +1047,11 @@ module Fortran
     end
 
     def vars_in
-      vars_with_intent("in")
+      vars_with_intent("inout")+vars_with_intent("in")
     end
 
     def vars_out
-      vars_with_intent("out")
+      vars_with_intent("inout")+vars_with_intent("out")
     end
 
   end

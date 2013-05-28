@@ -262,12 +262,13 @@ grammar Fortran
 
   rule sms_serial_intent
     sms_t_ignore /
+    sms_t_inout /
     sms_t_in /
     sms_t_out
   end
 
   rule sms_serial_intent_list
-    t_lt sms_serial_varlist t_comma ( sms_t_in / sms_t_out ) t_gt <SMS_Serial_Intent_List>
+    t_lt sms_serial_varlist t_comma sms_serial_intent t_gt <SMS_Serial_Intent_List>
   end
 
   rule sms_serial_intent_lists
@@ -333,6 +334,10 @@ grammar Fortran
 
   rule sms_t_in
     "in" <T>
+  end
+
+  rule sms_t_inout
+    "inout" <T>
   end
 
   rule sms_t_lbound

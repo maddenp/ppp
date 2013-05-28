@@ -3414,16 +3414,21 @@ module Fortran
     if r1
       r0 = r1
     else
-      r2 = _nt_sms_t_in
+      r2 = _nt_sms_t_inout
       if r2
         r0 = r2
       else
-        r3 = _nt_sms_t_out
+        r3 = _nt_sms_t_in
         if r3
           r0 = r3
         else
-          @index = i0
-          r0 = nil
+          r4 = _nt_sms_t_out
+          if r4
+            r0 = r4
+          else
+            @index = i0
+            r0 = nil
+          end
         end
       end
     end
@@ -3444,6 +3449,10 @@ module Fortran
 
     def t_comma
       elements[2]
+    end
+
+    def sms_serial_intent
+      elements[3]
     end
 
     def t_gt
@@ -3472,23 +3481,11 @@ module Fortran
         r3 = _nt_t_comma
         s0 << r3
         if r3
-          i4 = index
-          r5 = _nt_sms_t_in
-          if r5
-            r4 = r5
-          else
-            r6 = _nt_sms_t_out
-            if r6
-              r4 = r6
-            else
-              @index = i4
-              r4 = nil
-            end
-          end
+          r4 = _nt_sms_serial_intent
           s0 << r4
           if r4
-            r7 = _nt_t_gt
-            s0 << r7
+            r5 = _nt_t_gt
+            s0 << r5
           end
         end
       end
@@ -4041,6 +4038,30 @@ module Fortran
     end
 
     node_cache[:sms_t_in][start_index] = r0
+
+    r0
+  end
+
+  def _nt_sms_t_inout
+    start_index = index
+    if node_cache[:sms_t_inout].has_key?(index)
+      cached = node_cache[:sms_t_inout][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("inout", false, index)
+      r0 = instantiate_node(T,input, index...(index + 5))
+      @index += 5
+    else
+      terminal_parse_failure("inout")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_inout][start_index] = r0
 
     r0
   end
