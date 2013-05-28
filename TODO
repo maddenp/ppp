@@ -144,3 +144,10 @@
 
 - Make nnt_/ppp_/sms_ namespace consistent. Ensure that any rolled-out names
   adhere to whatever standard is chosen.
+
+- In fortran.rb/sms_fortran.rb, standardize when methods on nodes return strings
+  or SyntaxNode subclasses. That is, should we convert to strings as early as
+  possible, or delay until a string is absolutely required? Probably the latter.
+
+- Can cat() et al be moved into SyntaxNode extension in fortran.rb and used in
+  various to_s() functions to simplify syntax?
