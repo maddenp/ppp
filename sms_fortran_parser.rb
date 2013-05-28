@@ -2067,86 +2067,6 @@ module Fortran
     r0
   end
 
-  module SmsParenthesizedArgs0
-    def character
-      elements[1]
-    end
-  end
-
-  module SmsParenthesizedArgs1
-    def t_paren_l
-      elements[0]
-    end
-
-    def t_paren_r
-      elements[2]
-    end
-  end
-
-  def _nt_sms_parenthesized_args
-    start_index = index
-    if node_cache[:sms_parenthesized_args].has_key?(index)
-      cached = node_cache[:sms_parenthesized_args][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0, s0 = index, []
-    r1 = _nt_t_paren_l
-    s0 << r1
-    if r1
-      s2, i2 = [], index
-      loop do
-        i3, s3 = index, []
-        i4 = index
-        r5 = _nt_t_paren_r
-        if r5
-          r4 = nil
-        else
-          @index = i4
-          r4 = instantiate_node(SyntaxNode,input, index...index)
-        end
-        s3 << r4
-        if r4
-          r6 = _nt_character
-          s3 << r6
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(SmsParenthesizedArgs0)
-        else
-          @index = i3
-          r3 = nil
-        end
-        if r3
-          s2 << r3
-        else
-          break
-        end
-      end
-      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
-      s0 << r2
-      if r2
-        r7 = _nt_t_paren_r
-        s0 << r7
-      end
-    end
-    if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(SmsParenthesizedArgs1)
-    else
-      @index = i0
-      r0 = nil
-    end
-
-    node_cache[:sms_parenthesized_args][start_index] = r0
-
-    r0
-  end
-
   module SmsParallel0
     def sms_parallel_begin
       elements[0]
@@ -3166,7 +3086,7 @@ module Fortran
       r2 = _nt_sms_t_serial
       s0 << r2
       if r2
-        r4 = _nt_sms_parenthesized_args
+        r4 = _nt_sms_serial_control
         if r4
           r3 = r4
         else
@@ -3203,6 +3123,208 @@ module Fortran
     end
 
     node_cache[:sms_serial_begin][start_index] = r0
+
+    r0
+  end
+
+  module SmsSerialControl0
+    def t_paren_l
+      elements[0]
+    end
+
+    def sms_serial_control_option
+      elements[1]
+    end
+
+    def t_paren_r
+      elements[2]
+    end
+  end
+
+  def _nt_sms_serial_control
+    start_index = index
+    if node_cache[:sms_serial_control].has_key?(index)
+      cached = node_cache[:sms_serial_control][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_paren_l
+    s0 << r1
+    if r1
+      r2 = _nt_sms_serial_control_option
+      s0 << r2
+      if r2
+        r3 = _nt_t_paren_r
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Serial_Control,input, i0...index, s0)
+      r0.extend(SmsSerialControl0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_serial_control][start_index] = r0
+
+    r0
+  end
+
+  module SmsSerialControlOption0
+    def t_colon
+      elements[0]
+    end
+
+    def sms_serial_default
+      elements[1]
+    end
+  end
+
+  module SmsSerialControlOption1
+    def sms_serial_intent_lists
+      elements[0]
+    end
+
+  end
+
+  module SmsSerialControlOption2
+    def sms_serial_default
+      elements[0]
+    end
+
+  end
+
+  def _nt_sms_serial_control_option
+    start_index = index
+    if node_cache[:sms_serial_control_option].has_key?(index)
+      cached = node_cache[:sms_serial_control_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    i1, s1 = index, []
+    r2 = _nt_sms_serial_intent_lists
+    s1 << r2
+    if r2
+      i4, s4 = index, []
+      r5 = _nt_t_colon
+      s4 << r5
+      if r5
+        r6 = _nt_sms_serial_default
+        s4 << r6
+      end
+      if s4.last
+        r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
+        r4.extend(SmsSerialControlOption0)
+      else
+        @index = i4
+        r4 = nil
+      end
+      if r4
+        r3 = r4
+      else
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      end
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(SMS_Serial_Control_Option_1,input, i1...index, s1)
+      r1.extend(SmsSerialControlOption1)
+    else
+      @index = i1
+      r1 = nil
+    end
+    if r1
+      r0 = r1
+    else
+      i7, s7 = index, []
+      r8 = _nt_sms_serial_default
+      s7 << r8
+      if r8
+        if has_terminal?("", false, index)
+          r9 = instantiate_node(SyntaxNode,input, index...(index + 0))
+          @index += 0
+        else
+          terminal_parse_failure("")
+          r9 = nil
+        end
+        s7 << r9
+      end
+      if s7.last
+        r7 = instantiate_node(SMS_Serial_Control_Option_2,input, i7...index, s7)
+        r7.extend(SmsSerialControlOption2)
+      else
+        @index = i7
+        r7 = nil
+      end
+      if r7
+        r0 = r7
+      else
+        @index = i0
+        r0 = nil
+      end
+    end
+
+    node_cache[:sms_serial_control_option][start_index] = r0
+
+    r0
+  end
+
+  module SmsSerialDefault0
+    def sms_t_default
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def sms_serial_intent
+      elements[2]
+    end
+  end
+
+  def _nt_sms_serial_default
+    start_index = index
+    if node_cache[:sms_serial_default].has_key?(index)
+      cached = node_cache[:sms_serial_default][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_t_default
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_sms_serial_intent
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Serial_Default,input, i0...index, s0)
+      r0.extend(SmsSerialDefault0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_serial_default][start_index] = r0
 
     r0
   end
@@ -3272,6 +3394,262 @@ module Fortran
     end
 
     node_cache[:sms_serial_end][start_index] = r0
+
+    r0
+  end
+
+  def _nt_sms_serial_intent
+    start_index = index
+    if node_cache[:sms_serial_intent].has_key?(index)
+      cached = node_cache[:sms_serial_intent][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    r1 = _nt_sms_t_ignore
+    if r1
+      r0 = r1
+    else
+      r2 = _nt_sms_t_in
+      if r2
+        r0 = r2
+      else
+        r3 = _nt_sms_t_out
+        if r3
+          r0 = r3
+        else
+          @index = i0
+          r0 = nil
+        end
+      end
+    end
+
+    node_cache[:sms_serial_intent][start_index] = r0
+
+    r0
+  end
+
+  module SmsSerialIntentList0
+    def t_lt
+      elements[0]
+    end
+
+    def sms_serial_varlist
+      elements[1]
+    end
+
+    def t_comma
+      elements[2]
+    end
+
+    def t_gt
+      elements[4]
+    end
+  end
+
+  def _nt_sms_serial_intent_list
+    start_index = index
+    if node_cache[:sms_serial_intent_list].has_key?(index)
+      cached = node_cache[:sms_serial_intent_list][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_lt
+    s0 << r1
+    if r1
+      r2 = _nt_sms_serial_varlist
+      s0 << r2
+      if r2
+        r3 = _nt_t_comma
+        s0 << r3
+        if r3
+          i4 = index
+          r5 = _nt_sms_t_in
+          if r5
+            r4 = r5
+          else
+            r6 = _nt_sms_t_out
+            if r6
+              r4 = r6
+            else
+              @index = i4
+              r4 = nil
+            end
+          end
+          s0 << r4
+          if r4
+            r7 = _nt_t_gt
+            s0 << r7
+          end
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Serial_Intent_List,input, i0...index, s0)
+      r0.extend(SmsSerialIntentList0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_serial_intent_list][start_index] = r0
+
+    r0
+  end
+
+  module SmsSerialIntentLists0
+    def t_comma
+      elements[0]
+    end
+
+    def sms_serial_intent_list
+      elements[1]
+    end
+  end
+
+  module SmsSerialIntentLists1
+    def sms_serial_intent_list
+      elements[0]
+    end
+
+  end
+
+  def _nt_sms_serial_intent_lists
+    start_index = index
+    if node_cache[:sms_serial_intent_lists].has_key?(index)
+      cached = node_cache[:sms_serial_intent_lists][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_serial_intent_list
+    s0 << r1
+    if r1
+      i3, s3 = index, []
+      r4 = _nt_t_comma
+      s3 << r4
+      if r4
+        r5 = _nt_sms_serial_intent_list
+        s3 << r5
+      end
+      if s3.last
+        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+        r3.extend(SmsSerialIntentLists0)
+      else
+        @index = i3
+        r3 = nil
+      end
+      if r3
+        r2 = r3
+      else
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Serial_Intent_Lists,input, i0...index, s0)
+      r0.extend(SmsSerialIntentLists1)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_serial_intent_lists][start_index] = r0
+
+    r0
+  end
+
+  module SmsSerialVarlist0
+    def t_comma
+      elements[0]
+    end
+
+    def variable
+      elements[1]
+    end
+
+  end
+
+  module SmsSerialVarlist1
+    def variable
+      elements[0]
+    end
+
+  end
+
+  def _nt_sms_serial_varlist
+    start_index = index
+    if node_cache[:sms_serial_varlist].has_key?(index)
+      cached = node_cache[:sms_serial_varlist][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_variable
+    s0 << r1
+    if r1
+      s2, i2 = [], index
+      loop do
+        i3, s3 = index, []
+        r4 = _nt_t_comma
+        s3 << r4
+        if r4
+          r5 = _nt_variable
+          s3 << r5
+          if r5
+            i6 = index
+            r7 = _nt_t_gt
+            if r7
+              r6 = nil
+            else
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            end
+            s3 << r6
+          end
+        end
+        if s3.last
+          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+          r3.extend(SmsSerialVarlist0)
+        else
+          @index = i3
+          r3 = nil
+        end
+        if r3
+          s2 << r3
+        else
+          break
+        end
+      end
+      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Serial_Varlist,input, i0...index, s0)
+      r0.extend(SmsSerialVarlist1)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_serial_varlist][start_index] = r0
 
     r0
   end
@@ -3499,6 +3877,30 @@ module Fortran
     r0
   end
 
+  def _nt_sms_t_default
+    start_index = index
+    if node_cache[:sms_t_default].has_key?(index)
+      cached = node_cache[:sms_t_default][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("default", false, index)
+      r0 = instantiate_node(T,input, index...(index + 7))
+      @index += 7
+    else
+      terminal_parse_failure("default")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_default][start_index] = r0
+
+    r0
+  end
+
   def _nt_sms_t_distribute
     start_index = index
     if node_cache[:sms_t_distribute].has_key?(index)
@@ -3619,6 +4021,30 @@ module Fortran
     r0
   end
 
+  def _nt_sms_t_in
+    start_index = index
+    if node_cache[:sms_t_in].has_key?(index)
+      cached = node_cache[:sms_t_in][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("in", false, index)
+      r0 = instantiate_node(T,input, index...(index + 2))
+      @index += 2
+    else
+      terminal_parse_failure("in")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_in][start_index] = r0
+
+    r0
+  end
+
   def _nt_sms_t_lbound
     start_index = index
     if node_cache[:sms_t_lbound].has_key?(index)
@@ -3687,6 +4113,30 @@ module Fortran
     end
 
     node_cache[:sms_t_min][start_index] = r0
+
+    r0
+  end
+
+  def _nt_sms_t_out
+    start_index = index
+    if node_cache[:sms_t_out].has_key?(index)
+      cached = node_cache[:sms_t_out][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("out", false, index)
+      r0 = instantiate_node(T,input, index...(index + 3))
+      @index += 3
+    else
+      terminal_parse_failure("out")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_out][start_index] = r0
 
     r0
   end

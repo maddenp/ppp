@@ -914,15 +914,158 @@ module Fortran
   end
 
   class SMS_Serial < SMS_Region
-    def to_s() "#{e[0]}#{e[1]}#{e[2]}" end
+
+    def default
+      e[0].default
+    end
+
+    def to_s
+      "#{e[0]}#{e[1]}#{e[2]}"
+    end
+
+    def vars_in
+      e[0].vars_in
+    end
+
+    def vars_out
+      e[0].vars_out
+    end
+
   end
 
   class SMS_Serial_Begin < SMS
-    def to_s() sms("#{sa(e[2])}#{e[3]}") end
+
+    def default
+      (e[2])?(e[2].default):(nil)
+    end
+
+    def to_s
+      sms("#{sa(e[2])}#{e[3]}")
+    end
+
+    def vars_in
+      (e[2])?(e[2].vars_in):(nil)
+    end
+
+    def vars_out
+      (e[2])?(e[2].vars_out):(nil)
+    end
+
+  end
+
+  class SMS_Serial_Control < SMS
+
+    def default
+      e[1].default
+    end
+
+    def vars_in
+      e[1].vars_int
+    end
+
+    def vars_out
+      e[1].vars_out
+    end
+
+  end
+
+  class SMS_Serial_Control_Option_1 < SMS
+
+    def default
+      (e[1])?(e[1].e[1].intent):(nil)
+    end
+
+    def to_s
+      "#{e[0]}#{e[1].cat}"
+    end
+
+    def vars_in
+      e[0].vars_in
+    end
+
+    def vars_out
+      e[0].vars_out
+    end
+
+  end
+
+  class SMS_Serial_Control_Option_2 < SMS
+
+    def default
+      e[0].intent
+    end
+
+    def vars_in
+      []
+    end
+
+    def vars_out
+      []
+    end
+
+  end
+
+  class SMS_Serial_Default < SMS
+
+    def intent
+      e[3]
+    end
+
   end
 
   class SMS_Serial_End < SMS
-    def to_s() sms("#{e[2]}") end
+
+    def to_s
+      sms("#{e[2]}")
+    end
+
+  end
+
+  class SMS_Serial_Intent_List < SMS
+
+    def intent
+      e[3]
+    end
+
+    def vars
+      e[1].vars
+    end
+
+  end
+
+  class SMS_Serial_Intent_Lists < SMS
+
+    def vars_with_intent(x)
+      return e[0].vars if "#{e[0].intent}"==x
+      return [] unless e[1]
+      return e[1].e[1].vars if "#{e[1].e[1].intent}"==x
+      []
+    end
+
+    def to_s
+      "#{e[0]}#{e[1].cat}"
+    end
+
+    def vars_in
+      vars_with_intent("in")
+    end
+
+    def vars_out
+      vars_with_intent("out")
+    end
+
+  end
+
+  class SMS_Serial_Varlist < SMS
+
+    def vars
+      list_to_s.split(",")
+    end
+
+    def to_s
+      list_to_s
+    end
+
   end
 
   class SMS_Set_Communicator < SMS

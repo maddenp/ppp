@@ -184,11 +184,6 @@ grammar Fortran
     sms_sentinel sms_t_ignore sms_t_end t_newline <SMS_Ignore_End>
   end
 
-  rule sms_parenthesized_args
-    # REMOVE
-    t_paren_l (!t_paren_r character)* t_paren_r <T>
-  end
-
   rule sms_parallel
     sms_parallel_begin block sms_parallel_end <SMS_Parallel>
   end
@@ -245,11 +240,42 @@ grammar Fortran
   end
 
   rule sms_serial_begin
-    sms_sentinel sms_t_serial sms_parenthesized_args? sms_t_begin t_newline &{ |e| sp_sms_serial_begin } <SMS_Serial_Begin>
+    sms_sentinel sms_t_serial sms_serial_control? sms_t_begin t_newline &{ |e| sp_sms_serial_begin } <SMS_Serial_Begin>
+  end
+
+  rule sms_serial_control
+    t_paren_l sms_serial_control_option t_paren_r <SMS_Serial_Control>
+  end
+
+  rule sms_serial_control_option
+    sms_serial_intent_lists ( t_colon sms_serial_default )? <SMS_Serial_Control_Option_1> /
+    sms_serial_default "" <SMS_Serial_Control_Option_2>
+  end
+
+  rule sms_serial_default
+    sms_t_default t_equal sms_serial_intent <SMS_Serial_Default>
   end
 
   rule sms_serial_end
     sms_sentinel sms_t_serial sms_t_end t_newline &{ |e| sp_sms_serial_end } <SMS_Serial_End>
+  end
+
+  rule sms_serial_intent
+    sms_t_ignore /
+    sms_t_in /
+    sms_t_out
+  end
+
+  rule sms_serial_intent_list
+    t_lt sms_serial_varlist t_comma ( sms_t_in / sms_t_out ) t_gt <SMS_Serial_Intent_List>
+  end
+
+  rule sms_serial_intent_lists
+    sms_serial_intent_list ( t_comma sms_serial_intent_list )? <SMS_Serial_Intent_Lists>
+  end
+
+  rule sms_serial_varlist
+    variable ( t_comma variable !t_gt )* <SMS_Serial_Varlist>
   end
 
   rule sms_set_communicator
@@ -281,6 +307,10 @@ grammar Fortran
     "declare_decomp" <T>
   end
 
+  rule sms_t_default
+    "default" <T>
+  end
+
   rule sms_t_distribute
     "distribute" <T>
   end
@@ -301,6 +331,10 @@ grammar Fortran
     "ignore" <T>
   end
 
+  rule sms_t_in
+    "in" <T>
+  end
+
   rule sms_t_lbound
     "lbound" <T>
   end
@@ -311,6 +345,10 @@ grammar Fortran
 
   rule sms_t_min
     "min" <T>
+  end
+
+  rule sms_t_out
+    "out" <T>
   end
 
   rule sms_t_parallel
