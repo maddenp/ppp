@@ -26,11 +26,6 @@ module Fortran
     node.respond_to?(attr) && node.send(attr)
   end
 
-  def cat
-    # concatenate elements' string representations
-    self.e.map { |x| x.to_s }.join
-  end
-
   def deepcopy(o)
     Marshal.load(Marshal.dump(o))
   end
@@ -367,6 +362,11 @@ module Fortran
   # Extension of SyntaxNode class
 
   class Treetop::Runtime::SyntaxNode
+
+    def cat
+      # concatenate elements' string representations
+      (e)?(self.e.map { |x| x.to_s }.join):("")
+    end
 
     def descendants(*classes)
       if self.e
