@@ -157,6 +157,3 @@
 
 - sms$serial ought to give diagnostic information about which variables it will
   gather, scatter or broadcast, so that users can tune the directive.
-
-- In SMS_Reduce#translate, can we replace 'dataypes' and 'globalsizes' arrays
-  with array literals?
