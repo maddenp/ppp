@@ -902,29 +902,6 @@ module Fortran
         var=vars[i]
         fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
         fail "SMS$REDUCE inapplicable to distributed array '#{var}'" if varenv["decomp"]
-#       type=varenv["type"]
-#       kind=varenv["kind"]
-#       if kind=="_default"
-#         nnt_type="nnt_#{type}"
-#       else
-#         case type
-#         when "integer"
-#           type_letter="i"
-#         when "real"
-#           type_letter="r"
-#         when "complex"
-#           type_letter="c"
-#         else
-#           fail "No type_letter defined for type '#{type}'"
-#         end
-#         case kind
-#         when "8"
-#           nnt_type="nnt_#{type_letter}#{kind}"
-#         else
-#           fail "No nnt_type defined for '#{type_letter}#{kind}'"
-#         end
-#       end
-#       stmts.push(["datatypes(#{i+1})=#{nnt_type}",:assignment_stmt])
         stmts.push(["datatypes(#{i+1})=#{smstype(varenv["type"],varenv["kind"])}",:assignment_stmt])
       end
       stmts.push(["call ppp_reduce_#{nvars}(globalsizes,datatypes,nnt_#{op},ppp__status,#{vars.join(',')})",:call_stmt])
@@ -951,10 +928,6 @@ module Fortran
 
   class SMS_Serial < SMS_Region
 
-#   def default
-#     e[0].default
-#   end
-
     def to_s
       "#{e[0]}#{e[1]}#{e[2]}"
     end
@@ -964,21 +937,9 @@ module Fortran
       use("nnt_types_module")
     end
 
-#   def vars_in
-#     e[0].vars_in
-#   end
-
-#   def vars_out
-#     e[0].vars_out
-#   end
-
   end
 
   class SMS_Serial_Begin < SMS
-
-#   def default
-#     (e[2])?(e[2].default):(nil)
-#   end
 
     def to_s
       sms("#{sa(e[2])}#{e[3]}")
@@ -992,14 +953,6 @@ module Fortran
       serial.vars_out=("#{e[2]}".empty?)?([]):(e[2].vars_out)
 #     remove
     end
-
-#   def vars_in
-#     ("#{e[2]}".empty?)?([]):(e[2].vars_in)
-#   end
-
-#   def vars_out
-#     ("#{e[2]}".empty?)?([]):(e[2].vars_out)
-#   end
 
   end
 
