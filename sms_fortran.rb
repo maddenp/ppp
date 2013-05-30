@@ -894,24 +894,17 @@ module Fortran
       nvars=vars.size
       fail "SMS$REDUCE supports reduction of 25 variables max" if nvars>25
       use("module_decomp")
-#     declare("integer","globalsizes",{:dims=>%w[ppp_max_reduce_vars]})
-#     declare("integer","datatypes",{:dims=>%w[ppp_max_reduce_vars]})
-#     stmts=[]
-#     stmts.push(["globalsizes=1",:assignment_stmt])
       sizes=[]
       types=[]
       nvars.times do |i|
         var=vars[i]
         fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
         fail "SMS$REDUCE inapplicable to distributed array '#{var}'" if varenv["decomp"]
-#       stmts.push(["datatypes(#{i+1})=#{smstype(varenv["type"],varenv["kind"])}",:assignment_stmt])
         sizes.push("1") # but why?
         types.push(smstype(varenv["type"],varenv["kind"]))
       end
       sizes="(/#{sizes.join(",")}/)"
       types="(/#{types.join(",")}/)"
-#     stmts.push(["call ppp_reduce_#{nvars}(globalsizes,datatypes,nnt_#{op},ppp__status,#{vars.join(',')})",:call_stmt])
-#     replace_statements(stmts)
       code="call ppp_reduce_#{nvars}(#{sizes},#{types},nnt_#{op},ppp__status,#{vars.join(',')})"
       replace_statement(code,:call_stmt)
     end
