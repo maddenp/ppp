@@ -1,7 +1,7 @@
 - directives still to do
 
   !sms$serial begin/end
-  directiveless io translations
+  directiveless io translations (print, write, stop, namelist stuff, ???)
   !sms$ignore begin/end
 
 - Need tests of F90:R1206 generic_spec (2nd two forms).
@@ -151,3 +151,12 @@
 
 - Can cat() et al be moved into SyntaxNode extension in fortran.rb and used in
   various to_s() functions to simplify syntax?
+
+- Try to find out which directives actually require module_decomp and/or
+  nnt_types_module and limit rolled-out 'declare' calls.
+
+- sms$serial ought to give diagnostic information about which variables it will
+  gather, scatter or broadcast, so that users can tune the directive.
+
+- In SMS_Reduce#translate, can we replace 'dataypes' and 'globalsizes' arrays
+  with array literals?

@@ -68,7 +68,7 @@ module Fortran
   def sp_sms_serial_begin
     fail "Already inside serial region" if env[:sms_serial]
     envpush
-    env[:sms_serial]=true
+    env[:sms_serial]=OpenStruct.new
     true
   end
 
@@ -100,16 +100,17 @@ module Fortran
     kind=nil if kind=="_default"
     case type
     when "integer"
-      (kind)?("nnt_i#{kind}"):("nnt_integer")
+      return (kind)?("nnt_i#{kind}"):("nnt_integer")
     when "real"
-      (kind)?("nnt_r#{kind}"):("nnt_real")
+      return (kind)?("nnt_r#{kind}"):("nnt_real")
     when "doubleprecision"
-      "nnt_doubleprecision"
+      return "nnt_doubleprecision"
     when "complex"
-      (kind)?("nnt_c#{kind}"):("nnt_complex")
+      return (kind)?("nnt_c#{kind}"):("nnt_complex")
     when "logical"
-      (kind)?("nnt_l#{kind}"):("nnt_logical")
+      return (kind)?("nnt_l#{kind}"):("nnt_logical")
     end
+    fail "No NNT type defined for '#{type}#{kind}'"
   end
 
   class T < Treetop::Runtime::SyntaxNode
@@ -334,6 +335,35 @@ module Fortran
         code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
         replace_element(code,:expr)
       end
+      if not inside?(SMS_Serial_Begin) and (serial=self.env[:sms_serial])
+        var="#{self}"
+        # There's a potential issue here in that a Name may be e.g. a function
+        # or subroutine name, in which case it may not (will not?) appear in the
+        # environment. For now, ignore the Name if it's not in the environment,
+        # which prevents translation of non-variable names. Note that 'standard'
+        # behavior is to exit with an error if an expected name is not found,
+        # so this is divergent. Worse, it may be *wrong* as function names may
+        # eventually appear in the environment (to note their type).
+        if (varenv=self.env[var])
+          default=true
+#s="### Name '#{var}' is"
+          if serial.vars_ignore.include?(var)
+#puts "#{s} ignore"
+            default=false
+          end
+          if serial.vars_in.include?(var)
+#puts "#{s} in"
+            default=false
+          end
+          if serial.vars_out.include?(var)
+#puts "#{s} out"
+            default=false
+          end
+          if default
+#puts "#{s} #{serial.default}"
+          end
+        end
+      end
     end
 
   end
@@ -387,8 +417,12 @@ module Fortran
       bound
     end
 
+    def maxrank
+      7
+    end
+
     def ranks
-      (1..7)
+      (1..maxrank)
     end
 
   end
@@ -700,11 +734,11 @@ module Fortran
       end
       cornerdepth="(/#{cornerdepth.join(",")}/)"
       dectypes="(/#{dectypes.join(",")}/)"
-      gllbs="reshape((/#{gllbs.join(",")}/),(/#{nvars},7/))"
-      glubs="reshape((/#{glubs.join(",")}/),(/#{nvars},7/))"
-      halol="reshape((/#{halol.join(",")}/),(/#{nvars},7/))"
-      halou="reshape((/#{halou.join(",")}/),(/#{nvars},7/))"
-      perms="reshape((/#{perms.join(",")}/),(/#{nvars},7/))"
+      gllbs="reshape((/#{gllbs.join(",")}/),(/#{nvars},#{maxrank}/))"
+      glubs="reshape((/#{glubs.join(",")}/),(/#{nvars},#{maxrank}/))"
+      halol="reshape((/#{halol.join(",")}/),(/#{nvars},#{maxrank}/))"
+      halou="reshape((/#{halou.join(",")}/),(/#{nvars},#{maxrank}/))"
+      perms="reshape((/#{perms.join(",")}/),(/#{nvars},#{maxrank}/))"
       types="(/#{types.join(",")}/)"
       code="call ppp_exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},ppp__status,#{vars},#{names})"
       replace_statement(code,:call_stmt)
@@ -867,29 +901,31 @@ module Fortran
       nvars.times do |i|
         var=vars[i]
         fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
-        type=varenv["type"]
-        kind=varenv["kind"]
-        if kind=="_default"
-          nnt_type="nnt_#{type}"
-        else
-          case type
-          when "integer"
-            type_letter="i"
-          when "real"
-            type_letter="r"
-          when "complex"
-            type_letter="c"
-          else
-            fail "No type_letter defined for type '#{type}'"
-          end
-          case kind
-          when "8"
-            nnt_type="nnt_#{type_letter}#{kind}"
-          else
-            fail "No nnt_type defined for '#{type_letter}#{kind}'"
-          end
-        end
-        stmts.push(["datatypes(#{i+1})=#{nnt_type}",:assignment_stmt])
+        fail "SMS$REDUCE inapplicable to distributed array '#{var}'" if varenv["decomp"]
+#       type=varenv["type"]
+#       kind=varenv["kind"]
+#       if kind=="_default"
+#         nnt_type="nnt_#{type}"
+#       else
+#         case type
+#         when "integer"
+#           type_letter="i"
+#         when "real"
+#           type_letter="r"
+#         when "complex"
+#           type_letter="c"
+#         else
+#           fail "No type_letter defined for type '#{type}'"
+#         end
+#         case kind
+#         when "8"
+#           nnt_type="nnt_#{type_letter}#{kind}"
+#         else
+#           fail "No nnt_type defined for '#{type_letter}#{kind}'"
+#         end
+#       end
+#       stmts.push(["datatypes(#{i+1})=#{nnt_type}",:assignment_stmt])
+        stmts.push(["datatypes(#{i+1})=#{smstype(varenv["type"],varenv["kind"])}",:assignment_stmt])
       end
       stmts.push(["call ppp_reduce_#{nvars}(globalsizes,datatypes,nnt_#{op},ppp__status,#{vars.join(',')})",:call_stmt])
       replace_statements(stmts)
@@ -915,41 +951,55 @@ module Fortran
 
   class SMS_Serial < SMS_Region
 
-    def default
-      e[0].default
-    end
+#   def default
+#     e[0].default
+#   end
 
     def to_s
       "#{e[0]}#{e[1]}#{e[2]}"
     end
 
-    def vars_in
-      e[0].vars_in
+    def translate
+      use("module_decomp")
+      use("nnt_types_module")
     end
 
-    def vars_out
-      e[0].vars_out
-    end
+#   def vars_in
+#     e[0].vars_in
+#   end
+
+#   def vars_out
+#     e[0].vars_out
+#   end
 
   end
 
   class SMS_Serial_Begin < SMS
 
-    def default
-      (e[2])?(e[2].default):(nil)
-    end
+#   def default
+#     (e[2])?(e[2].default):(nil)
+#   end
 
     def to_s
       sms("#{sa(e[2])}#{e[3]}")
     end
 
-    def vars_in
-      (e[2])?(e[2].vars_in):(nil)
+    def translate
+      serial=self.env[:sms_serial]
+      serial.default=("#{e[2]}".empty?)?("inout"):(e[2].default)
+      serial.vars_ignore=("#{e[2]}".empty?)?([]):(e[2].vars_ignore)
+      serial.vars_in=("#{e[2]}".empty?)?([]):(e[2].vars_in)
+      serial.vars_out=("#{e[2]}".empty?)?([]):(e[2].vars_out)
+#     remove
     end
 
-    def vars_out
-      (e[2])?(e[2].vars_out):(nil)
-    end
+#   def vars_in
+#     ("#{e[2]}".empty?)?([]):(e[2].vars_in)
+#   end
+
+#   def vars_out
+#     ("#{e[2]}".empty?)?([]):(e[2].vars_out)
+#   end
 
   end
 
@@ -957,6 +1007,10 @@ module Fortran
 
     def default
       e[1].default
+    end
+
+    def vars_ignore
+      e[1].vars_ignore
     end
 
     def vars_in
@@ -972,11 +1026,15 @@ module Fortran
   class SMS_Serial_Control_Option_1 < SMS
 
     def default
-      (e[1])?(e[1].e[1].intent):(nil)
+      ("#{e[1]}".empty?)?("inout"):(e[1].e[1].intent)
     end
 
     def to_s
       "#{e[0]}#{e[1].cat}"
+    end
+
+    def vars_ignore
+      e[0].vars_ignore
     end
 
     def vars_in
@@ -995,6 +1053,10 @@ module Fortran
       e[0].intent
     end
 
+    def vars_ignore
+      []
+    end
+
     def vars_in
       []
     end
@@ -1008,7 +1070,7 @@ module Fortran
   class SMS_Serial_Default < SMS
 
     def intent
-      e[3]
+      e[2]
     end
 
   end
@@ -1017,6 +1079,32 @@ module Fortran
 
     def to_s
       sms("#{e[2]}")
+    end
+
+    def translate
+      stmts=[]
+      serial=self.env[:sms_serial]
+      serial.vars_out.each do |var|
+        fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
+        dims=varenv["dims"]
+        rank=varenv["rank"]
+        type=smstype(varenv["type"],varenv["kind"])
+        if rank=="_scalar"
+#puts "### SMS_Serial_End: broadcast scalar '#{var}'"
+          stmts.push(["call ppp_bcast(#{var},#{type},(/1/),1,ppp__status)",:call_stmt])
+        elsif rank=="_array"
+          if (decomp=varenv["decomp"])
+#puts "### SMS_Serial_End: scatter distributed array '#{var}'"
+          else
+#puts "### SMS_Serial_End: broadcast non-distributed array '#{var}'"
+            sizes="(/#{(1..dims).reduce([]) { |m,x| m.push("size(a,#{x})") }.join(",")}/)"
+            stmts.push(["call ppp_bcast(#{var},#{type},#{sizes},#{dims},ppp__status)",:call_stmt])
+          end
+        else
+          fail "Unexpected rank '#{rank}' for '#{var}'"
+        end
+      end
+#     replace_statements(stmts)
     end
 
   end
@@ -1037,13 +1125,17 @@ module Fortran
 
     def vars_with_intent(x)
       return e[0].vars if "#{e[0].intent}"==x
-      return [] unless e[1]
+      return [] if "#{e[1]}".empty?
       return e[1].e[1].vars if "#{e[1].e[1].intent}"==x
       []
     end
 
     def to_s
       "#{e[0]}#{e[1].cat}"
+    end
+
+    def vars_ignore
+      vars_with_intent("ignore")
     end
 
     def vars_in
