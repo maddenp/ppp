@@ -14,8 +14,6 @@
 
 - Remove various HACKS and deal with any fallout.
 
-- REMOVE sms_passthrough and everything related to it.
-
 - In declare(), use push(tree) instead of insert(0,tree) to insert new
   declarations at the END of the declarations list. Unfortunately, the old
   ppp breaks (fim:cnuity.F90) with the declaration at the end -- can't see
@@ -175,3 +173,10 @@
 - Should T#declare in fortran.rb exist? Should it abort if called?
 
 - translate_children() -- do we need 'if e' & compact & 'if x'?
+
+- In fail tests for improperly nested regions, use SMS$DIRECTIVE names instead
+  of generic descriptions.
+
+- Consider which sms_ignore_* rules are actually needed. Certainly _executable,
+  but possibly not _declarative, _use or _implicit. Get rid of what isn't
+  necessary.

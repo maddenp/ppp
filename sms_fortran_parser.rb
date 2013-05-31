@@ -85,17 +85,12 @@ module Fortran
                     if r12
                       r0 = r12
                     else
-                      r13 = _nt_sms_passthrough
+                      r13 = _nt_sms_declarative
                       if r13
                         r0 = r13
                       else
-                        r14 = _nt_sms_declarative
-                        if r14
-                          r0 = r14
-                        else
-                          @index = i0
-                          r0 = nil
-                        end
+                        @index = i0
+                        r0 = nil
                       end
                     end
                   end
@@ -220,17 +215,12 @@ module Fortran
               if r6
                 r0 = r6
               else
-                r7 = _nt_sms_passthrough
+                r7 = _nt_sms_executable
                 if r7
                   r0 = r7
                 else
-                  r8 = _nt_sms_executable
-                  if r8
-                    r0 = r8
-                  else
-                    @index = i0
-                    r0 = nil
-                  end
+                  @index = i0
+                  r0 = nil
                 end
               end
             end
@@ -242,6 +232,13 @@ module Fortran
     node_cache[:executable_construct][start_index] = r0
 
     r0
+  end
+
+  module ExternalSubprogram0
+    def sms_ignore_external_subprogram
+      elements[0]
+    end
+
   end
 
   def _nt_external_subprogram
@@ -268,7 +265,27 @@ module Fortran
         if r3
           r0 = r3
         else
-          r4 = _nt_sms_passthrough
+          i4, s4 = index, []
+          r5 = _nt_sms_ignore_external_subprogram
+          s4 << r5
+          if r5
+            i6 = index
+            r7 = lambda { |e| sp_sms_ignore }.call(s4)
+            if r7
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r6 = nil
+            end
+            s4 << r6
+          end
+          if s4.last
+            r4 = instantiate_node(E,input, i4...index, s4)
+            r4.extend(ExternalSubprogram0)
+          else
+            @index = i4
+            r4 = nil
+          end
           if r4
             r0 = r4
           else
@@ -318,13 +335,8 @@ module Fortran
       if r3
         r0 = r3
       else
-        r4 = _nt_sms_passthrough
-        if r4
-          r0 = r4
-        else
-          @index = i0
-          r0 = nil
-        end
+        @index = i0
+        r0 = nil
       end
     end
 
@@ -357,13 +369,8 @@ module Fortran
         if r3
           r0 = r3
         else
-          r4 = _nt_sms_passthrough
-          if r4
-            r0 = r4
-          else
-            @index = i0
-            r0 = nil
-          end
+          @index = i0
+          r0 = nil
         end
       end
     end
@@ -397,13 +404,8 @@ module Fortran
         if r3
           r0 = r3
         else
-          r4 = _nt_sms_passthrough
-          if r4
-            r0 = r4
-          else
-            @index = i0
-            r0 = nil
-          end
+          @index = i0
+          r0 = nil
         end
       end
     end
@@ -819,6 +821,13 @@ module Fortran
     r0
   end
 
+  module SmsDeclarative0
+    def sms_ignore_declarative
+      elements[0]
+    end
+
+  end
+
   def _nt_sms_declarative
     start_index = index
     if node_cache[:sms_declarative].has_key?(index)
@@ -843,8 +852,33 @@ module Fortran
         if r3
           r0 = r3
         else
-          @index = i0
-          r0 = nil
+          i4, s4 = index, []
+          r5 = _nt_sms_ignore_declarative
+          s4 << r5
+          if r5
+            i6 = index
+            r7 = lambda { |e| sp_sms_ignore }.call(s4)
+            if r7
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r6 = nil
+            end
+            s4 << r6
+          end
+          if s4.last
+            r4 = instantiate_node(E,input, i4...index, s4)
+            r4.extend(SmsDeclarative0)
+          else
+            @index = i4
+            r4 = nil
+          end
+          if r4
+            r0 = r4
+          else
+            @index = i0
+            r0 = nil
+          end
         end
       end
     end
@@ -1431,20 +1465,27 @@ module Fortran
   end
 
   module SmsExecutable1
-    def sms_parallel
+    def sms_ignore_executable
       elements[0]
     end
 
   end
 
   module SmsExecutable2
-    def sms_serial
+    def sms_parallel
       elements[0]
     end
 
   end
 
   module SmsExecutable3
+    def sms_serial
+      elements[0]
+    end
+
+  end
+
+  module SmsExecutable4
     def sms_to_local
       elements[0]
     end
@@ -1504,11 +1545,11 @@ module Fortran
               r0 = r5
             else
               i9, s9 = index, []
-              r10 = _nt_sms_parallel
+              r10 = _nt_sms_ignore_executable
               s9 << r10
               if r10
                 i11 = index
-                r12 = lambda { |e| sp_sms_parallel }.call(s9)
+                r12 = lambda { |e| sp_sms_ignore }.call(s9)
                 if r12
                   @index = i11
                   r11 = instantiate_node(SyntaxNode,input, index...index)
@@ -1527,69 +1568,89 @@ module Fortran
               if r9
                 r0 = r9
               else
-                r13 = _nt_sms_reduce
+                i13, s13 = index, []
+                r14 = _nt_sms_parallel
+                s13 << r14
+                if r14
+                  i15 = index
+                  r16 = lambda { |e| sp_sms_parallel }.call(s13)
+                  if r16
+                    @index = i15
+                    r15 = instantiate_node(SyntaxNode,input, index...index)
+                  else
+                    r15 = nil
+                  end
+                  s13 << r15
+                end
+                if s13.last
+                  r13 = instantiate_node(E,input, i13...index, s13)
+                  r13.extend(SmsExecutable2)
+                else
+                  @index = i13
+                  r13 = nil
+                end
                 if r13
                   r0 = r13
                 else
-                  i14, s14 = index, []
-                  r15 = _nt_sms_serial
-                  s14 << r15
-                  if r15
-                    i16 = index
-                    r17 = lambda { |e| sp_sms_serial }.call(s14)
-                    if r17
-                      @index = i16
-                      r16 = instantiate_node(SyntaxNode,input, index...index)
-                    else
-                      r16 = nil
+                  r17 = _nt_sms_reduce
+                  if r17
+                    r0 = r17
+                  else
+                    i18, s18 = index, []
+                    r19 = _nt_sms_serial
+                    s18 << r19
+                    if r19
+                      i20 = index
+                      r21 = lambda { |e| sp_sms_serial }.call(s18)
+                      if r21
+                        @index = i20
+                        r20 = instantiate_node(SyntaxNode,input, index...index)
+                      else
+                        r20 = nil
+                      end
+                      s18 << r20
                     end
-                    s14 << r16
-                  end
-                  if s14.last
-                    r14 = instantiate_node(E,input, i14...index, s14)
-                    r14.extend(SmsExecutable2)
-                  else
-                    @index = i14
-                    r14 = nil
-                  end
-                  if r14
-                    r0 = r14
-                  else
-                    r18 = _nt_sms_set_communicator
+                    if s18.last
+                      r18 = instantiate_node(E,input, i18...index, s18)
+                      r18.extend(SmsExecutable3)
+                    else
+                      @index = i18
+                      r18 = nil
+                    end
                     if r18
                       r0 = r18
                     else
-                      i19, s19 = index, []
-                      r20 = _nt_sms_to_local
-                      s19 << r20
-                      if r20
-                        i21 = index
-                        r22 = lambda { |e| sp_sms_to_local }.call(s19)
-                        if r22
-                          @index = i21
-                          r21 = instantiate_node(SyntaxNode,input, index...index)
-                        else
-                          r21 = nil
+                      r22 = _nt_sms_set_communicator
+                      if r22
+                        r0 = r22
+                      else
+                        i23, s23 = index, []
+                        r24 = _nt_sms_to_local
+                        s23 << r24
+                        if r24
+                          i25 = index
+                          r26 = lambda { |e| sp_sms_to_local }.call(s23)
+                          if r26
+                            @index = i25
+                            r25 = instantiate_node(SyntaxNode,input, index...index)
+                          else
+                            r25 = nil
+                          end
+                          s23 << r25
                         end
-                        s19 << r21
-                      end
-                      if s19.last
-                        r19 = instantiate_node(E,input, i19...index, s19)
-                        r19.extend(SmsExecutable3)
-                      else
-                        @index = i19
-                        r19 = nil
-                      end
-                      if r19
-                        r0 = r19
-                      else
-                        r23 = _nt_sms_unstructured_grid
+                        if s23.last
+                          r23 = instantiate_node(E,input, i23...index, s23)
+                          r23.extend(SmsExecutable4)
+                        else
+                          @index = i23
+                          r23 = nil
+                        end
                         if r23
                           r0 = r23
                         else
-                          r24 = _nt_sms_passthrough
-                          if r24
-                            r0 = r24
+                          r27 = _nt_sms_unstructured_grid
+                          if r27
+                            r0 = r27
                           else
                             @index = i0
                             r0 = nil
@@ -1985,6 +2046,210 @@ module Fortran
     r0
   end
 
+  module SmsIgnoreDeclarative0
+    def sms_ignore_begin
+      elements[0]
+    end
+
+    def declaration_constructs
+      elements[1]
+    end
+
+    def sms_ignore_end
+      elements[2]
+    end
+  end
+
+  def _nt_sms_ignore_declarative
+    start_index = index
+    if node_cache[:sms_ignore_declarative].has_key?(index)
+      cached = node_cache[:sms_ignore_declarative][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_ignore_begin
+    s0 << r1
+    if r1
+      r2 = _nt_declaration_constructs
+      s0 << r2
+      if r2
+        r3 = _nt_sms_ignore_end
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Ignore,input, i0...index, s0)
+      r0.extend(SmsIgnoreDeclarative0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_ignore_declarative][start_index] = r0
+
+    r0
+  end
+
+  module SmsIgnoreExecutable0
+    def sms_ignore_begin
+      elements[0]
+    end
+
+    def block
+      elements[1]
+    end
+
+    def sms_ignore_end
+      elements[2]
+    end
+  end
+
+  def _nt_sms_ignore_executable
+    start_index = index
+    if node_cache[:sms_ignore_executable].has_key?(index)
+      cached = node_cache[:sms_ignore_executable][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_ignore_begin
+    s0 << r1
+    if r1
+      r2 = _nt_block
+      s0 << r2
+      if r2
+        r3 = _nt_sms_ignore_end
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Ignore,input, i0...index, s0)
+      r0.extend(SmsIgnoreExecutable0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_ignore_executable][start_index] = r0
+
+    r0
+  end
+
+  module SmsIgnoreExternalSubprogram0
+    def sms_ignore_begin
+      elements[0]
+    end
+
+    def external_subprogram
+      elements[1]
+    end
+
+    def sms_ignore_end
+      elements[2]
+    end
+  end
+
+  def _nt_sms_ignore_external_subprogram
+    start_index = index
+    if node_cache[:sms_ignore_external_subprogram].has_key?(index)
+      cached = node_cache[:sms_ignore_external_subprogram][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_ignore_begin
+    s0 << r1
+    if r1
+      r2 = _nt_external_subprogram
+      s0 << r2
+      if r2
+        r3 = _nt_sms_ignore_end
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Ignore,input, i0...index, s0)
+      r0.extend(SmsIgnoreExternalSubprogram0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_ignore_external_subprogram][start_index] = r0
+
+    r0
+  end
+
+  module SmsIgnoreUse0
+    def sms_ignore_begin
+      elements[0]
+    end
+
+    def sms_ignore_end
+      elements[2]
+    end
+  end
+
+  def _nt_sms_ignore_use
+    start_index = index
+    if node_cache[:sms_ignore_use].has_key?(index)
+      cached = node_cache[:sms_ignore_use][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_ignore_begin
+    s0 << r1
+    if r1
+      i2 = index
+      r3 = _nt_use_stmt
+      if r3
+        r2 = r3
+      else
+        r4 = _nt_directive
+        if r4
+          r2 = r4
+        else
+          @index = i2
+          r2 = nil
+        end
+      end
+      s0 << r2
+      if r2
+        r5 = _nt_sms_ignore_end
+        s0 << r5
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Ignore,input, i0...index, s0)
+      r0.extend(SmsIgnoreUse0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_ignore_use][start_index] = r0
+
+    r0
+  end
+
   module SmsIgnoreBegin0
     def sms_sentinel
       elements[0]
@@ -2001,6 +2266,7 @@ module Fortran
     def t_newline
       elements[3]
     end
+
   end
 
   def _nt_sms_ignore_begin
@@ -2026,6 +2292,17 @@ module Fortran
         if r3
           r4 = _nt_t_newline
           s0 << r4
+          if r4
+            i5 = index
+            r6 = lambda { |e| sp_sms_ignore_begin }.call(s0)
+            if r6
+              @index = i5
+              r5 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r5 = nil
+            end
+            s0 << r5
+          end
         end
       end
     end
@@ -2058,6 +2335,7 @@ module Fortran
     def t_newline
       elements[3]
     end
+
   end
 
   def _nt_sms_ignore_end
@@ -2083,6 +2361,17 @@ module Fortran
         if r3
           r4 = _nt_t_newline
           s0 << r4
+          if r4
+            i5 = index
+            r6 = lambda { |e| sp_sms_ignore_end }.call(s0)
+            if r6
+              @index = i5
+              r5 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r5 = nil
+            end
+            s0 << r5
+          end
         end
       end
     end
@@ -2736,36 +3025,6 @@ module Fortran
     end
 
     node_cache[:sms_parallel_var_lists][start_index] = r0
-
-    r0
-  end
-
-  def _nt_sms_passthrough
-    start_index = index
-    if node_cache[:sms_passthrough].has_key?(index)
-      cached = node_cache[:sms_passthrough][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0 = index
-    r1 = _nt_sms_ignore_begin
-    if r1
-      r0 = r1
-    else
-      r2 = _nt_sms_ignore_end
-      if r2
-        r0 = r2
-      else
-        @index = i0
-        r0 = nil
-      end
-    end
-
-    node_cache[:sms_passthrough][start_index] = r0
 
     r0
   end
@@ -5233,6 +5492,13 @@ module Fortran
     r0
   end
 
+  module UsePart0
+    def sms_ignore_use
+      elements[0]
+    end
+
+  end
+
   def _nt_use_part
     start_index = index
     if node_cache[:use_part].has_key?(index)
@@ -5255,7 +5521,27 @@ module Fortran
         if r3
           r1 = r3
         else
-          r4 = _nt_sms_passthrough
+          i4, s4 = index, []
+          r5 = _nt_sms_ignore_use
+          s4 << r5
+          if r5
+            i6 = index
+            r7 = lambda { |e| sp_sms_ignore }.call(s4)
+            if r7
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r6 = nil
+            end
+            s4 << r6
+          end
+          if s4.last
+            r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
+            r4.extend(UsePart0)
+          else
+            @index = i4
+            r4 = nil
+          end
           if r4
             r1 = r4
           else

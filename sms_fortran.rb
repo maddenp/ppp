@@ -44,6 +44,22 @@ module Fortran
     true
   end
 
+  def sp_sms_ignore
+    envpop
+    true
+  end
+
+  def sp_sms_ignore_begin
+    fail "Already inside SMS$IGNORE region" if env[:sms_ignore]
+    env[:sms_ignore]=true
+    true
+  end
+
+  def sp_sms_ignore_end
+    fail "Not inside SMS$IGNORE region" unless env[:sms_ignore]
+    true
+  end
+
   def sp_sms_parallel
     envpop
     true
@@ -767,12 +783,29 @@ module Fortran
     end
   end
 
+  class SMS_Ignore < SMS_Region
+  end
+
   class SMS_Ignore_Begin < SMS
-    def to_s() sms("#{e[2]}") end
+
+    def to_s
+      sms("#{e[2]}")
+    end
+
+    def translate
+    end
+
   end
 
   class SMS_Ignore_End < SMS
-    def to_s() sms("#{e[2]}") end
+
+    def to_s
+      sms("#{e[2]}")
+    end
+
+    def translate
+    end
+
   end
 
   class SMS_Parallel < SMS_Region
@@ -977,13 +1010,13 @@ module Fortran
           sizes="(/#{(1..dims).reduce([]) { |m,x| m.push("size(a,#{x})") }.join(",")}/)"
         end
         code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
-        insert_statement_after(code,:call_stmt,block.last)
+#       insert_statement_after(code,:call_stmt,block.last)
       end
       # Gathers
       to_gather.each do |var|
         varenv=self.env[var]
         dims=(":"*varenv["dims"]).split("")
-        declare(varenv["type"],"ppp__g_#{var}",{:attrs=>["allocatable"],:dims=>dims})
+#       declare(varenv["type"],"ppp__g_#{var}",{:attrs=>["allocatable"],:dims=>dims})
       end
       # Scatters
       to_scatter.each do |var|
@@ -1006,7 +1039,7 @@ module Fortran
       si.vars_in=("#{e[2]}".empty?)?([]):(e[2].vars_in)
       si.vars_out=("#{e[2]}".empty?)?([]):(e[2].vars_out)
       parent.env[:sms_serial_info]=self.env[:sms_serial_info]
-      remove
+#     remove
     end
 
   end
@@ -1090,7 +1123,7 @@ module Fortran
     end
 
     def translate
-      remove
+#     remove
     end
 
   end
