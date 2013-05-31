@@ -1438,6 +1438,13 @@ module Fortran
   end
 
   module SmsExecutable2
+    def sms_serial
+      elements[0]
+    end
+
+  end
+
+  module SmsExecutable3
     def sms_to_local
       elements[0]
     end
@@ -1524,44 +1531,69 @@ module Fortran
                 if r13
                   r0 = r13
                 else
-                  r14 = _nt_sms_set_communicator
+                  i14, s14 = index, []
+                  r15 = _nt_sms_serial
+                  s14 << r15
+                  if r15
+                    i16 = index
+                    r17 = lambda { |e| sp_sms_serial }.call(s14)
+                    if r17
+                      @index = i16
+                      r16 = instantiate_node(SyntaxNode,input, index...index)
+                    else
+                      r16 = nil
+                    end
+                    s14 << r16
+                  end
+                  if s14.last
+                    r14 = instantiate_node(E,input, i14...index, s14)
+                    r14.extend(SmsExecutable2)
+                  else
+                    @index = i14
+                    r14 = nil
+                  end
                   if r14
                     r0 = r14
                   else
-                    i15, s15 = index, []
-                    r16 = _nt_sms_to_local
-                    s15 << r16
-                    if r16
-                      i17 = index
-                      r18 = lambda { |e| sp_sms_to_local }.call(s15)
-                      if r18
-                        @index = i17
-                        r17 = instantiate_node(SyntaxNode,input, index...index)
-                      else
-                        r17 = nil
+                    r18 = _nt_sms_set_communicator
+                    if r18
+                      r0 = r18
+                    else
+                      i19, s19 = index, []
+                      r20 = _nt_sms_to_local
+                      s19 << r20
+                      if r20
+                        i21 = index
+                        r22 = lambda { |e| sp_sms_to_local }.call(s19)
+                        if r22
+                          @index = i21
+                          r21 = instantiate_node(SyntaxNode,input, index...index)
+                        else
+                          r21 = nil
+                        end
+                        s19 << r21
                       end
-                      s15 << r17
-                    end
-                    if s15.last
-                      r15 = instantiate_node(E,input, i15...index, s15)
-                      r15.extend(SmsExecutable2)
-                    else
-                      @index = i15
-                      r15 = nil
-                    end
-                    if r15
-                      r0 = r15
-                    else
-                      r19 = _nt_sms_unstructured_grid
+                      if s19.last
+                        r19 = instantiate_node(E,input, i19...index, s19)
+                        r19.extend(SmsExecutable3)
+                      else
+                        @index = i19
+                        r19 = nil
+                      end
                       if r19
                         r0 = r19
                       else
-                        r20 = _nt_sms_passthrough
-                        if r20
-                          r0 = r20
+                        r23 = _nt_sms_unstructured_grid
+                        if r23
+                          r0 = r23
                         else
-                          @index = i0
-                          r0 = nil
+                          r24 = _nt_sms_passthrough
+                          if r24
+                            r0 = r24
+                          else
+                            @index = i0
+                            r0 = nil
+                          end
                         end
                       end
                     end
@@ -2708,13 +2740,6 @@ module Fortran
     r0
   end
 
-  module SmsPassthrough0
-    def sms_serial
-      elements[0]
-    end
-
-  end
-
   def _nt_sms_passthrough
     start_index = index
     if node_cache[:sms_passthrough].has_key?(index)
@@ -2735,33 +2760,8 @@ module Fortran
       if r2
         r0 = r2
       else
-        i3, s3 = index, []
-        r4 = _nt_sms_serial
-        s3 << r4
-        if r4
-          i5 = index
-          r6 = lambda { |e| sp_sms_serial }.call(s3)
-          if r6
-            @index = i5
-            r5 = instantiate_node(SyntaxNode,input, index...index)
-          else
-            r5 = nil
-          end
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(E,input, i3...index, s3)
-          r3.extend(SmsPassthrough0)
-        else
-          @index = i3
-          r3 = nil
-        end
-        if r3
-          r0 = r3
-        else
-          @index = i0
-          r0 = nil
-        end
+        @index = i0
+        r0 = nil
       end
     end
 
@@ -3535,25 +3535,29 @@ module Fortran
     r1 = _nt_sms_serial_intent_list
     s0 << r1
     if r1
-      i3, s3 = index, []
-      r4 = _nt_t_comma
-      s3 << r4
-      if r4
-        r5 = _nt_sms_serial_intent_list
-        s3 << r5
+      s2, i2 = [], index
+      loop do
+        i3, s3 = index, []
+        r4 = _nt_t_comma
+        s3 << r4
+        if r4
+          r5 = _nt_sms_serial_intent_list
+          s3 << r5
+        end
+        if s3.last
+          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
+          r3.extend(SmsSerialIntentLists0)
+        else
+          @index = i3
+          r3 = nil
+        end
+        if r3
+          s2 << r3
+        else
+          break
+        end
       end
-      if s3.last
-        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-        r3.extend(SmsSerialIntentLists0)
-      else
-        @index = i3
-        r3 = nil
-      end
-      if r3
-        r2 = r3
-      else
-        r2 = instantiate_node(SyntaxNode,input, index...index)
-      end
+      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
       s0 << r2
     end
     if s0.last

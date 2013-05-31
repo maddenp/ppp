@@ -1,4 +1,5 @@
 require "fortran"
+require "set"
 require "sms_fortran_parser"
 
 module Fortran
@@ -68,7 +69,7 @@ module Fortran
   def sp_sms_serial_begin
     fail "Already inside serial region" if env[:sms_serial]
     envpush
-    env[:sms_serial]=OpenStruct.new
+    env[:sms_serial]=true
     true
   end
 
@@ -321,6 +322,7 @@ module Fortran
   class Name < T
 
     def translate
+      # sms$to_local handling
       if tolocal=self.env[:sms_to_local] and p=tolocal[name]
         case p.key
         when "lbound"
@@ -335,34 +337,9 @@ module Fortran
         code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
         replace_element(code,:expr)
       end
-      if not inside?(SMS_Serial_Begin) and (serial=self.env[:sms_serial])
-        var="#{self}"
-        # There's a potential issue here in that a Name may be e.g. a function
-        # or subroutine name, in which case it may not (will not?) appear in the
-        # environment. For now, ignore the Name if it's not in the environment,
-        # which prevents translation of non-variable names. Note that 'standard'
-        # behavior is to exit with an error if an expected name is not found,
-        # so this is divergent. Worse, it may be *wrong* as function names may
-        # eventually appear in the environment (to note their type).
-        if (varenv=self.env[var])
-          default=true
-#s="### Name '#{var}' is"
-          if serial.vars_ignore.include?(var)
-#puts "#{s} ignore"
-            default=false
-          end
-          if serial.vars_in.include?(var)
-#puts "#{s} in"
-            default=false
-          end
-          if serial.vars_out.include?(var)
-#puts "#{s} out"
-            default=false
-          end
-          if default
-#puts "#{s} #{serial.default}"
-          end
-        end
+      # sms$serial handling
+      if inside?(SMS_Serial) and not inside?(SMS_Serial_Begin)
+        self.env[:sms_serial_info].names_in_region.add("#{self}")
       end
     end
 
@@ -934,8 +911,83 @@ module Fortran
     end
 
     def translate
-      use("module_decomp")
-      use("nnt_types_module")
+      # Initially, we don't know which variables will need to be gathered,
+      # scattered, or broadcast.
+      to_bcast=[]
+      to_gather=[]
+      to_scatter=[]
+      # Get the serial info recorded when the SMS$SERIAL ... BEGIN statement.
+      # was parsed.
+      si=self.env[:sms_serial_info]
+      # Iterate over the set of names that occurred in the region. Note that
+      # we do not yet know whether the names are variables (they might e.g. be
+      # function or subroutine names.
+      si.names_in_region.each do |name|
+        # Skip names with no entries in the environemnt, i.e. that are not
+        # variables.
+        next unless (varenv=self.env[name])
+        decomp=varenv["decomp"]
+        rank=varenv["rank"]
+        # Conservatively assume that the default intent will apply to this
+        # variable.
+        default=true
+        if si.vars_in.include?(name)
+          # Explicit 'in' intent was specified for this variable: Ensure that
+          # conflicting 'ignore' intent was not specified; schedule the variable
+          # for a gather *if* it is decomposed; and note that the default intent
+          # does not apply.
+          if si.vars_ignore.include?(name)
+            fail "'#{name}' cannot be both 'ignore' and 'out' in SMS$SERIAL"
+          end
+          to_gather.push(name) if decomp
+          default=false
+        end
+        if si.vars_out.include?(name)
+          # Explicit 'out' intent was specified for this variable. Ensure that
+          # conflicting 'ignore' intent was not specified; schedule scalars and
+          # non-decomposed arrays for broadcast, and decomposed arrays for a
+          # scatter; and note that the default intent does not apply.
+          if si.vars_ignore.include?(name)
+            fail "'#{name}' cannot be both 'ignore' and 'in' SMS$SERIAL"
+          end
+          ((rank=="_scalar"||!decomp)?(to_bcast):(to_scatter)).push(name)
+          default=false
+        end
+        if default and not si.vars_ignore.include?(name)
+          # If no explicit intent was specified, the default applies. Treatment
+          # of scalars, non-decomposed arrays and decomposed arrays is the same
+          # as described above.
+          d=si.default
+          to_gather.push(name) if decomp and (d=="in" or d=="inout")
+          if d=="out" or d=="inout"
+            ((rank=="_scalar"||!decomp)?(to_bcast):(to_scatter)).push(name)
+          end
+        end
+      end
+      # Insert statements for the necessary gathers, scatters and broadcasts.
+      block=e[0].e
+      # Broadcasts
+      to_bcast.each do |var|
+        varenv=self.env[var]
+        if varenv["rank"]=="_scalar"
+          dims="1"
+          sizes="(/1/)"
+        else
+          dims=varenv["dims"]
+          sizes="(/#{(1..dims).reduce([]) { |m,x| m.push("size(a,#{x})") }.join(",")}/)"
+        end
+        code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
+        insert_statement_after(code,:call_stmt,block.last)
+      end
+      # Gathers
+      to_gather.each do |var|
+        varenv=self.env[var]
+        dims=(":"*varenv["dims"]).split("")
+        declare(varenv["type"],"ppp__g_#{var}",{:attrs=>["allocatable"],:dims=>dims})
+      end
+      # Scatters
+      to_scatter.each do |var|
+      end
     end
 
   end
@@ -947,12 +999,14 @@ module Fortran
     end
 
     def translate
-      serial=self.env[:sms_serial]
-      serial.default=("#{e[2]}".empty?)?("inout"):(e[2].default)
-      serial.vars_ignore=("#{e[2]}".empty?)?([]):(e[2].vars_ignore)
-      serial.vars_in=("#{e[2]}".empty?)?([]):(e[2].vars_in)
-      serial.vars_out=("#{e[2]}".empty?)?([]):(e[2].vars_out)
-#     remove
+      si=self.env[:sms_serial_info]=OpenStruct.new
+      si.default=("#{e[2]}".empty?)?("inout"):(e[2].default)
+      si.names_in_region=Set.new
+      si.vars_ignore=("#{e[2]}".empty?)?([]):(e[2].vars_ignore)
+      si.vars_in=("#{e[2]}".empty?)?([]):(e[2].vars_in)
+      si.vars_out=("#{e[2]}".empty?)?([]):(e[2].vars_out)
+      parent.env[:sms_serial_info]=self.env[:sms_serial_info]
+      remove
     end
 
   end
@@ -980,7 +1034,7 @@ module Fortran
   class SMS_Serial_Control_Option_1 < SMS
 
     def default
-      ("#{e[1]}".empty?)?("inout"):(e[1].e[1].intent)
+      (e[1].e&&e[1].e[1].respond_to?(:intent))?(e[1].e[1].intent):("inout")
     end
 
     def to_s
@@ -1024,7 +1078,7 @@ module Fortran
   class SMS_Serial_Default < SMS
 
     def intent
-      e[2]
+      "#{e[2]}"
     end
 
   end
@@ -1036,29 +1090,7 @@ module Fortran
     end
 
     def translate
-      stmts=[]
-      serial=self.env[:sms_serial]
-      serial.vars_out.each do |var|
-        fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
-        dims=varenv["dims"]
-        rank=varenv["rank"]
-        type=smstype(varenv["type"],varenv["kind"])
-        if rank=="_scalar"
-#puts "### SMS_Serial_End: broadcast scalar '#{var}'"
-          stmts.push(["call ppp_bcast(#{var},#{type},(/1/),1,ppp__status)",:call_stmt])
-        elsif rank=="_array"
-          if (decomp=varenv["decomp"])
-#puts "### SMS_Serial_End: scatter distributed array '#{var}'"
-          else
-#puts "### SMS_Serial_End: broadcast non-distributed array '#{var}'"
-            sizes="(/#{(1..dims).reduce([]) { |m,x| m.push("size(a,#{x})") }.join(",")}/)"
-            stmts.push(["call ppp_bcast(#{var},#{type},#{sizes},#{dims},ppp__status)",:call_stmt])
-          end
-        else
-          fail "Unexpected rank '#{rank}' for '#{var}'"
-        end
-      end
-#     replace_statements(stmts)
+      remove
     end
 
   end
@@ -1066,7 +1098,7 @@ module Fortran
   class SMS_Serial_Intent_List < SMS
 
     def intent
-      e[3]
+      "#{e[3]}"
     end
 
     def vars
@@ -1077,11 +1109,10 @@ module Fortran
 
   class SMS_Serial_Intent_Lists < SMS
 
-    def vars_with_intent(x)
-      return e[0].vars if "#{e[0].intent}"==x
-      return [] if "#{e[1]}".empty?
-      return e[1].e[1].vars if "#{e[1].e[1].intent}"==x
-      []
+    def vars_with_intent(intent)
+      vars=(e[0].intent==intent)?(e[0].vars):([])
+      e[1].e.each { |x| vars+=x.e[1].vars if x.e[1].intent==intent }
+      vars
     end
 
     def to_s

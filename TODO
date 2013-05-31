@@ -157,3 +157,21 @@
 
 - sms$serial ought to give diagnostic information about which variables it will
   gather, scatter or broadcast, so that users can tune the directive.
+
+- sms$serial should complain about in/out/inout intent of variables that never
+  occur in the region.
+
+- sms$serial should complain about mismatches, e.g. explicitly specifying a
+  variable as both 'in' and 'ignore'.
+
+- In SMS_Serial#translate, there's a potential issue in that a Name may be
+  e.g. a function or subroutine name, in which case it may not (will not?)
+  appear in the environment. For now, ignore the Name if it's not in the
+  environment, which prevents translation of non-variable names. Note that
+  'standard' behavior is to exit with an error if an expected name is not found,
+  so this is divergent. Worse, it may be *wrong* as function names may
+  eventually appear in the environment (to note their type).
+
+- Should T#declare in fortran.rb exist? Should it abort if called?
+
+- translate_children() -- do we need 'if e' & compact & 'if x'?

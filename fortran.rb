@@ -465,16 +465,24 @@ module Fortran
       r.instance_variable_set(:@level,l+1)
     end
 
-    def insert_statement(code,rule,predecessor)
+    def insert_statement(code,rule,node,offset)
       tree=raw(code,rule,@srcfile)
-      tree.parent=predecessor.parent
-      block=predecessor.parent.e
-      block.insert(block.index(predecessor)+1,tree)
+      tree.parent=node.parent
+      block=node.parent.e
+      block.insert(block.index(node)+offset,tree)
       tree
     end
 
-    def inside?(class_or_classes)
-      (ancestor(class_or_classes))?(true):(false)
+    def insert_statement_after(code,rule,predecessor)
+      insert_statement(code,rule,predecessor,1)
+    end
+
+    def insert_statement_before(code,rule,successor)
+      insert_statement(code,rule,successor,0)
+    end
+
+    def inside?(*class_or_classes)
+      (ancestor(*class_or_classes))?(true):(false)
     end
 
     def level
@@ -520,7 +528,7 @@ module Fortran
     def replace_statements(stmt_pairs,node=self)
       p=stmt_pairs.shift
       s=replace_statement(p[0],p[1],node)
-      stmt_pairs.each { |p| s=insert_statement(p[0],p[1],s) }
+      stmt_pairs.each { |p| s=insert_statement_after(p[0],p[1],s) }
     end
 
     def root

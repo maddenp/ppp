@@ -150,6 +150,7 @@ grammar Fortran
     sms_halo_comp &{ |e| sp_sms_halo_comp } <E> /
     sms_parallel &{ |e| sp_sms_parallel } <E> /
     sms_reduce /
+    sms_serial &{ |e| sp_sms_serial } <E> /
     sms_set_communicator /
     sms_to_local &{ |e| sp_sms_to_local } <E> /
     sms_unstructured_grid /
@@ -213,8 +214,7 @@ grammar Fortran
 
   rule sms_passthrough
     sms_ignore_begin /
-    sms_ignore_end /
-    sms_serial &{ |e| sp_sms_serial } <E> 
+    sms_ignore_end
   end
 
   rule sms_reduce
@@ -272,7 +272,7 @@ grammar Fortran
   end
 
   rule sms_serial_intent_lists
-    sms_serial_intent_list ( t_comma sms_serial_intent_list )? <SMS_Serial_Intent_Lists>
+    sms_serial_intent_list ( t_comma sms_serial_intent_list )* <SMS_Serial_Intent_Lists>
   end
 
   rule sms_serial_varlist
