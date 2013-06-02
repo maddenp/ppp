@@ -180,3 +180,8 @@
 - Consider which sms_ignore_* rules are actually needed. Certainly _executable,
   but possibly not _declarative, _use or _implicit. Get rid of what isn't
   necessary.
+
+- Any error output from parsing must go to stderr, not stdout, so that output
+  file containing error info instead of code isn't created. Otherwise, make
+  may fail to properly build, since a lately-timestamped output file will
+  exist. (Already done for PARSE FAILED.)
