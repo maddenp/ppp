@@ -13528,7 +13528,7 @@ module Fortran
       s1 << r3
     end
     if s1.last
-      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+      r1 = instantiate_node(E,input, i1...index, s1)
       r1.extend(ExternalSubprogram0)
     else
       @index = i1
@@ -13552,7 +13552,7 @@ module Fortran
         s5 << r7
       end
       if s5.last
-        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+        r5 = instantiate_node(E,input, i5...index, s5)
         r5.extend(ExternalSubprogram1)
       else
         @index = i5
@@ -17333,7 +17333,7 @@ module Fortran
       s1 << r3
     end
     if s1.last
-      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+      r1 = instantiate_node(E,input, i1...index, s1)
       r1.extend(InternalSubprogram0)
     else
       @index = i1
@@ -17357,7 +17357,7 @@ module Fortran
         s5 << r7
       end
       if s5.last
-        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+        r5 = instantiate_node(E,input, i5...index, s5)
         r5.extend(InternalSubprogram1)
       else
         @index = i5
@@ -20508,7 +20508,7 @@ module Fortran
       s1 << r3
     end
     if s1.last
-      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+      r1 = instantiate_node(E,input, i1...index, s1)
       r1.extend(ModuleSubprogram0)
     else
       @index = i1
@@ -20532,7 +20532,7 @@ module Fortran
         s5 << r7
       end
       if s5.last
-        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+        r5 = instantiate_node(E,input, i5...index, s5)
         r5.extend(ModuleSubprogram1)
       else
         @index = i5

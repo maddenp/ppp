@@ -39,10 +39,10 @@ grammar Fortran
   rule external_subprogram
     # F90:R203
 
-    subroutine_subprogram /
-    function_subprogram /
+    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
+    function_subprogram &{ |e| sp_function_subprogram } <E> /
     directive /
-    sms_ignore_external_subprogram &{ |e| sp_sms_ignore } <E>
+    sms_ignore_subprogram
   end
 
   rule implicit_part
@@ -60,17 +60,19 @@ grammar Fortran
   rule internal_subprogram
     # F90:R211
 
-    subroutine_subprogram /
-    function_subprogram /
-    directive
+    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
+    function_subprogram &{ |e| sp_function_subprogram } <E> /
+    directive /
+    sms_ignore_subprogram
   end
 
   rule module_subprogram
     # F90:R213
 
-    subroutine_subprogram /
-    function_subprogram /
-    directive
+    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
+    function_subprogram &{ |e| sp_function_subprogram } <E> /
+    directive /
+    sms_ignore_subprogram
   end
 
   rule sms_barrier
@@ -101,7 +103,7 @@ grammar Fortran
     sms_declare_decomp /
     sms_distribute_begin /
     sms_distribute_end /
-    sms_ignore_declarative &{ |e| sp_sms_ignore } <E>
+    sms_ignore_declarative
   end
 
   rule sms_declare_decomp
@@ -144,7 +146,7 @@ grammar Fortran
     sms_create_decomp /
     sms_exchange /
     sms_halo_comp &{ |e| sp_sms_halo_comp } <E> /
-    sms_ignore_executable &{ |e| sp_sms_ignore } <E> /
+    sms_ignore_executable /
     sms_parallel &{ |e| sp_sms_parallel } <E> /
     sms_reduce /
     sms_serial &{ |e| sp_sms_serial } <E> /
@@ -181,12 +183,12 @@ grammar Fortran
     sms_ignore_begin block sms_ignore_end <SMS_Ignore>
   end
 
-  rule sms_ignore_external_subprogram
-    sms_ignore_begin external_subprogram sms_ignore_end <SMS_Ignore>
+  rule sms_ignore_subprogram
+    sms_ignore_begin ( external_subprogram / internal_subprogram / module_subprogram ) sms_ignore_end <SMS_Ignore>
   end
 
   rule sms_ignore_use
-    sms_ignore_begin ( use_stmt / directive ) sms_ignore_end <SMS_Ignore>
+    sms_ignore_begin use_part sms_ignore_end <SMS_Ignore>
   end
 
   rule sms_ignore_begin
@@ -446,7 +448,7 @@ grammar Fortran
   end
 
   rule use_part
-    ( use_stmt / directive / ( sms_ignore_use &{ |e| sp_sms_ignore } ) )* <Use_Part>
+    ( use_stmt / directive / sms_ignore_use )* <Use_Part>
   end
 
 end

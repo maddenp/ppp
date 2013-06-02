@@ -44,11 +44,6 @@ module Fortran
     true
   end
 
-  def sp_sms_ignore
-    envpop
-    true
-  end
-
   def sp_sms_ignore_begin
     fail "Already inside SMS$IGNORE region" if env[:sms_ignore]
     env[:sms_ignore]=true
@@ -57,6 +52,7 @@ module Fortran
 
   def sp_sms_ignore_end
     fail "Not inside SMS$IGNORE region" unless env[:sms_ignore]
+    env.delete(:sms_ignore)
     true
   end
 
@@ -116,16 +112,18 @@ module Fortran
   def smstype(type,kind)
     kind=nil if kind=="_default"
     case type
-    when "integer"
-      return (kind)?("nnt_i#{kind}"):("nnt_integer")
-    when "real"
-      return (kind)?("nnt_r#{kind}"):("nnt_real")
-    when "doubleprecision"
-      return "nnt_doubleprecision"
+    when "character"
+      return "nnt_bytes"
     when "complex"
       return (kind)?("nnt_c#{kind}"):("nnt_complex")
+    when "doubleprecision"
+      return "nnt_doubleprecision"
+    when "integer"
+      return (kind)?("nnt_i#{kind}"):("nnt_integer")
     when "logical"
       return (kind)?("nnt_l#{kind}"):("nnt_logical")
+    when "real"
+      return (kind)?("nnt_r#{kind}"):("nnt_real")
     end
     fail "No NNT type defined for '#{type}#{kind}'"
   end
@@ -197,15 +195,8 @@ module Fortran
         old_uses=up.env[:uses]
         up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
   # sub HACK start
-        t=raw("!sms$ignore begin",:sms_ignore_begin,@srcfile)
-        t.parent=up
-        up.e.push(t)
-  # sub HACK end
-        t=raw(code,:use_stmt,@srcfile)
-        t.parent=up
-        up.e.push(t)
-  # sub HACK start
-        t=raw("!sms$ignore end",:sms_ignore_end,@srcfile)
+        code=("!sms$ignore begin\n#{code}\n!sms$ignore end")
+        t=raw(code,:sms_ignore_use,@srcfile)
         t.parent=up
         up.e.push(t)
   # sub HACK end
@@ -957,8 +948,10 @@ module Fortran
       # function or subroutine names.
       si.names_in_region.each do |name|
         # Skip names with no entries in the environemnt, i.e. that are not
-        # variables.
-        next unless (varenv=self.env[name])
+        # variables. HACK: Also skip names with no type information, on the
+        # (probably naive) assumption that they are function or subroutine names
+        # that are in the environment due to access specification.
+        next unless (varenv=self.env[name]) and varenv["type"]
         decomp=varenv["decomp"]
         rank=varenv["rank"]
         # Conservatively assume that the default intent will apply to this
@@ -1149,7 +1142,7 @@ module Fortran
     end
 
     def to_s
-      "#{e[0]}#{e[1].cat}"
+      "#{e[0]}"+e[1].e.reduce("") { |m,x| m+"#{x.e[0]}#{x.e[1]}" }
     end
 
     def vars_ignore
