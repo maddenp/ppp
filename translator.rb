@@ -212,7 +212,7 @@ module Translator
       srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
       unless raw_tree
         na=n.split("\n")
-        na.each_index { |i| puts "#{i+1} #{na[i]}" }
+        na.each_index { |i| $stderr.puts "#{i+1} #{na[i]}" }
         fail "#{fp.failure_reason.split("\n")[0]}\nPARSE FAILED#{srcmsg}"
         return # if in server mode and did not exit in fail()
       end
