@@ -1411,8 +1411,8 @@ grammar Fortran
   rule external_subprogram
     # F90:R203
 
-    subroutine_subprogram &{ |e| sp_subroutine_subprogram } /
-    function_subprogram &{ |e| sp_function_subprogram } /
+    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
+    function_subprogram &{ |e| sp_function_subprogram } <E> /
     directive
   end
 
@@ -1738,8 +1738,8 @@ grammar Fortran
   rule internal_subprogram
     # F90:R211
 
-    subroutine_subprogram &{ |e| sp_subroutine_subprogram } /
-    function_subprogram &{ |e| sp_function_subprogram } /
+    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
+    function_subprogram &{ |e| sp_function_subprogram } <E> /
     directive
   end
 
@@ -2064,8 +2064,8 @@ grammar Fortran
   rule module_subprogram
     # F90:R213
 
-    subroutine_subprogram &{ |e| sp_subroutine_subprogram } /
-    function_subprogram &{ |e| sp_function_subprogram } /
+    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
+    function_subprogram &{ |e| sp_function_subprogram } <E> /
     directive
   end
 
