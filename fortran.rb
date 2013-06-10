@@ -365,7 +365,7 @@ module Fortran
 
     def cat
       # concatenate elements' string representations
-      (e)?(self.e.map { |x| x.to_s }.join):("")
+      (e)?(self.e.map { |x| "#{x}" }.join):("")
     end
 
     def descendants(*classes)
@@ -457,6 +457,13 @@ module Fortran
 
     def execution_part
       scoping_unit.e[2]
+    end
+
+    def getvarenv(name,node=self,expected=true)
+      unless (varenv=node.env["#{name}"])
+        fail "'#{name}' not found in environment" if expected
+      end
+      varenv
     end
 
     def indent
@@ -853,9 +860,7 @@ module Fortran
       unless ok
         code="#{self}"
         replace_element(code,:deferred_shape_spec_list)
-        unless (varenv=self.env["#{array_name}"])
-          fail "'#{array_name}' not found in environment"
-        end
+        varenv=getvarenv(array_name)
         varenv.keys.each { |k| varenv[k]="_deferred" if k=~/[lu]b\d+/ }
       end
     end

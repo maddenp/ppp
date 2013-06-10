@@ -12,6 +12,11 @@
 
 - Need tests of all F90:R924 possibilities.
 
+- Change all 'print *' to print/write with format list in tests. Otherwise,
+  output may vary with processor (gfortran, ifort, etc.). Expanded idea: Use
+  'control' mechanism only for certain tests (e.g. those exercising sms$insert)
+  and compare output to untranslated test code to translated test code.
+
 - Remove various HACKS and deal with any fallout.
 
 - In declare(), use push(tree) instead of insert(0,tree) to insert new
@@ -40,11 +45,12 @@
 - Stop tracking kind. Pass only *type* to MPI-calling SMS routines and, in the
   latter, use mpi_sizeof() + mpi_type_match_size() in the library to make a
   run-time determination of MPI type to use. Get rid of related kind() methods
-  in fortran.rb.
+  in fortran.rb. Is this a good idea?
 
 - Check for and clean up any unused rules (especially sms_* rules)
 
-- It might be better to prefix in-class method calls with 'self.' for clarity.
+- It might be better to prefix all in-class method calls with 'self.' for
+  clarity.
 
 - Why does sms$parallel require positional variable lists, while sms$to_local
   requires numbered lists? This should be harmonized. The latter is better.
@@ -62,9 +68,6 @@
 
 - write-stmt seems to parse wrong, 'write' recognized as Data_Ref. This could be
   a problem re: implicit translation of write io statements.
-
-- Change all 'print *' to print/write with format list in tests. Otherwise,
-  output may vary with processor (gfortran, ifort, etc.).
 
 - translate() on SMS_Unstructured_Grid cannot possibly be correct in the general
   case, right?
@@ -116,9 +119,6 @@
 
 - To make all of this more useful, build an AST from the parse tree. Then, do
   translations on and produce final output from the AST.
-
-- Make a single method for complaining about not-found-in-environment symbols
-  and explaining what the cause & remedy might be.
 
 - Reformulate distribute being/end as distribute region.
 
@@ -185,3 +185,14 @@
   file containing error info instead of code isn't created. Otherwise, make
   may fail to properly build, since a lately-timestamped output file will
   exist. (Already done for PARSE FAILED.)
+
+- Need some kind of fixed-point treatment of assemble / include / sms$insert.
+
+- Check all allocates rolled out by ppp.
+
+- In getvarenv(), give more verbose information about why a failure has occurred
+  and what to do about it (e.g. .env file is not available, so get dependencies
+  right, or write your own .env file, only ask ppp to operate on appropriate
+  variables, etc.)
+
+- Factor array-literal creation for sms_exhcange, sms_serial, etc.

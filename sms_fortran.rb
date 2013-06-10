@@ -132,7 +132,7 @@ module Fortran
 
     def declare(type,name,props={})
       dc=declaration_constructs
-      varenv=dc.env[name]
+      varenv=getvarenv(name,dc,false)
       if varenv
         fail "Variable #{name} is already defined" unless varenv["pppvar"]
       else
@@ -147,7 +147,8 @@ module Fortran
         t=raw(code,:type_declaration_stmt,root.srcfile)
         t.parent=dc
         dc.e[0].e.insert(0,t) # prefer "dc.e.push(t)" -- see TODO
-        dc.env[name]={"pppvar"=>true}
+        dc.env[name]||={}
+        dc.env[name]["pppvar"]=true
       end
     end
 
@@ -222,10 +223,10 @@ module Fortran
 # the environment and then... Can we have a decomposed array inside a derived
 # type? A decomposed array *of* dervived type, yes -- but the components?
 
-#         fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
+#         varenv=getvarenv(var)
 #         if varenv["decomp"]
 
-          varenv=self.env["#{var}"]
+          varenv=getvarenv(var,self,false)
           if varenv and varenv["decomp"]
             subscript_list=part_ref.subscript_list
             newdims=[]
@@ -275,13 +276,14 @@ module Fortran
 
     def translate
       if self.instance_variable_get(:@smsignore)
-        code=""
-        code+="do\n"
-        code+="!sms$ignore begin\n"
-        code+="#{self}"
-        code+="!sms$ignore end\n"
-        code+="exit\n"
-        code+="enddo"
+        code=[]
+        code.push("do")
+        code.push("!sms$ignore begin")
+        code.push("#{self}")
+        code.push("!sms$ignore end")
+        code.push("exit")
+        code.push("enddo")
+        code=code.join("\n")
         replace_statement(code,:block_do_construct)
       end
     end
@@ -295,7 +297,7 @@ module Fortran
     def translate
       var="#{e[0]}"
       spec=e[2].spec
-      varenv=self.env["#{var}"]
+      varenv=getvarenv(var)
       distribute_array_bounds(spec,varenv)
     end
 
@@ -305,7 +307,7 @@ module Fortran
 
     def translate
       var="#{e[0]}"
-      fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
+      varenv=getvarenv(var)
       spec=nil
       if varenv["rank"]=="_array"
         if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
@@ -435,7 +437,7 @@ module Fortran
       use("nnt_types_module")
       declare("logical","sms_debugging_on")
       var="#{e[3].name}"
-      fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
+      varenv=getvarenv(var)
       dims=varenv["dims"]
       str="#{e[5]}"
       type=smstype(varenv["type"],varenv["kind"])
@@ -704,7 +706,7 @@ module Fortran
       varenv=nil
       (0..nvars-1).each do |i|
         var=v[i].name
-        fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
+        varenv=getvarenv(var)
         dims=varenv["dims"]
         dh=varenv["decomp"]
         dectypes.push("#{dh}(dh__nestlevel)")
@@ -899,7 +901,7 @@ module Fortran
       types=[]
       nvars.times do |i|
         var=vars[i]
-        fail "'#{var}' not found in environment" unless (varenv=self.env["#{var}"])
+        varenv=getvarenv(var)
         fail "SMS$REDUCE inapplicable to distributed array '#{var}'" if varenv["decomp"]
         sizes.push("1") # but why?
         types.push(smstype(varenv["type"],varenv["kind"]))
@@ -935,11 +937,13 @@ module Fortran
     end
 
     def translate
+      use("module_decomp")
+      declare("logical","iam_root")
       # Initially, we don't know which variables will need to be gathered,
       # scattered, or broadcast.
-      to_bcast=[]
-      to_gather=[]
-      to_scatter=[]
+      bcasts=[]
+      gathers=[]
+      scatters=[]
       # Get the serial info recorded when the SMS$SERIAL ... BEGIN statement.
       # was parsed.
       si=self.env[:sms_serial_info]
@@ -951,7 +955,7 @@ module Fortran
         # variables. HACK: Also skip names with no type information, on the
         # (probably naive) assumption that they are function or subroutine names
         # that are in the environment due to access specification.
-        next unless (varenv=self.env[name]) and varenv["type"]
+        next unless (varenv=getvarenv(name,self,false)) and varenv["type"]
         decomp=varenv["decomp"]
         rank=varenv["rank"]
         # Conservatively assume that the default intent will apply to this
@@ -965,7 +969,7 @@ module Fortran
           if si.vars_ignore.include?(name)
             fail "'#{name}' cannot be both 'ignore' and 'out' in SMS$SERIAL"
           end
-          to_gather.push(name) if decomp
+          gathers.push(name) if decomp
           default=false
         end
         if si.vars_out.include?(name)
@@ -976,7 +980,7 @@ module Fortran
           if si.vars_ignore.include?(name)
             fail "'#{name}' cannot be both 'ignore' and 'in' SMS$SERIAL"
           end
-          ((rank=="_scalar"||!decomp)?(to_bcast):(to_scatter)).push(name)
+          ((rank=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
           default=false
         end
         if default and not si.vars_ignore.include?(name)
@@ -984,17 +988,27 @@ module Fortran
           # of scalars, non-decomposed arrays and decomposed arrays is the same
           # as described above.
           d=si.default
-          to_gather.push(name) if decomp and (d=="in" or d=="inout")
+          gathers.push(name) if decomp and (d=="in" or d=="inout")
           if d=="out" or d=="inout"
-            ((rank=="_scalar"||!decomp)?(to_bcast):(to_scatter)).push(name)
+            ((rank=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
           end
         end
       end
+      # Wrap old block in conditional. Note that 'begin' and 'end' nodes have
+      # already been removed, so the only element remaining is the block.
+      oldblock=e[0]
+      code=[]
+      code.push("if (iam_root()) then")
+      code.push("#{oldblock}")
+      code.push("endif")
+      code=code.join("\n")
+      t=replace_statement(code,:block,oldblock)
+      oldblock=t.e[0].e[1].e[1]
+      newblock=e[0]
       # Insert statements for the necessary gathers, scatters and broadcasts.
-      block=e[0].e
       # Broadcasts
-      to_bcast.each do |var|
-        varenv=self.env[var]
+      bcasts.each do |var|
+        varenv=getvarenv(var)
         if varenv["rank"]=="_scalar"
           dims="1"
           sizes="(/1/)"
@@ -1005,14 +1019,69 @@ module Fortran
         code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
 #       insert_statement_after(code,:call_stmt,block.last)
       end
-      # Gathers
-      to_gather.each do |var|
-        varenv=self.env[var]
+      # Declaration of globally-sized variables
+      globals=Set.new(gathers+scatters)
+      globals.sort.each do |var|
+        varenv=getvarenv(var)
         dims=(":"*varenv["dims"]).split("")
 #       declare(varenv["type"],"ppp__g_#{var}",{:attrs=>["allocatable"],:dims=>dims})
       end
+      # Allocation of globally-sized variables. On non-root tasks, allocate all
+      # dimensions at unit size. On the root task, allocate the non-decomposed
+      # dimensions at local size, and the decomposed dimensions at the global
+      # size indicated by the decomposition info.
+      globals.sort.each do |var|
+        varenv=getvarenv(var)
+        dims=varenv["dims"]
+        bounds_root=[]
+        (1..dims).each do |i|
+          bounds_root.push((decdim=varenv["dim#{i}"])?("dh__globalsize(#{decdim},dh__nestlevel)"):("size(#{var},#{i})"))
+        end
+        bounds_root=bounds_root.join(",")
+        bounds_nonroot=("1"*dims).split("").join(",")
+        code=[]
+        code.push("if (iam_root()) then")
+        code.push("allocate(ppp_g_#{var}(#{bounds_root}),stat=ppp__status)")
+        code.push("else")
+        code.push("allocate(ppp_g_#{var}(#{bounds_nonroot}),stat=ppp__status)")
+        code.push("endif")
+        code=code.join("\n")
+        insert_statement_before(code,:if_construct,newblock.e.first)
+      end
+      # Gathers
+      gathers.each do |var|
+
+        gllbs=[]
+        glubs=[]
+        halol=[]
+        halou=[]
+        perms=[]
+        types=[]
+
+        args=[]
+        args.push("ppp_max_rank")
+        args.push("ppp_max_vars")
+        args.push("ppp__globallower")
+        args.push("ppp__globalupper")
+        args.push("ppp__globalstart")
+        args.push("ppp__globalstop")
+        args.push("ppp__permute")
+        args.push("ppp__decomptype")
+        args.push("ppp__datatype")
+        args.push(".false.")
+        args.push("#{var}")
+        args.push("ppp__g_#{var}")
+        args.push("ppp__status")
+        code="call sms_gather(#{args.join(",")})"
+        insert_statement_before(code,:call_stmt,oldblock.e.first)
+      end
       # Scatters
-      to_scatter.each do |var|
+      scatters.each do |var|
+      end
+      # Deallocation of globally-sized variables
+      globals.sort.each do |var|
+        code="deallocate(ppp__g_#{var})"
+        insert_statement_after(code,:deallocate_stmt,newblock.e.last)
       end
     end
 
@@ -1272,7 +1341,7 @@ module Fortran
 
     def translate
       var="#{e[3]}"
-      fail "No module info found for variable '#{var}'" unless (varenv=self.env["#{var}"])
+      fail "No module info found for variable '#{var}'" unless (varenv=getvarenv(var))
       fail "No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
       use("nnt_types_module")
       stmts=[]
