@@ -1,5 +1,6 @@
 *.env
 *.mod
 *.o
+/p.f90
 a.out
 pppc
