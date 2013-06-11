@@ -1783,7 +1783,7 @@ grammar Fortran
     io_unit t_comma format !t_equal <T> /
     io_unit t_comma namelist_group_name !t_equal <T> /
     t_advance t_equal scalar_default_char_expr <T> /
-    t_end t_equal label <T> /
+    t_io_control_spec_end t_equal label <T> /
     t_eor t_equal label <T> /
     t_err t_equal label <T> /
     t_fmt t_equal format <T> /
@@ -3213,6 +3213,10 @@ grammar Fortran
 
   rule t_intrinsic
     "intrinsic" <T>
+  end
+
+  rule t_io_control_spec_end
+    "end" &t_equal <T>
   end
 
   rule t_iolength
