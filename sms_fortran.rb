@@ -64,7 +64,7 @@ module Fortran
   def sp_sms_parallel_begin(sms_decomp_name,sms_parallel_var_lists)
     fail "Already inside parallel region" if env[:sms_parallel]
     envpush
-    env[:sms_parallel]=OpenStruct.new({:dh=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
+    env[:sms_parallel]=OpenStruct.new({:decomp=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
     true
   end
 
@@ -227,13 +227,13 @@ module Fortran
 #         if varenv["decomp"]
 
           varenv=getvarenv(var,self,false)
-          if varenv and varenv["decomp"]
+          if varenv and (decomp=varenv["decomp"])
             subscript_list=part_ref.subscript_list
             newdims=[]
             subscript_list.each_index do |i|
               arrdim=i+1
               if (decdim=varenv["dim#{arrdim}"])
-                newdims.push("dh__local_lb(#{decdim},dh__nestlevel):dh__local_ub(#{decdim},dh__nestlevel)")
+                newdims.push("#{decomp}__local_lb(#{decdim},#{decomp}__nestlevel):#{decomp}__local_ub(#{decdim},#{decomp}__nestlevel)")
               else
                 newdims.push("#{subscript_list[i]}")
               end
@@ -368,13 +368,14 @@ module Fortran
               break
             end
           end
+          decomp=parallel.decomp
           if decdim
             halo_lo=halo_offsets(decdim).lo
             halo_up=halo_offsets(decdim).up
             if loop_control.is_a?(Loop_Control_1)
-              lo=raw("dh__s#{decdim}(#{loop_control.e[3]},#{halo_lo},dh__nestlevel)",:scalar_numeric_expr,"",{:nl=>false})
+              lo=raw("#{decomp}__s#{decdim}(#{loop_control.e[3]},#{halo_lo},#{decomp}__nestlevel)",:scalar_numeric_expr,"",{:nl=>false})
               lo.parent=loop_control
-              up=raw(",dh__e#{decdim}(#{loop_control.e[4].value},#{halo_up},dh__nestlevel)",:loop_control_pair,"",{:nl=>false})
+              up=raw(",#{decomp}__e#{decdim}(#{loop_control.e[4].value},#{halo_up},#{decomp}__nestlevel)",:loop_control_pair,"",{:nl=>false})
               up.parent=loop_control
               loop_control.e[3]=lo
               loop_control.e[4]=up
@@ -393,9 +394,10 @@ module Fortran
       fail "Bad upper bound: #{bound}" if bound=="_default" and x==:u
       return 1 if bound=="_default" and x==:l
       if ["_assumed","_deferred","_explicit"].include?(bound)
-        if decdim=varenv["dim#{dim}"]
+        if (decdim=varenv["dim#{dim}"])
+          decomp=varenv["decomp"]
           lu=(x==:l)?("low"):("upper")
-          return "dh__#{lu}bounds(#{decdim},dh__nestlevel)"
+          return "#{decomp}__#{lu}bounds(#{decdim},#{decomp}__nestlevel)"
         else
           return "#{x}bound(#{var},#{dim})"
         end
@@ -441,11 +443,11 @@ module Fortran
       dims=varenv["dims"]
       str="#{e[5]}"
       type=smstype(varenv["type"],varenv["kind"])
-      gllbs="(/"+ranks.map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:l)) }.join(",")+"/)"
-      glubs="(/"+ranks.map { |i| (i>dims)?(1):(fixbound(varenv,var,i,:u)) }.join(",")+"/)"
-      perms="(/"+ranks.map { |i| varenv["dim#{i}"]||0 }.join(",")+"/)"
-      if dh=varenv["decomp"]
-        decomp="#{dh}(dh__nestlevel)"
+      gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+      glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+      perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
+      if (decomp=varenv["decomp"])
+        decomp="#{decomp}(#{decomp}__nestlevel)"
       else
         decomp="ppp_not_decomposed"
       end
@@ -483,8 +485,8 @@ module Fortran
       n="#{decomp}__nestlevel"
       use("module_decomp")
       use("nnt_types_module")
-      declare("integer","ppp__periodicusedupper",{:dims=>%w[ppp_max_decomposed_dims]})
-      declare("integer","ppp__periodicusedlower",{:dims=>%w[ppp_max_decomposed_dims]})
+      declare("integer","ppp__periodicusedupper",{:dims=>%W[ppp_max_decomposed_dims]})
+      declare("integer","ppp__periodicusedlower",{:dims=>%W[ppp_max_decomposed_dims]})
       stmts=[]
       stmts.push(["#{n}=1",:assignment_stmt])
       stmts.push(["#{d}__nregions=1",:assignment_stmt])
@@ -598,31 +600,31 @@ module Fortran
 
       use("nnt_types_module")
       decomp="#{e[3]}"
-      declare("integer","dh__s3",{:attrs=>["allocatable"],:dims=>%w[: : :]})
-      declare("integer","dh__s2",{:attrs=>["allocatable"],:dims=>%w[: : :]})
-      declare("integer","dh__s1",{:attrs=>["allocatable"],:dims=>%w[: : :]})
-      declare("integer","dh__e3",{:attrs=>["allocatable"],:dims=>%w[: : :]})
-      declare("integer","dh__e2",{:attrs=>["allocatable"],:dims=>%w[: : :]})
-      declare("integer","dh__e1",{:attrs=>["allocatable"],:dims=>%w[: : :]})
-      declare("integer","dh__upperbounds", {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
-      declare("integer","dh__lowbounds",   {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
-      declare("integer","dh__localsize",   {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
-      declare("integer","dh__local_ub",    {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
-      declare("integer","dh__local_lb",    {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
-      declare("integer","dh__halosize",    {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
-      declare("integer","dh__globalsize",  {:dims=>%w[ppp_max_decomposed_dims dh__maxnests]})
-      declare("integer","dh__boundarytype",{:dims=>%w[ppp_max_decomposed_dims]})
-      declare("integer","dh__nestlevels",  {:dims=>%w[dh__maxnests]})
-      declare("integer",decomp,            {:dims=>%w[1]})
-      declare("integer","dh__nregions")
-      declare("integer","dh__nestlevel")
-      declare("integer","dh__localhalosize")
-      declare("integer","dh__index")
-      declare("integer","dh__ignore")
-      declare("character*32","dh__decompname")
+      declare("integer","#{decomp}__s3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{decomp}__s2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{decomp}__s1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{decomp}__e3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{decomp}__e2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{decomp}__e1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{decomp}__upperbounds", {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__lowbounds",   {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__localsize",   {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__local_ub",    {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__local_lb",    {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__halosize",    {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__globalsize",  {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__boundarytype",{:dims=>%W[ppp_max_decomposed_dims]})
+      declare("integer","#{decomp}__nestlevels",  {:dims=>%W[#{decomp}__maxnests]})
+      declare("integer",decomp,{:dims=>%W[1]})
+      declare("integer","#{decomp}__nregions")
+      declare("integer","#{decomp}__nestlevel")
+      declare("integer","#{decomp}__localhalosize")
+      declare("integer","#{decomp}__index")
+      declare("integer","#{decomp}__ignore")
+      declare("character*32","#{decomp}__decompname")
       # HACK start: Do parameters last so they will appear first
-      declare("integer","dh__maxnests",{:attrs=>"parameter",:init=>"1"})
-      declare("integer","dh__ppp_max_regions",{:attrs=>"parameter",:init=>"1"})
+      declare("integer","#{decomp}__maxnests",{:attrs=>"parameter",:init=>"1"})
+      declare("integer","#{decomp}__ppp_max_regions",{:attrs=>"parameter",:init=>"1"})
       # HACK end
       remove
     end
@@ -708,14 +710,14 @@ module Fortran
         var=v[i].name
         varenv=getvarenv(var)
         dims=varenv["dims"]
-        dh=varenv["decomp"]
-        dectypes.push("#{dh}(dh__nestlevel)")
+        decomp=varenv["decomp"]
+        dectypes.push("#{decomp}(#{decomp}__nestlevel)")
         cornerdepth.push("9999")
-        ranks.each { |j| gllbs.push((j>dims)?(1):(fixbound(varenv,var,j,:l))) }
-        ranks.each { |j| glubs.push((j>dims)?(1):(fixbound(varenv,var,j,:u))) }
-        ranks.each { |j| halol.push((j>dims)?(0):("dh__halosize(1,dh__nestlevel)")) }
-        ranks.each { |j| halou.push((j>dims)?(0):("dh__halosize(1,dh__nestlevel)")) }
-        ranks.each { |j| perms.push(varenv["dim#{j}"]||0) }
+        ranks.each { |r| gllbs.push((r>dims)?(1):(fixbound(varenv,var,r,:l))) }
+        ranks.each { |r| glubs.push((r>dims)?(1):(fixbound(varenv,var,r,:u))) }
+        ranks.each { |r| halol.push((r>dims)?(0):("#{decomp}__halosize(1,#{decomp}__nestlevel)")) }
+        ranks.each { |r| halou.push((r>dims)?(0):("#{decomp}__halosize(1,#{decomp}__nestlevel)")) }
+        ranks.each { |r| perms.push(varenv["dim#{r}"]||0) }
         types.push(smstype(varenv["type"],varenv["kind"]))
       end
       cornerdepth="(/#{cornerdepth.join(",")}/)"
@@ -936,154 +938,161 @@ module Fortran
       "#{e[0]}#{e[1]}#{e[2]}"
     end
 
-    def translate
-      use("module_decomp")
-      declare("logical","iam_root")
-      # Initially, we don't know which variables will need to be gathered,
-      # scattered, or broadcast.
-      bcasts=[]
-      gathers=[]
-      scatters=[]
-      # Get the serial info recorded when the SMS$SERIAL ... BEGIN statement.
-      # was parsed.
-      si=self.env[:sms_serial_info]
-      # Iterate over the set of names that occurred in the region. Note that
-      # we do not yet know whether the names are variables (they might e.g. be
-      # function or subroutine names.
-      si.names_in_region.each do |name|
-        # Skip names with no entries in the environemnt, i.e. that are not
-        # variables. HACK: Also skip names with no type information, on the
-        # (probably naive) assumption that they are function or subroutine names
-        # that are in the environment due to access specification.
-        next unless (varenv=getvarenv(name,self,false)) and varenv["type"]
-        decomp=varenv["decomp"]
-        rank=varenv["rank"]
-        # Conservatively assume that the default intent will apply to this
-        # variable.
-        default=true
-        if si.vars_in.include?(name)
-          # Explicit 'in' intent was specified for this variable: Ensure that
-          # conflicting 'ignore' intent was not specified; schedule the variable
-          # for a gather *if* it is decomposed; and note that the default intent
-          # does not apply.
-          if si.vars_ignore.include?(name)
-            fail "'#{name}' cannot be both 'ignore' and 'out' in SMS$SERIAL"
-          end
-          gathers.push(name) if decomp
-          default=false
-        end
-        if si.vars_out.include?(name)
-          # Explicit 'out' intent was specified for this variable. Ensure that
-          # conflicting 'ignore' intent was not specified; schedule scalars and
-          # non-decomposed arrays for broadcast, and decomposed arrays for a
-          # scatter; and note that the default intent does not apply.
-          if si.vars_ignore.include?(name)
-            fail "'#{name}' cannot be both 'ignore' and 'in' SMS$SERIAL"
-          end
-          ((rank=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
-          default=false
-        end
-        if default and not si.vars_ignore.include?(name)
-          # If no explicit intent was specified, the default applies. Treatment
-          # of scalars, non-decomposed arrays and decomposed arrays is the same
-          # as described above.
-          d=si.default
-          gathers.push(name) if decomp and (d=="in" or d=="inout")
-          if d=="out" or d=="inout"
-            ((rank=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
-          end
-        end
-      end
-      # Wrap old block in conditional. Note that 'begin' and 'end' nodes have
-      # already been removed, so the only element remaining is the block.
-      oldblock=e[0]
-      code=[]
-      code.push("if (iam_root()) then")
-      code.push("#{oldblock}")
-      code.push("endif")
-      code=code.join("\n")
-      t=replace_statement(code,:block,oldblock)
-      oldblock=t.e[0].e[1].e[1]
-      newblock=e[0]
-      # Insert statements for the necessary gathers, scatters and broadcasts.
-      # Broadcasts
-      bcasts.each do |var|
-        varenv=getvarenv(var)
-        if varenv["rank"]=="_scalar"
-          dims="1"
-          sizes="(/1/)"
-        else
-          dims=varenv["dims"]
-          sizes="(/#{(1..dims).reduce([]) { |m,x| m.push("size(a,#{x})") }.join(",")}/)"
-        end
-        code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
-#       insert_statement_after(code,:call_stmt,block.last)
-      end
-      # Declaration of globally-sized variables
-      globals=Set.new(gathers+scatters)
-      globals.sort.each do |var|
-        varenv=getvarenv(var)
-        dims=(":"*varenv["dims"]).split("")
+#   def translate
+#     use("module_decomp")
+#     declare("logical","iam_root")
+#     # Initially, we don't know which variables will need to be gathered,
+#     # scattered, or broadcast.
+#     bcasts=[]
+#     gathers=[]
+#     scatters=[]
+#     # Get the serial info recorded when the SMS$SERIAL ... BEGIN statement.
+#     # was parsed.
+#     si=self.env[:sms_serial_info]
+#     # Iterate over the set of names that occurred in the region. Note that
+#     # we do not yet know whether the names are variables (they might e.g. be
+#     # function or subroutine names.
+#     si.names_in_region.each do |name|
+#       # Skip names with no entries in the environemnt, i.e. that are not
+#       # variables. HACK: Also skip names with no type information, on the
+#       # (probably naive) assumption that they are function or subroutine names
+#       # that are in the environment due to access specification.
+#       next unless (varenv=getvarenv(name,self,false)) and varenv["type"]
+#       decomp=varenv["decomp"]
+#       rank=varenv["rank"]
+#       # Conservatively assume that the default intent will apply to this
+#       # variable.
+#       default=true
+#       if si.vars_in.include?(name)
+#         # Explicit 'in' intent was specified for this variable: Ensure that
+#         # conflicting 'ignore' intent was not specified; schedule the variable
+#         # for a gather *if* it is decomposed; and note that the default intent
+#         # does not apply.
+#         if si.vars_ignore.include?(name)
+#           fail "'#{name}' cannot be both 'ignore' and 'out' in SMS$SERIAL"
+#         end
+#         gathers.push(name) if decomp
+#         default=false
+#       end
+#       if si.vars_out.include?(name)
+#         # Explicit 'out' intent was specified for this variable. Ensure that
+#         # conflicting 'ignore' intent was not specified; schedule scalars and
+#         # non-decomposed arrays for broadcast, and decomposed arrays for a
+#         # scatter; and note that the default intent does not apply.
+#         if si.vars_ignore.include?(name)
+#           fail "'#{name}' cannot be both 'ignore' and 'in' SMS$SERIAL"
+#         end
+#         ((rank=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
+#         default=false
+#       end
+#       if default and not si.vars_ignore.include?(name)
+#         # If no explicit intent was specified, the default applies. Treatment
+#         # of scalars, non-decomposed arrays and decomposed arrays is the same
+#         # as described above.
+#         d=si.default
+#         gathers.push(name) if decomp and (d=="in" or d=="inout")
+#         if d=="out" or d=="inout"
+#           ((rank=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
+#         end
+#       end
+#     end
+#     # Wrap old block in conditional. Note that 'begin' and 'end' nodes have
+#     # already been removed, so the only element remaining is the block.
+#     oldblock=e[0]
+#     code=[]
+#     code.push("if (iam_root()) then")
+#     code.push("#{oldblock}")
+#     code.push("endif")
+#     code=code.join("\n")
+#     t=replace_statement(code,:block,oldblock)
+#     oldblock=t.e[0].e[1].e[1]
+#     newblock=e[0]
+#     # Insert statements for the necessary gathers, scatters and broadcasts.
+#     # Broadcasts
+#     bcasts.each do |var|
+#       varenv=getvarenv(var)
+#       if varenv["rank"]=="_scalar"
+#         dims="1"
+#         sizes="(/1/)"
+#       else
+#         dims=varenv["dims"]
+#         sizes="(/#{(1..dims).reduce([]) { |m,x| m.push("size(a,#{x})") }.join(",")}/)"
+#       end
+#       code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
+#       insert_statement_after(code,:call_stmt,newblock.e.last)
+#     end
+#     # Declaration of globally-sized variables
+#     globals=Set.new(gathers+scatters)
+#     globals.sort.each do |var|
+#       varenv=getvarenv(var)
+#       dims=(":"*varenv["dims"]).split("")
 #       declare(varenv["type"],"ppp__g_#{var}",{:attrs=>["allocatable"],:dims=>dims})
-      end
-      # Allocation of globally-sized variables. On non-root tasks, allocate all
-      # dimensions at unit size. On the root task, allocate the non-decomposed
-      # dimensions at local size, and the decomposed dimensions at the global
-      # size indicated by the decomposition info.
-      globals.sort.each do |var|
-        varenv=getvarenv(var)
-        dims=varenv["dims"]
-        bounds_root=[]
-        (1..dims).each do |i|
-          bounds_root.push((decdim=varenv["dim#{i}"])?("dh__globalsize(#{decdim},dh__nestlevel)"):("size(#{var},#{i})"))
-        end
-        bounds_root=bounds_root.join(",")
-        bounds_nonroot=("1"*dims).split("").join(",")
-        code=[]
-        code.push("if (iam_root()) then")
-        code.push("allocate(ppp_g_#{var}(#{bounds_root}),stat=ppp__status)")
-        code.push("else")
-        code.push("allocate(ppp_g_#{var}(#{bounds_nonroot}),stat=ppp__status)")
-        code.push("endif")
-        code=code.join("\n")
-        insert_statement_before(code,:if_construct,newblock.e.first)
-      end
-      # Gathers
-      gathers.each do |var|
-
-        gllbs=[]
-        glubs=[]
-        halol=[]
-        halou=[]
-        perms=[]
-        types=[]
-
-        args=[]
-        args.push("ppp_max_rank")
-        args.push("ppp_max_vars")
-        args.push("ppp__globallower")
-        args.push("ppp__globalupper")
-        args.push("ppp__globalstart")
-        args.push("ppp__globalstop")
-        args.push("ppp__permute")
-        args.push("ppp__decomptype")
-        args.push("ppp__datatype")
-        args.push(".false.")
-        args.push("#{var}")
-        args.push("ppp__g_#{var}")
-        args.push("ppp__status")
-        code="call sms_gather(#{args.join(",")})"
-        insert_statement_before(code,:call_stmt,oldblock.e.first)
-      end
-      # Scatters
-      scatters.each do |var|
-      end
-      # Deallocation of globally-sized variables
-      globals.sort.each do |var|
-        code="deallocate(ppp__g_#{var})"
-        insert_statement_after(code,:deallocate_stmt,newblock.e.last)
-      end
-    end
+#     end
+#     # Allocation of globally-sized variables. On non-root tasks, allocate all
+#     # dimensions at unit size. On the root task, allocate the non-decomposed
+#     # dimensions at local size, and the decomposed dimensions at the global
+#     # size indicated by the decomposition info.
+#     globals.sort.each do |var|
+#       varenv=getvarenv(var)
+#       decomp=varenv["decomp"]
+#       dims=varenv["dims"]
+#       bounds_root=[]
+#       (1..dims).each do |i|
+#         bounds_root.push((decdim=varenv["dim#{i}"])?("#{decomp}__globalsize(#{decdim},#{decomp}__nestlevel)"):("size(#{var},#{i})"))
+#       end
+#       bounds_root=bounds_root.join(",")
+#       bounds_nonroot=("1"*dims).split("").join(",")
+#       code=[]
+#       code.push("if (iam_root()) then")
+#       code.push("allocate(ppp_g_#{var}(#{bounds_root}),stat=ppp__status)")
+#       code.push("else")
+#       code.push("allocate(ppp_g_#{var}(#{bounds_nonroot}),stat=ppp__status)")
+#       code.push("endif")
+#       code=code.join("\n")
+#       insert_statement_before(code,:if_construct,newblock.e.first)
+#     end
+#     # Gathers
+#     gathers.each do |var|
+#       varenv=getvarenv(var)
+#       decomp=varenv["decomp"]
+#       dims=varenv["dims"]
+#       type=smstype(varenv["type"],varenv["kind"])
+#       gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+#       glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+#       gstop="(/"+ranks.map { |r| (r>dims)?(0):("ppp_globalupper") }.join(",")+"/)"
+#       gstrt="(/"+ranks.map { |r| (r>dims)?(0):("ppp_globallower") }.join(",")+"/)"
+#       perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
+#       if dh=varenv["decomp"]
+#         decomp="#{dh}(#{decomp}__nestlevel)"
+#       else
+#         decomp="ppp_not_decomposed"
+#       end
+#       args=[]
+#       args.push("ppp_max_rank")
+#       args.push("ppp_max_vars")
+#       args.push("#{gllbs}")
+#       args.push("#{glubs}")
+#       args.push("#{gstrt}")
+#       args.push("#{gstop}")
+#       args.push("#{perms}")
+#       args.push("#{decomp}")
+#       args.push("#{type}")
+#       args.push(".false.") # but why?
+#       args.push("#{var}")
+#       args.push("ppp__g_#{var}")
+#       args.push("ppp__status")
+#       code="call sms_gather(#{args.join(",")})"
+#       insert_statement_before(code,:call_stmt,oldblock.e.first)
+#     end
+#     # Scatters
+#     scatters.each do |var|
+#     end
+#     # Deallocation of globally-sized variables
+#     globals.sort.each do |var|
+#       code="deallocate(ppp__g_#{var})"
+#       insert_statement_after(code,:deallocate_stmt,newblock.e.last)
+#     end
+#   end
 
   end
 
@@ -1381,7 +1390,7 @@ module Fortran
   class T < Treetop::Runtime::SyntaxNode
 
     def distribute_array_bounds(spec,varenv)
-      if (dh=varenv["decomp"])
+      if (decomp=varenv["decomp"])
         if spec and spec.is_a?(Explicit_Shape_Spec_List)
           cb=spec.concrete_boundslist
           newbounds=[]
@@ -1389,8 +1398,8 @@ module Fortran
             b=cb[i]
             arrdim=i+1
             if (decdim=varenv["dim#{arrdim}"])
-              s="#{dh}__local_lb(#{decdim},dh__nestlevel):"+
-                "#{dh}__local_ub(#{decdim},dh__nestlevel)"
+              s="#{decomp}__local_lb(#{decdim},#{decomp}__nestlevel):"+
+                "#{decomp}__local_ub(#{decdim},#{decomp}__nestlevel)"
             else
               s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
             end
