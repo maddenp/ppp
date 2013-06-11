@@ -195,4 +195,5 @@
   right, or write your own .env file, only ask ppp to operate on appropriate
   variables, etc.)
 
-- Factor array-literal creation for sms_exhcange, sms_serial, etc.
+- Factor array-literal creation for sms_compare_var, esms_exhcange, sms_serial,
+  etc.
