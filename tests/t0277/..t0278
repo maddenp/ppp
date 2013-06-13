@@ -1,0 +1,20 @@
+program t
+  implicit none
+  character*5::output
+  integer::ierr
+  integer::ierra
+  open (95, status='old', file='infile', action='read')
+  read (95, '(a)') output
+  print *,output
+
+  write (95, '(a)',iostat=ierr) 'evil words'
+  if (ierr .ne. 0) then
+    print *, 'world'
+  endif
+
+  endfile (95, iostat=ierra)
+  if (ierra .ne. 0) then
+    print *,'again'
+  endif
+  
+endprogram t
