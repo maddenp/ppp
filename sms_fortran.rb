@@ -309,7 +309,7 @@ module Fortran
       var="#{e[0]}"
       varenv=getvarenv(var)
       spec=nil
-      if varenv["rank"]=="_array"
+      if varenv["sort"]=="_array"
         if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
           # entity_decl_array_spec case
           spec=entity_decl_array_spec.e[1].spec
@@ -974,7 +974,7 @@ module Fortran
         # that are in the environment due to access specification.
         next unless (varenv=getvarenv(name,self,false)) and varenv["type"]
         decomp=varenv["decomp"]
-        rank=varenv["rank"]
+        sort=varenv["sort"]
         # Conservatively assume that the default intent will apply to this
         # variable.
         default=true
@@ -997,7 +997,7 @@ module Fortran
           if si.vars_ignore.include?(name)
             fail "'#{name}' cannot be both 'ignore' and 'in' SMS$SERIAL"
           end
-          ((rank=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
+          ((sort=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
           default=false
         end
         if default and not si.vars_ignore.include?(name)
@@ -1007,7 +1007,7 @@ module Fortran
           d=si.default
           gathers.push(name) if decomp and (d=="in" or d=="inout")
           if d=="out" or d=="inout"
-            ((rank=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
+            ((sort=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
           end
         end
       end
@@ -1160,7 +1160,7 @@ module Fortran
       # Broadcasts
       bcasts.each do |var|
         varenv=getvarenv(var)
-        if varenv["rank"]=="_scalar"
+        if varenv["sort"]=="_scalar"
           dims="1"
           sizes="(/1/)"
         else

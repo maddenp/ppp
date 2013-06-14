@@ -139,7 +139,7 @@ module Fortran
       # Record that this var has been marked allocatable, which means that it
       # must be an array with deferred bounds.
       env[:allocatable].push(var)
-      varsetprop(var,"rank","_array")
+      varsetprop(var,"sort","_array")
       # Correct for the case where this array has already been seen and its
       # bounds incorrectly marked as assumed.
       env[var].keys.each { |k| env[var][k]="_deferred" if k=~/[lu]b\d+/ }
@@ -172,7 +172,7 @@ module Fortran
         env[var].merge!(array_props(array_spec,{},@distribute))
       end
     end
-    array_names_and_specs.names.each { |x| varsetprop(x,"rank","_array") }
+    array_names_and_specs.names.each { |x| varsetprop(x,"sort","_array") }
     true
   end
 
@@ -193,7 +193,7 @@ module Fortran
 
   def sp_is_array?(node)
     return false unless node.respond_to?(:name)
-    vargetprop(node.name,"rank")=="_array"
+    vargetprop(node.name,"sort")=="_array"
   end
 
   def sp_main_program
@@ -242,7 +242,7 @@ module Fortran
     target_object_list.objects.each do |x|
       if x.is_a?(Array_Name_And_Spec)
         var=x.name
-        varsetprop(var,"rank","_array")
+        varsetprop(var,"sort","_array")
       end
     end
     true
@@ -253,7 +253,7 @@ module Fortran
     if x=attrchk(attr_spec_option,:dimension?)
       array_spec=x.e[0]
       varprops.each do |v,p|
-        p["rank"]="_array"
+        p["sort"]="_array"
         array_props(array_spec,p,@distribute)
       end
     end
@@ -266,7 +266,7 @@ module Fortran
     end
     varprops.each do |v,p|
       varenv=env[v]||={}
-      ["access","rank"].each { |x| p.delete(x) if varenv.include?(x) }
+      ["access","sort"].each { |x| p.delete(x) if varenv.include?(x) }
       p["type"]=type_spec.type
       p["kind"]=type_spec.kind
       if env[:allocatable] and env[:allocatable].include?(v)
@@ -1250,7 +1250,7 @@ module Fortran
       if e[1].is_a?(Entity_Decl_Array_Spec)
         array_props(e[1].e[1].e[0],_props,distribute)
       end
-      _props["rank"]=((array?)?("_array"):("_scalar"))
+      _props["sort"]=((array?)?("_array"):("_scalar"))
       {name=>_props}
     end
 
