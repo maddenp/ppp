@@ -6,11 +6,9 @@
 
 - Need tests of F90:R1206 generic_spec (2nd two forms).
 
-- Need tests of all R905 possibilities.
+- Need test for R912 format specifier
 
-- Need tests of all F90:R912 possibilities.
-
-- Need tests of all F90:R924 possibilities.
+- Need descriptions on tests after t0290
 
 - Change all 'print *' to print/write with format list in tests. Otherwise,
   output may vary with processor (gfortran, ifort, etc.). Expanded idea: Use
