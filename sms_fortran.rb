@@ -328,6 +328,14 @@ module Fortran
 
   end
 
+# HACK start
+  class Execution_Part
+    def translate
+      declare("logical","iam_root")
+    end
+  end
+# HACK end
+  
   class Name < T
 
     def translate
@@ -940,7 +948,14 @@ module Fortran
 
     def translate
       use("module_decomp")
-      declare("logical","iam_root")
+# HACK start
+# Uncomment this when legacy ppp is gone, and remove Executable_Part#translate.
+# For now, we need to declare iam_root everywhere in case legacy ppp needs it,
+# though in the working FIMsrc/fim/horizontal/Makefile, we're deleting any
+# definition legacy ppp makes, to avoid duplicate declarations (legacy ppp does
+# not check for an existing declaration).
+#     declare("logical","iam_root")
+# HACK end
       # Initially, we don't know which variables will need to be gathered,
       # scattered, or broadcast.
       bcasts=[]
@@ -1000,12 +1015,22 @@ module Fortran
       # already been removed, so the only element remaining is the block.
       oldblock=e[0]
       code=[]
+# HACK start
+      code.push("!sms$ignore begin")
+# HACK end
       code.push("if (iam_root()) then")
       code.push("#{oldblock}")
       code.push("endif")
+# HACK start
+      code.push("!sms$ignore end")
+# HACK end
       code=code.join("\n")
-      t=replace_statement(code,:block,oldblock)
-      oldblock=t.e[0].e[1].e[1]
+#     t=replace_statement(code,:block,oldblock)
+#     oldblock=t.e[0].e[1].e[1]
+# HACK start
+      t=replace_statement(code,:sms_ignore_executable,oldblock)
+      oldblock=t.e[1].e[0].e[1].e[1]
+# HACK end
       newblock=e[0]
       # Insert statements for the necessary gathers, scatters and broadcasts.
       # Declaration of globally-sized variables
@@ -1023,8 +1048,10 @@ module Fortran
         type=smstype(varenv["type"],varenv["kind"])
         gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
         glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
-        gstop="(/"+ranks.map { |r| (r>dims)?(0):("ppp__globalupper") }.join(",")+"/)"
-        gstrt="(/"+ranks.map { |r| (r>dims)?(0):("ppp__globallower") }.join(",")+"/)"
+#       gstop="(/"+ranks.map { |r| (r>dims)?(0):("ppp__globalupper") }.join(",")+"/)"
+#       gstrt="(/"+ranks.map { |r| (r>dims)?(0):("ppp__globallower") }.join(",")+"/)"
+        gstop=glubs
+        gstrt=gllbs
         perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
         if dh=varenv["decomp"]
           decomp="#{dh}(#{decomp}__nestlevel)"
@@ -1045,8 +1072,12 @@ module Fortran
         args.push("#{var}")
         args.push("ppp__g_#{var}")
         args.push("ppp__status")
-        code="call sms_gather(#{args.join(",")})"
-        insert_statement_before(code,:call_stmt,newblock.e.first)
+#       code="call sms_gather(#{args.join(",")})"
+#       insert_statement_before(code,:call_stmt,newblock.e.first)
+# HACK start
+        code="!sms$ignore begin\ncall sms_gather(#{args.join(",")})\n!sms$ignore end"
+        insert_statement_before(code,:sms_ignore_executable,newblock.e.first)
+# HACK end
       end
       # Allocation of globally-sized variables. On non-root tasks, allocate all
       # dimensions at unit size. On the root task, allocate the non-decomposed
@@ -1063,13 +1094,22 @@ module Fortran
         bounds_root=bounds_root.join(",")
         bounds_nonroot=("1"*dims).split("").join(",")
         code=[]
+# HACK start
+        code.push("!sms$ignore begin")
+# HACK end
         code.push("if (iam_root()) then")
-        code.push("allocate(ppp_g_#{var}(#{bounds_root}),stat=ppp__status)")
+        code.push("allocate(ppp__g_#{var}(#{bounds_root}),stat=ppp__status)")
         code.push("else")
-        code.push("allocate(ppp_g_#{var}(#{bounds_nonroot}),stat=ppp__status)")
+        code.push("allocate(ppp__g_#{var}(#{bounds_nonroot}),stat=ppp__status)")
         code.push("endif")
+# HACK start
+      code.push("!sms$ignore end")
+# HACK end
         code=code.join("\n")
-        insert_statement_before(code,:if_construct,newblock.e.first)
+#       insert_statement_before(code,:if_construct,newblock.e.first)
+# HACK start
+        insert_statement_before(code,:sms_ignore_executable,newblock.e.first)
+# HACK end
       end
       # Scatters
       scatters.each do |var|
@@ -1081,8 +1121,10 @@ module Fortran
         type=smstype(varenv["type"],varenv["kind"])
         gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
         glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
-        gstop="(/"+ranks.map { |r| (r>dims)?(0):("ppp__globalupper") }.join(",")+"/)"
-        gstrt="(/"+ranks.map { |r| (r>dims)?(0):("ppp__globallower") }.join(",")+"/)"
+#       gstop="(/"+ranks.map { |r| (r>dims)?(0):("ppp__globalupper") }.join(",")+"/)"
+#       gstrt="(/"+ranks.map { |r| (r>dims)?(0):("ppp__globallower") }.join(",")+"/)"
+        gstop=glubs
+        gstrt=gllbs
         halol="(/"+ranks.map { |r| (r>dims)?(0):("#{decomp}__halosize(1,#{decomp}__nestlevel)") }.join(",")+"/)"
         halou="(/"+ranks.map { |r| (r>dims)?(0):("#{decomp}__halosize(1,#{decomp}__nestlevel)") }.join(",")+"/)"
         perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
@@ -1108,8 +1150,12 @@ module Fortran
         args.push("ppp__g_#{var}")
         args.push("#{var}")
         args.push("ppp__status")
-        code="call sms_scatter(#{args.join(",")})"
-        insert_statement_after(code,:call_stmt,newblock.e.last)
+#       code="call sms_scatter(#{args.join(",")})"
+#       insert_statement_after(code,:call_stmt,newblock.e.last)
+# HACK start
+        code="!sms$ignore begin\ncall sms_scatter(#{args.join(",")})\n!sms$ignore end"
+        insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
+# HACK end
       end
       # Broadcasts
       bcasts.each do |var|
@@ -1119,15 +1165,23 @@ module Fortran
           sizes="(/1/)"
         else
           dims=varenv["dims"]
-          sizes="(/#{(1..dims).reduce([]) { |m,x| m.push("size(a,#{x})") }.join(",")}/)"
+          sizes="(/#{(1..dims).reduce([]) { |m,x| m.push("size(#{var},#{x})") }.join(",")}/)"
         end
-        code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
-        insert_statement_after(code,:call_stmt,newblock.e.last)
+#       code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
+#       insert_statement_after(code,:call_stmt,newblock.e.last)
+# HACK start
+        code="!sms$ignore begin\ncall ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)\n!sms$ignore end"
+        insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
+# HACK end
       end
       # Deallocation of globally-sized variables
       globals.sort.each do |var|
-        code="deallocate(ppp__g_#{var})"
-        insert_statement_after(code,:deallocate_stmt,newblock.e.last)
+#       code="deallocate(ppp__g_#{var})"
+#       insert_statement_after(code,:deallocate_stmt,newblock.e.last)
+# HACK start
+        code="!sms$ignore begin\ndeallocate(ppp__g_#{var})\n!sms$ignore end"
+        insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
+# HACK end
       end
     end
 
