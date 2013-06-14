@@ -197,3 +197,12 @@
 
 - Factor array-literal creation for sms_compare_var, esms_exhcange, sms_serial,
   etc.
+
+- What does declare() do when specification_part is nil? Which is possible,
+  right?
+
+- Add no-translate option to ppp so that .env files are generated w/o changing
+  the source at all.
+
+- Need SMS library function that takes type and kind arguemnts and returns the
+  correct nnt_ type to use in library calls.
