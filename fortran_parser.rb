@@ -21068,7 +21068,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Namelist_Group_Set,input, i0...index, s0)
       r0.extend(NamelistGroupSet0)
     else
       @index = i0
@@ -21142,7 +21142,7 @@ module Fortran
         break
       end
     end
-    r0 = instantiate_node(E,input, i0...index, s0)
+    r0 = instantiate_node(Namelist_Group_Sets,input, i0...index, s0)
 
     node_cache[:namelist_group_sets][start_index] = r0
 

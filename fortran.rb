@@ -1602,15 +1602,55 @@ module Fortran
   end
 
   class Namelist_Group_Object_List < T
-    def to_s() list_to_s end
+
+    def objects
+      e[1].e.reduce(["#{e[0]}"]) { |m,x| m.push("#{x.e[1]}") }
+    end
+
+    def to_s
+      list_to_s
+    end
+
+  end
+
+  class Namelist_Group_Set < T
+
+    def set
+      OpenStruct.new({:name=>"#{e[1]}",:objects=>e[3].objects})
+    end
+
+  end
+
+  class Namelist_Group_Sets < E
+
+    def sets
+      e[0].e.reduce([]) { |m,x| m.push(x.set) }
+    end
+
   end
 
   class Namelist_Group_Set_Pair < T
-    def to_s() "#{ir(e[0],""," ")}#{e[1]}" end
+
+    def set
+      e[1].set
+    end
+
+    def to_s
+      "#{ir(e[0],""," ")}#{e[1]}"
+    end
+
   end
 
   class Namelist_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
+
+    def sets
+      e[2].set+e[3].sets
+    end
+
+    def to_s
+      stmt("#{e[1]} #{e[2]}#{e[3]}")
+    end
+
   end
 
   class Nonlabel_Do_Stmt < T

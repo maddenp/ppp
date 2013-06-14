@@ -2127,7 +2127,7 @@ grammar Fortran
   end
 
   rule namelist_group_set
-    t_slash namelist_group_name t_slash namelist_group_object_list <T>
+    t_slash namelist_group_name t_slash namelist_group_object_list <Namelist_Group_Set>
   end
 
   rule namelist_group_set_pair
@@ -2135,7 +2135,7 @@ grammar Fortran
   end
 
   rule namelist_group_sets
-    namelist_group_set_pair* <E>
+    namelist_group_set_pair* <Namelist_Group_Sets>
   end
 
   rule namelist_stmt
