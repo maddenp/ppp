@@ -146,7 +146,7 @@ module Fortran
         code+="=#{init}" if init
         t=raw(code,:type_declaration_stmt,root.srcfile)
         t.parent=dc
-        dc.e[0].e.insert(0,t) # prefer "dc.e.push(t)" -- see TODO
+        dc.e.insert(0,t) # prefer "dc.e.push(t)" -- see TODO
         dc.env[name]||={}
         dc.env[name]["pppvar"]=true
       end

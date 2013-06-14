@@ -215,6 +215,10 @@ module Fortran
     true
   end
 
+  def sp_namelist_stmt(namelist_stmt)
+    true
+  end
+
   def sp_module_stmt
     envpush
     true
@@ -1036,6 +1040,10 @@ module Fortran
 
   end
 
+  class Data_Stmt < T
+    def to_s() stmt("#{e[1]} #{e[2]}") end
+  end
+
   class Data_Stmt_Object_List < T
     def to_s() list_to_s end
   end
@@ -1048,7 +1056,11 @@ module Fortran
   end
 
   class Declaration_Constructs < T
-    def to_s() e[0].e.reduce("") { |m,x| m+"#{x}" } end
+
+    def to_s()
+      e.reduce("") { |m,x| m+"#{x}" }
+    end
+
   end
 
   class Deferred_Shape_Spec < T
@@ -1619,6 +1631,7 @@ module Fortran
       OpenStruct.new({:name=>"#{e[1]}",:objects=>e[3].objects})
     end
 
+    def to_s() "#{e[0]}#{e[1]}#{e[2]} #{e[3]}" end
   end
 
   class Namelist_Group_Sets < E
