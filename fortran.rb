@@ -216,6 +216,14 @@ module Fortran
   end
 
   def sp_namelist_stmt(namelist_stmt)
+    namelist_stmt.sets.each do |x|
+      name=x[0]
+      objects=x[1]
+      env[name]||={}
+      env[name]["sort"]="_namelist"
+      env[name]["objects"]=objects
+      env[name]["access"]||=@access
+    end
     true
   end
 
@@ -1628,16 +1636,19 @@ module Fortran
   class Namelist_Group_Set < T
 
     def set
-      OpenStruct.new({:name=>"#{e[1]}",:objects=>e[3].objects})
+      ["#{e[1]}",e[3].objects]
     end
 
-    def to_s() "#{e[0]}#{e[1]}#{e[2]} #{e[3]}" end
+    def to_s
+      "#{e[0]}#{e[1]}#{e[2]} #{e[3]}"
+    end
+
   end
 
   class Namelist_Group_Sets < E
 
     def sets
-      e[0].e.reduce([]) { |m,x| m.push(x.set) }
+      e.reduce([]) { |m,x| m.push(x.set) }
     end
 
   end
@@ -1657,7 +1668,7 @@ module Fortran
   class Namelist_Stmt < T
 
     def sets
-      e[2].set+e[3].sets
+      e[3].sets.push(e[2].set)
     end
 
     def to_s
