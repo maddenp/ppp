@@ -1,5 +1,6 @@
 program t1
   implicit none
+!inquire stmt 'number' specifier
   integer::a
 
   inquire (file='infile', number=a)

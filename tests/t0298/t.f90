@@ -1,12 +1,13 @@
 program t1
   implicit none
+! io-control-spec format specifier
   integer::a
   real::b
   character*4::c
   logical::d
   open (90, file='tmpfile', status='new')
   write (90, '(i5)') 1043
-  write (90, '(f4.2)') 3.141592654
+  write (90, '(f9.6)') 3.141592654
   write (90, '(a7)') 'hello'
   write (90, '(l)') .true.
   rewind (90)

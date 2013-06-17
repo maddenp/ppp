@@ -1,5 +1,7 @@
 program t1
   implicit none
+! inquire stmt all 'action' specifiers (write)
+! note: results differ by compiler
   character*9::a
   character*3::b,c,d
   open (56, status='new', file='tmpfile', action='write')

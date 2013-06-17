@@ -1,5 +1,6 @@
 program t1
   implicit none
+!inquire stmt 'named' specifier
   logical::I1=.true.
 character*7::a
   inquire (95, named=I1)

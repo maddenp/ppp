@@ -1,5 +1,8 @@
 program t1
   implicit none
+! inquire stmt all 'access' and 'form' specifiers (direct unformatted)
+! and character-variables in open specifiers
+!and 'recl' specifier in inquire stmt
   character*11::a,b,c,x,y,z
   integer::r
   character*6::end='direct'

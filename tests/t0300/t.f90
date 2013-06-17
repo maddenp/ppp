@@ -1,5 +1,7 @@
 program t1
   implicit none
+! inquire stmt 'opened' specifier
+!and character variable in open specifier
   logical::I1=.true.
   character*6::name='infile'
   inquire (file='infile', opened=I1)

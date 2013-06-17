@@ -1,5 +1,6 @@
 program t1
   implicit none
+! inquire stmt 'exist' specifier
   logical::a=.true.
   inquire (file='tmpfile', exist=a)
   print *,a

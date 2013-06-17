@@ -1,5 +1,6 @@
 program t1
   implicit none
+! io-control-spec namelist specifier
   integer::i
   namelist /a/ w,x,y,z
   integer::w=1000
