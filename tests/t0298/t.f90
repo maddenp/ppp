@@ -19,5 +19,6 @@ program t1
   print *,c
   read (90, '(l)') d
   print *,d
+  close (90,status='delete')
 endprogram t1
 

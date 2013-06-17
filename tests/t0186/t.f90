@@ -17,5 +17,5 @@ program t
   else
     print '(a)','ok'
   endif
-  close(77,iostat=ierr)
+  close(77,status='delete',iostat=ierr)
 end program t

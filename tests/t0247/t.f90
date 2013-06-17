@@ -6,5 +6,5 @@ program t
   rewind(77)
   read(77) i
   print '(i0)',i
-  close(77)
+  close (77,status='delete')
 end program t
