@@ -1,4 +1,4 @@
-PROGRAM T
+program t
   TYPE PERSON
     INTEGER AGE
     CHARACTER (LEN = 50) NAME
@@ -6,4 +6,4 @@ PROGRAM T
   TYPE(PERSON)::P
   DATA P/PERSON(21, 'JOHN SMITH')/
   print '(a,a,i0,a)',p%name(1:10),' is ',p%age,' years old'
-END PROGRAM T
+end program t

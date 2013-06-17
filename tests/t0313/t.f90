@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! inquire stmt all 'action' specifiers (read)
 ! note: results differ by complier interpretation 
@@ -11,4 +11,4 @@ program t1
   print *,b
   print *,c
   print *,d
- endprogram t1
+ endprogram t

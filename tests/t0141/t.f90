@@ -1,4 +1,4 @@
-PROGRAM T
+program t
 
   TYPE PERSON
     INTEGER AGE
@@ -8,4 +8,4 @@ PROGRAM T
     TYPE(PERSON) P
   END TYPE OTHER
 
-END PROGRAM T
+end program t

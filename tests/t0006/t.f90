@@ -1,3 +1,3 @@
-program T0006
+program t
   print *
-end program T0006
+end program t

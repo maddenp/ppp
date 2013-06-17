@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! inquire stmt 'opened' specifier
 !and character variable in open specifier
@@ -10,5 +10,5 @@ program t1
   open (95, file=name)
   inquire (95, opened =I1)
   print *,I1
- endprogram t1
+ endprogram t
 

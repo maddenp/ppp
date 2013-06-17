@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 !open stmt scratch status, check for existence then nonexistence 
   logical::I1=.false.
@@ -20,5 +20,5 @@ character::out
   open (345, status='old')
   close (345, status='delete')
   
-endprogram t1
+endprogram t
 

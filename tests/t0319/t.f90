@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! inquire stmt 'pad' specifier (yes)
   character*3::a
@@ -6,4 +6,4 @@ program t1
   inquire (56, pad=a)
   print *,a
   close (56,status='delete')
-   endprogram t1
+   endprogram t

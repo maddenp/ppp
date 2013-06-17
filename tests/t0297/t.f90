@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! io-control-spec namelist specifier
   integer::i
@@ -7,9 +7,9 @@ program t1
   real::x=3.141592654
   integer::y(3)
   character*10::z='blast off!'
-  namelist /b/ s,t
-  integer::s=3
-  character*4::t='test'
+  namelist /b/ u,v
+  integer::u=3
+  character*4::v='test'
   y= (/1,2,3/)
   open (95, file='tmpfile', status='new')
   write (95, nml=a)
@@ -25,5 +25,5 @@ program t1
   enddo
   print *,z
   close (95,status='delete')
-endprogram t1
+endprogram t
 

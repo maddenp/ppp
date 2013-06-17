@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! inquire stmt all 'action' specifiers (write)
 ! note: results differ by compiler
@@ -11,4 +11,4 @@ program t1
   print *,c
   print *,d
   close (56,status='delete')
- endprogram t1
+ endprogram t

@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! open stmt (no error) iostat&ierr
   character*16::out
@@ -13,5 +13,5 @@ program t1
     print *,'and yes'
   endif
   
-endprogram t1
+endprogram t
  

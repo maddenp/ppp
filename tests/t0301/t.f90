@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 !inquire stmt 'number' specifier
   integer::a
@@ -9,5 +9,5 @@ program t1
   open (95, file='infile')
   inquire (95, number=a)
   print *,a
- endprogram t1
+ endprogram t
 

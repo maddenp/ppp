@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! open stmt read/write from scratch w/rewind
   character*18::answer
@@ -17,5 +17,5 @@ program t1
     print *,a
   enddo 
   
-endprogram t1
+endprogram t
  

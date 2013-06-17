@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! open stmt replace status
   character*22::a,b
@@ -19,5 +19,5 @@ program t1
   print *,b
 
   close(85,status='delete')
-endprogram t1
+endprogram t
  

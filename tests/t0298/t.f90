@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! io-control-spec format specifier
   integer::a
@@ -20,5 +20,5 @@ program t1
   read (90, '(l)') d
   print *,d
   close (90,status='delete')
-endprogram t1
+endprogram t
 

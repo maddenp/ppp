@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! inquire stmt 'blank specifier' (null)
 ! and character variable in open stmt
@@ -7,5 +7,5 @@ program t1
   inquire (56, blank=a)
   print *,a
   close (56,status='delete')
- endprogram t1
+ endprogram t
 

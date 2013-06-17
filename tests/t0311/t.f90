@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! inquire stmt 'position' specifier (append)
   character*6::a
@@ -6,5 +6,5 @@ program t1
   inquire (56, position=a)
   print *,a
   close (56,status='delete')
- endprogram t1
+ endprogram t
 

@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! io-control-spec read stmt end label
   character*4::out
@@ -10,5 +10,5 @@ program t1
   print *,'i wish this'
   
 100 print *,'test was successful'
-endprogram t1
+endprogram t
 

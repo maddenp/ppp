@@ -1,4 +1,4 @@
-PROGRAM t
+program t
   ! comment 1
   print '(a)', & ! comment 2
 'hello world 1'
@@ -19,4 +19,4 @@ worLd 6"
   continue ;;; print '(a)','world 9'
   print '(a)','hello' ; &
     print '(a)','world 0'
-end prOGRam t
+end program t

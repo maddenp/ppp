@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
   character*16::answer
 ! open stmt new status
@@ -9,4 +9,4 @@ program t1
   read (95, '(a)') answer
   print *,answer
   close (95,status='delete')
-endprogram t1
+end program t

@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 !open stmt error (file nonexistence) iostat & err label 
   integer::ierr
@@ -14,5 +14,5 @@ program t1
   endif
   
   
-endprogram t1
+endprogram t
  

@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! inquire stmt all 'access' and 'form' specifiers (sequential unformatted)
 ! and character-variables in open specifiers
@@ -16,5 +16,5 @@ program t1
 
   close (56,status='delete')
   
- endprogram t1
+ endprogram t
 

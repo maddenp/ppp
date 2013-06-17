@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 ! inquire stmt 'exist' specifier
   logical::a=.true.
@@ -8,4 +8,4 @@ program t1
   inquire (file='tmpfile', exist=a)
   print *,a
   close (95,status='delete')
-   endprogram t1
+   endprogram t

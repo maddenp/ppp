@@ -1,4 +1,4 @@
-program t1
+program t
   implicit none
 !open stmt append position 
   character*8::output
@@ -6,4 +6,4 @@ program t1
 backspace 95
   read (95, '(a)') output
   print *,output
-endprogram t1
+endprogram t

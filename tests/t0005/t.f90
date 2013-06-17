@@ -1,2 +1,2 @@
-program T0005
-end program T0005
+program t
+end program t

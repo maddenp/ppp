@@ -4,7 +4,7 @@ module m
   namelist /n/ a,b,c
 end module m
 
-program p
+program t
   use m,only:n,a,b,c
   implicit none
   open (88,file='infile',status='old',err=100)
@@ -15,4 +15,4 @@ program p
   close (88)
   stop
 100 print *,'error'
-end program p
+end program t
