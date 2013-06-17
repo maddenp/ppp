@@ -25,5 +25,8 @@ program t1
     print*,c
     print*,d
   endif
+
+  close (99,status='delete')
+
 endprogram t1
 

@@ -1,3 +1,2 @@
-DISABLE_CONTROL=1
-DISABLE_EXE=1
+STATIC_OUT_OLD=1
 include ../common

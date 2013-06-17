@@ -9,4 +9,5 @@ program t
 
   read (88, '(a6)', rec=2) output
   print*,output
+  close (88,status='delete')
 endprogram t

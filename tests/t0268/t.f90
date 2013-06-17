@@ -8,4 +8,5 @@ program t1
   open (95, file='tmpfile', status='old')
   read (95, '(a)') answer
   print *,answer
+  close (95,status='delete')
 endprogram t1

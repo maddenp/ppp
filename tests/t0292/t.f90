@@ -9,4 +9,5 @@ program t
   if (ierr .ne. 0) then
     print *,'test successful'
   endif
+  close (95,status='delete')
 endprogram t

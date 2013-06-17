@@ -10,4 +10,5 @@ program t
   print *,output
   inquire (95, action=a)
   print *,a
+  close (95,status='delete')
 endprogram t

@@ -139,7 +139,7 @@ module Fortran
       # Record that this var has been marked allocatable, which means that it
       # must be an array with deferred bounds.
       env[:allocatable].push(var)
-      varsetprop(var,"rank","_array")
+      varsetprop(var,"sort","_array")
       # Correct for the case where this array has already been seen and its
       # bounds incorrectly marked as assumed.
       env[var].keys.each { |k| env[var][k]="_deferred" if k=~/[lu]b\d+/ }
@@ -172,7 +172,7 @@ module Fortran
         env[var].merge!(array_props(array_spec,{},@distribute))
       end
     end
-    array_names_and_specs.names.each { |x| varsetprop(x,"rank","_array") }
+    array_names_and_specs.names.each { |x| varsetprop(x,"sort","_array") }
     true
   end
 
@@ -193,7 +193,7 @@ module Fortran
 
   def sp_is_array?(node)
     return false unless node.respond_to?(:name)
-    vargetprop(node.name,"rank")=="_array"
+    vargetprop(node.name,"sort")=="_array"
   end
 
   def sp_main_program
@@ -212,6 +212,18 @@ module Fortran
     end
     envpop
     @access="_default"
+    true
+  end
+
+  def sp_namelist_stmt(namelist_stmt)
+    namelist_stmt.sets.each do |x|
+      name=x[0]
+      objects=x[1]
+      env[name]||={}
+      env[name]["sort"]="_namelist"
+      env[name]["objects"]=objects
+      env[name]["access"]||=@access
+    end
     true
   end
 
@@ -242,7 +254,7 @@ module Fortran
     target_object_list.objects.each do |x|
       if x.is_a?(Array_Name_And_Spec)
         var=x.name
-        varsetprop(var,"rank","_array")
+        varsetprop(var,"sort","_array")
       end
     end
     true
@@ -253,7 +265,7 @@ module Fortran
     if x=attrchk(attr_spec_option,:dimension?)
       array_spec=x.e[0]
       varprops.each do |v,p|
-        p["rank"]="_array"
+        p["sort"]="_array"
         array_props(array_spec,p,@distribute)
       end
     end
@@ -266,7 +278,7 @@ module Fortran
     end
     varprops.each do |v,p|
       varenv=env[v]||={}
-      ["access","rank"].each { |x| p.delete(x) if varenv.include?(x) }
+      ["access","sort"].each { |x| p.delete(x) if varenv.include?(x) }
       p["type"]=type_spec.type
       p["kind"]=type_spec.kind
       if env[:allocatable] and env[:allocatable].include?(v)
@@ -1036,6 +1048,10 @@ module Fortran
 
   end
 
+  class Data_Stmt < T
+    def to_s() stmt("#{e[1]} #{e[2]}") end
+  end
+
   class Data_Stmt_Object_List < T
     def to_s() list_to_s end
   end
@@ -1048,7 +1064,11 @@ module Fortran
   end
 
   class Declaration_Constructs < T
-    def to_s() e[0].e.reduce("") { |m,x| m+"#{x}" } end
+
+    def to_s()
+      e.reduce("") { |m,x| m+"#{x}" }
+    end
+
   end
 
   class Deferred_Shape_Spec < T
@@ -1250,7 +1270,7 @@ module Fortran
       if e[1].is_a?(Entity_Decl_Array_Spec)
         array_props(e[1].e[1].e[0],_props,distribute)
       end
-      _props["rank"]=((array?)?("_array"):("_scalar"))
+      _props["sort"]=((array?)?("_array"):("_scalar"))
       {name=>_props}
     end
 
@@ -1602,15 +1622,59 @@ module Fortran
   end
 
   class Namelist_Group_Object_List < T
-    def to_s() list_to_s end
+
+    def objects
+      e[1].e.reduce(["#{e[0]}"]) { |m,x| m.push("#{x.e[1]}") }
+    end
+
+    def to_s
+      list_to_s
+    end
+
+  end
+
+  class Namelist_Group_Set < T
+
+    def set
+      ["#{e[1]}",e[3].objects]
+    end
+
+    def to_s
+      "#{e[0]}#{e[1]}#{e[2]} #{e[3]}"
+    end
+
+  end
+
+  class Namelist_Group_Sets < E
+
+    def sets
+      e.reduce([]) { |m,x| m.push(x.set) }
+    end
+
   end
 
   class Namelist_Group_Set_Pair < T
-    def to_s() "#{ir(e[0],""," ")}#{e[1]}" end
+
+    def set
+      e[1].set
+    end
+
+    def to_s
+      "#{ir(e[0],""," ")}#{e[1]}"
+    end
+
   end
 
   class Namelist_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
+
+    def sets
+      e[3].sets.push(e[2].set)
+    end
+
+    def to_s
+      stmt("#{e[1]} #{e[2]}#{e[3]}")
+    end
+
   end
 
   class Nonlabel_Do_Stmt < T

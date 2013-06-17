@@ -1,15 +1,13 @@
+- (MH) Add output to no-output tests to make sure code is not deleted in translation
+  (e.g. reveiw t0160 changes)
+
+- (MH) Need tests of F90:R1206 generic_spec (2nd two forms).
+
 - directives still to do
 
   !sms$serial begin/end
   directiveless io translations (print, write, stop, namelist stuff, ???)
   !sms$ignore begin/end
-
-- Need tests of F90:R1206 generic_spec (2nd two forms).
-
-- Change all 'print *' to print/write with format list in tests. Otherwise,
-  output may vary with processor (gfortran, ifort, etc.). Expanded idea: Use
-  'control' mechanism only for certain tests (e.g. those exercising sms$insert)
-  and compare output to untranslated test code to translated test code.
 
 - Remove various HACKS and deal with any fallout.
 
@@ -66,9 +64,6 @@
 - translate() on SMS_Unstructured_Grid cannot possibly be correct in the general
   case, right?
 
-- Add output to no-output tests to make sure code is not deleted in translation
-  (e.g. reveiw t0160 changes)
-
 - Sort envfile output for easy xxdiff comparison.
 
 - Does the envfile from a module that uses another module contain the info from
@@ -109,12 +104,10 @@
 - In translator.rb, think about 'opts' and what is actually optional. Move
   requirements into the mandatory argslist.
 
-- Does pppts in server mode adequately indicate the failed test?
-
 - To make all of this more useful, build an AST from the parse tree. Then, do
   translations on and produce final output from the AST.
 
-- Reformulate distribute being/end as distribute region.
+- Reformulate distribute begin/end as distribute region.
 
 - In SMS_Create_Decomp#translate, merge multiple 1..3 loops. They are as they
   are now to aid in textual comparison to legacy ppp.
@@ -142,7 +135,8 @@
   possible, or delay until a string is absolutely required? Probably the latter.
 
 - Can cat() et al be moved into SyntaxNode extension in fortran.rb and used in
-  various to_s() functions to simplify syntax?
+  various to_s() functions to simplify syntax? In general, try to move methods
+  into the nearest ancestor class possible.
 
 - Try to find out which directives actually require module_decomp and/or
   nnt_types_module and limit rolled-out 'declare' calls.
@@ -151,7 +145,7 @@
   gather, scatter or broadcast, so that users can tune the directive.
 
 - sms$serial should complain about in/out/inout intent of variables that never
-  occur in the region.
+  occur in the region. Or should we force bcast/gather/scatter of these?
 
 - sms$serial should complain about mismatches, e.g. explicitly specifying a
   variable as both 'in' and 'ignore'.
@@ -180,9 +174,9 @@
   may fail to properly build, since a lately-timestamped output file will
   exist. (Already done for PARSE FAILED.)
 
-- Need some kind of fixed-point treatment of assemble / include / sms$insert.
+- Need some kind of fixed-point treatment of assemble / include / sms$insert?
 
-- Check all allocates rolled out by ppp.
+- Check status on all allocates rolled out by ppp.
 
 - In getvarenv(), give more verbose information about why a failure has occurred
   and what to do about it (e.g. .env file is not available, so get dependencies
@@ -191,3 +185,9 @@
 
 - Factor array-literal creation for sms_compare_var, esms_exhcange, sms_serial,
   etc.
+
+- Add no-translate option to ppp so that .env files are generated w/o changing
+  the source at all.
+
+- Need SMS library function that takes type and kind arguemnts and returns the
+  correct nnt_ type to use in library calls.

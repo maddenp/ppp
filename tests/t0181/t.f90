@@ -16,6 +16,6 @@ program t
   read(77,fmt='(a)',iostat=ierr) s
   print 100,ierr
   print '(a)',s
-  close(77,iostat=ierr)
+  close(77,status='delete',iostat=ierr)
   print 100,ierr
 end program t

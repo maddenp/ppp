@@ -9,5 +9,5 @@ program t
   backspace (95)
   read (95, '(a)') output
   print *,output
-  
+  close (95,status='delete')
 endprogram t

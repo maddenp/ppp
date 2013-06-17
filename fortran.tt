@@ -785,7 +785,7 @@ grammar Fortran
   rule data_stmt
     # F90:R529
 
-    label:label? t_data data_stmt_set_list t_newline <StmtJ>
+    label:label? t_data data_stmt_set_list t_newline <Data_Stmt>
   end
 
   rule data_stmt_constant
@@ -868,7 +868,7 @@ grammar Fortran
   end
 
   rule declaration_constructs
-    declaration_construct* "" <Declaration_Constructs>
+    declaration_construct* <Declaration_Constructs>
   end
 
   rule default_char_variable
@@ -2127,7 +2127,7 @@ grammar Fortran
   end
 
   rule namelist_group_set
-    t_slash namelist_group_name t_slash namelist_group_object_list <T>
+    t_slash namelist_group_name t_slash namelist_group_object_list <Namelist_Group_Set>
   end
 
   rule namelist_group_set_pair
@@ -2135,7 +2135,7 @@ grammar Fortran
   end
 
   rule namelist_group_sets
-    namelist_group_set_pair* <E>
+    namelist_group_set_pair* <Namelist_Group_Sets>
   end
 
   rule namelist_stmt
@@ -2822,7 +2822,7 @@ grammar Fortran
     external_stmt /
     intent_stmt /
     intrinsic_stmt /
-    namelist_stmt /
+    namelist_stmt &{ |e| sp_namelist_stmt(e[0]) } <E> /
     optional_stmt /
     pointer_stmt /
     save_stmt /

@@ -11,5 +11,7 @@ program t
   if (ierr .ne. 0) then
     print *,'backwards alphabet'
   endif
-  
+
+  close (95,status='delete')
+
 endprogram t

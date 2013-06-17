@@ -6,5 +6,6 @@ program t1
   write (56, rec=4) 'record d'
   inquire (56, nextrec=a)
   print *,a
+  close (56,status='delete')
  endprogram t1
 

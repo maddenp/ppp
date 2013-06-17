@@ -8,5 +8,5 @@ program t
   open (95, status='old', file='tmpfile', position='rewind')
   read (95, '(a)') output
   print *,output
-  
+  close (95,status='delete')
 endprogram t

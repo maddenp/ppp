@@ -1,4 +1,4 @@
-TARGETS=clean control
+TARGETS=clean
 TESTS=$(wildcard t*)
 
 default:
@@ -6,6 +6,3 @@ default:
 
 clean:
 	@$(foreach x,$(TESTS),$(MAKE) --quiet -C $(x) clean;)
-
-control:
-	@$(foreach x,$(TESTS),echo "Updating 'control' for test $(x)" && $(MAKE) --quiet -C $(x) control;)

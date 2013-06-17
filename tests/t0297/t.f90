@@ -24,5 +24,6 @@ program t1
     print *,y(4-i)
   enddo
   print *,z
+  close (95,status='delete')
 endprogram t1
 

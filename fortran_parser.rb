@@ -8108,7 +8108,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtJ,input, i0...index, s0)
+      r0 = instantiate_node(Data_Stmt,input, i0...index, s0)
       r0.extend(DataStmt0)
     else
       @index = i0
@@ -8781,9 +8781,6 @@ module Fortran
     r0
   end
 
-  module DeclarationConstructs0
-  end
-
   def _nt_declaration_constructs
     start_index = index
     if node_cache[:declaration_constructs].has_key?(index)
@@ -8795,35 +8792,16 @@ module Fortran
       return cached
     end
 
-    i0, s0 = index, []
-    s1, i1 = [], index
+    s0, i0 = [], index
     loop do
-      r2 = _nt_declaration_construct
-      if r2
-        s1 << r2
+      r1 = _nt_declaration_construct
+      if r1
+        s0 << r1
       else
         break
       end
     end
-    r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
-    s0 << r1
-    if r1
-      if has_terminal?("", false, index)
-        r3 = instantiate_node(SyntaxNode,input, index...(index + 0))
-        @index += 0
-      else
-        terminal_parse_failure("")
-        r3 = nil
-      end
-      s0 << r3
-    end
-    if s0.last
-      r0 = instantiate_node(Declaration_Constructs,input, i0...index, s0)
-      r0.extend(DeclarationConstructs0)
-    else
-      @index = i0
-      r0 = nil
-    end
+    r0 = instantiate_node(Declaration_Constructs,input, i0...index, s0)
 
     node_cache[:declaration_constructs][start_index] = r0
 
@@ -21068,7 +21046,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Namelist_Group_Set,input, i0...index, s0)
       r0.extend(NamelistGroupSet0)
     else
       @index = i0
@@ -21142,7 +21120,7 @@ module Fortran
         break
       end
     end
-    r0 = instantiate_node(E,input, i0...index, s0)
+    r0 = instantiate_node(Namelist_Group_Sets,input, i0...index, s0)
 
     node_cache[:namelist_group_sets][start_index] = r0
 
@@ -26707,6 +26685,13 @@ module Fortran
     r0
   end
 
+  module SpecificationStmt0
+    def namelist_stmt
+      elements[0]
+    end
+
+  end
+
   def _nt_specification_stmt
     start_index = index
     if node_cache[:specification_stmt].has_key?(index)
@@ -26755,25 +26740,45 @@ module Fortran
                     if r9
                       r0 = r9
                     else
-                      r10 = _nt_namelist_stmt
+                      i10, s10 = index, []
+                      r11 = _nt_namelist_stmt
+                      s10 << r11
+                      if r11
+                        i12 = index
+                        r13 = lambda { |e| sp_namelist_stmt(e[0]) }.call(s10)
+                        if r13
+                          @index = i12
+                          r12 = instantiate_node(SyntaxNode,input, index...index)
+                        else
+                          r12 = nil
+                        end
+                        s10 << r12
+                      end
+                      if s10.last
+                        r10 = instantiate_node(E,input, i10...index, s10)
+                        r10.extend(SpecificationStmt0)
+                      else
+                        @index = i10
+                        r10 = nil
+                      end
                       if r10
                         r0 = r10
                       else
-                        r11 = _nt_optional_stmt
-                        if r11
-                          r0 = r11
+                        r14 = _nt_optional_stmt
+                        if r14
+                          r0 = r14
                         else
-                          r12 = _nt_pointer_stmt
-                          if r12
-                            r0 = r12
+                          r15 = _nt_pointer_stmt
+                          if r15
+                            r0 = r15
                           else
-                            r13 = _nt_save_stmt
-                            if r13
-                              r0 = r13
+                            r16 = _nt_save_stmt
+                            if r16
+                              r0 = r16
                             else
-                              r14 = _nt_target_stmt
-                              if r14
-                                r0 = r14
+                              r17 = _nt_target_stmt
+                              if r17
+                                r0 = r17
                               else
                                 @index = i0
                                 r0 = nil

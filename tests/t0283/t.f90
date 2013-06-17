@@ -17,4 +17,5 @@ enddo
 read (82) output,a
 print *,output,a
 
+close (82,status='delete')
 endprogram t
