@@ -3,43 +3,65 @@
 # not been tested. Set 'FC' appropriately. See http://bit.ly/N6I39Y for more
 # information.
 
-EXE=a.out
+EXE_NEW=exe.new
+EXE_OLD=exe.old
 EXT=$(suffix $(TEST))
 FC=gfortran
 FFLAGS=-w
 INCFLAG=
-OBJ=$(STEM)_ppp.o
+OBJ_NEW=$(STEM)_ppp.o
+OBJ_OLD=$(STEM).o
+OUT_NEW=out.new
+OUT_OLD=out.old
 PPP=../../ppp
 PPPC=../../pppc
 STEM=$(basename $(TEST))
-TARGETS=clean exe obj translation
+TARGETS=clean comp $(EXE_NEW) $(EXE_OLD) translation
 TEST=$(wildcard t.f t.f90)
 TMPFILE=tmpfile
+TOCLEAN=$(OUT_NEW) $(EXE_NEW) $(EXE_OLD) $(OUT_NEW) $(TMPFILE) $(TRANSLATION) a.out *.env *.mod *.o
 TRANSLATION=$(STEM)_ppp$(EXT)
 
 ifdef INCDIRS
 INCFLAG=-I $(INCDIRS)
 endif
 
-.PHONY: clean control
+.PHONY: $(TARGETS)
 
 default:
 	$(error Valid targets are: $(TARGETS))
 
 clean:
-	$(RM) $(EXE) $(TMPFILE) $(TRANSLATION) *.env *.mod *.o
+ifdef STATIC_OUT_OLD
+	$(RM) $(TOCLEAN)
+else
+	$(RM) $(TOCLEAN) $(OUT_OLD)
+endif
 
-exe: $(EXE)
-
-obj: $(OBJ)
+comp: $(OUT_OLD) $(OUT_NEW)
+	diff $(OUT_OLD) $(OUT_NEW)
 
 translation: $(TRANSLATION)
 
-$(EXE): $(OBJ)
-	$(FC) $(FFLAGS) $(OBJ)
+$(EXE_NEW): $(OBJ_NEW)
+	$(FC) $(FFLAGS) $(OBJ_NEW) -o $(EXE_NEW)
 
-$(OBJ): $(TRANSLATION)
-	$(FC) $(FFLAGS) -c $(TRANSLATION)
+$(EXE_OLD): $(OBJ_OLD)
+	$(FC) $(FFLAGS) $(OBJ_OLD) -o $(EXE_OLD)
+
+$(OBJ_NEW): $(TRANSLATION)
+	$(FC) $(FFLAGS) $(INCFLAG) -c $(TRANSLATION)
+
+$(OBJ_OLD): $(TEST)
+	$(FC) $(FFLAGS) $(INCFLAG) -c $(TEST)
+
+$(OUT_NEW): $(EXE_NEW)
+	./$(EXE_NEW) >$(OUT_NEW)
+
+$(OUT_OLD): $(EXE_OLD)
+ifndef STATIC_OUT_OLD
+	./$(EXE_OLD) >$(OUT_OLD)
+endif
 
 $(TRANSLATION): $(TEST)
 ifdef SOCKET

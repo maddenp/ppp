@@ -24,5 +24,5 @@ program t
   print *,a
   print*,b
   
-  
+  close (95,status='delete')
 endprogram t

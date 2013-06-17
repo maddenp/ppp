@@ -8,4 +8,5 @@ program t1
   print *,b
   print *,c
   print *,d
+  close (56,status='delete')
  endprogram t1

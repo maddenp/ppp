@@ -6,5 +6,5 @@ program t
   write (95, err=100) 'hello'
 print *,'no'
  100 print*,'test successful'
-
+close (95,status='delete')
 endprogram t

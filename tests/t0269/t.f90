@@ -17,6 +17,7 @@ program t1
   read (85, '(a)') b
   print *,a
   print *,b
-  
+
+  close(85,status='delete')
 endprogram t1
  

@@ -5,4 +5,5 @@ program t1
   open (56, status='new', file='tmpfile', delim=inquire)
   inquire (56, delim=a)
   print *,a
+  close (56,status='delete')
    endprogram t1

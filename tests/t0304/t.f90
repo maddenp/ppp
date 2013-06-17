@@ -11,5 +11,8 @@ program t1
   print *,x
   print *,y
   print *,z
+
+  close (56,status='delete')
+  
  endprogram t1
 

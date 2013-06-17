@@ -8,4 +8,5 @@ character*8::output
   write (96, rec=3) 'record c'
   read (96, rec=2) output
   print*,output
+  close (96,status='delete')
 endprogram t

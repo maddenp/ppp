@@ -1,3 +1,3 @@
 program t
-!sms$insert print *,3
+!sms$insert write(*,'(i0)') 3
 end program t

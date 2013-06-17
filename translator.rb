@@ -267,7 +267,8 @@ module Translator
         rescue Errno::EPIPE
           # Handle broken pipe (i.e. other end of the socket dies)
         rescue Interrupt=>ex
-          server_stop(socket,0,monitor)
+          server_stop(socket,false)
+          return
         rescue SystemExit=>ex
           monitor.join
         rescue Exception=>ex
@@ -275,7 +276,7 @@ module Translator
           s+="#{ex.message}\n"
           s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }
           fail s
-          server_stop(socket,1,monitor)
+          server_stop(socket,1)
         end
       end
     end
@@ -295,10 +296,9 @@ module Translator
     end
   end
 
-  def server_stop(socket,status,monitor=nil)
+  def server_stop(socket,status)
     FileUtils.rm_f(socket)
-    monitor.kill if monitor
-    exit(status)
+    exit(status) unless status==false
   end
 
   def tree(s,root,srcfile,opts={})
