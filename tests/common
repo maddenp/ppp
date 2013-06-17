@@ -12,7 +12,7 @@ OBJ=$(STEM)_ppp.o
 PPP=../../ppp
 PPPC=../../pppc
 STEM=$(basename $(TEST))
-TARGETS=clean control exe obj translation
+TARGETS=clean exe obj translation
 TEST=$(wildcard t.f t.f90)
 TMPFILE=tmpfile
 TRANSLATION=$(STEM)_ppp$(EXT)
@@ -21,20 +21,13 @@ ifdef INCDIRS
 INCFLAG=-I $(INCDIRS)
 endif
 
-.PHONY: control
+.PHONY: clean control
 
 default:
 	$(error Valid targets are: $(TARGETS))
 
 clean:
 	$(RM) $(EXE) $(TMPFILE) $(TRANSLATION) *.env *.mod *.o
-
-control: $(TEST)
-ifdef DISABLE_CONTROL
-	$(info Generation of 'control' is disabled for this test.)
-else
-	$(FC) $(FFLAGS) $(INCFLAG) $^ && a.out >control 2>&1 && $(RM) a.out
-endif
 
 exe: $(EXE)
 
@@ -43,9 +36,7 @@ obj: $(OBJ)
 translation: $(TRANSLATION)
 
 $(EXE): $(OBJ)
-ifndef DISABLE_EXE
 	$(FC) $(FFLAGS) $(OBJ)
-endif
 
 $(OBJ): $(TRANSLATION)
 	$(FC) $(FFLAGS) -c $(TRANSLATION)
