@@ -1,6 +1,7 @@
 *.env
 *.mod
 *.o
+.nfs*
 /p.f90
 a.out
 pppc
