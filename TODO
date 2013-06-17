@@ -6,10 +6,6 @@
 
 - Need tests of F90:R1206 generic_spec (2nd two forms).
 
-- Need test for R912 format specifier
-
-- Need descriptions on tests after t0290
-
 - Change all 'print *' to print/write with format list in tests. Otherwise,
   output may vary with processor (gfortran, ifort, etc.). Expanded idea: Use
   'control' mechanism only for certain tests (e.g. those exercising sms$insert)
