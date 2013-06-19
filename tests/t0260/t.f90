@@ -1,4 +1,5 @@
 integer::i
+call s  
 end
   
 subroutine s

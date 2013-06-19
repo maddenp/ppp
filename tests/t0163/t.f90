@@ -3,4 +3,5 @@ program t
   save i
 100 save j,k
   save::l,m
+  print *,'ok'
 end program t

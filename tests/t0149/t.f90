@@ -1,7 +1,7 @@
 program t
   implicit none
   type a
-    integer,pointer::pa
+    integer,pointer::pa=>null()
   end type a
   type b
     integer,pointer::pb(:)
@@ -11,8 +11,14 @@ program t
   integer::ierr
   type(a)::x
   type(b)::y
+  print *,associated(x%pa)
   x%pa=>p
+  print *,x%pa.eq.p
+  print *,associated(y%pb)
   allocate(y%pb(1),stat=ierr)
+  print *,associated(y%pb)
   deallocate(y%pb)
+  print *,associated(y%pb)
   nullify(y%pb)
+  print *,associated(y%pb)
 end program t

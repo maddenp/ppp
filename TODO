@@ -1,6 +1,3 @@
-- (MH) Add output to no-output tests to make sure code is not deleted in translation
-  (e.g. reveiw t0160 changes)
-
 - directives still to do
 
   !sms$serial begin/end

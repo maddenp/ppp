@@ -1,6 +1,7 @@
 program t
   character(len=4)::a,b
-  character(len=5)::c(2)
+  character(len=5)::c(2)=(/'hello','world'/)
   equivalence (a,c(1)),(b,c(2))
-  print *,len(c(1)),len(a)
+  print *,a
+  print *,b
 end program t
