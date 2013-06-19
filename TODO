@@ -1,8 +1,6 @@
 - (MH) Add output to no-output tests to make sure code is not deleted in translation
   (e.g. reveiw t0160 changes)
 
-- (MH) Need tests of F90:R1206 generic_spec (2nd two forms).
-
 - directives still to do
 
   !sms$serial begin/end
