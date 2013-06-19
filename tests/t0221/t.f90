@@ -4,9 +4,9 @@ module m
     integer::x
     integer::y
   end type vector
-  interface operator (+)
+  interface operator (.plus.)
      module procedure addw
-  end interface
+  end interface operator (.plus.)
 contains
   function addw(a,b)
     type(vector),intent(in)::a,b
@@ -27,6 +27,6 @@ program t
   g%y=10
   h=7
   i=8
-  print *,f+g
+  print *,f.plus.g
   print *,h+i
 end program t
