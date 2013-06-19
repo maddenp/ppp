@@ -1153,7 +1153,7 @@ grammar Fortran
   rule end_interface_stmt
     # F90:R1203
 
-    label:label? t_end t_interface t_newline <End_Interface_Stmt>
+    label:label? t_end t_interface generic_spec_option? t_newline <End_Interface_Stmt>
   end
 
   rule end_module_option
@@ -1484,9 +1484,21 @@ grammar Fortran
   rule generic_spec
     # F90:R1206
 
-    generic_name /
-    t_operator t_paren_l defined_operator t_paren_r <Generic_Spec> /
+    generic_spec_option /
+    generic_name
+  end
+
+  rule generic_spec_option_1
+    t_operator t_paren_l defined_operator t_paren_r <Generic_Spec>
+  end
+
+  rule generic_spec_option_2
     t_assignment t_paren_l t_equal t_paren_r <Generic_Spec>
+  end
+
+  rule generic_spec_option
+    generic_spec_option_1 /
+    generic_spec_option_2
   end
 
   rule goto_stmt

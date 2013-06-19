@@ -213,7 +213,12 @@ module Translator
       unless raw_tree
         na=n.split("\n")
         na.each_index { |i| $stderr.puts "#{i+1} #{na[i]}" }
-        fail "#{fp.failure_reason.split("\n")[0]}\nPARSE FAILED#{srcmsg}"
+        failmsg=""
+        failmsg+="#{fp.failure_reason.split("\n")[0]}\n"
+        failmsg+="Original source: #{srcfile}\n"
+        failmsg+="PARSE FAILED"
+        failmsg+="#{srcmsg}"
+        fail failmsg
         return # if in server mode and did not exit in fail()
       end
       translated_tree=(opts[:translate])?(raw_tree.translate_top):(nil)

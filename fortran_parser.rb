@@ -11160,7 +11160,7 @@ module Fortran
     end
 
     def t_newline
-      elements[3]
+      elements[4]
     end
   end
 
@@ -11190,8 +11190,17 @@ module Fortran
         r4 = _nt_t_interface
         s0 << r4
         if r4
-          r5 = _nt_t_newline
+          r6 = _nt_generic_spec_option
+          if r6
+            r5 = r6
+          else
+            r5 = instantiate_node(SyntaxNode,input, index...index)
+          end
           s0 << r5
+          if r5
+            r7 = _nt_t_newline
+            s0 << r7
+          end
         end
       end
     end
@@ -14168,7 +14177,37 @@ module Fortran
     r0
   end
 
-  module GenericSpec0
+  def _nt_generic_spec
+    start_index = index
+    if node_cache[:generic_spec].has_key?(index)
+      cached = node_cache[:generic_spec][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    r1 = _nt_generic_spec_option
+    if r1
+      r0 = r1
+    else
+      r2 = _nt_generic_name
+      if r2
+        r0 = r2
+      else
+        @index = i0
+        r0 = nil
+      end
+    end
+
+    node_cache[:generic_spec][start_index] = r0
+
+    r0
+  end
+
+  module GenericSpecOption10
     def t_operator
       elements[0]
     end
@@ -14186,7 +14225,46 @@ module Fortran
     end
   end
 
-  module GenericSpec1
+  def _nt_generic_spec_option_1
+    start_index = index
+    if node_cache[:generic_spec_option_1].has_key?(index)
+      cached = node_cache[:generic_spec_option_1][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_operator
+    s0 << r1
+    if r1
+      r2 = _nt_t_paren_l
+      s0 << r2
+      if r2
+        r3 = _nt_defined_operator
+        s0 << r3
+        if r3
+          r4 = _nt_t_paren_r
+          s0 << r4
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(Generic_Spec,input, i0...index, s0)
+      r0.extend(GenericSpecOption10)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:generic_spec_option_1][start_index] = r0
+
+    r0
+  end
+
+  module GenericSpecOption20
     def t_assignment
       elements[0]
     end
@@ -14204,10 +14282,49 @@ module Fortran
     end
   end
 
-  def _nt_generic_spec
+  def _nt_generic_spec_option_2
     start_index = index
-    if node_cache[:generic_spec].has_key?(index)
-      cached = node_cache[:generic_spec][index]
+    if node_cache[:generic_spec_option_2].has_key?(index)
+      cached = node_cache[:generic_spec_option_2][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_assignment
+    s0 << r1
+    if r1
+      r2 = _nt_t_paren_l
+      s0 << r2
+      if r2
+        r3 = _nt_t_equal
+        s0 << r3
+        if r3
+          r4 = _nt_t_paren_r
+          s0 << r4
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(Generic_Spec,input, i0...index, s0)
+      r0.extend(GenericSpecOption20)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:generic_spec_option_2][start_index] = r0
+
+    r0
+  end
+
+  def _nt_generic_spec_option
+    start_index = index
+    if node_cache[:generic_spec_option].has_key?(index)
+      cached = node_cache[:generic_spec_option][index]
       if cached
         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
@@ -14216,67 +14333,20 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_generic_name
+    r1 = _nt_generic_spec_option_1
     if r1
       r0 = r1
     else
-      i2, s2 = index, []
-      r3 = _nt_t_operator
-      s2 << r3
-      if r3
-        r4 = _nt_t_paren_l
-        s2 << r4
-        if r4
-          r5 = _nt_defined_operator
-          s2 << r5
-          if r5
-            r6 = _nt_t_paren_r
-            s2 << r6
-          end
-        end
-      end
-      if s2.last
-        r2 = instantiate_node(Generic_Spec,input, i2...index, s2)
-        r2.extend(GenericSpec0)
-      else
-        @index = i2
-        r2 = nil
-      end
+      r2 = _nt_generic_spec_option_2
       if r2
         r0 = r2
       else
-        i7, s7 = index, []
-        r8 = _nt_t_assignment
-        s7 << r8
-        if r8
-          r9 = _nt_t_paren_l
-          s7 << r9
-          if r9
-            r10 = _nt_t_equal
-            s7 << r10
-            if r10
-              r11 = _nt_t_paren_r
-              s7 << r11
-            end
-          end
-        end
-        if s7.last
-          r7 = instantiate_node(Generic_Spec,input, i7...index, s7)
-          r7.extend(GenericSpec1)
-        else
-          @index = i7
-          r7 = nil
-        end
-        if r7
-          r0 = r7
-        else
-          @index = i0
-          r0 = nil
-        end
+        @index = i0
+        r0 = nil
       end
     end
 
-    node_cache[:generic_spec][start_index] = r0
+    node_cache[:generic_spec_option][start_index] = r0
 
     r0
   end

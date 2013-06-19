@@ -1208,7 +1208,7 @@ module Fortran
   class End_Interface_Stmt < T
     def to_s
       unindent
-      stmt(space)
+      stmt("#{e[1]} #{e[2]}#{sb(e[3])}")
     end
   end
 
@@ -1419,6 +1419,7 @@ module Fortran
   class Generic_Spec < T
     def localname() usename end
     def name() usename end
+    def to_s() "#{e[0]} #{e[1]}#{e[2]}#{e[3]}" end
     def usename() "#{e[2]}" end
   end
 

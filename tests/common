@@ -26,6 +26,9 @@ ifdef INCDIRS
 INCFLAG=-I $(INCDIRS)
 endif
 
+%.o: %.f90
+	$(FC) $(FFLAGS) $(INCFLAG) -c $^
+
 .PHONY: $(TARGETS)
 
 default:
@@ -43,11 +46,11 @@ comp: $(OUT_OLD) $(OUT_NEW)
 
 translation: $(TRANSLATION)
 
-$(EXE_NEW): $(OBJ_NEW)
-	$(FC) $(FFLAGS) $(OBJ_NEW) -o $(EXE_NEW)
+$(EXE_NEW): $(EXTRA_OBJS) $(OBJ_NEW)
+	$(FC) $(FFLAGS) $(OBJ_NEW) $(EXTRA_OBJS) -o $(EXE_NEW)
 
-$(EXE_OLD): $(OBJ_OLD)
-	$(FC) $(FFLAGS) $(OBJ_OLD) -o $(EXE_OLD)
+$(EXE_OLD): $(EXTRA_OBJS) $(OBJ_OLD)
+	$(FC) $(FFLAGS) $(OBJ_OLD) $(EXTRA_OBJS) -o $(EXE_OLD)
 
 $(OBJ_NEW): $(TRANSLATION)
 	$(FC) $(FFLAGS) $(INCFLAG) -c $(TRANSLATION)
