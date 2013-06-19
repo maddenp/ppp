@@ -7,5 +7,5 @@ program t
   TYPE OTHER
     TYPE(PERSON) P
   END TYPE OTHER
-
+print *,kind (age) ,kind(p)
 end program t

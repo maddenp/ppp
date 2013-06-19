@@ -4,4 +4,5 @@ program t
     REAL                   :: WIDTH   ! Line width in centimeters
     INTEGER                :: PATTERN ! 1 for solid, 2 for dash, 3 for dot
   END TYPE LINE
+  print *,kind(COORD)
 end program t

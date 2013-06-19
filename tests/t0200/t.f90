@@ -1,4 +1,5 @@
 program t
+  print *,'ok'
 end program t
 
 module m

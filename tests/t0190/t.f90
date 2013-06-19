@@ -1,6 +1,3 @@
-program t
-end program t
-
 module a
 end
 
@@ -11,8 +8,12 @@ module c
 end module c
 
 module d
-  integer::i
+  integer::i=3
   logical::l
   real::r
 end module d
 
+program t
+  use d
+  print *,i
+end program t
