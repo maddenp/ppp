@@ -197,10 +197,10 @@ module Translator
     s=assemble(s,[srcfile],opts[:incdirs])
     cppcheck(s)
     puts "RAW SOURCE\n\n#{s}\n" if debug
-    puts "NORMALIZED SOURCE\n\n" if debug
+    puts "NORMALIZED SOURCE\n" if debug
     n=normalize(s,opts[:nl])
+    puts "\n#{n}" if debug or opts[:normalize]
     unless opts[:normalize]
-      puts n if debug
       raw_tree=fp.parse(n,:root=>root)
       raw_tree.instance_variable_set(:@srcfile,srcfile)
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
