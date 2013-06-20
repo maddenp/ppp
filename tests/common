@@ -7,7 +7,6 @@ EXE_NEW=exe.new
 EXE_OLD=exe.old
 EXT=$(suffix $(TEST))
 FC=gfortran
-FFLAGS=-w
 INCFLAG=
 OBJ_NEW=$(STEM)_ppp.o
 OBJ_OLD=$(STEM).o
@@ -24,6 +23,10 @@ TRANSLATION=$(STEM)_ppp$(EXT)
 
 ifdef INCDIRS
 INCFLAG=-I $(INCDIRS)
+endif
+
+ifndef ENV
+ENV=true
 endif
 
 %.o: %.f90
@@ -47,23 +50,23 @@ comp: $(OUT_OLD) $(OUT_NEW)
 translation: $(TRANSLATION)
 
 $(EXE_NEW): $(EXTRA_OBJS) $(OBJ_NEW)
-	$(FC) $(FFLAGS) $(OBJ_NEW) $(EXTRA_OBJS) -o $(EXE_NEW)
+	$(FC) -w $(FFLAGS) $(OBJ_NEW) $(EXTRA_OBJS) $(LIBS) -o $(EXE_NEW)
 
 $(EXE_OLD): $(EXTRA_OBJS) $(OBJ_OLD)
-	$(FC) $(FFLAGS) $(OBJ_OLD) $(EXTRA_OBJS) -o $(EXE_OLD)
+	$(FC) -w $(FFLAGS) $(OBJ_OLD) $(EXTRA_OBJS) $(LIBS) -o $(EXE_OLD)
 
 $(OBJ_NEW): $(TRANSLATION)
-	$(FC) $(FFLAGS) $(INCFLAG) -c $(TRANSLATION)
+	$(FC) -w $(FFLAGS) $(INCFLAG) -c $(TRANSLATION)
 
 $(OBJ_OLD): $(TEST)
-	$(FC) $(FFLAGS) $(INCFLAG) -c $(TEST)
+	$(FC) -w $(FFLAGS) $(INCFLAG) -c $(TEST)
 
 $(OUT_NEW): $(EXE_NEW)
-	./$(EXE_NEW) >$(OUT_NEW)
+	$(ENV) && ./$(EXE_NEW) >$(OUT_NEW)
 
 $(OUT_OLD): $(EXE_OLD)
 ifndef STATIC_OUT_OLD
-	./$(EXE_OLD) >$(OUT_OLD)
+	$(ENV) && ./$(EXE_OLD) >$(OUT_OLD)
 endif
 
 $(TRANSLATION): $(TEST)
