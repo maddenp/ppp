@@ -191,3 +191,10 @@
 
 - Need SMS library function that takes type and kind arguemnts and returns the
   correct nnt_ type to use in library calls.
+
+- In SMS_Serial#translate, what should halo[l|u] be when dh is nil?
+
+- Refactor SMS_Serial#translate!
+
+- replace_element may also be unsounds, as it removes nodes from the tree.
+  Instead, maybe walk up the tree and update text_value components?
