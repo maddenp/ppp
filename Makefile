@@ -1,5 +1,5 @@
 CLIENT=pppc
-PARSERS=$(addsuffix _parser.rb,fortran normfree sms_fortran sms_normfree)
+PARSERS=$(addsuffix _parser.rb,fortran normfixed normfree sms_fortran sms_normfree)
 
 .PHONY: clean cleaner
 

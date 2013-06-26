@@ -35,7 +35,7 @@ module Normfree
         # Convert instances of F90:1016 char-string-edit-desc to quoted strings
         # to preserve case and whitespace.
         h=false
-        p="\(.*?[0-9]{1,5}[ \t]format[ \t]*\\(.*?\)\([0-9]+\)[ \t]*[hH]\(.*?\)\\)\(.*\)"
+        p="\(.*?[0-9]{1,5}[ \t]*format[ \t]*\\(.*?\)\([0-9]+\)[ \t]*[hH]\(.*?\)\\)\(.*\)"
         r=Regexp.new(p,true)
         while m=r.match(l)
           h=true
