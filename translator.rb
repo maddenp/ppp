@@ -158,6 +158,10 @@ module Translator
       end
     end
 
+    def fixed2free(s)
+      s
+    end
+
     def incchain(seen,incfile)
       "\n  "+(seen+[incfile]).join(" includes\n  ")
     end
@@ -198,6 +202,7 @@ module Translator
     cppcheck(s)
     puts "RAW SOURCE\n\n#{s}\n" if debug
     puts "NORMALIZED SOURCE\n" if debug
+    s=fixed2free(s) if opts[:fixed]
     n=normalize(s,opts[:nl])
     puts "\n#{n}" if debug or opts[:normalize]
     unless opts[:normalize]
@@ -323,10 +328,12 @@ module Translator
           fail "No such directory: #{d}" unless File.directory?(d)
           opts[:incdirs].push(d)
         end
-      when "normalize"
-        opts[:normalize]=true
+      when "fixed"
+        opts[:fixed]=true
       when "debug"
         opts[:debug]=true
+      when "normalize"
+        opts[:normalize]=true
       else
         fail usage
       end
@@ -335,7 +342,12 @@ module Translator
   end
 
   def usage
-    "Usage: #{File.basename(@wrapper)} [-I dir[:dir:...]] source"
+    opts=[]
+    opts.push("-I dir[:dir:...]]")
+    opts.push("debug")
+    opts.push("fixed")
+    opts.push("normalize")
+    "#{File.basename(@wrapper)} [ #{opts.join(" | ")} ] source"
   end
 
 end
