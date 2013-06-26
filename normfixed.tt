@@ -1,4 +1,4 @@
-grammar Normfree
+grammar Normfixed
 
   rule text
     ( directive / comment / quoted / unquoted )* <Text>

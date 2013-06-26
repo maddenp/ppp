@@ -57,5 +57,3 @@ n=pppts_run_all(threads,socket)
 puts "\nOK (#{n} tests)" unless @fail
 if srvr then srvr.raise(Interrupt); srvr.join end
 exit((@fail)?(0):(1))
-
-# paul.a.madden@noaa.gov

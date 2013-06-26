@@ -159,6 +159,14 @@ module Translator
     end
 
     def fixed2free(s)
+      np=NormfixedParser.new
+      s=np.parse(np.parse(s).to_s).to_s
+      p="\(.*?\)\(^[^\n]+\)\n[ \t]{5}[^0 \t]\(.*\)"
+      r=Regexp.new(p,Regexp::MULTILINE)
+      while m=r.match(s)
+        blanks=' '*(72-m[2].length)
+        s=m[1]+m[2]+blanks+m[3]
+      end
       s
     end
 
@@ -351,5 +359,3 @@ module Translator
   end
 
 end
-
-# paul.a.madden@noaa.gov

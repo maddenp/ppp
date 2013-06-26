@@ -161,5 +161,3 @@ class NormfreeParser < Treetop::Runtime::CompiledParser
   include Normfree
 end
 
-
-# paul.a.madden@noaa.gov

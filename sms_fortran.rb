@@ -1523,5 +1523,3 @@ module Translator
   end
 
 end
-
-# paul.a.madden@noaa.gov

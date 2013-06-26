@@ -13,5 +13,3 @@ module Normfree
   end
 
 end
-
-# paul.a.madden@noaa.gov
