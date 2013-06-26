@@ -1,7 +1,7 @@
 require "fileutils"
 require "thread"
 
-server_mode=true
+server_mode=false
 threads=8
 
 def pppts_exe(cmd)
