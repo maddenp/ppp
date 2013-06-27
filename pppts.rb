@@ -48,7 +48,7 @@ end
 @lock=Mutex.new
 pppts_fail("Need at least one thread to run tests") unless threads>0
 pppts_exe("make")
-load File.join(File.dirname($0),"common.rb")
+load File.join(File.dirname($0),"requires.rb")
 srvr,socket=(server_mode)?(pppts_server_start):(nil)
 n=pppts_run_all(threads,socket)
 puts "\nOK (#{n} tests)" unless @fail

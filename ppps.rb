@@ -1,2 +1,3 @@
-load File.join(File.dirname($0),"common.rb")
+load File.join(File.dirname($0),"requires.rb")
+include Translator
 server(ARGV[0])
