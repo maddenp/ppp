@@ -1,8 +1,6 @@
-require "normcommon"
-
-include Normcommon
-
 module Normfixed
+
+  load "normcommon.rb"
 
   class Normalize < Treetop::Runtime::SyntaxNode
     def to_s
