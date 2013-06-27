@@ -1,4 +1,4 @@
-require 'normfree_parser'
+require "normfree_parser"
 
 grammar Normfree
 
