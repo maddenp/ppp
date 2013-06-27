@@ -1,4 +1,4 @@
-require 'fortran_parser'
+require "fortran_parser"
 
 grammar Fortran
 
