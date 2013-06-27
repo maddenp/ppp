@@ -1,7 +1,3 @@
-require "fortran"
-require "set"
-require "sms_fortran_parser"
-
 module Fortran
 
   def sms(s)

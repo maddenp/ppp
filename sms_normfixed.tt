@@ -1,4 +1,2 @@
-require "normfixed_parser"
-
 grammar Normfixed
 end

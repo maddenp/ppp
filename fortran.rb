@@ -1,7 +1,5 @@
 module Fortran
 
-  require "ostruct"
-
   def array_props(array_spec,_props,distribute)
     dims=0
     array_spec.abstract_boundslist.each_index do |i|

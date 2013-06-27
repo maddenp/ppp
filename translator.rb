@@ -1,10 +1,5 @@
 module Translator
 
-  require "fileutils"
-  require "pathname"
-  require "socket"
-  require "yaml"
-
   include Fortran
 
   class XFortranParser < FortranParser

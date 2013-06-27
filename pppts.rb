@@ -1,6 +1,3 @@
-require "fileutils"
-require "thread"
-
 server_mode=false
 threads=8
 

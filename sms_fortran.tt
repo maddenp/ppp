@@ -1,5 +1,3 @@
-require "fortran_parser"
-
 grammar Fortran
 
   rule declaration_construct

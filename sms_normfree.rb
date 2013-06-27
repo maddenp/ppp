@@ -1,6 +1,3 @@
-require "normfree"
-require "sms_normfree_parser"
-
 module Normfree
 
   class SMS < Treetop::Runtime::SyntaxNode
