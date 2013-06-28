@@ -5,7 +5,7 @@ module Normfree
       t=text_value
       t=t.gsub(/&$(\n&?)?/,"") # join continuation lines
       t=t.gsub(/\s*;\s*/,"\n") # split semicolon-delimited statement lines
-      t=Normalizer.fix_h(t)    # fix F90:1016 'h' edit descriptors
+      t=Normalizer.csedfix(t)  # fix F90:1016 'h' edit descriptors
       t=t.gsub(/\n\n+/,"\n")   # remove blank lines
     end
   end

@@ -1,14 +1,17 @@
 module Normalizer
 
-  def Normalizer.fix_h(t,extra=true)
+  # module method(s)
+
+  def Normalizer.csedfix(t,extra=true)
+    # Convert instances of F90:1016 char-string-edit-desc to quoted strings to
+    # preserve case and whitespace.
+    #
     # Attempting a multiline match of the regular expression below on a string
     # representing a huge source file is incredibly slow. Breaking the string
     # into lines improves performance significantly. 
     a=t.split("\n")
     a.each_index do |i|
       l=a[i]
-      # Convert instances of F90:1016 char-string-edit-desc to quoted strings
-      # to preserve case and whitespace.
       h=false
       p="\(.*?[0-9]{1,5}[ \t]*format[ \t]*\\(.*?\)\([0-9]+\)[ \t]*[hH]\(.*?\)\\)\(.*\)"
       r=Regexp.new(p,true)
@@ -34,6 +37,19 @@ module Normalizer
     end
     t=a.join("\n")
   end
+
+  # class method(s)
+
+  def update(m1)
+    to_update=["Normalize","Quoted"]
+    m0=Normalizer
+    to_update.each do |e|
+      m0.send(:remove_const,e) if m0.const_defined?(e)
+      m0.const_set(e,m1.const_get(e.to_sym))
+    end
+  end
+
+  # classes
 
   class Delete < Treetop::Runtime::SyntaxNode
     def to_s
