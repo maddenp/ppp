@@ -156,6 +156,7 @@ module Translator
 
     def fixed2free(s)
       np=NormfixedParser.new
+      np.update(Normfree)
       s=np.parse(np.parse(s).to_s).to_s
       p="\(.*?\)\(^[^\n]+\)\n[ \t]{5}[^0 \t]\(.*\)"
       r=Regexp.new(p,Regexp::MULTILINE)
