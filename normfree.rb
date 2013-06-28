@@ -1,7 +1,5 @@
 module Normfree
 
-  load "normcommon.rb"
-
   class Normalize < Treetop::Runtime::SyntaxNode
     def to_s
       t=text_value

@@ -14,15 +14,10 @@ require "yaml"
 
 require "treetop/runtime"
 
-require "normfixed"
-require "normfixed_parser"
-require "sms_normfixed"
-require "sms_normfixed_parser"
-
-require "normfree"
-require "normfree_parser"
-require "sms_normfree"
-require "sms_normfree_parser"
+require "normalizer"
+require "normalizer_parser"
+require "sms_normalizer"
+require "sms_normalizer_parser"
 
 require "fortran"
 require "fortran_parser"

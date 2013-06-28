@@ -1,13 +1,12 @@
 CLIENT=pppc
-PARSERS=$(addsuffix _parser.rb,fortran normfixed normfree sms_fortran sms_normfixed sms_normfree)
+PARSERS=$(addsuffix _parser.rb,fortran normalizer sms_fortran sms_normalizer)
 
 .PHONY: clean cleaner
 
 all: $(PARSERS) $(CLIENT)
 
 sms_fortran_parser.rb: fortran_parser.rb
-sms_normfixed_parser.rb: normfixed_parser.rb
-sms_normfree_parser.rb: normfree_parser.rb
+sms_normalizer_parser.rb: normalizer_parser.rb
 
 %_parser.rb: %.tt
 	RUBYLIB=lib tt -o $@ $<

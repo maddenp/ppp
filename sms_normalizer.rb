@@ -1,4 +1,4 @@
-module Normfree
+module Normalizer
 
   class SMS < Treetop::Runtime::SyntaxNode
     def to_s
