@@ -79,7 +79,7 @@ module Translator
   end
 
   def normalize(s,newline)
-    np=NormalizerParser.new
+    np=NormfreeParser.new
     s=s.gsub(directive,'@\1')          # hide directives
     s=s.gsub(/^\s+/,"")                # remove leading whitespace
     s=s.gsub(/[ \t]+$/,"")             # remove trailing whitespace
