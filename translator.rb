@@ -79,8 +79,9 @@ module Translator
   end
 
   def normalize(s,newline)
+    Normalizer.const_set("Normalize",Normfree::Normalize)
+    Normalizer.const_set("Quoted",Normfree::Quoted)
     np=NormalizerParser.new
-    load "normfree.rb"
     s=s.gsub(directive,'@\1')          # hide directives
     s=s.gsub(/^\s+/,"")                # remove leading whitespace
     s=s.gsub(/[ \t]+$/,"")             # remove trailing whitespace
