@@ -21,22 +21,29 @@ void term(int sock)
   if (status<0) fail("sending term");
 }
 
+void usage(char *exe)
+{
+  printf("usage: %s <socket> <infile> fixed|free [dir[:dir:...]]\n",exe);
+  exit(1);
+}
+
 int main (int argc,char **argv)
 {
-  char c,*fin,*fsock,*inc,*lensrcstr,*src;
+  char c,*exe,*fin,*form,*fsock,*inc,*lensrcstr,*src;
   int bytesout,fd,digits,lensrc,sock,status;
   struct sockaddr_un server;
   struct stat fileinfo;
 
-  if ((argc<3)||(argc>4))
-  {
-    printf("usage: %s <socket> <infile> [dir[:dir:...]]\n",argv[0]);
-    exit(1);
-  }
+  exe=argv[0];
+
+  if ((argc<4)||(argc>5)) usage(exe);
 
   fsock=argv[1];
   fin=argv[2];
-  inc=argv[3];
+  form=argv[3];
+  inc=argv[4];
+
+  if ((strcmp("fixed",form)!=0)&&(strcmp("free",form)!=0)) usage(exe);
 
   if ((fd=open(fin,O_RDONLY))<0) fail("opening infile");
   if (fstat(fd,&fileinfo)<0) fail("getting infile info");
@@ -63,7 +70,10 @@ int main (int argc,char **argv)
   if (status<0) fail("sending infile");
   term(sock);
 
-  status=0;
+  status=write(sock,form,strlen(form));
+  if (status<0) fail("sending form");
+  term(sock);
+
   if (inc!=NULL) status=write(sock,inc,strlen(inc));
   if (status<0) fail("sending includes");
   term(sock);

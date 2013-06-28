@@ -155,7 +155,7 @@ module Translator
     end
 
     def fixed2free(s)
-      np=NormfixedParser.new
+      np=NormalizerParser.new
       np.update(Normfree)
       s=np.parse(np.parse(s).to_s).to_s
       p="\(.*?\)\(^[^\n]+\)\n[ \t]{5}[^0 \t]\(.*\)"
@@ -261,6 +261,7 @@ module Translator
           opts={}
           client=server.accept
           srcfile=client.gets.chomp
+          form=client.gets.chomp
           dirlist=client.gets.chomp
           lensrc=client.gets.chomp.to_i
           s=client.read(lensrc)
@@ -269,6 +270,7 @@ module Translator
           end
           srcdir=File.dirname(File.expand_path(srcfile))
           opts[:incdirs]=[srcdir]
+          opts[:fixed]=(form=="fixed")
           dirlist.split(":").each do |d|
             d=File.join(srcdir,d) if Pathname.new(d).relative?
             unless File.directory?(d)
