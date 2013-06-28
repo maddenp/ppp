@@ -19,12 +19,6 @@ require "normalizer_parser"
 require "sms_normalizer"
 require "sms_normalizer_parser"
 
-require "normfree"
-require "sms_normfree_parser"
-
-require "normfixed"
-require "sms_normfixed_parser"
-
 require "fortran"
 require "fortran_parser"
 require "sms_fortran"

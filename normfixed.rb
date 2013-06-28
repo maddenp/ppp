@@ -1,4 +1,4 @@
-module Normfixed
+module Normalizer
 
   class Normalize < Treetop::Runtime::SyntaxNode
     def to_s
