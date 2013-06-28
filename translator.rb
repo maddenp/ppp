@@ -337,6 +337,8 @@ module Translator
         end
       when "fixed"
         opts[:fixed]=true
+      when "free"
+        nil # default behavior
       when "debug"
         opts[:debug]=true
       when "normalize"
