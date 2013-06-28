@@ -3,30 +3,45 @@
 # not been tested. Set 'FC' appropriately. See http://bit.ly/N6I39Y for more
 # information.
 
-ifndef ENV
-ENV=true
-endif
+# static settings
+
 EXE_NEW=exe.new
 EXE_OLD=exe.old
 FC=gfortran
-ifdef INCDIRS
-INCFLAG=-I $(INCDIRS)
-endif
 OBJ_NEW=$(STEM)_ppp.o
 OBJ_OLD=$(STEM).o
 OUT_NEW=out.new
 OUT_OLD=out.old
 PPP=../../ppp
 PPPC=../../pppc
-ifeq ($(TEST),t.f)
-PPPFLAGS+= fixed
-endif
 STEM=$(basename $(TEST))
 TARGETS=clean comp $(EXE_NEW) $(EXE_OLD) $(OUT_NEW) $(OUT_OLD) translation
 TEST=$(wildcard t.f t.f90)
 TMPFILE=tmpfile
 TOCLEAN=$(OUT_NEW) $(EXE_NEW) $(EXE_OLD) $(OUT_NEW) $(TMPFILE) $(TRANSLATION) a.out *.env *.mod *.o
 TRANSLATION=$(STEM)_ppp.f90
+
+# dynamic settings
+
+ifndef ENV
+ENV=true
+endif
+
+ifeq ($(TEST),t.f)
+FIXEDFREE=fixed
+else
+FIXEDFREE=free
+endif
+
+ifdef INCDIRS
+INCFLAG=-I $(INCDIRS)
+endif
+
+ifeq ($(TEST),t.f)
+PPPFLAGS=fixed
+endif
+
+# the rest
 
 %.o: %.f90
 	$(FC) $(FFLAGS) $(INCFLAG) -c $^
@@ -70,7 +85,7 @@ endif
 
 $(TRANSLATION): $(TEST)
 ifdef SOCKET
-	$(PPPC) $(SOCKET) $(CURDIR)/$(TEST) $(INCDIRS) > $(TRANSLATION)
+	$(PPPC) $(SOCKET) $(CURDIR)/$(TEST) $(FIXEDFREE) $(INCDIRS) > $(TRANSLATION)
 else
 	$(PPP) $(PPPFLAGS) $(INCFLAG) $(TEST) > $(TRANSLATION)
 endif

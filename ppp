@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
 
 load File.join(File.dirname($0),"requires.rb")
-include Translator
 go $0

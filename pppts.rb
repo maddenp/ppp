@@ -1,4 +1,4 @@
-server_mode=false
+server_mode=true
 threads=8
 
 def pppts_exe(cmd)

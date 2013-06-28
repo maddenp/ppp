@@ -27,3 +27,5 @@ require "sms_fortran"
 require "sms_fortran_parser"
 
 require "translator"
+
+include Translator
