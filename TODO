@@ -191,3 +191,5 @@
 
 - Need SMS library function that takes type and kind arguemnts and returns the
   correct nnt_ type to use in library calls.
+
+- Trim rolled-out variable names to 31 characters (F90 section 3.2.2)
