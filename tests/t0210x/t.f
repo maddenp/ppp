@@ -17,7 +17,7 @@
       print '(a)','hello' ;;
       
       continue ;;; print '(a)','world 9'
-      print '(a)','hello' ; 
-     aprint '(a)','world 0'
+      print '(a)','hello' 
+     a;print '(a)','world 0'
       end program t
       
