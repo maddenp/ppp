@@ -1,7 +1,5 @@
-- (MH) Build fixed-form normalizer. Doing some simple tweaks to fixed-form
-  source and then passing it to the free-form normalizer might work and would
-  probably be the best bet if it's possible. Have to watch out for how
-  directives are treated...
+- (MH) Fix in progress fixed form tests that don't work (gfortran
+  -ffixed-form doesn't like syntax
 
 - directives still to do
 
