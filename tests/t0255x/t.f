@@ -1,5 +1,5 @@
       program t
- 100  format ( 12 H Hello 
+ 100  format ( 58 H Hello 
      3World)
  200  format (2hA )
  300  format (2h B)
