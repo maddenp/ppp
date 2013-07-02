@@ -1125,13 +1125,13 @@ grammar Fortran
   end
 
   rule end_do_continue_stmt
-    label:label? t_continue t_newline &{ |e| dolabel_pop(e[0]) } <End_Do_Stmt>
+    label:label? t_continue t_newline &{ |e| dolabel_pop } <End_Do_Stmt>
   end
 
   rule end_do_stmt
     # F90:R825
 
-    label:label? t_enddo do_construct_name? t_newline &{ |e| dolabel_pop(e[0]) } <End_Do_Stmt>
+    label:label? t_enddo do_construct_name? t_newline &{ |e| dolabel_pop } <End_Do_Stmt>
   end
 
   rule end_function_option
@@ -1882,7 +1882,7 @@ grammar Fortran
   rule label_do_stmt
     # F90:R819
 
-    label:label? do_construct_name_label? t_do dolabel:label loop_control? t_newline &{ |e| dolabel_push(e[3]) } <Label_Do_Stmt>
+    label:label? do_construct_name_label? t_do label loop_control? t_newline &{ |e| dolabel_push(e[3]) } <Label_Do_Stmt>
   end
 
   rule label_list

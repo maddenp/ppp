@@ -10878,7 +10878,7 @@ module Fortran
         s0 << r4
         if r4
           i5 = index
-          r6 = lambda { |e| dolabel_pop(e[0]) }.call(s0)
+          r6 = lambda { |e| dolabel_pop }.call(s0)
           if r6
             @index = i5
             r5 = instantiate_node(SyntaxNode,input, index...index)
@@ -10952,7 +10952,7 @@ module Fortran
           s0 << r6
           if r6
             i7 = index
-            r8 = lambda { |e| dolabel_pop(e[0]) }.call(s0)
+            r8 = lambda { |e| dolabel_pop }.call(s0)
             if r8
               @index = i7
               r7 = instantiate_node(SyntaxNode,input, index...index)
@@ -18852,7 +18852,7 @@ module Fortran
   end
 
   module LabelDoStmt0
-    def label
+    def label1
       elements[0]
     end
 
@@ -18860,7 +18860,7 @@ module Fortran
       elements[2]
     end
 
-    def dolabel
+    def label2
       elements[3]
     end
 

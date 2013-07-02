@@ -157,36 +157,17 @@ module Translator
     def fixed2free(s)
       np=NormalizerParser.new
       np.update(Normfixed)
-      s=s.gsub /\n[ \t]*$/, ''                     #Removes blank lines   
-      a=s.split("\n")                              #Splits file into an array by line
-      a=a.map {|e| (e+(" "*72))[0..71]}            #Pad each line with 72 blanks, truncate at column 72
-      s=a.join "\n"                                #Join array into string
-      s=s.gsub /\n(c|C|\*)/, "\n!"                 #Replace fixed form comment indicators with "!"
-      s=s.gsub(directive,'@\1')                    #Hide directives
-      s=s.gsub /\n[ \t]{5}[^ \t0]/, "\n     a"     #Replace any continuation character with generic "a"
-      s=s.gsub /\n\s*![^\n]*/, ''                  #Remove full line comments
-      s=np.parse(np.parse(s).to_s).to_s            #Parse
-      s=s.gsub /\n[ \t]{5}a/, ""                   #Join continuation lines
-      
-#### REGEX VERSION OF PADDING QUOTED STRING BLANKS ####
-#     p="\(.*?\)\(^[^\n]+?\)\n[ \t]{5}[^0 \t]\(.*\)"
-#     r=Regexp.new(p,Regexp::MULTILINE)
-#     i=66
-#     while m=r.match(s)
-#       puts "### m0 #{m[0]}"
-#       puts "### #{m[1]}"
-#       puts "### m2 #{m[2]}"
-#       puts i
-#       puts m[2].length
-#       num_blanks=i-m[2].length
-#       puts num_blanks
-#       blanks=' '*(num_blanks)
-#       s=m[1]+m[2]+blanks+m[3]
-#       i+=66
-#     end
-#### Not effective because parse removes whitespace that is critical to character count ####
-      
-      s=s.gsub(/^@(,*)/i,'!\1')                    #Show directives
+      s=s.gsub /\n[ \t]*$/, ''                 # Removes blank lines   
+      a=s.split("\n")                          # Splits file into an array by line
+      a=a.map {|e| (e+(" "*72))[0..71]}        # Pad each line with 72 blanks, truncate at column 72
+      s=a.join "\n"                            # Join array into string
+      s=s.gsub /\n(c|C|\*)/, "\n!"             # Replace fixed form comment indicators with "!"
+      s=s.gsub(directive,'@\1')                # Hide directives
+      s=s.gsub /\n[ \t]{5}[^ \t0]/, "\n     a" # Replace any continuation character with generic "a"
+      s=s.gsub /\n\s*![^\n]*/, ''              # Remove full line comments
+      s=np.parse(np.parse(s).to_s).to_s        # Parse
+      s=s.gsub /\n[ \t]{5}a/, ""               # Join continuation lines
+      s=s.gsub(/^@(,*)/i,'!\1')                # Show directives
       s
     end
 
@@ -232,8 +213,6 @@ module Translator
     puts "RAW SOURCE\n\n#{s}\n" if debug
     puts "NORMALIZED SOURCE\n" if debug
     s=fixed2free(s) if opts[:fixed]
-#puts "###\n#{s}\n###"
-#exit
     n=normalize(s,opts[:nl])
     puts "\n#{n}" if debug or opts[:normalize]
     unless opts[:normalize]

@@ -32,12 +32,12 @@ module Fortran
     "#{@dolabels[-1]}"=="#{@dolabels[-2]}"
   end
 
-  def dolabel_pop(label)
+  def dolabel_pop
     @dolabels.pop
   end
 
   def dolabel_push(label)
-    @dolabels.push(label)
+    @dolabels.push("#{label}")
   end
 
   def env
