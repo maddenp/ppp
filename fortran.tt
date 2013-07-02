@@ -100,7 +100,7 @@ grammar Fortran
   rule action_term_do_construct
     # F90:R827
 
-    label_do_stmt !{ |e| dolabel_dupe? } do_body do_term_action_stmt <E>
+    label_do_stmt !{ |e| dolabel_repeat? } do_body do_term_action_stmt <E>
   end
 
   rule actual_arg
@@ -2255,7 +2255,7 @@ grammar Fortran
   rule outer_shared_do_construct
     # F90:R830
 
-    label_do_stmt !{ |e| dolabel_dupe? } do_body shared_term_do_construct <E>
+    label_do_stmt !{ |e| dolabel_repeat? } do_body shared_term_do_construct <E>
   end
 
   rule output_item

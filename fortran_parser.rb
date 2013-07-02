@@ -770,7 +770,7 @@ module Fortran
     s0 << r1
     if r1
       i2 = index
-      r3 = lambda { |e| dolabel_dupe? }.call(s0)
+      r3 = lambda { |e| dolabel_repeat? }.call(s0)
       if r3
         r2 = nil
       else
@@ -22245,7 +22245,7 @@ module Fortran
     s0 << r1
     if r1
       i2 = index
-      r3 = lambda { |e| dolabel_dupe? }.call(s0)
+      r3 = lambda { |e| dolabel_repeat? }.call(s0)
       if r3
         r2 = nil
       else

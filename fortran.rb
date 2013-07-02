@@ -28,16 +28,16 @@ module Fortran
     Marshal.load(Marshal.dump(o))
   end
 
-  def dolabel_dupe?
-    "#{@dolabels[-1]}"=="#{@dolabels[-2]}"
-  end
-
   def dolabel_pop
     @dolabels.pop
   end
 
   def dolabel_push(label)
     @dolabels.push("#{label}")
+  end
+
+  def dolabel_repeat?
+    "#{@dolabels[-1]}"=="#{@dolabels[-2]}"
   end
 
   def env
@@ -92,11 +92,15 @@ module Fortran
   def nonblock_do_end?(node)
     return false unless node.respond_to?(:label)
     return false if node.label.to_s.empty?
-    ("#{node.label}"=="#{@dolabels.last}")?(true):(false)
+    ("#{node.label}"==@dolabels.last)?(true):(false)
   end
 
   def nonblock_do_end!(node)
-    @dolabels.pop if nonblock_do_end?(node)
+    return false unless nonblock_do_end?(node)
+    while "#{node.label}"==@dolabels.last
+      @dolabels.pop
+    end
+    true
   end
 
   def sa(e)
