@@ -3871,11 +3871,11 @@ module Fortran
     end
 
     def do_block
-      elements[1]
+      elements[2]
     end
 
     def end_do
-      elements[2]
+      elements[3]
     end
   end
 
@@ -3894,11 +3894,22 @@ module Fortran
     r1 = _nt_do_stmt
     s0 << r1
     if r1
-      r2 = _nt_do_block
+      i2 = index
+      r3 = lambda { |e| dolabel_repeat? }.call(s0)
+      if r3
+        r2 = nil
+      else
+        @index = i2
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      end
       s0 << r2
       if r2
-        r3 = _nt_end_do
-        s0 << r3
+        r4 = _nt_do_block
+        s0 << r4
+        if r4
+          r5 = _nt_end_do
+          s0 << r5
+        end
       end
     end
     if s0.last
@@ -9609,6 +9620,20 @@ module Fortran
     r0
   end
 
+  module DoConstruct0
+    def nonblock_do_construct
+      elements[0]
+    end
+
+  end
+
+  module DoConstruct1
+    def block_do_construct
+      elements[0]
+    end
+
+  end
+
   def _nt_do_construct
     start_index = index
     if node_cache[:do_construct].has_key?(index)
@@ -9621,13 +9646,53 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_nonblock_do_construct
+    i1, s1 = index, []
+    r2 = _nt_nonblock_do_construct
+    s1 << r2
+    if r2
+      i3 = index
+      r4 = lambda { |e| dolabel_pop_nonblock }.call(s1)
+      if r4
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r3 = nil
+      end
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(E,input, i1...index, s1)
+      r1.extend(DoConstruct0)
+    else
+      @index = i1
+      r1 = nil
+    end
     if r1
       r0 = r1
     else
-      r2 = _nt_block_do_construct
-      if r2
-        r0 = r2
+      i5, s5 = index, []
+      r6 = _nt_block_do_construct
+      s5 << r6
+      if r6
+        i7 = index
+        r8 = lambda { |e| dolabel_pop_block }.call(s5)
+        if r8
+          @index = i7
+          r7 = instantiate_node(SyntaxNode,input, index...index)
+        else
+          r7 = nil
+        end
+        s5 << r7
+      end
+      if s5.last
+        r5 = instantiate_node(E,input, i5...index, s5)
+        r5.extend(DoConstruct1)
+      else
+        @index = i5
+        r5 = nil
+      end
+      if r5
+        r0 = r5
       else
         @index = i0
         r0 = nil
@@ -9787,7 +9852,7 @@ module Fortran
       s0 << r3
       if r3
         i4 = index
-        r5 = lambda { |e| nonblock_do_end!(e[1]) }.call(s0)
+        r5 = lambda { |e| nonblock_do_end?(e[1]) }.call(s0)
         if r5
           @index = i4
           r4 = instantiate_node(SyntaxNode,input, index...index)
@@ -9918,7 +9983,7 @@ module Fortran
       s0 << r3
       if r3
         i4 = index
-        r5 = lambda { |e| nonblock_do_end!(e[1]) }.call(s0)
+        r5 = lambda { |e| nonblock_do_end?(e[1]) }.call(s0)
         if r5
           @index = i4
           r4 = instantiate_node(SyntaxNode,input, index...index)
@@ -10848,7 +10913,6 @@ module Fortran
     def t_newline
       elements[2]
     end
-
   end
 
   def _nt_end_do_continue_stmt
@@ -10876,17 +10940,6 @@ module Fortran
       if r3
         r4 = _nt_t_newline
         s0 << r4
-        if r4
-          i5 = index
-          r6 = lambda { |e| dolabel_pop }.call(s0)
-          if r6
-            @index = i5
-            r5 = instantiate_node(SyntaxNode,input, index...index)
-          else
-            r5 = nil
-          end
-          s0 << r5
-        end
       end
     end
     if s0.last
@@ -10914,7 +10967,6 @@ module Fortran
     def t_newline
       elements[3]
     end
-
   end
 
   def _nt_end_do_stmt
@@ -10950,17 +11002,6 @@ module Fortran
         if r4
           r6 = _nt_t_newline
           s0 << r6
-          if r6
-            i7 = index
-            r8 = lambda { |e| dolabel_pop }.call(s0)
-            if r8
-              @index = i7
-              r7 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r7 = nil
-            end
-            s0 << r7
-          end
         end
       end
     end
@@ -15451,11 +15492,11 @@ module Fortran
     end
 
     def do_body
-      elements[1]
+      elements[2]
     end
 
     def do_term_shared_stmt
-      elements[2]
+      elements[3]
     end
   end
 
@@ -15474,11 +15515,22 @@ module Fortran
     r1 = _nt_label_do_stmt
     s0 << r1
     if r1
-      r2 = _nt_do_body
+      i2 = index
+      r3 = lambda { |e| dolabel_repeat? }.call(s0)
+      if r3
+        @index = i2
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r2 = nil
+      end
       s0 << r2
       if r2
-        r3 = _nt_do_term_shared_stmt
-        s0 << r3
+        r4 = _nt_do_body
+        s0 << r4
+        if r4
+          r5 = _nt_do_term_shared_stmt
+          s0 << r5
+        end
       end
     end
     if s0.last
@@ -22221,11 +22273,11 @@ module Fortran
     end
 
     def do_body
-      elements[2]
+      elements[1]
     end
 
     def shared_term_do_construct
-      elements[3]
+      elements[2]
     end
   end
 
@@ -22244,22 +22296,11 @@ module Fortran
     r1 = _nt_label_do_stmt
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| dolabel_repeat? }.call(s0)
-      if r3
-        r2 = nil
-      else
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
-      end
+      r2 = _nt_do_body
       s0 << r2
       if r2
-        r4 = _nt_do_body
-        s0 << r4
-        if r4
-          r5 = _nt_shared_term_do_construct
-          s0 << r5
-        end
+        r3 = _nt_shared_term_do_construct
+        s0 << r3
       end
     end
     if s0.last
@@ -26351,11 +26392,11 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_outer_shared_do_construct
+    r1 = _nt_inner_shared_do_construct
     if r1
       r0 = r1
     else
-      r2 = _nt_inner_shared_do_construct
+      r2 = _nt_outer_shared_do_construct
       if r2
         r0 = r2
       else

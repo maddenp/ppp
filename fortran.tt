@@ -415,7 +415,7 @@ grammar Fortran
   rule block_do_construct
     # F90:R817
 
-    do_stmt do_block end_do <E>
+    do_stmt !{ |e| dolabel_repeat? } do_block end_do <E>
   end
 
   rule boz_literal_constant
@@ -978,8 +978,8 @@ grammar Fortran
   rule do_construct
     # F90:R816
 
-    nonblock_do_construct /
-    block_do_construct
+    nonblock_do_construct &{ |e| dolabel_pop_nonblock } <E> /
+    block_do_construct &{ |e| dolabel_pop_block } <E>
   end
 
   rule do_construct_name
@@ -1002,7 +1002,7 @@ grammar Fortran
   rule do_term_action_stmt
     # F90:R829
 
-    !do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end!(e[1]) } <Do_Term_Action_Stmt>
+    !do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end?(e[1]) } <Do_Term_Action_Stmt>
   end
 
   rule do_term_action_stmt_disallowed
@@ -1022,7 +1022,7 @@ grammar Fortran
   rule do_term_shared_stmt
     # F90:R833
 
-    !do_term_shared_stmt_disallowed action_stmt &{ |e| nonblock_do_end!(e[1]) } <Do_Term_Shared_Stmt>
+    !do_term_shared_stmt_disallowed action_stmt &{ |e| nonblock_do_end?(e[1]) } <Do_Term_Shared_Stmt>
   end
 
   rule do_term_shared_stmt_disallowed
@@ -1125,13 +1125,13 @@ grammar Fortran
   end
 
   rule end_do_continue_stmt
-    label:label? t_continue t_newline &{ |e| dolabel_pop } <End_Do_Stmt>
+    label:label? t_continue t_newline <End_Do_Stmt>
   end
 
   rule end_do_stmt
     # F90:R825
 
-    label:label? t_enddo do_construct_name? t_newline &{ |e| dolabel_pop } <End_Do_Stmt>
+    label:label? t_enddo do_construct_name? t_newline <End_Do_Stmt>
   end
 
   rule end_function_option
@@ -1616,7 +1616,7 @@ grammar Fortran
   rule inner_shared_do_construct
     # F90:R832
 
-    label_do_stmt do_body do_term_shared_stmt <Inner_Shared_Do_Construct>
+    label_do_stmt &{ |e| dolabel_repeat? } do_body do_term_shared_stmt <Inner_Shared_Do_Construct>
   end
 
   rule input_item
@@ -2255,7 +2255,7 @@ grammar Fortran
   rule outer_shared_do_construct
     # F90:R830
 
-    label_do_stmt !{ |e| dolabel_repeat? } do_body shared_term_do_construct <E>
+    label_do_stmt do_body shared_term_do_construct <E>
   end
 
   rule output_item
@@ -2755,8 +2755,8 @@ grammar Fortran
   rule shared_term_do_construct
     # F90:R831
 
-    outer_shared_do_construct /
-    inner_shared_do_construct
+    inner_shared_do_construct /
+    outer_shared_do_construct
   end
 
   rule sign

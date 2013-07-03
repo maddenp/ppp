@@ -28,15 +28,25 @@ module Fortran
     Marshal.load(Marshal.dump(o))
   end
 
-  def dolabel_pop
+  def dolabel_pop_block
     @dolabels.pop
+    true
+  end
+    
+  def dolabel_pop_nonblock
+    if (current=@dolabels.last)
+      @dolabels.pop while @dolabels.last==current
+    end
+    true    
   end
 
   def dolabel_push(label)
-    @dolabels.push("#{label}")
+    @dolabels.push((label.is_a?(Symbol))?(label):("#{label}"))
+    true
   end
 
   def dolabel_repeat?
+    return false if @dolabels.last==:nolabel
     "#{@dolabels[-1]}"=="#{@dolabels[-2]}"
   end
 
@@ -93,14 +103,6 @@ module Fortran
     return false unless node.respond_to?(:label)
     return false if node.label.to_s.empty?
     ("#{node.label}"==@dolabels.last)?(true):(false)
-  end
-
-  def nonblock_do_end!(node)
-    return false unless nonblock_do_end?(node)
-    while "#{node.label}"==@dolabels.last
-      @dolabels.pop
-    end
-    true
   end
 
   def sa(e)
