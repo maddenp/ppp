@@ -414,6 +414,10 @@ grammar Fortran
 
   rule block_do_construct
     # F90:R817
+    #
+    # Note: For this rule to match, the label (if any) on the do_stmt cannot be
+    # a repeat, as that would require more than one end-do-stmt with the same
+    # label, which is not permitted.
 
     do_stmt !{ |e| dolabel_repeat? } do_block end_do <E>
   end
@@ -977,6 +981,9 @@ grammar Fortran
 
   rule do_construct
     # F90:R816
+    #
+    # Note: When either option is matched, the appropriate label-popping method
+    # should be called. See those methods for more information.
 
     nonblock_do_construct &{ |e| dolabel_pop_nonblock } <E> /
     block_do_construct &{ |e| dolabel_pop_block } <E>
@@ -1615,6 +1622,10 @@ grammar Fortran
 
   rule inner_shared_do_construct
     # F90:R832
+    #
+    # Note: For this rule to match, the label on the label_do_stmt must match
+    # that of the enclosing outer_shared_do_construct, which has already been
+    # pushed onto the stack.
 
     label_do_stmt &{ |e| dolabel_repeat? } do_body do_term_shared_stmt <Inner_Shared_Do_Construct>
   end
@@ -2254,6 +2265,10 @@ grammar Fortran
 
   rule outer_shared_do_construct
     # F90:R830
+    #
+    # Note: The label on label_do_stmt may match that of an enclosing o_s_d_c
+    # (e.g. the second level in a triply-nested loop), or may not (e.g. in the
+    # outermost o_s_d_c in a triply-nested loop).
 
     label_do_stmt do_body shared_term_do_construct <E>
   end
