@@ -230,8 +230,12 @@ module Translator
     s=assemble(s,[srcfile],opts[:incdirs])
     cppcheck(s)
     puts "RAW SOURCE\n\n#{s}\n" if debug
-    puts "NORMALIZED SOURCE\n" if debug
-    s=fixed2free(s) if opts[:fixed]
+    if opts[:fixed]
+      puts "FIXED2FREE SOURCE\n\n" if debug
+      s=fixed2free(s)
+      puts "#{s}\n\n" if debug
+    end
+    puts "FREE2NORMALIZED SOURCE\n" if debug
     n=normalize(s,opts[:nl])
     puts "\n#{n}" if debug or opts[:normalize]
     unless opts[:normalize]

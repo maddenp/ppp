@@ -1,5 +1,5 @@
-- (MH) Fix in progress fixed form tests that don't work (gfortran
-  -ffixed-form doesn't like syntax
+- (MH) Work on testing ppp with FIM source code to find any potential
+  errors
 
 - directives still to do
 
