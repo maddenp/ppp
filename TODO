@@ -193,3 +193,7 @@
 - Trim rolled-out variable names to 31 characters (F90 section 3.2.2)
 
 - Consider limitation on number of continuation lines.
+
+- In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
+  label, but also labels further down in the stack? That would also be an error,
+  right?

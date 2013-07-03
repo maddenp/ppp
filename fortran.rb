@@ -29,11 +29,23 @@ module Fortran
   end
 
   def dolabel_pop_block
+    # F90:R817 block-do-construct's do-stmt always pushes a label: either the
+    # actual label (when do-stmt is a label-do-stmt), or the symbol :nolabel
+    # (when do-stmt is a nonlabel-do-stmt). Since each block-do-construct has
+    # a single matching end-do, simply pop one label from the label stack.
     @dolabels.pop
     true
   end
     
   def dolabel_pop_nonblock
+    # F90:R826 nonblock-do-construct requires label-do-stmt components, each
+    # of whose labels will be pushed onto the label stack. But these labels
+    # may be repeated, to match a single do-term-shared-stmt. When terminating
+    # a nonblock-do-construct, account for this possibility by popping a series
+    # (potentially) of matching labels off the stack. This technique should
+    # work for F90:R827 action-term-do-construct as well as F90:R830
+    # outer-shared-do-construct, though only the latter may actually encounter
+    # multiple matching labels on the stack.
     if (current=@dolabels.last)
       @dolabels.pop while @dolabels.last==current
     end
@@ -41,11 +53,19 @@ module Fortran
   end
 
   def dolabel_push(label)
+    # A non-label-do-stmt pushes the symbol :nolabel onto the stack, which must
+    # not be converted to a string, to avoid matching a potential literal label
+    # 'nolabel'. If the passed-in label is not a symbol, push its string version
+    # onto the label stack.
     @dolabels.push((label.is_a?(Symbol))?(label):("#{label}"))
     true
   end
 
   def dolabel_repeat?
+    # Report whether the top two labels on the label stack match. Some grammar
+    # rules only match when this is not the case; others require it. But if the
+    # topmost label is the symbol :nolabel, never consider that a repeat, as
+    # nonlabel versions of block-do-construct may have arbitrarily deep nesting.
     return false if @dolabels.last==:nolabel
     "#{@dolabels[-1]}"=="#{@dolabels[-2]}"
   end
@@ -100,6 +120,9 @@ module Fortran
   end
 
   def nonblock_do_end?(node)
+    # F90:R826 requires that the label on the terminating action-stmt match that
+    # of the matching label-do-stmt. If this isn't the case, this node cannot be
+    # the end of a nonblock-do-construct.
     return false unless node.respond_to?(:label)
     return false if node.label.to_s.empty?
     ("#{node.label}"==@dolabels.last)?(true):(false)
@@ -2001,4 +2024,3 @@ module Fortran
   end
 
 end
-
