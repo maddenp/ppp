@@ -161,10 +161,10 @@ module Translator
       a=s.split("\n")                              #Splits file into an array by line
       a=a.map {|e| (e+(" "*72))[0..71]}            #Pad each line with 72 blanks, truncate at column 72
       s=a.join "\n"                                #Join array into string
-      s=s.gsub /\n(c|C|\*)/, "\n!"                 #Replace fixed form comment indicators with "!"
+      s=s.gsub /^(c|C|\*)/, "!"                    #Replace fixed form comment indicators with "!"
       s=s.gsub(directive,'@\1')                    #Hide directives
       s=s.gsub /\n[ \t]{5}[^ \t0]/, "\n     a"     #Replace any continuation character with generic "a"
-      s=s.gsub /\n\s*![^\n]*/, ''                  #Remove full line comments
+      s=s.gsub /^\s*![^\n]*\n/, ''                  #Remove full line comments
       s=np.parse(np.parse(s).to_s).to_s            #Parse
       s=s.gsub /\n[ \t]{5}a/, ""                   #Join continuation lines
       

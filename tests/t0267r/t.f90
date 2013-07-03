@@ -1,3 +1,4 @@
+        !First Line Comment
 program t
   implicit none
 ! open stmt old status
