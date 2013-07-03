@@ -1,3 +1,4 @@
+c first line comment 
       program t
       implicit none
 c     open stmt old status
