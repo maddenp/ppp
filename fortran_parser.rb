@@ -25213,7 +25213,7 @@ module Fortran
     if r1
       r0 = r1
     else
-      if has_terminal?('\G[\\[\\]\\~\\`\\@\\#\\^\\|\\{\\}]', true, index)
+      if has_terminal?('\G[\\[\\]\\~\\`\\@\\#\\^\\|\\{\\}\\\\]', true, index)
         r2 = true
         @index += 1
       else
