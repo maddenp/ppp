@@ -285,9 +285,9 @@ grammar Fortran
     # all cases with only information encountered so far. This is corrected in
     # tree post-processing.
 
+    assumed_size_spec "" <Array_Spec> /
     explicit_shape_spec_list "" <Array_Spec> /
-    assumed_shape_spec_list "" <Array_Spec> /
-    assumed_size_spec "" <Array_Spec>
+    assumed_shape_spec_list "" <Array_Spec>
   end
 
   rule array_variable_name

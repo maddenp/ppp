@@ -2450,21 +2450,21 @@ module Fortran
   end
 
   module ArraySpec0
-    def explicit_shape_spec_list
+    def assumed_size_spec
       elements[0]
     end
 
   end
 
   module ArraySpec1
-    def assumed_shape_spec_list
+    def explicit_shape_spec_list
       elements[0]
     end
 
   end
 
   module ArraySpec2
-    def assumed_size_spec
+    def assumed_shape_spec_list
       elements[0]
     end
 
@@ -2483,7 +2483,7 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
-    r2 = _nt_explicit_shape_spec_list
+    r2 = _nt_assumed_size_spec
     s1 << r2
     if r2
       if has_terminal?("", false, index)
@@ -2506,7 +2506,7 @@ module Fortran
       r0 = r1
     else
       i4, s4 = index, []
-      r5 = _nt_assumed_shape_spec_list
+      r5 = _nt_explicit_shape_spec_list
       s4 << r5
       if r5
         if has_terminal?("", false, index)
@@ -2529,7 +2529,7 @@ module Fortran
         r0 = r4
       else
         i7, s7 = index, []
-        r8 = _nt_assumed_size_spec
+        r8 = _nt_assumed_shape_spec_list
         s7 << r8
         if r8
           if has_terminal?("", false, index)

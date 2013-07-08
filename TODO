@@ -197,3 +197,7 @@
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
   label, but also labels further down in the stack? That would also be an error,
   right?
+
+- In fortran.tt, rule array_spec makes a claim about a bad parse. The comment
+  should include a case to demonstrate this, so that the comment can be removed
+  if/when the parse problem is corrected.
