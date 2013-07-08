@@ -3614,6 +3614,7 @@ grammar Fortran
     t_doubleprecision "" <Type_Spec> /
     t_complex "" <Type_Spec> /
     t_character char_selector? <Type_Spec> /
+    t_logical star_int <Type_Spec> / # NONSTANDARD!
     t_logical "" <Type_Spec> /
     t_type t_paren_l type_name t_paren_r <Type_Spec>
   end

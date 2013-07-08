@@ -32356,9 +32356,19 @@ module Fortran
       elements[0]
     end
 
+    def star_int
+      elements[1]
+    end
   end
 
   module TypeSpecWithoutKindSelector8
+    def t_logical
+      elements[0]
+    end
+
+  end
+
+  module TypeSpecWithoutKindSelector9
     def t_type
       elements[0]
     end
@@ -32540,13 +32550,7 @@ module Fortran
                   r24 = _nt_t_logical
                   s23 << r24
                   if r24
-                    if has_terminal?("", false, index)
-                      r25 = instantiate_node(SyntaxNode,input, index...(index + 0))
-                      @index += 0
-                    else
-                      terminal_parse_failure("")
-                      r25 = nil
-                    end
+                    r25 = _nt_star_int
                     s23 << r25
                   end
                   if s23.last
@@ -32560,19 +32564,17 @@ module Fortran
                     r0 = r23
                   else
                     i26, s26 = index, []
-                    r27 = _nt_t_type
+                    r27 = _nt_t_logical
                     s26 << r27
                     if r27
-                      r28 = _nt_t_paren_l
-                      s26 << r28
-                      if r28
-                        r29 = _nt_type_name
-                        s26 << r29
-                        if r29
-                          r30 = _nt_t_paren_r
-                          s26 << r30
-                        end
+                      if has_terminal?("", false, index)
+                        r28 = instantiate_node(SyntaxNode,input, index...(index + 0))
+                        @index += 0
+                      else
+                        terminal_parse_failure("")
+                        r28 = nil
                       end
+                      s26 << r28
                     end
                     if s26.last
                       r26 = instantiate_node(Type_Spec,input, i26...index, s26)
@@ -32584,8 +32586,34 @@ module Fortran
                     if r26
                       r0 = r26
                     else
-                      @index = i0
-                      r0 = nil
+                      i29, s29 = index, []
+                      r30 = _nt_t_type
+                      s29 << r30
+                      if r30
+                        r31 = _nt_t_paren_l
+                        s29 << r31
+                        if r31
+                          r32 = _nt_type_name
+                          s29 << r32
+                          if r32
+                            r33 = _nt_t_paren_r
+                            s29 << r33
+                          end
+                        end
+                      end
+                      if s29.last
+                        r29 = instantiate_node(Type_Spec,input, i29...index, s29)
+                        r29.extend(TypeSpecWithoutKindSelector9)
+                      else
+                        @index = i29
+                        r29 = nil
+                      end
+                      if r29
+                        r0 = r29
+                      else
+                        @index = i0
+                        r0 = nil
+                      end
                     end
                   end
                 end
