@@ -17545,27 +17545,12 @@ module Fortran
             if r5
               r0 = r5
             else
-              r6 = _nt_not_op
+              r6 = _nt_logical_op
               if r6
                 r0 = r6
               else
-                r7 = _nt_and_op
-                if r7
-                  r0 = r7
-                else
-                  r8 = _nt_or_op
-                  if r8
-                    r0 = r8
-                  else
-                    r9 = _nt_equiv_op
-                    if r9
-                      r0 = r9
-                    else
-                      @index = i0
-                      r0 = nil
-                    end
-                  end
-                end
+                @index = i0
+                r0 = nil
               end
             end
           end
@@ -19948,6 +19933,46 @@ module Fortran
     end
 
     node_cache[:logical_literal_constant][start_index] = r0
+
+    r0
+  end
+
+  def _nt_logical_op
+    start_index = index
+    if node_cache[:logical_op].has_key?(index)
+      cached = node_cache[:logical_op][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    r1 = _nt_not_op
+    if r1
+      r0 = r1
+    else
+      r2 = _nt_and_op
+      if r2
+        r0 = r2
+      else
+        r3 = _nt_or_op
+        if r3
+          r0 = r3
+        else
+          r4 = _nt_equiv_op
+          if r4
+            r0 = r4
+          else
+            @index = i0
+            r0 = nil
+          end
+        end
+      end
+    end
+
+    node_cache[:logical_op][start_index] = r0
 
     r0
   end
@@ -26572,7 +26597,7 @@ module Fortran
     end
 
     def t_dot
-      elements[1]
+      elements[2]
     end
 
   end
@@ -26603,19 +26628,19 @@ module Fortran
     r2 = _nt_digit_string
     s1 << r2
     if r2
-      r3 = _nt_t_dot
+      i3 = index
+      r4 = _nt_significand_disallowed
+      if r4
+        r3 = nil
+      else
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      end
       s1 << r3
       if r3
-        i4 = index
-        r5 = _nt_significand_disallowed
+        r5 = _nt_t_dot
+        s1 << r5
         if r5
-          r4 = nil
-        else
-          @index = i4
-          r4 = instantiate_node(SyntaxNode,input, index...index)
-        end
-        s1 << r4
-        if r4
           r7 = _nt_digit_string
           if r7
             r6 = r7
@@ -26675,23 +26700,11 @@ module Fortran
     end
 
     i0 = index
-    if has_terminal?("and.", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 4))
-      @index += 4
-    else
-      terminal_parse_failure("and.")
-      r1 = nil
-    end
+    r1 = _nt_rel_op
     if r1
       r0 = r1
     else
-      if has_terminal?("or.", false, index)
-        r2 = instantiate_node(SyntaxNode,input, index...(index + 3))
-        @index += 3
-      else
-        terminal_parse_failure("or.")
-        r2 = nil
-      end
+      r2 = _nt_logical_op
       if r2
         r0 = r2
       else
