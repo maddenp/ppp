@@ -14599,7 +14599,7 @@ module Fortran
       return cached
     end
 
-    if has_terminal?('\G[0123456789abcdef]', true, index)
+    if has_terminal?('\G[0123456789aAbBcCdDeEfF]', true, index)
       r0 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
