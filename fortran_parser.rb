@@ -14489,91 +14489,109 @@ module Fortran
     end
 
     i0, s0 = index, []
+    i1 = index
     if has_terminal?("z", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      r2 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("z")
-      r1 = nil
+      r2 = nil
+    end
+    if r2
+      r1 = r2
+    else
+      if has_terminal?("x", false, index)
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        @index += 1
+      else
+        terminal_parse_failure("x")
+        r3 = nil
+      end
+      if r3
+        r1 = r3
+      else
+        @index = i1
+        r1 = nil
+      end
     end
     s0 << r1
     if r1
-      i2 = index
-      i3, s3 = index, []
-      r4 = _nt_t_apostrophe
-      s3 << r4
-      if r4
-        s5, i5 = [], index
+      i4 = index
+      i5, s5 = index, []
+      r6 = _nt_t_apostrophe
+      s5 << r6
+      if r6
+        s7, i7 = [], index
         loop do
-          r6 = _nt_hex_digit
-          if r6
-            s5 << r6
+          r8 = _nt_hex_digit
+          if r8
+            s7 << r8
           else
             break
           end
         end
-        if s5.empty?
-          @index = i5
-          r5 = nil
+        if s7.empty?
+          @index = i7
+          r7 = nil
         else
-          r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+          r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
         end
-        s3 << r5
-        if r5
-          r7 = _nt_t_apostrophe
-          s3 << r7
+        s5 << r7
+        if r7
+          r9 = _nt_t_apostrophe
+          s5 << r9
         end
       end
-      if s3.last
-        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-        r3.extend(HexConstant0)
+      if s5.last
+        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+        r5.extend(HexConstant0)
       else
-        @index = i3
-        r3 = nil
+        @index = i5
+        r5 = nil
       end
-      if r3
-        r2 = r3
+      if r5
+        r4 = r5
       else
-        i8, s8 = index, []
-        r9 = _nt_t_quotemark
-        s8 << r9
-        if r9
-          s10, i10 = [], index
+        i10, s10 = index, []
+        r11 = _nt_t_quotemark
+        s10 << r11
+        if r11
+          s12, i12 = [], index
           loop do
-            r11 = _nt_hex_digit
-            if r11
-              s10 << r11
+            r13 = _nt_hex_digit
+            if r13
+              s12 << r13
             else
               break
             end
           end
-          if s10.empty?
-            @index = i10
-            r10 = nil
+          if s12.empty?
+            @index = i12
+            r12 = nil
           else
-            r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
+            r12 = instantiate_node(SyntaxNode,input, i12...index, s12)
           end
-          s8 << r10
-          if r10
-            r12 = _nt_t_quotemark
-            s8 << r12
+          s10 << r12
+          if r12
+            r14 = _nt_t_quotemark
+            s10 << r14
           end
         end
-        if s8.last
-          r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
-          r8.extend(HexConstant1)
+        if s10.last
+          r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
+          r10.extend(HexConstant1)
         else
-          @index = i8
-          r8 = nil
+          @index = i10
+          r10 = nil
         end
-        if r8
-          r2 = r8
+        if r10
+          r4 = r10
         else
-          @index = i2
-          r2 = nil
+          @index = i4
+          r4 = nil
         end
       end
-      s0 << r2
+      s0 << r4
     end
     if s0.last
       r0 = instantiate_node(T,input, i0...index, s0)

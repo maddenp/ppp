@@ -1516,8 +1516,10 @@ grammar Fortran
 
   rule hex_constant
     # F90:R410
+    #
+    # Note: x is non-conformant!
 
-    "z" ( ( t_apostrophe hex_digit+ t_apostrophe ) / ( t_quotemark hex_digit+ t_quotemark ) ) <T>
+    ( "z" / "x" ) ( ( t_apostrophe hex_digit+ t_apostrophe ) / ( t_quotemark hex_digit+ t_quotemark ) ) <T>
   end
 
   rule hex_digit
