@@ -1,6 +1,12 @@
 - (MH) Work on testing ppp with FIM source code to find any potential
   errors
 
+- (MH) In translator.rb, think about 'opts' and what is actually optional. Move
+  requirements into the mandatory argslist.
+
+- (MH) Need some kind of fixed-point treatment of assemble / include /
+  sms$insert?
+
 - directives still to do
 
   !sms$serial begin/end
@@ -35,7 +41,7 @@
 - Stop tracking kind. Pass only *type* to MPI-calling SMS routines and, in the
   latter, use mpi_sizeof() + mpi_type_match_size() in the library to make a
   run-time determination of MPI type to use. Get rid of related kind() methods
-  in fortran.rb. Is this a good idea?
+  in fortran.rb. IS THIS A GOOD IDEA?
 
 - Check for and clean up any unused rules (especially sms_* rules)
 
@@ -98,9 +104,6 @@
 - .env file does not contain items added during translation, e.g.
   module_decomp.env does not even *exist*, much less contain the items added
   during translation.
-
-- In translator.rb, think about 'opts' and what is actually optional. Move
-  requirements into the mandatory argslist.
 
 - To make all of this more useful, build an AST from the parse tree. Then, do
   translations on and produce final output from the AST.
@@ -172,8 +175,6 @@
   may fail to properly build, since a lately-timestamped output file will
   exist. (Already done for PARSE FAILED.)
 
-- Need some kind of fixed-point treatment of assemble / include / sms$insert?
-
 - Check status on all allocates rolled out by ppp.
 
 - In getvarenv(), give more verbose information about why a failure has occurred
@@ -185,7 +186,7 @@
   etc.
 
 - Add no-translate option to ppp so that .env files are generated w/o changing
-  the source at all.
+  the source at all. JUST REDIRECT OUTPUT TO /dev/null OR SIMILAR?
 
 - Need SMS library function that takes type and kind arguemnts and returns the
   correct nnt_ type to use in library calls.
