@@ -68,6 +68,14 @@ module Translator
     exit(1) if die
   end
 
+  def fixed_point_normalize(s,parser)
+    s0=nil
+    while s=parser.parse(s).to_s
+      return s if s==s0
+      s0=s
+    end
+  end
+
   def go(wrapper)
     @wrapper=wrapper
     fail usage unless srcfile=ARGV.pop
@@ -85,7 +93,7 @@ module Translator
     s=s.gsub(/^\s+/,"")                # remove leading whitespace
     s=s.gsub(/[ \t]+$/,"")             # remove trailing whitespace
     s=s.gsub(/^!.*\n/,"")              # remove full-line comments
-    s=np.parse(np.parse(s).to_s).to_s  # two normalize passes
+    s=fixed_point_normalize(s,np)      # normalize
     s=s.sub(/^\n+/,"")                 # remove leading newlines
     s+="\n" if s[-1]!="\n" and newline # ensure final newline
     s=s.gsub(/^@(.*)/i,'!\1')          # show directives
@@ -165,7 +173,7 @@ module Translator
       s=s.gsub(directive,'@\1')                # hide directives
       s=s.gsub /\n[ \t]{5}[^ \t0]/, "\n     a" # replace any continuation character with generic "a"
       s=s.gsub /^\s*![^\n]*\n/, ''             # remove full line comments
-      s=np.parse(np.parse(s).to_s).to_s        # parse
+      s=fixed_point_normalize(s,np)            # normalize
       s=s.gsub /\n[ \t]{5}a/, ""               # join continuation lines
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
       s
@@ -210,13 +218,15 @@ module Translator
     s=prepsrc_free(s) if defined? prepsrc_free
     s=assemble(s,[srcfile],opts[:incdirs])
     cppcheck(s)
-    puts "RAW SOURCE\n\n#{s}\n" if debug
+    if debug
+      puts "RAW #{(opts[:fixed])?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}\n"
+    end
     if opts[:fixed]
-      puts "FIXED2FREE SOURCE\n\n" if debug
+      puts "FREE-FORM TRANSLATION\n\n" if debug
       s=fixed2free(s)
       puts "#{s}\n\n" if debug
     end
-    puts "FREE2NORMALIZED SOURCE\n" if debug
+    puts "NORMALIZED FORM\n" if debug
     n=normalize(s,opts[:nl])
     puts "\n#{n}" if debug or opts[:normalize]
     unless opts[:normalize]
