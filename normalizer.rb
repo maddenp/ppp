@@ -13,8 +13,8 @@ module Normalizer
     a.each_index do |i|
       l=a[i]
       h=false
-      p="\(.*?[0-9]{1,5}[ \t]*format[ \t]*\\(.*?\)\([0-9]+\)[ \t]*[hH]\(.*?\)\\)\(.*\)"
-      r=Regexp.new(p,true)
+      p="\([ \t]*?[0-9]{1,5}[ \t]*format[ \t]*\\(.*?\)\([0-9]+\)[ \t]*[hH]\(.*?\)\\)\(.*\)"
+      r=Regexp.new(p,true) # true => case-insensitive
       while m=r.match(l)
         h=true
         p1=m[3][0..m[2].to_i-1]
