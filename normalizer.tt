@@ -17,7 +17,7 @@ grammar Normalizer
   end
 
   rule unquoted
-    [^\'\"!@]+ <Normalize>
+    [^\'\"!@]+ <Unquoted>
   end
 
 end

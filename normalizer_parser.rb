@@ -326,7 +326,7 @@ module Normalizer
       @index = i0
       r0 = nil
     else
-      r0 = instantiate_node(Normalize,input, i0...index, s0)
+      r0 = instantiate_node(Unquoted,input, i0...index, s0)
     end
 
     node_cache[:unquoted][start_index] = r0

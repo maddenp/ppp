@@ -63,7 +63,7 @@ module Normalizer
   # class method(s)
 
   def update(m1)
-    to_update=["Normalize","Quoted"]
+    to_update=["Quoted","Unquoted"]
     m0=Normalizer
     to_update.each do |e|
       m0.send(:remove_const,e) if m0.const_defined?(e)
