@@ -165,7 +165,10 @@ module Translator
     def fixed2free(s)
       np=NormalizerParser.new
       np.update(Normfixed)
-      s=s.gsub /\n[ \t]*$/, ''                 # removes blank lines
+      unless /\n[ \t]*\t/ !~ s
+        fail ("ERROR: NO SUPPORT FOR TABS IN LEADING WHITESPACE")
+      end
+      s=s.gsub /^[ \t]*\n/, ''                 # removes blank lines
       a=s.split("\n")                          # splits file into an array by line
       a=a.map {|e| (e+(" "*72))[0..71]}        # pad each line with 72 blanks, truncate at column 72
       s=a.join "\n"                            # join array into string
