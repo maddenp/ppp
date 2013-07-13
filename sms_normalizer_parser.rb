@@ -121,7 +121,7 @@ module Normalizer
             if r5
               s6, i6 = [], index
               loop do
-                if has_terminal?('\G[^\\n\\\'\\"]', true, index)
+                if has_terminal?('\G[^\\\'\\"\\n]', true, index)
                   r7 = true
                   @index += 1
                 else

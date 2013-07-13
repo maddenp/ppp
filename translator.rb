@@ -2,11 +2,31 @@ module Translator
 
   include Fortran
 
+  class Stringmap
+
+    def initialize
+      @index=1
+      @map={}
+    end
+
+    def get(k)
+      @map[k]
+    end
+
+    def set(s)
+      k="##{@index}#"
+      @map[k]=s
+      @index+=1
+      k
+    end
+
+  end
+      
+  # X*Parser scheme due to Clifford Heath (http://goo.gl/62pJ6)
+
   class XFortranParser < FortranParser
 
-    # Clifford Heath's mechanism (http://goo.gl/62pJ6)
-
-    class InputProxy
+    class Xinput
 
       attr_accessor :envstack,:srcfile
 
@@ -31,8 +51,32 @@ module Translator
     end
 
     def parse(input,options={})
-      input=InputProxy.new(input,@envstack)
+      input=Xinput.new(input,@envstack)
       super(input,options)
+    end
+
+  end
+
+  class XNormalizerParser < NormalizerParser
+
+    class Xinput
+
+      attr_accessor :control
+
+      def initialize(input,control)
+        @input=input
+        @control=control
+      end
+
+      def method_missing(method,*args)
+        @input.send(method,*args)
+      end
+
+    end
+
+    def parse(input,control=OpenStruct.new)
+      input=Xinput.new(input,control)
+      super(input)
     end
 
   end
@@ -52,6 +96,19 @@ module Translator
     }
   end
 
+  def dehollerith(s)
+    # Convert instances of F90:R1016 char-string-edit-desc to quoted strings to
+    # preserve case and whitespace.
+    restr="^\([ \t]*?[0-9]{1,5}[ \t]*format[ \t]*\\(.*?\)\([0-9]+\)[ \t]*[hH]\(.*?\)\\)\(.*\)"
+    r=Regexp.new(restr,true) # true => case-insensitivity
+    while m=r.match(s)
+      p1=m[3][0..m[2].to_i-1]
+      p2=m[3].sub(/^#{p1}/,"")
+      s=s.gsub(m[0],"#{m[1]}'#{p1}'#{p2})#{m[4]}")
+    end
+    s
+  end
+
   def directive
     unless @directive
       f=File.join(File.dirname(File.expand_path($0)),"sentinels")
@@ -68,9 +125,11 @@ module Translator
     exit(1) if die
   end
 
-  def fixed_point_normalize(s,parser)
+  def fpn(s,parser,control=OpenStruct.new)
+    # fixed-point normalization
     s0=nil
-    while s=parser.parse(s).to_s
+    while s=parser.parse(s,control).to_s
+      s=s.gsub(/^$[ \t]*\n/,'')
       return s if s==s0
       s0=s
     end
@@ -86,17 +145,40 @@ module Translator
     puts out(s,:program_units,srcfile,opts)
   end
 
+  def restore_strings(s,stringmap)
+    r=Regexp.new("#[0-9]+#")
+    while m=r.match(s)
+      s.sub!("#{m}",stringmap.get("#{m}"))
+    end
+    s
+  end
+
   def normalize(s,newline)
-    np=NormalizerParser.new
+    np=XNormalizerParser.new
     np.update(Normfree)
-    s=s.gsub(directive,'@\1')          # hide directives
-    s=s.gsub(/^\s+/,"")                # remove leading whitespace
-    s=s.gsub(/[ \t]+$/,"")             # remove trailing whitespace
-    s=s.gsub(/^!.*\n/,"")              # remove full-line comments
-    s=fixed_point_normalize(s,np)      # normalize
-    s=s.sub(/^\n+/,"")                 # remove leading newlines
-    s+="\n" if s[-1]!="\n" and newline # ensure final newline
-    s=s.gsub(/^@(.*)/i,'!\1')          # show directives
+    control=OpenStruct.new
+    stringmap=Stringmap.new
+    control.stringmap=stringmap
+    s=s.gsub(directive,'@\1')           # hide directives
+    s=s.gsub(/^[ \t]+/,"")              # remove leading whitespace
+    s=s.gsub(/[ \t]+$/,"")              # remove trailing whitespace
+    s=s.gsub(/^[ \t]*!.*$\n/,"")        # remove full-line comments
+    control.op=1
+    s=fpn(s,np,control)                 # string-aware transform 1
+    s=s.gsub(/&[ \t]*\n[ \t]*&?/,"")    # join continuation lines
+    control.op=2
+    s=np.parse(s,control).to_s          # hide original strings
+    s=dehollerith(s)                    # replace holleriths
+    s=np.parse(s,control).to_s          # hide dehollerith'ed strings
+    s=s.downcase                        # lower-case text only
+    s=s.gsub(/[ \t]+/,"")               # remove whitespace
+    s=restore_strings(s,stringmap)      # restore strings
+    s=s.sub(/^\n+/,"")                  # remove leading newlines
+    s=s+"\n" if s[-1]!="\n" and newline # append final newline if required
+    s=s.chomp unless newline            # remove final newline if forbidden
+    s=s.gsub(/^@(.*)/i,'!\1')           # show directives
+    s=s.gsub(/^[ \t]*\n/,'')            # remove blank lines
+    s
   end
 
   def out(s,root,srcfile,opts={})
@@ -163,21 +245,21 @@ module Translator
     end
 
     def fixed2free(s)
-      np=NormalizerParser.new
+      np=XNormalizerParser.new
       np.update(Normfixed)
       unless /\n[ \t]*\t/ !~ s
         fail ("ERROR: NO SUPPORT FOR TABS IN LEADING WHITESPACE")
       end
-      s=s.gsub /^[ \t]*\n/, ''                 # removes blank lines
-      a=s.split("\n")                          # splits file into an array by line
+      s=s.gsub(/^[ \t]*\n/,'')                 # remove blank lines
+      a=s.split("\n")                          # split file into an array by line
       a=a.map {|e| (e+(" "*72))[0..71]}        # pad each line with 72 blanks, truncate at column 72
-      s=a.join "\n"                            # join array into string
-      s=s.gsub /^(c|C|\*)/, "!"                # replace fixed form comment indicators with "!"
+      s=a.join("\n")                           # join array into string
+      s=s.gsub(/^(c|C|\*)/,"!")                # replace fixed form comment indicators with "!"
       s=s.gsub(directive,'@\1')                # hide directives
-      s=s.gsub /\n[ \t]{5}[^ \t0]/, "\n     a" # replace any continuation character with generic "a"
-      s=s.gsub /^\s*![^\n]*\n/, ''             # remove full line comments
-      s=fixed_point_normalize(s,np)            # normalize
-      s=s.gsub /\n[ \t]{5}a/, ""               # join continuation lines
+      s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # replace any continuation character with generic "a"
+      s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
+      s=fpn(s,np)                              # string-aware transform
+      s=s.gsub(/\n[ \t]{5}a/,"")               # join continuation lines
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
       s
     end
@@ -233,7 +315,7 @@ module Translator
     n=normalize(s,opts[:nl])
     puts "\n#{n}" if debug or opts[:normalize]
     unless opts[:normalize]
-      raw_tree=fp.parse(n,:root=>root)
+      raw_tree=fp.parse(n,{:root=>root})
       raw_tree.instance_variable_set(:@srcfile,srcfile)
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
       if debug
