@@ -161,11 +161,15 @@ module Translator
   end
 
   def restore_strings(s,stringmap)
-    r=Regexp.new("#[0-9]+#")
-    while m=r.match(s)
-      s.sub!("#{m}",stringmap.get("#{m}"))
-    end
-    s
+    # Source-program string literals may contain our string placeholder token,
+    # so we must avoid processing restored strings (e.g. via gsub), as their
+    # contents could incorrectly be 'restored'. So, split the source on the
+    # placeholder token and iterate *once* over it, replacing token keys with
+    # their corresponding saved values.
+    r=Regexp.new("(#[0-9]+#)")
+    a=s.split(r)
+    a.map! { |e| (e=~r)?(stringmap.get(e)):(e) }
+    s=a.join
   end
 
   def normalize(s,newline)

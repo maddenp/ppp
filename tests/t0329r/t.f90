@@ -9,4 +9,5 @@ program t
 66666 FORMAT ('Hel&
         &lo ',&
   &5hWorld) ; print 66666
+77777 FORMAT ('#2#',5HWorld) ; print 77777
 end program t

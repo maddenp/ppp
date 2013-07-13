@@ -8,4 +8,5 @@
      &5hWorld) ; print 55555
 66666 FORMAT ('Hello ', ! comment
      _5hWorld) ; print 66666
+77777 FORMAT ('#2#',5HWorld) ; print 77777
       end program t
