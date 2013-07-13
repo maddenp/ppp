@@ -204,3 +204,8 @@
 - In fortran.tt, rule array_spec makes a claim about a bad parse. The comment
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
+
+- In normalizer.tt, should Quoted have higher precendence? Otherwise, what about
+  '@' inside a quoted string?
+
+- Normalizing parses can fail, too. Handle it.
