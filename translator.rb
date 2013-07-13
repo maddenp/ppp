@@ -98,15 +98,29 @@ module Translator
   end
 
   def dehollerith(s)
-    # Convert instances of F90:R1016 char-string-edit-desc to quoted strings to
-    # preserve case and whitespace.
-    restr="^\([ \t]*?[0-9]{1,5}[ \t]*format[ \t]*\\(.*?\)\([0-9]+\)[ \t]*[hH]\(.*?\)\\)\(.*\)"
-    r=Regexp.new(restr,true) # true => case-insensitivity
-    while m=r.match(s)
-      p1=m[3][0..m[2].to_i-1]
-      p2=m[3].sub(/^#{p1}/,"")
-      s=s.gsub(m[0],"#{m[1]}'#{p1}'#{p2})#{m[4]}")
+    # Convert instances of Hollerith(-esque) constants to quoted strings.
+    def replace(s,re)
+      r=Regexp.new(re,true) # true => case-insensitivity
+      while m=r.match(s)
+        first=m[1]
+        strlen=m[2].to_i-1
+        string=m[3][0..strlen]
+        rest=m[3].sub(/^#{string}/,"")
+        s=s.gsub(m[0],"#{first}'#{string}'#{rest}")
+      end
+      s
     end
+    w  = "[ \t]*"                  # whitespace
+    lm = "^(#{w}[0-9]{1,5}#{w}"    # label (mandatory)
+    lo = "^(#{w}[0-9]{0,5}#{w}"    # label (optional)
+    n  = ")([0-9]+)#{w}"           # number
+    o  = ".*?"                     # other
+    r  = "(.*)"                    # rest (including hollerith constant)
+    v  = "#{w}[a-z][a-z0-9_]*#{w}" # variable name
+    res=[]
+    res.push(lm+"format"+w+"\\("+o+n+"h"+r) # F90:R1016 char-string-edit-desc
+    res.push(lo+"data"+v+"/"+o+n+"h"+r)     # Hollerith in data-stmt
+    res.each { |re| s=replace(s,re) }
     s
   end
 

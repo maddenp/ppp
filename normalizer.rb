@@ -26,7 +26,8 @@ module Normalizer
 
   class Text < Treetop::Runtime::SyntaxNode
     def to_s
-      elements.reduce("") { |s,e| s+="#{e}" }
+      s=elements.reduce("") { |s,e| s+="#{e}" }
+      s
     end
   end
 
