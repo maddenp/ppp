@@ -212,3 +212,6 @@
 
 - 'include Translator' in requires.rb adds all Translator (and thus *Parser)
   methods to Object -- not good! Fix it.
+
+- Is there *really* no way (e.g. with generics) for string-hiding tokens to
+  appear in valid fortran code? Investigate and fix if necessary.
