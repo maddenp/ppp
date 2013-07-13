@@ -4,10 +4,12 @@ module Translator
 
   class Stringmap
 
-    def initialize(maskfn)
+    attr_reader :re
+
+    def initialize
       @index=1
       @map={}
-      @maskfn=maskfn
+      @re=Regexp.new("(#[0-9]+#)")
     end
 
     def get(k)
@@ -15,7 +17,7 @@ module Translator
     end
 
     def set(s)
-      k=@maskfn.call(@index+=1)
+      k="##{@index+=1}#"
       @map[k]=s
       k
     end
@@ -160,20 +162,10 @@ module Translator
     puts out(s,:program_units,srcfile,opts)
   end
 
-  def mask
-    # fn returns a string-masking token incorporating the given (espected to be
-    # unique) integer. re matches tokens created by fn. String-masking tokens
-    # must not match anything that could appear in valid Fortran code outside a
-    # string literal. Avoid use of F90:R1206 generic-spec operators.
-    fn=Proc.new { |n| "##{n}#" }
-    re=Regexp.new("(#[0-9]+#)")
-    OpenStruct.new({:fn=>fn,:re=>re})
-  end
-
   def normalize(s,newline)
     np=XNormalizerParser.new
     np.update(Normfree)
-    m=Stringmap.new(mask.fn)
+    m=Stringmap.new
     s=s.gsub(directive,'@\1')           # hide directives
     s=s.gsub(/^[ \t]+/,"")              # remove leading whitespace
     s=s.gsub(/[ \t]+$/,"")              # remove trailing whitespace
@@ -372,7 +364,7 @@ module Translator
     # contents could incorrectly be 'restored'. So, split the source on the
     # placeholder token and iterate *once* over it, replacing token keys with
     # their corresponding saved values.
-    r=mask.re
+    r=stringmap.re
     a=s.split(r)
     a.map! { |e| (e=~r)?(stringmap.get(e)):(e) }
     s=a.join

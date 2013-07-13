@@ -218,5 +218,3 @@
 
 - OMP directives are now being mangled by normalization. Maybe need to use
   hiding mechanism like for string literals. t0256 tests actually fail.
-
-- Should mask() be part of Stringmap?
