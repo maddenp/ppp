@@ -209,3 +209,6 @@
   '@' inside a quoted string?
 
 - Normalizing parses can fail, too. Handle it.
+
+- 'include Translator' in requires.rb adds all Translator (and thus *Parser)
+  methods to Object -- not good! Fix it.
