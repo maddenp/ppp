@@ -61,11 +61,12 @@ module Translator
 
     class Xinput
 
-      attr_accessor :control
+      attr_accessor :op,:stringmap
 
-      def initialize(input,control)
+      def initialize(input,op,stringmap)
         @input=input
-        @control=control
+        @op=op
+        @stringmap=stringmap
       end
 
       def method_missing(method,*args)
@@ -74,8 +75,8 @@ module Translator
 
     end
 
-    def parse(input,control=OpenStruct.new)
-      input=Xinput.new(input,control)
+    def parse(input,op,stringmap)
+      input=Xinput.new(input,op,stringmap)
       super(input)
     end
 
@@ -125,10 +126,10 @@ module Translator
     exit(1) if die
   end
 
-  def fpn(s,parser,control=OpenStruct.new)
+  def fpn(s,parser,op=nil,stringmap=nil)
     # fixed-point normalization
     s0=nil
-    while s=parser.parse(s,control).to_s
+    while s=parser.parse(s,op,stringmap).to_s
       s=s.gsub(/^$[ \t]*\n/,'')
       return s if s==s0
       s0=s
@@ -156,23 +157,19 @@ module Translator
   def normalize(s,newline)
     np=XNormalizerParser.new
     np.update(Normfree)
-    control=OpenStruct.new
-    stringmap=Stringmap.new
-    control.stringmap=stringmap
+    m=Stringmap.new
     s=s.gsub(directive,'@\1')           # hide directives
     s=s.gsub(/^[ \t]+/,"")              # remove leading whitespace
     s=s.gsub(/[ \t]+$/,"")              # remove trailing whitespace
     s=s.gsub(/^[ \t]*!.*$\n/,"")        # remove full-line comments
-    control.op=1
-    s=fpn(s,np,control)                 # string-aware transform 1
+    s=fpn(s,np,1,m)                     # string-aware transform 1
     s=s.gsub(/&[ \t]*\n[ \t]*&?/,"")    # join continuation lines
-    control.op=2
-    s=np.parse(s,control).to_s          # hide original strings
+    s=np.parse(s,2,m).to_s              # hide original strings
     s=dehollerith(s)                    # replace holleriths
-    s=np.parse(s,control).to_s          # hide dehollerith'ed strings
+    s=np.parse(s,2,m).to_s              # hide dehollerith'ed strings
     s=s.downcase                        # lower-case text only
     s=s.gsub(/[ \t]+/,"")               # remove whitespace
-    s=restore_strings(s,stringmap)      # restore strings
+    s=restore_strings(s,m)              # restore strings
     s=s.sub(/^\n+/,"")                  # remove leading newlines
     s=s+"\n" if s[-1]!="\n" and newline # append final newline if required
     s=s.chomp unless newline            # remove final newline if forbidden
