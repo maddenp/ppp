@@ -4,9 +4,10 @@ module Translator
 
   class Stringmap
 
-    def initialize
+    def initialize(maskfn)
       @index=1
       @map={}
+      @maskfn=maskfn
     end
 
     def get(k)
@@ -14,9 +15,8 @@ module Translator
     end
 
     def set(s)
-      k="##{@index}#"
+      k=@maskfn.call(@index+=1)
       @map[k]=s
-      @index+=1
       k
     end
 
@@ -160,31 +160,29 @@ module Translator
     puts out(s,:program_units,srcfile,opts)
   end
 
-  def restore_strings(s,stringmap)
-    # Source-program string literals may contain our string placeholder token,
-    # so we must avoid processing restored strings (e.g. via gsub), as their
-    # contents could incorrectly be 'restored'. So, split the source on the
-    # placeholder token and iterate *once* over it, replacing token keys with
-    # their corresponding saved values.
-    r=Regexp.new("(#[0-9]+#)")
-    a=s.split(r)
-    a.map! { |e| (e=~r)?(stringmap.get(e)):(e) }
-    s=a.join
+  def mask
+    # fn returns a string-masking token incorporating the given (espected to be
+    # unique) integer. re matches tokens created by fn. String-masking tokens
+    # must not match anything that could appear in valid Fortran code outside a
+    # string literal. Avoid use of F90:R1206 generic-spec operators.
+    fn=Proc.new { |n| "##{n}#" }
+    re=Regexp.new("(#[0-9]+#)")
+    OpenStruct.new({:fn=>fn,:re=>re})
   end
 
   def normalize(s,newline)
     np=XNormalizerParser.new
     np.update(Normfree)
-    m=Stringmap.new
+    m=Stringmap.new(mask.fn)
     s=s.gsub(directive,'@\1')           # hide directives
     s=s.gsub(/^[ \t]+/,"")              # remove leading whitespace
     s=s.gsub(/[ \t]+$/,"")              # remove trailing whitespace
     s=s.gsub(/^[ \t]*!.*$\n/,"")        # remove full-line comments
     s=fpn(s,np,1,m)                     # string-aware transform 1
     s=s.gsub(/&[ \t]*\n[ \t]*&?/,"")    # join continuation lines
-    s=np.parse(s,2,m).to_s              # hide original strings
+    s=np.parse(s,2,m).to_s              # mask original strings
     s=dehollerith(s)                    # replace holleriths
-    s=np.parse(s,2,m).to_s              # hide dehollerith'ed strings
+    s=np.parse(s,2,m).to_s              # mask dehollerith'ed strings
     s=s.downcase                        # lower-case text only
     s=s.gsub(/[ \t]+/,"")               # remove whitespace
     s=restore_strings(s,m)              # restore strings
@@ -366,6 +364,18 @@ module Translator
     opts[:translate]=false
     translated_source,raw_tree,translated_tree=process(s,root,srcfile,opts)
     raw_tree
+  end
+
+  def restore_strings(s,stringmap)
+    # Source-program string literals may contain our string placeholder token,
+    # so we must avoid processing restored strings (e.g. via gsub), as their
+    # contents could incorrectly be 'restored'. So, split the source on the
+    # placeholder token and iterate *once* over it, replacing token keys with
+    # their corresponding saved values.
+    r=mask.re
+    a=s.split(r)
+    a.map! { |e| (e=~r)?(stringmap.get(e)):(e) }
+    s=a.join
   end
 
   def server(socket,quiet=false)
