@@ -13,19 +13,16 @@ require "yaml"
 # ppp requires
 
 require "treetop/runtime"
-
 require "normalizer"
 require "normalizer_parser"
 require "sms_normalizer"
 require "sms_normalizer_parser"
 require "normfixed"
 require "normfree"
-
 require "fortran"
 require "fortran_parser"
 require "sms_fortran"
 require "sms_fortran_parser"
-
 require "translator"
 
 include Translator

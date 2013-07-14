@@ -1513,7 +1513,7 @@ end
 module Translator
 
   def prepsrc_free(s)
-    s=s.gsub(/^\s*!sms\$insert\s*/i,"")                           # process inserts
+    s=s.gsub(/^\s*!sms\$insert\s*/i,"")                            # process inserts
     s=s.gsub(/^\s*!sms\$remove\s+begin.*?!sms\$remove\s+end/im,"") # process removes
     s
   end
