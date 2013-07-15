@@ -47,7 +47,7 @@ module Translator
       :debug=>false,
       :incdirs=>[],
       :nl=>true,
-      :normalize=>false,
+      :norm=>false,
       :translate=>true
     }
   end
@@ -82,8 +82,8 @@ module Translator
     srcfile=File.expand_path(srcfile)
     fail "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
     s=File.open(srcfile,"rb").read
-    opts=unpack({},ARGV)
-    puts out(s,:program_units,srcfile,opts)
+    conf=unpack({},ARGV)
+    puts out(s,:program_units,srcfile,conf)
   end
 
   def normalize(s,newline)
@@ -99,13 +99,13 @@ module Translator
     s=s.gsub(/^@(.*)/i,'!\1')          # show directives
   end
 
-  def out(s,root,srcfile,opts={})
-    opts=default_opts.merge(opts)
-    translated_source,raw_tree,translated_tree=process(s,root,srcfile,opts)
+  def out(s,root,srcfile,conf)
+    conf=ostruct_default_merge(conf)
+    translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
     translated_source
   end
 
-  def process(s,root,srcfile,opts={})
+  def process(s,root,srcfile,conf)
 
     def assemble(s,seen,incdirs=[])
       current=seen.last
@@ -214,29 +214,36 @@ module Translator
       a.join("\n")
     end
 
-    opts=default_opts.merge(opts)
-    debug=opts[:debug]
-    fp=XFortranParser.new(srcfile,opts[:incdirs])
-    s=prepsrc_fixed(s) if defined? prepsrc_fixed and opts[:fixed]
-    s=prepsrc_free(s) if defined? prepsrc_free
-    s=assemble(s,[srcfile],opts[:incdirs])
+    conf=ostruct_default_merge(conf)
+    fp=XFortranParser.new(srcfile,conf.incdirs)
+    s0=nil
+    while s!=s0
+      s0=s
+      if defined? prepsrc_fixed and conf.fixed
+        s=prepsrc_fixed(s)
+      end
+      if defined? prepsrc_free
+        s=prepsrc_free(s)
+      end
+      s=assemble(s,[srcfile],conf.incdirs)
+    end
     cppcheck(s)
-    if debug
-      puts "RAW #{(opts[:fixed])?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}\n"
+    if conf.debug
+      puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}\n"
     end
-    if opts[:fixed]
-      puts "FREE-FORM TRANSLATION\n\n" if debug
+    if conf.fixed
+      puts "FREE-FORM TRANSLATION\n\n" if conf.debug
       s=fixed2free(s)
-      puts "#{s}\n\n" if debug
+      puts "#{s}\n\n" if conf.debug
     end
-    puts "NORMALIZED FORM\n" if debug
-    n=normalize(s,opts[:nl])
-    puts "\n#{n}" if debug or opts[:normalize]
-    unless opts[:normalize]
+    puts "NORMALIZED FORM\n" if conf.debug
+    n=normalize(s,conf.nl)
+    puts "\n#{n}" if conf.debug or conf.norm
+    unless conf.norm
       raw_tree=fp.parse(n,:root=>root)
       raw_tree.instance_variable_set(:@srcfile,srcfile)
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
-      if debug
+      if conf.debug
         puts "\nRAW TREE\n\n"
         p raw_tree
       end
@@ -253,21 +260,21 @@ module Translator
         fail failmsg
         return # if in server mode and did not exit in fail()
       end
-      translated_tree=(opts[:translate])?(raw_tree.translate_top):(nil)
-      if debug
+      translated_tree=(conf.translate)?(raw_tree.translate_top):(nil)
+      if conf.debug
         puts "\nTRANSLATED TREE\n\n"
         p translated_tree
       end
       t=wrap(translated_tree.to_s)
-      puts "\nTRANSLATED SOURCE\n\n" if debug
+      puts "\nTRANSLATED SOURCE\n\n" if conf.debug
     end
     [t,raw_tree,translated_tree]
   end
 
-  def raw(s,root,srcfile,opts={})
-    opts=default_opts.merge(opts)
-    opts[:translate]=false
-    translated_source,raw_tree,translated_tree=process(s,root,srcfile,opts)
+  def raw(s,root,srcfile,conf=OpenStruct.new)
+    conf=ostruct_default_merge(conf)
+    conf.translate=false
+    translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
     raw_tree
   end
 
@@ -280,7 +287,7 @@ module Translator
     UNIXServer.open(socket) do |server|
       while true
         begin
-          opts={}
+          conf=OpenStruct.new
           client=server.accept
           srcfile=client.gets.chomp
           form=client.gets.chomp
@@ -291,17 +298,17 @@ module Translator
             fail("No such file: #{srcfile}",false,srcfile)
           end
           srcdir=File.dirname(File.expand_path(srcfile))
-          opts[:incdirs]=[srcdir]
-          opts[:fixed]=(form=="fixed")
+          conf.incdirs=[srcdir]
+          conf.fixed=(form=="fixed")
           dirlist.split(":").each do |d|
             d=File.join(srcdir,d) if Pathname.new(d).relative?
             unless File.directory?(d)
               fail("No such directory: #{d}",false,srcfile)
             end
-            opts[:incdirs].push(d)
+            conf.incdirs.push(d)
           end
           puts "Translating #{srcfile}" unless quiet
-          client.puts(out(s,:program_units,srcfile,opts))
+          client.puts(out(s,:program_units,srcfile,conf))
           client.close
         rescue Errno::EPIPE
           # Handle broken pipe (i.e. other end of the socket dies)
@@ -340,14 +347,19 @@ module Translator
     exit(status) unless status==false
   end
 
-  def tree(s,root,srcfile,opts={})
-    opts=default_opts.merge(opts)
-    translated_source,raw_tree,translated_tree=process(s,root,srcfile,opts)
+  def tree(s,root,srcfile,conf)
+    conf=ostruct_default_merge(conf)
+    translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
     translated_tree
   end
 
-  def unpack(opts,args)
-    opts[:incdirs]=["."]
+  def ostruct_default_merge(a)
+    OpenStruct.new(default_opts.merge(a.marshal_dump))
+  end
+
+  def unpack(conf,args)
+    conf=OpenStruct.new(conf)
+    conf.incdirs=["."]
     while opt=args.shift
       case opt
       when "-I"
@@ -355,30 +367,30 @@ module Translator
         fail usage unless dirlist
         dirlist.split(":").each do |d|
           fail "No such directory: #{d}" unless File.directory?(d)
-          opts[:incdirs].push(d)
+          conf.incdirs.push(d)
         end
       when "fixed"
-        opts[:fixed]=true
+        conf.fixed=true
       when "free"
         nil # default behavior
       when "debug"
-        opts[:debug]=true
+        conf.debug=true
       when "normalize"
-        opts[:normalize]=true
+        conf.norm=true
       else
         fail usage
       end
     end
-    opts
+    conf
   end
 
   def usage
-    opts=[]
-    opts.push("-I dir[:dir:...]]")
-    opts.push("debug")
-    opts.push("fixed")
-    opts.push("normalize")
-    "#{File.basename(@wrapper)} [ #{opts.join(" | ")} ] source"
+    x=[]
+    x.push("-I dir[:dir:...]]")
+    x.push("debug")
+    x.push("fixed")
+    x.push("normalize")
+    "#{File.basename(@wrapper)} [ #{x.join(" | ")} ] source"
   end
 
 end
