@@ -62,7 +62,9 @@
   See t0151. May also be related to need to track, store, load user-defined type
   info.
 
-- Make implicit none mandatory! Parsing is weird w/o it.
+- Make implicit none mandatory! Parsing is weird w/o it. Update: Not sure if
+  this is feasible if we want to use others' libraries -- may be too much work
+  to modify old code using implicit typing.
 
 - write-stmt seems to parse wrong, 'write' recognized as Data_Ref. This could be
   a problem re: implicit translation of write io statements.
@@ -103,7 +105,7 @@
   section, not at the top, so that declare() calls can be made, intuitively, in
   the required order.
 
-- .env file does not contain items added during translation, e.g.
+- .env file does not contain items added during translation, (true?) e.g.
   module_decomp.env does not even *exist*, much less contain the items added
   during translation.
 
@@ -136,10 +138,6 @@
 - In fortran.rb/sms_fortran.rb, standardize when methods on nodes return strings
   or SyntaxNode subclasses. That is, should we convert to strings as early as
   possible, or delay until a string is absolutely required? Probably the latter.
-
-- Can cat() et al be moved into SyntaxNode extension in fortran.rb and used in
-  various to_s() functions to simplify syntax? In general, try to move methods
-  into the nearest ancestor class possible.
 
 - Try to find out which directives actually require module_decomp and/or
   nnt_types_module and limit rolled-out 'declare' calls.
@@ -193,9 +191,11 @@
 - Need SMS library function that takes type and kind arguemnts and returns the
   correct nnt_ type to use in library calls.
 
-- Trim rolled-out variable names to 31 characters (F90 section 3.2.2)
+- Trim rolled-out variable names to 31 characters (F90 section 3.2.2) Or use
+  some numeric scheme in too-long cases, to avoid collisions.
 
-- Consider limitation on number of continuation lines.
+- Consider limitation on number of continuation lines. At least exit with error
+  if this is happening.
 
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
   label, but also labels further down in the stack? That would also be an error,
@@ -209,9 +209,6 @@
   '@' inside a quoted string?
 
 - Normalizing parses can fail, too. Handle it.
-
-- 'include Translator' in requires.rb adds all Translator (and thus *Parser)
-  methods to Object -- not good! Fix it.
 
 - OMP directives are now being mangled by normalization. Maybe need to use
   hiding mechanism like for string literals. t0256 tests actually fail.
