@@ -1,13 +1,5 @@
-- (MH) Work on testing ppp with FIM source code to find any potential
+-  IN PROGRESS (MH) Work on testing ppp with FIM source code to find any potential
   errors
-
-- (MH) In translator.rb, think about 'opts' and what is actually optional. Move
-  requirements into the mandatory argslist.
-
-- (MH) Replace opts Hash with an OpenStruct?
-
-- (MH) Need some kind of fixed-point treatment of assemble / include /
-  sms$insert?
 
 - directives still to do
 

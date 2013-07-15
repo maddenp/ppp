@@ -508,7 +508,7 @@ module Fortran
     end
 
     def replace_element(code,rule,node=self)
-      tree=raw(code,rule,@srcfile,{:nl=>false})
+      tree=raw(code,rule,@srcfile,OpenStruct.new("nl"=>false))
       node=node.parent while "#{node}"=="#{node.parent}"
       tree.parent=node.parent
       block=node.parent.e
