@@ -19,7 +19,10 @@ module Normalizer
   class Directive < Treetop::Runtime::SyntaxNode
     def to_s
       s=text_value
-      s="\n"+s
+      case input.op
+      when 1
+        s=input.stringmap.set(s)
+      end
       s
     end
   end
