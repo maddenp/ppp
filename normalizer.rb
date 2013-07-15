@@ -1,67 +1,5 @@
 module Normalizer
 
-  # module method(s)
-
-# def Normalizer.csedfix(t,extra=true)
-#   # Convert instances of F90:1016 char-string-edit-desc to quoted strings to
-#   # preserve case and whitespace.
-#   #
-#   # Attempting a multiline match of the regular expression below on a string
-#   # representing a huge source file is incredibly slow. Breaking the string
-#   # into lines improves performance significantly. 
-#   a=t.split("\n")
-#   a.each_index do |i|
-#     l=a[i]
-#     h=false
-#     p="\([ \t]*?[0-9]{1,5}[ \t]*format[ \t]*\\(.*?\)\([0-9]+\)[ \t]*[hH]\(.*?\)\\)\(.*\)"
-#     r=Regexp.new(p,true) # true => case-insensitive
-#     while m=r.match(l)
-#       h=true
-#       p1=m[3][0..m[2].to_i-1]
-#       p2=m[3].sub(/^#{p1}/,"")
-#       l="#{m[1]}'#{p1}'#{p2})#{m[4]}"
-#     end
-#     if extra
-#       # If a F90:1016 conversion occurred, quoted strings have been introduced
-#       # and it is no longer safe to change case or whitespace. Note, though,
-#       # that these conversions can only happen in the first normalization pass,
-#       # so that the second pass can normalize case and whitespace.
-#       unless h
-#         # Make upper-case characters lower-case
-#         l=l.downcase
-#         # Remove tabs & spaces
-#         l=l.gsub(/[ \t]+/,"")
-#       end
-#     end
-#     a[i]=l
-#   end
-#   t=a.join("\n")
-#   t
-# end
-
-  def Normalizer.csedfix(t,extra=true)
-    # Convert instances of F90:R1016 char-string-edit-desc to quoted strings to
-    # preserve case and whitespace.
-    h=false
-    p="^\([ \t]*?[0-9]{1,5}[ \t]*format[ \t]*\\(.*?\)\([0-9]+\)[ \t]*[hH]\(.*?\)\\)\(.*\)"
-    r=Regexp.new(p,true) # true => case-insensitivity
-    while m=r.match(t)
-      h=true
-      p1=m[3][0..m[2].to_i-1]
-      p2=m[3].sub(/^#{p1}/,"")
-      t=t.gsub(m[0],"#{m[1]}'#{p1}'#{p2})#{m[4]}")
-    end
-    # Downcase string and remove tabs/spaces. However, if a R1016 conversion
-    # occurred, quoted strings have been introduced and it is no longer safe to
-    # change case or whitespace. Note, though, that these conversions can only
-    # happen in the first normalization pass, so that the second pass can
-    # normalize case and whitespace.
-    t=t.downcase.gsub(/[ \t]+/,"").chomp if extra and not h
-    t
-  end
-
-  # class method(s)
-
   def update(m1)
     to_update=["Quoted","Unquoted"]
     m0=Normalizer
@@ -71,24 +9,28 @@ module Normalizer
     end
   end
 
-  # classes
-
-  class Delete < Treetop::Runtime::SyntaxNode
+  class Comment < Treetop::Runtime::SyntaxNode
     def to_s
-      ""
+      s="\n"
+      s
     end
   end
 
   class Directive < Treetop::Runtime::SyntaxNode
     def to_s
-      t=text_value
-      t="\n"+t
+      s=text_value
+      case input.op
+      when 1
+        s=input.stringmap.set(s)
+      end
+      s
     end
   end
 
   class Text < Treetop::Runtime::SyntaxNode
     def to_s
-      elements.reduce("") { |s,e| s+="#{e}" }
+      s=elements.reduce("") { |s,e| s+="#{e}" }
+      s
     end
   end
 

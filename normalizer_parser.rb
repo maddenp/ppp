@@ -97,9 +97,33 @@ module Normalizer
       end
       r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
       s0 << r2
+      if r2
+        s4, i4 = [], index
+        loop do
+          if has_terminal?("\n", false, index)
+            r5 = instantiate_node(SyntaxNode,input, index...(index + 1))
+            @index += 1
+          else
+            terminal_parse_failure("\n")
+            r5 = nil
+          end
+          if r5
+            s4 << r5
+          else
+            break
+          end
+        end
+        if s4.empty?
+          @index = i4
+          r4 = nil
+        else
+          r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
+        end
+        s0 << r4
+      end
     end
     if s0.last
-      r0 = instantiate_node(Delete,input, i0...index, s0)
+      r0 = instantiate_node(Comment,input, i0...index, s0)
       r0.extend(Comment0)
     else
       @index = i0
@@ -149,8 +173,23 @@ module Normalizer
           break
         end
       end
-      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+      if s2.empty?
+        @index = i2
+        r2 = nil
+      else
+        r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+      end
       s0 << r2
+      if r2
+        if has_terminal?("\n", false, index)
+          r4 = instantiate_node(SyntaxNode,input, index...(index + 1))
+          @index += 1
+        else
+          terminal_parse_failure("\n")
+          r4 = nil
+        end
+        s0 << r4
+      end
     end
     if s0.last
       r0 = instantiate_node(Directive,input, i0...index, s0)

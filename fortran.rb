@@ -1,28 +1,14 @@
+$: << (basedir=File.dirname($0)) << File.join(basedir,"lib")
+
+require "ostruct"
+require "yaml"
+
+require "treetop/runtime"
+require "common"
+
 module Fortran
 
-  def array_props(array_spec,_props,distribute)
-    dims=0
-    array_spec.abstract_boundslist.each_index do |i|
-      arrdim=i+1
-      _props["lb#{arrdim}"]=array_spec.abstract_boundslist[i].alb
-      _props["ub#{arrdim}"]=array_spec.abstract_boundslist[i].aub
-      if distribute and (decompdim=distribute["dim"].index(arrdim))
-        _props["decomp"]=distribute["decomp"]
-        _props["dim#{arrdim}"]=decompdim+1
-      end
-      dims+=1
-    end
-    _props["dims"]||=dims
-    _props
-  end
-
-  def attrany(attr,e=nil)
-    (e||self.e).reduce(false) { |m,x| m||=attrchk(x,attr) }
-  end
-
-  def attrchk(node,attr)
-    node.respond_to?(attr) && node.send(attr)
-  end
+  include Common
 
   def deepcopy(o)
     Marshal.load(Marshal.dump(o))
@@ -88,18 +74,6 @@ module Fortran
     @envstack.push(deepcopy(env))
   end
 
-  def ik(e,c,a)
-    # identity keep: If the [e]lement's string form equals the [c]ontrol string,
-    # return the element itself; otherwise return the [a]lternate.
-    (e.to_s==c)?(e):(a)
-  end
-
-  def ir(e,c,a)
-    # identity replace: If the [e]lement's string form equals the [c]ontrol
-    # string, return the [a]lternate; otherwise return the element itself.
-    (e.to_s==c)?(a):(e)
-  end
-
   def modenv(m)
     if d=@incdirs.find_all { |x| File.exist?(envfile(m,x)) }[0]
       f=envfile(m,d)
@@ -115,10 +89,6 @@ module Fortran
     {}
   end
 
-  def msg(s)
-    $stderr.write(s)
-  end
-
   def nonblock_do_end?(node)
     # F90:R826 requires that the label on the terminating action-stmt match that
     # of the matching label-do-stmt. If this isn't the case, this node cannot be
@@ -126,18 +96,6 @@ module Fortran
     return false unless node.respond_to?(:label)
     return false if node.label.to_s.empty?
     ("#{node.label}"==@dolabels.last)?(true):(false)
-  end
-
-  def sa(e)
-    # space after: If the [e]lement's string form is empty, return that; else
-    # return its string form with a trailing space appended.
-    (e.to_s=="")?(""):("#{e} ")
-  end
-
-  def sb(e)
-    # space before: If the [e]lement's string form is empty, return that; else
-    # return its string form with a prepended space.
-    (e.to_s=="")?(""):(" #{e}")
   end
 
   def sp_access_stmt(access_spec,access_stmt_option)
@@ -317,6 +275,19 @@ module Fortran
   end
 
   def sp_use_stmt(modulename,list)
+    def use_add(modulename,usenames,localnames)
+      env[:uses]||={}
+      names=localnames.zip(usenames)
+      unless env[:uses][modulename]
+        env[:uses][modulename]=names
+      else
+        unless uses?(modulename,:all)
+          names.each do |x|
+            env[:uses][modulename].push(x) unless uses?(modulename,x)
+          end
+        end
+      end
+    end
     m="#{modulename}"
     if list.respond_to?(:usenames)
       use_add(m,list.usenames,list.localnames)
@@ -333,30 +304,6 @@ module Fortran
       end
     end
     true
-  end
-
-  def space(all=false)
-    a=(all)?(self.e):(self.e[1..-1])
-    a.map { |x| x.to_s }.join(" ").strip
-  end
-
-  def stmt(s)
-    l=level||0
-    (" "*2*l)+(("#{sa(e[0])}"+s.chomp).strip)+"\n"
-  end
-
-  def use_add(modulename,usenames,localnames)
-    env[:uses]||={}
-    names=localnames.zip(usenames)
-    unless env[:uses][modulename]
-      env[:uses][modulename]=names
-    else
-      unless uses?(modulename,:all)
-        names.each do |x|
-          env[:uses][modulename].push(x) unless uses?(modulename,x)
-        end
-      end
-    end
   end
 
   def use_localname(modulename,usename)
@@ -378,16 +325,6 @@ module Fortran
     e[:uses][modulename].map { |x| x[1] }
   end
 
-  def use_part
-    specification_part.e[0]
-  end
-
-  def uses?(modname,usename)
-    e=(self.is_a?(T))?(use_part.env):(env)
-    return false unless e[:uses]
-    (e[:uses][modname])?(use_localnames(modname).include?(usename)):(false)
-  end
-
   def vargetprop(n,k)
     return nil unless env["#{n}"]
     env["#{n}"]["#{k}"]||nil
@@ -401,19 +338,6 @@ module Fortran
   # Extension of SyntaxNode class
 
   class Treetop::Runtime::SyntaxNode
-
-    def cat
-      # concatenate elements' string representations
-      (e)?(self.e.map { |x| "#{x}" }.join):("")
-    end
-
-    def descendants(*classes)
-      if self.e
-        mine=self.e.find_all { |x| classes.include?(x.class) }
-        return self.e.reduce(mine) { |m,x| m+x.descendants(classes) }
-      end
-      []
-    end
 
     def post_common
       post_children
@@ -463,6 +387,8 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
+    include Common
+
     attr_accessor :envref,:srcfile
 
     def initialize(*args)
@@ -477,6 +403,15 @@ module Fortran
         return n if classes.any? { |x| n.is_a?(x) }
       end while n=n.parent
       nil
+    end
+
+    def attrany(attr,e=nil)
+      (e||self.e).reduce(false) { |m,x| m||=attrchk(x,attr) }
+    end
+
+    def cat
+      # concatenate elements' string representations
+      (e)?(self.e.map { |x| "#{x}" }.join):("")
     end
 
     def declaration_constructs
@@ -503,6 +438,18 @@ module Fortran
         fail "'#{name}' not found in environment" if expected
       end
       varenv
+    end
+
+    def ik(e,c,a)
+      # identity keep: If the [e]lement's string form equals the [c]ontrol
+      # string, return the element itself; otherwise return the [a]lternate.
+      (e.to_s==c)?(e):(a)
+    end
+
+    def ir(e,c,a)
+      # identity replace: If the [e]lement's string form equals the [c]ontrol
+      # string, return the [a]lternate; otherwise return the element itself.
+      (e.to_s==c)?(a):(e)
     end
 
     def indent
@@ -552,6 +499,10 @@ module Fortran
       r.instance_variable_set(:@tag,t)
     end
 
+    def raw(code,rule,srcfile,opts={})
+      Translator.new.raw(code,rule,srcfile,opts)
+    end
+
     def remove
       self.parent.e[self.parent.e.index(self)]=nil
     end
@@ -583,12 +534,34 @@ module Fortran
       n
     end
 
+    def sa(e)
+      # space after: If the [e]lement's string form is empty, return that; else
+      # return its string form with a trailing space appended.
+      (e.to_s=="")?(""):("#{e} ")
+    end
+
+    def sb(e)
+      # space before: If the [e]lement's string form is empty, return that; else
+      # return its string form with a prepended space.
+      (e.to_s=="")?(""):(" #{e}")
+    end
+
     def scoping_unit
       ancestor(Scoping_Unit)
     end
 
+    def space(all=false)
+      a=(all)?(self.e):(self.e[1..-1])
+      a.map { |x| x.to_s }.join(" ").strip
+    end
+
     def specification_part
       scoping_unit.e[1]
+    end
+
+    def stmt(s)
+      l=level||0
+      (" "*2*l)+(("#{sa(e[0])}"+s.chomp).strip)+"\n"
     end
 
     def unindent

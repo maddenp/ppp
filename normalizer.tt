@@ -5,11 +5,11 @@ grammar Normalizer
   end
 
   rule comment
-    "!" [^\n]* <Delete>
+    "!" [^\n]* "\n"+ <Comment>
   end
 
   rule directive
-    "@" [^\n]* <Directive>
+    "@" [^\n]+ "\n" <Directive>
   end
 
   rule quoted

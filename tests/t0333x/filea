@@ -1,0 +1,4 @@
+      wri
+     !te (*, '(a)') 'hello2'
+!sms$insert include "fileb"
+      write (*, '(a)') 'goodbye2'

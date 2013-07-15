@@ -1,12 +1,52 @@
-module Translator
+$: << (basedir=File.dirname($0))
+
+require "fileutils"
+require "pathname"
+require "socket"
+require "thread"
+
+require "fortran"
+require "fortran_parser"
+require "sms_fortran"
+require "sms_fortran_parser"
+require "normalizer"
+require "normalizer_parser"
+require "sms_normalizer"
+require "sms_normalizer_parser"
+require "normfixed"
+require "normfree"
+
+class Translator
 
   include Fortran
 
+  class Stringmap
+
+    attr_reader :re
+
+    def initialize
+      @index=1
+      @map={}
+      @re=Regexp.new("(#[0-9]+#)")
+    end
+
+    def get(k)
+      @map[k]
+    end
+
+    def set(s)
+      k="##{@index+=1}#"
+      @map[k]=s
+      k
+    end
+
+  end
+      
+  # X*Parser scheme due to Clifford Heath (http://goo.gl/62pJ6)
+
   class XFortranParser < FortranParser
 
-    # Clifford Heath's mechanism (http://goo.gl/62pJ6)
-
-    class InputProxy
+    class Xinput
 
       attr_accessor :envstack,:srcfile
 
@@ -31,15 +71,40 @@ module Translator
     end
 
     def parse(input,options={})
-      input=InputProxy.new(input,@envstack)
+      input=Xinput.new(input,@envstack)
       super(input,options)
+    end
+
+  end
+
+  class XNormalizerParser < NormalizerParser
+
+    class Xinput
+
+      attr_accessor :op,:stringmap
+
+      def initialize(input,op,stringmap)
+        @input=input
+        @op=op
+        @stringmap=stringmap
+      end
+
+      def method_missing(method,*args)
+        @input.send(method,*args)
+      end
+
+    end
+
+    def parse(input,op,stringmap)
+      input=Xinput.new(input,op,stringmap)
+      super(input)
     end
 
   end
 
   def clear_socket(socket)
     FileUtils.rm_f(socket)
-    fail "Socket file #{socket} in use, please free it" if File.exist?(socket)
+    die "Socket file #{socket} in use, please free it" if File.exist?(socket)
   end
 
   def default_opts
@@ -52,6 +117,44 @@ module Translator
     }
   end
 
+  def dehollerith(s)
+    # Convert instances of Hollerith(-esque) constants to quoted strings. Do so
+    # by breaking each statement in which a Hollerith occurs into three pieces:
+    # The one leading up to the Hollerith, the one specifying the length of the
+    # represented string literal, and the one starting with the the string
+    # literal and running to the end of the line. The h/H marker itself is
+    # discarded. Note that the statement is expected to be on a single line at
+    # this point.
+    def replace(s,re)
+      r=Regexp.new(re,true) # true => case-insensitivity
+      while m=r.match(s)
+        first=m[1]
+        strlen=m[2].to_i-1
+        string=m[3][0..strlen]
+        # Pass a string to sub() instead of a regexp so that regexp characters
+        # like * and $ can be replaced without special meaning being attributed
+        # to them.
+        rest=m[3].sub(string,"")
+        s=s.sub(m[0],"#{first}'#{string}'#{rest}")
+      end
+      s
+    end
+    # Common elements in Hollerith-matching regexps
+    w  = "[ \t]*"                  # whitespace
+    lm = "^(#{w}[0-9]{1,5}#{w}"    # label (mandatory)
+    lo = "^(#{w}[0-9]{0,5}#{w}"    # label (optional)
+    n  = ")([0-9]+)#{w}"           # number
+    o  = ".*?"                     # other
+    r  = "(.*)"                    # rest (including string literal)
+    v  = "#{w}[a-z][a-z0-9_]*#{w}" # variable name
+    # Create and iterate over a list of Hollerith-matching regexps.
+    res=[]
+    res.push(lm+"format"+w+"\\("+o+n+"h"+r) # F90:R1016 char-string-edit-desc
+    res.push(lo+"data"+v+"/"+o+n+"h"+r)     # Hollerith in data-stmt
+    res.each { |re| s=replace(s,re) }
+    s
+  end
+
   def directive
     unless @directive
       f=File.join(File.dirname(File.expand_path($0)),"sentinels")
@@ -61,42 +164,55 @@ module Translator
     @directive
   end
 
-  def fail(msg,die=true,srcfile=nil)
+  def die(msg,die=true,srcfile=nil)
     s="#{msg}"
     s+=": #{srcfile}" if srcfile
     $stderr.puts s
     exit(1) if die
   end
 
-  def fixed_point_normalize(s,parser)
+  def fpn(s,parser,op=nil,stringmap=nil)
+    # fixed-point normalization
     s0=nil
-    while s=parser.parse(s).to_s
+    while s=parser.parse(s,op,stringmap).to_s
+      s=s.gsub(/^$[ \t]*\n/,'')
       return s if s==s0
       s0=s
     end
   end
 
-  def go(wrapper)
+  def go(wrapper,args)
     @wrapper=wrapper
-    fail usage unless srcfile=ARGV.pop
+    die usage unless srcfile=args.pop
     srcfile=File.expand_path(srcfile)
-    fail "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
+    die "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
     s=File.open(srcfile,"rb").read
-    conf=unpack({},ARGV)
+    conf=unpack({},args)
     puts out(s,:program_units,srcfile,conf)
   end
 
   def normalize(s,newline)
-    np=NormalizerParser.new
+    np=XNormalizerParser.new
     np.update(Normfree)
-    s=s.gsub(directive,'@\1')          # hide directives
-    s=s.gsub(/^\s+/,"")                # remove leading whitespace
-    s=s.gsub(/[ \t]+$/,"")             # remove trailing whitespace
-    s=s.gsub(/^!.*\n/,"")              # remove full-line comments
-    s=fixed_point_normalize(s,np)      # normalize
-    s=s.sub(/^\n+/,"")                 # remove leading newlines
-    s+="\n" if s[-1]!="\n" and newline # ensure final newline
-    s=s.gsub(/^@(.*)/i,'!\1')          # show directives
+    m=Stringmap.new
+    s=s.gsub(directive,'@\1')           # hide directives
+    s=s.gsub(/^[ \t]+/,"")              # remove leading whitespace
+    s=s.gsub(/[ \t]+$/,"")              # remove trailing whitespace
+    s=s.gsub(/^[ \t]*!.*$\n/,"")        # remove full-line comments
+    s=fpn(s,np,1,m)                     # string-aware transform 1
+    s=s.gsub(/&[ \t]*\n[ \t]*&?/,"")    # join continuation lines
+    s=np.parse(s,2,m).to_s              # mask original strings
+    s=dehollerith(s)                    # replace holleriths
+    s=np.parse(s,2,m).to_s              # mask dehollerith'ed strings
+    s=s.downcase                        # lower-case text only
+    s=s.gsub(/[ \t]+/,"")               # remove whitespace
+    s=restore_strings(s,m)              # restore strings
+    s=s.sub(/^\n+/,"")                  # remove leading newlines
+    s=s+"\n" if s[-1]!="\n" and newline # append final newline if required
+    s=s.chomp unless newline            # remove final newline if forbidden
+    s=s.gsub(/^@(.*)/i,'!\1')           # show directives
+    s=s.gsub(/^[ \t]*\n/,'')            # remove blank lines
+    s
   end
 
   def out(s,root,srcfile,conf)
@@ -118,7 +234,7 @@ module Translator
           if incfile[0]=="/" or incfile[0]=="."
             incfile=File.expand_path(File.join(File.dirname(current),incfile))
             unless File.exist?(incfile)
-              fail "Could not find included file #{incfile}"
+              die "Could not find included file #{incfile}"
             end
           else
             found=false
@@ -131,18 +247,18 @@ module Translator
               end
             end
             unless found
-              fail "Could not find included file #{incfile} on search path"
+              die "Could not find included file #{incfile} on search path"
             end
           end
           if seen.include?(incfile)
             msg="File #{current} includes #{incfile} recursively:\n"
             msg+=incchain(seen,incfile)
-            fail msg
+            die msg
           end
           unless File.readable?(incfile)
             msg="Could not read file #{incfile} "
             msg+=incchain(seen,incfile)
-            fail msg
+            die msg
           end
           a+=assemble(File.open(incfile,"rb").read,seen+[incfile],incdirs)
         else
@@ -157,27 +273,27 @@ module Translator
       i=1
       s.split("\n").each do |line|
         m=r.match(line)
-        fail "Detected cpp directive:\n\n#{i}: #{line.strip}" if m
+        die "Detected cpp directive:\n\n#{i}: #{line.strip}" if m
         i+=1
       end
     end
 
     def fixed2free(s)
-      np=NormalizerParser.new
+      np=XNormalizerParser.new
       np.update(Normfixed)
       unless /\n[ \t]*\t/ !~ s
-        fail ("ERROR: NO SUPPORT FOR TABS IN LEADING WHITESPACE")
+        die ("ERROR: NO SUPPORT FOR TABS IN LEADING WHITESPACE")
       end
-      s=s.gsub /^[ \t]*\n/, ''                 # removes blank lines
-      a=s.split("\n")                          # splits file into an array by line
+      s=s.gsub(/^[ \t]*\n/,'')                 # remove blank lines
+      a=s.split("\n")                          # split file into an array by line
       a=a.map {|e| (e+(" "*72))[0..71]}        # pad each line with 72 blanks, truncate at column 72
-      s=a.join "\n"                            # join array into string
-      s=s.gsub /^(c|C|\*)/, "!"                # replace fixed form comment indicators with "!"
+      s=a.join("\n")                           # join array into string
+      s=s.gsub(/^(c|C|\*)/,"!")                # replace fixed form comment indicators with "!"
       s=s.gsub(directive,'@\1')                # hide directives
-      s=s.gsub /\n[ \t]{5}[^ \t0]/, "\n     a" # replace any continuation character with generic "a"
-      s=s.gsub /^\s*![^\n]*\n/, ''             # remove full line comments
-      s=fixed_point_normalize(s,np)            # normalize
-      s=s.gsub /\n[ \t]{5}a/, ""               # join continuation lines
+      s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # replace any continuation character with generic "a"
+      s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
+      s=fpn(s,np)                              # string-aware transform
+      s=s.gsub(/\n[ \t]{5}a/,"")               # join continuation lines
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
       s
     end
@@ -240,7 +356,7 @@ module Translator
     n=normalize(s,conf.nl)
     puts "\n#{n}" if conf.debug or conf.norm
     unless conf.norm
-      raw_tree=fp.parse(n,:root=>root)
+      raw_tree=fp.parse(n,{:root=>root})
       raw_tree.instance_variable_set(:@srcfile,srcfile)
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
       if conf.debug
@@ -257,8 +373,8 @@ module Translator
         failmsg+="Original source: #{srcfile}\n"
         failmsg+="PARSE FAILED"
         failmsg+="#{srcmsg}"
-        fail failmsg
-        return # if in server mode and did not exit in fail()
+        die failmsg
+        return # if in server mode and did not exit in die()
       end
       translated_tree=(conf.translate)?(raw_tree.translate_top):(nil)
       if conf.debug
@@ -278,6 +394,18 @@ module Translator
     raw_tree
   end
 
+  def restore_strings(s,stringmap)
+    # Source-program string literals may contain our string placeholder token,
+    # so we must avoid processing restored strings (e.g. via gsub), as their
+    # contents could incorrectly be 'restored'. So, split the source on the
+    # placeholder token and iterate *once* over it, replacing token keys with
+    # their corresponding saved values.
+    r=stringmap.re
+    a=s.split(r)
+    a.map! { |e| (e=~r)?(stringmap.get(e)):(e) }
+    s=a.join
+  end
+
   def server(socket,quiet=false)
     srcfile='unknown'
     clear_socket(socket)
@@ -295,7 +423,7 @@ module Translator
           lensrc=client.gets.chomp.to_i
           s=client.read(lensrc)
           unless File.exist?(srcfile)
-            fail("No such file: #{srcfile}",false,srcfile)
+            die("No such file: #{srcfile}",false,srcfile)
           end
           srcdir=File.dirname(File.expand_path(srcfile))
           conf.incdirs=[srcdir]
@@ -303,7 +431,7 @@ module Translator
           dirlist.split(":").each do |d|
             d=File.join(srcdir,d) if Pathname.new(d).relative?
             unless File.directory?(d)
-              fail("No such directory: #{d}",false,srcfile)
+              die("No such directory: #{d}",false,srcfile)
             end
             conf.incdirs.push(d)
           end
@@ -321,7 +449,7 @@ module Translator
           s="Caught exception '#{ex.class}':\n"
           s+="#{ex.message}\n"
           s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }
-          fail s
+          die s
           server_stop(socket,1)
         end
       end
@@ -354,7 +482,8 @@ module Translator
   end
 
   def ostruct_default_merge(a)
-    OpenStruct.new(default_opts.merge(a.marshal_dump))
+    a=a.marshal_dump if a.is_a?(OpenStruct)
+    OpenStruct.new(default_opts.merge(a))
   end
 
   def unpack(conf,args)
@@ -364,9 +493,9 @@ module Translator
       case opt
       when "-I"
         dirlist=args.shift
-        fail usage unless dirlist
+        die usage unless dirlist
         dirlist.split(":").each do |d|
-          fail "No such directory: #{d}" unless File.directory?(d)
+          die "No such directory: #{d}" unless File.directory?(d)
           conf.incdirs.push(d)
         end
       when "fixed"
@@ -378,7 +507,7 @@ module Translator
       when "normalize"
         conf.norm=true
       else
-        fail usage
+        die usage
       end
     end
     conf

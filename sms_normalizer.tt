@@ -5,7 +5,7 @@ grammar Normalizer
   end
 
   rule sms
-    "@" [sS] [mM] [sS] "$" [^\n\'\"]* <SMS>
+    "@" [sS] [mM] [sS] "$" [^\'\"\n]* <SMS>
   end
 
 end

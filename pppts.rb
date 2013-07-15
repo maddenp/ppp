@@ -1,56 +1,80 @@
+debug=false
 server_mode=true
 threads=8
 
-def pppts_exe(cmd)
-  out=IO.popen(cmd+" 2>&1") { |e| e.readlines.reduce("") { |s,e| s+=e } }
-  pppts_fail(out,cmd) unless $?.exitstatus==0
-  out
-end
+$: << File.dirname($0)
 
-def pppts_fail(msg=nil,cmd=nil)
-  @lock.synchronize do
-    return if @fail
-    puts "\nFAIL"+((cmd)?(": #{cmd}\n"):(""))
-    puts msg.lines.reduce("") { |m,e| m+="      #{e}" } if msg
-    @fail=true
+require "fileutils"
+require "thread"
+require "translator"
+
+class PPPTS
+
+  def initialize(debug,server_mode,threads,args)
+    @failure=false
+    @lock=Mutex.new
+    threads=1 if debug
+    die("Tests require at least one thread") unless threads>0
+    exe("make")
+    t=Translator.new
+    srvr,socket=(server_mode)?(server_start(t)):(nil)
+    n=run_all(threads,socket,debug,args)
+    puts "\nOK (#{n} tests)" unless @failure
+    if srvr then srvr.raise(Interrupt); srvr.join end
+    exit((@failure)?(0):(1))
   end
+
+  def exe(cmd)
+    out=IO.popen(cmd+" 2>&1") { |e| e.readlines.reduce("") { |s,e| s+=e } }
+    die(out,cmd) unless $?.exitstatus==0
+    out
+  end
+
+  def die(msg=nil,cmd=nil)
+    @lock.synchronize do
+      return if @failure
+      puts "\nFAIL"+((cmd)?(": #{cmd}\n"):(""))
+      puts msg.lines.reduce("") { |m,e| m+="      #{e}" } if msg
+      @failure=true
+    end
+  end
+
+  def run_all(threads,socket,debug,args)
+    def go(q,socket,debug) 
+      test(q.deq,socket,debug) until q.empty?
+    end
+    tdir="tests"
+    q=Queue.new
+    tests=(args[0])?(["#{tdir}/#{args[0]}"]):(Dir.glob("#{tdir}/t*").sort)
+    tests.each { |e| q.enq(e) }
+    runners=(1..threads).reduce([]) do |m,e|
+      m << Thread.new { go(q,socket,debug) }
+    end
+    runners.each { |e| e.join }
+    tests.size
+  end
+
+  def server_start(t)
+    socket=File.expand_path("./socket.#{$$}")
+    FileUtils.rm_f(socket)
+    die "Socket file #{socket} in use, please free it" if File.exist?(socket)
+    s=Thread.new { t.server(socket,true) }
+    sleep 1 until File.exist?(socket)
+    [s,socket]
+  end
+
+  def test(t,socket,debug)
+    @lock.synchronize do
+      return if @failure
+      print "trying #{File.basename(t)}..." if debug
+    end
+    exe("make -C #{t} clean")
+    x=(socket)?(" SOCKET=#{socket} "):(" ")
+    exe("make -C #{t}#{x}comp")
+    exe("make -C #{t} clean")
+    @lock.synchronize { (debug)?(puts " ok"):(print ".") unless @failure }
+  end
+
 end
 
-def pppts_run_all(threads,socket)
-  def go(q,socket) pppts_test(q.deq,socket) until q.empty? end
-  tdir="tests"
-  q=Queue.new
-  tests=(ARGV[0])?(["#{tdir}/#{ARGV[0]}"]):(Dir.glob("#{tdir}/t*").sort)
-  tests.each { |e| q.enq(e) }
-  runners=(1..threads).reduce([]) { |m,e| m << Thread.new { go(q,socket) } }
-  runners.each { |e| e.join }
-  tests.size
-end
-
-def pppts_server_start
-  socket=File.expand_path("./socket.#{$$}")
-  clear_socket(socket)
-  s=Thread.new { server(socket,true) }
-  sleep 1 until File.exist?(socket)
-  [s,socket]
-end
-
-def pppts_test(t,socket)
-  @lock.synchronize { return if @fail }
-  pppts_exe("make -C #{t} clean")
-  x=(socket)?(" SOCKET=#{socket} "):(" ")
-  pppts_exe("make -C #{t}#{x}comp")
-  pppts_exe("make -C #{t} clean")
-  @lock.synchronize { print "." unless @fail }
-end
-
-@fail=false
-@lock=Mutex.new
-pppts_fail("Need at least one thread to run tests") unless threads>0
-pppts_exe("make")
-load File.join(File.dirname($0),"requires.rb")
-srvr,socket=(server_mode)?(pppts_server_start):(nil)
-n=pppts_run_all(threads,socket)
-puts "\nOK (#{n} tests)" unless @fail
-if srvr then srvr.raise(Interrupt); srvr.join end
-exit((@fail)?(0):(1))
+PPPTS.new(debug,server_mode,threads,ARGV)
