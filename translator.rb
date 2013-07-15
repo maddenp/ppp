@@ -1,4 +1,22 @@
-module Translator
+$: << (basedir=File.dirname($0))
+
+require "fileutils"
+require "pathname"
+require "socket"
+require "thread"
+
+require "fortran"
+require "fortran_parser"
+require "sms_fortran"
+require "sms_fortran_parser"
+require "normalizer"
+require "normalizer_parser"
+require "sms_normalizer"
+require "sms_normalizer_parser"
+require "normfixed"
+require "normfree"
+
+class Translator
 
   include Fortran
 
@@ -86,7 +104,7 @@ module Translator
 
   def clear_socket(socket)
     FileUtils.rm_f(socket)
-    fail "Socket file #{socket} in use, please free it" if File.exist?(socket)
+    die "Socket file #{socket} in use, please free it" if File.exist?(socket)
   end
 
   def default_opts
@@ -135,7 +153,7 @@ module Translator
     @directive
   end
 
-  def fail(msg,die=true,srcfile=nil)
+  def die(msg,die=true,srcfile=nil)
     s="#{msg}"
     s+=": #{srcfile}" if srcfile
     $stderr.puts s
@@ -152,13 +170,13 @@ module Translator
     end
   end
 
-  def go(wrapper)
+  def go(wrapper,args)
     @wrapper=wrapper
-    fail usage unless srcfile=ARGV.pop
+    die usage unless srcfile=args.pop
     srcfile=File.expand_path(srcfile)
-    fail "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
+    die "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
     s=File.open(srcfile,"rb").read
-    opts=unpack({},ARGV)
+    opts=unpack({},args)
     puts out(s,:program_units,srcfile,opts)
   end
 
@@ -205,7 +223,7 @@ module Translator
           if incfile[0]=="/" or incfile[0]=="."
             incfile=File.expand_path(File.join(File.dirname(current),incfile))
             unless File.exist?(incfile)
-              fail "Could not find included file #{incfile}"
+              die "Could not find included file #{incfile}"
             end
           else
             found=false
@@ -218,18 +236,18 @@ module Translator
               end
             end
             unless found
-              fail "Could not find included file #{incfile} on search path"
+              die "Could not find included file #{incfile} on search path"
             end
           end
           if seen.include?(incfile)
             msg="File #{current} includes #{incfile} recursively:\n"
             msg+=incchain(seen,incfile)
-            fail msg
+            die msg
           end
           unless File.readable?(incfile)
             msg="Could not read file #{incfile} "
             msg+=incchain(seen,incfile)
-            fail msg
+            die msg
           end
           a+=assemble(File.open(incfile,"rb").read,seen+[incfile],incdirs)
         else
@@ -244,7 +262,7 @@ module Translator
       i=1
       s.split("\n").each do |line|
         m=r.match(line)
-        fail "Detected cpp directive:\n\n#{i}: #{line.strip}" if m
+        die "Detected cpp directive:\n\n#{i}: #{line.strip}" if m
         i+=1
       end
     end
@@ -253,7 +271,7 @@ module Translator
       np=XNormalizerParser.new
       np.update(Normfixed)
       unless /\n[ \t]*\t/ !~ s
-        fail ("ERROR: NO SUPPORT FOR TABS IN LEADING WHITESPACE")
+        die ("ERROR: NO SUPPORT FOR TABS IN LEADING WHITESPACE")
       end
       s=s.gsub(/^[ \t]*\n/,'')                 # remove blank lines
       a=s.split("\n")                          # split file into an array by line
@@ -337,8 +355,8 @@ module Translator
         failmsg+="Original source: #{srcfile}\n"
         failmsg+="PARSE FAILED"
         failmsg+="#{srcmsg}"
-        fail failmsg
-        return # if in server mode and did not exit in fail()
+        die failmsg
+        return # if in server mode and did not exit in die()
       end
       translated_tree=(opts[:translate])?(raw_tree.translate_top):(nil)
       if debug
@@ -387,7 +405,7 @@ module Translator
           lensrc=client.gets.chomp.to_i
           s=client.read(lensrc)
           unless File.exist?(srcfile)
-            fail("No such file: #{srcfile}",false,srcfile)
+            die("No such file: #{srcfile}",false,srcfile)
           end
           srcdir=File.dirname(File.expand_path(srcfile))
           opts[:incdirs]=[srcdir]
@@ -395,7 +413,7 @@ module Translator
           dirlist.split(":").each do |d|
             d=File.join(srcdir,d) if Pathname.new(d).relative?
             unless File.directory?(d)
-              fail("No such directory: #{d}",false,srcfile)
+              die("No such directory: #{d}",false,srcfile)
             end
             opts[:incdirs].push(d)
           end
@@ -413,7 +431,7 @@ module Translator
           s="Caught exception '#{ex.class}':\n"
           s+="#{ex.message}\n"
           s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }
-          fail s
+          die s
           server_stop(socket,1)
         end
       end
@@ -451,9 +469,9 @@ module Translator
       case opt
       when "-I"
         dirlist=args.shift
-        fail usage unless dirlist
+        die usage unless dirlist
         dirlist.split(":").each do |d|
-          fail "No such directory: #{d}" unless File.directory?(d)
+          die "No such directory: #{d}" unless File.directory?(d)
           opts[:incdirs].push(d)
         end
       when "fixed"
@@ -465,7 +483,7 @@ module Translator
       when "normalize"
         opts[:normalize]=true
       else
-        fail usage
+        die usage
       end
     end
     opts

@@ -1,9 +1,5 @@
 module Fortran
 
-  def sms(s)
-    "#{e[0]}#{e[1]} #{s}\n"
-  end
-
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
     fail "Already inside distribute region" if @distribute
     @distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
@@ -105,25 +101,6 @@ module Fortran
     true
   end
 
-  def smstype(type,kind)
-    kind=nil if kind=="_default"
-    case type
-    when "character"
-      return "nnt_bytes"
-    when "complex"
-      return (kind)?("nnt_c#{kind}"):("nnt_complex")
-    when "doubleprecision"
-      return "nnt_doubleprecision"
-    when "integer"
-      return (kind)?("nnt_i#{kind}"):("nnt_integer")
-    when "logical"
-      return (kind)?("nnt_l#{kind}"):("nnt_logical")
-    when "real"
-      return (kind)?("nnt_r#{kind}"):("nnt_real")
-    end
-    fail "No NNT type defined for '#{type}#{kind}'"
-  end
-
   class T < Treetop::Runtime::SyntaxNode
 
     def declare(type,name,props={})
@@ -161,6 +138,29 @@ module Fortran
         halo_up=offsets.up
       end
       OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
+    end
+
+    def sms(s)
+      "#{e[0]}#{e[1]} #{s}\n"
+    end
+
+    def smstype(type,kind)
+      kind=nil if kind=="_default"
+      case type
+      when "character"
+        return "nnt_bytes"
+      when "complex"
+        return (kind)?("nnt_c#{kind}"):("nnt_complex")
+      when "doubleprecision"
+        return "nnt_doubleprecision"
+      when "integer"
+        return (kind)?("nnt_i#{kind}"):("nnt_integer")
+      when "logical"
+        return (kind)?("nnt_l#{kind}"):("nnt_logical")
+      when "real"
+        return (kind)?("nnt_r#{kind}"):("nnt_real")
+      end
+      fail "No NNT type defined for '#{type}#{kind}'"
     end
 
 # HACK start
@@ -377,9 +377,9 @@ module Fortran
             halo_lo=halo_offsets(decdim).lo
             halo_up=halo_offsets(decdim).up
             if loop_control.is_a?(Loop_Control_1)
-              lo=raw("#{decomp}__s#{decdim}(#{loop_control.e[3]},#{halo_lo},#{decomp}__nestlevel)",:scalar_numeric_expr,"",{:nl=>false})
+              lo=raw("#{decomp}__s#{decdim}(#{loop_control.e[3]},#{halo_lo},#{decomp}__nestlevel)",:scalar_numeric_expr,@srcfile,{:nl=>false})
               lo.parent=loop_control
-              up=raw(",#{decomp}__e#{decdim}(#{loop_control.e[4].value},#{halo_up},#{decomp}__nestlevel)",:loop_control_pair,"",{:nl=>false})
+              up=raw(",#{decomp}__e#{decdim}(#{loop_control.e[4].value},#{halo_up},#{decomp}__nestlevel)",:loop_control_pair,@srcfile,{:nl=>false})
               up.parent=loop_control
               loop_control.e[3]=lo
               loop_control.e[4]=up
@@ -1510,7 +1510,7 @@ module Fortran
 
 end
 
-module Translator
+class Translator
 
   def prepsrc_free(s)
     s=s.gsub(/^\s*!sms\$insert\s*/i,"")                            # process inserts
