@@ -118,25 +118,36 @@ class Translator
   end
 
   def dehollerith(s)
-    # Convert instances of Hollerith(-esque) constants to quoted strings.
+    # Convert instances of Hollerith(-esque) constants to quoted strings. Do so
+    # by breaking each statement in which a Hollerith occurs into three pieces:
+    # The one leading up to the Hollerith, the one specifying the length of the
+    # represented string literal, and the one starting with the the string
+    # literal and running to the end of the line. The h/H marker itself is
+    # discarded. Note that the statement is expected to be on a single line at
+    # this point.
     def replace(s,re)
       r=Regexp.new(re,true) # true => case-insensitivity
       while m=r.match(s)
         first=m[1]
         strlen=m[2].to_i-1
         string=m[3][0..strlen]
+        # Pass a string to sub() instead of a regexp so that regexp characters
+        # like * and $ can be replaced without special meaning being attributed
+        # to them.
         rest=m[3].sub(string,"")
         s=s.sub(m[0],"#{first}'#{string}'#{rest}")
       end
       s
     end
+    # Common elements in Hollerith-matching regexps
     w  = "[ \t]*"                  # whitespace
     lm = "^(#{w}[0-9]{1,5}#{w}"    # label (mandatory)
     lo = "^(#{w}[0-9]{0,5}#{w}"    # label (optional)
     n  = ")([0-9]+)#{w}"           # number
     o  = ".*?"                     # other
-    r  = "(.*)"                    # rest (including hollerith constant)
+    r  = "(.*)"                    # rest (including string literal)
     v  = "#{w}[a-z][a-z0-9_]*#{w}" # variable name
+    # Create and iterate over a list of Hollerith-matching regexps.
     res=[]
     res.push(lm+"format"+w+"\\("+o+n+"h"+r) # F90:R1016 char-string-edit-desc
     res.push(lo+"data"+v+"/"+o+n+"h"+r)     # Hollerith in data-stmt
