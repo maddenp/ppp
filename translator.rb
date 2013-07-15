@@ -125,8 +125,8 @@ class Translator
         first=m[1]
         strlen=m[2].to_i-1
         string=m[3][0..strlen]
-        rest=m[3].sub(/^#{string}/,"")
-        s=s.gsub(m[0],"#{first}'#{string}'#{rest}")
+        rest=m[3].sub(string,"")
+        s=s.sub(m[0],"#{first}'#{string}'#{rest}")
       end
       s
     end
@@ -284,6 +284,7 @@ class Translator
       s=fpn(s,np)                              # string-aware transform
       s=s.gsub(/\n[ \t]{5}a/,"")               # join continuation lines
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
+#puts "###\n#{s}\n###";exit
       s
     end
 
