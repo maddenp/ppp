@@ -112,7 +112,7 @@ class Translator
       :debug=>false,
       :incdirs=>[],
       :nl=>true,
-      :norm=>false,
+      :normalize=>false,
       :translate=>true
     }
   end
@@ -350,8 +350,8 @@ class Translator
     end
     puts "NORMALIZED FORM\n" if conf.debug
     n=normalize(s,conf.nl)
-    puts "\n#{n}" if conf.debug or conf.norm
-    unless conf.norm
+    puts "\n#{n}" if conf.debug or conf.normalize
+    unless conf.normalize
       raw_tree=fp.parse(n,{:root=>root})
       raw_tree.instance_variable_set(:@srcfile,srcfile)
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
@@ -501,7 +501,7 @@ class Translator
       when "debug"
         conf.debug=true
       when "normalize"
-        conf.norm=true
+        conf.normalize=true
       else
         die usage
       end
