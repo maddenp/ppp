@@ -339,19 +339,6 @@ module Fortran
 
   class Treetop::Runtime::SyntaxNode
 
-    def cat
-      # concatenate elements' string representations
-      (e)?(self.e.map { |x| "#{x}" }.join):("")
-    end
-
-    def descendants(*classes)
-      if self.e
-        mine=self.e.find_all { |x| classes.include?(x.class) }
-        return self.e.reduce(mine) { |m,x| m+x.descendants(classes) }
-      end
-      []
-    end
-
     def post_common
       post_children
       post if respond_to?(:post)
@@ -420,6 +407,11 @@ module Fortran
 
     def attrany(attr,e=nil)
       (e||self.e).reduce(false) { |m,x| m||=attrchk(x,attr) }
+    end
+
+    def cat
+      # concatenate elements' string representations
+      (e)?(self.e.map { |x| "#{x}" }.join):("")
     end
 
     def declaration_constructs
