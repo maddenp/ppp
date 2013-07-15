@@ -278,12 +278,26 @@ class Translator
       end
     end
 
+    def detabify(s)
+      # Intel tab-format scheme for fixed-format source
+      # labeled statement
+      while (m=Regexp.new("^([0-9 ]{1,5})\t").match(s))
+        label=m[1].delete(" ")
+        s=s.sub(m[0],label+(" "*(5-(label.size-1))))
+      end
+      # comment line
+      s=s.gsub(/^[cC*]\t/,'! ')
+      # continuation line
+      s=s.gsub(/^\t[1-9]/,'     a')
+      # unlabeled statement
+      s=s.gsub(/^\t/,'      ')
+      s
+    end
+
     def fixed2free(s)
       np=XNormalizerParser.new
       np.update(Normfixed)
-      unless /\n[ \t]*\t/ !~ s
-        die ("ERROR: NO SUPPORT FOR TABS IN LEADING WHITESPACE")
-      end
+      s=detabify(s)
       s=s.gsub(/^[ \t]*\n/,'')                 # remove blank lines
       a=s.split("\n")                          # split file into an array by line
       a=a.map {|e| (e+(" "*72))[0..71]}        # pad each line with 72 blanks, truncate at column 72
