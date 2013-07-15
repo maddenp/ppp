@@ -174,7 +174,7 @@ class Translator
   def fpn(s,parser,op=nil,stringmap=nil)
     # fixed-point normalization
     s0=nil
-    while s=parser.parse(s,op,stringmap).to_s
+    while s=parser.parse(s,op,stringmap).to_s and not s.nil?
       s=s.gsub(/^$[ \t]*\n/,'')
       return s if s==s0
       s0=s
@@ -333,14 +333,10 @@ class Translator
     conf=ostruct_default_merge(conf)
     fp=XFortranParser.new(srcfile,conf.incdirs)
     s0=nil
-    while s!=s0
+    while s!=s0 and not s.nil?
       s0=s
-      if defined? prepsrc_fixed and conf.fixed
-        s=prepsrc_fixed(s)
-      end
-      if defined? prepsrc_free
-        s=prepsrc_free(s)
-      end
+      s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and conf.fixed
+      s=prepsrc_free(s) if defined?(prepsrc_free)
       s=assemble(s,[srcfile],conf.incdirs)
     end
     cppcheck(s)
