@@ -79,9 +79,6 @@
 - After replacing an element or statement, walk up tree replacing text_value
   with new version while ancestor text_value = *old* replaced node's text_value?
 
-- Better vertical whitespace in output (e.g. before & after functions and sub-
-  routines -- maybe all blocks?)
-
 - IIRC, parsing of allocate_object is broken, in that the variable_name option
   (2nd choice) will never be chosen because structure_component always matches.
   Need some more sophisticated logic...
@@ -162,11 +159,6 @@
   but possibly not _declarative, _use or _implicit. Get rid of what isn't
   necessary.
 
-- Any error output from parsing must go to stderr, not stdout, so that output
-  file containing error info instead of code isn't created. Otherwise, make
-  may fail to properly build, since a lately-timestamped output file will
-  exist. (Already done for PARSE FAILED.)
-
 - Check status on all allocates rolled out by ppp.
 
 - In getvarenv(), give more verbose information about why a failure has occurred
@@ -177,17 +169,11 @@
 - Factor array-literal creation for sms_compare_var, esms_exhcange, sms_serial,
   etc.
 
-- Add no-translate option to ppp so that .env files are generated w/o changing
-  the source at all. JUST REDIRECT OUTPUT TO /dev/null OR SIMILAR?
-
 - Need SMS library function that takes type and kind arguemnts and returns the
   correct nnt_ type to use in library calls.
 
 - Trim rolled-out variable names to 31 characters (F90 section 3.2.2) Or use
   some numeric scheme in too-long cases, to avoid collisions.
-
-- Consider limitation on number of continuation lines. At least exit with error
-  if this is happening.
 
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
   label, but also labels further down in the stack? That would also be an error,
@@ -197,7 +183,23 @@
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
 
-- In normalizer.tt, should Quoted have higher precendence? Otherwise, what about
-  '@' inside a quoted string?
+- (MH) Add no-translate option to ppp so that .env files are generated w/o
+  changing the source at all. JUST REDIRECT OUTPUT TO /dev/null OR SIMILAR? No,
+  skip the translation phase because it is time-consuming. Call option 'modinfo'
+  for now.
 
-- Normalizing parses can fail, too. Handle it.
+- (MH) Consider limitation on number of continuation lines. At least exit with
+  error if this is happening.
+
+- (MH) In normalizer.tt, should Quoted have higher precendence? Otherwise, what
+  about '@' inside a quoted string?
+
+- (MH) Normalizing parses can fail, too. Handle it.
+
+- (MH) Any error output from parsing must go to stderr, not stdout, so that
+  output file containing error info instead of code isn't created. Otherwise,
+  make may fail to properly build, since a lately-timestamped output file will
+  exist. (Already done for PARSE FAILED.)
+
+- (MH) Better vertical whitespace in output (e.g. before & after functions and
+  sub-routines -- maybe all blocks?)
