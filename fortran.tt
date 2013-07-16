@@ -830,7 +830,7 @@ grammar Fortran
   end
 
   rule data_stmt_set_list_pair
-    t_comma data_stmt_set <E>
+    t_comma? data_stmt_set <E>
   end
 
   rule data_stmt_set_list_pairs

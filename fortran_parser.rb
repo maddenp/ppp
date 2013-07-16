@@ -8393,10 +8393,6 @@ module Fortran
   end
 
   module DataStmtSetListPair0
-    def t_comma
-      elements[0]
-    end
-
     def data_stmt_set
       elements[1]
     end
@@ -8414,11 +8410,16 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r1 = _nt_t_comma
+    r2 = _nt_t_comma
+    if r2
+      r1 = r2
+    else
+      r1 = instantiate_node(SyntaxNode,input, index...index)
+    end
     s0 << r1
     if r1
-      r2 = _nt_data_stmt_set
-      s0 << r2
+      r3 = _nt_data_stmt_set
+      s0 << r3
     end
     if s0.last
       r0 = instantiate_node(E,input, i0...index, s0)
