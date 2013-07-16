@@ -1440,8 +1440,6 @@ grammar Fortran
 
   rule format_specification
     # F90:R1002
-    #
-    # Note: See NOTES file about F90:R1002
 
     t_paren_l format_item_list* t_paren_r <T>
   end
@@ -1456,7 +1454,13 @@ grammar Fortran
   end
 
   rule char_string_edit_desc
-#    "c" &{ |e| puts "#### c";true} "h" &{ |e| puts "#### h";true} rep_char+ &{ |e| puts "#### rep_char";true} <T> /
+    # F90:R1016
+    
+    # Note: the char-string-edit-desc
+    # 'c H rep-char[rep-char]... is converted
+    # to a string literal and therefore not
+    # defined in this grammar
+    
     char_literal_constant
   end
   
@@ -1503,26 +1507,26 @@ grammar Fortran
 
   rule data_edit_desc
     # F90:R1005
-    data_edit_desc_a int_literal_constant (t_dot int_literal_constant)? <T> / 
-    data_edit_desc_b int_literal_constant t_dot int_literal_constant <T> / 
-    data_edit_desc_c int_literal_constant t_dot int_literal_constant ("e" int_literal_constant)? <T> /
+    data_edit_desc_1 int_literal_constant (t_dot int_literal_constant)? <T> /
+    data_edit_desc_2 int_literal_constant t_dot int_literal_constant <T> / 
+    data_edit_desc_3 int_literal_constant t_dot int_literal_constant ("e" int_literal_constant)? <T> /
     "l" int_literal_constant <T>/ 
     "a" int_literal_constant? <T>
   end
 
-  rule data_edit_desc_a
+  rule data_edit_desc_1
     "i" /
     "b" /
     "o" /
     "z"
   end
 
-  rule data_edit_desc_b
+  rule data_edit_desc_2
     "f" /
     "d"
   end
 
-  rule data_edit_desc_c
+  rule data_edit_desc_3
     "en" /
     "es" /
     "e" /

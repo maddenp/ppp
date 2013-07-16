@@ -14241,7 +14241,7 @@ module Fortran
   end
 
   module DataEditDesc1
-    def data_edit_desc_a
+    def data_edit_desc_1
       elements[0]
     end
 
@@ -14252,7 +14252,7 @@ module Fortran
   end
 
   module DataEditDesc2
-    def data_edit_desc_b
+    def data_edit_desc_2
       elements[0]
     end
 
@@ -14276,7 +14276,7 @@ module Fortran
   end
 
   module DataEditDesc4
-    def data_edit_desc_c
+    def data_edit_desc_3
       elements[0]
     end
 
@@ -14316,7 +14316,7 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
-    r2 = _nt_data_edit_desc_a
+    r2 = _nt_data_edit_desc_1
     s1 << r2
     if r2
       r3 = _nt_int_literal_constant
@@ -14355,7 +14355,7 @@ module Fortran
       r0 = r1
     else
       i8, s8 = index, []
-      r9 = _nt_data_edit_desc_b
+      r9 = _nt_data_edit_desc_2
       s8 << r9
       if r9
         r10 = _nt_int_literal_constant
@@ -14380,7 +14380,7 @@ module Fortran
         r0 = r8
       else
         i13, s13 = index, []
-        r14 = _nt_data_edit_desc_c
+        r14 = _nt_data_edit_desc_3
         s13 << r14
         if r14
           r15 = _nt_int_literal_constant
@@ -14496,10 +14496,10 @@ module Fortran
     r0
   end
 
-  def _nt_data_edit_desc_a
+  def _nt_data_edit_desc_1
     start_index = index
-    if node_cache[:data_edit_desc_a].has_key?(index)
-      cached = node_cache[:data_edit_desc_a][index]
+    if node_cache[:data_edit_desc_1].has_key?(index)
+      cached = node_cache[:data_edit_desc_1][index]
       if cached
         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
@@ -14555,15 +14555,15 @@ module Fortran
       end
     end
 
-    node_cache[:data_edit_desc_a][start_index] = r0
+    node_cache[:data_edit_desc_1][start_index] = r0
 
     r0
   end
 
-  def _nt_data_edit_desc_b
+  def _nt_data_edit_desc_2
     start_index = index
-    if node_cache[:data_edit_desc_b].has_key?(index)
-      cached = node_cache[:data_edit_desc_b][index]
+    if node_cache[:data_edit_desc_2].has_key?(index)
+      cached = node_cache[:data_edit_desc_2][index]
       if cached
         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
@@ -14597,15 +14597,15 @@ module Fortran
       end
     end
 
-    node_cache[:data_edit_desc_b][start_index] = r0
+    node_cache[:data_edit_desc_2][start_index] = r0
 
     r0
   end
 
-  def _nt_data_edit_desc_c
+  def _nt_data_edit_desc_3
     start_index = index
-    if node_cache[:data_edit_desc_c].has_key?(index)
-      cached = node_cache[:data_edit_desc_c][index]
+    if node_cache[:data_edit_desc_3].has_key?(index)
+      cached = node_cache[:data_edit_desc_3][index]
       if cached
         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
@@ -14661,7 +14661,7 @@ module Fortran
       end
     end
 
-    node_cache[:data_edit_desc_c][start_index] = r0
+    node_cache[:data_edit_desc_3][start_index] = r0
 
     r0
   end
