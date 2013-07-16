@@ -1440,16 +1440,97 @@ grammar Fortran
 
   rule format_specification
     # F90:R1002
-    #
-    # Note: See NOTES file about F90:R1002
 
-    t_paren_l format_specification_element+ t_paren_r <T>
+    t_paren_l format_item_list* t_paren_r <T>
   end
 
-  rule format_specification_element
-    format_specification /
-    char_literal_constant /
-    ( !( t_paren_l / t_paren_r / t_apostrophe / t_quotemark ) character )+ <T>
+  rule format_item
+    # F90:R1003
+    
+    int_literal_constant? data_edit_desc <T> /
+    control_edit_desc /
+    char_string_edit_desc /
+    int_literal_constant? format_specification <T>
+  end
+
+  rule char_string_edit_desc
+    # F90:R1016
+    
+    # Note: the char-string-edit-desc
+    # 'c H rep-char[rep-char]... is converted
+    # to a string literal and therefore not
+    # defined in this grammar
+    
+    char_literal_constant
+  end
+  
+  rule format_item_list
+    # F90:R1003
+    
+    format_item (t_comma format_item)* <T> 
+  end
+
+  rule control_edit_desc
+    # F90:R1010
+    
+    position_edit_desc /
+    blank_interp_edit_desc /
+    sign_edit_desc /
+    int_literal_constant? t_slash <T>/ 
+    t_colon /
+    signed_int_literal_constant? "p" <T>
+  end
+
+  rule position_edit_desc
+    # F90:R1012
+    
+    "tl" int_literal_constant <T>/ 
+    "tr" int_literal_constant <T>/
+    "t" int_literal_constant <T>/
+    int_literal_constant "x" <T>
+  end
+
+  rule sign_edit_desc
+    # F90:R1014
+    
+    "sp" /
+    "ss" /
+    "s"
+  end
+
+  rule blank_interp_edit_desc
+    # F90:R1015
+    
+    "bn" /
+    "bz"
+  end
+
+  rule data_edit_desc
+    # F90:R1005
+    data_edit_desc_1 int_literal_constant (t_dot int_literal_constant)? <T> /
+    data_edit_desc_2 int_literal_constant t_dot int_literal_constant <T> / 
+    data_edit_desc_3 int_literal_constant t_dot int_literal_constant ("e" int_literal_constant)? <T> /
+    "l" int_literal_constant <T>/ 
+    "a" int_literal_constant? <T>
+  end
+
+  rule data_edit_desc_1
+    "i" /
+    "b" /
+    "o" /
+    "z"
+  end
+
+  rule data_edit_desc_2
+    "f" /
+    "d"
+  end
+
+  rule data_edit_desc_3
+    "en" /
+    "es" /
+    "e" /
+    "g"
   end
 
   rule format_stmt
