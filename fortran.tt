@@ -388,6 +388,13 @@ grammar Fortran
     "b" ( ( t_apostrophe t_binary+ t_apostrophe ) / ( t_quotemark t_binary+ t_quotemark ) ) <T>
   end
 
+  rule blank_interp_edit_desc
+    # F90:R1015
+    
+    "bn" /
+    "bz"
+  end
+
   rule block
     # F90:R801
 
@@ -551,6 +558,17 @@ grammar Fortran
     t_paren_l kind_pair scalar_int_initialization_expr ( t_comma len_pair type_param_value )? t_paren_r <T>
   end
 
+  rule char_string_edit_desc
+    # F90:R1016
+    
+    # Note: the char-string-edit-desc
+    # 'c H rep-char[rep-char]... is converted
+    # to a string literal and therefore not
+    # defined in this grammar
+    
+    char_literal_constant
+  end
+  
   rule char_variable
     # F90:R605
 
@@ -750,10 +768,49 @@ grammar Fortran
     label:label? t_continue t_newline <StmtJ>
   end
 
+  rule control_edit_desc
+    # F90:R1010
+    
+    position_edit_desc /
+    blank_interp_edit_desc /
+    sign_edit_desc /
+    int_literal_constant? t_slash <T>/ 
+    t_colon /
+    signed_int_literal_constant? "p" <T>
+  end
+
   rule cycle_stmt
     # F90:R834
 
     label:label? t_cycle do_construct_name? t_newline <StmtJ>
+  end
+
+  rule data_edit_desc
+    # F90:R1005
+    data_edit_desc_1 int_literal_constant (t_dot int_literal_constant)? <T> /
+    data_edit_desc_2 int_literal_constant t_dot int_literal_constant <T> / 
+    data_edit_desc_3 int_literal_constant t_dot int_literal_constant ("e" int_literal_constant)? <T> /
+    "l" int_literal_constant <T>/ 
+    "a" int_literal_constant? <T>
+  end
+
+  rule data_edit_desc_1
+    "i" /
+    "b" /
+    "o" /
+    "z"
+  end
+
+  rule data_edit_desc_2
+    "f" /
+    "d"
+  end
+
+  rule data_edit_desc_3
+    "en" /
+    "es" /
+    "e" /
+    "g"
   end
 
   rule data_i_do_object
@@ -1438,12 +1495,6 @@ grammar Fortran
     scalar_default_int_variable
   end
 
-  rule format_specification
-    # F90:R1002
-
-    t_paren_l format_item_list* t_paren_r <T>
-  end
-
   rule format_item
     # F90:R1003
     
@@ -1453,84 +1504,16 @@ grammar Fortran
     int_literal_constant? format_specification <T>
   end
 
-  rule char_string_edit_desc
-    # F90:R1016
-    
-    # Note: the char-string-edit-desc
-    # 'c H rep-char[rep-char]... is converted
-    # to a string literal and therefore not
-    # defined in this grammar
-    
-    char_literal_constant
-  end
-  
   rule format_item_list
     # F90:R1003
     
     format_item (t_comma format_item)* <T> 
   end
 
-  rule control_edit_desc
-    # F90:R1010
-    
-    position_edit_desc /
-    blank_interp_edit_desc /
-    sign_edit_desc /
-    int_literal_constant? t_slash <T>/ 
-    t_colon /
-    signed_int_literal_constant? "p" <T>
-  end
+  rule format_specification
+    # F90:R1002
 
-  rule position_edit_desc
-    # F90:R1012
-    
-    "tl" int_literal_constant <T>/ 
-    "tr" int_literal_constant <T>/
-    "t" int_literal_constant <T>/
-    int_literal_constant "x" <T>
-  end
-
-  rule sign_edit_desc
-    # F90:R1014
-    
-    "sp" /
-    "ss" /
-    "s"
-  end
-
-  rule blank_interp_edit_desc
-    # F90:R1015
-    
-    "bn" /
-    "bz"
-  end
-
-  rule data_edit_desc
-    # F90:R1005
-    data_edit_desc_1 int_literal_constant (t_dot int_literal_constant)? <T> /
-    data_edit_desc_2 int_literal_constant t_dot int_literal_constant <T> / 
-    data_edit_desc_3 int_literal_constant t_dot int_literal_constant ("e" int_literal_constant)? <T> /
-    "l" int_literal_constant <T>/ 
-    "a" int_literal_constant? <T>
-  end
-
-  rule data_edit_desc_1
-    "i" /
-    "b" /
-    "o" /
-    "z"
-  end
-
-  rule data_edit_desc_2
-    "f" /
-    "d"
-  end
-
-  rule data_edit_desc_3
-    "en" /
-    "es" /
-    "e" /
-    "g"
+    t_paren_l format_item_list* t_paren_r <T>
   end
 
   rule format_stmt
@@ -2456,6 +2439,15 @@ grammar Fortran
 
     label:label? t_pointer double_colon? object_names_and_spec_lists t_newline <Pointer_Stmt>
   end
+  
+  rule position_edit_desc
+    # F90:R1012
+    
+    "tl" int_literal_constant <T>/ 
+    "tr" int_literal_constant <T>/
+    "t" int_literal_constant <T>/
+    int_literal_constant "x" <T>
+  end
 
   rule position_spec
     # F90:R922
@@ -2866,6 +2858,14 @@ grammar Fortran
 
     t_plus /
     t_minus
+  end
+
+  rule sign_edit_desc
+    # F90:R1014
+    
+    "sp" /
+    "ss" /
+    "s"
   end
 
   rule signed_digit_string
