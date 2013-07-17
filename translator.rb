@@ -140,17 +140,16 @@ class Translator
       s
     end
     # Common elements in Hollerith-matching regexps
-    w  = "[ \t]*"                  # whitespace
-    lm = "^(#{w}[0-9]{1,5}#{w}"    # label (mandatory)
-    lo = "^(#{w}[0-9]{0,5}#{w}"    # label (optional)
-    n  = ")([0-9]+)#{w}"           # number
-    o  = ".*?"                     # other
-    r  = "(.*)"                    # rest (including string literal)
-    v  = "#{w}[a-z][a-z0-9_]*#{w}" # variable name
+    lm = "^( *[0-9]{1,5} *"    # label (mandatory)
+    lo = "^( *[0-9]{0,5} *"    # label (optional)
+    n  = ")([0-9]+) *"         # number
+    o  = ".*?"                 # other
+    r  = "(.*)"                # rest (including string literal)
+    v  = " *[a-z][a-z0-9_]* *" # variable name
     # Create and iterate over a list of Hollerith-matching regexps.
     res=[]
-    res.push(lm+"format"+w+"\\("+o+n+"h"+r) # F90:R1016 char-string-edit-desc
-    res.push(lo+"data"+v+"/"+o+n+"h"+r)     # Hollerith in data-stmt
+    res.push(lm+"format *\\("+o+n+"h"+r) # F90:R1016 char-string-edit-desc
+    res.push(lo+"data"+v+"/"+o+n+"h"+r)  # Hollerith in data-stmt
     res.each { |re| s=replace(s,re) }
     s
   end
@@ -175,7 +174,7 @@ class Translator
     # fixed-point normalization
     s0=nil
     while s=parser.parse(s,op,stringmap).to_s and not s.nil?
-      s=s.gsub(/^$[ \t]*\n/,'')
+      s=s.gsub(/^$ *\n/,'')
       return s if s==s0
       s0=s
     end
@@ -200,7 +199,7 @@ class Translator
     s=s.gsub(/^ +/,"")                  # remove leading whitespace
     s=s.gsub(/ +$/,"")                  # remove trailing whitespace
     s=s.gsub(/^ *!.*$\n/,"")            # remove full-line comments
-    s=fpn(s,np,1,m)                     # string-aware transform 1
+    s=fpn(s,np,1,m)                     # string-aware transform
     s=s.gsub(/& *\n *&?/,"")            # join continuation lines
     s=np.parse(s,2,m).to_s              # mask original strings
     s=dehollerith(s)                    # replace holleriths
