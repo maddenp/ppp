@@ -808,7 +808,7 @@ module Fortran
 
   end
 
-  class Array_Names_And_Specs < E
+  class Array_Names_And_Specs < T
 
     def items
       e[1].e.reduce([e[0]]) { |m,x| m.push(x) }
@@ -816,6 +816,10 @@ module Fortran
 
     def names
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
+    end
+
+    def to_s
+      list_to_s      
     end
 
   end

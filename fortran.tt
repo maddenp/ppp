@@ -561,10 +561,7 @@ grammar Fortran
   rule char_string_edit_desc
     # F90:R1016
     
-    # Note: The char-string-edit-desc 'c H rep-char [rep-char] ... has already
-    # been converted to a string literal by the normalizer and therefore not
-    # defined in this grammar.
-    
+    int_literal_constant "h" rep_char+ <T> /
     char_literal_constant
   end
   
