@@ -196,22 +196,23 @@ class Translator
     np.update(Normfree)
     m=Stringmap.new
     s=s.gsub(directive,'@\1')           # hide directives
-    s=s.gsub(/^[ \t]+/,"")              # remove leading whitespace
-    s=s.gsub(/[ \t]+$/,"")              # remove trailing whitespace
-    s=s.gsub(/^[ \t]*!.*$\n/,"")        # remove full-line comments
+    s=s.gsub(/\t/," ")                  # tabs to spaces
+    s=s.gsub(/^ +/,"")                  # remove leading whitespace
+    s=s.gsub(/ +$/,"")                  # remove trailing whitespace
+    s=s.gsub(/^ *!.*$\n/,"")            # remove full-line comments
     s=fpn(s,np,1,m)                     # string-aware transform 1
-    s=s.gsub(/&[ \t]*\n[ \t]*&?/,"")    # join continuation lines
+    s=s.gsub(/& *\n *&?/,"")            # join continuation lines
     s=np.parse(s,2,m).to_s              # mask original strings
     s=dehollerith(s)                    # replace holleriths
     s=np.parse(s,2,m).to_s              # mask dehollerith'ed strings
     s=s.downcase                        # lower-case text only
-    s=s.gsub(/[ \t]+/,"")               # remove whitespace
+    s=s.gsub(/ +/,"")                   # remove spaces
     s=restore_strings(s,m)              # restore strings
     s=s.sub(/^\n+/,"")                  # remove leading newlines
     s=s+"\n" if s[-1]!="\n" and newline # append final newline if required
     s=s.chomp unless newline            # remove final newline if forbidden
     s=s.gsub(/^@(.*)/i,'!\1')           # show directives
-    s=s.gsub(/^[ \t]*\n/,'')            # remove blank lines
+    s=s.gsub(/^ *\n/,"")                # remove blank lines
     s
   end
 

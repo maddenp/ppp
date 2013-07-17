@@ -20,8 +20,8 @@ module Normfree
       s=text_value
       case input.op
       when 1
-        s=s.gsub(/&[ \t]*$\n[ \t]*&?/,"") # join continuation lines
-        s=s.gsub(/[ \t]*;[ \t]*/,"\n")    # split semicolon-delimited lines
+        s=s.gsub(/& *$\n *&?/,"") # join continuation lines
+        s=s.gsub(/ *; */,"\n")    # split semicolon-delimited lines
       end
       s
     end
