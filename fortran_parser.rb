@@ -5342,6 +5342,13 @@ module Fortran
     r0
   end
 
+  module CharStringEditDesc0
+    def int_literal_constant
+      elements[0]
+    end
+
+  end
+
   def _nt_char_string_edit_desc
     start_index = index
     if node_cache[:char_string_edit_desc].has_key?(index)
@@ -5353,7 +5360,56 @@ module Fortran
       return cached
     end
 
-    r0 = _nt_char_literal_constant
+    i0 = index
+    i1, s1 = index, []
+    r2 = _nt_int_literal_constant
+    s1 << r2
+    if r2
+      if has_terminal?("h", false, index)
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        @index += 1
+      else
+        terminal_parse_failure("h")
+        r3 = nil
+      end
+      s1 << r3
+      if r3
+        s4, i4 = [], index
+        loop do
+          r5 = _nt_rep_char
+          if r5
+            s4 << r5
+          else
+            break
+          end
+        end
+        if s4.empty?
+          @index = i4
+          r4 = nil
+        else
+          r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
+        end
+        s1 << r4
+      end
+    end
+    if s1.last
+      r1 = instantiate_node(T,input, i1...index, s1)
+      r1.extend(CharStringEditDesc0)
+    else
+      @index = i1
+      r1 = nil
+    end
+    if r1
+      r0 = r1
+    else
+      r6 = _nt_char_literal_constant
+      if r6
+        r0 = r6
+      else
+        @index = i0
+        r0 = nil
+      end
+    end
 
     node_cache[:char_string_edit_desc][start_index] = r0
 
