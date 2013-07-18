@@ -2203,53 +2203,6 @@ module Fortran
     r0
   end
 
-  module ArrayNamesAndDeferredShapeSpecLists0
-    def array_name_and_deferred_shape_spec_list
-      elements[0]
-    end
-
-  end
-
-  def _nt_array_names_and_deferred_shape_spec_lists
-    start_index = index
-    if node_cache[:array_names_and_deferred_shape_spec_lists].has_key?(index)
-      cached = node_cache[:array_names_and_deferred_shape_spec_lists][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0, s0 = index, []
-    r1 = _nt_array_name_and_deferred_shape_spec_list
-    s0 << r1
-    if r1
-      s2, i2 = [], index
-      loop do
-        r3 = _nt_array_name_and_deferred_shape_spec_list_pair
-        if r3
-          s2 << r3
-        else
-          break
-        end
-      end
-      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
-      s0 << r2
-    end
-    if s0.last
-      r0 = instantiate_node(Array_Names_And_Deferred_Shape_Spec_Lists,input, i0...index, s0)
-      r0.extend(ArrayNamesAndDeferredShapeSpecLists0)
-    else
-      @index = i0
-      r0 = nil
-    end
-
-    node_cache[:array_names_and_deferred_shape_spec_lists][start_index] = r0
-
-    r0
-  end
-
   module ArrayNameAndSpec0
     def array_name
       elements[0]
@@ -2344,6 +2297,53 @@ module Fortran
     end
 
     node_cache[:array_name_and_spec_pair][start_index] = r0
+
+    r0
+  end
+
+  module ArrayNamesAndDeferredShapeSpecLists0
+    def array_name_and_deferred_shape_spec_list
+      elements[0]
+    end
+
+  end
+
+  def _nt_array_names_and_deferred_shape_spec_lists
+    start_index = index
+    if node_cache[:array_names_and_deferred_shape_spec_lists].has_key?(index)
+      cached = node_cache[:array_names_and_deferred_shape_spec_lists][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_array_name_and_deferred_shape_spec_list
+    s0 << r1
+    if r1
+      s2, i2 = [], index
+      loop do
+        r3 = _nt_array_name_and_deferred_shape_spec_list_pair
+        if r3
+          s2 << r3
+        else
+          break
+        end
+      end
+      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Array_Names_And_Deferred_Shape_Spec_Lists,input, i0...index, s0)
+      r0.extend(ArrayNamesAndDeferredShapeSpecLists0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:array_names_and_deferred_shape_spec_lists][start_index] = r0
 
     r0
   end

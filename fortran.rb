@@ -765,6 +765,21 @@ module Fortran
   class Array_Name < E
   end
 
+  class Array_Name_And_Deferred_Shape_Spec_List < E
+
+    def array_spec
+      (e[1].respond_to?(:array_spec))?(e[1].array_spec):(nil)
+    end
+
+    def name
+      "#{e[0]}"
+    end
+
+  end
+
+  class Array_Name_And_Deferred_Shape_Spec_List_Pair < E
+  end
+
   class Array_Name_And_Spec < E
 
     def name
@@ -779,21 +794,6 @@ module Fortran
 
   class Array_Name_And_Spec_Pair < E
     def name() e[1].name end
-  end
-
-  class Array_Name_And_Deferred_Shape_Spec_List < E
-
-    def array_spec
-      (e[1].respond_to?(:array_spec))?(e[1].array_spec):(nil)
-    end
-
-    def name
-      "#{e[0]}"
-    end
-
-  end
-
-  class Array_Name_And_Deferred_Shape_Spec_List_Pair < E
   end
 
   class Array_Names_And_Deferred_Shape_Spec_Lists < T

@@ -255,16 +255,16 @@ grammar Fortran
     t_comma array_name_and_deferred_shape_spec_list <Array_Name_And_Deferred_Shape_Spec_List_Pair>
   end
 
-  rule array_names_and_deferred_shape_spec_lists
-    array_name_and_deferred_shape_spec_list array_name_and_deferred_shape_spec_list_pair* <Array_Names_And_Deferred_Shape_Spec_Lists>
-  end
-
   rule array_name_and_spec
     array_name t_paren_l array_spec t_paren_r <Array_Name_And_Spec>
   end
 
   rule array_name_and_spec_pair
     t_comma array_name_and_spec <Array_Name_And_Spec_Pair>
+  end
+
+  rule array_names_and_deferred_shape_spec_lists
+    array_name_and_deferred_shape_spec_list array_name_and_deferred_shape_spec_list_pair* <Array_Names_And_Deferred_Shape_Spec_Lists>
   end
 
   rule array_names_and_specs
