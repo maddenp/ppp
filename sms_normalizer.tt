@@ -1,0 +1,11 @@
+grammar Normalizer
+
+  rule text
+    ( sms / directive / comment / quoted / unquoted )* <Text>
+  end
+
+  rule sms
+    "@" [sS] [mM] [sS] "$" [^\'\"\n]* <SMS>
+  end
+
+end

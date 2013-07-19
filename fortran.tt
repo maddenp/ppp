@@ -100,7 +100,7 @@ grammar Fortran
   rule action_term_do_construct
     # F90:R827
 
-    label_do_stmt !{ |e| dolabel_dupe? } do_body do_term_action_stmt <E>
+    label_do_stmt !{ |e| dolabel_repeat? } do_body do_term_action_stmt <E>
   end
 
   rule actual_arg
@@ -285,9 +285,9 @@ grammar Fortran
     # all cases with only information encountered so far. This is corrected in
     # tree post-processing.
 
+    assumed_size_spec "" <Array_Spec> /
     explicit_shape_spec_list "" <Array_Spec> /
-    assumed_shape_spec_list "" <Array_Spec> /
-    assumed_size_spec "" <Array_Spec>
+    assumed_shape_spec_list "" <Array_Spec>
   end
 
   rule array_variable_name
@@ -388,6 +388,13 @@ grammar Fortran
     "b" ( ( t_apostrophe t_binary+ t_apostrophe ) / ( t_quotemark t_binary+ t_quotemark ) ) <T>
   end
 
+  rule blank_interp_edit_desc
+    # F90:R1015
+    
+    "bn" /
+    "bz"
+  end
+
   rule block
     # F90:R801
 
@@ -414,8 +421,12 @@ grammar Fortran
 
   rule block_do_construct
     # F90:R817
+    #
+    # Note: For this rule to match, the label (if any) on the do_stmt cannot be
+    # a repeat, as that would require more than one end-do-stmt with the same
+    # label, which is not permitted.
 
-    do_stmt do_block end_do <E>
+    do_stmt !{ |e| dolabel_repeat? } do_block end_do <E>
   end
 
   rule boz_literal_constant
@@ -547,6 +558,13 @@ grammar Fortran
     t_paren_l kind_pair scalar_int_initialization_expr ( t_comma len_pair type_param_value )? t_paren_r <T>
   end
 
+  rule char_string_edit_desc
+    # F90:R1016
+    
+    int_literal_constant "h" rep_char+ <T> /
+    char_literal_constant
+  end
+  
   rule char_variable
     # F90:R605
 
@@ -746,10 +764,49 @@ grammar Fortran
     label:label? t_continue t_newline <StmtJ>
   end
 
+  rule control_edit_desc
+    # F90:R1010
+
+    position_edit_desc /
+    blank_interp_edit_desc /
+    sign_edit_desc /
+    int_literal_constant? t_slash <T> /
+    t_colon /
+    signed_int_literal_constant? "p" <T>
+  end
+
   rule cycle_stmt
     # F90:R834
 
     label:label? t_cycle do_construct_name? t_newline <StmtJ>
+  end
+
+  rule data_edit_desc
+    # F90:R1005
+    data_edit_desc_1 int_literal_constant (t_dot int_literal_constant)? <T> /
+    data_edit_desc_2 int_literal_constant t_dot int_literal_constant <T> /
+    data_edit_desc_3 int_literal_constant t_dot int_literal_constant ("e" int_literal_constant)? <T> /
+    "l" int_literal_constant <T> /
+    "a" int_literal_constant? <T>
+  end
+
+  rule data_edit_desc_1
+    "i" /
+    "b" /
+    "o" /
+    "z"
+  end
+
+  rule data_edit_desc_2
+    "f" /
+    "d"
+  end
+
+  rule data_edit_desc_3
+    "en" /
+    "es" /
+    "e" /
+    "g"
   end
 
   rule data_i_do_object
@@ -826,7 +883,7 @@ grammar Fortran
   end
 
   rule data_stmt_set_list_pair
-    t_comma data_stmt_set <E>
+    t_comma? data_stmt_set <E>
   end
 
   rule data_stmt_set_list_pairs
@@ -977,9 +1034,12 @@ grammar Fortran
 
   rule do_construct
     # F90:R816
+    #
+    # Note: When either option is matched, the appropriate label-popping method
+    # should be called. See those methods for more information.
 
-    nonblock_do_construct /
-    block_do_construct
+    nonblock_do_construct &{ |e| dolabel_pop_nonblock } <E> /
+    block_do_construct &{ |e| dolabel_pop_block } <E>
   end
 
   rule do_construct_name
@@ -1002,7 +1062,7 @@ grammar Fortran
   rule do_term_action_stmt
     # F90:R829
 
-    !do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end!(e[1]) } <Do_Term_Action_Stmt>
+    !do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end?(e[1]) } <Do_Term_Action_Stmt>
   end
 
   rule do_term_action_stmt_disallowed
@@ -1022,7 +1082,7 @@ grammar Fortran
   rule do_term_shared_stmt
     # F90:R833
 
-    !do_term_shared_stmt_disallowed action_stmt &{ |e| nonblock_do_end!(e[1]) } <Do_Term_Shared_Stmt>
+    !do_term_shared_stmt_disallowed action_stmt &{ |e| nonblock_do_end?(e[1]) } <Do_Term_Shared_Stmt>
   end
 
   rule do_term_shared_stmt_disallowed
@@ -1125,13 +1185,13 @@ grammar Fortran
   end
 
   rule end_do_continue_stmt
-    label:label? t_continue t_newline &{ |e| dolabel_pop(e[0]) } <End_Do_Stmt>
+    label:label? t_continue t_newline <End_Do_Stmt>
   end
 
   rule end_do_stmt
     # F90:R825
 
-    label:label? t_enddo do_construct_name? t_newline &{ |e| dolabel_pop(e[0]) } <End_Do_Stmt>
+    label:label? t_enddo do_construct_name? t_newline <End_Do_Stmt>
   end
 
   rule end_function_option
@@ -1151,9 +1211,9 @@ grammar Fortran
   end
 
   rule end_interface_stmt
-    # F90:R1203
+    # F90:R1203 + F95:R1204
 
-    label:label? t_end t_interface t_newline <End_Interface_Stmt>
+    label:label? t_end t_interface generic_spec_option? t_newline <End_Interface_Stmt>
   end
 
   rule end_module_option
@@ -1431,18 +1491,25 @@ grammar Fortran
     scalar_default_int_variable
   end
 
-  rule format_specification
-    # F90:R1002
-    #
-    # Note: See NOTES file about F90:R1002
-
-    t_paren_l format_specification_element+ t_paren_r <T>
+  rule format_item
+    # F90:R1003
+    
+    int_literal_constant? data_edit_desc <T> /
+    control_edit_desc /
+    char_string_edit_desc /
+    int_literal_constant? format_specification <T>
   end
 
-  rule format_specification_element
-    format_specification /
-    char_literal_constant /
-    ( !( t_paren_l / t_paren_r / t_apostrophe / t_quotemark ) character )+ <T>
+  rule format_item_list
+    # F90:R1003
+    
+    format_item ( t_comma format_item )* <T> 
+  end
+
+  rule format_specification
+    # F90:R1002
+
+    t_paren_l format_item_list* t_paren_r <T>
   end
 
   rule format_stmt
@@ -1484,9 +1551,21 @@ grammar Fortran
   rule generic_spec
     # F90:R1206
 
-    generic_name /
-    t_operator t_paren_l defined_operator t_paren_r <Generic_Spec> /
+    generic_spec_option /
+    generic_name
+  end
+
+  rule generic_spec_option_1
+    t_operator t_paren_l defined_operator t_paren_r <Generic_Spec>
+  end
+
+  rule generic_spec_option_2
     t_assignment t_paren_l t_equal t_paren_r <Generic_Spec>
+  end
+
+  rule generic_spec_option
+    generic_spec_option_1 /
+    generic_spec_option_2
   end
 
   rule goto_stmt
@@ -1497,14 +1576,16 @@ grammar Fortran
 
   rule hex_constant
     # F90:R410
+    #
+    # Note: x is non-conformant!
 
-    "z" ( ( t_apostrophe hex_digit+ t_apostrophe ) / ( t_quotemark hex_digit+ t_quotemark ) ) <T>
+    ( "z" / "x" ) ( ( t_apostrophe hex_digit+ t_apostrophe ) / ( t_quotemark hex_digit+ t_quotemark ) ) <T>
   end
 
   rule hex_digit
     # F90:R411
 
-    [0123456789abcdef]
+    [0123456789aAbBcCdDeEfF]
   end
 
   rule if_construct
@@ -1552,7 +1633,7 @@ grammar Fortran
   rule implicit_part
     # F90:R205
     #
-    # Note: The standard requires that the last statement in implicit_part be
+    # Note: The standard insists that the last statement in implicit_part be
     # an implicit_stmt but, given that this seems unlikely to affect parsing,
     # and the availibility of 3rd-party syntax-checking compilers, it is not
     # enforced here.
@@ -1603,8 +1684,12 @@ grammar Fortran
 
   rule inner_shared_do_construct
     # F90:R832
+    #
+    # Note: For this rule to match, the label on the label_do_stmt must match
+    # that of the enclosing outer_shared_do_construct, which has already been
+    # pushed onto the stack.
 
-    label_do_stmt do_body do_term_shared_stmt <Inner_Shared_Do_Construct>
+    label_do_stmt &{ |e| dolabel_repeat? } do_body do_term_shared_stmt <Inner_Shared_Do_Construct>
   end
 
   rule input_item
@@ -1755,10 +1840,7 @@ grammar Fortran
     add_op /
     concat_op /
     rel_op /
-    not_op /
-    and_op /
-    or_op /
-    equiv_op
+    logical_op
   end
 
   rule intrinsic_procedure_name
@@ -1870,7 +1952,7 @@ grammar Fortran
   rule label_do_stmt
     # F90:R819
 
-    label:label? do_construct_name_label? t_do dolabel:label loop_control? t_newline &{ |e| dolabel_push(e[3]) } <Label_Do_Stmt>
+    label:label? do_construct_name_label? t_do label loop_control? t_newline &{ |e| dolabel_push(e[3]) } <Label_Do_Stmt>
   end
 
   rule label_list
@@ -1992,6 +2074,13 @@ grammar Fortran
     # F90:R421
 
     ( t_true / t_false ) ( t_underscore kind_param )? <T>
+  end
+
+  rule logical_op
+    not_op /
+    and_op /
+    or_op /
+    equiv_op
   end
 
   rule logical_variable
@@ -2242,8 +2331,12 @@ grammar Fortran
 
   rule outer_shared_do_construct
     # F90:R830
+    #
+    # Note: The label on label_do_stmt may match that of an enclosing o_s_d_c
+    # (e.g. the second level in a triply-nested loop), or may not (e.g. in the
+    # outermost o_s_d_c in a triply-nested loop).
 
-    label_do_stmt !{ |e| dolabel_dupe? } do_body shared_term_do_construct <E>
+    label_do_stmt do_body shared_term_do_construct <E>
   end
 
   rule output_item
@@ -2341,6 +2434,15 @@ grammar Fortran
     # F90:R527
 
     label:label? t_pointer double_colon? object_names_and_spec_lists t_newline <Pointer_Stmt>
+  end
+  
+  rule position_edit_desc
+    # F90:R1012
+    
+    "tl" int_literal_constant <T> / 
+    "tr" int_literal_constant <T> /
+    "t" int_literal_constant <T> /
+    int_literal_constant "x" <T>
   end
 
   rule position_spec
@@ -2543,10 +2645,10 @@ grammar Fortran
   end
 
   rule rep_char
-    # F90:4.3.2.1 (processor-dependent)
+    # F90:4.3.2.1 (processor-dependent). Also see F90:3.1.5.
 
     character /
-    [\[\]\~\`\@\#\^\|\{\}]
+    [\[\]\~\`\@\#\^\|\{\}\\]
   end
 
   rule result_name
@@ -2743,8 +2845,8 @@ grammar Fortran
   rule shared_term_do_construct
     # F90:R831
 
-    outer_shared_do_construct /
-    inner_shared_do_construct
+    inner_shared_do_construct /
+    outer_shared_do_construct
   end
 
   rule sign
@@ -2752,6 +2854,14 @@ grammar Fortran
 
     t_plus /
     t_minus
+  end
+
+  rule sign_edit_desc
+    # F90:R1014
+    
+    "sp" /
+    "ss" /
+    "s"
   end
 
   rule signed_digit_string
@@ -2775,7 +2885,7 @@ grammar Fortran
   rule significand
     # F90:R414
 
-    digit_string t_dot !significand_disallowed digit_string? <T> /
+    digit_string !significand_disallowed t_dot digit_string? <T> /
     t_dot digit_string <T>
   end
 
@@ -2788,8 +2898,8 @@ grammar Fortran
     # Without the negative lookahead assertion, "0." would be recognized as a
     # real_literal_constant and consumed, and the parse would fail.
 
-    "and." /
-    "or."
+    rel_op /
+    logical_op
   end
 
   rule special_character
@@ -3587,6 +3697,7 @@ grammar Fortran
     t_doubleprecision "" <Type_Spec> /
     t_complex "" <Type_Spec> /
     t_character char_selector? <Type_Spec> /
+    t_logical star_int <Type_Spec> / # NONSTANDARD!
     t_logical "" <Type_Spec> /
     t_type t_paren_l type_name t_paren_r <Type_Spec>
   end
@@ -3663,5 +3774,3 @@ grammar Fortran
   end
 
 end
-
-# paul.a.madden@noaa.gov

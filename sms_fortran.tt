@@ -1,5 +1,3 @@
-require 'fortran_parser'
-
 grammar Fortran
 
   rule declaration_construct
@@ -452,5 +450,3 @@ grammar Fortran
   end
 
 end
-
-# paul.a.madden@noaa.gov

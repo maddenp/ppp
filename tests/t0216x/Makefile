@@ -1,0 +1,2 @@
+INCDIRS=include
+include ../common

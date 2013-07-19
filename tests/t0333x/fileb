@@ -1,0 +1,3 @@
+      write (*, '(a)') 'hello3'
+Csms$insert include 'filec'
+      write (*,'(a)') 'goodbye3'

@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
 
-load File.join(File.dirname($0),"common.rb")
-go $0
+$: << File.dirname($0)
+require "translator"
+Translator.new.go($0,ARGV)

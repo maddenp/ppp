@@ -1,0 +1,23 @@
+grammar Normalizer
+
+  rule text
+    ( directive / comment / quoted / unquoted )* <Text>
+  end
+
+  rule comment
+    "!" [^\n]* "\n"+ <Comment>
+  end
+
+  rule directive
+    "@" [^\n]+ "\n" <Directive>
+  end
+
+  rule quoted
+    ( [\"] [^\"]* [\"] / [\'] [^\']* [\'] )+ <Quoted>
+  end
+
+  rule unquoted
+    [^\'\"!@]+ <Unquoted>
+  end
+
+end

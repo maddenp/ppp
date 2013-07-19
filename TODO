@@ -1,7 +1,5 @@
-- (MH) Add output to no-output tests to make sure code is not deleted in translation
-  (e.g. reveiw t0160 changes)
-
-- (MH) Need tests of F90:R1206 generic_spec (2nd two forms).
+- IN PROGRESS (MH) Work on testing ppp with FIM source code to find any potential
+  errors
 
 - directives still to do
 
@@ -37,7 +35,7 @@
 - Stop tracking kind. Pass only *type* to MPI-calling SMS routines and, in the
   latter, use mpi_sizeof() + mpi_type_match_size() in the library to make a
   run-time determination of MPI type to use. Get rid of related kind() methods
-  in fortran.rb. Is this a good idea?
+  in fortran.rb. IS THIS A GOOD IDEA?
 
 - Check for and clean up any unused rules (especially sms_* rules)
 
@@ -56,7 +54,9 @@
   See t0151. May also be related to need to track, store, load user-defined type
   info.
 
-- Make implicit none mandatory! Parsing is weird w/o it.
+- Make implicit none mandatory! Parsing is weird w/o it. Update: Not sure if
+  this is feasible if we want to use others' libraries -- may be too much work
+  to modify old code using implicit typing.
 
 - write-stmt seems to parse wrong, 'write' recognized as Data_Ref. This could be
   a problem re: implicit translation of write io statements.
@@ -79,9 +79,6 @@
 - After replacing an element or statement, walk up tree replacing text_value
   with new version while ancestor text_value = *old* replaced node's text_value?
 
-- Better vertical whitespace in output (e.g. before & after functions and sub-
-  routines -- maybe all blocks?)
-
 - IIRC, parsing of allocate_object is broken, in that the variable_name option
   (2nd choice) will never be chosen because structure_component always matches.
   Need some more sophisticated logic...
@@ -97,12 +94,9 @@
   section, not at the top, so that declare() calls can be made, intuitively, in
   the required order.
 
-- .env file does not contain items added during translation, e.g.
+- .env file does not contain items added during translation, (true?) e.g.
   module_decomp.env does not even *exist*, much less contain the items added
   during translation.
-
-- In translator.rb, think about 'opts' and what is actually optional. Move
-  requirements into the mandatory argslist.
 
 - To make all of this more useful, build an AST from the parse tree. Then, do
   translations on and produce final output from the AST.
@@ -133,10 +127,6 @@
 - In fortran.rb/sms_fortran.rb, standardize when methods on nodes return strings
   or SyntaxNode subclasses. That is, should we convert to strings as early as
   possible, or delay until a string is absolutely required? Probably the latter.
-
-- Can cat() et al be moved into SyntaxNode extension in fortran.rb and used in
-  various to_s() functions to simplify syntax? In general, try to move methods
-  into the nearest ancestor class possible.
 
 - Try to find out which directives actually require module_decomp and/or
   nnt_types_module and limit rolled-out 'declare' calls.
@@ -169,13 +159,6 @@
   but possibly not _declarative, _use or _implicit. Get rid of what isn't
   necessary.
 
-- Any error output from parsing must go to stderr, not stdout, so that output
-  file containing error info instead of code isn't created. Otherwise, make
-  may fail to properly build, since a lately-timestamped output file will
-  exist. (Already done for PARSE FAILED.)
-
-- Need some kind of fixed-point treatment of assemble / include / sms$insert?
-
 - Check status on all allocates rolled out by ppp.
 
 - In getvarenv(), give more verbose information about why a failure has occurred
@@ -185,9 +168,6 @@
 
 - Factor array-literal creation for sms_compare_var, esms_exhcange, sms_serial,
   etc.
-
-- Add no-translate option to ppp so that .env files are generated w/o changing
-  the source at all.
 
 - Need SMS library function that takes type and kind arguemnts and returns the
   correct nnt_ type to use in library calls.
@@ -221,3 +201,35 @@
   env.
 
 - In sms_fortran.rb SMS_Serial#translate, factor varenv["dim#{r}"] & similar.
+
+- Trim rolled-out variable names to 31 characters (F90 section 3.2.2) Or use
+  some numeric scheme in too-long cases, to avoid collisions.
+
+- In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
+  label, but also labels further down in the stack? That would also be an error,
+  right?
+
+- In fortran.tt, rule array_spec makes a claim about a bad parse. The comment
+  should include a case to demonstrate this, so that the comment can be removed
+  if/when the parse problem is corrected.
+
+- (MH) Add no-translate option to ppp so that .env files are generated w/o
+  changing the source at all. JUST REDIRECT OUTPUT TO /dev/null OR SIMILAR? No,
+  skip the translation phase because it is time-consuming. Call option 'modinfo'
+  for now.
+
+- (MH) Consider limitation on number of continuation lines. At least exit with
+  error if this is happening.
+
+- (MH) In normalizer.tt, should Quoted have higher precendence? Otherwise, what
+  about '@' inside a quoted string?
+
+- (MH) Normalizing parses can fail, too. Handle it.
+
+- (MH) Any error output from parsing must go to stderr, not stdout, so that
+  output file containing error info instead of code isn't created. Otherwise,
+  make may fail to properly build, since a lately-timestamped output file will
+  exist. (Already done for PARSE FAILED.)
+
+- (MH) Better vertical whitespace in output (e.g. before & after functions and
+  sub-routines -- maybe all blocks?)
