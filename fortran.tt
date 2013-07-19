@@ -345,7 +345,7 @@ grammar Fortran
   rule attr_spec
     # F90:R503
 
-    t_parameter /
+    t_parameter "" <Attr_Spec_Parameter> /
     access_spec /
     t_allocatable /
     t_dimension t_paren_l array_spec t_paren_r <Attr_Spec_Dimension> /
@@ -2103,7 +2103,7 @@ grammar Fortran
   rule named_constant_def
     # F90:R539
 
-    named_constant t_equal initialization_expr <E>
+    named_constant t_equal initialization_expr <Named_Constant_Def>
   end
 
   rule named_constant_def_list
@@ -2262,7 +2262,7 @@ grammar Fortran
   rule parameter_stmt
     # F90:R538
 
-    label:label? t_parameter t_paren_l named_constant_def_list t_paren_r t_newline <StmtC>
+    label:label? t_parameter t_paren_l named_constant_def_list t_paren_r t_newline &{ |e| sp_parameter_stmt(e[3]) } <StmtC>
   end
 
   rule parent_string
@@ -2279,7 +2279,7 @@ grammar Fortran
   end
 
   rule parenthesized_args
-    t_paren_l actual_arg_spec_list? t_paren_r <T>
+    t_paren_l actual_arg_spec_list? t_paren_r <Parenthesized_Args>
   end
 
   rule parenthesized_component_array_spec

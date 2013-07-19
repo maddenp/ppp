@@ -232,6 +232,13 @@ module Fortran
     true
   end
 
+  def sp_parameter_stmt(named_constant_def_list)
+    named_constant_def_list.names.each do |x|
+      varsetprop(x,"parameter","_true")
+    end
+    true
+  end
+
   def sp_subroutine_stmt(dummy_arg_list_option)
     envpush
     if dummy_arg_list_option.e
@@ -268,6 +275,9 @@ module Fortran
         p["sort"]="_array"
         array_props(array_spec,p,@distribute)
       end
+    end
+    if attrchk(attr_spec_option,:parameter?)
+      varprops.each { |v,p| p["parameter"]="_true" }
     end
     if attrchk(attr_spec_option,:private?)
       varprops.each { |v,p| p["access"]="private" }
@@ -310,7 +320,7 @@ module Fortran
 
   def space(all=false)
     a=(all)?(self.e):(self.e[1..-1])
-    a.map { |x| x.to_s }.join(" ").strip
+    a.map { |x| "#{x}" }.join(" ").strip
   end
 
   def stmt(s)
@@ -618,7 +628,7 @@ module Fortran
   end
 
   class StmtC < T
-    def to_s() stmt(e[1..-1].map { |x| x.to_s }.join) end
+    def to_s() stmt(e[1..-1].map { |x| "#{x}" }.join) end
   end
 
   class StmtJ < T
@@ -666,7 +676,7 @@ module Fortran
     def to_s() list_to_s end
   end
 
-  class Add_Operand < T
+  class Add_Operand < E
 
     def to_s
       "#{e[0]}"+((e[1].e)?("#{e[1].e[0]}#{e[1].e[1]}"):(""))
@@ -923,6 +933,7 @@ module Fortran
 
   class Attr_Spec_Base < E
     def dimension?() attrany(:dimension?) end
+    def parameter?() attrany(:parameter?) end
     def private?() attrany(:private?) end
     def public?() attrany(:public?) end
   end
@@ -939,12 +950,18 @@ module Fortran
 
   class Attr_Spec_List_Pairs < Attr_Spec_Base
     def dimension?() (e[0])?(attrany(:dimension?,e[0].e)):(false) end
+    def parameter?() (e[0])?(attrany(:parameter?,e[0].e)):(false) end
     def private?() (e[0])?(attrany(:private?,e[0].e)):(false) end
     def public?() (e[0])?(attrany(:public?,e[0].e)):(false) end
   end
 
   class Attr_Spec_Option < Attr_Spec_Base
     def dimension?() e[1].dimension? end
+    def parameter?() e[1].parameter? end
+  end
+
+  class Attr_Spec_Parameter < E
+    def parameter?() true end
   end
 
   class Block_Data < Scoping_Unit
@@ -1032,7 +1049,7 @@ module Fortran
     def to_s() list_to_s end
   end
 
-  class Data_Ref < T
+  class Data_Ref < E
 
     def name
       (e[1].e.empty?)?(e[0].name):(e[1].e[-1].e[1].name)
@@ -1044,6 +1061,10 @@ module Fortran
       else
         e[1].e[-1].e[1]
       end
+    end
+
+    def to_s
+      e[1].e.reduce("#{e[0]}") { |m,x| m+"#{x.e[0]}#{x.e[1]}" }
     end
 
   end
@@ -1144,6 +1165,11 @@ module Fortran
   end
 
   class Dummy_Arg_Name_List < T
+
+    def to_s
+      e[1].e.reduce("#{e[0]}") { |m,x| m+"#{x.e[0]}#{x.e[1]}" }
+    end
+
   end
 
   class Else_If_Stmt < T
@@ -1377,7 +1403,7 @@ module Fortran
 
   end
 
-  class Expr < T
+  class Expr < E
 
     def to_s
       "#{e[0]}"+((e[1].e)?("#{e[1].e[0]}#{e[1].e[1]}"):(""))
@@ -1595,7 +1621,7 @@ module Fortran
     def to_s() "#{e[0]}#{e[1].e.reduce("") { |m,x| m+="#{x}" } }" end
   end
 
-  class Mult_Operand < T
+  class Mult_Operand < E
 
     def to_s
       "#{e[0]}#{e[1]}"
@@ -1614,8 +1640,20 @@ module Fortran
   class Named_Constant < E
   end
 
+  class Named_Constant_Def < E
+    def name() e[0] end
+  end
+
   class Named_Constant_Def_List < T
-    def to_s() list_to_s end
+
+    def names
+      [e[0].name]+e[1].e.reduce([]) { |m,x| m.push(x.e[1].name) }
+    end
+
+    def to_s
+      list_to_s
+    end
+
   end
 
   class Namelist_Group_Name < E
@@ -1717,6 +1755,9 @@ module Fortran
     def to_s() list_to_s end
   end
 
+  class Parenthesized_Args < E
+  end
+
   class Parenthesized_Deferred_Shape_Spec_List < T
 
     def abstract_boundslist
@@ -1733,7 +1774,7 @@ module Fortran
     def abstract_boundslist() e[1].abstract_boundslist end
   end
 
-  class Parenthesized_Section_Subscript_List < T
+  class Parenthesized_Section_Subscript_List < E
 
     def subscript_list
       e[1].subscript_list
@@ -1744,7 +1785,7 @@ module Fortran
   class Part_Name < E
   end
 
-  class Part_Ref < T
+  class Part_Ref < E
 
     def name
       e[0].name
@@ -1858,7 +1899,7 @@ module Fortran
     def to_s() list_to_s end
   end
 
-  class Section_Subscript_List < T
+  class Section_Subscript_List < E
 
     def subscript_list
       e[1].elements.reduce([e[0]]) { |m,x| m.push(x.e[1]) }

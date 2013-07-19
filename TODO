@@ -198,3 +198,26 @@
 
 - replace_element may also be unsounds, as it removes nodes from the tree.
   Instead, maybe walk up the tree and update text_value components?
+
+- In sms_fortran.rb, 'names_in_region' should be 'vars_in_region' and should
+  be just that -- not function or subroutine names, not parameter names, etc.
+
+- Why are some SMS API routines ppp_* (e.g. ppp_bcast) and some sms_* (e.g.
+  sms_scatter)? Can this please be made consistent?
+
+- read_stmt, write_stmt et al are not function calls, so we *do* know which of
+  their arguments may be modified during a call (e.g. iostat's variable can,
+  file's variable cannot) we we can limit bcast/gather/scatter of these in a
+  serial region.
+
+- See "BUG" comment in SMS_Serial#translate.
+
+- Get rid of class T and all uses? E seems much safer...
+
+- Is/are other halol/halou roll-out(s) correct? sms$exchange? All positions 0
+  except for decomposed dim?
+
+- Hardcoded '1's referring to decomposition elements should be looked up from
+  env.
+
+- In sms_fortran.rb SMS_Serial#translate, factor varenv["dim#{r}"] & similar.
