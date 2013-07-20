@@ -323,12 +323,6 @@ module Fortran
     return usename
   end
 
-  def use_localnames(modulename)
-    e=(self.is_a?(T))?(use_part.env):(env)
-    return [] unless e[:uses]
-    e[:uses][modulename].map { |x| x[0] }
-  end
-
   def use_usenames(modulename)
     e=(self.is_a?(T))?(use_part.env):(env)
     return [] unless e[:uses]
@@ -348,6 +342,11 @@ module Fortran
   # Extension of SyntaxNode class
 
   class Treetop::Runtime::SyntaxNode
+
+    def cat
+      # concatenate elements' string representations
+      (e)?(self.e.map { |x| "#{x}" }.join):("")
+    end
 
     def post_common
       post_children
@@ -417,11 +416,6 @@ module Fortran
 
     def attrany(attr,e=nil)
       (e||self.e).reduce(false) { |m,x| m||=attrchk(x,attr) }
-    end
-
-    def cat
-      # concatenate elements' string representations
-      (e)?(self.e.map { |x| "#{x}" }.join):("")
     end
 
     def declaration_constructs
@@ -829,7 +823,7 @@ module Fortran
     end
 
     def to_s
-      list_to_s      
+      list_to_s
     end
 
   end

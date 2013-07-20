@@ -41,7 +41,7 @@ class Translator
     end
 
   end
-      
+
   # X*Parser scheme due to Clifford Heath (http://goo.gl/62pJ6)
 
   class XFortranParser < FortranParser

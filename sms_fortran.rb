@@ -1,3 +1,5 @@
+require "set"
+
 module Fortran
 
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
@@ -333,7 +335,7 @@ module Fortran
     end
   end
 # HACK end
-  
+
   class Name < T
 
     def self.global(name)
