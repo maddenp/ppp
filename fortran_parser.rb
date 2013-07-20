@@ -3080,6 +3080,13 @@ module Fortran
   end
 
   module AttrSpec0
+    def t_parameter
+      elements[0]
+    end
+
+  end
+
+  module AttrSpec1
     def t_dimension
       elements[0]
     end
@@ -3097,7 +3104,7 @@ module Fortran
     end
   end
 
-  module AttrSpec1
+  module AttrSpec2
     def t_intent
       elements[0]
     end
@@ -3127,91 +3134,110 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_t_parameter
+    i1, s1 = index, []
+    r2 = _nt_t_parameter
+    s1 << r2
+    if r2
+      if has_terminal?("", false, index)
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
+      else
+        terminal_parse_failure("")
+        r3 = nil
+      end
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(Attr_Spec_Parameter,input, i1...index, s1)
+      r1.extend(AttrSpec0)
+    else
+      @index = i1
+      r1 = nil
+    end
     if r1
       r0 = r1
     else
-      r2 = _nt_access_spec
-      if r2
-        r0 = r2
+      r4 = _nt_access_spec
+      if r4
+        r0 = r4
       else
-        r3 = _nt_t_allocatable
-        if r3
-          r0 = r3
+        r5 = _nt_t_allocatable
+        if r5
+          r0 = r5
         else
-          i4, s4 = index, []
-          r5 = _nt_t_dimension
-          s4 << r5
-          if r5
-            r6 = _nt_t_paren_l
-            s4 << r6
-            if r6
-              r7 = _nt_array_spec
-              s4 << r7
-              if r7
-                r8 = _nt_t_paren_r
-                s4 << r8
+          i6, s6 = index, []
+          r7 = _nt_t_dimension
+          s6 << r7
+          if r7
+            r8 = _nt_t_paren_l
+            s6 << r8
+            if r8
+              r9 = _nt_array_spec
+              s6 << r9
+              if r9
+                r10 = _nt_t_paren_r
+                s6 << r10
               end
             end
           end
-          if s4.last
-            r4 = instantiate_node(Attr_Spec_Dimension,input, i4...index, s4)
-            r4.extend(AttrSpec0)
+          if s6.last
+            r6 = instantiate_node(Attr_Spec_Dimension,input, i6...index, s6)
+            r6.extend(AttrSpec1)
           else
-            @index = i4
-            r4 = nil
+            @index = i6
+            r6 = nil
           end
-          if r4
-            r0 = r4
+          if r6
+            r0 = r6
           else
-            r9 = _nt_t_external
-            if r9
-              r0 = r9
+            r11 = _nt_t_external
+            if r11
+              r0 = r11
             else
-              i10, s10 = index, []
-              r11 = _nt_t_intent
-              s10 << r11
-              if r11
-                r12 = _nt_t_paren_l
-                s10 << r12
-                if r12
-                  r13 = _nt_intent_spec
-                  s10 << r13
-                  if r13
-                    r14 = _nt_t_paren_r
-                    s10 << r14
+              i12, s12 = index, []
+              r13 = _nt_t_intent
+              s12 << r13
+              if r13
+                r14 = _nt_t_paren_l
+                s12 << r14
+                if r14
+                  r15 = _nt_intent_spec
+                  s12 << r15
+                  if r15
+                    r16 = _nt_t_paren_r
+                    s12 << r16
                   end
                 end
               end
-              if s10.last
-                r10 = instantiate_node(T,input, i10...index, s10)
-                r10.extend(AttrSpec1)
+              if s12.last
+                r12 = instantiate_node(T,input, i12...index, s12)
+                r12.extend(AttrSpec2)
               else
-                @index = i10
-                r10 = nil
+                @index = i12
+                r12 = nil
               end
-              if r10
-                r0 = r10
+              if r12
+                r0 = r12
               else
-                r15 = _nt_t_intrinsic
-                if r15
-                  r0 = r15
+                r17 = _nt_t_intrinsic
+                if r17
+                  r0 = r17
                 else
-                  r16 = _nt_t_optional
-                  if r16
-                    r0 = r16
+                  r18 = _nt_t_optional
+                  if r18
+                    r0 = r18
                   else
-                    r17 = _nt_t_pointer
-                    if r17
-                      r0 = r17
+                    r19 = _nt_t_pointer
+                    if r19
+                      r0 = r19
                     else
-                      r18 = _nt_t_save
-                      if r18
-                        r0 = r18
+                      r20 = _nt_t_save
+                      if r20
+                        r0 = r20
                       else
-                        r19 = _nt_t_target
-                        if r19
-                          r0 = r19
+                        r21 = _nt_t_target
+                        if r21
+                          r0 = r21
                         else
                           @index = i0
                           r0 = nil
@@ -21662,7 +21688,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(E,input, i0...index, s0)
+      r0 = instantiate_node(Named_Constant_Def,input, i0...index, s0)
       r0.extend(NamedConstantDef0)
     else
       @index = i0
@@ -23193,6 +23219,7 @@ module Fortran
     def t_newline
       elements[5]
     end
+
   end
 
   def _nt_parameter_stmt
@@ -23229,6 +23256,17 @@ module Fortran
             if r6
               r7 = _nt_t_newline
               s0 << r7
+              if r7
+                i8 = index
+                r9 = lambda { |e| sp_parameter_stmt(e[3]) }.call(s0)
+                if r9
+                  @index = i8
+                  r8 = instantiate_node(SyntaxNode,input, index...index)
+                else
+                  r8 = nil
+                end
+                s0 << r8
+              end
             end
           end
         end
@@ -23374,7 +23412,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Parenthesized_Args,input, i0...index, s0)
       r0.extend(ParenthesizedArgs0)
     else
       @index = i0

@@ -1,3 +1,5 @@
+require "set"
+
 module Fortran
 
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
@@ -109,10 +111,12 @@ module Fortran
       if varenv
         fail "Variable #{name} is already defined" unless varenv["pppvar"]
       else
+        kind=props[:kind]
+        kind=([nil,"_default"].include?(kind))?(""):("(kind=#{kind})")
         attrs=props[:attrs]||[]
         attrs=[attrs] unless attrs.is_a?(Array)
         attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
-        code="#{type}#{attrs}::#{name}"
+        code="#{type}#{kind}#{attrs}::#{name}"
         dims=props[:dims]
         code+="(#{dims.join(',')})" if dims
         init=props[:init]
@@ -331,8 +335,17 @@ module Fortran
     end
   end
 # HACK end
-  
+
   class Name < T
+
+    def self.global(name)
+      "ppp__g_#{name}"
+    end
+
+    def globalize
+      code=Name.global(self)
+      replace_element(code,:name)
+    end
 
     def translate
       # sms$to_local handling
@@ -352,7 +365,11 @@ module Fortran
       end
       # sms$serial handling
       if inside?(SMS_Serial) and not inside?(SMS_Serial_Begin)
-        self.env[:sms_serial_info].names_in_region.add("#{self}")
+        if (varenv=self.env["#{self}"])
+          unless varenv["parameter"]
+            self.env[:sms_serial_info].names_in_region.add("#{self}")
+          end
+        end
       end
     end
 
@@ -942,244 +959,263 @@ module Fortran
       "#{e[0]}#{e[1]}#{e[2]}"
     end
 
-    def translate
-      use("module_decomp")
-# HACK start
-# Uncomment this when legacy ppp is gone, and remove Executable_Part#translate.
-# For now, we need to declare iam_root everywhere in case legacy ppp needs it,
-# though in the working FIMsrc/fim/horizontal/Makefile, we're deleting any
-# definition legacy ppp makes, to avoid duplicate declarations (legacy ppp does
-# not check for an existing declaration).
-#     declare("logical","iam_root")
-# HACK end
-      # Initially, we don't know which variables will need to be gathered,
-      # scattered, or broadcast.
-      bcasts=[]
-      gathers=[]
-      scatters=[]
-      # Get the serial info recorded when the SMS$SERIAL ... BEGIN statement.
-      # was parsed.
-      si=self.env[:sms_serial_info]
-      # Iterate over the set of names that occurred in the region. Note that
-      # we do not yet know whether the names are variables (they might e.g. be
-      # function or subroutine names.
-      si.names_in_region.each do |name|
-        # Skip names with no entries in the environemnt, i.e. that are not
-        # variables. HACK: Also skip names with no type information, on the
-        # (probably naive) assumption that they are function or subroutine names
-        # that are in the environment due to access specification.
-        next unless (varenv=getvarenv(name,self,false)) and varenv["type"]
-        decomp=varenv["decomp"]
-        sort=varenv["sort"]
-        # Conservatively assume that the default intent will apply to this
-        # variable.
-        default=true
-        if si.vars_in.include?(name)
-          # Explicit 'in' intent was specified for this variable: Ensure that
-          # conflicting 'ignore' intent was not specified; schedule the variable
-          # for a gather *if* it is decomposed; and note that the default intent
-          # does not apply.
-          if si.vars_ignore.include?(name)
-            fail "'#{name}' cannot be both 'ignore' and 'out' in SMS$SERIAL"
-          end
-          gathers.push(name) if decomp
-          default=false
-        end
-        if si.vars_out.include?(name)
-          # Explicit 'out' intent was specified for this variable. Ensure that
-          # conflicting 'ignore' intent was not specified; schedule scalars and
-          # non-decomposed arrays for broadcast, and decomposed arrays for a
-          # scatter; and note that the default intent does not apply.
-          if si.vars_ignore.include?(name)
-            fail "'#{name}' cannot be both 'ignore' and 'in' SMS$SERIAL"
-          end
-          ((sort=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
-          default=false
-        end
-        if default and not si.vars_ignore.include?(name)
-          # If no explicit intent was specified, the default applies. Treatment
-          # of scalars, non-decomposed arrays and decomposed arrays is the same
-          # as described above.
-          d=si.default
-          gathers.push(name) if decomp and (d=="in" or d=="inout")
-          if d=="out" or d=="inout"
-            ((sort=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
-          end
-        end
-      end
-      # Wrap old block in conditional. Note that 'begin' and 'end' nodes have
-      # already been removed, so the only element remaining is the block.
-      oldblock=e[0]
-      code=[]
-# HACK start
-      code.push("!sms$ignore begin")
-# HACK end
-      code.push("if (iam_root()) then")
-      code.push("#{oldblock}")
-      code.push("endif")
-# HACK start
-      code.push("!sms$ignore end")
-# HACK end
-      code=code.join("\n")
-#     t=replace_statement(code,:block,oldblock)
-#     oldblock=t.e[0].e[1].e[1]
-# HACK start
-      t=replace_statement(code,:sms_ignore_executable,oldblock)
-      oldblock=t.e[1].e[0].e[1].e[1]
-# HACK end
-      newblock=e[0]
-      # Insert statements for the necessary gathers, scatters and broadcasts.
-      # Declaration of globally-sized variables
-      globals=Set.new(gathers+scatters)
-      globals.sort.each do |var|
-        varenv=getvarenv(var)
-        dims=(":"*varenv["dims"]).split("")
-        declare(varenv["type"],"ppp__g_#{var}",{:attrs=>["allocatable"],:dims=>dims})
-      end
-      # Gathers
-      gathers.each do |var|
-        varenv=getvarenv(var)
-        decomp=varenv["decomp"]
-        dims=varenv["dims"]
-        type=smstype(varenv["type"],varenv["kind"])
-        gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
-        glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
-#       gstop="(/"+ranks.map { |r| (r>dims)?(0):("ppp__globalupper") }.join(",")+"/)"
-#       gstrt="(/"+ranks.map { |r| (r>dims)?(0):("ppp__globallower") }.join(",")+"/)"
-        gstop=glubs
-        gstrt=gllbs
-        perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-        if dh=varenv["decomp"]
-          decomp="#{dh}(#{decomp}__nestlevel)"
-        else
-          decomp="ppp_not_decomposed"
-        end
-        args=[]
-        args.push("ppp_max_rank")
-        args.push("ppp_max_vars")
-        args.push("#{gllbs}")
-        args.push("#{glubs}")
-        args.push("#{gstrt}")
-        args.push("#{gstop}")
-        args.push("#{perms}")
-        args.push("#{decomp}")
-        args.push("#{type}")
-        args.push(".false.") # but why?
-        args.push("#{var}")
-        args.push("ppp__g_#{var}")
-        args.push("ppp__status")
-#       code="call sms_gather(#{args.join(",")})"
-#       insert_statement_before(code,:call_stmt,newblock.e.first)
-# HACK start
-        code="!sms$ignore begin\ncall sms_gather(#{args.join(",")})\n!sms$ignore end"
-        insert_statement_before(code,:sms_ignore_executable,newblock.e.first)
-# HACK end
-      end
-      # Allocation of globally-sized variables. On non-root tasks, allocate all
-      # dimensions at unit size. On the root task, allocate the non-decomposed
-      # dimensions at local size, and the decomposed dimensions at the global
-      # size indicated by the decomposition info.
-      globals.sort.each do |var|
-        varenv=getvarenv(var)
-        decomp=varenv["decomp"]
-        dims=varenv["dims"]
-        bounds_root=[]
-        (1..dims).each do |i|
-          bounds_root.push((decdim=varenv["dim#{i}"])?("#{decomp}__globalsize(#{decdim},#{decomp}__nestlevel)"):("size(#{var},#{i})"))
-        end
-        bounds_root=bounds_root.join(",")
-        bounds_nonroot=("1"*dims).split("").join(",")
-        code=[]
-# HACK start
-        code.push("!sms$ignore begin")
-# HACK end
-        code.push("if (iam_root()) then")
-        code.push("allocate(ppp__g_#{var}(#{bounds_root}),stat=ppp__status)")
-        code.push("else")
-        code.push("allocate(ppp__g_#{var}(#{bounds_nonroot}),stat=ppp__status)")
-        code.push("endif")
-# HACK start
-      code.push("!sms$ignore end")
-# HACK end
-        code=code.join("\n")
-#       insert_statement_before(code,:if_construct,newblock.e.first)
-# HACK start
-        insert_statement_before(code,:sms_ignore_executable,newblock.e.first)
-# HACK end
-      end
-      # Scatters
-      scatters.each do |var|
-        tag="ppp__tag_#{newtag}"
-        declare("integer",tag,{:attrs=>"save"})
-        varenv=getvarenv(var)
-        decomp=varenv["decomp"]
-        dims=varenv["dims"]
-        type=smstype(varenv["type"],varenv["kind"])
-        gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
-        glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
-#       gstop="(/"+ranks.map { |r| (r>dims)?(0):("ppp__globalupper") }.join(",")+"/)"
-#       gstrt="(/"+ranks.map { |r| (r>dims)?(0):("ppp__globallower") }.join(",")+"/)"
-        gstop=glubs
-        gstrt=gllbs
-        halol="(/"+ranks.map { |r| (r>dims)?(0):("#{decomp}__halosize(1,#{decomp}__nestlevel)") }.join(",")+"/)"
-        halou="(/"+ranks.map { |r| (r>dims)?(0):("#{decomp}__halosize(1,#{decomp}__nestlevel)") }.join(",")+"/)"
-        perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-        if dh=varenv["decomp"]
-          decomp="#{dh}(#{decomp}__nestlevel)"
-        else
-          decomp="ppp_not_decomposed"
-        end
-        args=[]
-        args.push("ppp_max_rank")
-        args.push("ppp_max_vars")
-        args.push("#{tag}")
-        args.push("#{gllbs}")
-        args.push("#{glubs}")
-        args.push("#{gstrt}")
-        args.push("#{gstop}")
-        args.push("#{perms}")
-        args.push("#{halol}")
-        args.push("#{halou}")
-        args.push("#{decomp}")
-        args.push("#{type}")
-        args.push(".false.") # but why?
-        args.push("ppp__g_#{var}")
-        args.push("#{var}")
-        args.push("ppp__status")
-#       code="call sms_scatter(#{args.join(",")})"
-#       insert_statement_after(code,:call_stmt,newblock.e.last)
-# HACK start
-        code="!sms$ignore begin\ncall sms_scatter(#{args.join(",")})\n!sms$ignore end"
-        insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
-# HACK end
-      end
-      # Broadcasts
-      bcasts.each do |var|
-        varenv=getvarenv(var)
-        if varenv["sort"]=="_scalar"
-          dims="1"
-          sizes="(/1/)"
-        else
-          dims=varenv["dims"]
-          sizes="(/#{(1..dims).reduce([]) { |m,x| m.push("size(#{var},#{x})") }.join(",")}/)"
-        end
-#       code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
-#       insert_statement_after(code,:call_stmt,newblock.e.last)
-# HACK start
-        code="!sms$ignore begin\ncall ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)\n!sms$ignore end"
-        insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
-# HACK end
-      end
-      # Deallocation of globally-sized variables
-      globals.sort.each do |var|
-#       code="deallocate(ppp__g_#{var})"
-#       insert_statement_after(code,:deallocate_stmt,newblock.e.last)
-# HACK start
-        code="!sms$ignore begin\ndeallocate(ppp__g_#{var})\n!sms$ignore end"
-        insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
-# HACK end
-      end
-    end
+#   def translate
+#     use("module_decomp")
+## HACK start
+## Uncomment this when legacy ppp is gone, and remove Executable_Part#translate.
+## For now, we need to declare iam_root everywhere in case legacy ppp needs it,
+## though in the working FIMsrc/fim/horizontal/Makefile, we're deleting any
+## definition legacy ppp makes, to avoid duplicate declarations (legacy ppp does
+## not check for an existing declaration).
+##     declare("logical","iam_root")
+## HACK end
+#     # Initially, we don't know which variables will need to be gathered,
+#     # scattered, or broadcast.
+#     bcasts=[]
+#     gathers=[]
+#     scatters=[]
+#     # Get the serial info recorded when the SMS$SERIAL ... BEGIN statement.
+#     # was parsed.
+#     si=self.env[:sms_serial_info]
+#     # Iterate over the set of names that occurred in the region. Note that
+#     # we do not yet know whether the names are variables (they might e.g. be
+#     # function or subroutine names.
+#     si.names_in_region.sort.each do |name|
+#       # Skip names with no entries in the environemnt, i.e. that are not
+#       # variables. HACK: Also skip names with no type information, on the
+#       # (probably naive) assumption that they are function or subroutine names
+#       # that are in the environment due to access specification.
+#       next unless (varenv=getvarenv(name,self,false)) and varenv["type"]
+#       decomp=varenv["decomp"]
+#       sort=varenv["sort"]
+#       # Conservatively assume that the default intent will apply to this
+#       # variable.
+#       default=true
+#       if si.vars_in.include?(name)
+#         # Explicit 'in' intent was specified for this variable: Ensure that
+#         # conflicting 'ignore' intent was not specified; schedule the variable
+#         # for a gather *if* it is decomposed; and note that the default intent
+#         # does not apply.
+#         if si.vars_ignore.include?(name)
+#           fail "'#{name}' cannot be both 'ignore' and 'out' in SMS$SERIAL"
+#         end
+#         gathers.push(name) if decomp
+#         default=false
+#       end
+#       if si.vars_out.include?(name)
+#         # Explicit 'out' intent was specified for this variable. Ensure that
+#         # conflicting 'ignore' intent was not specified; schedule scalars and
+#         # non-decomposed arrays for broadcast, and decomposed arrays for a
+#         # scatter; and note that the default intent does not apply.
+#         if si.vars_ignore.include?(name)
+#           fail "'#{name}' cannot be both 'ignore' and 'in' SMS$SERIAL"
+#         end
+#         ((sort=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
+#         default=false
+#       end
+#       if default and not si.vars_ignore.include?(name)
+#         # If no explicit intent was specified, the default applies. Treatment
+#         # of scalars, non-decomposed arrays and decomposed arrays is the same
+#         # as described above.
+#         d=si.default
+#         gathers.push(name) if decomp and (d=="in" or d=="inout")
+#         if d=="out" or d=="inout"
+#           ((sort=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
+#         end
+#       end
+#     end
+#     # Walk the subtree representing the serial region's body and replace the
+#     # names of all scattered/gathered variables with their global versions.
+#     # Note that 'begin' and 'end' nodes have already been removed, so the only
+#     # element remaining is the block.
+#     def globalize(node,to_globalize)
+#       if node.e
+## CAN WE JUST USE EACH HERE INSTEAD OF EACH_INDEX?
+#         node.e.each_index { |i| globalize(node.e[i],to_globalize) }
+#       end
+#       if node.is_a?(Name) and to_globalize.include?("#{node}")
+##         puts "### globalizing #{node}"
+#         node.globalize
+#       end
+#     end
+#     globalize(e[0],gathers+scatters)
+#     # Wrap old block in conditional. Note that 'begin' and 'end' nodes have
+#     # already been removed, so the only element remaining is the block.
+#     oldblock=e[0]
+#     code=[]
+## HACK start
+#     code.push("!sms$ignore begin")
+## HACK end
+#     code.push("if (iam_root()) then")
+#     code.push("#{oldblock}")
+#     code.push("endif")
+## HACK start
+#     code.push("!sms$ignore end")
+## HACK end
+#     code=code.join("\n")
+##     t=replace_statement(code,:block,oldblock)
+##     oldblock=t.e[0].e[1].e[1]
+## HACK start
+#     t=replace_statement(code,:sms_ignore_executable,oldblock)
+#     oldblock=t.e[1].e[0].e[1].e[1]
+## HACK end
+#     newblock=e[0]
+#     # Insert statements for the necessary gathers, scatters and broadcasts.
+#     # Declaration of globally-sized variables
+#     globals=Set.new(gathers+scatters)
+#     globals.sort.each do |var|
+#       varenv=getvarenv(var)
+#       dims=(":"*varenv["dims"]).split("")
+#       kind=varenv["kind"]
+#       declare(varenv["type"],Name.global(var),{:attrs=>["allocatable"],:dims=>dims,:kind=>kind})
+#     end
+#     # Gathers
+#     gathers.each do |var|
+#       varenv=getvarenv(var)
+#       dh=varenv["decomp"]
+#       dims=varenv["dims"]
+#       type="(/"+smstype(varenv["type"],varenv["kind"])+"/)"
+#       gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+#       glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+#       gstop=glubs
+#       gstrt=gllbs
+#       perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
+#       decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/ppp_not_decomposed/)")
+#       args=[]
+#       args.push("#{maxrank}")
+#       args.push("1")
+#       args.push("#{gllbs}")
+#       args.push("#{glubs}")
+#       args.push("#{gstrt}")
+#       args.push("#{gstop}")
+#       args.push("#{perms}")
+#       args.push("#{decomp}")
+#       args.push("#{type}")
+#       args.push(".false.") # but why?
+#       args.push("#{var}")
+#       args.push(Name.global(var))
+#       args.push("ppp__status")
+##       code="call sms_gather(#{args.join(",")})"
+##       insert_statement_before(code,:call_stmt,newblock.e.first)
+## HACK start
+#       code="!sms$ignore begin\ncall sms_gather(#{args.join(",")})\n!sms$ignore end"
+##       code="!sms$ignore begin\ncall sms_gather(#{args.join(",")})\ncall nnt_chkstat('gather #{var} failed',' ',ppp__status,nnt_abort_on_error,ppp__status)\n!sms$ignore end"
+#       insert_statement_before(code,:sms_ignore_executable,newblock.e.first)
+## HACK end
+#     end
+#     # Allocation of globally-sized variables. On non-root tasks, allocate all
+#     # dimensions at unit size. On the root task, allocate the non-decomposed
+#     # dimensions at local size, and the decomposed dimensions at the global
+#     # size indicated by the decomposition info.
+#     globals.sort.each do |var|
+#       varenv=getvarenv(var)
+#       decomp=varenv["decomp"]
+#       dims=varenv["dims"]
+#       bounds_root=[]
+#       (1..dims).each do |i|
+##         bounds_root.push((decdim=varenv["dim#{i}"])?("#{fixbound(varenv,var,i,:l)}:#{fixbound(varenv,var,i,:u)}"):("size(#{var},#{i})"))
+#         bounds_root.push((decdim=varenv["dim#{i}"])?("#{fixbound(varenv,var,i,:l)}:#{fixbound(varenv,var,i,:u)}"):("lbound(#{var},#{i}):ubound(#{var},#{i})"))
+#       end
+#       bounds_root=bounds_root.join(",")
+#       bounds_nonroot=("1"*dims).split("").join(",")
+#       code=[]
+## HACK start
+#       code.push("!sms$ignore begin")
+## HACK end
+#       code.push("if (iam_root()) then")
+#       code.push("allocate(#{Name.global(var)}(#{bounds_root}),stat=ppp__status)")
+#       code.push("else")
+#       code.push("allocate(#{Name.global(var)}(#{bounds_nonroot}),stat=ppp__status)")
+#       code.push("endif")
+## HACK start
+#     code.push("!sms$ignore end")
+## HACK end
+#       code=code.join("\n")
+##       insert_statement_before(code,:if_construct,newblock.e.first)
+## HACK start
+#       insert_statement_before(code,:sms_ignore_executable,newblock.e.first)
+## HACK end
+#     end
+#     # Scatters
+#     scatters.each do |var|
+#       tag="ppp__tag_#{newtag}"
+#       declare("integer",tag,{:attrs=>"save"})
+#       varenv=getvarenv(var)
+#       dh=varenv["decomp"]
+#       dims=varenv["dims"]
+#       type="(/"+smstype(varenv["type"],varenv["kind"])+"/)"
+#       gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+#       glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+#       gstop=glubs
+#       gstrt=gllbs
+##       # BUG? What if var is not decomposed i.e. dh is nil?
+##       halol="(/"+ranks.map { |r| (r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)") }.join(",")+"/)"
+##       halou="(/"+ranks.map { |r| (r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)") }.join(",")+"/)"
+#       # BUG? What if var is not decomposed i.e. dh is nil?
+#       halol="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
+#       halou="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
+#       perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
+#       decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/ppp_not_decomposed/)")
+#       args=[]
+#       args.push("#{maxrank}")
+#       args.push("1")
+#       args.push("#{tag}")
+#       args.push("#{gllbs}")
+#       args.push("#{glubs}")
+#       args.push("#{gstrt}")
+#       args.push("#{gstop}")
+#       args.push("#{perms}")
+#       args.push("#{halol}")
+#       args.push("#{halou}")
+#       args.push("#{decomp}")
+#       args.push("#{type}")
+#       args.push(Name.global(var))
+#       args.push("#{var}")
+#       args.push("ppp__status")
+##       code="call sms_scatter(#{args.join(",")})"
+##       insert_statement_after(code,:call_stmt,newblock.e.last)
+## HACK start
+#       code="!sms$ignore begin\ncall sms_scatter(#{args.join(",")})\n!sms$ignore end"
+##       code="!sms$ignore begin\ncall sms_scatter(#{args.join(",")})\ncall nnt_chkstat('scatter #{var} failed',' ',ppp__status,nnt_abort_on_error,ppp__status)\n!sms$ignore end"
+#       insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
+## HACK end
+#     end
+#     # Broadcasts
+#     bcasts.each do |var|
+#       varenv=getvarenv(var)
+#       if varenv["sort"]=="_scalar"
+#         dims="1"
+#         sizes="(/1,1,1,1,1,1,1/)"
+#       else
+#         dims=varenv["dims"]
+#         sizes="(/"+ranks.map { |r| (r>dims)?(1):("size(#{var},#{r})") }.join(",")+"/)"
+#       end
+##       code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
+##       insert_statement_after(code,:call_stmt,newblock.e.last)
+## HACK start
+#       # NOTE: Need both cases when hack is undone...
+#       if varenv["type"]=="character"
+#         code="!sms$ignore begin\ncall ppp_bcast_char(#{var},#{dims},ppp__status)\n!sms$ignore end"
+##         code="!sms$ignore begin\ncall ppp_bcast_char(#{var},#{dims},ppp__status)\ncall nnt_chkstat('bcast #{var} failed',' ',ppp__status)\n!sms$ignore end"
+#       else
+#         code="!sms$ignore begin\ncall ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},ppp_max_decomposed_dims,ppp__status)\n!sms$ignore end"
+##         code="!sms$ignore begin\ncall ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},ppp_max_decomposed_dims,ppp__status)\ncall nnt_chkstat('bcast #{var} failed',' ',ppp__status,nnt_abort_on_error,ppp__status)\n!sms$ignore end"
+#       end
+#       insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
+## HACK end
+#     end
+#     # Deallocation of globally-sized variables
+#     globals.sort.each do |var|
+##       code="deallocate(ppp__g_#{var})"
+##       insert_statement_after(code,:deallocate_stmt,newblock.e.last)
+## HACK start
+#       code="!sms$ignore begin\ndeallocate(#{Name.global(var)})\n!sms$ignore end"
+#       insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
+## HACK end
+#     end
+#   end
+#
+# end
 
   end
 
@@ -1197,7 +1233,7 @@ module Fortran
       si.vars_in=("#{e[2]}".empty?)?([]):(e[2].vars_in)
       si.vars_out=("#{e[2]}".empty?)?([]):(e[2].vars_out)
       parent.env[:sms_serial_info]=self.env[:sms_serial_info]
-      remove
+#     remove
     end
 
   end
@@ -1281,7 +1317,7 @@ module Fortran
     end
 
     def translate
-      remove
+#     remove
     end
 
   end

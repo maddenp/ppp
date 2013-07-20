@@ -40,7 +40,7 @@ class PPPTS
   end
 
   def run_all(threads,socket,debug,args)
-    def go(q,socket,debug) 
+    def go(q,socket,debug)
       test(q.deq,socket,debug) until q.empty?
     end
     tdir="tests"

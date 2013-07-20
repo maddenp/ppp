@@ -168,7 +168,7 @@ grammar Fortran
   end
 
   rule allocate_object_list_pair
-    t_comma allocate_object <Allocate_Object_List_Pair> 
+    t_comma allocate_object <Allocate_Object_List_Pair>
   end
 
   rule allocate_shape_spec
@@ -345,7 +345,7 @@ grammar Fortran
   rule attr_spec
     # F90:R503
 
-    t_parameter /
+    t_parameter "" <Attr_Spec_Parameter> /
     access_spec /
     t_allocatable /
     t_dimension t_paren_l array_spec t_paren_r <Attr_Spec_Dimension> /
@@ -390,7 +390,7 @@ grammar Fortran
 
   rule blank_interp_edit_desc
     # F90:R1015
-    
+
     "bn" /
     "bz"
   end
@@ -560,11 +560,11 @@ grammar Fortran
 
   rule char_string_edit_desc
     # F90:R1016
-    
+
     int_literal_constant "h" rep_char+ <T> /
     char_literal_constant
   end
-  
+
   rule char_variable
     # F90:R605
 
@@ -783,9 +783,9 @@ grammar Fortran
 
   rule data_edit_desc
     # F90:R1005
-    data_edit_desc_1 int_literal_constant (t_dot int_literal_constant)? <T> /
+    data_edit_desc_1 int_literal_constant ( t_dot int_literal_constant )? <T> /
     data_edit_desc_2 int_literal_constant t_dot int_literal_constant <T> /
-    data_edit_desc_3 int_literal_constant t_dot int_literal_constant ("e" int_literal_constant)? <T> /
+    data_edit_desc_3 int_literal_constant t_dot int_literal_constant ( "e" int_literal_constant )? <T> /
     "l" int_literal_constant <T> /
     "a" int_literal_constant? <T>
   end
@@ -1493,7 +1493,7 @@ grammar Fortran
 
   rule format_item
     # F90:R1003
-    
+
     int_literal_constant? data_edit_desc <T> /
     control_edit_desc /
     char_string_edit_desc /
@@ -1502,8 +1502,8 @@ grammar Fortran
 
   rule format_item_list
     # F90:R1003
-    
-    format_item ( t_comma format_item )* <T> 
+
+    format_item ( t_comma format_item )* <T>
   end
 
   rule format_specification
@@ -2192,7 +2192,7 @@ grammar Fortran
   rule named_constant_def
     # F90:R539
 
-    named_constant t_equal initialization_expr <E>
+    named_constant t_equal initialization_expr <Named_Constant_Def>
   end
 
   rule named_constant_def_list
@@ -2355,7 +2355,7 @@ grammar Fortran
   rule parameter_stmt
     # F90:R538
 
-    label:label? t_parameter t_paren_l named_constant_def_list t_paren_r t_newline <StmtC>
+    label:label? t_parameter t_paren_l named_constant_def_list t_paren_r t_newline &{ |e| sp_parameter_stmt(e[3]) } <StmtC>
   end
 
   rule parent_string
@@ -2372,7 +2372,7 @@ grammar Fortran
   end
 
   rule parenthesized_args
-    t_paren_l actual_arg_spec_list? t_paren_r <T>
+    t_paren_l actual_arg_spec_list? t_paren_r <Parenthesized_Args>
   end
 
   rule parenthesized_component_array_spec
@@ -2435,11 +2435,11 @@ grammar Fortran
 
     label:label? t_pointer double_colon? object_names_and_spec_lists t_newline <Pointer_Stmt>
   end
-  
+
   rule position_edit_desc
     # F90:R1012
-    
-    "tl" int_literal_constant <T> / 
+
+    "tl" int_literal_constant <T> /
     "tr" int_literal_constant <T> /
     "t" int_literal_constant <T> /
     int_literal_constant "x" <T>
@@ -2858,7 +2858,7 @@ grammar Fortran
 
   rule sign_edit_desc
     # F90:R1014
-    
+
     "sp" /
     "ss" /
     "s"
