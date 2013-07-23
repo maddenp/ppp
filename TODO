@@ -213,18 +213,11 @@
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
 
-- (MH) Add no-translate option to ppp so that .env files are generated w/o
-  changing the source at all. JUST REDIRECT OUTPUT TO /dev/null OR SIMILAR? No,
-  skip the translation phase because it is time-consuming. Call option 'modinfo'
-  for now.
-
-- (MH) Consider limitation on number of continuation lines. At least exit with
-  error if this is happening.
-
 - (MH) In normalizer.tt, should Quoted have higher precendence? Otherwise, what
   about '@' inside a quoted string?
 
-- (MH) Normalizing parses can fail, too. Handle it.
+- What about '#' in continuation character? Is recognized as cpp directive, is
+  this a problem?
 
 - (MH) Any error output from parsing must go to stderr, not stdout, so that
   output file containing error info instead of code isn't created. Otherwise,
