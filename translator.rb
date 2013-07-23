@@ -120,7 +120,8 @@ class Translator
       :incdirs=>[],
       :nl=>true,
       :normalize=>false,
-      :translate=>true
+      :translate=>true,
+      :modinfo=>false
     }
   end
 
@@ -366,6 +367,9 @@ class Translator
       s=assemble(s,[srcfile],conf.incdirs)
     end
     cppcheck(s)
+    if conf.normalize and conf.modinfo
+      puts "NOTE: 'NORMALIZE' OVERRIDES 'MODINFO'"
+    end
     if conf.debug
       puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}\n"
     end
@@ -379,6 +383,9 @@ class Translator
     puts "\n#{n}" if conf.debug or conf.normalize
     unless conf.normalize
       raw_tree=fp.parse(n,{:root=>root})
+      if conf.modinfo
+        exit
+      end
       raw_tree.instance_variable_set(:@srcfile,srcfile)
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
       if conf.debug
@@ -528,6 +535,8 @@ class Translator
         conf.debug=true
       when "normalize"
         conf.normalize=true
+      when "modinfo"
+        conf.modinfo=true
       else
         die usage
       end
