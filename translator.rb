@@ -108,20 +108,18 @@ class Translator
   end
 
   def chkparse(s)
-    if s =~ /^\s*$/ or s==nil
-      die ("NORMALIZING PARSE FAILED")
-    end
-    return s
+    die "NORMALIZING PARSE FAILED" if s.nil? or s=~/^\s*$/
+    s
   end
       
   def default_opts
     {
       :debug=>false,
       :incdirs=>[],
+      :modinfo=>false,
       :nl=>true,
       :normalize=>false,
-      :translate=>true,
-      :modinfo=>false
+      :translate=>true
     }
   end
 
@@ -330,31 +328,33 @@ class Translator
         s=~directive
       end
 
-      max=132
+      maxcols=132 # columns
+      maxcont=4   # continuation lines
       a=s.split("\n")
       (0..a.length-1).each do |n|
+        cont=0
         e=a[n].chomp
         unless directive?(e)
-          if e.length>max
+          if e.length>maxcols
             e=~/^( *).*$/
             i=$1.length+2
             t=""
-            counter=0
             begin
-              r=[max-2,e.length-1].min
+              r=[maxcols-2,e.length-1].min
               t+=e[0..r]+"&\n"
               e=" "*i+"&"+e[r+1..-1]
-              if counter==39
-                die ("STATEMENT EXCEEDS ALLOWED NUMBER OF CONTINUATION LINES (39)")
-              end
-              counter+=1
-            end while e.length>max
+              cont+=1
+            end while e.length>maxcols
             t+=e
+            if cont>maxcont
+              die "ERROR: More than #{maxcont} continuation lines:\n\n#{t}"
+            end
             a[n]=t
           end
         end
       end
-      a.join("\n")
+      s=a.join("\n")
+      s
     end
 
     conf=ostruct_default_merge(conf)
@@ -368,7 +368,7 @@ class Translator
     end
     cppcheck(s)
     if conf.normalize and conf.modinfo
-      die ("ERROR: 'NORMALIZE' AND 'MODINFO' ARE MUTUALLY EXCLUSIVE\n"+usage)
+      die ("ERROR: 'normalize' and 'modinfo' are mutually exclusive\n"+usage)
     end
     if conf.debug
       puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}\n"
@@ -383,9 +383,7 @@ class Translator
     puts "\n#{n}" if conf.debug or conf.normalize
     unless conf.normalize
       raw_tree=fp.parse(n,{:root=>root})
-      if conf.modinfo
-        exit
-      end
+      exit if conf.modinfo
       raw_tree.instance_variable_set(:@srcfile,srcfile)
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
       if conf.debug
@@ -549,8 +547,8 @@ class Translator
     x.push("-I dir[:dir:...]]")
     x.push("debug")
     x.push("fixed")
-    x.push("normalize")
     x.push("modinfo")
+    x.push("normalize")
     "#{File.basename(@wrapper)} [ #{x.join(" | ")} ] source"
   end
 
