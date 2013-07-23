@@ -107,13 +107,21 @@ class Translator
     die "Socket file #{socket} in use, please free it" if File.exist?(socket)
   end
 
+  def chkparse(s)
+    if s =~ /^\s*$/ or s==nil
+      die ("NORMALIZING PARSE FAILED")
+    end
+    return s
+  end
+      
   def default_opts
     {
       :debug=>false,
       :incdirs=>[],
       :nl=>true,
       :normalize=>false,
-      :translate=>true
+      :translate=>true,
+      :modinfo=>false
     }
   end
 
@@ -170,7 +178,7 @@ class Translator
     exit(1) if die
   end
 
-  def fpn(s,parser,op=nil,stringmap=nil)
+  def fix_pt_norm(s,parser,op=nil,stringmap=nil)
     # fixed-point normalization
     s0=nil
     while s=parser.parse(s,op,stringmap).to_s and not s.nil?
@@ -199,11 +207,11 @@ class Translator
     s=s.gsub(/^ +/,"")                  # remove leading whitespace
     s=s.gsub(/ +$/,"")                  # remove trailing whitespace
     s=s.gsub(/^ *!.*$\n/,"")            # remove full-line comments
-    s=fpn(s,np,1,m)                     # string-aware transform
+    s=chkparse(fix_pt_norm(s,np,1,m))   # string-aware transform
     s=s.gsub(/& *\n *&?/,"")            # join continuation lines
-    s=np.parse(s,2,m).to_s              # mask original strings
+    s=chkparse(np.parse(s,2,m).to_s)    # mask original strings
     s=dehollerith(s)                    # replace holleriths
-    s=np.parse(s,2,m).to_s              # mask dehollerith'ed strings
+    s=chkparse(np.parse(s,2,m).to_s)    # mask dehollerith'ed strings
     s=s.downcase                        # lower-case text only
     s=s.gsub(/ +/,"")                   # remove spaces
     s=restore_strings(s,m)              # restore strings
@@ -306,7 +314,7 @@ class Translator
       s=s.gsub(directive,'@\1')                # hide directives
       s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # replace any continuation character with generic "a"
       s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
-      s=fpn(s,np)                              # string-aware transform
+      s=chkparse(fix_pt_norm(s,np))            # string-aware transform
       s=s.gsub(/\n[ \t]{5}a/,"")               # join continuation lines
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
       s
@@ -331,10 +339,15 @@ class Translator
             e=~/^( *).*$/
             i=$1.length+2
             t=""
+            counter=0
             begin
               r=[max-2,e.length-1].min
               t+=e[0..r]+"&\n"
               e=" "*i+"&"+e[r+1..-1]
+              if counter==39
+                die ("STATEMENT EXCEEDS ALLOWED NUMBER OF CONTINUATION LINES (39)")
+              end
+              counter+=1
             end while e.length>max
             t+=e
             a[n]=t
@@ -354,6 +367,9 @@ class Translator
       s=assemble(s,[srcfile],conf.incdirs)
     end
     cppcheck(s)
+    if conf.normalize and conf.modinfo
+      die ("ERROR: 'NORMALIZE' AND 'MODINFO' ARE MUTUALLY EXCLUSIVE\n"+usage)
+    end
     if conf.debug
       puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}\n"
     end
@@ -367,6 +383,9 @@ class Translator
     puts "\n#{n}" if conf.debug or conf.normalize
     unless conf.normalize
       raw_tree=fp.parse(n,{:root=>root})
+      if conf.modinfo
+        exit
+      end
       raw_tree.instance_variable_set(:@srcfile,srcfile)
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
       if conf.debug
@@ -516,6 +535,8 @@ class Translator
         conf.debug=true
       when "normalize"
         conf.normalize=true
+      when "modinfo"
+        conf.modinfo=true
       else
         die usage
       end
@@ -529,6 +550,7 @@ class Translator
     x.push("debug")
     x.push("fixed")
     x.push("normalize")
+    x.push("modinfo")
     "#{File.basename(@wrapper)} [ #{x.join(" | ")} ] source"
   end
 
