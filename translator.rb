@@ -368,7 +368,8 @@ class Translator
     end
     cppcheck(s)
     if conf.normalize and conf.modinfo
-      puts "NOTE: 'NORMALIZE' OVERRIDES 'MODINFO'"
+      puts "NOTE: 'NORMALIZE' AND 'MODINFO' ARE MUTUALLY EXCLUSIVE"
+      die usage
     end
     if conf.debug
       puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}\n"
