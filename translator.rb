@@ -368,8 +368,7 @@ class Translator
     end
     cppcheck(s)
     if conf.normalize and conf.modinfo
-      puts "NOTE: 'NORMALIZE' AND 'MODINFO' ARE MUTUALLY EXCLUSIVE"
-      die usage
+      die ("ERROR: 'NORMALIZE' AND 'MODINFO' ARE MUTUALLY EXCLUSIVE\n"+usage)
     end
     if conf.debug
       puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}\n"
@@ -551,6 +550,7 @@ class Translator
     x.push("debug")
     x.push("fixed")
     x.push("normalize")
+    x.push("modinfo")
     "#{File.basename(@wrapper)} [ #{x.join(" | ")} ] source"
   end
 
