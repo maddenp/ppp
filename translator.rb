@@ -107,6 +107,13 @@ class Translator
     die "Socket file #{socket} in use, please free it" if File.exist?(socket)
   end
 
+  def chkparse(s)
+    if s =~ /^\s*$/ or s==nil
+      die ("NORMALIZING PARSE FAILED")
+    end
+    return s
+  end
+      
   def default_opts
     {
       :debug=>false,
@@ -170,7 +177,7 @@ class Translator
     exit(1) if die
   end
 
-  def fpn(s,parser,op=nil,stringmap=nil)
+  def fix_pt_norm(s,parser,op=nil,stringmap=nil)
     # fixed-point normalization
     s0=nil
     while s=parser.parse(s,op,stringmap).to_s and not s.nil?
@@ -199,11 +206,11 @@ class Translator
     s=s.gsub(/^ +/,"")                  # remove leading whitespace
     s=s.gsub(/ +$/,"")                  # remove trailing whitespace
     s=s.gsub(/^ *!.*$\n/,"")            # remove full-line comments
-    s=fpn(s,np,1,m)                     # string-aware transform
+    s=chkparse(fix_pt_norm(s,np,1,m))   # string-aware transform
     s=s.gsub(/& *\n *&?/,"")            # join continuation lines
-    s=np.parse(s,2,m).to_s              # mask original strings
+    s=chkparse(np.parse(s,2,m).to_s)    # mask original strings
     s=dehollerith(s)                    # replace holleriths
-    s=np.parse(s,2,m).to_s              # mask dehollerith'ed strings
+    s=chkparse(np.parse(s,2,m).to_s)    # mask dehollerith'ed strings
     s=s.downcase                        # lower-case text only
     s=s.gsub(/ +/,"")                   # remove spaces
     s=restore_strings(s,m)              # restore strings
@@ -306,7 +313,7 @@ class Translator
       s=s.gsub(directive,'@\1')                # hide directives
       s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # replace any continuation character with generic "a"
       s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
-      s=fpn(s,np)                              # string-aware transform
+      s=chkparse(fix_pt_norm(s,np))            # string-aware transform
       s=s.gsub(/\n[ \t]{5}a/,"")               # join continuation lines
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
       s
