@@ -338,10 +338,15 @@ class Translator
             e=~/^( *).*$/
             i=$1.length+2
             t=""
+            counter=0
             begin
               r=[max-2,e.length-1].min
               t+=e[0..r]+"&\n"
               e=" "*i+"&"+e[r+1..-1]
+              if counter==39
+                die ("STATEMENT EXCEEDS ALLOWED NUMBER OF CONTINUATION LINES (39)")
+              end
+              counter+=1
             end while e.length>max
             t+=e
             a[n]=t
