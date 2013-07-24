@@ -226,7 +226,9 @@ class Translator
   def out(s,root,srcfile,conf)
     conf=ostruct_default_merge(conf)
     translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
-    translated_source
+    t=translated_source.gsub(/\n\n\n+/,"\n\n")    # Reduces multiple blank lines into one
+    t[0]=t[0].sub(/^\n/,"")                       # Removes blank first line
+    t
   end
 
   def process(s,root,srcfile,conf)
