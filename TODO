@@ -1,5 +1,8 @@
-- IN PROGRESS (MH) Work on testing ppp with FIM source code to find any potential
+- (IN PROGRESS) (MH) Work on testing ppp with FIM source code to find any potential
   errors
+
+- (IN PROGRESS) (MH) Better vertical whitespace in output (e.g. before & after functions and
+  sub-routines -- maybe all blocks?)
 
 - directives still to do
 
@@ -212,17 +215,3 @@
 - In fortran.tt, rule array_spec makes a claim about a bad parse. The comment
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
-
-- (MH) In normalizer.tt, should Quoted have higher precendence? Otherwise, what
-  about '@' inside a quoted string?
-
-- What about '#' in continuation character? Is recognized as cpp directive, is
-  this a problem?
-
-- (MH) Any error output from parsing must go to stderr, not stdout, so that
-  output file containing error info instead of code isn't created. Otherwise,
-  make may fail to properly build, since a lately-timestamped output file will
-  exist. (Already done for PARSE FAILED.)
-
-- (MH) Better vertical whitespace in output (e.g. before & after functions and
-  sub-routines -- maybe all blocks?)

@@ -1173,7 +1173,7 @@ module Fortran
   class Else_If_Stmt < T
     def to_s
       unindent
-      s=stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}")
+      s="\n"+stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}")
       indent
       s
     end
@@ -1182,7 +1182,8 @@ module Fortran
   class Else_Stmt < T
     def to_s
       unindent
-      s=stmt(space)
+      s="\n#{stmt(space)}"
+      
       indent
       s
     end
@@ -1225,7 +1226,7 @@ module Fortran
   class End_If_Stmt < T
     def to_s
       unindent
-      stmt(space)
+      "#{stmt(space)}\n"
     end
   end
 
@@ -1456,6 +1457,10 @@ module Fortran
 
   class If_Then_Stmt < T
     def to_s
+      
+      # ISSUE: ADDING A NEWLINE SEPARATES THE LABEL FROM THE STATEMENT      
+      # s="\n"+stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
+
       s=stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
       indent
       s
