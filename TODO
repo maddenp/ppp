@@ -6,18 +6,17 @@
   fim/wrfphys/module_cu_gd.F
   fim/wrfphys/module_mp_morr_two_moment.F
 
-- end interface issue in fim/wrfphys/module_ra_rrtmg_lw.F
-
 - Unexpected end of program (complicated 'do' loops with 'continue'):
   fim/column/crhtab.f
 
 - Statement like 'complex*16y(*) is not supported (fim/wrfphys/libmassv.F)
+  NOTE: also not supported by gfortran...
 
 - Why does ppp translation (or maybe just gfortran) not work with .f files
   that refer to .f90 external modules? (MH has a list of the problematic
   programs - all others in column dir PROBLEMS & wrfphys dir PROBLEMS)
 
-- Vertical whitespace before if/then statements cuts of optional label
+- Vertical whitespace before if/then statements cuts off optional label
   
 - (IN PROGRESS) (MH) Better vertical whitespace in output (e.g. before & after
   functions and sub-routines -- maybe all blocks?)

@@ -9,6 +9,6 @@
       SUBROUTINE COMPLEX_SWITCH (X, Y)
       COMPLEX, INTENT (INOUT) :: X, Y
       END SUBROUTINE COMPLEX_SWITCH
-      END INTERFACE
+      END INTERFACE SWITCH
       PRINT *,'ok'
       end program t

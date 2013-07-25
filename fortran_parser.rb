@@ -11911,7 +11911,7 @@ module Fortran
         r4 = _nt_t_interface
         s0 << r4
         if r4
-          r6 = _nt_generic_spec_option
+          r6 = _nt_generic_spec
           if r6
             r5 = r6
           else

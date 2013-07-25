@@ -1213,7 +1213,7 @@ grammar Fortran
   rule end_interface_stmt
     # F90:R1203 + F95:R1204
 
-    label:label? t_end t_interface generic_spec_option? t_newline <End_Interface_Stmt>
+    label:label? t_end t_interface generic_spec? t_newline <End_Interface_Stmt>
   end
 
   rule end_module_option
