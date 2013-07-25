@@ -1457,11 +1457,7 @@ module Fortran
 
   class If_Then_Stmt < T
     def to_s
-      
-      # ISSUE: ADDING A NEWLINE SEPARATES THE LABEL FROM THE STATEMENT      
-      # s="\n"+stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
-
-      s=stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
+      s="\n"+stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
       indent
       s
     end

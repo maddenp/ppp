@@ -1594,7 +1594,7 @@ grammar Fortran
     # Note: if_then_construct, else_if_construct and else_construct added for
     # clarity, not specified in standard.
 
-    label:label? if_then_construct else_if_construct? else_construct? end_if_stmt <E>
+    if_then_construct else_if_construct? else_construct? end_if_stmt <E>
   end
 
   rule if_construct_name

@@ -18,12 +18,8 @@
   FIM source files fail when their translated source is compiled by gfortran
   due to issues related to finding included files and modules
 
-- Vertical whitespace before if/then statements cuts off optional label because
-  the label is parsed as part of an if_construct, and printed *before* the
-  if_then_construct is recognized (why is this happening?)
-  
-- (IN PROGRESS) (MH) Better vertical whitespace in output (e.g. before & after
-  functions and sub-routines -- maybe all blocks?)
+- (IN PROGRESS) (MH) Better vertical whitespace in output (more changes coming
+  based on other people's opinions)
 
 - (CONTINUING) (MH) Work on testing ppp with FIM source code to find any 
   potential errors
