@@ -18,6 +18,14 @@
   FIM source files fail when their translated source is compiled by gfortran
   due to issues related to finding included files and modules
 
+- Should the fixed2free parser detect invalid fixed-form to avoid any issues
+  related to doing the wrong transformation on free-form source?
+  For example, a 'contains' statement in free-form in column one would change
+  into a comment, messing up the rest of the program.  Detecting a user mistake
+  (a 'fixed' flag when the source is free-form) would help avoid this. Could be
+  done by differentiating .f and .f90 files or a regex leading to die() in
+  fixed2free
+
 - (IN PROGRESS) (MH) Better vertical whitespace in output (more changes coming
   based on other people's opinions)
 
