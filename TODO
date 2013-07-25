@@ -1,8 +1,27 @@
-- (IN PROGRESS) (MH) Work on testing ppp with FIM source code to find any potential
-  errors
+- Unexplained FIM ppp errors:
+  
+  Parse Fails:
+  fim/column/radiation_aerosols.f
+  fim/column/radlw_main.f
+  fim/wrfphys/module_cu_gd.F
+  fim/wrfphys/module_mp_morr_two_moment.F
 
-- (IN PROGRESS) (MH) Better vertical whitespace in output (e.g. before & after functions and
-  sub-routines -- maybe all blocks?)
+- end interface issue in fim/wrfphys/module_ra_rrtmg_lw.F
+
+- Unexpected end of program (complicated 'do' loops with 'continue'):
+  fim/column/crhtab.f
+
+- Statement like 'complex*16y(*) is not supported (fim/wrfphys/libmassv.F)
+
+- Why does ppp translation (or maybe just gfortran) not work with .f files
+  that refer to .f90 external modules? (MH has a list of the problematic
+  programs - all others in column dir PROBLEMS & wrfphys dir PROBLEMS)
+  
+- (IN PROGRESS) (MH) Better vertical whitespace in output (e.g. before & after
+  functions and sub-routines -- maybe all blocks?)
+
+- (CONTINUING) (MH) Work on testing ppp with FIM source code to find any 
+  potential errors
 
 - directives still to do
 
