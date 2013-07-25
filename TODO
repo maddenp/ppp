@@ -16,6 +16,8 @@
 - Why does ppp translation (or maybe just gfortran) not work with .f files
   that refer to .f90 external modules? (MH has a list of the problematic
   programs - all others in column dir PROBLEMS & wrfphys dir PROBLEMS)
+
+- Vertical whitespace before if/then statements cuts of optional label
   
 - (IN PROGRESS) (MH) Better vertical whitespace in output (e.g. before & after
   functions and sub-routines -- maybe all blocks?)
