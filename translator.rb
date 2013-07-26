@@ -329,7 +329,7 @@ class Translator
       end
 
       maxcols=132 # columns
-      maxcont=4   # continuation lines
+      maxcont=39  # continuation lines
       a=s.split("\n")
       (0..a.length-1).each do |n|
         cont=0
