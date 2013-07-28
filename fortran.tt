@@ -1213,7 +1213,7 @@ grammar Fortran
   rule end_interface_stmt
     # F90:R1203 + F95:R1204
 
-    label:label? t_end t_interface generic_spec_option? t_newline <End_Interface_Stmt>
+    label:label? t_end t_interface generic_spec? t_newline <End_Interface_Stmt>
   end
 
   rule end_module_option
@@ -1594,7 +1594,7 @@ grammar Fortran
     # Note: if_then_construct, else_if_construct and else_construct added for
     # clarity, not specified in standard.
 
-    label:label? if_then_construct else_if_construct? else_construct? end_if_stmt <E>
+    if_then_construct else_if_construct? else_construct? end_if_stmt <E>
   end
 
   rule if_construct_name

@@ -1,6 +1,7 @@
 program t
   implicit none
 !open stmt error (file nonexistence) iostat & err label 
+!and number label with letter label in if-construct
   integer::ierr
   
   open (unit=95, status='old', file='test', err=100, iostat=ierr)
@@ -9,9 +10,9 @@ program t
 
 100 print *,'yes'
 
-  if (ierr .ne. 0) then
+200 x:  if (ierr .ne. 0) then
     print *,'and yes'
-  endif
+  endif x
   
   
 endprogram t

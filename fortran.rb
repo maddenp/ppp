@@ -1037,7 +1037,7 @@ module Fortran
   class Contains_Stmt < T
     def to_s
       unindent
-      s=stmt(space)
+      s="\n#{stmt(space)}"
       indent
       s
     end
@@ -1173,7 +1173,7 @@ module Fortran
   class Else_If_Stmt < T
     def to_s
       unindent
-      s=stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}")
+      s="\n"+stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}")
       indent
       s
     end
@@ -1182,7 +1182,8 @@ module Fortran
   class Else_Stmt < T
     def to_s
       unindent
-      s=stmt(space)
+      s="\n#{stmt(space)}"
+      
       indent
       s
     end
@@ -1211,28 +1212,28 @@ module Fortran
   class End_Do_Stmt < T
     def to_s
       unindent
-      stmt(space)
+      "#{stmt(space)}\n"
     end
   end
 
   class End_Function_Stmt < T
     def to_s
       unindent
-      stmt(space)
+      stmt(space)+"\n"
     end
   end
 
   class End_If_Stmt < T
     def to_s
       unindent
-      stmt(space)
+      "#{stmt(space)}\n"
     end
   end
 
   class End_Interface_Stmt < T
     def to_s
       unindent
-      stmt("#{e[1]} #{e[2]}#{sb(e[3])}")
+      stmt("#{e[1]} #{e[2]}#{sb(e[3])}")+"\n"
     end
   end
 
@@ -1243,7 +1244,7 @@ module Fortran
   class End_Module_Stmt < T
     def to_s
       unindent
-      stmt(space)
+      "#{stmt(space)}\n"
     end
   end
 
@@ -1265,7 +1266,7 @@ module Fortran
   class End_Subroutine_Stmt < T
     def to_s
       unindent
-      stmt(space)
+      "#{stmt(space)}\n"
     end
   end
 
@@ -1428,7 +1429,7 @@ module Fortran
 
   class Function_Stmt < T
     def to_s
-      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")
+      s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")
       indent
       s
     end
@@ -1456,14 +1457,14 @@ module Fortran
 
   class If_Then_Stmt < T
     def to_s
-      s=stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
+      s="\n"+stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
       indent
       s
     end
   end
 
   class Implicit_None_Stmt < E
-    def to_s() stmt(space) end
+    def to_s() stmt(space)+"\n" end
   end
 
   class Implicit_Spec_List < T
@@ -1514,7 +1515,7 @@ module Fortran
 
   class Interface_Stmt < T
     def to_s
-      s=stmt(space)
+      s="\n#{stmt(space)}"
       indent
       s
     end
@@ -1547,7 +1548,7 @@ module Fortran
 
   class Label_Do_Stmt < T
     def to_s
-      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
+      s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
       indent
       s
     end
@@ -1609,7 +1610,7 @@ module Fortran
     end
 
     def to_s
-      s=stmt(space)
+      s="\n#{stmt(space)}"
       indent
       s
     end
@@ -1717,7 +1718,7 @@ module Fortran
   class Nonlabel_Do_Stmt < T
 
     def to_s
-      s=stmt("#{sa(e[1])}#{e[2]}#{e[3]}")
+      s="\n"+stmt("#{sa(e[1])}#{e[2]}#{e[3]}")
       indent
       s
     end
@@ -1938,7 +1939,7 @@ module Fortran
 
   class Subroutine_Stmt < T
     def to_s
-      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
+      s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
       indent
       s
     end

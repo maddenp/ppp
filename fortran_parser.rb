@@ -11911,7 +11911,7 @@ module Fortran
         r4 = _nt_t_interface
         s0 << r4
         if r4
-          r6 = _nt_generic_spec_option
+          r6 = _nt_generic_spec
           if r6
             r5 = r6
           else
@@ -15366,16 +15366,12 @@ module Fortran
   end
 
   module IfConstruct0
-    def label
+    def if_then_construct
       elements[0]
     end
 
-    def if_then_construct
-      elements[1]
-    end
-
     def end_if_stmt
-      elements[4]
+      elements[3]
     end
   end
 
@@ -15391,18 +15387,18 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
-    if r2
-      r1 = r2
-    else
-      r1 = instantiate_node(SyntaxNode,input, index...index)
-    end
+    r1 = _nt_if_then_construct
     s0 << r1
     if r1
-      r3 = _nt_if_then_construct
-      s0 << r3
+      r3 = _nt_else_if_construct
       if r3
-        r5 = _nt_else_if_construct
+        r2 = r3
+      else
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      end
+      s0 << r2
+      if r2
+        r5 = _nt_else_construct
         if r5
           r4 = r5
         else
@@ -15410,17 +15406,8 @@ module Fortran
         end
         s0 << r4
         if r4
-          r7 = _nt_else_construct
-          if r7
-            r6 = r7
-          else
-            r6 = instantiate_node(SyntaxNode,input, index...index)
-          end
+          r6 = _nt_end_if_stmt
           s0 << r6
-          if r6
-            r8 = _nt_end_if_stmt
-            s0 << r8
-          end
         end
       end
     end

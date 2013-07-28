@@ -224,7 +224,10 @@ class Translator
   def out(s,root,srcfile,conf)
     conf=ostruct_default_merge(conf)
     translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
-    translated_source
+    unless conf.normalize
+      t=vertspace(translated_source)
+    end
+    t
   end
 
   def process(s,root,srcfile,conf)
@@ -301,6 +304,7 @@ class Translator
     end
 
     def fixed2free(s)
+      # Normalizer from fixed form to free form
       np=XNormalizerParser.new
       np.update(Normfixed)
       s=detabify(s)
@@ -310,9 +314,12 @@ class Translator
       s=a.join("\n")                           # join array into string
       s=s.gsub(/^(c|C|\*)/,"!")                # replace fixed form comment indicators with "!"
       s=s.gsub(directive,'@\1')                # hide directives
+      if s=~/\n[ \t]{5}\#/                     # gives user more information about problem
+        $stderr.puts "ERROR:'#' in column six is a cpp directive, not\na valid fixed-form continuation character\n\n"
+      end                                      # will always end in die() from cpp-check
       s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # replace any continuation character with generic "a"
       s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
-      s=chkparse(fix_pt_norm(s,np))            # string-aware transform
+      s=chkparse(fix_pt_norm(s,np))            # string-aware transform & parse error checking
       s=s.gsub(/\n[ \t]{5}a/,"")               # join continuation lines
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
       s
@@ -357,18 +364,20 @@ class Translator
       s
     end
 
+    def vertspace(t)
+      t=t.gsub(/\n\n\n+/,"\n\n")                    # Reduces multiple blank lines into one
+      t[0]=t[0].sub(/^\n/,"")                       # Removes blank first line
+      t
+    end
+    
     conf=ostruct_default_merge(conf)
     fp=XFortranParser.new(srcfile,conf.incdirs)
     s0=nil
-    while s!=s0 and not s.nil?
-      s0=s
-      s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and conf.fixed
-      s=prepsrc_free(s) if defined?(prepsrc_free)
-      s=assemble(s,[srcfile],conf.incdirs)
-    end
-    cppcheck(s)
-    if conf.normalize and conf.modinfo
-      die ("ERROR: 'normalize' and 'modinfo' are mutually exclusive\n"+usage)
+    while s!=s0 and not s.nil?                                        # Fixed point treatment of prepsrc() and assemble()
+      s0=s                                                            # for cases in which files added by 'include'
+      s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and conf.fixed    # statements or '!sms$insert include' statements
+      s=prepsrc_free(s) if defined?(prepsrc_free)                     # also contain such a statement; this follows the path
+      s=assemble(s,[srcfile],conf.incdirs)                            # until all souce has been appropriately inserted
     end
     if conf.debug
       puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}\n"
@@ -378,6 +387,7 @@ class Translator
       s=fixed2free(s)
       puts "#{s}\n\n" if conf.debug
     end
+    cppcheck(s)                                               #  any time the continuation warning in fixed2free is shown, cppcheck will exit in die()
     puts "NORMALIZED FORM\n" if conf.debug
     n=normalize(s,conf.nl)
     puts "\n#{n}" if conf.debug or conf.normalize
@@ -537,6 +547,9 @@ class Translator
         conf.modinfo=true
       else
         die usage
+      end
+      if conf.modinfo and conf.normalize
+        die ("ERROR: 'normalize' and 'modinfo' are mutually exclusive\n"+usage)
       end
     end
     conf
