@@ -1577,7 +1577,7 @@ grammar Fortran
   rule hex_constant
     # F90:R410
     #
-    # Note: x is non-conformant!
+    # Note: x is NON-CONFORMANT
 
     ( "z" / "x" ) ( ( t_apostrophe hex_digit+ t_apostrophe ) / ( t_quotemark hex_digit+ t_quotemark ) ) <T>
   end
@@ -3690,14 +3690,14 @@ grammar Fortran
   end
 
   rule type_spec_without_kind_selector
-    t_integer star_int <Type_Spec> / # NONSTANDARD!
+    t_integer star_int <Type_Spec> / # NON-CONFORMANT!
     t_integer "" <Type_Spec> /
-    t_real star_int <Type_Spec> / # NONSTANDARD!
+    t_real star_int <Type_Spec> / # NON-CONFORMANT!
     t_real "" <Type_Spec> /
     t_doubleprecision "" <Type_Spec> /
     t_complex "" <Type_Spec> /
     t_character char_selector? <Type_Spec> /
-    t_logical star_int <Type_Spec> / # NONSTANDARD!
+    t_logical star_int <Type_Spec> / # NON-CONFORMANT!
     t_logical "" <Type_Spec> /
     t_type t_paren_l type_name t_paren_r <Type_Spec>
   end
