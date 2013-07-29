@@ -5,9 +5,6 @@
   fim/wrfphys/module_cu_gd.F
   fim/wrfphys/module_mp_morr_two_moment.F
 
-- If statements with labels (parse fails)
-  fim/column/radiation_aerosols.f  
-
 - Unexpected end of program (complicated 'do' loops with 'continue'):
   Example: fim/column/crhtab.f
 
