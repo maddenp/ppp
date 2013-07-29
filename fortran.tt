@@ -3695,6 +3695,7 @@ grammar Fortran
     t_real star_int <Type_Spec> / # NON-CONFORMANT!
     t_real "" <Type_Spec> /
     t_doubleprecision "" <Type_Spec> /
+    t_complex star_int <Type_Spec> /
     t_complex "" <Type_Spec> /
     t_character char_selector? <Type_Spec> /
     t_logical star_int <Type_Spec> / # NON-CONFORMANT!
