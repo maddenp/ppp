@@ -161,6 +161,15 @@ module Fortran
     true
   end
 
+  def sp_do_body(execution_part_construct)
+    execution_part_construct.e.each do |x|
+      if x.is_a?(Nonblock_Do_Construct)
+        return (not dolabel_repeat?)
+      end
+    end
+    true
+  end
+
   def sp_function_stmt(dummy_arg_name_list)
     envpush
     if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
@@ -976,6 +985,9 @@ module Fortran
     end
   end
 
+  class Block_Do_Construct < E
+  end
+
   class Call_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
   end
@@ -1134,6 +1146,9 @@ module Fortran
 
   class Dimension_Stmt < T
     def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
+  end
+
+  class Do_Body < E
   end
 
   class Do_Construct_Name < E
@@ -1486,10 +1501,16 @@ module Fortran
   end
 
   class Inner_Shared_Do_Construct < T
+
+    def label
+      e[0].label
+    end
+
     def to_s
       unindent
       cat
     end
+
   end
 
   class Input_Item_List < T
@@ -1547,11 +1568,17 @@ module Fortran
   end
 
   class Label_Do_Stmt < T
+
+    def label
+      "#{e[3]}"
+    end
+
     def to_s
       s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
       indent
       s
     end
+
   end
 
   class Label_List < T
@@ -1715,6 +1742,14 @@ module Fortran
 
   end
 
+  class Nonblock_Do_Construct < E
+
+    def label
+      e[0].label
+    end
+
+  end
+
   class Nonlabel_Do_Stmt < T
 
     def to_s
@@ -1749,6 +1784,10 @@ module Fortran
 
   class Optional_Stmt < T
     def to_s() stmt("#{e[1]}#{ik(e[2],"::"," ")}#{e[3]}") end
+  end
+
+  class Outer_Shared_Do_Construct < E
+    def label() e[0].label end
   end
 
   class Output_Item_List < T
