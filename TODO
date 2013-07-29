@@ -1,7 +1,6 @@
 - Unexplained FIM ppp errors:
   
   Parse Fails:
-  fim/column/radiation_aerosols.f
   fim/column/radlw_main.f
   fim/wrfphys/module_cu_gd.F
   fim/wrfphys/module_mp_morr_two_moment.F
@@ -9,22 +8,11 @@
 - Unexpected end of program (complicated 'do' loops with 'continue'):
   Example: fim/column/crhtab.f
 
-- Statement like 'complex*16y(*)' is not supported (fim/wrfphys/libmassv.F)
-  NOTE: also not supported by gfortran...
-
 - Why does ppp translation (or maybe just gfortran) not work with .f files
   that refer to .f90 external modules? (MH has a list of the problematic
   programs - all others in column dir PROBLEMS & wrfphys dir PROBLEMS). Many
   FIM source files fail when their translated source is compiled by gfortran
   due to issues related to finding included files and modules
-
-- Should the fixed2free parser detect invalid fixed-form to avoid any issues
-  related to doing the wrong transformation on free-form source?
-  For example, a 'contains' statement in free-form in column one would change
-  into a comment, messing up the rest of the program.  Detecting a user mistake
-  (a 'fixed' flag when the source is free-form) would help avoid this. Could be
-  done by differentiating .f and .f90 files or a regex leading to die() in
-  fixed2free
 
 - (CONTINUING) (MH) Work on testing ppp with FIM source code to find any 
   potential errors
