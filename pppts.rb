@@ -6,7 +6,6 @@ $: << File.dirname($0)
 
 require "fileutils"
 require "thread"
-require "translator"
 
 class PPPTS
 
@@ -16,6 +15,7 @@ class PPPTS
     threads=1 if debug
     die("Tests require at least one thread") unless threads>0
     exe("make")
+    require "translator"
     t=Translator.new
     srvr,socket=(server_mode)?(server_start(t)):(nil)
     n=run_all(threads,socket,debug,args)

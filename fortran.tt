@@ -100,7 +100,7 @@ grammar Fortran
   rule action_term_do_construct
     # F90:R827
 
-    label_do_stmt !{ |e| dolabel_repeat? } do_body? do_term_action_stmt <E>
+    label_do_stmt !{ |e| sp_dolabel_repeat? } do_body? do_term_action_stmt <E>
   end
 
   rule actual_arg
@@ -426,7 +426,7 @@ grammar Fortran
     # a repeat, as that would require more than one end-do-stmt with the same
     # label, which is not permitted.
 
-    do_stmt !{ |e| dolabel_repeat? } do_block end_do <E>
+    do_stmt !{ |e| sp_dolabel_repeat? } do_block end_do <E>
   end
 
   rule boz_literal_constant
@@ -1038,8 +1038,8 @@ grammar Fortran
     # Note: When either option is matched, the appropriate label-popping method
     # should be called. See those methods for more information.
 
-    nonblock_do_construct &{ |e| dolabel_pop_nonblock } <Nonblock_Do_Construct> /
-    block_do_construct &{ |e| dolabel_pop_block } <Block_Do_Construct>
+    nonblock_do_construct &{ |e| sp_dolabel_pop_nonblock } <Nonblock_Do_Construct> /
+    block_do_construct &{ |e| sp_dolabel_pop_block } <Block_Do_Construct>
   end
 
   rule do_construct_name
@@ -1062,7 +1062,7 @@ grammar Fortran
   rule do_term_action_stmt
     # F90:R829
 
-    !do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end?(e[1]) } <Do_Term_Action_Stmt>
+    !do_term_action_stmt_disallowed action_stmt &{ |e| sp_nonblock_do_end?(e[1]) } <Do_Term_Action_Stmt>
   end
 
   rule do_term_action_stmt_disallowed
@@ -1082,7 +1082,7 @@ grammar Fortran
   rule do_term_shared_stmt
     # F90:R833
 
-    !do_term_shared_stmt_disallowed action_stmt &{ |e| nonblock_do_end?(e[1]) } <Do_Term_Shared_Stmt>
+    !do_term_shared_stmt_disallowed action_stmt &{ |e| sp_nonblock_do_end?(e[1]) } <Do_Term_Shared_Stmt>
   end
 
   rule do_term_shared_stmt_disallowed
@@ -1374,7 +1374,7 @@ grammar Fortran
   end
 
   rule executable_construct_action_stmt
-    !execution_part_disallowed action_stmt !{ |e| nonblock_do_end?(e[1]) } <StmtJ>
+    !execution_part_disallowed action_stmt !{ |e| sp_nonblock_do_end?(e[1]) } <StmtJ>
   end
 
   rule execution_part
@@ -1689,7 +1689,7 @@ grammar Fortran
     # that of the enclosing outer_shared_do_construct, which has already been
     # pushed onto the stack.
 
-    label_do_stmt &{ |e| dolabel_repeat? } do_body? do_term_shared_stmt <Inner_Shared_Do_Construct>
+    label_do_stmt &{ |e| sp_dolabel_repeat? } do_body? do_term_shared_stmt <Inner_Shared_Do_Construct>
   end
 
   rule input_item
@@ -1952,7 +1952,7 @@ grammar Fortran
   rule label_do_stmt
     # F90:R819
 
-    label:label? do_construct_name_label? t_do label loop_control? t_newline &{ |e| dolabel_push(e[3]) } <Label_Do_Stmt>
+    label:label? do_construct_name_label? t_do label loop_control? t_newline &{ |e| sp_dolabel_push(e[3]) } <Label_Do_Stmt>
   end
 
   rule label_list
@@ -2243,7 +2243,7 @@ grammar Fortran
   rule nonlabel_do_stmt
     # F90:R820
 
-    label:label? do_construct_name_label? t_do loop_control? t_newline &{ |e| dolabel_push(:nolabel) } <Nonlabel_Do_Stmt>
+    label:label? do_construct_name_label? t_do loop_control? t_newline &{ |e| sp_dolabel_push(:nolabel) } <Nonlabel_Do_Stmt>
   end
 
   rule not_op

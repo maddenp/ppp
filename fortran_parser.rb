@@ -766,7 +766,7 @@ module Fortran
     s0 << r1
     if r1
       i2 = index
-      r3 = lambda { |e| dolabel_repeat? }.call(s0)
+      r3 = lambda { |e| sp_dolabel_repeat? }.call(s0)
       if r3
         r2 = nil
       else
@@ -3964,7 +3964,7 @@ module Fortran
     s0 << r1
     if r1
       i2 = index
-      r3 = lambda { |e| dolabel_repeat? }.call(s0)
+      r3 = lambda { |e| sp_dolabel_repeat? }.call(s0)
       if r3
         r2 = nil
       else
@@ -10359,7 +10359,7 @@ module Fortran
     s1 << r2
     if r2
       i3 = index
-      r4 = lambda { |e| dolabel_pop_nonblock }.call(s1)
+      r4 = lambda { |e| sp_dolabel_pop_nonblock }.call(s1)
       if r4
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
@@ -10383,7 +10383,7 @@ module Fortran
       s5 << r6
       if r6
         i7 = index
-        r8 = lambda { |e| dolabel_pop_block }.call(s5)
+        r8 = lambda { |e| sp_dolabel_pop_block }.call(s5)
         if r8
           @index = i7
           r7 = instantiate_node(SyntaxNode,input, index...index)
@@ -10560,7 +10560,7 @@ module Fortran
       s0 << r3
       if r3
         i4 = index
-        r5 = lambda { |e| nonblock_do_end?(e[1]) }.call(s0)
+        r5 = lambda { |e| sp_nonblock_do_end?(e[1]) }.call(s0)
         if r5
           @index = i4
           r4 = instantiate_node(SyntaxNode,input, index...index)
@@ -10691,7 +10691,7 @@ module Fortran
       s0 << r3
       if r3
         i4 = index
-        r5 = lambda { |e| nonblock_do_end?(e[1]) }.call(s0)
+        r5 = lambda { |e| sp_nonblock_do_end?(e[1]) }.call(s0)
         if r5
           @index = i4
           r4 = instantiate_node(SyntaxNode,input, index...index)
@@ -13493,7 +13493,7 @@ module Fortran
       s0 << r3
       if r3
         i4 = index
-        r5 = lambda { |e| nonblock_do_end?(e[1]) }.call(s0)
+        r5 = lambda { |e| sp_nonblock_do_end?(e[1]) }.call(s0)
         if r5
           r4 = nil
         else
@@ -16281,7 +16281,7 @@ module Fortran
     s0 << r1
     if r1
       i2 = index
-      r3 = lambda { |e| dolabel_repeat? }.call(s0)
+      r3 = lambda { |e| sp_dolabel_repeat? }.call(s0)
       if r3
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
@@ -19723,7 +19723,7 @@ module Fortran
               s0 << r9
               if r9
                 i10 = index
-                r11 = lambda { |e| dolabel_push(e[3]) }.call(s0)
+                r11 = lambda { |e| sp_dolabel_push(e[3]) }.call(s0)
                 if r11
                   @index = i10
                   r10 = instantiate_node(SyntaxNode,input, index...index)
@@ -22202,7 +22202,7 @@ module Fortran
             s0 << r8
             if r8
               i9 = index
-              r10 = lambda { |e| dolabel_push(:nolabel) }.call(s0)
+              r10 = lambda { |e| sp_dolabel_push(:nolabel) }.call(s0)
               if r10
                 @index = i9
                 r9 = instantiate_node(SyntaxNode,input, index...index)
