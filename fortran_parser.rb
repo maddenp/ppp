@@ -11230,7 +11230,7 @@ module Fortran
     end
 
     def t_newline
-      elements[7]
+      elements[8]
     end
   end
 
@@ -11303,8 +11303,17 @@ module Fortran
                 r13 = _nt_t_then
                 s0 << r13
                 if r13
-                  r14 = _nt_t_newline
+                  r15 = _nt_if_construct_name
+                  if r15
+                    r14 = r15
+                  else
+                    r14 = instantiate_node(SyntaxNode,input, index...index)
+                  end
                   s0 << r14
+                  if r14
+                    r16 = _nt_t_newline
+                    s0 << r16
+                  end
                 end
               end
             end
