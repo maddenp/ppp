@@ -11222,32 +11222,43 @@ module Fortran
   end
 
   module ElseIfStmt0
+    def t_else
+      elements[0]
+    end
+
+    def if_construct_name
+      elements[1]
+    end
+
+  end
+
+  module ElseIfStmt1
     def label
       elements[0]
     end
 
     def t_elseif
-      elements[1]
-    end
-
-    def t_paren_l
       elements[2]
     end
 
-    def scalar_logical_expr
+    def t_paren_l
       elements[3]
     end
 
-    def t_paren_r
+    def scalar_logical_expr
       elements[4]
     end
 
-    def t_then
+    def t_paren_r
       elements[5]
     end
 
-    def t_newline
+    def t_then
       elements[6]
+    end
+
+    def t_newline
+      elements[8]
     end
   end
 
@@ -11271,23 +11282,67 @@ module Fortran
     end
     s0 << r1
     if r1
-      r3 = _nt_t_elseif
+      i3 = index
+      i4, s4 = index, []
+      r5 = _nt_t_else
+      s4 << r5
+      if r5
+        r6 = _nt_if_construct_name
+        s4 << r6
+        if r6
+          i7 = index
+          r8 = _nt_t_paren_l
+          if r8
+            r7 = nil
+          else
+            @index = i7
+            r7 = instantiate_node(SyntaxNode,input, index...index)
+          end
+          s4 << r7
+        end
+      end
+      if s4.last
+        r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
+        r4.extend(ElseIfStmt0)
+      else
+        @index = i4
+        r4 = nil
+      end
+      if r4
+        r3 = nil
+      else
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      end
       s0 << r3
       if r3
-        r4 = _nt_t_paren_l
-        s0 << r4
-        if r4
-          r5 = _nt_scalar_logical_expr
-          s0 << r5
-          if r5
-            r6 = _nt_t_paren_r
-            s0 << r6
-            if r6
-              r7 = _nt_t_then
-              s0 << r7
-              if r7
-                r8 = _nt_t_newline
-                s0 << r8
+        r9 = _nt_t_elseif
+        s0 << r9
+        if r9
+          r10 = _nt_t_paren_l
+          s0 << r10
+          if r10
+            r11 = _nt_scalar_logical_expr
+            s0 << r11
+            if r11
+              r12 = _nt_t_paren_r
+              s0 << r12
+              if r12
+                r13 = _nt_t_then
+                s0 << r13
+                if r13
+                  r15 = _nt_if_construct_name
+                  if r15
+                    r14 = r15
+                  else
+                    r14 = instantiate_node(SyntaxNode,input, index...index)
+                  end
+                  s0 << r14
+                  if r14
+                    r16 = _nt_t_newline
+                    s0 << r16
+                  end
+                end
               end
             end
           end
@@ -11296,7 +11351,7 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Else_If_Stmt,input, i0...index, s0)
-      r0.extend(ElseIfStmt0)
+      r0.extend(ElseIfStmt1)
     else
       @index = i0
       r0 = nil
@@ -29607,9 +29662,6 @@ module Fortran
     r0
   end
 
-  module TElse0
-  end
-
   def _nt_t_else
     start_index = index
     if node_cache[:t_else].has_key?(index)
@@ -29621,55 +29673,11 @@ module Fortran
       return cached
     end
 
-    i0, s0 = index, []
     if has_terminal?("else", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 4))
+      r0 = instantiate_node(T,input, index...(index + 4))
       @index += 4
     else
       terminal_parse_failure("else")
-      r1 = nil
-    end
-    s0 << r1
-    if r1
-      i2 = index
-      i3 = index
-      if has_terminal?("if", false, index)
-        r4 = instantiate_node(SyntaxNode,input, index...(index + 2))
-        @index += 2
-      else
-        terminal_parse_failure("if")
-        r4 = nil
-      end
-      if r4
-        r3 = r4
-      else
-        if has_terminal?("where", false, index)
-          r5 = instantiate_node(SyntaxNode,input, index...(index + 5))
-          @index += 5
-        else
-          terminal_parse_failure("where")
-          r5 = nil
-        end
-        if r5
-          r3 = r5
-        else
-          @index = i3
-          r3 = nil
-        end
-      end
-      if r3
-        r2 = nil
-      else
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
-      end
-      s0 << r2
-    end
-    if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(TElse0)
-    else
-      @index = i0
       r0 = nil
     end
 
