@@ -33302,16 +33302,26 @@ module Fortran
       elements[0]
     end
 
+    def star_int
+      elements[1]
+    end
   end
 
   module TypeSpecWithoutKindSelector6
-    def t_character
+    def t_complex
       elements[0]
     end
 
   end
 
   module TypeSpecWithoutKindSelector7
+    def t_character
+      elements[0]
+    end
+
+  end
+
+  module TypeSpecWithoutKindSelector8
     def t_logical
       elements[0]
     end
@@ -33321,14 +33331,14 @@ module Fortran
     end
   end
 
-  module TypeSpecWithoutKindSelector8
+  module TypeSpecWithoutKindSelector9
     def t_logical
       elements[0]
     end
 
   end
 
-  module TypeSpecWithoutKindSelector9
+  module TypeSpecWithoutKindSelector10
     def t_type
       elements[0]
     end
@@ -33465,13 +33475,7 @@ module Fortran
               r17 = _nt_t_complex
               s16 << r17
               if r17
-                if has_terminal?("", false, index)
-                  r18 = instantiate_node(SyntaxNode,input, index...(index + 0))
-                  @index += 0
-                else
-                  terminal_parse_failure("")
-                  r18 = nil
-                end
+                r18 = _nt_star_int
                 s16 << r18
               end
               if s16.last
@@ -33485,14 +33489,15 @@ module Fortran
                 r0 = r16
               else
                 i19, s19 = index, []
-                r20 = _nt_t_character
+                r20 = _nt_t_complex
                 s19 << r20
                 if r20
-                  r22 = _nt_char_selector
-                  if r22
-                    r21 = r22
+                  if has_terminal?("", false, index)
+                    r21 = instantiate_node(SyntaxNode,input, index...(index + 0))
+                    @index += 0
                   else
-                    r21 = instantiate_node(SyntaxNode,input, index...index)
+                    terminal_parse_failure("")
+                    r21 = nil
                   end
                   s19 << r21
                 end
@@ -33506,34 +33511,33 @@ module Fortran
                 if r19
                   r0 = r19
                 else
-                  i23, s23 = index, []
-                  r24 = _nt_t_logical
-                  s23 << r24
-                  if r24
-                    r25 = _nt_star_int
-                    s23 << r25
-                  end
-                  if s23.last
-                    r23 = instantiate_node(Type_Spec,input, i23...index, s23)
-                    r23.extend(TypeSpecWithoutKindSelector7)
-                  else
-                    @index = i23
-                    r23 = nil
-                  end
+                  i22, s22 = index, []
+                  r23 = _nt_t_character
+                  s22 << r23
                   if r23
-                    r0 = r23
+                    r25 = _nt_char_selector
+                    if r25
+                      r24 = r25
+                    else
+                      r24 = instantiate_node(SyntaxNode,input, index...index)
+                    end
+                    s22 << r24
+                  end
+                  if s22.last
+                    r22 = instantiate_node(Type_Spec,input, i22...index, s22)
+                    r22.extend(TypeSpecWithoutKindSelector7)
+                  else
+                    @index = i22
+                    r22 = nil
+                  end
+                  if r22
+                    r0 = r22
                   else
                     i26, s26 = index, []
                     r27 = _nt_t_logical
                     s26 << r27
                     if r27
-                      if has_terminal?("", false, index)
-                        r28 = instantiate_node(SyntaxNode,input, index...(index + 0))
-                        @index += 0
-                      else
-                        terminal_parse_failure("")
-                        r28 = nil
-                      end
+                      r28 = _nt_star_int
                       s26 << r28
                     end
                     if s26.last
@@ -33547,19 +33551,17 @@ module Fortran
                       r0 = r26
                     else
                       i29, s29 = index, []
-                      r30 = _nt_t_type
+                      r30 = _nt_t_logical
                       s29 << r30
                       if r30
-                        r31 = _nt_t_paren_l
-                        s29 << r31
-                        if r31
-                          r32 = _nt_type_name
-                          s29 << r32
-                          if r32
-                            r33 = _nt_t_paren_r
-                            s29 << r33
-                          end
+                        if has_terminal?("", false, index)
+                          r31 = instantiate_node(SyntaxNode,input, index...(index + 0))
+                          @index += 0
+                        else
+                          terminal_parse_failure("")
+                          r31 = nil
                         end
+                        s29 << r31
                       end
                       if s29.last
                         r29 = instantiate_node(Type_Spec,input, i29...index, s29)
@@ -33571,8 +33573,34 @@ module Fortran
                       if r29
                         r0 = r29
                       else
-                        @index = i0
-                        r0 = nil
+                        i32, s32 = index, []
+                        r33 = _nt_t_type
+                        s32 << r33
+                        if r33
+                          r34 = _nt_t_paren_l
+                          s32 << r34
+                          if r34
+                            r35 = _nt_type_name
+                            s32 << r35
+                            if r35
+                              r36 = _nt_t_paren_r
+                              s32 << r36
+                            end
+                          end
+                        end
+                        if s32.last
+                          r32 = instantiate_node(Type_Spec,input, i32...index, s32)
+                          r32.extend(TypeSpecWithoutKindSelector10)
+                        else
+                          @index = i32
+                          r32 = nil
+                        end
+                        if r32
+                          r0 = r32
+                        else
+                          @index = i0
+                          r0 = nil
+                        end
                       end
                     end
                   end
