@@ -1147,8 +1147,21 @@ grammar Fortran
 
   rule else_if_stmt
     # F90:R804
+    #
+    # Note: The negagive lookahead assertion here enables parsing code like:
+    #
+    #   if_label: if (.false.) then
+    #     print *,1
+    #   else if_label
+    #     print *,2
+    #   end if if_label
+    #
+    # After normalization, line 3 reads "elseif_label". Without the negative
+    # lookahead assertion, and due to the packrat nature of PEG parsers, the
+    # characters 'elseif' are irrevocably recognized using rule t_elseif, and
+    # a parse failure follows, as '_label' is then unexpected.
 
-    label:label? t_elseif t_paren_l scalar_logical_expr t_paren_r t_then t_newline <Else_If_Stmt>
+    label:label? !( t_else if_construct_name !t_paren_l ) t_elseif t_paren_l scalar_logical_expr t_paren_r t_then t_newline <Else_If_Stmt>
   end
 
   rule else_stmt
@@ -3178,7 +3191,8 @@ grammar Fortran
   end
 
   rule t_else
-    "else" !( "if" / "where" ) <T>
+#   "else" !( "if" / "where" ) <T>
+    "else" <T>
   end
 
   rule t_elseif

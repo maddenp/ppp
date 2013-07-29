@@ -1173,7 +1173,7 @@ module Fortran
   class Else_If_Stmt < T
     def to_s
       unindent
-      s="\n"+stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}")
+      s="\n"+stmt("#{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
       indent
       s
     end
