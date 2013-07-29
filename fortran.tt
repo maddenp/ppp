@@ -1161,7 +1161,7 @@ grammar Fortran
     # characters 'elseif' are irrevocably recognized using rule t_elseif, and
     # a parse failure follows, as '_label' is then unexpected.
 
-    label:label? !( t_else if_construct_name !t_paren_l ) t_elseif t_paren_l scalar_logical_expr t_paren_r t_then t_newline <Else_If_Stmt>
+    label:label? !( t_else if_construct_name !t_paren_l ) t_elseif t_paren_l scalar_logical_expr t_paren_r t_then if_construct_name? t_newline <Else_If_Stmt>
   end
 
   rule else_stmt
@@ -3191,7 +3191,6 @@ grammar Fortran
   end
 
   rule t_else
-#   "else" !( "if" / "where" ) <T>
     "else" <T>
   end
 
