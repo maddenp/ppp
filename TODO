@@ -1,10 +1,3 @@
-- Unexplained FIM ppp errors:
-  
-  Parse Fails:
-  fim/column/radlw_main.f
-  fim/wrfphys/module_cu_gd.F
-  fim/wrfphys/module_mp_morr_two_moment.F
-
 - Unexpected end of program (complicated 'do' loops with 'continue'):
   Example: fim/column/crhtab.f
 

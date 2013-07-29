@@ -205,6 +205,7 @@ class Translator
     s=s.gsub(/^ +/,"")                  # remove leading whitespace
     s=s.gsub(/ +$/,"")                  # remove trailing whitespace
     s=s.gsub(/^ *!.*$\n/,"")            # remove full-line comments
+    s=s.gsub(/^[ \t]*\n/,'')            # remove blank lines (continuation statement issue fix)
     s=chkparse(fix_pt_norm(s,np,1,m))   # string-aware transform
     s=s.gsub(/& *\n *&?/,"")            # join continuation lines
     s=chkparse(np.parse(s,2,m).to_s)    # mask original strings
