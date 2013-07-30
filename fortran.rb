@@ -1162,10 +1162,20 @@ module Fortran
   end
 
   class Do_Term_Shared_Stmt < T
+
+    def label
+      "#{e[1].e[0]}"
+    end
+
     def to_s
       unindent
+      n=self
+      while (n=n.ancestor(Outer_Shared_Do_Construct))
+        unindent if n.label==self.label
+      end
       cat
     end
+
   end
 
   class Double_Colon < T
@@ -1266,7 +1276,7 @@ module Fortran
   class End_Program_Stmt < T
     def to_s
       unindent
-      stmt("#{e[1]}#{sb(e[3])}#{sb(e[4])}")
+      "\n"+stmt("#{e[1]}#{sb(e[3])}#{sb(e[4])}")
     end
   end
 
@@ -1507,7 +1517,6 @@ module Fortran
     end
 
     def to_s
-      unindent
       cat
     end
 
@@ -1574,7 +1583,7 @@ module Fortran
     end
 
     def to_s
-      s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
+      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
       indent
       s
     end
@@ -1753,7 +1762,7 @@ module Fortran
   class Nonlabel_Do_Stmt < T
 
     def to_s
-      s="\n"+stmt("#{sa(e[1])}#{e[2]}#{e[3]}")
+      s=stmt("#{sa(e[1])}#{e[2]}#{e[3]}")
       indent
       s
     end
@@ -1959,7 +1968,8 @@ module Fortran
     end
   end
 
-  class Specification_Part < E
+  class Specification_Part < T
+    def to_s() "\n#{cat}\n" end
   end
 
   class Star_Int < T
@@ -2037,7 +2047,8 @@ module Fortran
   class Use_Name < E
   end
 
-  class Use_Part < E
+  class Use_Part < T
+    def to_s() "\n#{cat}\n" end
   end
 
   class Use_Stmt < T
