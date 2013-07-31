@@ -110,39 +110,17 @@ module Fortran
     true
   end
 
-  def sp_do_body(execution_part_construct)
-    execution_part_construct.e.each do |x|
-      if x.is_a?(Nonblock_Do_Construct)
-        return (not sp_dolabel_repeat?)
-      end
-    end
-    true
-  end
-
-  def sp_dolabel_pop_block
+  def sp_dolabel_pop
     # F90:R817 block-do-construct's do-stmt always pushes a label: either the
     # actual label (when do-stmt is a label-do-stmt), or the symbol :nolabel
-    # (when do-stmt is a nonlabel-do-stmt). Since each block-do-construct has
-    # a single matching end-do, simply pop one label from the label stack.
+    # (when do-stmt is a nonlabel-do-stmt). F90:R826 nonblock-do-construct
+    # requires label-do-stmt components, each of whose labels will be pushed
+    # onto the label stack. But these labels may be repeated, to match a single
+    # do-term-shared-stmt.
     @dolabels.pop
     true
   end
     
-  def sp_dolabel_pop_nonblock
-    # F90:R826 nonblock-do-construct requires label-do-stmt components, each
-    # of whose labels will be pushed onto the label stack. But these labels
-    # may be repeated, to match a single do-term-shared-stmt. When terminating
-    # a nonblock-do-construct, account for this possibility by popping a series
-    # (potentially) of matching labels off the stack. This technique should
-    # work for F90:R827 action-term-do-construct as well as F90:R830
-    # outer-shared-do-construct, though only the latter may actually encounter
-    # multiple matching labels on the stack.
-    if (current=@dolabels.last)
-      @dolabels.pop while @dolabels.last==current
-    end
-    true    
-  end
-
   def sp_dolabel_push(label)
     # A non-label-do-stmt pushes the symbol :nolabel onto the stack, which must
     # not be converted to a string, to avoid matching a potential literal label

@@ -185,7 +185,7 @@
 
 - Refactor SMS_Serial#translate!
 
-- replace_element may also be unsounds, as it removes nodes from the tree.
+- replace_element may also be unsound, as it removes nodes from the tree.
   Instead, maybe walk up the tree and update text_value components?
 
 - In sms_fortran.rb, 'names_in_region' should be 'vars_in_region' and should
@@ -221,3 +221,6 @@
 - In fortran.tt, rule array_spec makes a claim about a bad parse. The comment
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
+
+- Use cpp for sms extensions (esp. in grammars), rather than including files
+  on top of one another?
