@@ -13658,29 +13658,7 @@ module Fortran
 
     s0, i0 = [], index
     loop do
-      i1 = index
-      r2 = _nt_executable_construct
-      if r2
-        r1 = r2
-      else
-        r3 = _nt_format_stmt
-        if r3
-          r1 = r3
-        else
-          r4 = _nt_data_stmt
-          if r4
-            r1 = r4
-          else
-            r5 = _nt_entry_stmt
-            if r5
-              r1 = r5
-            else
-              @index = i1
-              r1 = nil
-            end
-          end
-        end
-      end
+      r1 = _nt_execution_part_construct_item
       if r1
         s0 << r1
       else
@@ -13690,6 +13668,46 @@ module Fortran
     r0 = instantiate_node(E,input, i0...index, s0)
 
     node_cache[:execution_part_construct][start_index] = r0
+
+    r0
+  end
+
+  def _nt_execution_part_construct_item
+    start_index = index
+    if node_cache[:execution_part_construct_item].has_key?(index)
+      cached = node_cache[:execution_part_construct_item][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    r1 = _nt_executable_construct
+    if r1
+      r0 = r1
+    else
+      r2 = _nt_format_stmt
+      if r2
+        r0 = r2
+      else
+        r3 = _nt_data_stmt
+        if r3
+          r0 = r3
+        else
+          r4 = _nt_entry_stmt
+          if r4
+            r0 = r4
+          else
+            @index = i0
+            r0 = nil
+          end
+        end
+      end
+    end
+
+    node_cache[:execution_part_construct_item][start_index] = r0
 
     r0
   end

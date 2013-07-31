@@ -1030,6 +1030,7 @@ grammar Fortran
     # F90:R828
 
     execution_part_construct "" <Do_Body>
+#   execution_part_construct &{ |e| $stderr.puts "### do_body [#{e[0]}]"; true }  <Do_Body>
   end
 
   rule do_construct
@@ -1083,6 +1084,7 @@ grammar Fortran
     # F90:R833
 
     !do_term_shared_stmt_disallowed action_stmt &{ |e| sp_nonblock_do_end?(e[1]) } <Do_Term_Shared_Stmt>
+#   !do_term_shared_stmt_disallowed action_stmt &{ |e| puts "### action_stmt [#{e[1]}]";sp_do_term_shared_stmt?(e[1]) } <Do_Term_Shared_Stmt>
   end
 
   rule do_term_shared_stmt_disallowed
@@ -1405,7 +1407,15 @@ grammar Fortran
   rule execution_part_construct
     # F90:R209
 
-    ( executable_construct / format_stmt / data_stmt / entry_stmt )* <E>
+#   ( executable_construct / format_stmt / data_stmt / entry_stmt )* <E>
+    execution_part_construct_item* <E>
+  end
+
+  rule execution_part_construct_item
+    executable_construct /
+    format_stmt /
+    data_stmt /
+    entry_stmt
   end
 
   rule exit_stmt
@@ -1703,6 +1713,7 @@ grammar Fortran
     # pushed onto the stack.
 
     label_do_stmt &{ |e| sp_dolabel_repeat? } do_body do_term_shared_stmt <Inner_Shared_Do_Construct>
+#   label_do_stmt &{ |e| sp_dolabel_repeat? } do_body do_term_shared_stmt &{ |e| $stderr.puts "### do_term_shared_stmt [#{e[3]}]";true } <Inner_Shared_Do_Construct>
   end
 
   rule input_item
@@ -2250,6 +2261,7 @@ grammar Fortran
     # F90:R826
 
     outer_shared_do_construct /
+#   outer_shared_do_construct &{ |e| $stderr.puts "### ndc osdc [#{e[0]}]";true } <E> /
     action_term_do_construct
   end
 
@@ -2350,6 +2362,7 @@ grammar Fortran
     # outermost o_s_d_c in a triply-nested loop).
 
     label_do_stmt do_body shared_term_do_construct <Outer_Shared_Do_Construct>
+#   label_do_stmt do_body shared_term_do_construct &{ |e| $stderr.puts "### osdc do_body [#{e[1]}]";true } <Outer_Shared_Do_Construct>
   end
 
   rule output_item
@@ -2860,6 +2873,8 @@ grammar Fortran
 
     inner_shared_do_construct /
     outer_shared_do_construct
+#   inner_shared_do_construct &{ |e| $stderr.puts "### stdc isdc [#{e[0]}]"; true } <E> /
+#   outer_shared_do_construct &{ |e| $stderr.puts "### stdc osdc [#{e[0]}]"; true } <E>
   end
 
   rule sign

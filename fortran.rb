@@ -10,6 +10,26 @@ module Fortran
 
   include Common
 
+  #PM#
+  def termlabel_get
+    $stderr.puts "### termlabel_get #{(defined?(@termlabel))?(@termlabel):(nil)}"
+    (defined?(@termlabel))?(@termlabel):(nil)
+  end
+
+  def termlabel_set(label)
+    $stderr.puts "### termlabel_set #{label}"
+    @termlabel=label
+  end
+
+  def sp_do_term_shared_stmt?(action_stmt)
+    if sp_nonblock_do_end?(action_stmt)
+      termlabel_set(action_stmt.label)
+      return true
+    end
+    false
+  end
+  #PM#
+
   def deepcopy(o)
     Marshal.load(Marshal.dump(o))
   end
@@ -117,7 +137,6 @@ module Fortran
     # requires label-do-stmt components, each of whose labels will be pushed
     # onto the label stack. But these labels may be repeated, to match a single
     # do-term-shared-stmt.
-
     @dolabels.pop
     true
   end
