@@ -1215,7 +1215,7 @@ module Fortran
   class End_Do_Stmt < T
     def to_s
       unindent
-      "#{stmt(space)}\n"
+      "#{stmt(space)}"
     end
   end
 
@@ -1229,7 +1229,7 @@ module Fortran
   class End_If_Stmt < T
     def to_s
       unindent
-      "#{stmt(space)}\n"
+      "#{stmt(space)}"
     end
   end
 
@@ -1460,7 +1460,7 @@ module Fortran
 
   class If_Then_Stmt < T
     def to_s
-      s="\n"+stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
+      s=stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
       indent
       s
     end
