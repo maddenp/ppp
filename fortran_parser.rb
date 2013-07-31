@@ -745,6 +745,10 @@ module Fortran
       elements[0]
     end
 
+    def do_body
+      elements[2]
+    end
+
     def do_term_action_stmt
       elements[3]
     end
@@ -775,16 +779,11 @@ module Fortran
       end
       s0 << r2
       if r2
-        r5 = _nt_do_body
-        if r5
-          r4 = r5
-        else
-          r4 = instantiate_node(SyntaxNode,input, index...index)
-        end
+        r4 = _nt_do_body
         s0 << r4
         if r4
-          r6 = _nt_do_term_action_stmt
-          s0 << r6
+          r5 = _nt_do_term_action_stmt
+          s0 << r5
         end
       end
     end
@@ -10305,12 +10304,11 @@ module Fortran
     r1 = _nt_execution_part_construct
     s0 << r1
     if r1
-      i2 = index
-      r3 = lambda { |e| sp_do_body(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -16315,6 +16313,10 @@ module Fortran
       elements[0]
     end
 
+    def do_body
+      elements[2]
+    end
+
     def do_term_shared_stmt
       elements[3]
     end
@@ -16345,16 +16347,11 @@ module Fortran
       end
       s0 << r2
       if r2
-        r5 = _nt_do_body
-        if r5
-          r4 = r5
-        else
-          r4 = instantiate_node(SyntaxNode,input, index...index)
-        end
+        r4 = _nt_do_body
         s0 << r4
         if r4
-          r6 = _nt_do_term_shared_stmt
-          s0 << r6
+          r5 = _nt_do_term_shared_stmt
+          s0 << r5
         end
       end
     end
@@ -23122,6 +23119,10 @@ module Fortran
       elements[0]
     end
 
+    def do_body
+      elements[1]
+    end
+
     def shared_term_do_construct
       elements[2]
     end
@@ -23142,16 +23143,11 @@ module Fortran
     r1 = _nt_label_do_stmt
     s0 << r1
     if r1
-      r3 = _nt_do_body
-      if r3
-        r2 = r3
-      else
-        r2 = instantiate_node(SyntaxNode,input, index...index)
-      end
+      r2 = _nt_do_body
       s0 << r2
       if r2
-        r4 = _nt_shared_term_do_construct
-        s0 << r4
+        r3 = _nt_shared_term_do_construct
+        s0 << r3
       end
     end
     if s0.last

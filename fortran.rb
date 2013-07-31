@@ -110,15 +110,6 @@ module Fortran
     true
   end
 
-  def sp_do_body(execution_part_construct)
-    execution_part_construct.e.each do |x|
-      if x.is_a?(Nonblock_Do_Construct)
-        return (not sp_dolabel_repeat?)
-      end
-    end
-    true
-  end
-
   def sp_dolabel_pop_block
     # F90:R817 block-do-construct's do-stmt always pushes a label: either the
     # actual label (when do-stmt is a label-do-stmt), or the symbol :nolabel

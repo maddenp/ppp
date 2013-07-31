@@ -100,7 +100,7 @@ grammar Fortran
   rule action_term_do_construct
     # F90:R827
 
-    label_do_stmt !{ |e| sp_dolabel_repeat? } do_body? do_term_action_stmt <E>
+    label_do_stmt !{ |e| sp_dolabel_repeat? } do_body do_term_action_stmt <E>
   end
 
   rule actual_arg
@@ -1029,7 +1029,7 @@ grammar Fortran
   rule do_body
     # F90:R828
 
-    execution_part_construct &{ |e| sp_do_body(e[0]) } <Do_Body>
+    execution_part_construct "" <Do_Body>
   end
 
   rule do_construct
@@ -1702,7 +1702,7 @@ grammar Fortran
     # that of the enclosing outer_shared_do_construct, which has already been
     # pushed onto the stack.
 
-    label_do_stmt &{ |e| sp_dolabel_repeat? } do_body? do_term_shared_stmt <Inner_Shared_Do_Construct>
+    label_do_stmt &{ |e| sp_dolabel_repeat? } do_body do_term_shared_stmt <Inner_Shared_Do_Construct>
   end
 
   rule input_item
@@ -2349,7 +2349,7 @@ grammar Fortran
     # (e.g. the second level in a triply-nested loop), or may not (e.g. in the
     # outermost o_s_d_c in a triply-nested loop).
 
-    label_do_stmt do_body? shared_term_do_construct <Outer_Shared_Do_Construct>
+    label_do_stmt do_body shared_term_do_construct <Outer_Shared_Do_Construct>
   end
 
   rule output_item
