@@ -1040,6 +1040,7 @@ grammar Fortran
     # should be called. See those methods for more information.
 
     nonblock_do_construct &{ |e| sp_dolabel_pop } <Nonblock_Do_Construct> /
+#   nonblock_do_construct &{ |e| $stderr.puts "### dc ndc [#{e[0]}]";sp_dolabel_pop } <Nonblock_Do_Construct> /
     block_do_construct &{ |e| sp_dolabel_pop } <Block_Do_Construct>
   end
 
@@ -1383,6 +1384,7 @@ grammar Fortran
     executable_construct_action_stmt /
     case_construct /
     do_construct /
+#   do_construct &{ |e| $stderr.puts "### executable_construct dc [#{e[0]}]";true } <E> /
     if_construct /
     where_construct /
     directive
@@ -1407,12 +1409,12 @@ grammar Fortran
   rule execution_part_construct
     # F90:R209
 
-#   ( executable_construct / format_stmt / data_stmt / entry_stmt )* <E>
     execution_part_construct_item* <E>
   end
 
   rule execution_part_construct_item
     executable_construct /
+#   executable_construct &{ |e| $stderr.puts "### execution_part_construct_item executable_construct [#{e[0]}]";true } <E> /
     format_stmt /
     data_stmt /
     entry_stmt
@@ -2260,8 +2262,10 @@ grammar Fortran
   rule nonblock_do_construct
     # F90:R826
 
-    outer_shared_do_construct /
+#   outer_shared_do_construct /
 #   outer_shared_do_construct &{ |e| $stderr.puts "### ndc osdc [#{e[0]}]";true } <E> /
+#   outer_shared_do_construct !{ |e| sp_middle_shared_do_construct?(e[0]) } <E> /
+    outer_shared_do_construct !{ |e| sp_dolabel_repeat? } <E> /
     action_term_do_construct
   end
 
@@ -2871,10 +2875,10 @@ grammar Fortran
   rule shared_term_do_construct
     # F90:R831
 
-    inner_shared_do_construct /
-    outer_shared_do_construct
-#   inner_shared_do_construct &{ |e| $stderr.puts "### stdc isdc [#{e[0]}]"; true } <E> /
-#   outer_shared_do_construct &{ |e| $stderr.puts "### stdc osdc [#{e[0]}]"; true } <E>
+    inner_shared_do_construct &{ |e| sp_dolabel_pop } <E> /
+    outer_shared_do_construct &{ |e| sp_dolabel_pop } <E> 
+#   inner_shared_do_construct &{ |e| $stderr.puts "### stdc isdc [#{e[0]}]";sp_dolabel_pop } <E> /
+#   outer_shared_do_construct &{ |e| $stderr.puts "### stdc osdc [#{e[0]}]";sp_dolabel_pop } <E>
   end
 
   rule sign

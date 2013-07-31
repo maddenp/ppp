@@ -22184,6 +22184,13 @@ module Fortran
     r0
   end
 
+  module NonblockDoConstruct0
+    def outer_shared_do_construct
+      elements[0]
+    end
+
+  end
+
   def _nt_nonblock_do_construct
     start_index = index
     if node_cache[:nonblock_do_construct].has_key?(index)
@@ -22196,13 +22203,33 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_outer_shared_do_construct
+    i1, s1 = index, []
+    r2 = _nt_outer_shared_do_construct
+    s1 << r2
+    if r2
+      i3 = index
+      r4 = lambda { |e| sp_dolabel_repeat? }.call(s1)
+      if r4
+        r3 = nil
+      else
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      end
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(E,input, i1...index, s1)
+      r1.extend(NonblockDoConstruct0)
+    else
+      @index = i1
+      r1 = nil
+    end
     if r1
       r0 = r1
     else
-      r2 = _nt_action_term_do_construct
-      if r2
-        r0 = r2
+      r5 = _nt_action_term_do_construct
+      if r5
+        r0 = r5
       else
         @index = i0
         r0 = nil
@@ -27398,6 +27425,20 @@ module Fortran
     r0
   end
 
+  module SharedTermDoConstruct0
+    def inner_shared_do_construct
+      elements[0]
+    end
+
+  end
+
+  module SharedTermDoConstruct1
+    def outer_shared_do_construct
+      elements[0]
+    end
+
+  end
+
   def _nt_shared_term_do_construct
     start_index = index
     if node_cache[:shared_term_do_construct].has_key?(index)
@@ -27410,13 +27451,53 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_inner_shared_do_construct
+    i1, s1 = index, []
+    r2 = _nt_inner_shared_do_construct
+    s1 << r2
+    if r2
+      i3 = index
+      r4 = lambda { |e| sp_dolabel_pop }.call(s1)
+      if r4
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r3 = nil
+      end
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(E,input, i1...index, s1)
+      r1.extend(SharedTermDoConstruct0)
+    else
+      @index = i1
+      r1 = nil
+    end
     if r1
       r0 = r1
     else
-      r2 = _nt_outer_shared_do_construct
-      if r2
-        r0 = r2
+      i5, s5 = index, []
+      r6 = _nt_outer_shared_do_construct
+      s5 << r6
+      if r6
+        i7 = index
+        r8 = lambda { |e| sp_dolabel_pop }.call(s5)
+        if r8
+          @index = i7
+          r7 = instantiate_node(SyntaxNode,input, index...index)
+        else
+          r7 = nil
+        end
+        s5 << r7
+      end
+      if s5.last
+        r5 = instantiate_node(E,input, i5...index, s5)
+        r5.extend(SharedTermDoConstruct1)
+      else
+        @index = i5
+        r5 = nil
+      end
+      if r5
+        r0 = r5
       else
         @index = i0
         r0 = nil

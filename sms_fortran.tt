@@ -22,17 +22,17 @@ grammar Fortran
     !sms_sentinel "!" character+ t_newline <T>
   end
 
-  rule executable_construct
-    # F90:R215
-
-    executable_construct_action_stmt /
-    case_construct /
-    do_construct /
-    if_construct /
-    where_construct /
-    directive /
-    sms_executable
-  end
+# rule executable_construct
+#   # F90:R215
+#
+#   executable_construct_action_stmt /
+#   case_construct /
+#   do_construct /
+#   if_construct /
+#   where_construct /
+#   directive /
+#   sms_executable
+# end
 
   rule external_subprogram
     # F90:R203
