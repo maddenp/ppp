@@ -10,31 +10,6 @@ module Fortran
 
   include Common
 
-  #PM#
-# def termlabel_get
-#$stderr.puts "### termlabel_get #{(defined?(@termlabel))?(@termlabel):(nil)}"
-#   (defined?(@termlabel))?(@termlabel):(nil)
-# end
-
-# def termlabel_set(label)
-#$stderr.puts "### termlabel_set #{label}"
-#   @termlabel=label
-# end
-
-  def sp_do_term_shared_stmt?(action_stmt)
-    if sp_nonblock_do_end?(action_stmt)
-#     termlabel_set(action_stmt.label)
-      return true
-    end
-    false
-  end
-
-# def sp_middle_shared_do_construct?(outer_shared_do_construct)
-#$stderr.puts "### ndc osdc [#{outer_shared_do_construct}] dolabels #{@dolabels} middle? #{sp_dolabel_repeat?}"
-#   sp_dolabel_repeat?
-# end
-  #PM#
-
   def deepcopy(o)
     Marshal.load(Marshal.dump(o))
   end
@@ -143,7 +118,6 @@ module Fortran
     # onto the label stack. But these labels may be repeated, to match a single
     # do-term-shared-stmt.
     @dolabels.pop
-#$stderr.puts "### pop: dolabels #{@dolabels}"
     true
   end
     
@@ -153,7 +127,6 @@ module Fortran
     # 'nolabel'. If the passed-in label is not a symbol, push its string version
     # onto the label stack.
     @dolabels.push((label.is_a?(Symbol))?(label):("#{label}"))
-#$stderr.puts "### push: dolabels #{@dolabels}"
     true
   end
 
