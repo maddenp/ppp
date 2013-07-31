@@ -1214,8 +1214,6 @@ module Fortran
 ## HACK end
 #     end
 #   end
-#
-# end
 
   end
 
