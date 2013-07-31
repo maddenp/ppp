@@ -10357,7 +10357,7 @@ module Fortran
     s1 << r2
     if r2
       i3 = index
-      r4 = lambda { |e| sp_dolabel_pop_nonblock }.call(s1)
+      r4 = lambda { |e| sp_dolabel_pop }.call(s1)
       if r4
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
@@ -10381,7 +10381,7 @@ module Fortran
       s5 << r6
       if r6
         i7 = index
-        r8 = lambda { |e| sp_dolabel_pop_block }.call(s5)
+        r8 = lambda { |e| sp_dolabel_pop }.call(s5)
         if r8
           @index = i7
           r7 = instantiate_node(SyntaxNode,input, index...index)
