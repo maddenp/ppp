@@ -1,9 +1,6 @@
 - Unexpected end of program (complicated 'do' loops with 'continue'):
   Example: fim/column/crhtab.f
 
-- !sms$to local begin not recognized correcty
-  fim/wrfphys/module_cu_gd.F
-
 - (MH) Resolve remaining FIM errors in 'problems' files
 
 - directives still to do
