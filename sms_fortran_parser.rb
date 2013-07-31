@@ -177,6 +177,61 @@ module Fortran
     r0
   end
 
+  def _nt_executable_construct
+    start_index = index
+    if node_cache[:executable_construct].has_key?(index)
+      cached = node_cache[:executable_construct][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    r1 = _nt_executable_construct_action_stmt
+    if r1
+      r0 = r1
+    else
+      r2 = _nt_case_construct
+      if r2
+        r0 = r2
+      else
+        r3 = _nt_do_construct
+        if r3
+          r0 = r3
+        else
+          r4 = _nt_if_construct
+          if r4
+            r0 = r4
+          else
+            r5 = _nt_where_construct
+            if r5
+              r0 = r5
+            else
+              r6 = _nt_directive
+              if r6
+                r0 = r6
+              else
+                r7 = _nt_sms_executable
+                if r7
+                  r0 = r7
+                else
+                  @index = i0
+                  r0 = nil
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    node_cache[:executable_construct][start_index] = r0
+
+    r0
+  end
+
   module ExternalSubprogram0
     def subroutine_subprogram
       elements[0]
