@@ -221,3 +221,6 @@
 - In fortran.tt, rule array_spec makes a claim about a bad parse. The comment
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
+
+- Use cpp for sms extensions (esp. in grammars), rather than including files
+  on top of one another?
