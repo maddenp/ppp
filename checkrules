@@ -1,0 +1,7 @@
+# !/bin/bash
+
+for x in $(grep -i -h 'rule \+.*$' *.tt | sed 's/^.*\#.*$//I' | sed 's/rule *\(.*\)/\1/I')
+do
+grep -i -h "$x\( \|\$\|\?\\|\+\|\*\)" *.tt | sed 's/\(^.*\)\#.*$/\1/I' | grep -v "^ *$" | grep -v -q "^ *rule" || echo "Unused Rule:" $x "in" $(grep -i -l "rule \+$x" *.tt)
+done
+
