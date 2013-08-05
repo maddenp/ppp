@@ -1,14 +1,7 @@
 - Unexpected end of program (complicated 'do' loops with 'continue'):
   Example: fim/column/crhtab.f
 
-- Why does ppp translation (or maybe just gfortran) not work with .f files
-  that refer to .f90 external modules? (MH has a list of the problematic
-  programs - all others in column dir PROBLEMS & wrfphys dir PROBLEMS). Many
-  FIM source files fail when their translated source is compiled by gfortran
-  due to issues related to finding included files and modules
-
-- (CONTINUING) (MH) Work on testing ppp with FIM source code to find any 
-  potential errors
+- (MH) Resolve remaining FIM errors in 'problems' files
 
 - directives still to do
 
