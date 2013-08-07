@@ -1,31 +1,28 @@
-#!/usr/bin/env ruby
-
 class Dehollerizer
 
-  def initialize(s)
-    @i=0
-    @a=s.split(//)                       # Split string into array by character
-  end
-
-  def process
+  def process(s=nil)
+    if s
+      @i=0
+      @a=s.split(//)   # Split string into array by character
+    end
     while @i<=@a.length
       b=@a[@i]
-      if b=~/[Dd]/            # Match start of a data statement
-        data_stmt       # Process potential data statement
-      elsif b=~/[Ff]/         # Match start of a format statement
-        format_stmt     # Process potential format statement
-      elsif b=~/[Cc]/         # Looking for a call statement
-        call_stmt       # Process potential call statement
-      elsif b=~/'/            # Match single-quotes
-        single_quoted   # Process quotes
-        @i+=1                 # Move ahead 
-      elsif b=~/"/            # Match double quotes
-        double_quoted   # Process quotes
-        @i+=1                 # Move ahead
-      elsif b=~/!/            # Match a comment (would not match quoted string
-        remove_comment  # Remove the comment
+      if b=~/[Dd]/     # Match start of a data statement
+        data_stmt      # Process potential data statement
+      elsif b=~/[Ff]/  # Match start of a format statement
+        format_stmt    # Process potential format statement
+      elsif b=~/[Cc]/  # Looking for a call statement
+        call_stmt      # Process potential call statement
+      elsif b=~/'/     # Match single-quotes
+        single_quoted  # Process quotes
+        @i+=1          # Move ahead 
+      elsif b=~/"/     # Match double quotes
+        double_quoted  # Process quotes
+        @i+=1          # Move ahead
+      elsif b=~/!/     # Match a comment (would not match quoted string
+        remove_comment # Remove the comment
       else
-        @i+=1                 # If none of the above is found, move on to next character
+        @i+=1          # If none of the above is found, move on to next character
       end
     end
     @a.join
@@ -275,28 +272,3 @@ class Dehollerizer
   end
 
 end
-
-s='!format (5HWorLD)
-f o"for&
-
-&mat (5HHellO)" alsdfkj f or &
-
-!comment
-mat (1&
-
-&1&
-    
-&& !Comment
-!comment
-
-H HEllo& !comment
-!5HhEllO 
-sdflk& !comment
-
-)'
-
-#s='da s;dlfjk d at a Afdakjlfd /1HA/'
-
-puts "ORIGINAL STRING:\n#{s}\n\n"
-d=Dehollerizer.new(s)
-puts "\nNEW STRING:\n#{d.process}"
