@@ -115,6 +115,7 @@ class Translator
   def default_opts
     {
       :debug=>false,
+      :hollerith=>false,
       :incdirs=>[],
       :modinfo=>false,
       :nl=>true,
@@ -389,6 +390,9 @@ class Translator
       puts "#{s}\n\n" if conf.debug
     end
     cppcheck(s)                                               #  any time the continuation warning in fixed2free is shown, cppcheck will exit in die()
+#   if conf.hollerith
+#     dehollerizer_parser_method(s)
+#   end
     puts "NORMALIZED FORM\n" if conf.debug
     n=normalize(s,conf.nl)
     puts "\n#{n}" if conf.debug or conf.normalize
@@ -546,6 +550,8 @@ class Translator
         conf.normalize=true
       when "modinfo"
         conf.modinfo=true
+      when "hollerith"
+        conf.hollerith=true
       else
         die usage
       end
@@ -561,6 +567,7 @@ class Translator
     x.push("-I dir[:dir:...]]")
     x.push("debug")
     x.push("fixed")
+    x.push("hollerith")
     x.push("modinfo")
     x.push("normalize")
     "#{File.basename(@wrapper)} [ #{x.join(" | ")} ] source"
