@@ -391,7 +391,7 @@ class Translator
     end
     cppcheck(s)                                               #  any time the continuation warning in fixed2free is shown, cppcheck will exit in die()
 #   if conf.hollerith
-      #   dehollerith(s)
+#     dehollerizer_parser_method(s)
 #   end
     puts "NORMALIZED FORM\n" if conf.debug
     n=normalize(s,conf.nl)
