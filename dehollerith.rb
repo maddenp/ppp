@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-s='hello'
 def process(a,i)
   while @i<=a.length
     b=a[@i]
@@ -20,21 +19,20 @@ def process(a,i)
       @i+=1                 # If none of the above is found, move on to next character
     end
   end
-  puts "\nNEW STRING:\n#{a.join}"
 end
 
-def data_stmt(a,i)               # Checks for all elements of a data statement
+def data_stmt(a,i)           # Checks for all elements of a data statement
   @i+=1
   eat_whitespace(a,@i)
-  if a[@i]=~/[aA]/
+  if a[@i]=~/[Aa]/
     @i+=1
     eat_whitespace(a,@i)
     continuation(a,@i)
-    if a[@i]=~/[tT]/
+    if a[@i]=~/[Tt]/
       @i+=1
       eat_whitespace(a,@i)
       continuation(a,@i)
-      if a[@i]=~/[aA]/
+      if a[@i]=~/[Aa]/
         @i+=1
         eat_whitespace(a,@i)
         continuation(a,@i)
@@ -83,13 +81,13 @@ end
 def hollerith(a,i)                        # Once a hollerith is found
   l=Array.new                             # An array of digits specifying the length 
   l[0]=a[@i]                              # First digit in hollerith
-  numdigits=1                                # Sets array value counter to one (zero is already taken)
+  numdigits=1                             # Sets array value counter to one (zero is already taken)
   @i+=1                                   # Moves to next character    
   continuation(a,@i)                      # Check for a continuation after the first digit
   while a[@i]=~/[0-9]/                    # As long as the next character is a digit
-    l[numdigits]=a[@i]                       # Sets next array value to hollerith digit value
+    l[numdigits]=a[@i]                    # Sets next array value to hollerith digit value
     @i+=1                                 # Move to next digit
-    numdigits+=1                             # Add one to the number of digits
+    numdigits+=1                          # Add one to the number of digits
     continuation(a,@i)                    # Check for a continuation after the second digit
   end  
   strlen=(l.join).to_i                     # Turns the array of digits into an integer
@@ -105,6 +103,8 @@ def hollerith(a,i)                        # Once a hollerith is found
     hollerith=a.join[(start-numdigits)..(start+strlen)]  # Identify the hollerith
     puts "HOLLERITH:#{hollerith}"
     @i=start+strlen                               # Set the value to the last hollerith character (moves forward later) 
+  else
+    @i-=1                                  # Set the value to the last detected digit (moves forward later)
   end
 end
 
@@ -113,13 +113,13 @@ def continuation(a,i)
     start=@i                      # Designate a start index
     @i+=1                         # Move forward one (past &)
     remove_whitespace(a,@i)       # Remove space before a newline
-    remove_comment(a,@i)             # Remove end of line comment
+    remove_comment(a,@i)          # Remove end of line comment
     if a[@i]=~/\n/                # If end of line
       a.delete_at(@i)             # Remove the newline character
       while a[@i]=~/[ \t\n\!]/
         remove_whitespace(a,@i)   # Remove potential whitespace in next line
-        remove_comment(a,@i)         # Remove potential comment in next line
-        remove_newline(a,@i)         # Remove blank line
+        remove_comment(a,@i)      # Remove potential comment in next line
+        remove_newline(a,@i)      # Remove blank line
       end
       if a[@i]=~/&/               # Find matching &
         a.slice!(start..@i)       # Remove continuation
@@ -164,10 +164,10 @@ def check_hollerith_data(a,i)      # Distinguishes between hollerith and other p
     end
     @i+=1                          # Advance to next character
   end
-  process(a,@i)                      # Back to main check at the end of data statement
+  process(a,@i)                   # Back to main check at the end of data statement
 end
 
-def check_hollerith(a,i)   # Distinguishes between hollerith and other parts of a format statment
+def check_hollerith(a,i)          # Distinguishes between hollerith and other parts of a format statment
   x=1                             # Parentheses counter (to find the end of the format statement)
   until x==0                      # Until all embedded parentheses are matched
     if a[@i]=~/\'/                # Detect a single quoted string
@@ -183,30 +183,30 @@ def check_hollerith(a,i)   # Distinguishes between hollerith and other parts of 
     end
     @i+=1                         # Move to next character
   end
-  process(a,@i)
+# process(a,@i)
 end
 
-def format_stmt(a,i)           # Looks for all elements of a format statement
+def format_stmt(a,i)              # Looks for all elements of a format statement
   @i+=1
   eat_whitespace(a,@i)
   continuation(a,@i)
-  if a[@i]=~/[oO]/
+  if a[@i]=~/[Oo]/
     @i+=1
     eat_whitespace(a,@i)
     continuation(a,@i)
-    if a[@i]=~/[rR]/
+    if a[@i]=~/[Rr]/
       @i+=1
       eat_whitespace(a,@i)
       continuation(a,@i)
-      if a[@i]=~/[mM]/
+      if a[@i]=~/[Mm]/
         @i+=1
         eat_whitespace(a,@i)
         continuation(a,@i)
-        if a[@i]=~/[aA]/
+        if a[@i]=~/[Aa]/
           @i+=1
           eat_whitespace(a,@i)
           continuation(a,@i)
-          if a[@i]=~/[tT]/
+          if a[@i]=~/[Tt]/
             @i+=1
             eat_whitespace(a,@i)
             continuation(a,@i)
@@ -245,7 +245,7 @@ def call_stmt(a,i)
           @i+=1                           # Move past '('
           eat_whitespace(a,@i)            # Consume potential whitespace
           continuation(a,@i)              # Process potential continuation
-          check_hollerith(a,@i)    # Check contents of statement for a hollerith
+          check_hollerith(a,@i)           # Check contents of statement for a hollerith
         end
       end
     end
@@ -253,6 +253,7 @@ def call_stmt(a,i)
 end
 
 puts "ORIGINAL STRING:\n#{s}\n\n"
-@i=0             # Character array counting variable
-a=s.split(//)    # Split string into array by character
-process(a,@i)      # Main process
+@i=0                              # Character array counting variable
+a=s.split(//)                     # Split string into array by character
+process(a,@i)                     # Main process
+puts "\nNEW STRING:\n#{a.join}"
