@@ -120,7 +120,6 @@ class Dehollerizer
   end
 
   def hollerith                 # Once a hollerith is found
-#   debug :hollerith_0
     origin=@i
     l=[]
     l[0]=@a[@i]                 # First digit in hollerith
@@ -135,13 +134,10 @@ class Dehollerizer
     end  
     strlen=(l.join).to_i        # Turns the array of digits into an integer
     remove_whitespace           # Removes whitespace after length specifier
-#   debug :hollerith_1
-#   if @a[@i]=~/[Hh]/           # Check for an 'H' or 'h' after digits
     if see 'h'                  # Check for an 'H' or 'h' after digits
       @a[@i]='h'                # Normalizes the 'H' to lowercase
       start=@i                  # Set a value for the character position of 'h'
       fwd                     # Move to the next character (first in string)
-#     debug :hollerith_2
       while @i<=start+strlen    # While still in the string
         continuation            # Check for continuation at this point
         fwd                   # Move one forward
@@ -150,12 +146,9 @@ class Dehollerizer
       he=start+strlen
       hollerith=@a.join[hb..he] # Identify the hollerith
       token=@m.set(hollerith)
-#puts "### hollerith: [#{hollerith}]"
       @a.slice!(hb..he)
       token.reverse.each_char { |c| @a.insert(hb,c) }
-#puts "###\n#{@a.join}###"
       @i=origin+token.size-1
-#     debug :hollerith_3
     else
       @i-=1                     # Set the value to the last detected digit (moves forward later)
     end
@@ -231,9 +224,9 @@ class Dehollerizer
   end
     
   def single_quoted
-    fwd                             # Advances to the next character (after ')
+    fwd   # Advances to the next character (after ')
     until @a[@i]=~/'/
-      fwd                           # Continue advancing until endquote is matched
+      fwd # Continue advancing until endquote is matched
     end
   end
 

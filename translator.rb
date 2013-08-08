@@ -76,6 +76,10 @@ class Translator
       super(input,options)
     end
 
+      def to_s
+        @input.to_s
+      end
+
   end
 
   class XNormalizerParser < NormalizerParser
@@ -92,6 +96,10 @@ class Translator
 
       def method_missing(method,*args)
         @input.send(method,*args)
+      end
+
+      def to_s
+        @input.to_s
       end
 
     end
@@ -116,7 +124,6 @@ class Translator
   def default_opts
     {
       :debug=>false,
-#     :holleriths=>false,
       :incdirs=>[],
       :modinfo=>false,
       :nl=>true,
@@ -124,43 +131,6 @@ class Translator
       :translate=>true
     }
   end
-
-# def dehollerith(s)
-#   # Convert instances of Hollerith(-esque) constants to quoted strings. Do so
-#   # by breaking each statement in which a Hollerith occurs into three pieces:
-#   # The one leading up to the Hollerith, the one specifying the length of the
-#   # represented string literal, and the one starting with the the string
-#   # literal and running to the end of the line. The h/H marker itself is
-#   # discarded. Note that the statement is expected to be on a single line at
-#   # this point.
-#   def replace(s,re)
-#     r=Regexp.new(re,true) # true => case-insensitivity
-#     while m=r.match(s)
-#       first=m[1]
-#       strlen=m[2].to_i-1
-#       string=m[3][0..strlen]
-#       # Pass a string to sub() instead of a regexp so that regexp characters
-#       # like * and $ can be replaced without special meaning being attributed
-#       # to them.
-#       rest=m[3].sub(string,"")
-#       s=s.sub(m[0],"#{first}'#{string}'#{rest}")
-#     end
-#     s
-#   end
-#   # Common elements in Hollerith-matching regexps
-#   lm = "^( *[0-9]{1,5} *"    # label (mandatory)
-#   lo = "^( *[0-9]{0,5} *"    # label (optional)
-#   n  = ")([0-9]+) *"         # number
-#   o  = ".*?"                 # other
-#   r  = "(.*)"                # rest (including string literal)
-#   v  = " *[a-z][a-z0-9_]* *" # variable name
-#   # Create and iterate over a list of Hollerith-matching regexps.
-#   res=[]
-#   res.push(lm+"format *\\("+o+n+"h"+r) # F90:R1016 char-string-edit-desc
-#   res.push(lo+"data"+v+"/"+o+n+"h"+r)  # Hollerith in data-stmt
-#   res.each { |re| s=replace(s,re) }
-#   s
-# end
 
   def directive
     unless @directive
@@ -322,9 +292,7 @@ class Translator
       end                                      # will always end in die() from cpp-check
       s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # replace any continuation character with generic "a"
       s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
-#puts "###\n#{s}###"
       s=chkparse(fix_pt_norm(s,np))            # string-aware transform & parse error checking
-#puts "###\n#{s}###"
       s=s.gsub(/\n[ \t]{5}a/,"")               # join continuation lines
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
       s
@@ -370,19 +338,19 @@ class Translator
     end
 
     def vertspace(t)
-      t=t.gsub(/\n\n\n+/,"\n\n")                    # Reduces multiple blank lines into one
-      t[0]=t[0].sub(/^\n/,"")                       # Removes blank first line
+      t=t.gsub(/\n\n\n+/,"\n\n") # Collapse multiple blank lines into one
+      t[0]=t[0].sub(/^\n/,"")    # Remove blank first line
       t
     end
     
     conf=ostruct_default_merge(conf)
     fp=XFortranParser.new(srcfile,conf.incdirs)
     s0=nil
-    while s!=s0 and not s.nil?                                        # Fixed point treatment of prepsrc() and assemble()
-      s0=s                                                            # for cases in which files added by 'include'
-      s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and conf.fixed    # statements or '!sms$insert include' statements
-      s=prepsrc_free(s) if defined?(prepsrc_free)                     # also contain such a statement; this follows the path
-      s=assemble(s,[srcfile],conf.incdirs)                            # until all souce has been appropriately inserted
+    while s!=s0 and not s.nil?                                     # Fixed point treatment of prepsrc() and assemble()
+      s0=s                                                         # for cases in which files added by 'include'
+      s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and conf.fixed # statements or '!sms$insert include' statements
+      s=prepsrc_free(s) if defined?(prepsrc_free)                  # also contain such a statement; this follows the path
+      s=assemble(s,[srcfile],conf.incdirs)                         # until all souce has been appropriately inserted
     end
     if conf.debug
       puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}"
@@ -392,7 +360,7 @@ class Translator
       s=fixed2free(s)
       puts "#{s}\n\n" if conf.debug
     end
-    cppcheck(s) #  any time the continuation warning in fixed2free is shown, cppcheck will exit in die()
+    cppcheck(s) # When a continuation warning in fixed2free is shown, cppcheck will exit in die()
     puts "NORMALIZED FORM\n" if conf.debug
     n=normalize(s,conf.nl)
     puts "\n#{n}" if conf.debug or conf.normalize
@@ -546,8 +514,6 @@ class Translator
         nil # default behavior
       when "debug"
         conf.debug=true
-#     when "holleriths"
-#       conf.holleriths=true
       when "normalize"
         conf.normalize=true
       when "modinfo"
@@ -567,7 +533,6 @@ class Translator
     x.push("-I dir[:dir:...]]")
     x.push("debug")
     x.push("fixed")
-#   x.push("holleriths")
     x.push("modinfo")
     x.push("normalize")
     "#{File.basename(@wrapper)} [ #{x.join(" | ")} ] source"
