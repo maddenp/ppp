@@ -24,7 +24,7 @@ class Dehollerizer
 # end
 
   def call_stmt
-    @i+=1 #PM# if invariant, move this into match
+    fwd #PM# if invariant, move this into match
     if match("all")
       eat #PM# match does this, right?
       eat_variable
@@ -37,19 +37,18 @@ class Dehollerizer
     eat
     nest=0
     begin
-      c=@a[@i]
-      if c=~/\'/       # Detect a single quoted string
-        single_quoted  # Consume the string
-      elsif c=~/\"/    # Detect a double quoted string
-        double_quoted  # Consume the string
-      elsif c=~/[0-9]/ # Detect the hollerith length specifier
-        hollerith      # Do work on the hollerith
-      elsif c=~/\(/    # Detect open parenthesis
-        nest+=1        # Open parenthesis: increase nest
-      elsif c=~/\)/    # Detect close parenthesis
-        nest-=1        # Close parenthesis: decrease nest
+      if see "'"        # Detect a single quoted string
+        single_quoted   # Consume the string
+      elsif see '"'     # Detect a double quoted string
+        double_quoted   # Consume the string
+      elsif see /[0-9]/ # Detect the hollerith length specifier
+        hollerith       # Do work on the hollerith
+      elsif see "("     # Detect open parenthesis
+        nest+=1         # Open parenthesis: increase nest
+      elsif see ")"     # Detect close parenthesis
+        nest-=1         # Close parenthesis: decrease nest
       end
-      @i+=1            # Move to next character
+      fwd               # Move to next character
     end while nest>0
   end
 
@@ -63,7 +62,7 @@ class Dehollerizer
       elsif @a[@i]=~/[0-9]/ # Detect the hollerith lenght specifier
         hollerith           # Do work on hollerith
       end
-      @i+=1                 # Advance to next character
+      fwd                 # Advance to next character
     end
     process                 # Back to main check at the end of data statement
   end
@@ -71,7 +70,7 @@ class Dehollerizer
   def continuation
     while @a[@i]=~/[\&!]/          # Check for & or !
       start=@i                     # Designate a start index
-      @i+=1                        # Move forward one (past &)
+      fwd                        # Move forward one (past &)
       remove_whitespace            # Remove space before a newline
       remove_comment               # Remove end of line comment
       if @a[@i]=~/\n/              # If end of line
@@ -93,21 +92,21 @@ class Dehollerizer
   end
 
   def data_stmt           # Checks for all elements of a data statement
-    @i+=1
+    fwd
     eat
     if @a[@i]=~/[Aa]/
-      @i+=1
+      fwd
       eat
       if @a[@i]=~/[Tt]/
-        @i+=1
+        fwd
         eat
         if @a[@i]=~/[Aa]/
-          @i+=1
+          fwd
           eat
           eat_variable
           eat
           if @a[@i]=~/\//
-            @i+=1
+            fwd
             check_hollerith_data
           end
         end
@@ -120,9 +119,9 @@ class Dehollerizer
   end
 
   def double_quoted
-    @i+=1                             # Advances to the next character (after ")
+    fwd                             # Advances to the next character (after ")
     until @a[@i]=~/"/
-      @i+=1                           # Continue advancing until endquote is matched
+      fwd                           # Continue advancing until endquote is matched
     end
   end
 
@@ -134,22 +133,26 @@ class Dehollerizer
 
   def eat_variable
     if @a[@i]=~/[A-za-z]/
-      @i+=1
+      fwd
       eat
       while @a[@i]=~/[A-Za-z0-9_]/
-        @i+=1
+        fwd
         eat
       end
     end
   end
 
   def eat_whitespace
-    @i+=1 while @a[@i]=~/[ \t]/ # Consume all whitespace
+    fwd while @a[@i]=~/[ \t]/ # Consume all whitespace
   end
 
   def format_stmt
-    @i+=1
+    fwd
     check_hollerith if match ("ormat") and see '('
+  end
+
+  def fwd
+    @i+=1
   end
 
   def hollerith                 # Once a hollerith is found
@@ -157,11 +160,11 @@ class Dehollerizer
     l=[]
     l[0]=@a[@i]                 # First digit in hollerith
     numdigits=1                 # Sets array value counter to one (zero is already taken)
-    @i+=1                       # Moves to next character    
+    fwd                       # Moves to next character    
     continuation                # Check for a continuation after the first digit
     while @a[@i]=~/[0-9]/       # As long as the next character is a digit
       l[numdigits]=@a[@i]       # Sets next array value to hollerith digit value
-      @i+=1                     # Move to next digit
+      fwd                     # Move to next digit
       numdigits+=1              # Add one to the number of digits
       continuation              # Check for a continuation after the second digit
     end  
@@ -170,10 +173,10 @@ class Dehollerizer
     if @a[@i]=~/[Hh]/           # Check for an 'H' or 'h' after digits
       @a[@i]='h'                # Normalizes the 'H' to lowercase
       start=@i                  # Set a value for the character position of 'h'
-      @i+=1                     # Move to the next character (first in string)
+      fwd                     # Move to the next character (first in string)
       while @i<=start+strlen    # While still in the string
         continuation            # Check for continuation at this point
-        @i+=1                   # Move one forward
+        fwd                   # Move one forward
       end                       # Repeat until outside of the string
       hb=start-numdigits
       he=start+strlen
@@ -195,7 +198,7 @@ class Dehollerizer
         @i=origin
         return false
       end
-      @i+=1
+      fwd
     end
     eat
   end
@@ -216,14 +219,14 @@ class Dehollerizer
         call_stmt      # Process potential call statement
       elsif b=~/'/     # Match single-quotes
         single_quoted  # Process quotes
-        @i+=1          # Move ahead 
+        fwd          # Move ahead 
       elsif b=~/"/     # Match double quotes
         double_quoted  # Process quotes
-        @i+=1          # Move ahead
+        fwd          # Move ahead
       elsif b=~/!/     # Match a comment (would not match quoted string
         skip_comment
       else
-        @i+=1          # If none of the above is found, move on to next character
+        fwd          # If none of the above is found, move on to next character
       end
     end
     @a.join
@@ -250,19 +253,20 @@ class Dehollerizer
   end
 
   def see(x)
+    return x.match(@a[@i].downcase) if x.is_a?(Regexp)
     Regexp.new(Regexp.quote(x)).match(@a[@i].downcase)
   end
     
   def single_quoted
-    @i+=1                             # Advances to the next character (after ')
+    fwd                             # Advances to the next character (after ')
     until @a[@i]=~/'/
-      @i+=1                           # Continue advancing until endquote is matched
+      fwd                           # Continue advancing until endquote is matched
     end
   end
 
   def skip_comment
-    @i+=1 until @a[@i]=="\n" or @i==@a.size
-    @i+=1
+    fwd until @a[@i]=="\n" or @i==@a.size
+    fwd
   end
 
 end
