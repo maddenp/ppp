@@ -29,21 +29,6 @@ class Dehollerizer
     end while nest>0
   end
 
-# def check_hollerith_data  # Distinguishes between hollerith and other parts of a data statement
-#   eat
-#   until @a[@i]=~/\//      # '/' in a string will never be matched here
-#     if @a[@i]=~/\'/       # Detect a quoted string
-#       single_quoted       # Consumes everything in quotes
-#     elsif @a[@i]=~/\"/    # Detect a quoted string
-#       double_quoted       # Consumes everything in quotes
-#     elsif @a[@i]=~/[0-9]/ # Detect the hollerith length specifier
-#       hollerith           # Do work on hollerith
-#     end
-#     fwd                 # Advance to next character
-#   end
-#   process                 # Back to main check at the end of data statement
-# end
-
   def check_hollerith_data
     eat
     begin
@@ -54,10 +39,10 @@ class Dehollerizer
       elsif @a[@i]=~/[0-9]/ # Detect the hollerith length specifier
         hollerith           # Do work on hollerith
       end
+#debug
       fwd                 # Advance to next character
     end until @a[@i]=~/\//      # '/' in a string will never be matched here
-#   debug :check_hollerith_data
-#   process                 # Back to main check at the end of data statement
+#puts "### leaving check_hollerith_data!"
   end
 
   def continuation
@@ -84,16 +69,12 @@ class Dehollerizer
     end
   end
 
-  def data_stmt
+  def data_stmt #PM# pipleline & simplify? what does eat_variable return?
     fwd
-#   debug 1
     if match("ata")
-#     debug 2
       eat_variable
-#     debug 3
       if see '/'
         fwd
-#       debug 4
         check_hollerith_data
       end
     end
@@ -169,8 +150,10 @@ class Dehollerizer
       he=start+strlen
       hollerith=@a.join[hb..he] # Identify the hollerith
       token=@m.set(hollerith)
+#puts "### hollerith: [#{hollerith}]"
       @a.slice!(hb..he)
-      token.each_char { |c| @a.insert(hb,c) }
+      token.reverse.each_char { |c| @a.insert(hb,c) }
+#puts "###\n#{@a.join}###"
       @i=origin+token.size-1
 #     debug :hollerith_3
     else
