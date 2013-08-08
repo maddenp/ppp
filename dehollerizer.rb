@@ -64,10 +64,7 @@ class Dehollerizer
       eat
       eat_variable
       continuation
-      if @a[@i]=~/\(/
-#       @i+=1
-        check_hollerith
-      end
+      check_hollerith if @a[@i]=~/\(/
     end
   end
 
@@ -94,42 +91,12 @@ class Dehollerizer
     end
   end
 
-  def format_stmt              # Looks for all elements of a format statement
-    @i+=1
-    eat
-    if @a[@i]=~/[Oo]/
-      @i+=1
-      eat
-      if @a[@i]=~/[Rr]/
-        @i+=1
-        eat
-        if @a[@i]=~/[Mm]/
-          @i+=1
-          eat
-          if @a[@i]=~/[Aa]/
-            @i+=1
-            eat
-            if @a[@i]=~/[Tt]/
-              @i+=1
-              eat
-              if @a[@i]=~/\(/
-#               @i+=1
-#               eat
-                check_hollerith
-              end
-            end
-          end
-        end
-      end
-    end
-  end
-
   def match(keyword)
-    reset=@i
+    origin=@i
     keyword.each_char do |c|
       eat
-      unless @a[@i].downcase==c
-        @i=reset
+      unless see c
+        @i=origin
         return false
       end
       @i+=1
@@ -137,71 +104,48 @@ class Dehollerizer
     eat
   end
       
-# def format_stmt              # Looks for all elements of a format statement
-#   @i+=1
-#   if match("ormat")
-#     if @a[@i]=~/\(/
-#       @i+=1
-#       check_hollerith
-#     end
-#   end
-# end
-
-  def debug(x=nil)
-    $stderr.puts "### #{(x)?("[#{x}] "):("")}looking at: #{@a[@i..@i+5]}"
+  def format_stmt
+    @i+=1
+    check_hollerith if match ("ormat") and see '('
   end
-
-# def check_hollerith       # Distinguishes between hollerith and other parts of a format statment
-#   eat
-#   x=1                     # Parentheses counter (to find the end of the format statement)
-#   until x==0              # Until all embedded parentheses are matched
-#     if @a[@i]=~/\'/       # Detect a single quoted string
-#       single_quoted       # Consume the string
-#     elsif @a[@i]=~/\"/    # Detect a double quoted string
-#       double_quoted       # Consume the string
-#     elsif @a[@i]=~/[0-9]/ # Detect the hollerith length specifier
-#       hollerith           # Do work on the hollerith
-#     elsif @a[@i]=~/\(/    # Detect open parentheses
-#       x+=1                # Open parentheses: increase counter
-#     elsif @a[@i]=~/\)/    # Detect close parentheses
-#       x-=1                # Close parentheses: decrease counter
-#     end
-#     @i+=1                 # Move to next character
-#   end
-# end
 
   def check_hollerith
     eat
     nest=0
     begin
-      if @a[@i]=~/\'/       # Detect a single quoted string
-        single_quoted       # Consume the string
-      elsif @a[@i]=~/\"/    # Detect a double quoted string
-        double_quoted       # Consume the string
-      elsif @a[@i]=~/[0-9]/ # Detect the hollerith length specifier
-        hollerith           # Do work on the hollerith
-      elsif @a[@i]=~/\(/    # Detect open parentheses
-        nest+=1          # Open parentheses: increase counter
-      elsif @a[@i]=~/\)/    # Detect close parentheses
-        nest-=1          # Close parentheses: decrease counter
+      c=@a[@i]
+      if c=~/\'/       # Detect a single quoted string
+        single_quoted  # Consume the string
+      elsif c=~/\"/    # Detect a double quoted string
+        double_quoted  # Consume the string
+      elsif c=~/[0-9]/ # Detect the hollerith length specifier
+        hollerith      # Do work on the hollerith
+      elsif c=~/\(/    # Detect open parenthesis
+        nest+=1        # Open parenthesis: increase nest
+      elsif c=~/\)/    # Detect close parenthesis
+        nest-=1        # Close parenthesis: decrease nest
       end
-      @i+=1                 # Move to next character
+      @i+=1            # Move to next character
     end while nest>0
   end
 
-  def check_hollerith_data      # Distinguishes between hollerith and other parts of a data statement
+  def check_hollerith_data  # Distinguishes between hollerith and other parts of a data statement
     eat
-    until @a[@i]=~/\//                # '/' in a string will never be matched here
-      if @a[@i]=~/\'/                 # Detect a quoted string
-        single_quoted        # Consumes everything in quotes
-      elsif @a[@i]=~/\"/              # Detect a quoted string
-        double_quoted          # Consumes everything in quotes
-      elsif @a[@i]=~/[0-9]/           # Detect the hollerith lenght specifier
-        hollerith              # Do work on hollerith
+    until @a[@i]=~/\//      # '/' in a string will never be matched here
+      if @a[@i]=~/\'/       # Detect a quoted string
+        single_quoted       # Consumes everything in quotes
+      elsif @a[@i]=~/\"/    # Detect a quoted string
+        double_quoted       # Consumes everything in quotes
+      elsif @a[@i]=~/[0-9]/ # Detect the hollerith lenght specifier
+        hollerith           # Do work on hollerith
       end
-      @i+=1                          # Advance to next character
+      @i+=1                 # Advance to next character
     end
-    process                   # Back to main check at the end of data statement
+    process                 # Back to main check at the end of data statement
+  end
+
+  def debug(x=nil)
+    $stderr.puts "### #{(x)?("[#{x}] "):("")}looking at: #{@a[@i..@i+5]}"
   end
 
   def hollerith                         # Once a hollerith is found
@@ -305,17 +249,21 @@ class Dehollerizer
     end
   end
 
-  def skip_comment
-    @i+=1 until @a[@i]=="\n" or @i==@a.size
-    @i+=1
-  end
-
   def remove_comment
     if @a[@i]=~/!/                     # If comment is detected
       until @a[@i]=~/\n/
         @a.delete_at(@i)               # Remove the entire comment
       end
     end
+  end
+
+  def see(x)
+    Regexp.new(Regexp.quote(x)).match(@a[@i].downcase)
+  end
+    
+  def skip_comment
+    @i+=1 until @a[@i]=="\n" or @i==@a.size
+    @i+=1
   end
 
 end
