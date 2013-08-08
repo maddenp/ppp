@@ -322,7 +322,9 @@ class Translator
       end                                      # will always end in die() from cpp-check
       s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # replace any continuation character with generic "a"
       s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
+#puts "###\n#{s}###"
       s=chkparse(fix_pt_norm(s,np))            # string-aware transform & parse error checking
+#puts "###\n#{s}###"
       s=s.gsub(/\n[ \t]{5}a/,"")               # join continuation lines
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
       s
@@ -383,17 +385,14 @@ class Translator
       s=assemble(s,[srcfile],conf.incdirs)                            # until all souce has been appropriately inserted
     end
     if conf.debug
-      puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}\n"
+      puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}"
     end
     if conf.fixed
       puts "FREE-FORM TRANSLATION\n\n" if conf.debug
       s=fixed2free(s)
       puts "#{s}\n\n" if conf.debug
     end
-    cppcheck(s)                                               #  any time the continuation warning in fixed2free is shown, cppcheck will exit in die()
-#   if conf.hollerith
-#     dehollerizer_parser_method(s)
-#   end
+    cppcheck(s) #  any time the continuation warning in fixed2free is shown, cppcheck will exit in die()
     puts "NORMALIZED FORM\n" if conf.debug
     n=normalize(s,conf.nl)
     puts "\n#{n}" if conf.debug or conf.normalize
