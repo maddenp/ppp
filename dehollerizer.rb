@@ -65,7 +65,7 @@ class Dehollerizer
       eat_variable
       continuation
       if @a[@i]=~/\(/
-        @i+=1
+#       @i+=1
         check_hollerith
       end
     end
@@ -113,8 +113,8 @@ class Dehollerizer
               @i+=1
               eat
               if @a[@i]=~/\(/
-                @i+=1
-                eat
+#               @i+=1
+#               eat
                 check_hollerith
               end
             end
@@ -147,23 +147,46 @@ class Dehollerizer
 #   end
 # end
 
-  def check_hollerith          # Distinguishes between hollerith and other parts of a format statment
+  def debug(x=nil)
+    $stderr.puts "### #{(x)?("[#{x}] "):("")}looking at: #{@a[@i..@i+5]}"
+  end
+
+# def check_hollerith       # Distinguishes between hollerith and other parts of a format statment
+#   eat
+#   x=1                     # Parentheses counter (to find the end of the format statement)
+#   until x==0              # Until all embedded parentheses are matched
+#     if @a[@i]=~/\'/       # Detect a single quoted string
+#       single_quoted       # Consume the string
+#     elsif @a[@i]=~/\"/    # Detect a double quoted string
+#       double_quoted       # Consume the string
+#     elsif @a[@i]=~/[0-9]/ # Detect the hollerith length specifier
+#       hollerith           # Do work on the hollerith
+#     elsif @a[@i]=~/\(/    # Detect open parentheses
+#       x+=1                # Open parentheses: increase counter
+#     elsif @a[@i]=~/\)/    # Detect close parentheses
+#       x-=1                # Close parentheses: decrease counter
+#     end
+#     @i+=1                 # Move to next character
+#   end
+# end
+
+  def check_hollerith
     eat
-    x=1                             # Parentheses counter (to find the end of the format statement)
-    until x==0                      # Until all embedded parentheses are matched
-      if @a[@i]=~/\'/                # Detect a single quoted string
-        single_quoted         # Consume the string
-      elsif @a[@i]=~/\"/             # Detect a double quoted string
-        double_quoted         # Consume the string
-      elsif @a[@i]=~/[0-9]/          # Detect the hollerith length specifier
-        hollerith             # Do work on the hollerith
-      elsif @a[@i]=~/\(/             # Detect open parentheses
-        x+=1                        # Open parentheses: increase counter
-      elsif @a[@i]=~/\)/             # Detect close parentheses
-        x-=1                        # Close parentheses: decrease counter
+    nest=0
+    begin
+      if @a[@i]=~/\'/       # Detect a single quoted string
+        single_quoted       # Consume the string
+      elsif @a[@i]=~/\"/    # Detect a double quoted string
+        double_quoted       # Consume the string
+      elsif @a[@i]=~/[0-9]/ # Detect the hollerith length specifier
+        hollerith           # Do work on the hollerith
+      elsif @a[@i]=~/\(/    # Detect open parentheses
+        nest+=1          # Open parentheses: increase counter
+      elsif @a[@i]=~/\)/    # Detect close parentheses
+        nest-=1          # Close parentheses: decrease counter
       end
-      @i+=1                         # Move to next character
-    end
+      @i+=1                 # Move to next character
+    end while nest>0
   end
 
   def check_hollerith_data      # Distinguishes between hollerith and other parts of a data statement
@@ -183,7 +206,7 @@ class Dehollerizer
 
   def hollerith                         # Once a hollerith is found
     origin=@i
-    l=Array.new                              # An array of digits specifying the length 
+    l=[]
     l[0]=@a[@i]                               # First digit in hollerith
     numdigits=1                              # Sets array value counter to one (zero is already taken)
     @i+=1                                    # Moves to next character    
@@ -208,10 +231,9 @@ class Dehollerizer
       he=start+strlen
       hollerith=@a.join[hb..he]  # Identify the hollerith
       token=@m.set(hollerith)
-      delta=hollerith.size-token.size
       @a.slice!(hb..he)
-      @a.insert(hb,token)
-      @i=origin
+      token.each_char { |c| @a.insert(hb,c) }
+      @i=origin+token.size-1
     else
       @i-=1                                  # Set the value to the last detected digit (moves forward later)
     end

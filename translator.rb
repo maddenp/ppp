@@ -213,8 +213,6 @@ class Translator
     s=chkparse(fix_pt_norm(s,np,1,m))   # string-aware transform
     s=s.gsub(/& *\n *&?/,"")            # join continuation lines
     s=chkparse(np.parse(s,2,m).to_s)    # mask original strings
-#   s=dehollerith(s)                    # replace holleriths
-#   s=chkparse(np.parse(s,2,m).to_s)    # mask dehollerith'ed strings
     s=s.downcase                        # lower-case text only
     s=s.gsub(/ +/,"")                   # remove spaces
     s=restore_strings(s,m)              # restore strings
