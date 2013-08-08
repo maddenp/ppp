@@ -1,9 +1,10 @@
 class Dehollerizer
 
-  def process(s=nil)
-    if s
+  def process(stringmap=nil,source=nil)
+    if stringmap
       @i=0
-      @a=s.split(//)   # Split string into array by character
+      @a=source.split(//)   # Split string into array by character
+      @m=stringmap
     end
     while @i<=@a.length
       b=@a[@i]
@@ -136,7 +137,10 @@ class Dehollerizer
   def check_hollerith          # Distinguishes between hollerith and other parts of a format statment
     eat
     x=1                             # Parentheses counter (to find the end of the format statement)
+#asdf=10
     until x==0                      # Until all embedded parentheses are matched
+#puts "### looking at: #{@a[@i]}"
+#break if (asdf-=1)==0
       if @a[@i]=~/\'/                # Detect a single quoted string
         single_quoted         # Consume the string
       elsif @a[@i]=~/\"/             # Detect a double quoted string
@@ -168,6 +172,7 @@ class Dehollerizer
   end
 
   def hollerith                         # Once a hollerith is found
+    origin=@i
     l=Array.new                              # An array of digits specifying the length 
     l[0]=@a[@i]                               # First digit in hollerith
     numdigits=1                              # Sets array value counter to one (zero is already taken)
@@ -189,9 +194,19 @@ class Dehollerizer
         continuation                   # Check for continuation at this point
         @i+=1                                # Move one forward
       end                                               # Repeat until outside of the string
-      hollerith=@a.join[(start-numdigits)..(start+strlen)]  # Identify the hollerith
-      puts "HOLLERITH:#{hollerith}"
-      @i=start+strlen                               # Set the value to the last hollerith character (moves forward later) 
+#     hollerith=@a.join[(start-numdigits)..(start+strlen)]  # Identify the hollerith
+      hb=start-numdigits
+      he=start+strlen
+      hollerith=@a.join[hb..he]  # Identify the hollerith
+      token=@m.set(hollerith)
+      delta=hollerith.size-token.size
+#puts "### hollerith #{hollerith} token #{token} delta #{delta}"
+#puts "### before: #{@a.join}"
+      @a.slice!(hb..he)
+      @a.insert(hb,token)
+#puts "###  after: #{@a.join}"
+#     @i=start+strlen                               # Set the value to the last hollerith character (moves forward later) 
+      @i=origin
     else
       @i-=1                                  # Set the value to the last detected digit (moves forward later)
     end
