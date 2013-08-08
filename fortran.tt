@@ -561,7 +561,7 @@ grammar Fortran
   rule char_string_edit_desc
     # F90:R1016
 
-    int_literal_constant "h" rep_char+ <T> /
+    hollerith /
     char_literal_constant
   end
 
@@ -848,6 +848,7 @@ grammar Fortran
   rule data_stmt_constant
     # F90:R533
 
+    hollerith /
     signed_real_literal_constant /
     signed_int_literal_constant /
     boz_literal_constant /
@@ -1606,6 +1607,14 @@ grammar Fortran
     # F90:R411
 
     [0123456789aAbBcCdDeEfF]
+  end
+
+  rule hollerith
+    digit_string "h" &{ |e| sp_hollerith_set_size(e[0]) } hollerith_string <T>
+  end
+
+  rule hollerith_string
+    &{ |e| sp_hollerith_reset_count } ( rep_char &{ |e| sp_hollerith_check_count } )+ <T>
   end
 
   rule if_construct

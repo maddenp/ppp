@@ -154,6 +154,21 @@ module Fortran
     true
   end
 
+  def sp_hollerith_check_count
+    @hollerith_count+=1
+    (@hollerith_count>@hollerith_size)?(false):(true)
+  end
+
+  def sp_hollerith_reset_count
+    @hollerith_count=0
+    true
+  end
+
+  def sp_hollerith_set_size(digit_string)
+    @hollerith_size=Integer(digit_string.to_s)
+    true
+  end
+
   def sp_is_array?(node)
     return false unless node.respond_to?(:name)
     vargetprop(node.name,"sort")=="_array"

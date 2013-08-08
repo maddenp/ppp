@@ -203,7 +203,7 @@ class Translator
     np.update(Normfree)
     m=Stringmap.new
     d=Dehollerizer.new
-    s=d.process(m,s)                    # remove holleriths
+    s=d.process(m,s)                    # mask holleriths
     s=s.gsub(directive,'@\1')           # hide directives
     s=s.gsub(/\t/," ")                  # tabs to spaces
     s=s.gsub(/^ +/,"")                  # remove leading whitespace
