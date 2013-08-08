@@ -21,7 +21,7 @@ class Dehollerizer
         double_quoted  # Process quotes
         @i+=1          # Move ahead
       elsif b=~/!/     # Match a comment (would not match quoted string
-        remove_comment # Remove the comment
+        skip_comment
       else
         @i+=1          # If none of the above is found, move on to next character
       end
@@ -35,25 +35,38 @@ class Dehollerizer
     true
   end
 
+# def call_stmt
+#   @i+=1
+#   eat
+#   if @a[@i]=~/[Aa]/
+#     @i+=1
+#     eat
+#     if @a[@i]=~/[Ll]/
+#       @i+=1
+#       eat
+#       if @a[@i]=~/[Ll]/
+#         @i+=1
+#         eat
+#         eat_variable
+#         continuation
+#         if @a[@i]=~/\(/
+#           @i+=1
+#           check_hollerith
+#         end
+#       end
+#     end
+#   end
+# end
+
   def call_stmt
     @i+=1
-    eat
-    if @a[@i]=~/[Aa]/
-      @i+=1
+    if match("all")
       eat
-      if @a[@i]=~/[Ll]/
+      eat_variable
+      continuation
+      if @a[@i]=~/\(/
         @i+=1
-        eat
-        if @a[@i]=~/[Ll]/
-          @i+=1
-          eat
-          eat_variable
-          continuation
-          if @a[@i]=~/\(/
-            @i+=1
-            check_hollerith
-          end
-        end
+        check_hollerith
       end
     end
   end
@@ -111,18 +124,18 @@ class Dehollerizer
     end
   end
 
-# def match(keyword)
-#   reset=@i
-#   keyword.each_char do |c|
-#     eat
-#     unless @a[@i].downcase==c
-#       @i=reset
-#       return false
-#     end
-#     @i+=1
-#   end
-#   eat
-# end
+  def match(keyword)
+    reset=@i
+    keyword.each_char do |c|
+      eat
+      unless @a[@i].downcase==c
+        @i=reset
+        return false
+      end
+      @i+=1
+    end
+    eat
+  end
       
 # def format_stmt              # Looks for all elements of a format statement
 #   @i+=1
@@ -137,10 +150,7 @@ class Dehollerizer
   def check_hollerith          # Distinguishes between hollerith and other parts of a format statment
     eat
     x=1                             # Parentheses counter (to find the end of the format statement)
-#asdf=10
     until x==0                      # Until all embedded parentheses are matched
-#puts "### looking at: #{@a[@i]}"
-#break if (asdf-=1)==0
       if @a[@i]=~/\'/                # Detect a single quoted string
         single_quoted         # Consume the string
       elsif @a[@i]=~/\"/             # Detect a double quoted string
@@ -194,18 +204,13 @@ class Dehollerizer
         continuation                   # Check for continuation at this point
         @i+=1                                # Move one forward
       end                                               # Repeat until outside of the string
-#     hollerith=@a.join[(start-numdigits)..(start+strlen)]  # Identify the hollerith
       hb=start-numdigits
       he=start+strlen
       hollerith=@a.join[hb..he]  # Identify the hollerith
       token=@m.set(hollerith)
       delta=hollerith.size-token.size
-#puts "### hollerith #{hollerith} token #{token} delta #{delta}"
-#puts "### before: #{@a.join}"
       @a.slice!(hb..he)
       @a.insert(hb,token)
-#puts "###  after: #{@a.join}"
-#     @i=start+strlen                               # Set the value to the last hollerith character (moves forward later) 
       @i=origin
     else
       @i-=1                                  # Set the value to the last detected digit (moves forward later)
@@ -276,6 +281,11 @@ class Dehollerizer
     while @a[@i]=~/\n/                 # If character is newline
       @a.delete_at(@i)                 # Remove it and continue to check
     end
+  end
+
+  def skip_comment
+    @i+=1 until @a[@i]=="\n" or @i==@a.size
+    @i+=1
   end
 
   def remove_comment

@@ -1269,7 +1269,7 @@ module Fortran
   class End_Subroutine_Stmt < T
     def to_s
       unindent
-      "#{stmt(space)}\n"
+      "\n#{stmt(space)}\n"
     end
   end
 
