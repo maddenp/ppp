@@ -15465,7 +15465,7 @@ module Fortran
       s0 << r2
       if r2
         i3 = index
-        r4 = lambda { |e| sp_hollerith_set_size(e[0]) }.call(s0)
+        r4 = lambda { |e| sp_hollerith_set_length(e[0]) }.call(s0)
         if r4
           @index = i3
           r3 = instantiate_node(SyntaxNode,input, index...index)

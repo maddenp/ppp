@@ -1,15 +1,5 @@
 class Dehollerizer
 
-  def call_stmt
-    fwd #PM# if invariant, move this into match
-    if match "all"
-      remove_continuation #PM# match does this, right?
-      skip_variable
-      remove_continuation
-      check_hollerith_parens if see '('
-    end
-  end
-
   def check_hollerith_parens
     remove_continuation
     nestlevel=0
@@ -37,21 +27,9 @@ class Dehollerizer
     end until see "/"
   end
 
-  def data_stmt
-    fwd
-    if match "ata" and skip_variable and see '/'
-      fwd
-      check_hollerith_slashes
-    end
-  end
-
   def debug(x=nil)
-    puts "DEBUG #{(x)?("[#{x}] "):("")}looking at: #{@a[@i..@i+5]}"
-  end
-
-  def format_stmt
-    fwd
-    check_hollerith_parens if match "ormat" and see '('
+    lookahead=5
+    puts "DEBUG #{(x)?("[#{x}] "):("")}: #{@a[@i..@i+lookahead]}"
   end
 
   def fwd
@@ -59,32 +37,30 @@ class Dehollerizer
   end
 
   def mask_hollerith
+    digits=[]
     origin=@i
-    digits=0
-    l=[]
     while see /[0-9]/
-      digits+=1
-      l.push(see)
+      digits.push(see)
       fwd
       remove_whitespace
       remove_continuation
     end
-    size=(l.join).to_i
+    length=(digits.join).to_i
     remove_whitespace
     if see 'h'
       @a[@i]='h'
-      start=@i
+      hindex=@i
       fwd
-      while @i<=start+size
+      while @i<=hindex+length
         remove_continuation
         fwd
       end
-      hb=start-digits
-      he=start+size
-      hollerith=@a.join[hb..he]
+      p0=hindex-digits.size
+      p1=hindex+length
+      hollerith=@a[p0..p1].join
       token=@m.set(hollerith)
-      @a.slice!(hb..he)
-      token.reverse.each_char { |c| @a.insert(hb,c) }
+      @a.slice!(p0..p1)
+      token.reverse.each_char { |c| @a.insert(p0,c) }
       @i=origin+token.size-1
     else
       @i-=1
@@ -106,13 +82,13 @@ class Dehollerizer
       
   def process(stringmap,source)
     @i=0
-    @a=source.split(//)
+    @a=source.split(//) # string -> character array
     @m=stringmap
     while @i<=@a.length
       case see
-      when "d" then data_stmt
-      when "f" then format_stmt
-      when "c" then call_stmt
+      when "c" then try_call
+      when "d" then try_data
+      when "f" then try_format
       when "'" then skip_sq
       when '"' then skip_dq
       when "!" then skip_comment
@@ -135,7 +111,7 @@ class Dehollerizer
   def remove_continuation
     skip_whitespace
     while see /[\&!]/
-      start=@i
+      origin=@i
       fwd
       remove_whitespace
       remove_comment
@@ -146,8 +122,8 @@ class Dehollerizer
           remove_comment
           remove_newline
         end
-        @a.slice!(start..((see "&")?(@i):(@i-1)))
-        @i=start
+        @a.slice!(origin..((see "&")?(@i):(@i-1)))
+        @i=origin
       end
     end
     true
@@ -196,6 +172,25 @@ class Dehollerizer
 
   def skip_whitespace
     fwd while see /[ \t]/
+  end
+
+  def try_call
+    if match "call"
+      skip_variable
+      remove_continuation
+      check_hollerith_parens if see '('
+    end
+  end
+
+  def try_data
+    if match "data" and skip_variable and see '/'
+      fwd
+      check_hollerith_slashes
+    end
+  end
+
+  def try_format
+    check_hollerith_parens if match "format" and see '('
   end
 
 end

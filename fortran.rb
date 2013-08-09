@@ -164,7 +164,7 @@ module Fortran
     true
   end
 
-  def sp_hollerith_set_size(digit_string)
+  def sp_hollerith_set_length(digit_string)
     @hollerith_size=Integer(digit_string.to_s)
     true
   end

@@ -1611,7 +1611,7 @@ grammar Fortran
   end
 
   rule hollerith
-    digit_string "h" &{ |e| sp_hollerith_set_size(e[0]) } hollerith_string <T>
+    digit_string "h" &{ |e| sp_hollerith_set_length(e[0]) } hollerith_string <T>
   end
 
   rule hollerith_string
