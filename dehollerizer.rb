@@ -2,10 +2,10 @@ class Dehollerizer
 
   def call_stmt
     fwd #PM# if invariant, move this into match
-    if match("all")
+    if match "all"
       eat #PM# match does this, right?
       skip_variable
-      continuation
+      remove_continuation
       check_hollerith_parens if see '('
     end
   end
@@ -37,33 +37,10 @@ class Dehollerizer
     end until see "/"
   end
 
-  def continuation
-    while see=~/[\&!]/          # Check for & or !
-      start=@i                     # Designate a start index
-      fwd                        # Move forward one (past &)
-      remove_whitespace            # Remove space before a newline
-      remove_comment               # Remove end of line comment
-      if see=~/\n/              # If end of line
-        remove_char           # Remove the newline character
-        while see=~/[ \t\n\!]/
-          remove_whitespace        # Remove potential whitespace in next line
-          remove_comment           # Remove potential comment in next line
-          remove_newline           # Remove blank line
-        end
-        if see=~/&/             # Find matching &
-          @a.slice!(start..@i)     # Remove continuation
-        else                       # If there is no matching &
-          @a.slice!(start..(@i-1)) # Remove continuation
-        end
-        @i=start                 # Move to next character after continuation
-      end
-    end
-  end
-
   def data_stmt
     fwd
-    if match("ata") and skip_variable and see '/'
-      fwd #PM# can/should check_hollerith_data do this instead?
+    if match "ata" and skip_variable and see '/'
+      fwd
       check_hollerith_slashes
     end
   end
@@ -74,7 +51,7 @@ class Dehollerizer
 
   def eat
     skip_whitespace
-    continuation
+    remove_continuation
     true
   end
 
@@ -85,7 +62,7 @@ class Dehollerizer
 
   def format_stmt
     fwd
-    check_hollerith_parens if match ("ormat") and see '('
+    check_hollerith_parens if match "ormat" and see '('
   end
 
   def fwd
@@ -101,27 +78,27 @@ class Dehollerizer
       l.push(see)
       fwd
       remove_whitespace
-      continuation #PM# remove_continuation
+      remove_continuation
     end
-    size=(l.join).to_i        # Turns the array of digits into an integer
-    remove_whitespace           # Removes whitespace after length specifier
-    if see 'h'                  # Check for an 'H' or 'h' after digits
-      @a[@i]='h'                # Normalizes the 'H' to lowercase
-      start=@i                  # Set a value for the character position of 'h'
-      fwd                     # Move to the next character (first in string)
-      while @i<=start+size    # While still in the string
-        continuation            # Check for continuation at this point
-        fwd                   # Move one forward
-      end                       # Repeat until outside of the string
+    size=(l.join).to_i
+    remove_whitespace
+    if see 'h'
+      @a[@i]='h'
+      start=@i
+      fwd
+      while @i<=start+size
+        remove_continuation
+        fwd
+      end
       hb=start-digits
       he=start+size
-      hollerith=@a.join[hb..he] # Identify the hollerith
+      hollerith=@a.join[hb..he]
       token=@m.set(hollerith)
       @a.slice!(hb..he)
       token.reverse.each_char { |c| @a.insert(hb,c) }
       @i=origin+token.size-1
     else
-      @i-=1                     # Set the value to the last detected digit (moves forward later)
+      @i-=1
     end
   end
 
@@ -138,30 +115,28 @@ class Dehollerizer
     eat
   end
       
-  def process(stringmap=nil,source=nil)
-    if stringmap
-      @i=0
-      @a=source.split(//) # string -> character array
-      @m=stringmap
-    end
+  def process(stringmap,source)
+    @i=0
+    @a=source.split(//)
+    @m=stringmap
     while @i<=@a.length
       b=see
-      if b=~/[Dd]/     # Match start of a data statement
-        data_stmt      # Handle potential data statement
-      elsif b=~/[Ff]/  # Match start of a format statement
-        format_stmt    # Handle potential format statement
-      elsif b=~/[Cc]/  # Looking for a call statement
-        call_stmt      # Handle potential call statement
-      elsif b=~/'/     # Match single-quotes
-        skip_sq  # Handle quotes
-        fwd          # Move ahead 
-      elsif b=~/"/     # Match double quotes
-        skip_dq  # Handle quotes
-        fwd          # Move ahead
-      elsif b=~/!/     # Match a comment (would not match quoted string
+      if b=~/[Dd]/
+        data_stmt
+      elsif b=~/[Ff]/
+        format_stmt
+      elsif b=~/[Cc]/
+        call_stmt
+      elsif b=~/'/
+        skip_sq
+        fwd
+      elsif b=~/"/
+        skip_dq
+        fwd
+      elsif b=~/!/
         skip_comment
       else
-        fwd          # If none of the above is found, move on to next character
+        fwd
       end
     end
     @a.join
@@ -175,6 +150,27 @@ class Dehollerizer
     if see "!"
       remove_char until see "\n"
     end
+  end
+
+  def remove_continuation
+    skip_whitespace
+    while see /[\&!]/
+      start=@i
+      fwd
+      remove_whitespace
+      remove_comment
+      if see "\n"
+        remove_char
+        while see /[ \t\n\!]/
+          remove_whitespace
+          remove_comment
+          remove_newline
+        end
+        @a.slice!(start..((see "&")?(@i):(@i-1)))
+        @i=start
+      end
+    end
+    true
   end
 
   def remove_newline
