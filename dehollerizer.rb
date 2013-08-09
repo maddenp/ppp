@@ -44,7 +44,7 @@ class Dehollerizer
       remove_whitespace            # Remove space before a newline
       remove_comment               # Remove end of line comment
       if see=~/\n/              # If end of line
-        @a.delete_at(@i)           # Remove the newline character
+        remove_char           # Remove the newline character
         while see=~/[ \t\n\!]/
           remove_whitespace        # Remove potential whitespace in next line
           remove_comment           # Remove potential comment in next line
@@ -167,24 +167,22 @@ class Dehollerizer
     @a.join
   end
 
+  def remove_char
+    @a.delete_at(@i)
+  end
+
   def remove_comment
-    if see=~/!/        # If comment is detected
-      until see=~/\n/
-        @a.delete_at(@i)  # Remove the entire comment
-      end
+    if see "!"
+      remove_char until see "\n"
     end
   end
 
   def remove_newline
-    while see=~/\n/    # If character is newline
-      @a.delete_at(@i)    # Remove it and continue to check
-    end
+    remove_char while see "\n"
   end
 
   def remove_whitespace
-    while see=~/[ \t]/ # If character is whitespace
-      @a.delete_at(@i)    # Remove it and continue to check
-    end
+    remove_char while see /[ \t]/
   end
 
   def see(x=nil)
