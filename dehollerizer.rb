@@ -38,19 +38,19 @@ class Dehollerizer
   end
 
   def continuation
-    while @a[@i]=~/[\&!]/          # Check for & or !
+    while see=~/[\&!]/          # Check for & or !
       start=@i                     # Designate a start index
       fwd                        # Move forward one (past &)
       remove_whitespace            # Remove space before a newline
       remove_comment               # Remove end of line comment
-      if @a[@i]=~/\n/              # If end of line
+      if see=~/\n/              # If end of line
         @a.delete_at(@i)           # Remove the newline character
-        while @a[@i]=~/[ \t\n\!]/
+        while see=~/[ \t\n\!]/
           remove_whitespace        # Remove potential whitespace in next line
           remove_comment           # Remove potential comment in next line
           remove_newline           # Remove blank line
         end
-        if @a[@i]=~/&/             # Find matching &
+        if see=~/&/             # Find matching &
           @a.slice!(start..@i)     # Remove continuation
         else                       # If there is no matching &
           @a.slice!(start..(@i-1)) # Remove continuation
@@ -98,7 +98,7 @@ class Dehollerizer
     l=[]
     while see /[0-9]/
       digits+=1
-      l.push(@a[@i]) #PM# see
+      l.push(see)
       fwd
       remove_whitespace
       continuation #PM# remove_continuation
@@ -141,11 +141,11 @@ class Dehollerizer
   def process(stringmap=nil,source=nil)
     if stringmap
       @i=0
-      @a=source.split(//)   # Split string into array by character
+      @a=source.split(//) # string -> character array
       @m=stringmap
     end
     while @i<=@a.length
-      b=@a[@i]
+      b=see
       if b=~/[Dd]/     # Match start of a data statement
         data_stmt      # Handle potential data statement
       elsif b=~/[Ff]/  # Match start of a format statement
@@ -168,21 +168,21 @@ class Dehollerizer
   end
 
   def remove_comment
-    if @a[@i]=~/!/        # If comment is detected
-      until @a[@i]=~/\n/
+    if see=~/!/        # If comment is detected
+      until see=~/\n/
         @a.delete_at(@i)  # Remove the entire comment
       end
     end
   end
 
   def remove_newline
-    while @a[@i]=~/\n/    # If character is newline
+    while see=~/\n/    # If character is newline
       @a.delete_at(@i)    # Remove it and continue to check
     end
   end
 
   def remove_whitespace
-    while @a[@i]=~/[ \t]/ # If character is whitespace
+    while see=~/[ \t]/ # If character is whitespace
       @a.delete_at(@i)    # Remove it and continue to check
     end
   end
