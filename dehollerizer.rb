@@ -3,7 +3,7 @@ class Dehollerizer
   def call_stmt
     fwd #PM# if invariant, move this into match
     if match "all"
-      eat #PM# match does this, right?
+      remove_continuation #PM# match does this, right?
       skip_variable
       remove_continuation
       check_hollerith_parens if see '('
@@ -11,7 +11,7 @@ class Dehollerizer
   end
 
   def check_hollerith_parens
-    eat
+    remove_continuation
     nestlevel=0
     begin
       case see
@@ -26,7 +26,7 @@ class Dehollerizer
   end
 
   def check_hollerith_slashes
-    eat
+    remove_continuation
     begin
       case see
       when "'"     then skip_sq
@@ -47,17 +47,6 @@ class Dehollerizer
 
   def debug(x=nil)
     puts "DEBUG #{(x)?("[#{x}] "):("")}looking at: #{@a[@i..@i+5]}"
-  end
-
-  def eat
-    skip_whitespace
-    remove_continuation
-    true
-  end
-
-  def fwd_eat
-    fwd
-    eat
   end
 
   def format_stmt
@@ -105,14 +94,14 @@ class Dehollerizer
   def match(keyword)
     origin=@i
     keyword.each_char do |c|
-      eat
+      remove_continuation
       unless see c
         @i=origin
         return false
       end
       fwd
     end
-    eat
+    remove_continuation
   end
       
   def process(stringmap,source)
@@ -120,24 +109,15 @@ class Dehollerizer
     @a=source.split(//)
     @m=stringmap
     while @i<=@a.length
-      b=see
-      if b=~/[Dd]/
-        data_stmt
-      elsif b=~/[Ff]/
-        format_stmt
-      elsif b=~/[Cc]/
-        call_stmt
-      elsif b=~/'/
-        skip_sq
-        fwd
-      elsif b=~/"/
-        skip_dq
-        fwd
-      elsif b=~/!/
-        skip_comment
-      else
-        fwd
+      case see
+      when "d" then data_stmt
+      when "f" then format_stmt
+      when "c" then call_stmt
+      when "'" then skip_sq
+      when '"' then skip_dq
+      when "!" then skip_comment
       end
+      fwd
     end
     @a.join
   end
@@ -196,19 +176,21 @@ class Dehollerizer
   end
 
   def skip_dq
-    fwd
     fwd until see '"'
   end
 
   def skip_sq
-    fwd
     fwd until see "'"
   end
 
   def skip_variable
+    def advance
+      fwd
+      remove_continuation
+    end
     return false unless see /[A-za-z]/
-    fwd_eat
-    fwd_eat while see /[A-Za-z0-9_]/
+    advance
+    advance while see /[A-Za-z0-9_]/
     true
   end
 
