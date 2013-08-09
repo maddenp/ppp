@@ -29,7 +29,7 @@ class Dehollerizer
 
   def debug(x=nil)
     lookahead=5
-    puts "DEBUG #{(x)?("[#{x}] "):("")}: #{@a[@i..@i+lookahead]}"
+    puts "DEBUG #{(x)?("[#{x}] "):("")}: #{@s.split(//)[@i..@i+lookahead]}"
   end
 
   def fwd
@@ -48,7 +48,7 @@ class Dehollerizer
     length=(digits.join).to_i
     remove_whitespace
     if see 'h'
-      @a[@i]='h'
+      @s[@i]='h'
       hindex=@i
       fwd
       while @i<=hindex+length
@@ -57,10 +57,10 @@ class Dehollerizer
       end
       p0=hindex-digits.size
       p1=hindex+length
-      hollerith=@a[p0..p1].join
+      hollerith=@s[p0..p1]
       token=@m.set(hollerith)
-      @a.slice!(p0..p1)
-      token.reverse.each_char { |c| @a.insert(p0,c) }
+      @s.slice!(p0..p1)
+      token.reverse.each_char { |c| @s.insert(p0,c) }
       @i=origin+token.size-1
     else
       @i-=1
@@ -82,9 +82,9 @@ class Dehollerizer
       
   def process(stringmap,source)
     @i=0
-    @a=source.split(//) # string -> character array
     @m=stringmap
-    while @i<=@a.length
+    @s=source
+    while @i<=@s.length
       case see
       when "c" then try_call
       when "d" then try_data
@@ -95,11 +95,11 @@ class Dehollerizer
       end
       fwd
     end
-    @a.join
+    @s
   end
 
   def remove_char
-    @a.delete_at(@i)
+    @s.slice!(@i)
   end
 
   def remove_comment
@@ -122,7 +122,7 @@ class Dehollerizer
           remove_comment
           remove_newline
         end
-        @a.slice!(origin..((see "&")?(@i):(@i-1)))
+        @s.slice!(origin..((see "&")?(@i):(@i-1)))
         @i=origin
       end
     end
@@ -138,7 +138,7 @@ class Dehollerizer
   end
 
   def see(x=nil)
-    return false unless (c=@a[@i])
+    return false unless (c=@s[@i])
     c=c.downcase
     return c unless x
     return (x.match(c))?(c):(false) if x.is_a?(Regexp)
@@ -147,7 +147,7 @@ class Dehollerizer
   end
     
   def skip_comment
-    fwd until see "\n" or @i==@a.size
+    fwd until see "\n" or @i==@s.length
     fwd
   end
 
