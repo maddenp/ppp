@@ -4,9 +4,9 @@ class Dehollerizer
     fwd #PM# if invariant, move this into match
     if match("all")
       eat #PM# match does this, right?
-      eat_variable
+      skip_variable
       continuation
-      check_hollerith if @a[@i]=~/\(/ #PM# see
+      check_hollerith if see '('
     end
   end
 
@@ -15,9 +15,9 @@ class Dehollerizer
     nest=0
     begin
       if see "'"        # Detect a single quoted string
-        single_quoted   # Consume the string
+        skip_sq   # Consume the string
       elsif see '"'     # Detect a double quoted string
-        double_quoted   # Consume the string
+        skip_dq   # Consume the string
       elsif see /[0-9]/ # Detect the hollerith length specifier
         hollerith       # Do work on the hollerith
       elsif see "("     # Detect open parenthesis
@@ -33,16 +33,14 @@ class Dehollerizer
     eat
     begin
       if @a[@i]=~/\'/       # Detect a quoted string
-        single_quoted       # Consumes everything in quotes
+        skip_sq       # Consumes everything in quotes
       elsif @a[@i]=~/\"/    # Detect a quoted string
-        double_quoted       # Consumes everything in quotes
+        skip_dq       # Consumes everything in quotes
       elsif @a[@i]=~/[0-9]/ # Detect the hollerith length specifier
         hollerith           # Do work on hollerith
       end
-#debug
       fwd                 # Advance to next character
     end until @a[@i]=~/\//      # '/' in a string will never be matched here
-#puts "### leaving check_hollerith_data!"
   end
 
   def continuation
@@ -60,23 +58,19 @@ class Dehollerizer
         end
         if @a[@i]=~/&/             # Find matching &
           @a.slice!(start..@i)     # Remove continuation
-          @i=start                 # Move to next character after continuation
         else                       # If there is no matching &
           @a.slice!(start..(@i-1)) # Remove continuation
-          @i=start                 # Move to next character after continuation
         end
+        @i=start                 # Move to next character after continuation
       end
     end
   end
 
-  def data_stmt #PM# pipleline & simplify? what does eat_variable return?
+  def data_stmt
     fwd
-    if match("ata")
-      eat_variable
-      if see '/'
-        fwd
-        check_hollerith_data
-      end
+    if match("ata") and skip_variable and see '/'
+      fwd #PM# can/should check_hollerith_data do this instead?
+      check_hollerith_data
     end
   end
 
@@ -84,30 +78,15 @@ class Dehollerizer
     puts "DEBUG #{(x)?("[#{x}] "):("")}looking at: #{@a[@i..@i+5]}"
   end
 
-  def double_quoted
-    fwd
-    fwd until @a[@i]=~/"/
-  end
-
   def eat
-    eat_whitespace
+    skip_whitespace
     continuation
     true
   end
 
-  def eat_variable
-    if @a[@i]=~/[A-za-z]/
-      fwd
-      eat
-      while @a[@i]=~/[A-Za-z0-9_]/
-        fwd
-        eat
-      end
-    end
-  end
-
-  def eat_whitespace
-    fwd while @a[@i]=~/[ \t]/
+  def fwd_eat
+    fwd
+    eat
   end
 
   def format_stmt
@@ -121,29 +100,27 @@ class Dehollerizer
 
   def hollerith                 # Once a hollerith is found
     origin=@i
+    digits=0
     l=[]
-    l[0]=@a[@i]                 # First digit in hollerith
-    numdigits=1                 # Sets array value counter to one (zero is already taken)
-    fwd                       # Moves to next character    
-    continuation                # Check for a continuation after the first digit
-    while @a[@i]=~/[0-9]/       # As long as the next character is a digit
-      l[numdigits]=@a[@i]       # Sets next array value to hollerith digit value
-      fwd                     # Move to next digit
-      numdigits+=1              # Add one to the number of digits
-      continuation              # Check for a continuation after the second digit
-    end  
-    strlen=(l.join).to_i        # Turns the array of digits into an integer
+    while see /[0-9]/
+      digits+=1
+      l.push(@a[@i]) #PM# see
+      fwd
+      remove_whitespace
+      continuation #PM# remove_continuation
+    end
+    size=(l.join).to_i        # Turns the array of digits into an integer
     remove_whitespace           # Removes whitespace after length specifier
     if see 'h'                  # Check for an 'H' or 'h' after digits
       @a[@i]='h'                # Normalizes the 'H' to lowercase
       start=@i                  # Set a value for the character position of 'h'
       fwd                     # Move to the next character (first in string)
-      while @i<=start+strlen    # While still in the string
+      while @i<=start+size    # While still in the string
         continuation            # Check for continuation at this point
         fwd                   # Move one forward
       end                       # Repeat until outside of the string
-      hb=start-numdigits
-      he=start+strlen
+      hb=start-digits
+      he=start+size
       hollerith=@a.join[hb..he] # Identify the hollerith
       token=@m.set(hollerith)
       @a.slice!(hb..he)
@@ -182,10 +159,10 @@ class Dehollerizer
       elsif b=~/[Cc]/  # Looking for a call statement
         call_stmt      # Handle potential call statement
       elsif b=~/'/     # Match single-quotes
-        single_quoted  # Handle quotes
+        skip_sq  # Handle quotes
         fwd          # Move ahead 
       elsif b=~/"/     # Match double quotes
-        double_quoted  # Handle quotes
+        skip_dq  # Handle quotes
         fwd          # Move ahead
       elsif b=~/!/     # Match a comment (would not match quoted string
         skip_comment
@@ -223,16 +200,30 @@ class Dehollerizer
     Regexp.new(Regexp.quote(x)).match(@a[@i].downcase)
   end
     
-  def single_quoted
-    fwd   # Advances to the next character (after ')
-    until @a[@i]=~/'/
-      fwd # Continue advancing until endquote is matched
-    end
-  end
-
   def skip_comment
     fwd until @a[@i]=="\n" or @i==@a.size
     fwd
+  end
+
+  def skip_dq
+    fwd
+    fwd until see '"'
+  end
+
+  def skip_sq
+    fwd
+    fwd until see "'"
+  end
+
+  def skip_variable
+    return false unless see /[A-za-z]/
+    fwd_eat
+    fwd_eat while see /[A-Za-z0-9_]/
+    true
+  end
+
+  def skip_whitespace
+    fwd while see /[ \t]/
   end
 
 end

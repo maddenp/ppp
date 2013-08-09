@@ -106,6 +106,7 @@ grammar Fortran
   rule actual_arg
     # F90:R1213
 
+    hollerith /
     expr /
     variable /
     procedure_name /

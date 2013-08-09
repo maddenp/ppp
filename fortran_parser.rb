@@ -812,24 +812,29 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_expr
+    r1 = _nt_hollerith
     if r1
       r0 = r1
     else
-      r2 = _nt_variable
+      r2 = _nt_expr
       if r2
         r0 = r2
       else
-        r3 = _nt_procedure_name
+        r3 = _nt_variable
         if r3
           r0 = r3
         else
-          r4 = _nt_alt_return_spec
+          r4 = _nt_procedure_name
           if r4
             r0 = r4
           else
-            @index = i0
-            r0 = nil
+            r5 = _nt_alt_return_spec
+            if r5
+              r0 = r5
+            else
+              @index = i0
+              r0 = nil
+            end
           end
         end
       end
