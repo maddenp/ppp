@@ -29,7 +29,7 @@ class Dehollerizer
 
   def debug(x=nil)
     lookahead=5
-    puts "DEBUG #{(x)?("[#{x}] "):("")}: #{@s.split(//)[@i..@i+lookahead]}"
+    puts "DEBUG #{(x)?('#{x}'):("")} #{@s.split(//)[@i..@i+lookahead]}"
   end
 
   def fwd

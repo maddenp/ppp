@@ -14,7 +14,7 @@ module Normfixed
       # have already been converted to 'a' by Translator#fixed2free; and (3) the
       # hollerith-masking procedure will run before final parsing is attempted.
 
-      s=("#{input}"[interval.max+1..-1]=~/^     a/)?("\n"):(text_value)
+      s=("#{input}"[interval.max+1..interval.max+7]=~/^     a/)?("\n"):(text_value)
       s
     end
   end
