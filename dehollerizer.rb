@@ -6,41 +6,35 @@ class Dehollerizer
       eat #PM# match does this, right?
       skip_variable
       continuation
-      check_hollerith if see '('
+      check_hollerith_parens if see '('
     end
   end
 
-  def check_hollerith #PM# merge with check_hollerith_data using passed in () or //
+  def check_hollerith_parens
     eat
-    nest=0
+    nestlevel=0
     begin
-      if see "'"        # Detect a single quoted string
-        skip_sq   # Consume the string
-      elsif see '"'     # Detect a double quoted string
-        skip_dq   # Consume the string
-      elsif see /[0-9]/ # Detect the hollerith length specifier
-        hollerith       # Do work on the hollerith
-      elsif see "("     # Detect open parenthesis
-        nest+=1         # Open parenthesis: increase nest
-      elsif see ")"     # Detect close parenthesis
-        nest-=1         # Close parenthesis: decrease nest
+      case see
+      when "'"     then skip_sq
+      when '"'     then skip_dq
+      when /[0-9]/ then mask_hollerith
+      when "("     then nestlevel+=1
+      when ")"     then nestlevel-=1
       end
-      fwd               # Move to next character
-    end while nest>0
+      fwd
+    end while nestlevel>0
   end
 
-  def check_hollerith_data
+  def check_hollerith_slashes
     eat
     begin
-      if @a[@i]=~/\'/       # Detect a quoted string
-        skip_sq       # Consumes everything in quotes
-      elsif @a[@i]=~/\"/    # Detect a quoted string
-        skip_dq       # Consumes everything in quotes
-      elsif @a[@i]=~/[0-9]/ # Detect the hollerith length specifier
-        hollerith           # Do work on hollerith
+      case see
+      when "'"     then skip_sq
+      when '"'     then skip_dq
+      when /[0-9]/ then mask_hollerith
       end
-      fwd                 # Advance to next character
-    end until @a[@i]=~/\//      # '/' in a string will never be matched here
+      fwd
+    end until see "/"
   end
 
   def continuation
@@ -70,7 +64,7 @@ class Dehollerizer
     fwd
     if match("ata") and skip_variable and see '/'
       fwd #PM# can/should check_hollerith_data do this instead?
-      check_hollerith_data
+      check_hollerith_slashes
     end
   end
 
@@ -91,14 +85,14 @@ class Dehollerizer
 
   def format_stmt
     fwd
-    check_hollerith if match ("ormat") and see '('
+    check_hollerith_parens if match ("ormat") and see '('
   end
 
   def fwd
     @i+=1
   end
 
-  def hollerith                 # Once a hollerith is found
+  def mask_hollerith
     origin=@i
     digits=0
     l=[]
@@ -193,15 +187,17 @@ class Dehollerizer
     end
   end
 
-  def see(x) #PM# return either nil or the character pointed at, and use see in place of @a[@i] in general
-    return nil if @a[@i].nil?
-    return x.match(@a[@i].downcase) if x.is_a?(Regexp)
+  def see(x=nil)
+    return false unless (c=@a[@i])
+    c=c.downcase
+    return c unless x
+    return (x.match(c))?(c):(false) if x.is_a?(Regexp)
     x.downcase!
-    Regexp.new(Regexp.quote(x)).match(@a[@i].downcase)
+    (Regexp.new(Regexp.quote(x)).match(c))?(c):(false)
   end
     
   def skip_comment
-    fwd until @a[@i]=="\n" or @i==@a.size
+    fwd until see "\n" or @i==@a.size
     fwd
   end
 
