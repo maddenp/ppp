@@ -79,7 +79,7 @@ class Dehollerizer
     end
     remove_continuation
   end
-      
+
   def process(stringmap,source)
     @i=0
     @m=stringmap
@@ -145,7 +145,7 @@ class Dehollerizer
     x.downcase!
     (Regexp.new(Regexp.quote(x)).match(c))?(c):(false)
   end
-    
+
   def skip_comment
     fwd until see "\n" or @i==@s.length
     fwd
