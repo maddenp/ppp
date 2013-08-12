@@ -32,6 +32,10 @@ class Dehollerizer
     puts "DEBUG #{(x)?('#{x}'):("")} #{@s.split(//)[@i..@i+lookahead]}"
   end
 
+  def end_of_string
+    @i==@s.length
+  end
+
   def fwd
     @i+=1
   end
@@ -147,7 +151,7 @@ class Dehollerizer
   end
 
   def skip_comment
-    fwd until see "\n" or @i==@s.length
+    fwd until see "\n" or end_of_string
     fwd
   end
 

@@ -173,9 +173,7 @@ class Translator
     np.update(Normfree)
     m=Stringmap.new
     d=Dehollerizer.new
-#puts "###\n#{s}"
     s=d.process(m,s)                    # mask holleriths
-#puts "###\n#{s}"
     s=s.gsub(directive,'@\1')           # hide directives
     s=s.gsub(/\t/," ")                  # tabs to spaces
     s=s.gsub(/^ +/,"")                  # remove leading whitespace
@@ -358,7 +356,7 @@ class Translator
       puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}"
     end
     if conf.fixed
-      puts "FREE-FORM TRANSLATION\n\n" if conf.debug
+      puts "\nFREE-FORM TRANSLATION\n\n" if conf.debug
       s=fixed2free(s)
       puts "#{s}\n\n" if conf.debug
     end
