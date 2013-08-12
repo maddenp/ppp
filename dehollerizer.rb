@@ -29,7 +29,7 @@ class Dehollerizer
 
   def debug(x=nil)
     lookahead=5
-    puts "DEBUG #{(x)?('#{x}'):("")} #{@s.split(//)[@i..@i+lookahead]}"
+    puts "DEBUG #{(x)?(x.to_s):("")} #{@s.split(//)[@i..@i+lookahead]}"
   end
 
   def end_of_string
@@ -114,7 +114,7 @@ class Dehollerizer
 
   def remove_continuation
     skip_whitespace
-    while see /[\&!]/
+    while see "&"
       origin=@i
       fwd
       remove_whitespace
