@@ -168,27 +168,29 @@ class Translator
     puts out(s,:program_units,srcfile,conf)
   end
 
-  def normalize(s,newline)
+  def normalize(s,conf)
     np=XNormalizerParser.new
     np.update(Normfree)
-    m=Stringmap.new
-    d=Dehollerizer.new
-    s=d.process(m,s)                    # mask holleriths
+    unless conf.fixed
+      @m=Stringmap.new
+      d=Dehollerizer.new
+      s=d.process(@m,s,conf)            # mask holleriths (only if not already done in fixed2free)
+    end
     s=s.gsub(directive,'@\1')           # hide directives
     s=s.gsub(/\t/," ")                  # tabs to spaces
     s=s.gsub(/^ +/,"")                  # remove leading whitespace
     s=s.gsub(/ +$/,"")                  # remove trailing whitespace
     s=s.gsub(/^ *!.*$\n/,"")            # remove full-line comments
     s=s.gsub(/^[ \t]*\n/,'')            # remove blank lines (continuation statement issue fix)
-    s=chkparse(fix_pt_norm(s,np,1,m))   # string-aware transform
+    s=chkparse(fix_pt_norm(s,np,1,@m))  # string-aware transform
     s=s.gsub(/& *\n *&?/,"")            # join continuation lines
-    s=chkparse(np.parse(s,2,m).to_s)    # mask original strings
+    s=chkparse(np.parse(s,2,@m).to_s)   # mask original strings
     s=s.downcase                        # lower-case text only
     s=s.gsub(/ +/,"")                   # remove spaces
-    s=restore_strings(s,m)              # restore strings
+    s=restore_strings(s,@m)             # restore strings
     s=s.sub(/^\n+/,"")                  # remove leading newlines
-    s=s+"\n" if s[-1]!="\n" and newline # append final newline if required
-    s=s.chomp unless newline            # remove final newline if forbidden
+    s=s+"\n" if s[-1]!="\n" and conf.nl # append final newline if required
+    s=s.chomp unless conf.nl            # remove final newline if forbidden
     s=s.gsub(/^@(.*)/i,'!\1')           # show directives
     s=s.gsub(/^ *\n/,"")                # remove blank lines
     s
@@ -276,7 +278,7 @@ class Translator
       s
     end
 
-    def fixed2free(s)
+    def fixed2free(s,conf)
       # Normalizer from fixed form to free form
       np=XNormalizerParser.new
       np.update(Normfixed)
@@ -292,6 +294,9 @@ class Translator
       end                                      # will always end in die() from cpp-check
       s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # replace any continuation character with generic "a"
       s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
+      @m=Stringmap.new                        
+      d=Dehollerizer.new
+      s=d.process(@m,s,conf)                   # mask holleriths (also removes hollerith-important continuations)
       s=chkparse(fix_pt_norm(s,np))            # string-aware transform & parse error checking
       s=s.gsub(/\n[ \t]{5}a/,"")               # join continuation lines
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
@@ -357,12 +362,12 @@ class Translator
     end
     if conf.fixed
       puts "\nFREE-FORM TRANSLATION\n\n" if conf.debug
-      s=fixed2free(s)
+      s=fixed2free(s,conf)
       puts "#{s}\n\n" if conf.debug
     end
     cppcheck(s) # When a continuation warning in fixed2free is shown, cppcheck will exit in die()
     puts "NORMALIZED FORM\n" if conf.debug
-    n=normalize(s,conf.nl)
+    n=normalize(s,conf)
     puts "\n#{n}" if conf.debug or conf.normalize
     unless conf.normalize
       raw_tree=fp.parse(n,{:root=>root})

@@ -1,6 +1,19 @@
       p r o g r a m  t
       c h a r a c t e r 
      *(l e n = 6 ) a _ b ( 3 )
+      c h a r a c t e r * 6 2
+c Comment
+
+     ': : x
+      d a
+
+*Comment
+      
+     ct a x /62HAbCdEfGhIjKlMnOpQrStUvWxYz1234567890aBcDeFgHiJkLmNoPqRsT
+
+     auVwXyZ/
+
+      p r i n t *,x
       d a t a a _ 
      *b / 'Hello ' , 5 
      *HWorld , 1 h! /

@@ -82,9 +82,11 @@ class Dehollerizer
       fwd
     end
     remove_continuation
+    true
   end
 
-  def process(stringmap,source)
+  def process(stringmap,source,conf)
+    @conf=conf
     @i=0
     @m=stringmap
     @s=source
@@ -114,20 +116,26 @@ class Dehollerizer
 
   def remove_continuation
     skip_whitespace
-    while see "&"
-      origin=@i
-      fwd
-      remove_whitespace
-      remove_comment
-      if see "\n"
-        remove_char
-        while see /[ \t\n\!]/
-          remove_whitespace
-          remove_comment
-          remove_newline
+    if @conf.fixed
+      if @s[@i..@i+6]=~/\n     a/ # There may be a better way using the see() method
+        @s.slice!(@i..@i+6)
+      end
+    else
+      while see "&"
+        origin=@i
+        fwd
+        remove_whitespace
+        remove_comment
+        if see "\n"
+          remove_char
+          while see /[ \t\n\!]/
+            remove_whitespace
+            remove_comment
+            remove_newline
+          end
+          @s.slice!(origin..((see "&")?(@i):(@i-1)))
+          @i=origin
         end
-        @s.slice!(origin..((see "&")?(@i):(@i-1)))
-        @i=origin
       end
     end
     true
