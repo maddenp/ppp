@@ -51,8 +51,8 @@ class Dehollerizer
     end
     length=(digits.join).to_i
     remove_whitespace
-    if see 'h'
-      @s[@i]='h'
+    if see "h"
+      @s[@i]="h"
       hindex=@i
       fwd
       while @i<=hindex+length
@@ -150,12 +150,10 @@ class Dehollerizer
   end
 
   def see(x=nil)
-    return false unless (c=@s[@i])
-    c=c.downcase
+    return false unless (c=(@s[@i])?(@s[@i].downcase):(nil))
     return c unless x
-    return (x.match(c))?(c):(false) if x.is_a?(Regexp)
-    x.downcase!
-    (Regexp.new(Regexp.quote(x)).match(c))?(c):(false)
+    r=(x.is_a?(String))?(Regexp.new(Regexp.quote(x))):(x)
+    (r.match(c))?(c):(nil)
   end
 
   def skip_comment
@@ -190,19 +188,19 @@ class Dehollerizer
     if match "call"
       skip_variable
       remove_continuation
-      check_hollerith_parens if see '('
+      check_hollerith_parens if see "("
     end
   end
 
   def try_data
-    if match "data" and skip_variable and see '/'
+    if match "data" and skip_variable and see "/"
       fwd
       check_hollerith_slashes
     end
   end
 
   def try_format
-    check_hollerith_parens if match "format" and see '('
+    check_hollerith_parens if match "format" and see "("
   end
 
 end
