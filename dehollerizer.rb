@@ -71,9 +71,14 @@ class Dehollerizer
     end
   end
 
-  def match(keyword)
+  def match(s)
+    (0..s.size-1).each { |i| return false unless @s[@i+i]==s[i] }
+    true
+  end
+
+  def keyword(s)
     origin=@i
-    keyword.each_char do |c|
+    s.each_char do |c|
       remove_continuation
       unless see c
         @i=origin
@@ -117,7 +122,7 @@ class Dehollerizer
   def remove_continuation
     skip_whitespace
     if @conf.fixed
-      if @s[@i..@i+6]=~/\n     a/ # There may be a better way using the see() method
+      if match "\n     a"
         @s.slice!(@i..@i+6)
       end
     else
@@ -185,7 +190,7 @@ class Dehollerizer
   end
 
   def try_call
-    if match "call"
+    if keyword "call"
       skip_variable
       remove_continuation
       check_hollerith_parens if see "("
@@ -193,14 +198,14 @@ class Dehollerizer
   end
 
   def try_data
-    if match "data" and skip_variable and see "/"
+    if keyword "data" and skip_variable and see "/"
       fwd
       check_hollerith_slashes
     end
   end
 
   def try_format
-    check_hollerith_parens if match "format" and see "("
+    check_hollerith_parens if keyword "format" and see "("
   end
 
 end
