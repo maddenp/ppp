@@ -1,4 +1,5 @@
       program t
+C test for bn and bz in format-item-list
       integer::a,b
  1234 format (bz,i5,bn,i5)
       open(95, file='infile',status='old')

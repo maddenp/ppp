@@ -1,4 +1,5 @@
 program t
+! test for continued holleriths in call, data, and format statements
   character(len=6)::a_b(3)
   character(len=3)::c
   data a_b/'Hello ', 5 HW&

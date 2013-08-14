@@ -1,4 +1,5 @@
       program t
+c test for nested do loops
       integer::i,j,k,l
       do 77 i=1,2
       do 88 j=1,2

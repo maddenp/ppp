@@ -1,4 +1,5 @@
       p r o g r a m  t
+c test for continued holleriths in call, data, and do statements 
       c h a r a c t e r 
      *(l e n = 6 ) a _ b ( 3 )
       c h a r a c t e r * 6 2
