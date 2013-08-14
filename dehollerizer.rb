@@ -40,6 +40,20 @@ class Dehollerizer
     @i+=1
   end
 
+  def keyword(s)
+    origin=@i
+    s.each_char do |c|
+      remove_continuation
+      unless see c
+        @i=origin
+        return false
+      end
+      fwd
+    end
+    remove_continuation
+    true
+  end
+
   def mask_hollerith
     digits=[]
     origin=@i
@@ -72,21 +86,7 @@ class Dehollerizer
   end
 
   def match(s)
-    (0..s.size-1).each { |i| return false unless @s[@i+i]==s[i] }
-    true
-  end
-
-  def keyword(s)
-    origin=@i
-    s.each_char do |c|
-      remove_continuation
-      unless see c
-        @i=origin
-        return false
-      end
-      fwd
-    end
-    remove_continuation
+    (0..s.size-1).each { |i| return nil unless @s[@i+i].nil? or @s[@i+i].downcase==s[i] }
     true
   end
 
@@ -157,8 +157,7 @@ class Dehollerizer
   def see(x=nil)
     return false unless (c=(@s[@i])?(@s[@i].downcase):(nil))
     return c unless x
-    r=(x.is_a?(String))?(Regexp.new(Regexp.quote(x))):(x)
-    (r.match(c))?(c):(nil)
+    ((x.is_a?(String))?(match(x)):(x.match(c)))?(c):(nil)
   end
 
   def skip_comment
