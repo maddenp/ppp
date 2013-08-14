@@ -535,7 +535,7 @@ class Translator
 
   def usage
     x=[]
-    x.push("-I dir[:dir:...]]")
+    x.push("-I dir[:dir:...]")
     x.push("debug")
     x.push("fixed")
     x.push("modinfo")
