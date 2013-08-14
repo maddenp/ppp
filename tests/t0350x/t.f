@@ -1,10 +1,12 @@
       p r o g r a m  t
+c test for continued holleriths in call, data, and do statements 
       c h a r a c t e r 
      *(l e n = 6 ) a _ b ( 3 )
       c h a r a c t e r * 6 2
 c Comment
 
      ': : x
+      c h a r a c t e r * 5 : : l , m , n , o , p , q
       d a
 
 *Comment
@@ -12,6 +14,19 @@ c Comment
      ct a x /62HAbCdEfGhIjKlMnOpQrStUvWxYz1234567890aBcDeFgHiJkLmNoPqRsT
 
      auVwXyZ/
+
+      character *60::a
+      data a/60H!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ccomment
+     !!!!!/
+      print *,a
+
+
+
+      d a t a l , m , n , o /5hHeLlo,5hwORLD,5hFrOm ,5hMaTT /,  p 
+     !/5hwHy!?/ , q / 5hnO!!!/
+
+      p r i n t * , l , m , o , p , q
 
       p r i n t *,x
       d a t a a _ 
