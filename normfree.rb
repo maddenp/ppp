@@ -1,12 +1,5 @@
 module Normfree
 
-  class Comment < Treetop::Runtime::SyntaxNode
-    def to_s
-      s="\n"
-      s
-    end
-  end
-
   class Quoted < Treetop::Runtime::SyntaxNode
     def to_s
       s=text_value
