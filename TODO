@@ -36,8 +36,6 @@
   run-time determination of MPI type to use. Get rid of related kind() methods
   in fortran.rb. IS THIS A GOOD IDEA?
 
-- Check for and clean up any unused rules (especially sms_* rules)
-
 - It might be better to prefix all in-class method calls with 'self.' for
   clarity.
 

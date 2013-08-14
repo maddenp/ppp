@@ -1,4 +1,5 @@
       program t
+! tests for complicated labeled if-statements
       implicit none
       integer::i=0
       
