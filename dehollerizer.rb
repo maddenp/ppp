@@ -85,11 +85,6 @@ class Dehollerizer
     end
   end
 
-  def match(s)
-    (0..s.size-1).each { |i| return nil unless @s[@i+i].nil? or @s[@i+i].downcase==s[i] }
-    true
-  end
-
   def process(stringmap,source,conf)
     @conf=conf
     @i=0
@@ -121,10 +116,8 @@ class Dehollerizer
 
   def remove_continuation
     skip_whitespace
-    if @conf.fixed
-      if match "\n     a"
-        @s.slice!(@i..@i+6)
-      end
+    if @conf.fixed and see "\n     a"
+      @s.slice!(@i..@i+6)
     else
       while see "&"
         origin=@i
@@ -157,7 +150,8 @@ class Dehollerizer
   def see(x=nil)
     return false unless (c=(@s[@i])?(@s[@i].downcase):(nil))
     return c unless x
-    ((x.is_a?(String))?(match(x)):(x.match(c)))?(c):(nil)
+    return (x.match(c))?(c):(nil) if x.is_a?(Regexp)
+    ((0..x.size-1).reduce(1) { |m,i| m && @s[@i+i] && @s[@i+i].downcase==x[i] })?(c):(nil)
   end
 
   def skip_comment
