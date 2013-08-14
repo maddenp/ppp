@@ -177,13 +177,16 @@ class Dehollerizer
       remove_continuation
     end
     return false unless see /[A-za-z]/
-    advance
-    advance while see /[A-Za-z0-9_]/
+    begin
+      advance
+      advance while see /[A-Za-z0-9_]/
+    end while see ","
     true
   end
 
   def skip_whitespace
     fwd while see /[ \t]/
+    true
   end
 
   def try_call
@@ -198,6 +201,15 @@ class Dehollerizer
     if match "data" and skip_variable and see '/'
       fwd
       check_hollerith_slashes
+      while see "/" and fwd and skip_whitespace and see ","
+        fwd
+        skip_whitespace
+        skip_variable
+        if see '/'
+          fwd
+          check_hollerith_slashes
+        end
+      end
     end
   end
 
