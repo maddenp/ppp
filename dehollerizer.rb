@@ -25,6 +25,7 @@ class Dehollerizer
       end
       fwd
     end until see "/"
+    true
   end
 
   def debug(x=nil)
@@ -109,9 +110,8 @@ class Dehollerizer
   end
 
   def remove_comment
-    if see "!"
-      remove_char until see "\n"
-    end
+    return unless see "!"
+    remove_char until see "\n"
   end
 
   def remove_continuation
@@ -194,17 +194,10 @@ class Dehollerizer
   end
 
   def try_data
-    if keyword "data" and skip_variable and see "/"
-      fwd
-      check_hollerith_slashes
-      while see "/" and fwd and skip_whitespace and see ","
-        fwd
-        skip_whitespace
-        skip_variable
-        if see '/'
-          fwd
-          check_hollerith_slashes
-        end
+    return unless keyword "data"
+    while skip_variable and see "/" and fwd and check_hollerith_slashes
+      ["/",","].each do |x|
+        return unless see x and fwd and remove_continuation and skip_whitespace
       end
     end
   end
