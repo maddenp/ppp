@@ -199,9 +199,6 @@
 
 - In sms_fortran.rb SMS_Serial#translate, factor varenv["dim#{r}"] & similar.
 
-- Trim rolled-out variable names to 31 characters (F90 section 3.2.2) Or use
-  some numeric scheme in too-long cases, to avoid collisions.
-
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
   label, but also labels further down in the stack? That would also be an error,
   right?
