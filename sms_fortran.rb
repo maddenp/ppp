@@ -1057,7 +1057,7 @@ module Fortran
 ##     oldblock=t.e[0].e[1].e[1]
 ## HACK start
 #     t=replace_statement(code,:sms_ignore_executable,oldblock)
-#     oldblock=t.e[1].e[0].e[1].e[1]
+##     oldblock=t.e[1].e[0].e[1].e[1]
 ## HACK end
 #     newblock=e[0]
 #     # Insert statements for the necessary gathers, scatters and broadcasts.
