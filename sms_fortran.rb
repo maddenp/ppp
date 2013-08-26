@@ -339,7 +339,13 @@ module Fortran
   class Name < T
 
     def self.global(name)
-      "ppp__g_#{name}"
+      n = name.to_s
+      return "ppp__g_#{n}" if n.size <= 24
+      @@g={} unless defined?(@@g)
+      return @@g[n] if @@g[n]
+      @@index=0 unless defined?(@@index)
+      prefix = "ppp__g_#{@@index+=1}_"
+      @@g[n]= prefix + n[0..29-prefix.size]
     end
 
     def globalize

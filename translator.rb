@@ -5,6 +5,7 @@ require "pathname"
 require "socket"
 require "thread"
 
+require "dehollerizer"
 require "fortran"
 require "fortran_parser"
 require "sms_fortran"
@@ -25,7 +26,7 @@ class Translator
     attr_reader :re
 
     def initialize
-      @index=1
+      @index=0
       @map={}
       @re=Regexp.new("(#[0-9]+#)")
     end
@@ -75,6 +76,10 @@ class Translator
       super(input,options)
     end
 
+      def to_s
+        @input.to_s
+      end
+
   end
 
   class XNormalizerParser < NormalizerParser
@@ -93,6 +98,10 @@ class Translator
         @input.send(method,*args)
       end
 
+      def to_s
+        @input.to_s
+      end
+
     end
 
     def parse(input,op,stringmap)
@@ -107,51 +116,20 @@ class Translator
     die "Socket file #{socket} in use, please free it" if File.exist?(socket)
   end
 
+  def chkparse(s)
+    die "NORMALIZING PARSE FAILED" if s.nil? or s=~/^\s*$/
+    s
+  end
+      
   def default_opts
     {
       :debug=>false,
       :incdirs=>[],
+      :modinfo=>false,
       :nl=>true,
       :normalize=>false,
       :translate=>true
     }
-  end
-
-  def dehollerith(s)
-    # Convert instances of Hollerith(-esque) constants to quoted strings. Do so
-    # by breaking each statement in which a Hollerith occurs into three pieces:
-    # The one leading up to the Hollerith, the one specifying the length of the
-    # represented string literal, and the one starting with the the string
-    # literal and running to the end of the line. The h/H marker itself is
-    # discarded. Note that the statement is expected to be on a single line at
-    # this point.
-    def replace(s,re)
-      r=Regexp.new(re,true) # true => case-insensitivity
-      while m=r.match(s)
-        first=m[1]
-        strlen=m[2].to_i-1
-        string=m[3][0..strlen]
-        # Pass a string to sub() instead of a regexp so that regexp characters
-        # like * and $ can be replaced without special meaning being attributed
-        # to them.
-        rest=m[3].sub(string,"")
-        s=s.sub(m[0],"#{first}'#{string}'#{rest}")
-      end
-      s
-    end
-    # Common elements in Hollerith-matching regexps
-    lm = "^( *[0-9]{1,5} *"    # label (mandatory)
-    lo = "^( *[0-9]{0,5} *"    # label (optional)
-    n  = ")([0-9]+) *"         # number
-    o  = ".*?"                 # other
-    r  = "(.*)"                # rest (including string literal)
-    v  = " *[a-z][a-z0-9_]* *" # variable name
-    # Create and iterate over a list of Hollerith-matching regexps.
-    res=[]
-    res.push(lm+"format *\\("+o+n+"h"+r) # F90:R1016 char-string-edit-desc
-    res.push(lo+"data"+v+"/"+o+n+"h"+r)  # Hollerith in data-stmt
-    res.each { |re| s=replace(s,re) }
-    s
   end
 
   def directive
@@ -170,7 +148,7 @@ class Translator
     exit(1) if die
   end
 
-  def fpn(s,parser,op=nil,stringmap=nil)
+  def fix_pt_norm(s,parser,op=nil,stringmap=nil)
     # fixed-point normalization
     s0=nil
     while s=parser.parse(s,op,stringmap).to_s and not s.nil?
@@ -190,26 +168,29 @@ class Translator
     puts out(s,:program_units,srcfile,conf)
   end
 
-  def normalize(s,newline)
+  def normalize(s,conf)
     np=XNormalizerParser.new
     np.update(Normfree)
-    m=Stringmap.new
+    unless conf.fixed
+      @m=Stringmap.new
+      d=Dehollerizer.new
+      s=d.process(@m,s,conf)            # mask holleriths (only if not already done in fixed2free)
+    end
     s=s.gsub(directive,'@\1')           # hide directives
     s=s.gsub(/\t/," ")                  # tabs to spaces
     s=s.gsub(/^ +/,"")                  # remove leading whitespace
     s=s.gsub(/ +$/,"")                  # remove trailing whitespace
     s=s.gsub(/^ *!.*$\n/,"")            # remove full-line comments
-    s=fpn(s,np,1,m)                     # string-aware transform
+    s=s.gsub(/^[ \t]*\n/,'')            # remove blank lines (continuation statement issue fix)
+    s=chkparse(fix_pt_norm(s,np,1,@m))  # string-aware transform
     s=s.gsub(/& *\n *&?/,"")            # join continuation lines
-    s=np.parse(s,2,m).to_s              # mask original strings
-    s=dehollerith(s)                    # replace holleriths
-    s=np.parse(s,2,m).to_s              # mask dehollerith'ed strings
+    s=chkparse(np.parse(s,2,@m).to_s)   # mask original strings
     s=s.downcase                        # lower-case text only
     s=s.gsub(/ +/,"")                   # remove spaces
-    s=restore_strings(s,m)              # restore strings
+    s=restore_strings(s,@m)             # restore strings
     s=s.sub(/^\n+/,"")                  # remove leading newlines
-    s=s+"\n" if s[-1]!="\n" and newline # append final newline if required
-    s=s.chomp unless newline            # remove final newline if forbidden
+    s=s+"\n" if s[-1]!="\n" and conf.nl # append final newline if required
+    s=s.chomp unless conf.nl            # remove final newline if forbidden
     s=s.gsub(/^@(.*)/i,'!\1')           # show directives
     s=s.gsub(/^ *\n/,"")                # remove blank lines
     s
@@ -218,7 +199,10 @@ class Translator
   def out(s,root,srcfile,conf)
     conf=ostruct_default_merge(conf)
     translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
-    translated_source
+    unless conf.normalize
+      t=vertspace(translated_source)
+    end
+    t
   end
 
   def process(s,root,srcfile,conf)
@@ -294,7 +278,8 @@ class Translator
       s
     end
 
-    def fixed2free(s)
+    def fixed2free(s,conf)
+      # Normalizer from fixed form to free form
       np=XNormalizerParser.new
       np.update(Normfixed)
       s=detabify(s)
@@ -304,9 +289,15 @@ class Translator
       s=a.join("\n")                           # join array into string
       s=s.gsub(/^(c|C|\*)/,"!")                # replace fixed form comment indicators with "!"
       s=s.gsub(directive,'@\1')                # hide directives
+      if s=~/\n[ \t]{5}\#/                     # gives user more information about problem
+        $stderr.puts "ERROR:'#' in column six is a cpp directive, not\na valid fixed-form continuation character\n\n"
+      end                                      # will always end in die() from cpp-check
       s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # replace any continuation character with generic "a"
       s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
-      s=fpn(s,np)                              # string-aware transform
+      @m=Stringmap.new                        
+      d=Dehollerizer.new
+      s=d.process(@m,s,conf)                   # mask holleriths (also removes hollerith-important continuations)
+      s=chkparse(fix_pt_norm(s,np))            # string-aware transform & parse error checking
       s=s.gsub(/\n[ \t]{5}a/,"")               # join continuation lines
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
       s
@@ -322,51 +313,65 @@ class Translator
         s=~directive
       end
 
-      max=132
+      maxcols=132 # columns
+      maxcont=39  # continuation lines
       a=s.split("\n")
       (0..a.length-1).each do |n|
+        cont=0
         e=a[n].chomp
         unless directive?(e)
-          if e.length>max
+          if e.length>maxcols
             e=~/^( *).*$/
             i=$1.length+2
             t=""
             begin
-              r=[max-2,e.length-1].min
+              r=[maxcols-2,e.length-1].min
               t+=e[0..r]+"&\n"
               e=" "*i+"&"+e[r+1..-1]
-            end while e.length>max
+              cont+=1
+            end while e.length>maxcols
             t+=e
+            if cont>maxcont
+              die "ERROR: More than #{maxcont} continuation lines:\n\n#{t}"
+            end
             a[n]=t
           end
         end
       end
-      a.join("\n")
+      s=a.join("\n")
+      s
     end
 
+    def vertspace(t)
+      t=t.gsub(/\n\n\n+/,"\n\n") # Collapse multiple blank lines into one
+      t[0]=t[0].sub(/^\n/,"")    # Remove blank first line
+      t
+    end
+    
     conf=ostruct_default_merge(conf)
     fp=XFortranParser.new(srcfile,conf.incdirs)
     s0=nil
-    while s!=s0 and not s.nil?
-      s0=s
-      s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and conf.fixed
-      s=prepsrc_free(s) if defined?(prepsrc_free)
-      s=assemble(s,[srcfile],conf.incdirs)
+    while s!=s0 and not s.nil?                                     # Fixed point treatment of prepsrc() and assemble()
+      s0=s                                                         # for cases in which files added by 'include'
+      s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and conf.fixed # statements or '!sms$insert include' statements
+      s=prepsrc_free(s) if defined?(prepsrc_free)                  # also contain such a statement; this follows the path
+      s=assemble(s,[srcfile],conf.incdirs)                         # until all souce has been appropriately inserted
     end
-    cppcheck(s)
     if conf.debug
-      puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}\n"
+      puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}"
     end
     if conf.fixed
-      puts "FREE-FORM TRANSLATION\n\n" if conf.debug
-      s=fixed2free(s)
+      puts "\nFREE-FORM TRANSLATION\n\n" if conf.debug
+      s=fixed2free(s,conf)
       puts "#{s}\n\n" if conf.debug
     end
+    cppcheck(s) # When a continuation warning in fixed2free is shown, cppcheck will exit in die()
     puts "NORMALIZED FORM\n" if conf.debug
-    n=normalize(s,conf.nl)
+    n=normalize(s,conf)
     puts "\n#{n}" if conf.debug or conf.normalize
     unless conf.normalize
       raw_tree=fp.parse(n,{:root=>root})
+      exit if conf.modinfo
       raw_tree.instance_variable_set(:@srcfile,srcfile)
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
       if conf.debug
@@ -516,8 +521,13 @@ class Translator
         conf.debug=true
       when "normalize"
         conf.normalize=true
+      when "modinfo"
+        conf.modinfo=true
       else
         die usage
+      end
+      if conf.modinfo and conf.normalize
+        die ("ERROR: 'normalize' and 'modinfo' are mutually exclusive\n"+usage)
       end
     end
     conf
@@ -525,9 +535,10 @@ class Translator
 
   def usage
     x=[]
-    x.push("-I dir[:dir:...]]")
+    x.push("-I dir[:dir:...]")
     x.push("debug")
     x.push("fixed")
+    x.push("modinfo")
     x.push("normalize")
     "#{File.basename(@wrapper)} [ #{x.join(" | ")} ] source"
   end

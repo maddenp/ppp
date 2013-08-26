@@ -1,4 +1,5 @@
       program t
+c test for i, f, t, tl, tr, and l in format-item-list
       integer::a=1234
       real::b=3.141592654
       logical::c=.true.

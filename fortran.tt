@@ -100,12 +100,13 @@ grammar Fortran
   rule action_term_do_construct
     # F90:R827
 
-    label_do_stmt !{ |e| dolabel_repeat? } do_body do_term_action_stmt <E>
+    label_do_stmt !{ |e| sp_dolabel_repeat? } do_body do_term_action_stmt <E>
   end
 
   rule actual_arg
     # F90:R1213
 
+    hollerith /
     expr /
     variable /
     procedure_name /
@@ -255,16 +256,16 @@ grammar Fortran
     t_comma array_name_and_deferred_shape_spec_list <Array_Name_And_Deferred_Shape_Spec_List_Pair>
   end
 
-  rule array_names_and_deferred_shape_spec_lists
-    array_name_and_deferred_shape_spec_list array_name_and_deferred_shape_spec_list_pair* <Array_Names_And_Deferred_Shape_Spec_Lists>
-  end
-
   rule array_name_and_spec
     array_name t_paren_l array_spec t_paren_r <Array_Name_And_Spec>
   end
 
   rule array_name_and_spec_pair
     t_comma array_name_and_spec <Array_Name_And_Spec_Pair>
+  end
+
+  rule array_names_and_deferred_shape_spec_lists
+    array_name_and_deferred_shape_spec_list array_name_and_deferred_shape_spec_list_pair* <Array_Names_And_Deferred_Shape_Spec_Lists>
   end
 
   rule array_names_and_specs
@@ -426,7 +427,7 @@ grammar Fortran
     # a repeat, as that would require more than one end-do-stmt with the same
     # label, which is not permitted.
 
-    do_stmt !{ |e| dolabel_repeat? } do_block end_do <E>
+    do_stmt !{ |e| sp_dolabel_repeat? } do_block end_do <E>
   end
 
   rule boz_literal_constant
@@ -561,7 +562,7 @@ grammar Fortran
   rule char_string_edit_desc
     # F90:R1016
 
-    int_literal_constant "h" rep_char+ <T> /
+    hollerith /
     char_literal_constant
   end
 
@@ -848,6 +849,7 @@ grammar Fortran
   rule data_stmt_constant
     # F90:R533
 
+    hollerith /
     signed_real_literal_constant /
     signed_int_literal_constant /
     boz_literal_constant /
@@ -1029,7 +1031,7 @@ grammar Fortran
   rule do_body
     # F90:R828
 
-    execution_part_construct
+    execution_part_construct "" <Do_Body>
   end
 
   rule do_construct
@@ -1038,8 +1040,8 @@ grammar Fortran
     # Note: When either option is matched, the appropriate label-popping method
     # should be called. See those methods for more information.
 
-    nonblock_do_construct &{ |e| dolabel_pop_nonblock } <E> /
-    block_do_construct &{ |e| dolabel_pop_block } <E>
+    nonblock_do_construct &{ |e| sp_dolabel_pop } <Nonblock_Do_Construct> /
+    block_do_construct &{ |e| sp_dolabel_pop } <Block_Do_Construct>
   end
 
   rule do_construct_name
@@ -1062,7 +1064,7 @@ grammar Fortran
   rule do_term_action_stmt
     # F90:R829
 
-    !do_term_action_stmt_disallowed action_stmt &{ |e| nonblock_do_end?(e[1]) } <Do_Term_Action_Stmt>
+    !do_term_action_stmt_disallowed action_stmt &{ |e| sp_nonblock_do_end?(e[1]) } <Do_Term_Action_Stmt>
   end
 
   rule do_term_action_stmt_disallowed
@@ -1082,7 +1084,7 @@ grammar Fortran
   rule do_term_shared_stmt
     # F90:R833
 
-    !do_term_shared_stmt_disallowed action_stmt &{ |e| nonblock_do_end?(e[1]) } <Do_Term_Shared_Stmt>
+    !do_term_shared_stmt_disallowed action_stmt &{ |e| sp_nonblock_do_end?(e[1]) } <Do_Term_Shared_Stmt>
   end
 
   rule do_term_shared_stmt_disallowed
@@ -1147,8 +1149,21 @@ grammar Fortran
 
   rule else_if_stmt
     # F90:R804
+    #
+    # Note: The negagive lookahead assertion here enables parsing code like:
+    #
+    #   if_label: if (.false.) then
+    #     print *,1
+    #   else if_label
+    #     print *,2
+    #   end if if_label
+    #
+    # After normalization, line 3 reads "elseif_label". Without the negative
+    # lookahead assertion, and due to the packrat nature of PEG parsers, the
+    # characters 'elseif' are irrevocably recognized using rule t_elseif, and
+    # a parse failure follows, as '_label' is then unexpected.
 
-    label:label? t_elseif t_paren_l scalar_logical_expr t_paren_r t_then t_newline <Else_If_Stmt>
+    label:label? !( t_else if_construct_name !t_paren_l ) t_elseif t_paren_l scalar_logical_expr t_paren_r t_then if_construct_name? t_newline <Else_If_Stmt>
   end
 
   rule else_stmt
@@ -1213,7 +1228,7 @@ grammar Fortran
   rule end_interface_stmt
     # F90:R1203 + F95:R1204
 
-    label:label? t_end t_interface generic_spec_option? t_newline <End_Interface_Stmt>
+    label:label? t_end t_interface generic_spec? t_newline <End_Interface_Stmt>
   end
 
   rule end_module_option
@@ -1374,7 +1389,7 @@ grammar Fortran
   end
 
   rule executable_construct_action_stmt
-    !execution_part_disallowed action_stmt !{ |e| nonblock_do_end?(e[1]) } <StmtJ>
+    !execution_part_disallowed action_stmt !{ |e| sp_nonblock_do_end?(e[1]) } <StmtJ>
   end
 
   rule execution_part
@@ -1392,7 +1407,14 @@ grammar Fortran
   rule execution_part_construct
     # F90:R209
 
-    ( executable_construct / format_stmt / data_stmt / entry_stmt )* <E>
+    execution_part_construct_item* <E>
+  end
+
+  rule execution_part_construct_item
+    executable_construct /
+    format_stmt /
+    data_stmt /
+    entry_stmt
   end
 
   rule exit_stmt
@@ -1577,7 +1599,7 @@ grammar Fortran
   rule hex_constant
     # F90:R410
     #
-    # Note: x is non-conformant!
+    # Note: x is NON-CONFORMANT
 
     ( "z" / "x" ) ( ( t_apostrophe hex_digit+ t_apostrophe ) / ( t_quotemark hex_digit+ t_quotemark ) ) <T>
   end
@@ -1588,13 +1610,21 @@ grammar Fortran
     [0123456789aAbBcCdDeEfF]
   end
 
+  rule hollerith
+    digit_string "h" &{ |e| sp_hollerith_set_length(e[0]) } hollerith_string <T>
+  end
+
+  rule hollerith_string
+    &{ |e| sp_hollerith_reset_count } ( rep_char &{ |e| sp_hollerith_check_count } )+ <T>
+  end
+
   rule if_construct
     # F90:R802
     #
     # Note: if_then_construct, else_if_construct and else_construct added for
     # clarity, not specified in standard.
 
-    label:label? if_then_construct else_if_construct? else_construct? end_if_stmt <E>
+    if_then_construct else_if_construct? else_construct? end_if_stmt <E>
   end
 
   rule if_construct_name
@@ -1689,7 +1719,7 @@ grammar Fortran
     # that of the enclosing outer_shared_do_construct, which has already been
     # pushed onto the stack.
 
-    label_do_stmt &{ |e| dolabel_repeat? } do_body do_term_shared_stmt <Inner_Shared_Do_Construct>
+    label_do_stmt &{ |e| sp_dolabel_repeat? } do_body do_term_shared_stmt <Inner_Shared_Do_Construct>
   end
 
   rule input_item
@@ -1952,7 +1982,7 @@ grammar Fortran
   rule label_do_stmt
     # F90:R819
 
-    label:label? do_construct_name_label? t_do label loop_control? t_newline &{ |e| dolabel_push(e[3]) } <Label_Do_Stmt>
+    label:label? do_construct_name_label? t_do label loop_control? t_newline &{ |e| sp_dolabel_push(e[3]) } <Label_Do_Stmt>
   end
 
   rule label_list
@@ -2236,14 +2266,14 @@ grammar Fortran
   rule nonblock_do_construct
     # F90:R826
 
-    outer_shared_do_construct /
+    outer_shared_do_construct !{ |e| sp_dolabel_repeat? } <E> /
     action_term_do_construct
   end
 
   rule nonlabel_do_stmt
     # F90:R820
 
-    label:label? do_construct_name_label? t_do loop_control? t_newline &{ |e| dolabel_push(:nolabel) } <Nonlabel_Do_Stmt>
+    label:label? do_construct_name_label? t_do loop_control? t_newline &{ |e| sp_dolabel_push(:nolabel) } <Nonlabel_Do_Stmt>
   end
 
   rule not_op
@@ -2336,7 +2366,7 @@ grammar Fortran
     # (e.g. the second level in a triply-nested loop), or may not (e.g. in the
     # outermost o_s_d_c in a triply-nested loop).
 
-    label_do_stmt do_body shared_term_do_construct <E>
+    label_do_stmt do_body shared_term_do_construct <Outer_Shared_Do_Construct>
   end
 
   rule output_item
@@ -2845,8 +2875,8 @@ grammar Fortran
   rule shared_term_do_construct
     # F90:R831
 
-    inner_shared_do_construct /
-    outer_shared_do_construct
+    inner_shared_do_construct &{ |e| sp_dolabel_pop } <E> /
+    outer_shared_do_construct &{ |e| sp_dolabel_pop } <E> 
   end
 
   rule sign
@@ -3178,7 +3208,7 @@ grammar Fortran
   end
 
   rule t_else
-    "else" !( "if" / "where" ) <T>
+    "else" <T>
   end
 
   rule t_elseif
@@ -3690,14 +3720,15 @@ grammar Fortran
   end
 
   rule type_spec_without_kind_selector
-    t_integer star_int <Type_Spec> / # NONSTANDARD!
+    t_integer star_int <Type_Spec> / # NON-CONFORMANT!
     t_integer "" <Type_Spec> /
-    t_real star_int <Type_Spec> / # NONSTANDARD!
+    t_real star_int <Type_Spec> / # NON-CONFORMANT!
     t_real "" <Type_Spec> /
     t_doubleprecision "" <Type_Spec> /
+    t_complex star_int <Type_Spec> /
     t_complex "" <Type_Spec> /
     t_character char_selector? <Type_Spec> /
-    t_logical star_int <Type_Spec> / # NONSTANDARD!
+    t_logical star_int <Type_Spec> / # NON-CONFORMANT!
     t_logical "" <Type_Spec> /
     t_type t_paren_l type_name t_paren_r <Type_Spec>
   end

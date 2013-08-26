@@ -1,4 +1,5 @@
       program t
+C test interface operator in user-derived type
       use m
       implicit none
       interface operator (+)

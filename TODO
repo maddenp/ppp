@@ -1,5 +1,4 @@
-- IN PROGRESS (MH) Work on testing ppp with FIM source code to find any potential
-  errors
+- (MH) Resolve remaining FIM errors in 'problems' files
 
 - directives still to do
 
@@ -36,8 +35,6 @@
   latter, use mpi_sizeof() + mpi_type_match_size() in the library to make a
   run-time determination of MPI type to use. Get rid of related kind() methods
   in fortran.rb. IS THIS A GOOD IDEA?
-
-- Check for and clean up any unused rules (especially sms_* rules)
 
 - It might be better to prefix all in-class method calls with 'self.' for
   clarity.
@@ -176,7 +173,7 @@
 
 - Refactor SMS_Serial#translate!
 
-- replace_element may also be unsounds, as it removes nodes from the tree.
+- replace_element may also be unsound, as it removes nodes from the tree.
   Instead, maybe walk up the tree and update text_value components?
 
 - In sms_fortran.rb, 'names_in_region' should be 'vars_in_region' and should
@@ -202,9 +199,6 @@
 
 - In sms_fortran.rb SMS_Serial#translate, factor varenv["dim#{r}"] & similar.
 
-- Trim rolled-out variable names to 31 characters (F90 section 3.2.2) Or use
-  some numeric scheme in too-long cases, to avoid collisions.
-
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
   label, but also labels further down in the stack? That would also be an error,
   right?
@@ -213,23 +207,5 @@
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
 
-- (MH) Add no-translate option to ppp so that .env files are generated w/o
-  changing the source at all. JUST REDIRECT OUTPUT TO /dev/null OR SIMILAR? No,
-  skip the translation phase because it is time-consuming. Call option 'modinfo'
-  for now.
-
-- (MH) Consider limitation on number of continuation lines. At least exit with
-  error if this is happening.
-
-- (MH) In normalizer.tt, should Quoted have higher precendence? Otherwise, what
-  about '@' inside a quoted string?
-
-- (MH) Normalizing parses can fail, too. Handle it.
-
-- (MH) Any error output from parsing must go to stderr, not stdout, so that
-  output file containing error info instead of code isn't created. Otherwise,
-  make may fail to properly build, since a lately-timestamped output file will
-  exist. (Already done for PARSE FAILED.)
-
-- (MH) Better vertical whitespace in output (e.g. before & after functions and
-  sub-routines -- maybe all blocks?)
+- Use cpp for sms extensions (esp. in grammars), rather than including files
+  on top of one another?

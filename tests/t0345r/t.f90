@@ -1,4 +1,5 @@
 program t
+! test for holleriths in data-stmt
   integer::c(6)
   character*6::d(6)
   DATA c/1h1,6HhElLo ,1HW,4horld,2h !,1h /

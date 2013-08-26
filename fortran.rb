@@ -14,48 +14,6 @@ module Fortran
     Marshal.load(Marshal.dump(o))
   end
 
-  def dolabel_pop_block
-    # F90:R817 block-do-construct's do-stmt always pushes a label: either the
-    # actual label (when do-stmt is a label-do-stmt), or the symbol :nolabel
-    # (when do-stmt is a nonlabel-do-stmt). Since each block-do-construct has
-    # a single matching end-do, simply pop one label from the label stack.
-    @dolabels.pop
-    true
-  end
-    
-  def dolabel_pop_nonblock
-    # F90:R826 nonblock-do-construct requires label-do-stmt components, each
-    # of whose labels will be pushed onto the label stack. But these labels
-    # may be repeated, to match a single do-term-shared-stmt. When terminating
-    # a nonblock-do-construct, account for this possibility by popping a series
-    # (potentially) of matching labels off the stack. This technique should
-    # work for F90:R827 action-term-do-construct as well as F90:R830
-    # outer-shared-do-construct, though only the latter may actually encounter
-    # multiple matching labels on the stack.
-    if (current=@dolabels.last)
-      @dolabels.pop while @dolabels.last==current
-    end
-    true    
-  end
-
-  def dolabel_push(label)
-    # A non-label-do-stmt pushes the symbol :nolabel onto the stack, which must
-    # not be converted to a string, to avoid matching a potential literal label
-    # 'nolabel'. If the passed-in label is not a symbol, push its string version
-    # onto the label stack.
-    @dolabels.push((label.is_a?(Symbol))?(label):("#{label}"))
-    true
-  end
-
-  def dolabel_repeat?
-    # Report whether the top two labels on the label stack match. Some grammar
-    # rules only match when this is not the case; others require it. But if the
-    # topmost label is the symbol :nolabel, never consider that a repeat, as
-    # nonlabel versions of block-do-construct may have arbitrarily deep nesting.
-    return false if @dolabels.last==:nolabel
-    "#{@dolabels[-1]}"=="#{@dolabels[-2]}"
-  end
-
   def env
     @envstack.last
   end
@@ -87,15 +45,6 @@ module Fortran
       end
     end
     {}
-  end
-
-  def nonblock_do_end?(node)
-    # F90:R826 requires that the label on the terminating action-stmt match that
-    # of the matching label-do-stmt. If this isn't the case, this node cannot be
-    # the end of a nonblock-do-construct.
-    return false unless node.respond_to?(:label)
-    return false if node.label.to_s.empty?
-    ("#{node.label}"==@dolabels.last)?(true):(false)
   end
 
   def sp_access_stmt(access_spec,access_stmt_option)
@@ -161,6 +110,35 @@ module Fortran
     true
   end
 
+  def sp_dolabel_pop
+    # F90:R817 block-do-construct's do-stmt always pushes a label: either the
+    # actual label (when do-stmt is a label-do-stmt), or the symbol :nolabel
+    # (when do-stmt is a nonlabel-do-stmt). F90:R826 nonblock-do-construct
+    # requires label-do-stmt components, each of whose labels will be pushed
+    # onto the label stack. But these labels may be repeated, to match a single
+    # do-term-shared-stmt.
+    @dolabels.pop
+    true
+  end
+    
+  def sp_dolabel_push(label)
+    # A non-label-do-stmt pushes the symbol :nolabel onto the stack, which must
+    # not be converted to a string, to avoid matching a potential literal label
+    # 'nolabel'. If the passed-in label is not a symbol, push its string version
+    # onto the label stack.
+    @dolabels.push((label.is_a?(Symbol))?(label):("#{label}"))
+    true
+  end
+
+  def sp_dolabel_repeat?
+    # Report whether the top two labels on the label stack match. Some grammar
+    # rules only match when this is not the case; others require it. But if the
+    # topmost label is the symbol :nolabel, never consider that a repeat, as
+    # nonlabel versions of block-do-construct may have arbitrarily deep nesting.
+    return false if @dolabels.last==:nolabel
+    "#{@dolabels[-1]}"=="#{@dolabels[-2]}"
+  end
+
   def sp_function_stmt(dummy_arg_name_list)
     envpush
     if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
@@ -173,6 +151,21 @@ module Fortran
 
   def sp_function_subprogram
     envpop
+    true
+  end
+
+  def sp_hollerith_check_count
+    @hollerith_count+=1
+    (@hollerith_count>@hollerith_size)?(false):(true)
+  end
+
+  def sp_hollerith_reset_count
+    @hollerith_count=0
+    true
+  end
+
+  def sp_hollerith_set_length(digit_string)
+    @hollerith_size=Integer(digit_string.to_s)
     true
   end
 
@@ -210,6 +203,15 @@ module Fortran
       env[name]["access"]||=@access
     end
     true
+  end
+
+  def sp_nonblock_do_end?(node)
+    # F90:R826 requires that the label on the terminating action-stmt match that
+    # of the matching label-do-stmt. If this isn't the case, this node cannot be
+    # the end of a nonblock-do-construct.
+    return false unless node.respond_to?(:label)
+    return false if node.label.to_s.empty?
+    ("#{node.label}"==@dolabels.last)?(true):(false)
   end
 
   def sp_module_stmt
@@ -769,6 +771,21 @@ module Fortran
   class Array_Name < E
   end
 
+  class Array_Name_And_Deferred_Shape_Spec_List < E
+
+    def array_spec
+      (e[1].respond_to?(:array_spec))?(e[1].array_spec):(nil)
+    end
+
+    def name
+      "#{e[0]}"
+    end
+
+  end
+
+  class Array_Name_And_Deferred_Shape_Spec_List_Pair < E
+  end
+
   class Array_Name_And_Spec < E
 
     def name
@@ -783,21 +800,6 @@ module Fortran
 
   class Array_Name_And_Spec_Pair < E
     def name() e[1].name end
-  end
-
-  class Array_Name_And_Deferred_Shape_Spec_List < E
-
-    def array_spec
-      (e[1].respond_to?(:array_spec))?(e[1].array_spec):(nil)
-    end
-
-    def name
-      "#{e[0]}"
-    end
-
-  end
-
-  class Array_Name_And_Deferred_Shape_Spec_List_Pair < E
   end
 
   class Array_Names_And_Deferred_Shape_Spec_Lists < T
@@ -976,6 +978,9 @@ module Fortran
     end
   end
 
+  class Block_Do_Construct < E
+  end
+
   class Call_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
   end
@@ -1037,7 +1042,7 @@ module Fortran
   class Contains_Stmt < T
     def to_s
       unindent
-      s=stmt(space)
+      s="\n#{stmt(space)}"
       indent
       s
     end
@@ -1136,6 +1141,9 @@ module Fortran
     def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
   end
 
+  class Do_Body < E
+  end
+
   class Do_Construct_Name < E
   end
 
@@ -1147,10 +1155,20 @@ module Fortran
   end
 
   class Do_Term_Shared_Stmt < T
+
+    def label
+      "#{e[1].e[0]}"
+    end
+
     def to_s
       unindent
+      n=self
+      while (n=n.ancestor(Outer_Shared_Do_Construct))
+        unindent if n.label==self.label
+      end
       cat
     end
+
   end
 
   class Double_Colon < T
@@ -1173,7 +1191,7 @@ module Fortran
   class Else_If_Stmt < T
     def to_s
       unindent
-      s=stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}")
+      s="\n"+stmt("#{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
       indent
       s
     end
@@ -1182,7 +1200,8 @@ module Fortran
   class Else_Stmt < T
     def to_s
       unindent
-      s=stmt(space)
+      s="\n#{stmt(space)}"
+      
       indent
       s
     end
@@ -1211,28 +1230,28 @@ module Fortran
   class End_Do_Stmt < T
     def to_s
       unindent
-      stmt(space)
+      "#{stmt(space)}"
     end
   end
 
   class End_Function_Stmt < T
     def to_s
       unindent
-      stmt(space)
+      stmt(space)+"\n"
     end
   end
 
   class End_If_Stmt < T
     def to_s
       unindent
-      stmt(space)
+      "#{stmt(space)}"
     end
   end
 
   class End_Interface_Stmt < T
     def to_s
       unindent
-      stmt("#{e[1]} #{e[2]}#{sb(e[3])}")
+      stmt("#{e[1]} #{e[2]}#{sb(e[3])}")+"\n"
     end
   end
 
@@ -1243,14 +1262,14 @@ module Fortran
   class End_Module_Stmt < T
     def to_s
       unindent
-      stmt(space)
+      "#{stmt(space)}\n"
     end
   end
 
   class End_Program_Stmt < T
     def to_s
       unindent
-      stmt("#{e[1]}#{sb(e[3])}#{sb(e[4])}")
+      "\n"+stmt("#{e[1]}#{sb(e[3])}#{sb(e[4])}")
     end
   end
 
@@ -1265,7 +1284,7 @@ module Fortran
   class End_Subroutine_Stmt < T
     def to_s
       unindent
-      stmt(space)
+      "\n#{stmt(space)}\n"
     end
   end
 
@@ -1428,7 +1447,7 @@ module Fortran
 
   class Function_Stmt < T
     def to_s
-      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")
+      s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")
       indent
       s
     end
@@ -1463,7 +1482,7 @@ module Fortran
   end
 
   class Implicit_None_Stmt < E
-    def to_s() stmt(space) end
+    def to_s() stmt(space)+"\n" end
   end
 
   class Implicit_Spec_List < T
@@ -1485,10 +1504,15 @@ module Fortran
   end
 
   class Inner_Shared_Do_Construct < T
+
+    def label
+      e[0].label
+    end
+
     def to_s
-      unindent
       cat
     end
+
   end
 
   class Input_Item_List < T
@@ -1514,7 +1538,7 @@ module Fortran
 
   class Interface_Stmt < T
     def to_s
-      s=stmt(space)
+      s="\n#{stmt(space)}"
       indent
       s
     end
@@ -1546,11 +1570,17 @@ module Fortran
   end
 
   class Label_Do_Stmt < T
+
+    def label
+      "#{e[3]}"
+    end
+
     def to_s
       s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
       indent
       s
     end
+
   end
 
   class Label_List < T
@@ -1609,7 +1639,7 @@ module Fortran
     end
 
     def to_s
-      s=stmt(space)
+      s="\n#{stmt(space)}"
       indent
       s
     end
@@ -1714,6 +1744,14 @@ module Fortran
 
   end
 
+  class Nonblock_Do_Construct < E
+
+    def label
+      e[0].label
+    end
+
+  end
+
   class Nonlabel_Do_Stmt < T
 
     def to_s
@@ -1748,6 +1786,10 @@ module Fortran
 
   class Optional_Stmt < T
     def to_s() stmt("#{e[1]}#{ik(e[2],"::"," ")}#{e[3]}") end
+  end
+
+  class Outer_Shared_Do_Construct < E
+    def label() e[0].label end
   end
 
   class Output_Item_List < T
@@ -1919,7 +1961,8 @@ module Fortran
     end
   end
 
-  class Specification_Part < E
+  class Specification_Part < T
+    def to_s() "\n#{cat}\n" end
   end
 
   class Star_Int < T
@@ -1938,7 +1981,7 @@ module Fortran
 
   class Subroutine_Stmt < T
     def to_s
-      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
+      s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
       indent
       s
     end
@@ -1997,7 +2040,8 @@ module Fortran
   class Use_Name < E
   end
 
-  class Use_Part < E
+  class Use_Part < T
+    def to_s() "\n#{cat}\n" end
   end
 
   class Use_Stmt < T

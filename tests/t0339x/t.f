@@ -1,4 +1,5 @@
       program t
+c test for : in format-item-list
       integer::a=12345
  1234 format (1x, i5/)
  5678 format (1x, i5,:/)
