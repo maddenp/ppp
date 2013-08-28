@@ -1036,10 +1036,7 @@ module Fortran
       # Note that 'begin' and 'end' nodes have already been removed, so the only
       # element remaining is the block.
       def globalize(node,to_globalize)
-        if node.e
-# CAN WE JUST USE EACH HERE INSTEAD OF EACH_INDEX?
-          node.e.each_index { |i| globalize(node.e[i],to_globalize) }
-        end
+        node.e.each { |x| globalize(x,to_globalize) } if node.e
         node.globalize if node.is_a?(Name) and to_globalize.include?("#{node}")
       end
       globalize(e[0],gathers+scatters)
