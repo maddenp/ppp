@@ -1058,10 +1058,8 @@ module Fortran
 # HACK end
       code=code.join("\n")
 #     t=replace_statement(code,:block,oldblock) # masked by following HACK
-#     oldblock=t.e[0].e[1].e[1]                 # masked by following HACK
 # HACK start
       t=replace_statement(code,:sms_ignore_executable,oldblock)
-      oldblock=t.e[1].e[0].e[1].e[1]
 # HACK end
       newblock=e[0]
       # Insert statements for the necessary gathers, scatters and broadcasts.
