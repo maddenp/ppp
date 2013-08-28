@@ -1040,10 +1040,7 @@ module Fortran
 # CAN WE JUST USE EACH HERE INSTEAD OF EACH_INDEX?
           node.e.each_index { |i| globalize(node.e[i],to_globalize) }
         end
-        if node.is_a?(Name) and to_globalize.include?("#{node}")
-#         puts "### globalizing #{node}"
-          node.globalize
-        end
+        node.globalize if node.is_a?(Name) and to_globalize.include?("#{node}")
       end
       globalize(e[0],gathers+scatters)
       # Wrap old block in conditional. Note that 'begin' and 'end' nodes have
@@ -1060,8 +1057,8 @@ module Fortran
       code.push("!sms$ignore end")
 # HACK end
       code=code.join("\n")
-#     t=replace_statement(code,:block,oldblock)
-#     oldblock=t.e[0].e[1].e[1]
+#     t=replace_statement(code,:block,oldblock) # masked by following HACK
+#     oldblock=t.e[0].e[1].e[1]                 # masked by following HACK
 # HACK start
       t=replace_statement(code,:sms_ignore_executable,oldblock)
       oldblock=t.e[1].e[0].e[1].e[1]
@@ -1102,11 +1099,10 @@ module Fortran
         args.push("#{var}")
         args.push(Name.global(var))
         args.push("ppp__status")
-#       code="call sms_gather(#{args.join(",")})"
-#       insert_statement_before(code,:call_stmt,newblock.e.first)
+#       code="call sms_gather(#{args.join(",")})"                 # masked by following HACK
+#       insert_statement_before(code,:call_stmt,newblock.e.first) # masked by following HACK
 # HACK start
         code="!sms$ignore begin\ncall sms_gather(#{args.join(",")})\n!sms$ignore end"
-#       code="!sms$ignore begin\ncall sms_gather(#{args.join(",")})\ncall nnt_chkstat('gather #{var} failed',' ',ppp__status,nnt_abort_on_error,ppp__status)\n!sms$ignore end"
         insert_statement_before(code,:sms_ignore_executable,newblock.e.first)
 # HACK end
       end
@@ -1138,7 +1134,7 @@ module Fortran
       code.push("!sms$ignore end")
 # HACK end
         code=code.join("\n")
-#       insert_statement_before(code,:if_construct,newblock.e.first)
+#       insert_statement_before(code,:if_construct,newblock.e.first) # masked by following HACK
 # HACK start
         insert_statement_before(code,:sms_ignore_executable,newblock.e.first)
 # HACK end
@@ -1179,11 +1175,10 @@ module Fortran
         args.push(Name.global(var))
         args.push("#{var}")
         args.push("ppp__status")
-#       code="call sms_scatter(#{args.join(",")})"
-#       insert_statement_after(code,:call_stmt,newblock.e.last)
+#       code="call sms_scatter(#{args.join(",")})"              # masked by following HACK
+#       insert_statement_after(code,:call_stmt,newblock.e.last) # masked by following HACK
 # HACK start
         code="!sms$ignore begin\ncall sms_scatter(#{args.join(",")})\n!sms$ignore end"
-#       code="!sms$ignore begin\ncall sms_scatter(#{args.join(",")})\ncall nnt_chkstat('scatter #{var} failed',' ',ppp__status,nnt_abort_on_error,ppp__status)\n!sms$ignore end"
         insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
 # HACK end
       end
@@ -1197,24 +1192,22 @@ module Fortran
           dims=varenv["dims"]
           sizes="(/"+ranks.map { |r| (r>dims)?(1):("size(#{var},#{r})") }.join(",")+"/)"
         end
-#       code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
-#       insert_statement_after(code,:call_stmt,newblock.e.last)
+#       code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)" # masked by following HACK
+#       insert_statement_after(code,:call_stmt,newblock.e.last)                                              # masked by following HACK
 # HACK start
         # NOTE: Need both cases when hack is undone...
         if varenv["type"]=="character"
           code="!sms$ignore begin\ncall ppp_bcast_char(#{var},#{dims},ppp__status)\n!sms$ignore end"
-#         code="!sms$ignore begin\ncall ppp_bcast_char(#{var},#{dims},ppp__status)\ncall nnt_chkstat('bcast #{var} failed',' ',ppp__status)\n!sms$ignore end"
         else
           code="!sms$ignore begin\ncall ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},ppp_max_decomposed_dims,ppp__status)\n!sms$ignore end"
-#         code="!sms$ignore begin\ncall ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},ppp_max_decomposed_dims,ppp__status)\ncall nnt_chkstat('bcast #{var} failed',' ',ppp__status,nnt_abort_on_error,ppp__status)\n!sms$ignore end"
         end
         insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
 # HACK end
       end
       # Deallocation of globally-sized variables
       globals.sort.each do |var|
-#       code="deallocate(ppp__g_#{var})"
-#       insert_statement_after(code,:deallocate_stmt,newblock.e.last)
+#       code="deallocate(ppp__g_#{var})"                              # masked by following HACK
+#       insert_statement_after(code,:deallocate_stmt,newblock.e.last) # masked by following HACK
 # HACK start
         code="!sms$ignore begin\ndeallocate(#{Name.global(var)})\n!sms$ignore end"
         insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
