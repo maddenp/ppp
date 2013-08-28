@@ -1200,8 +1200,7 @@ module Fortran
   class Else_Stmt < T
     def to_s
       unindent
-      s="\n#{stmt(space)}"
-      
+      s="#{stmt(space)}"
       indent
       s
     end
