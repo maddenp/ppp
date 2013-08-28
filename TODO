@@ -1,5 +1,3 @@
-- (MH) Resolve remaining FIM errors in 'problems' files
-
 - directives still to do
 
   !sms$serial begin/end
@@ -212,4 +210,8 @@
 
 - Re-enable continuation lines check, deal with looooong exchange in dyn_init.
   Are the array literals as compact as possible (e.g. do we need all 7 dims, all
-  25 (?) MAX_PPP_VARS)?
+  25 (?) MAX_PPP_VARS)? Better yet, make exchange use a begin/queue-multiple/end
+  buffering scheme, which avoids limits on exchange vars and minimized the size
+  of each call into the SMS library.
+
+- Implement a continuation scheme (following Fortran!) for SMS directives.
