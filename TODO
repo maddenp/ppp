@@ -209,3 +209,7 @@
 
 - Use cpp for sms extensions (esp. in grammars), rather than including files
   on top of one another?
+
+- Re-enable continuation lines check, deal with looooong exchange in dyn_init.
+  Are the array literals as compact as possible (e.g. do we need all 7 dims, all
+  25 (?) MAX_PPP_VARS)?
