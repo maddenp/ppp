@@ -932,7 +932,6 @@ module Fortran
         var=vars[i]
         varenv=getvarenv(var)
         fail "SMS$REDUCE inapplicable to distributed array '#{var}'" if varenv["decomp"]
-#       sizes.push("1") # but why?
         sizes.push((varenv["sort"]=="_array")?("size(#{var})"):("1"))
         types.push(smstype(varenv["type"],varenv["kind"]))
       end
@@ -1111,7 +1110,6 @@ module Fortran
         dims=varenv["dims"]
         bounds_root=[]
         (1..dims).each do |i|
-#         bounds_root.push((decdim=varenv["dim#{i}"])?("#{fixbound(varenv,var,i,:l)}:#{fixbound(varenv,var,i,:u)}"):("size(#{var},#{i})"))
           bounds_root.push((decdim=varenv["dim#{i}"])?("#{fixbound(varenv,var,i,:l)}:#{fixbound(varenv,var,i,:u)}"):("lbound(#{var},#{i}):ubound(#{var},#{i})"))
         end
         bounds_root=bounds_root.join(",")
@@ -1146,10 +1144,6 @@ module Fortran
         glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
         gstop=glubs
         gstrt=gllbs
-#       # BUG? What if var is not decomposed i.e. dh is nil?
-#       halol="(/"+ranks.map { |r| (r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)") }.join(",")+"/)"
-#       halou="(/"+ranks.map { |r| (r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)") }.join(",")+"/)"
-        # BUG? What if var is not decomposed i.e. dh is nil?
         halol="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
         halou="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
         perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
