@@ -1,6 +1,6 @@
 - Process implicit io translations
 
-- Process sms$ignore begin/end
+- Process sms$ignore begin/end (legacy ppp must be gone)
 
 - Remove recognition of sms$ignore in inappropriate regions
 

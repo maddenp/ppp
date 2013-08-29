@@ -44,14 +44,20 @@ module Fortran
   end
 
   def sp_sms_ignore_begin
-    fail "Already inside SMS$IGNORE region" if env[:sms_ignore]
+# HACK begin
+# Expose this when we're not bracketing stuff in sms$ignore to please legacy ppp
+#   fail "Already inside SMS$IGNORE region" if env[:sms_ignore]
+# HACK END    
     envpush
     env[:sms_ignore]=true
     true
   end
 
   def sp_sms_ignore_end
-    fail "Not inside SMS$IGNORE region" unless env[:sms_ignore]
+# HACK begin
+# Expose this when we're not bracketing stuff in sms$ignore to please legacy ppp
+#   fail "Not inside SMS$IGNORE region" unless env[:sms_ignore]
+# HACK END    
     true
   end
 
@@ -239,16 +245,29 @@ module Fortran
   end
 # HACK end
 
+  class If_Stmt < T
+
+    def translate
+      code=[]
+      code.push("#{self.label} #{self.prefix} then")
+      code.push("#{self.action}")
+      code.push("endif")
+      code=code.join("\n")
+      replace_statement(code,:if_construct)
+    end
+
+  end
+
   class Name < T
 
     def self.global(name)
-      n = name.to_s
-      return "ppp__g_#{n}" if n.size <= 24
+      n=name.to_s
+      return "ppp__g_#{n}" if n.size<=24
       @@g={} unless defined?(@@g)
       return @@g[n] if @@g[n]
       @@index=0 unless defined?(@@index)
-      prefix = "ppp__g_#{@@index+=1}_"
-      @@g[n]= prefix + n[0..29-prefix.size]
+      prefix="ppp__g_#{@@index+=1}_"
+      @@g[n]=prefix+n[0..29-prefix.size]
     end
 
     def globalize
@@ -326,14 +345,16 @@ module Fortran
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
-        code.push("if (iam_root()) #{self}")
+        code.push("if (iam_root()) then")
+        code.push("#{self}")
+        code.push("endif")
 # HACK start
         code.push("!sms$ignore end")
 # HACK end
         code=code.join("\n")
-#     t=replace_statement(code,:if_stmt,self) # masked by following HACK
 # HACK start
-        t=replace_statement(code,:sms_ignore_executable,self)
+# Get rid of sms$ignore bracketing when legacy ppp is gone
+        replace_statement(code,:sms_ignore_executable)
 # HACK end
       end
     end

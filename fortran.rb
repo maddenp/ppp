@@ -1465,16 +1465,31 @@ module Fortran
     def usename() "#{e[2]}" end
   end
 
+  class If_Construct < E
+  end
+
   class If_Construct_Name < E
   end
 
   class If_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5].to_s.strip}") end
+
+    def action
+      "#{e[5].to_s.strip}"
+    end
+
+    def prefix
+      "#{e[1]} #{e[2]}#{e[3]}#{e[4]}"
+    end
+
+    def to_s
+      stmt("#{prefix} #{action}")
+    end
+
   end
 
   class If_Then_Stmt < T
     def to_s
-      s=stmt("#{e[1]} #{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
+      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
       indent
       s
     end

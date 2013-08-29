@@ -15621,7 +15621,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(E,input, i0...index, s0)
+      r0 = instantiate_node(If_Construct,input, i0...index, s0)
       r0.extend(IfConstruct0)
     else
       @index = i0
