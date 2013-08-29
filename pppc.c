@@ -23,29 +23,30 @@ void term(int sock)
 
 void usage(char *exe)
 {
-  printf("usage: %s <socket> <infile> fixed|free [dir[:dir:...]]\n",exe);
+  printf("Usage: %s <socket> <infile> passthrough|translate fixed|free [dir[:dir:...]]\n",exe);
   exit(1);
 }
 
 int main (int argc,char **argv)
 {
-  char c,*exe,*fin,*form,*fsock,*inc,*lensrcstr,*src;
+  char *action,c,*exe,*form,*incdirs,*lensrcstr,*socket_file,*source_file,*src;
   int bytesout,fd,digits,lensrc,sock,status;
   struct sockaddr_un server;
   struct stat fileinfo;
 
   exe=argv[0];
 
-  if ((argc<4)||(argc>5)) usage(exe);
+  if ((argc<5)||(argc>6)) usage(exe);
 
-  fsock=argv[1];
-  fin=argv[2];
-  form=argv[3];
-  inc=argv[4];
+  socket_file=argv[1];
+  source_file=argv[2];
+  action=argv[3];
+  form=argv[4];
+  incdirs=argv[5];
 
   if ((strcmp("fixed",form)!=0)&&(strcmp("free",form)!=0)) usage(exe);
 
-  if ((fd=open(fin,O_RDONLY))<0) fail("opening infile");
+  if ((fd=open(source_file,O_RDONLY))<0) fail("opening infile");
   if (fstat(fd,&fileinfo)<0) fail("getting infile info");
 
   lensrc=fileinfo.st_size;
@@ -58,7 +59,7 @@ int main (int argc,char **argv)
   sock=socket(AF_UNIX,SOCK_STREAM,0);
   if (sock<0) fail("opening socket");
   server.sun_family=AF_UNIX;
-  strcpy(server.sun_path,fsock);
+  strcpy(server.sun_path,socket_file);
 
   if (connect(sock,(struct sockaddr *)&server,sizeof(struct sockaddr_un))<0)
   {
@@ -66,15 +67,19 @@ int main (int argc,char **argv)
     fail("connecting to server");
   }
 
-  status=write(sock,fin,strlen(fin));
+  status=write(sock,source_file,strlen(source_file));
   if (status<0) fail("sending infile");
+  term(sock);
+
+  status=write(sock,action,strlen(action));
+  if (status<0) fail("sending action");
   term(sock);
 
   status=write(sock,form,strlen(form));
   if (status<0) fail("sending form");
   term(sock);
 
-  if (inc!=NULL) status=write(sock,inc,strlen(inc));
+  if (incdirs!=NULL) status=write(sock,incdirs,strlen(incdirs));
   if (status<0) fail("sending includes");
   term(sock);
 

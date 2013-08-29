@@ -336,6 +336,11 @@ class Translator
 #           end
             a[n]=t
           end
+# HACK begin
+# We shouldn't need to left-justify directives when legacy ppp is gone          
+        else
+          a[n]=e.sub(/^ */,"")
+# HACK end
         end
       end
       s=a.join("\n")
@@ -372,6 +377,7 @@ class Translator
     unless conf.normalize
       raw_tree=fp.parse(n,{:root=>root})
       exit if conf.modinfo
+      return [wrap(raw_tree.to_s),raw_tree,nil] unless conf.translate
       raw_tree.instance_variable_set(:@srcfile,srcfile)
       raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
       if conf.debug
@@ -392,6 +398,7 @@ class Translator
         return # if in server mode and did not exit in die()
       end
       translated_tree=(conf.translate)?(raw_tree.translate_top):(nil)
+      die "Translation failed" unless translated_tree
       if conf.debug
         puts "\nTRANSLATED TREE\n\n"
         p translated_tree
@@ -433,6 +440,7 @@ class Translator
           conf=OpenStruct.new
           client=server.accept
           srcfile=client.gets.chomp
+          action=client.gets.chomp
           form=client.gets.chomp
           dirlist=client.gets.chomp
           lensrc=client.gets.chomp.to_i
@@ -442,6 +450,7 @@ class Translator
           end
           srcdir=File.dirname(File.expand_path(srcfile))
           conf.incdirs=[srcdir]
+          conf.translate=(action=="translate")
           conf.fixed=(form=="fixed")
           dirlist.split(":").each do |d|
             d=File.join(srcdir,d) if Pathname.new(d).relative?
@@ -523,6 +532,8 @@ class Translator
         conf.normalize=true
       when "modinfo"
         conf.modinfo=true
+      when "passthrough"
+        conf.translate=false
       else
         die usage
       end
@@ -540,6 +551,7 @@ class Translator
     x.push("fixed")
     x.push("modinfo")
     x.push("normalize")
+    x.push("passthrough")
     "#{File.basename(@wrapper)} [ #{x.join(" | ")} ] source"
   end
 

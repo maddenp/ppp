@@ -15,7 +15,7 @@ OPTSOBJ=$(strip $(FFLAGS) $(INCFLAG))
 OUT_NEW=out.new
 OUT_OLD=out.old
 PPP=../../ppp
-PPPARGS=$(strip $(strip $(FIXEDFREE) $(INCFLAG)) $(TEST))
+PPPARGS=$(strip $(strip $(FIXEDFREE) $(PASSTHROUGH) $(INCFLAG)) $(TEST))
 PPPC=../../pppc
 STEM=$(basename $(TEST))
 TARGETS=clean comp $(EXE_NEW) $(EXE_OLD) $(OUT_NEW) $(OUT_OLD) translation
@@ -26,8 +26,8 @@ TRANSLATION=$(STEM)_ppp.f90
 
 # dynamic settings
 
-ifndef ENV
-ENV=true
+ifdef INCDIRS
+INCFLAG=-I $(INCDIRS)
 endif
 
 ifeq ($(TEST),t.f)
@@ -36,8 +36,12 @@ else
 FIXEDFREE=free
 endif
 
-ifdef INCDIRS
-INCFLAG=-I $(INCDIRS)
+ifndef ENV
+ENV=true
+endif
+
+ifndef PASSTHROUGH
+PASSTHROUGH=passthrough
 endif
 
 # the rest
@@ -84,7 +88,7 @@ endif
 
 $(TRANSLATION): $(TEST)
 ifdef SOCKET
-	$(PPPC) $(SOCKET) $(CURDIR)/$(TEST) $(FIXEDFREE) $(INCDIRS) > $(TRANSLATION)
+	$(PPPC) $(SOCKET) $(CURDIR)/$(TEST) $(PASSTHROUGH) $(FIXEDFREE) $(INCDIRS) > $(TRANSLATION)
 else
 	$(PPP) $(PPPARGS) > $(TRANSLATION)
 endif

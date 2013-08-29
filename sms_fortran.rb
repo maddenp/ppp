@@ -38,15 +38,20 @@ module Fortran
     true
   end
 
+  def sp_sms_ignore
+    envpop
+    true
+  end
+
   def sp_sms_ignore_begin
     fail "Already inside SMS$IGNORE region" if env[:sms_ignore]
+    envpush
     env[:sms_ignore]=true
     true
   end
 
   def sp_sms_ignore_end
     fail "Not inside SMS$IGNORE region" unless env[:sms_ignore]
-    env.delete(:sms_ignore)
     true
   end
 
@@ -101,108 +106,6 @@ module Fortran
   def sp_sms_to_local_end
     fail "Not inside to_local region" unless env[:sms_to_local]
     true
-  end
-
-  class T < Treetop::Runtime::SyntaxNode
-
-    def declare(type,name,props={})
-      dc=declaration_constructs
-      varenv=getvarenv(name,dc,false)
-      if varenv
-        fail "Variable #{name} is already defined" unless varenv["pppvar"]
-      else
-        kind=props[:kind]
-        kind=([nil,"_default"].include?(kind))?(""):("(kind=#{kind})")
-        attrs=props[:attrs]||[]
-        attrs=[attrs] unless attrs.is_a?(Array)
-        attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
-        code="#{type}#{kind}#{attrs}::#{name}"
-        dims=props[:dims]
-        code+="(#{dims.join(',')})" if dims
-        init=props[:init]
-        code+="=#{init}" if init
-        t=raw(code,:type_declaration_stmt,root.srcfile)
-        t.parent=dc
-        dc.e.insert(0,t) # prefer "dc.e.push(t)" -- see TODO
-        dc.env[name]||={}
-        dc.env[name]["pppvar"]=true
-      end
-    end
-
-    def env
-      (envsrc=ancestor(Scoping_Unit,SMS_Region))?(envsrc.envref):(self.envref)
-    end
-
-    def halo_offsets(decdim)
-      halo_lo=0
-      halo_up=0
-      if halocomp=self.env[:sms_halo_comp]
-        offsets=halocomp[decdim]
-        halo_lo=offsets.lo
-        halo_up=offsets.up
-      end
-      OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
-    end
-
-    def sms(s)
-      "#{e[0]}#{e[1]} #{s}\n"
-    end
-
-    def smstype(type,kind)
-      kind=nil if kind=="_default"
-      case type
-      when "character"
-        return "nnt_bytes"
-      when "complex"
-        return (kind)?("nnt_c#{kind}"):("nnt_complex")
-      when "doubleprecision"
-        return "nnt_doubleprecision"
-      when "integer"
-        return (kind)?("nnt_i#{kind}"):("nnt_integer")
-      when "logical"
-        return (kind)?("nnt_l#{kind}"):("nnt_logical")
-      when "real"
-        return (kind)?("nnt_r#{kind}"):("nnt_real")
-      end
-      fail "No NNT type defined for '#{type}#{kind}'"
-    end
-
-# HACK start
-
-# This overrides T#use in fortran.rb to provide sms$ignore wraps for peaceful
-# coexistence with legacy ppp, for now. Remove this HACK when legacy ppp is
-# removed from build chain.
-
-    def use(modname,usenames=[])
-      unless uses?(modname,:all)
-        new_usenames=[]
-        code="use #{modname}"
-        unless usenames.empty?
-          list=[]
-          usenames.each do |x|
-            h=x.is_a?(Hash)
-            localname=(h)?(x.keys.first):(nil)
-            usename=(h)?(x.values.first):(x)
-            unless uses?(modname,usename)
-              list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
-              new_usenames.push([localname||usename,usename])
-            end
-          end
-          code+=((list.empty?)?(""):(",only:#{list.join(",")}"))
-        end
-        up=use_part
-        new_usenames=[[:all]] if new_usenames.empty?
-        new_uses={modname=>new_usenames}
-        old_uses=up.env[:uses]
-        up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
-  # sub HACK start
-        code=("!sms$ignore begin\n#{code}\n!sms$ignore end")
-        t=raw(code,:sms_ignore_use,@srcfile)
-        t.parent=up
-        up.e.push(t)
-  # sub HACK end
-      end
-    end
   end
 
 # HACK end
@@ -409,6 +312,29 @@ module Fortran
             end
           end
         end
+      end
+    end
+
+  end
+
+  class Print_Stmt < T
+
+    def translate
+      unless self.env[:sms_ignore]
+        declare("logical","iam_root")
+        code=[]
+# HACK start
+        code.push("!sms$ignore begin")
+# HACK end
+        code.push("if (iam_root()) #{self}")
+# HACK start
+        code.push("!sms$ignore end")
+# HACK end
+        code=code.join("\n")
+#     t=replace_statement(code,:if_stmt,self) # masked by following HACK
+# HACK start
+        t=replace_statement(code,:sms_ignore_executable,self)
+# HACK end
       end
     end
 
@@ -1499,6 +1425,30 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
+    def declare(type,name,props={})
+      dc=declaration_constructs
+      varenv=getvarenv(name,dc,false)
+      if varenv
+        fail "Variable #{name} is already defined" unless varenv["pppvar"]
+      else
+        kind=props[:kind]
+        kind=([nil,"_default"].include?(kind))?(""):("(kind=#{kind})")
+        attrs=props[:attrs]||[]
+        attrs=[attrs] unless attrs.is_a?(Array)
+        attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
+        code="#{type}#{kind}#{attrs}::#{name}"
+        dims=props[:dims]
+        code+="(#{dims.join(',')})" if dims
+        init=props[:init]
+        code+="=#{init}" if init
+        t=raw(code,:type_declaration_stmt,root.srcfile)
+        t.parent=dc
+        dc.e.insert(0,t) # prefer "dc.e.push(t)" -- see TODO
+        dc.env[name]||={}
+        dc.env[name]["pppvar"]=true
+      end
+    end
+
     def distribute_array_bounds(spec,varenv)
       if (decomp=varenv["decomp"])
         if spec and spec.is_a?(Explicit_Shape_Spec_List)
@@ -1529,6 +1479,81 @@ module Fortran
       end
     end
 
+    def env
+      (envsrc=ancestor(Scoping_Unit,SMS_Region))?(envsrc.envref):(self.envref)
+    end
+
+    def halo_offsets(decdim)
+      halo_lo=0
+      halo_up=0
+      if halocomp=self.env[:sms_halo_comp]
+        offsets=halocomp[decdim]
+        halo_lo=offsets.lo
+        halo_up=offsets.up
+      end
+      OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
+    end
+
+    def sms(s)
+      "#{e[0]}#{e[1]} #{s}\n"
+    end
+
+    def smstype(type,kind)
+      kind=nil if kind=="_default"
+      case type
+      when "character"
+        return "nnt_bytes"
+      when "complex"
+        return (kind)?("nnt_c#{kind}"):("nnt_complex")
+      when "doubleprecision"
+        return "nnt_doubleprecision"
+      when "integer"
+        return (kind)?("nnt_i#{kind}"):("nnt_integer")
+      when "logical"
+        return (kind)?("nnt_l#{kind}"):("nnt_logical")
+      when "real"
+        return (kind)?("nnt_r#{kind}"):("nnt_real")
+      end
+      fail "No NNT type defined for '#{type}#{kind}'"
+    end
+
+# HACK start
+
+# This overrides T#use in fortran.rb to provide sms$ignore wraps for peaceful
+# coexistence with legacy ppp, for now. Remove this HACK when legacy ppp is
+# removed from build chain.
+
+    def use(modname,usenames=[])
+      unless uses?(modname,:all)
+        new_usenames=[]
+        code="use #{modname}"
+        unless usenames.empty?
+          list=[]
+          usenames.each do |x|
+            h=x.is_a?(Hash)
+            localname=(h)?(x.keys.first):(nil)
+            usename=(h)?(x.values.first):(x)
+            unless uses?(modname,usename)
+              list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
+              new_usenames.push([localname||usename,usename])
+            end
+          end
+          code+=((list.empty?)?(""):(",only:#{list.join(",")}"))
+        end
+        up=use_part
+        new_usenames=[[:all]] if new_usenames.empty?
+        new_uses={modname=>new_usenames}
+        old_uses=up.env[:uses]
+        up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
+  # sub HACK start
+        code=("!sms$ignore begin\n#{code}\n!sms$ignore end")
+        t=raw(code,:sms_ignore_use,@srcfile)
+        t.parent=up
+        up.e.push(t)
+  # sub HACK end
+      end
+    end
+      
   end
 
 end

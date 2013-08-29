@@ -144,7 +144,7 @@ grammar Fortran
     sms_create_decomp /
     sms_exchange /
     sms_halo_comp &{ |e| sp_sms_halo_comp } <E> /
-    sms_ignore_executable /
+    sms_ignore_executable &{ |e| sp_sms_ignore } <E> /
     sms_parallel &{ |e| sp_sms_parallel } <E> /
     sms_reduce /
     sms_serial &{ |e| sp_sms_serial } <E> /

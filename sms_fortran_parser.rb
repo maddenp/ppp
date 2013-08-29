@@ -1581,20 +1581,27 @@ module Fortran
   end
 
   module SmsExecutable1
-    def sms_parallel
+    def sms_ignore_executable
       elements[0]
     end
 
   end
 
   module SmsExecutable2
-    def sms_serial
+    def sms_parallel
       elements[0]
     end
 
   end
 
   module SmsExecutable3
+    def sms_serial
+      elements[0]
+    end
+
+  end
+
+  module SmsExecutable4
     def sms_to_local
       elements[0]
     end
@@ -1653,93 +1660,113 @@ module Fortran
             if r5
               r0 = r5
             else
-              r9 = _nt_sms_ignore_executable
+              i9, s9 = index, []
+              r10 = _nt_sms_ignore_executable
+              s9 << r10
+              if r10
+                i11 = index
+                r12 = lambda { |e| sp_sms_ignore }.call(s9)
+                if r12
+                  @index = i11
+                  r11 = instantiate_node(SyntaxNode,input, index...index)
+                else
+                  r11 = nil
+                end
+                s9 << r11
+              end
+              if s9.last
+                r9 = instantiate_node(E,input, i9...index, s9)
+                r9.extend(SmsExecutable1)
+              else
+                @index = i9
+                r9 = nil
+              end
               if r9
                 r0 = r9
               else
-                i10, s10 = index, []
-                r11 = _nt_sms_parallel
-                s10 << r11
-                if r11
-                  i12 = index
-                  r13 = lambda { |e| sp_sms_parallel }.call(s10)
-                  if r13
-                    @index = i12
-                    r12 = instantiate_node(SyntaxNode,input, index...index)
+                i13, s13 = index, []
+                r14 = _nt_sms_parallel
+                s13 << r14
+                if r14
+                  i15 = index
+                  r16 = lambda { |e| sp_sms_parallel }.call(s13)
+                  if r16
+                    @index = i15
+                    r15 = instantiate_node(SyntaxNode,input, index...index)
                   else
-                    r12 = nil
+                    r15 = nil
                   end
-                  s10 << r12
+                  s13 << r15
                 end
-                if s10.last
-                  r10 = instantiate_node(E,input, i10...index, s10)
-                  r10.extend(SmsExecutable1)
+                if s13.last
+                  r13 = instantiate_node(E,input, i13...index, s13)
+                  r13.extend(SmsExecutable2)
                 else
-                  @index = i10
-                  r10 = nil
+                  @index = i13
+                  r13 = nil
                 end
-                if r10
-                  r0 = r10
+                if r13
+                  r0 = r13
                 else
-                  r14 = _nt_sms_reduce
-                  if r14
-                    r0 = r14
+                  r17 = _nt_sms_reduce
+                  if r17
+                    r0 = r17
                   else
-                    i15, s15 = index, []
-                    r16 = _nt_sms_serial
-                    s15 << r16
-                    if r16
-                      i17 = index
-                      r18 = lambda { |e| sp_sms_serial }.call(s15)
-                      if r18
-                        @index = i17
-                        r17 = instantiate_node(SyntaxNode,input, index...index)
+                    i18, s18 = index, []
+                    r19 = _nt_sms_serial
+                    s18 << r19
+                    if r19
+                      i20 = index
+                      r21 = lambda { |e| sp_sms_serial }.call(s18)
+                      if r21
+                        @index = i20
+                        r20 = instantiate_node(SyntaxNode,input, index...index)
                       else
-                        r17 = nil
+                        r20 = nil
                       end
-                      s15 << r17
+                      s18 << r20
                     end
-                    if s15.last
-                      r15 = instantiate_node(E,input, i15...index, s15)
-                      r15.extend(SmsExecutable2)
+                    if s18.last
+                      r18 = instantiate_node(E,input, i18...index, s18)
+                      r18.extend(SmsExecutable3)
                     else
-                      @index = i15
-                      r15 = nil
+                      @index = i18
+                      r18 = nil
                     end
-                    if r15
-                      r0 = r15
+                    if r18
+                      r0 = r18
                     else
-                      r19 = _nt_sms_set_communicator
-                      if r19
-                        r0 = r19
+                      r22 = _nt_sms_set_communicator
+                      if r22
+                        r0 = r22
                       else
-                        i20, s20 = index, []
-                        r21 = _nt_sms_to_local
-                        s20 << r21
-                        if r21
-                          i22 = index
-                          r23 = lambda { |e| sp_sms_to_local }.call(s20)
-                          if r23
-                            @index = i22
-                            r22 = instantiate_node(SyntaxNode,input, index...index)
+                        i23, s23 = index, []
+                        r24 = _nt_sms_to_local
+                        s23 << r24
+                        if r24
+                          i25 = index
+                          r26 = lambda { |e| sp_sms_to_local }.call(s23)
+                          if r26
+                            @index = i25
+                            r25 = instantiate_node(SyntaxNode,input, index...index)
                           else
-                            r22 = nil
+                            r25 = nil
                           end
-                          s20 << r22
+                          s23 << r25
                         end
-                        if s20.last
-                          r20 = instantiate_node(E,input, i20...index, s20)
-                          r20.extend(SmsExecutable3)
+                        if s23.last
+                          r23 = instantiate_node(E,input, i23...index, s23)
+                          r23.extend(SmsExecutable4)
                         else
-                          @index = i20
-                          r20 = nil
+                          @index = i23
+                          r23 = nil
                         end
-                        if r20
-                          r0 = r20
+                        if r23
+                          r0 = r23
                         else
-                          r24 = _nt_sms_unstructured_grid
-                          if r24
-                            r0 = r24
+                          r27 = _nt_sms_unstructured_grid
+                          if r27
+                            r0 = r27
                           else
                             @index = i0
                             r0 = nil
