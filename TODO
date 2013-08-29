@@ -1,8 +1,8 @@
-- directives still to do
+- Process implicit io translations
 
-  !sms$serial begin/end
-  directiveless io translations (print, write, stop, namelist stuff, ???)
-  !sms$ignore begin/end
+- Process sms$ignore begin/end
+
+- Remove recognition of sms$ignore in inappropriate regions
 
 - Remove various HACKS and deal with any fallout.
 
