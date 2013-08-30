@@ -2,19 +2,6 @@ require "set"
 
 module Fortran
 
-  def envpush
-    labels=env.delete(:labels)
-    @envstack.push(deepcopy(env))
-    env[:labels]=labels if labels
-  end
-
-  def sp_label(label)
-    n=label[0].e.reduce("") { |m,x| m+"#{x}" }.to_i
-    env[:labels]||=Set.new
-    env[:labels].add(n)
-    true
-  end
-
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
     fail "Already inside distribute region" if @distribute
     @distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
@@ -146,10 +133,12 @@ module Fortran
         init=props[:init]
         code+="=#{init}" if init
         t=raw(code,:type_declaration_stmt,root.srcfile)
+        newenv=t.input.envstack.last
+        newenv[var]["pppvar"]=true
         t.parent=dc
         dc.e.insert(0,t) # prefer "dc.e.push(t)" -- see TODO
         dc.env[var]||={}
-        dc.env[var]["pppvar"]=true
+        dc.env[var]=newenv[var]
       end
       var
     end
@@ -500,21 +489,38 @@ module Fortran
     def translate
       unless self.env[:sms_ignore] or self.env[:sms_serial]
         declare("logical","iam_root")
+        unless (label=self.label).empty?
+          label=self.label_delete
+        end
+        if (err=self.err)
+          err_label_old,err_label_new=err.relabel
+          err_var=err.pppvar
+        end
+        if (iostat=self.iostat)
+          use("module_decomp")
+          var=iostat.rhs
+          varenv=getvarenv(var)
+          code.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1,1,1,1,1,1,1/),ppp_max_decomposed_dims,ppp__status)")
+        end
         code=[]
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
-        code.push("if (iam_root()) then")
-        code.push("#{self}")
-        code.push("endif")
-        if (err=self.err)
-#         puts "### err label [#{err.rhs}]"
+        code.push("#{label} if (iam_root()) then")
+        if err
+          code.push("#{err_var}=.false.")
         end
-        if (iostat=self.iostat)
-#         use("module_decomp")
-#         var=iostat.rhs
-#         varenv=getvarenv(var)
-#         code.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1,1,1,1,1,1,1/),ppp_max_decomposed_dims,ppp__status)")
+        code.push("#{self}")
+        if err
+          code.push("goto #{continue_label=label_create}")
+          code.push("#{err_label_new} #{err_var}=.true.")
+          code.push("#{continue_label} continue")
+        end
+        code.push("endif")
+        if err
+          varenv=getvarenv(err_var)
+          code.push("call ppp_bcast(#{err_var},#{smstype(varenv["type"],varenv["kind"])},(/1,1,1,1,1,1,1/),ppp_max_decomposed_dims,ppp__status)")
+          code.push("if (#{err_var}) goto #{err_label_old}")
         end
 # HACK start
         code.push("!sms$ignore end")
@@ -534,11 +540,14 @@ module Fortran
     def translate
       unless self.env[:sms_ignore] or self.env[:sms_serial]
         declare("logical","iam_root")
+        unless (label=self.label).empty?
+          label=self.label_delete
+        end
         code=[]
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
-        code.push("if (iam_root()) then")
+        code.push("#{label} if (iam_root()) then")
         code.push("#{self}")
         code.push("endif")
 # HACK start

@@ -721,8 +721,8 @@ grammar Fortran
   rule connect_spec
     # F90:R905
 
-    t_iostat t_equal scalar_default_int_variable <IO_Spec_Iostat> /
-    t_err t_equal label <IO_Spec_Err> /
+    io_spec_iostat /
+    io_spec_err /
     t_file t_equal file_name_expr <T> /
     t_status t_equal scalar_default_char_expr <T> /
     t_access t_equal scalar_default_char_expr <T> /
@@ -737,7 +737,11 @@ grammar Fortran
   end
 
   rule connect_spec_list
-    connect_spec ( t_comma connect_spec )* <Connect_Spec_List>
+    connect_spec connect_spec_list_pair* <Connect_Spec_List>
+  end
+
+  rule connect_spec_list_pair
+    t_comma connect_spec <Connect_Spec_List_Pair>
   end
 
   rule constant
@@ -1896,19 +1900,23 @@ grammar Fortran
     io_unit t_comma namelist_group_name !t_equal <T> /
     t_advance t_equal scalar_default_char_expr <T> /
     t_io_control_spec_end t_equal label <T> /
-    t_eor t_equal label <IO_Spec_Eor> /
-    t_err t_equal label <IO_Spec_Err> /
+    io_spec_eor /
+    io_spec_err/
     t_fmt t_equal format <T> /
-    t_iostat t_equal scalar_default_int_variable <IO_Spec_Iostat> /
+    io_spec_iostat /
     t_nml t_equal namelist_group_name <T> /
     t_rec t_equal scalar_int_expr <T> /
-    t_size t_equal scalar_default_int_variable <IO_Spec_Size> /
+    io_spec_size /
     t_unit t_equal io_unit <T> /
     io_unit
   end
 
   rule io_control_spec_list
-    io_control_spec ( t_comma io_control_spec )* <IO_Control_Spec_List>
+    io_control_spec io_control_spec_list_pair* <IO_Control_Spec_List>
+  end
+
+  rule io_control_spec_list_pair
+    t_comma io_control_spec <IO_Control_Spec_List_Pair>
   end
 
   rule io_implied_do
@@ -1932,6 +1940,22 @@ grammar Fortran
 
   rule io_implied_do_object_list
     io_implied_do_object ( t_comma io_implied_do_object )* <IO_Implied_Do_Object_List>
+  end
+
+  rule io_spec_eor
+    t_eor t_equal label <IO_Spec_Eor>
+  end
+
+  rule io_spec_err
+    t_err t_equal label <IO_Spec_Err>
+  end
+
+  rule io_spec_iostat
+    t_iostat t_equal scalar_default_int_variable <IO_Spec_Iostat>
+  end
+
+  rule io_spec_size
+    t_size t_equal scalar_default_int_variable <IO_Spec_Size>
   end
 
   rule io_unit

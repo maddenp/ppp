@@ -29,7 +29,9 @@ module Fortran
   end
 
   def envpush
+    labels=env.delete(:labels)
     @envstack.push(deepcopy(env))
+    env[:labels]=labels if labels
   end
 
   def modenv(m)
@@ -172,6 +174,13 @@ module Fortran
   def sp_is_array?(node)
     return false unless node.respond_to?(:name)
     vargetprop(node.name,"sort")=="_array"
+  end
+
+  def sp_label(label)
+    n=label[0].e.reduce("") { |m,x| m+"#{x}" }.to_i
+    env[:labels]||=Set.new
+    env[:labels].add(n)
+    true
   end
 
   def sp_main_program
@@ -484,6 +493,23 @@ module Fortran
       (ancestor(*class_or_classes))?(true):(false)
     end
 
+    def label_create
+      labels=(self.env[:labels]||=Set.new)
+      99999.downto(1).each do |n|
+        unless labels.include?(n)
+          labels.add(n)
+          return n
+        end
+      end
+      fail "No unused labels available"
+    end
+
+    def label_delete
+      return nil if (label=self.label).empty?
+      self.e[0]=Treetop::Runtime::SyntaxNode.new("",nil)
+      label
+    end
+
     def level
       r=root
       unless r.instance_variable_defined?(:@level)
@@ -644,13 +670,9 @@ module Fortran
     end
 
     def list_item(spec)
-      return specpair(e[0]) if e[0].is_a?(spec)
-      e[1].e.each { |x| return specpair(x.e[1]) if x.e[1].is_a?(spec) } if e[1]
+      return e[0] if e[0].is_a?(spec)
+      e[1].e.each { |x| return x.e[1] if x.e[1].is_a?(spec) } if e[1]
       nil
-    end
-
-    def specpair(x)
-      OpenStruct.new({:spec=>x,:rhs=>x.rhs})
     end
 
     def to_s
@@ -1064,6 +1086,9 @@ module Fortran
   end
 
   class Connect_Spec_List < IO_Spec_List
+  end
+
+  class Connect_Spec_List_Pair < E
   end
 
   class Contains_Stmt < T
@@ -1601,18 +1626,37 @@ module Fortran
   class IO_Control_Spec_List < IO_Spec_List
   end
 
+  class IO_Control_Spec_List_Pair < E
+  end
+
   class IO_Implied_Do_Object_List < T
     def to_s() list_to_s end
   end
 
-  class IO_Spec < T
-    def rhs() "#{e[2]}" end
+  class IO_Spec < E
+
+    def relabel_spec(spec)
+      old=self.rhs
+      new=label_create
+      replace_element("#{new}",:label,self.e[2])
+      [old,new]
+    end
+
+    def rhs
+      "#{e[2]}"
+    end
+
   end
 
   class IO_Spec_Eor < IO_Spec
   end
 
   class IO_Spec_Err < IO_Spec
+
+    def relabel
+      relabel_spec(:err)
+    end
+
   end
 
   class IO_Spec_Iostat < IO_Spec

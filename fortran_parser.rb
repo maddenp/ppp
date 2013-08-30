@@ -7000,34 +7000,6 @@ module Fortran
   end
 
   module ConnectSpec0
-    def t_iostat
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_int_variable
-      elements[2]
-    end
-  end
-
-  module ConnectSpec1
-    def t_err
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def label
-      elements[2]
-    end
-  end
-
-  module ConnectSpec2
     def t_file
       elements[0]
     end
@@ -7041,7 +7013,7 @@ module Fortran
     end
   end
 
-  module ConnectSpec3
+  module ConnectSpec1
     def t_status
       elements[0]
     end
@@ -7055,7 +7027,7 @@ module Fortran
     end
   end
 
-  module ConnectSpec4
+  module ConnectSpec2
     def t_access
       elements[0]
     end
@@ -7069,7 +7041,7 @@ module Fortran
     end
   end
 
-  module ConnectSpec5
+  module ConnectSpec3
     def t_form
       elements[0]
     end
@@ -7083,7 +7055,7 @@ module Fortran
     end
   end
 
-  module ConnectSpec6
+  module ConnectSpec4
     def t_recl
       elements[0]
     end
@@ -7097,7 +7069,7 @@ module Fortran
     end
   end
 
-  module ConnectSpec7
+  module ConnectSpec5
     def t_blank
       elements[0]
     end
@@ -7111,7 +7083,7 @@ module Fortran
     end
   end
 
-  module ConnectSpec8
+  module ConnectSpec6
     def t_position
       elements[0]
     end
@@ -7125,7 +7097,7 @@ module Fortran
     end
   end
 
-  module ConnectSpec9
+  module ConnectSpec7
     def t_action
       elements[0]
     end
@@ -7139,7 +7111,7 @@ module Fortran
     end
   end
 
-  module ConnectSpec10
+  module ConnectSpec8
     def t_delim
       elements[0]
     end
@@ -7153,7 +7125,7 @@ module Fortran
     end
   end
 
-  module ConnectSpec11
+  module ConnectSpec9
     def t_pad
       elements[0]
     end
@@ -7167,7 +7139,7 @@ module Fortran
     end
   end
 
-  module ConnectSpec12
+  module ConnectSpec10
     def t_unit
       elements[0]
     end
@@ -7177,7 +7149,7 @@ module Fortran
     end
   end
 
-  module ConnectSpec13
+  module ConnectSpec11
     def external_file_unit
       elements[1]
     end
@@ -7195,292 +7167,258 @@ module Fortran
     end
 
     i0 = index
-    i1, s1 = index, []
-    r2 = _nt_t_iostat
-    s1 << r2
-    if r2
-      r3 = _nt_t_equal
-      s1 << r3
-      if r3
-        r4 = _nt_scalar_default_int_variable
-        s1 << r4
-      end
-    end
-    if s1.last
-      r1 = instantiate_node(IO_Spec_Iostat,input, i1...index, s1)
-      r1.extend(ConnectSpec0)
-    else
-      @index = i1
-      r1 = nil
-    end
+    r1 = _nt_io_spec_iostat
     if r1
       r0 = r1
     else
-      i5, s5 = index, []
-      r6 = _nt_t_err
-      s5 << r6
-      if r6
-        r7 = _nt_t_equal
-        s5 << r7
-        if r7
-          r8 = _nt_label
-          s5 << r8
-        end
-      end
-      if s5.last
-        r5 = instantiate_node(IO_Spec_Err,input, i5...index, s5)
-        r5.extend(ConnectSpec1)
+      r2 = _nt_io_spec_err
+      if r2
+        r0 = r2
       else
-        @index = i5
-        r5 = nil
-      end
-      if r5
-        r0 = r5
-      else
-        i9, s9 = index, []
-        r10 = _nt_t_file
-        s9 << r10
-        if r10
-          r11 = _nt_t_equal
-          s9 << r11
-          if r11
-            r12 = _nt_file_name_expr
-            s9 << r12
+        i3, s3 = index, []
+        r4 = _nt_t_file
+        s3 << r4
+        if r4
+          r5 = _nt_t_equal
+          s3 << r5
+          if r5
+            r6 = _nt_file_name_expr
+            s3 << r6
           end
         end
-        if s9.last
-          r9 = instantiate_node(T,input, i9...index, s9)
-          r9.extend(ConnectSpec2)
+        if s3.last
+          r3 = instantiate_node(T,input, i3...index, s3)
+          r3.extend(ConnectSpec0)
         else
-          @index = i9
-          r9 = nil
+          @index = i3
+          r3 = nil
         end
-        if r9
-          r0 = r9
+        if r3
+          r0 = r3
         else
-          i13, s13 = index, []
-          r14 = _nt_t_status
-          s13 << r14
-          if r14
-            r15 = _nt_t_equal
-            s13 << r15
-            if r15
-              r16 = _nt_scalar_default_char_expr
-              s13 << r16
+          i7, s7 = index, []
+          r8 = _nt_t_status
+          s7 << r8
+          if r8
+            r9 = _nt_t_equal
+            s7 << r9
+            if r9
+              r10 = _nt_scalar_default_char_expr
+              s7 << r10
             end
           end
-          if s13.last
-            r13 = instantiate_node(T,input, i13...index, s13)
-            r13.extend(ConnectSpec3)
+          if s7.last
+            r7 = instantiate_node(T,input, i7...index, s7)
+            r7.extend(ConnectSpec1)
           else
-            @index = i13
-            r13 = nil
+            @index = i7
+            r7 = nil
           end
-          if r13
-            r0 = r13
+          if r7
+            r0 = r7
           else
-            i17, s17 = index, []
-            r18 = _nt_t_access
-            s17 << r18
-            if r18
-              r19 = _nt_t_equal
-              s17 << r19
-              if r19
-                r20 = _nt_scalar_default_char_expr
-                s17 << r20
+            i11, s11 = index, []
+            r12 = _nt_t_access
+            s11 << r12
+            if r12
+              r13 = _nt_t_equal
+              s11 << r13
+              if r13
+                r14 = _nt_scalar_default_char_expr
+                s11 << r14
               end
             end
-            if s17.last
-              r17 = instantiate_node(T,input, i17...index, s17)
-              r17.extend(ConnectSpec4)
+            if s11.last
+              r11 = instantiate_node(T,input, i11...index, s11)
+              r11.extend(ConnectSpec2)
             else
-              @index = i17
-              r17 = nil
+              @index = i11
+              r11 = nil
             end
-            if r17
-              r0 = r17
+            if r11
+              r0 = r11
             else
-              i21, s21 = index, []
-              r22 = _nt_t_form
-              s21 << r22
-              if r22
-                r23 = _nt_t_equal
-                s21 << r23
-                if r23
-                  r24 = _nt_scalar_default_char_expr
-                  s21 << r24
+              i15, s15 = index, []
+              r16 = _nt_t_form
+              s15 << r16
+              if r16
+                r17 = _nt_t_equal
+                s15 << r17
+                if r17
+                  r18 = _nt_scalar_default_char_expr
+                  s15 << r18
                 end
               end
-              if s21.last
-                r21 = instantiate_node(T,input, i21...index, s21)
-                r21.extend(ConnectSpec5)
+              if s15.last
+                r15 = instantiate_node(T,input, i15...index, s15)
+                r15.extend(ConnectSpec3)
               else
-                @index = i21
-                r21 = nil
+                @index = i15
+                r15 = nil
               end
-              if r21
-                r0 = r21
+              if r15
+                r0 = r15
               else
-                i25, s25 = index, []
-                r26 = _nt_t_recl
-                s25 << r26
-                if r26
-                  r27 = _nt_t_equal
-                  s25 << r27
-                  if r27
-                    r28 = _nt_scalar_int_expr
-                    s25 << r28
+                i19, s19 = index, []
+                r20 = _nt_t_recl
+                s19 << r20
+                if r20
+                  r21 = _nt_t_equal
+                  s19 << r21
+                  if r21
+                    r22 = _nt_scalar_int_expr
+                    s19 << r22
                   end
                 end
-                if s25.last
-                  r25 = instantiate_node(T,input, i25...index, s25)
-                  r25.extend(ConnectSpec6)
+                if s19.last
+                  r19 = instantiate_node(T,input, i19...index, s19)
+                  r19.extend(ConnectSpec4)
                 else
-                  @index = i25
-                  r25 = nil
+                  @index = i19
+                  r19 = nil
                 end
-                if r25
-                  r0 = r25
+                if r19
+                  r0 = r19
                 else
-                  i29, s29 = index, []
-                  r30 = _nt_t_blank
-                  s29 << r30
-                  if r30
-                    r31 = _nt_t_equal
-                    s29 << r31
-                    if r31
-                      r32 = _nt_scalar_default_char_expr
-                      s29 << r32
+                  i23, s23 = index, []
+                  r24 = _nt_t_blank
+                  s23 << r24
+                  if r24
+                    r25 = _nt_t_equal
+                    s23 << r25
+                    if r25
+                      r26 = _nt_scalar_default_char_expr
+                      s23 << r26
                     end
                   end
-                  if s29.last
-                    r29 = instantiate_node(T,input, i29...index, s29)
-                    r29.extend(ConnectSpec7)
+                  if s23.last
+                    r23 = instantiate_node(T,input, i23...index, s23)
+                    r23.extend(ConnectSpec5)
                   else
-                    @index = i29
-                    r29 = nil
+                    @index = i23
+                    r23 = nil
                   end
-                  if r29
-                    r0 = r29
+                  if r23
+                    r0 = r23
                   else
-                    i33, s33 = index, []
-                    r34 = _nt_t_position
-                    s33 << r34
-                    if r34
-                      r35 = _nt_t_equal
-                      s33 << r35
-                      if r35
-                        r36 = _nt_scalar_default_char_expr
-                        s33 << r36
+                    i27, s27 = index, []
+                    r28 = _nt_t_position
+                    s27 << r28
+                    if r28
+                      r29 = _nt_t_equal
+                      s27 << r29
+                      if r29
+                        r30 = _nt_scalar_default_char_expr
+                        s27 << r30
                       end
                     end
-                    if s33.last
-                      r33 = instantiate_node(T,input, i33...index, s33)
-                      r33.extend(ConnectSpec8)
+                    if s27.last
+                      r27 = instantiate_node(T,input, i27...index, s27)
+                      r27.extend(ConnectSpec6)
                     else
-                      @index = i33
-                      r33 = nil
+                      @index = i27
+                      r27 = nil
                     end
-                    if r33
-                      r0 = r33
+                    if r27
+                      r0 = r27
                     else
-                      i37, s37 = index, []
-                      r38 = _nt_t_action
-                      s37 << r38
-                      if r38
-                        r39 = _nt_t_equal
-                        s37 << r39
-                        if r39
-                          r40 = _nt_scalar_default_char_expr
-                          s37 << r40
+                      i31, s31 = index, []
+                      r32 = _nt_t_action
+                      s31 << r32
+                      if r32
+                        r33 = _nt_t_equal
+                        s31 << r33
+                        if r33
+                          r34 = _nt_scalar_default_char_expr
+                          s31 << r34
                         end
                       end
-                      if s37.last
-                        r37 = instantiate_node(T,input, i37...index, s37)
-                        r37.extend(ConnectSpec9)
+                      if s31.last
+                        r31 = instantiate_node(T,input, i31...index, s31)
+                        r31.extend(ConnectSpec7)
                       else
-                        @index = i37
-                        r37 = nil
+                        @index = i31
+                        r31 = nil
                       end
-                      if r37
-                        r0 = r37
+                      if r31
+                        r0 = r31
                       else
-                        i41, s41 = index, []
-                        r42 = _nt_t_delim
-                        s41 << r42
-                        if r42
-                          r43 = _nt_t_equal
-                          s41 << r43
-                          if r43
-                            r44 = _nt_scalar_default_char_expr
-                            s41 << r44
+                        i35, s35 = index, []
+                        r36 = _nt_t_delim
+                        s35 << r36
+                        if r36
+                          r37 = _nt_t_equal
+                          s35 << r37
+                          if r37
+                            r38 = _nt_scalar_default_char_expr
+                            s35 << r38
                           end
                         end
-                        if s41.last
-                          r41 = instantiate_node(T,input, i41...index, s41)
-                          r41.extend(ConnectSpec10)
+                        if s35.last
+                          r35 = instantiate_node(T,input, i35...index, s35)
+                          r35.extend(ConnectSpec8)
                         else
-                          @index = i41
-                          r41 = nil
+                          @index = i35
+                          r35 = nil
                         end
-                        if r41
-                          r0 = r41
+                        if r35
+                          r0 = r35
                         else
-                          i45, s45 = index, []
-                          r46 = _nt_t_pad
-                          s45 << r46
-                          if r46
-                            r47 = _nt_t_equal
-                            s45 << r47
-                            if r47
-                              r48 = _nt_scalar_default_char_expr
-                              s45 << r48
+                          i39, s39 = index, []
+                          r40 = _nt_t_pad
+                          s39 << r40
+                          if r40
+                            r41 = _nt_t_equal
+                            s39 << r41
+                            if r41
+                              r42 = _nt_scalar_default_char_expr
+                              s39 << r42
                             end
                           end
-                          if s45.last
-                            r45 = instantiate_node(T,input, i45...index, s45)
-                            r45.extend(ConnectSpec11)
+                          if s39.last
+                            r39 = instantiate_node(T,input, i39...index, s39)
+                            r39.extend(ConnectSpec9)
                           else
-                            @index = i45
-                            r45 = nil
+                            @index = i39
+                            r39 = nil
                           end
-                          if r45
-                            r0 = r45
+                          if r39
+                            r0 = r39
                           else
-                            i49, s49 = index, []
-                            i51, s51 = index, []
-                            r52 = _nt_t_unit
-                            s51 << r52
-                            if r52
-                              r53 = _nt_t_equal
-                              s51 << r53
+                            i43, s43 = index, []
+                            i45, s45 = index, []
+                            r46 = _nt_t_unit
+                            s45 << r46
+                            if r46
+                              r47 = _nt_t_equal
+                              s45 << r47
                             end
-                            if s51.last
-                              r51 = instantiate_node(SyntaxNode,input, i51...index, s51)
-                              r51.extend(ConnectSpec12)
+                            if s45.last
+                              r45 = instantiate_node(SyntaxNode,input, i45...index, s45)
+                              r45.extend(ConnectSpec10)
                             else
-                              @index = i51
-                              r51 = nil
+                              @index = i45
+                              r45 = nil
                             end
-                            if r51
-                              r50 = r51
+                            if r45
+                              r44 = r45
                             else
-                              r50 = instantiate_node(SyntaxNode,input, index...index)
+                              r44 = instantiate_node(SyntaxNode,input, index...index)
                             end
-                            s49 << r50
-                            if r50
-                              r54 = _nt_external_file_unit
-                              s49 << r54
+                            s43 << r44
+                            if r44
+                              r48 = _nt_external_file_unit
+                              s43 << r48
                             end
-                            if s49.last
-                              r49 = instantiate_node(T,input, i49...index, s49)
-                              r49.extend(ConnectSpec13)
+                            if s43.last
+                              r43 = instantiate_node(T,input, i43...index, s43)
+                              r43.extend(ConnectSpec11)
                             else
-                              @index = i49
-                              r49 = nil
+                              @index = i43
+                              r43 = nil
                             end
-                            if r49
-                              r0 = r49
+                            if r43
+                              r0 = r43
                             else
                               @index = i0
                               r0 = nil
@@ -7504,16 +7442,6 @@ module Fortran
   end
 
   module ConnectSpecList0
-    def t_comma
-      elements[0]
-    end
-
-    def connect_spec
-      elements[1]
-    end
-  end
-
-  module ConnectSpecList1
     def connect_spec
       elements[0]
     end
@@ -7537,20 +7465,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_connect_spec
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(ConnectSpecList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_connect_spec_list_pair
         if r3
           s2 << r3
         else
@@ -7562,13 +7477,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Connect_Spec_List,input, i0...index, s0)
-      r0.extend(ConnectSpecList1)
+      r0.extend(ConnectSpecList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:connect_spec_list][start_index] = r0
+
+    r0
+  end
+
+  module ConnectSpecListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def connect_spec
+      elements[1]
+    end
+  end
+
+  def _nt_connect_spec_list_pair
+    start_index = index
+    if node_cache[:connect_spec_list_pair].has_key?(index)
+      cached = node_cache[:connect_spec_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_connect_spec
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Connect_Spec_List_Pair,input, i0...index, s0)
+      r0.extend(ConnectSpecListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:connect_spec_list_pair][start_index] = r0
 
     r0
   end
@@ -18748,34 +18704,6 @@ module Fortran
   end
 
   module IoControlSpec4
-    def t_eor
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def label
-      elements[2]
-    end
-  end
-
-  module IoControlSpec5
-    def t_err
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def label
-      elements[2]
-    end
-  end
-
-  module IoControlSpec6
     def t_fmt
       elements[0]
     end
@@ -18789,21 +18717,7 @@ module Fortran
     end
   end
 
-  module IoControlSpec7
-    def t_iostat
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_int_variable
-      elements[2]
-    end
-  end
-
-  module IoControlSpec8
+  module IoControlSpec5
     def t_nml
       elements[0]
     end
@@ -18817,7 +18731,7 @@ module Fortran
     end
   end
 
-  module IoControlSpec9
+  module IoControlSpec6
     def t_rec
       elements[0]
     end
@@ -18831,21 +18745,7 @@ module Fortran
     end
   end
 
-  module IoControlSpec10
-    def t_size
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_int_variable
-      elements[2]
-    end
-  end
-
-  module IoControlSpec11
+  module IoControlSpec7
     def t_unit
       elements[0]
     end
@@ -18977,177 +18877,109 @@ module Fortran
           if r17
             r0 = r17
           else
-            i21, s21 = index, []
-            r22 = _nt_t_eor
-            s21 << r22
-            if r22
-              r23 = _nt_t_equal
-              s21 << r23
-              if r23
-                r24 = _nt_label
-                s21 << r24
-              end
-            end
-            if s21.last
-              r21 = instantiate_node(IO_Spec_Eor,input, i21...index, s21)
-              r21.extend(IoControlSpec4)
-            else
-              @index = i21
-              r21 = nil
-            end
+            r21 = _nt_io_spec_eor
             if r21
               r0 = r21
             else
-              i25, s25 = index, []
-              r26 = _nt_t_err
-              s25 << r26
-              if r26
-                r27 = _nt_t_equal
-                s25 << r27
-                if r27
-                  r28 = _nt_label
-                  s25 << r28
-                end
-              end
-              if s25.last
-                r25 = instantiate_node(IO_Spec_Err,input, i25...index, s25)
-                r25.extend(IoControlSpec5)
+              r22 = _nt_io_spec_err
+              if r22
+                r0 = r22
               else
-                @index = i25
-                r25 = nil
-              end
-              if r25
-                r0 = r25
-              else
-                i29, s29 = index, []
-                r30 = _nt_t_fmt
-                s29 << r30
-                if r30
-                  r31 = _nt_t_equal
-                  s29 << r31
-                  if r31
-                    r32 = _nt_format
-                    s29 << r32
+                i23, s23 = index, []
+                r24 = _nt_t_fmt
+                s23 << r24
+                if r24
+                  r25 = _nt_t_equal
+                  s23 << r25
+                  if r25
+                    r26 = _nt_format
+                    s23 << r26
                   end
                 end
-                if s29.last
-                  r29 = instantiate_node(T,input, i29...index, s29)
-                  r29.extend(IoControlSpec6)
+                if s23.last
+                  r23 = instantiate_node(T,input, i23...index, s23)
+                  r23.extend(IoControlSpec4)
                 else
-                  @index = i29
-                  r29 = nil
+                  @index = i23
+                  r23 = nil
                 end
-                if r29
-                  r0 = r29
+                if r23
+                  r0 = r23
                 else
-                  i33, s33 = index, []
-                  r34 = _nt_t_iostat
-                  s33 << r34
-                  if r34
-                    r35 = _nt_t_equal
-                    s33 << r35
-                    if r35
-                      r36 = _nt_scalar_default_int_variable
-                      s33 << r36
-                    end
-                  end
-                  if s33.last
-                    r33 = instantiate_node(IO_Spec_Iostat,input, i33...index, s33)
-                    r33.extend(IoControlSpec7)
+                  r27 = _nt_io_spec_iostat
+                  if r27
+                    r0 = r27
                   else
-                    @index = i33
-                    r33 = nil
-                  end
-                  if r33
-                    r0 = r33
-                  else
-                    i37, s37 = index, []
-                    r38 = _nt_t_nml
-                    s37 << r38
-                    if r38
-                      r39 = _nt_t_equal
-                      s37 << r39
-                      if r39
-                        r40 = _nt_namelist_group_name
-                        s37 << r40
+                    i28, s28 = index, []
+                    r29 = _nt_t_nml
+                    s28 << r29
+                    if r29
+                      r30 = _nt_t_equal
+                      s28 << r30
+                      if r30
+                        r31 = _nt_namelist_group_name
+                        s28 << r31
                       end
                     end
-                    if s37.last
-                      r37 = instantiate_node(T,input, i37...index, s37)
-                      r37.extend(IoControlSpec8)
+                    if s28.last
+                      r28 = instantiate_node(T,input, i28...index, s28)
+                      r28.extend(IoControlSpec5)
                     else
-                      @index = i37
-                      r37 = nil
+                      @index = i28
+                      r28 = nil
                     end
-                    if r37
-                      r0 = r37
+                    if r28
+                      r0 = r28
                     else
-                      i41, s41 = index, []
-                      r42 = _nt_t_rec
-                      s41 << r42
-                      if r42
-                        r43 = _nt_t_equal
-                        s41 << r43
-                        if r43
-                          r44 = _nt_scalar_int_expr
-                          s41 << r44
+                      i32, s32 = index, []
+                      r33 = _nt_t_rec
+                      s32 << r33
+                      if r33
+                        r34 = _nt_t_equal
+                        s32 << r34
+                        if r34
+                          r35 = _nt_scalar_int_expr
+                          s32 << r35
                         end
                       end
-                      if s41.last
-                        r41 = instantiate_node(T,input, i41...index, s41)
-                        r41.extend(IoControlSpec9)
+                      if s32.last
+                        r32 = instantiate_node(T,input, i32...index, s32)
+                        r32.extend(IoControlSpec6)
                       else
-                        @index = i41
-                        r41 = nil
+                        @index = i32
+                        r32 = nil
                       end
-                      if r41
-                        r0 = r41
+                      if r32
+                        r0 = r32
                       else
-                        i45, s45 = index, []
-                        r46 = _nt_t_size
-                        s45 << r46
-                        if r46
-                          r47 = _nt_t_equal
-                          s45 << r47
-                          if r47
-                            r48 = _nt_scalar_default_int_variable
-                            s45 << r48
-                          end
-                        end
-                        if s45.last
-                          r45 = instantiate_node(IO_Spec_Size,input, i45...index, s45)
-                          r45.extend(IoControlSpec10)
+                        r36 = _nt_io_spec_size
+                        if r36
+                          r0 = r36
                         else
-                          @index = i45
-                          r45 = nil
-                        end
-                        if r45
-                          r0 = r45
-                        else
-                          i49, s49 = index, []
-                          r50 = _nt_t_unit
-                          s49 << r50
-                          if r50
-                            r51 = _nt_t_equal
-                            s49 << r51
-                            if r51
-                              r52 = _nt_io_unit
-                              s49 << r52
+                          i37, s37 = index, []
+                          r38 = _nt_t_unit
+                          s37 << r38
+                          if r38
+                            r39 = _nt_t_equal
+                            s37 << r39
+                            if r39
+                              r40 = _nt_io_unit
+                              s37 << r40
                             end
                           end
-                          if s49.last
-                            r49 = instantiate_node(T,input, i49...index, s49)
-                            r49.extend(IoControlSpec11)
+                          if s37.last
+                            r37 = instantiate_node(T,input, i37...index, s37)
+                            r37.extend(IoControlSpec7)
                           else
-                            @index = i49
-                            r49 = nil
+                            @index = i37
+                            r37 = nil
                           end
-                          if r49
-                            r0 = r49
+                          if r37
+                            r0 = r37
                           else
-                            r53 = _nt_io_unit
-                            if r53
-                              r0 = r53
+                            r41 = _nt_io_unit
+                            if r41
+                              r0 = r41
                             else
                               @index = i0
                               r0 = nil
@@ -19171,16 +19003,6 @@ module Fortran
   end
 
   module IoControlSpecList0
-    def t_comma
-      elements[0]
-    end
-
-    def io_control_spec
-      elements[1]
-    end
-  end
-
-  module IoControlSpecList1
     def io_control_spec
       elements[0]
     end
@@ -19204,20 +19026,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_io_control_spec
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(IoControlSpecList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_io_control_spec_list_pair
         if r3
           s2 << r3
         else
@@ -19229,13 +19038,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(IO_Control_Spec_List,input, i0...index, s0)
-      r0.extend(IoControlSpecList1)
+      r0.extend(IoControlSpecList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:io_control_spec_list][start_index] = r0
+
+    r0
+  end
+
+  module IoControlSpecListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def io_control_spec
+      elements[1]
+    end
+  end
+
+  def _nt_io_control_spec_list_pair
+    start_index = index
+    if node_cache[:io_control_spec_list_pair].has_key?(index)
+      cached = node_cache[:io_control_spec_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_io_control_spec
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Control_Spec_List_Pair,input, i0...index, s0)
+      r0.extend(IoControlSpecListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_control_spec_list_pair][start_index] = r0
 
     r0
   end
@@ -19553,6 +19403,202 @@ module Fortran
     end
 
     node_cache[:io_implied_do_object_list][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecEor0
+    def t_eor
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def label
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_eor
+    start_index = index
+    if node_cache[:io_spec_eor].has_key?(index)
+      cached = node_cache[:io_spec_eor][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_eor
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_label
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Eor,input, i0...index, s0)
+      r0.extend(IoSpecEor0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_eor][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecErr0
+    def t_err
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def label
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_err
+    start_index = index
+    if node_cache[:io_spec_err].has_key?(index)
+      cached = node_cache[:io_spec_err][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_err
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_label
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Err,input, i0...index, s0)
+      r0.extend(IoSpecErr0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_err][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecIostat0
+    def t_iostat
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_int_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_iostat
+    start_index = index
+    if node_cache[:io_spec_iostat].has_key?(index)
+      cached = node_cache[:io_spec_iostat][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_iostat
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_int_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Iostat,input, i0...index, s0)
+      r0.extend(IoSpecIostat0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_iostat][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecSize0
+    def t_size
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_int_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_size
+    start_index = index
+    if node_cache[:io_spec_size].has_key?(index)
+      cached = node_cache[:io_spec_size][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_size
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_int_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Size,input, i0...index, s0)
+      r0.extend(IoSpecSize0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_size][start_index] = r0
 
     r0
   end
