@@ -217,3 +217,7 @@
 - Implement a continuation scheme (following Fortran!) for SMS directives.
 
 - Factor 'if (iam_root()) then' wrapping in IO statements.
+
+- Does ppp_bcast require a 7-dimension array? And should it be max_decom.._dims
+  or the actual number?
+

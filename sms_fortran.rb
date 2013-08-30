@@ -348,6 +348,13 @@ module Fortran
         code.push("if (iam_root()) then")
         code.push("#{self}")
         code.push("endif")
+        if (var=self.iostat_var)
+          use("module_decomp")
+          varenv=getvarenv(var)
+          code.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1,1,1,1,1,1,1/),ppp_max_decomposed_dims,ppp__status)")
+        end
+        if (label=self.err_label)
+        end
 # HACK start
         code.push("!sms$ignore end")
 # HACK end
