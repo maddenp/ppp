@@ -215,3 +215,5 @@
   of each call into the SMS library.
 
 - Implement a continuation scheme (following Fortran!) for SMS directives.
+
+- Factor 'if (iam_root()) then' wrapping in IO statements.

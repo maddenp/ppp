@@ -336,6 +336,31 @@ module Fortran
 
   end
 
+  class Open_Stmt < StmtC
+
+    def translate
+      unless self.env[:sms_ignore]
+        declare("logical","iam_root")
+        code=[]
+# HACK start
+        code.push("!sms$ignore begin")
+# HACK end
+        code.push("if (iam_root()) then")
+        code.push("#{self}")
+        code.push("endif")
+# HACK start
+        code.push("!sms$ignore end")
+# HACK end
+        code=code.join("\n")
+# HACK start
+# Get rid of sms$ignore bracketing when legacy ppp is gone
+        replace_statement(code,:sms_ignore_executable)
+# HACK end
+      end
+    end
+
+  end
+
   class Print_Stmt < T
 
     def translate

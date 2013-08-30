@@ -1035,8 +1035,34 @@ module Fortran
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{ir(e[5],""," ")}#{e[6]}") end
   end
 
+  class Connect_Spec_Err < T
+    def rhs() "#{e[2]}" end
+  end
+
+  class Connect_Spec_Iostat < T
+    def rhs() "#{e[2]}" end
+  end
+
   class Connect_Spec_List < T
-    def to_s() list_to_s end
+
+    def err_label
+      list_item(Connect_Spec_Err)
+    end
+
+    def iostat_var
+      list_item(Connect_Spec_Iostat)
+    end
+
+    def list_item(spec)
+      return e[0].rhs if e[0].is_a?(spec)
+      e[1].e.each { |x| return x.e[1].rhs if x.e[1].is_a?(spec) } if e[1]
+      nil
+    end
+
+    def to_s
+      list_to_s
+    end
+
   end
 
   class Contains_Stmt < T
@@ -1796,6 +1822,18 @@ module Fortran
 
   class Only_Option < T
     def localname() "#{e[0]}" end
+  end
+
+  class Open_Stmt < StmtC
+
+    def err_label
+      e[3].err_label
+    end
+
+    def iostat_var
+      e[3].iostat_var
+    end
+
   end
 
   class Optional_Stmt < T

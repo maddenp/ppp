@@ -7207,7 +7207,7 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
+      r1 = instantiate_node(Connect_Spec_Iostat,input, i1...index, s1)
       r1.extend(ConnectSpec0)
     else
       @index = i1
@@ -7228,7 +7228,7 @@ module Fortran
         end
       end
       if s5.last
-        r5 = instantiate_node(T,input, i5...index, s5)
+        r5 = instantiate_node(Connect_Spec_Err,input, i5...index, s5)
         r5.extend(ConnectSpec1)
       else
         @index = i5
@@ -23162,7 +23162,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtC,input, i0...index, s0)
+      r0 = instantiate_node(Open_Stmt,input, i0...index, s0)
       r0.extend(OpenStmt0)
     else
       @index = i0

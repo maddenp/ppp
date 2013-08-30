@@ -721,8 +721,8 @@ grammar Fortran
   rule connect_spec
     # F90:R905
 
-    t_iostat t_equal scalar_default_int_variable <T> /
-    t_err t_equal label <T> /
+    t_iostat t_equal scalar_default_int_variable <Connect_Spec_Iostat> /
+    t_err t_equal label <Connect_Spec_Err> /
     t_file t_equal file_name_expr <T> /
     t_status t_equal scalar_default_char_expr <T> /
     t_access t_equal scalar_default_char_expr <T> /
@@ -2344,7 +2344,7 @@ grammar Fortran
   rule open_stmt
     # F90:R904
 
-    label:label? t_open t_paren_l connect_spec_list t_paren_r t_newline <StmtC>
+    label:label? t_open t_paren_l connect_spec_list t_paren_r t_newline <Open_Stmt>
   end
 
   rule optional_stmt
