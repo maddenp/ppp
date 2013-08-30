@@ -394,7 +394,7 @@ module Fortran
 
   end
 
-  # Generic Subclasses
+  # Generic subclasses
 
   class T < Treetop::Runtime::SyntaxNode
 
@@ -631,7 +631,35 @@ module Fortran
     def to_s() stmt(space) end
   end
 
-  # Specific Subclasses
+  # Out-of-order class definitions (must be defined before subclassed)
+
+  class IO_Spec_List < T
+
+    def err
+      list_item(IO_Spec_Err)
+    end
+
+    def iostat
+      list_item(IO_Spec_Iostat)
+    end
+
+    def list_item(spec)
+      return specpair(e[0]) if e[0].is_a?(spec)
+      e[1].e.each { |x| return specpair(x.e[1]) if x.e[1].is_a?(spec) } if e[1]
+      nil
+    end
+
+    def specpair(x)
+      OpenStruct.new({:spec=>x,:rhs=>x.rhs})
+    end
+
+    def to_s
+      list_to_s
+    end
+
+  end
+
+  # Grammar-supporting subclasses
 
   class AC_Implied_Do_Control < T
 
@@ -1035,34 +1063,7 @@ module Fortran
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{ir(e[5],""," ")}#{e[6]}") end
   end
 
-  class Connect_Spec_Err < T
-    def rhs() "#{e[2]}" end
-  end
-
-  class Connect_Spec_Iostat < T
-    def rhs() "#{e[2]}" end
-  end
-
-  class Connect_Spec_List < T
-
-    def err_label
-      list_item(Connect_Spec_Err)
-    end
-
-    def iostat_var
-      list_item(Connect_Spec_Iostat)
-    end
-
-    def list_item(spec)
-      return e[0].rhs if e[0].is_a?(spec)
-      e[1].e.each { |x| return x.e[1].rhs if x.e[1].is_a?(spec) } if e[1]
-      nil
-    end
-
-    def to_s
-      list_to_s
-    end
-
+  class Connect_Spec_List < IO_Spec_List
   end
 
   class Contains_Stmt < T
@@ -1597,12 +1598,27 @@ module Fortran
     def to_s() list_to_s end
   end
 
-  class IO_Control_Spec_List < T
-    def to_s() list_to_s end
+  class IO_Control_Spec_List < IO_Spec_List
   end
 
   class IO_Implied_Do_Object_List < T
     def to_s() list_to_s end
+  end
+
+  class IO_Spec < T
+    def rhs() "#{e[2]}" end
+  end
+
+  class IO_Spec_Eor < IO_Spec
+  end
+
+  class IO_Spec_Err < IO_Spec
+  end
+
+  class IO_Spec_Iostat < IO_Spec
+  end
+
+  class IO_Spec_Size < IO_Spec
   end
 
   class Kind_Selector < T
@@ -1826,12 +1842,12 @@ module Fortran
 
   class Open_Stmt < StmtC
 
-    def err_label
-      e[3].err_label
+    def err
+      e[3].err
     end
 
-    def iostat_var
-      e[3].iostat_var
+    def iostat
+      e[3].iostat
     end
 
   end

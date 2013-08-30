@@ -114,7 +114,141 @@ module Fortran
     true
   end
 
+  class T < Treetop::Runtime::SyntaxNode
+
+    def declare(type,var,props={})
+      dc=declaration_constructs
+      varenv=getvarenv(var,dc,false)
+      if varenv
+        fail "Variable #{var} is already defined" unless varenv["pppvar"]
+      else
+        kind=props[:kind]
+        kind=([nil,"_default"].include?(kind))?(""):("(kind=#{kind})")
+        attrs=props[:attrs]||[]
+        attrs=[attrs] unless attrs.is_a?(Array)
+        attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
+        code="#{type}#{kind}#{attrs}::#{var}"
+        dims=props[:dims]
+        code+="(#{dims.join(',')})" if dims
+        init=props[:init]
+        code+="=#{init}" if init
+        t=raw(code,:type_declaration_stmt,root.srcfile)
+        t.parent=dc
+        dc.e.insert(0,t) # prefer "dc.e.push(t)" -- see TODO
+        dc.env[var]||={}
+        dc.env[var]["pppvar"]=true
+      end
+      var
+    end
+
+    def distribute_array_bounds(spec,varenv)
+      if (decomp=varenv["decomp"])
+        if spec and spec.is_a?(Explicit_Shape_Spec_List)
+          cb=spec.concrete_boundslist
+          newbounds=[]
+          cb.each_index do |i|
+            b=cb[i]
+            arrdim=i+1
+            if (decdim=varenv["dim#{arrdim}"])
+              s="#{decomp}__local_lb(#{decdim},#{decomp}__nestlevel):"+
+                "#{decomp}__local_ub(#{decdim},#{decomp}__nestlevel)"
+            else
+              s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
+            end
+            newbounds.push(s)
+          end
+          code=newbounds.join(",")
+
+# HACK start
+
+# Uncomment when legacy ppp doesn't neeed to translate distribute
+
+#         replace_element(code,:array_spec,spec)
+
 # HACK end
+
+        end
+      end
+    end
+
+    def env
+      (envsrc=ancestor(Scoping_Unit,SMS_Region))?(envsrc.envref):(self.envref)
+    end
+
+    def halo_offsets(decdim)
+      halo_lo=0
+      halo_up=0
+      if halocomp=self.env[:sms_halo_comp]
+        offsets=halocomp[decdim]
+        halo_lo=offsets.lo
+        halo_up=offsets.up
+      end
+      OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
+    end
+
+    def sms(s)
+      "#{e[0]}#{e[1]} #{s}\n"
+    end
+
+    def smstype(type,kind)
+      kind=nil if kind=="_default"
+      case type
+      when "character"
+        return "nnt_bytes"
+      when "complex"
+        return (kind)?("nnt_c#{kind}"):("nnt_complex")
+      when "doubleprecision"
+        return "nnt_doubleprecision"
+      when "integer"
+        return (kind)?("nnt_i#{kind}"):("nnt_integer")
+      when "logical"
+        return (kind)?("nnt_l#{kind}"):("nnt_logical")
+      when "real"
+        return (kind)?("nnt_r#{kind}"):("nnt_real")
+      end
+      fail "No NNT type defined for '#{type}#{kind}'"
+    end
+
+# HACK start
+
+# This overrides T#use in fortran.rb to provide sms$ignore wraps for peaceful
+# coexistence with legacy ppp, for now. Remove this HACK when legacy ppp is
+# removed from build chain.
+
+    def use(modname,usenames=[])
+      unless uses?(modname,:all)
+        new_usenames=[]
+        code="use #{modname}"
+        unless usenames.empty?
+          list=[]
+          usenames.each do |x| 
+           h=x.is_a?(Hash)
+            localname=(h)?(x.keys.first):(nil)
+            usename=(h)?(x.values.first):(x)
+            unless uses?(modname,usename)
+              list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
+              new_usenames.push([localname||usename,usename])
+            end
+          end
+          code+=((list.empty?)?(""):(",only:#{list.join(",")}"))
+        end
+        up=use_part
+        new_usenames=[[:all]] if new_usenames.empty?
+        new_uses={modname=>new_usenames}
+        old_uses=up.env[:uses]
+        up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
+  # sub HACK start
+        code=("!sms$ignore begin\n#{code}\n!sms$ignore end")
+        t=raw(code,:sms_ignore_use,@srcfile)
+        t.parent=up
+        up.e.push(t)
+  # sub HACK end
+      end
+    end
+
+# HACK end
+
+  end # class T
 
   class Allocate_Object < E
 
@@ -258,6 +392,18 @@ module Fortran
 
   end
 
+  class IO_Spec_Eor < IO_Spec
+    def pppvar() declare("integer","ppp__io_eor") end
+  end
+
+  class IO_Spec_Err < IO_Spec
+    def pppvar() declare("integer","ppp__io_err") end
+  end
+
+  class IO_Spec_Size < IO_Spec
+    def pppvar() declare("integer","ppp__io_size") end
+  end
+
   class Name < T
 
     def self.global(name)
@@ -339,7 +485,7 @@ module Fortran
   class Open_Stmt < StmtC
 
     def translate
-      unless self.env[:sms_ignore]
+      unless self.env[:sms_ignore] or self.env[:sms_serial]
         declare("logical","iam_root")
         code=[]
 # HACK start
@@ -348,12 +494,14 @@ module Fortran
         code.push("if (iam_root()) then")
         code.push("#{self}")
         code.push("endif")
-        if (var=self.iostat_var)
-          use("module_decomp")
-          varenv=getvarenv(var)
-          code.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1,1,1,1,1,1,1/),ppp_max_decomposed_dims,ppp__status)")
+        if (err=self.err)
+#         puts "### err label [#{err.rhs}]"
         end
-        if (label=self.err_label)
+        if (iostat=self.iostat)
+#         use("module_decomp")
+#         var=iostat.rhs
+#         varenv=getvarenv(var)
+#         code.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1,1,1,1,1,1,1/),ppp_max_decomposed_dims,ppp__status)")
         end
 # HACK start
         code.push("!sms$ignore end")
@@ -371,7 +519,7 @@ module Fortran
   class Print_Stmt < T
 
     def translate
-      unless self.env[:sms_ignore]
+      unless self.env[:sms_ignore] or self.env[:sms_serial]
         declare("logical","iam_root")
         code=[]
 # HACK start
@@ -1476,140 +1624,7 @@ module Fortran
     def vars() [e[0]] end
   end
 
-  class T < Treetop::Runtime::SyntaxNode
-
-    def declare(type,name,props={})
-      dc=declaration_constructs
-      varenv=getvarenv(name,dc,false)
-      if varenv
-        fail "Variable #{name} is already defined" unless varenv["pppvar"]
-      else
-        kind=props[:kind]
-        kind=([nil,"_default"].include?(kind))?(""):("(kind=#{kind})")
-        attrs=props[:attrs]||[]
-        attrs=[attrs] unless attrs.is_a?(Array)
-        attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
-        code="#{type}#{kind}#{attrs}::#{name}"
-        dims=props[:dims]
-        code+="(#{dims.join(',')})" if dims
-        init=props[:init]
-        code+="=#{init}" if init
-        t=raw(code,:type_declaration_stmt,root.srcfile)
-        t.parent=dc
-        dc.e.insert(0,t) # prefer "dc.e.push(t)" -- see TODO
-        dc.env[name]||={}
-        dc.env[name]["pppvar"]=true
-      end
-    end
-
-    def distribute_array_bounds(spec,varenv)
-      if (decomp=varenv["decomp"])
-        if spec and spec.is_a?(Explicit_Shape_Spec_List)
-          cb=spec.concrete_boundslist
-          newbounds=[]
-          cb.each_index do |i|
-            b=cb[i]
-            arrdim=i+1
-            if (decdim=varenv["dim#{arrdim}"])
-              s="#{decomp}__local_lb(#{decdim},#{decomp}__nestlevel):"+
-                "#{decomp}__local_ub(#{decdim},#{decomp}__nestlevel)"
-            else
-              s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
-            end
-            newbounds.push(s)
-          end
-          code=newbounds.join(",")
-
-# HACK start
-
-# Uncomment when legacy ppp doesn't neeed to translate distribute
-
-#         replace_element(code,:array_spec,spec)
-
-# HACK end
-
-        end
-      end
-    end
-
-    def env
-      (envsrc=ancestor(Scoping_Unit,SMS_Region))?(envsrc.envref):(self.envref)
-    end
-
-    def halo_offsets(decdim)
-      halo_lo=0
-      halo_up=0
-      if halocomp=self.env[:sms_halo_comp]
-        offsets=halocomp[decdim]
-        halo_lo=offsets.lo
-        halo_up=offsets.up
-      end
-      OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
-    end
-
-    def sms(s)
-      "#{e[0]}#{e[1]} #{s}\n"
-    end
-
-    def smstype(type,kind)
-      kind=nil if kind=="_default"
-      case type
-      when "character"
-        return "nnt_bytes"
-      when "complex"
-        return (kind)?("nnt_c#{kind}"):("nnt_complex")
-      when "doubleprecision"
-        return "nnt_doubleprecision"
-      when "integer"
-        return (kind)?("nnt_i#{kind}"):("nnt_integer")
-      when "logical"
-        return (kind)?("nnt_l#{kind}"):("nnt_logical")
-      when "real"
-        return (kind)?("nnt_r#{kind}"):("nnt_real")
-      end
-      fail "No NNT type defined for '#{type}#{kind}'"
-    end
-
-# HACK start
-
-# This overrides T#use in fortran.rb to provide sms$ignore wraps for peaceful
-# coexistence with legacy ppp, for now. Remove this HACK when legacy ppp is
-# removed from build chain.
-
-    def use(modname,usenames=[])
-      unless uses?(modname,:all)
-        new_usenames=[]
-        code="use #{modname}"
-        unless usenames.empty?
-          list=[]
-          usenames.each do |x|
-            h=x.is_a?(Hash)
-            localname=(h)?(x.keys.first):(nil)
-            usename=(h)?(x.values.first):(x)
-            unless uses?(modname,usename)
-              list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
-              new_usenames.push([localname||usename,usename])
-            end
-          end
-          code+=((list.empty?)?(""):(",only:#{list.join(",")}"))
-        end
-        up=use_part
-        new_usenames=[[:all]] if new_usenames.empty?
-        new_uses={modname=>new_usenames}
-        old_uses=up.env[:uses]
-        up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
-  # sub HACK start
-        code=("!sms$ignore begin\n#{code}\n!sms$ignore end")
-        t=raw(code,:sms_ignore_use,@srcfile)
-        t.parent=up
-        up.e.push(t)
-  # sub HACK end
-      end
-    end
-      
-  end
-
-end
+end # module Fortran
 
 class Translator
 

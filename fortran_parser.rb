@@ -7207,7 +7207,7 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(Connect_Spec_Iostat,input, i1...index, s1)
+      r1 = instantiate_node(IO_Spec_Iostat,input, i1...index, s1)
       r1.extend(ConnectSpec0)
     else
       @index = i1
@@ -7228,7 +7228,7 @@ module Fortran
         end
       end
       if s5.last
-        r5 = instantiate_node(Connect_Spec_Err,input, i5...index, s5)
+        r5 = instantiate_node(IO_Spec_Err,input, i5...index, s5)
         r5.extend(ConnectSpec1)
       else
         @index = i5
@@ -18989,7 +18989,7 @@ module Fortran
               end
             end
             if s21.last
-              r21 = instantiate_node(T,input, i21...index, s21)
+              r21 = instantiate_node(IO_Spec_Eor,input, i21...index, s21)
               r21.extend(IoControlSpec4)
             else
               @index = i21
@@ -19010,7 +19010,7 @@ module Fortran
                 end
               end
               if s25.last
-                r25 = instantiate_node(T,input, i25...index, s25)
+                r25 = instantiate_node(IO_Spec_Err,input, i25...index, s25)
                 r25.extend(IoControlSpec5)
               else
                 @index = i25
@@ -19052,7 +19052,7 @@ module Fortran
                     end
                   end
                   if s33.last
-                    r33 = instantiate_node(T,input, i33...index, s33)
+                    r33 = instantiate_node(IO_Spec_Iostat,input, i33...index, s33)
                     r33.extend(IoControlSpec7)
                   else
                     @index = i33
@@ -19115,7 +19115,7 @@ module Fortran
                           end
                         end
                         if s45.last
-                          r45 = instantiate_node(T,input, i45...index, s45)
+                          r45 = instantiate_node(IO_Spec_Size,input, i45...index, s45)
                           r45.extend(IoControlSpec10)
                         else
                           @index = i45

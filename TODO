@@ -221,3 +221,4 @@
 - Does ppp_bcast require a 7-dimension array? And should it be max_decom.._dims
   or the actual number?
 
+- Must handle eor=/err= inside serial region, too.
