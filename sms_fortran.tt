@@ -64,6 +64,12 @@ grammar Fortran
     sms_ignore_subprogram
   end
 
+  rule label
+    # F90:R313
+
+    t_digit 1..5 &{ |e| sp_label(e) } <Label>
+  end
+
   rule module_subprogram
     # F90:R213
 

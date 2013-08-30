@@ -1625,6 +1625,9 @@ module Fortran
     def kind() "#{e[2]}" end
   end
 
+  class Label < T
+  end
+
   class Label_Do_Stmt < T
 
     def label

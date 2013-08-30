@@ -464,6 +464,64 @@ module Fortran
     r0
   end
 
+  module Label0
+  end
+
+  def _nt_label
+    start_index = index
+    if node_cache[:label].has_key?(index)
+      cached = node_cache[:label][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    s1, i1 = [], index
+    loop do
+      r2 = _nt_t_digit
+      if r2
+        s1 << r2
+      else
+        break
+      end
+      if s1.size == 5
+        break
+      end
+    end
+    if s1.size < 1
+      @index = i1
+      r1 = nil
+    else
+      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+    end
+    s0 << r1
+    if r1
+      i3 = index
+      r4 = lambda { |e| sp_label(e) }.call(s0)
+      if r4
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r3 = nil
+      end
+      s0 << r3
+    end
+    if s0.last
+      r0 = instantiate_node(Label,input, i0...index, s0)
+      r0.extend(Label0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:label][start_index] = r0
+
+    r0
+  end
+
   module ModuleSubprogram0
     def subroutine_subprogram
       elements[0]

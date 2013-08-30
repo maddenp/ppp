@@ -19830,7 +19830,7 @@ module Fortran
       @index = i0
       r0 = nil
     else
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Label,input, i0...index, s0)
     end
 
     node_cache[:label][start_index] = r0

@@ -1976,7 +1976,7 @@ grammar Fortran
   rule label
     # F90:R313
 
-    t_digit 1..5 <T>
+    t_digit 1..5 <Label>
   end
 
   rule label_do_stmt

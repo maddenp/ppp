@@ -2,6 +2,19 @@ require "set"
 
 module Fortran
 
+  def envpush
+    labels=env.delete(:labels)
+    @envstack.push(deepcopy(env))
+    env[:labels]=labels if labels
+  end
+
+  def sp_label(label)
+    n=label[0].e.reduce("") { |m,x| m+"#{x}" }.to_i
+    env[:labels]||=Set.new
+    env[:labels].add(n)
+    true
+  end
+
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
     fail "Already inside distribute region" if @distribute
     @distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
