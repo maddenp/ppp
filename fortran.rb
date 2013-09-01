@@ -24,8 +24,9 @@ module Fortran
   end
 
   def envpop
-    @envstack.pop
+    oldenv=@envstack.pop
     @envstack.push({}) if @envstack.empty?
+    oldenv
   end
 
   def envpush
@@ -283,7 +284,7 @@ module Fortran
       varprops.each { |v,p| p["access"]=@access }
     end
     varprops.each do |v,p|
-      varenv=env[v]||={}
+      varenv=(env[v]||={})
       ["access","sort"].each { |x| p.delete(x) if varenv.include?(x) }
       p["type"]=type_spec.type
       p["kind"]=type_spec.kind
@@ -441,7 +442,7 @@ module Fortran
     end
 
     def env
-      (envsrc=scoping_unit)?(envsrc.envref):(self.envref)
+      self.envref
     end
 
     def execution_part

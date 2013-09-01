@@ -2221,7 +2221,7 @@ module Fortran
   end
 
   module SmsIgnoreDeclarative0
-    def sms_ignore_begin
+    def sms_ignore_begin_HACK
       elements[0]
     end
 
@@ -2246,7 +2246,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r1 = _nt_sms_ignore_begin
+    r1 = _nt_sms_ignore_begin_HACK
     s0 << r1
     if r1
       r2 = _nt_declaration_constructs
@@ -2319,7 +2319,7 @@ module Fortran
   end
 
   module SmsIgnoreSubprogram0
-    def sms_ignore_begin
+    def sms_ignore_begin_HACK
       elements[0]
     end
 
@@ -2340,7 +2340,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r1 = _nt_sms_ignore_begin
+    r1 = _nt_sms_ignore_begin_HACK
     s0 << r1
     if r1
       i2 = index
@@ -2381,7 +2381,7 @@ module Fortran
   end
 
   module SmsIgnoreUse0
-    def sms_ignore_begin
+    def sms_ignore_begin_HACK
       elements[0]
     end
 
@@ -2406,7 +2406,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r1 = _nt_sms_ignore_begin
+    r1 = _nt_sms_ignore_begin_HACK
     s0 << r1
     if r1
       r2 = _nt_use_part
@@ -2494,6 +2494,63 @@ module Fortran
     end
 
     node_cache[:sms_ignore_begin][start_index] = r0
+
+    r0
+  end
+
+  module SmsIgnoreBeginHACK0
+    def sms_sentinel
+      elements[0]
+    end
+
+    def sms_t_ignore
+      elements[1]
+    end
+
+    def sms_t_begin
+      elements[2]
+    end
+
+    def t_newline
+      elements[3]
+    end
+  end
+
+  def _nt_sms_ignore_begin_HACK
+    start_index = index
+    if node_cache[:sms_ignore_begin_HACK].has_key?(index)
+      cached = node_cache[:sms_ignore_begin_HACK][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_sentinel
+    s0 << r1
+    if r1
+      r2 = _nt_sms_t_ignore
+      s0 << r2
+      if r2
+        r3 = _nt_sms_t_begin
+        s0 << r3
+        if r3
+          r4 = _nt_t_newline
+          s0 << r4
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Ignore_Begin,input, i0...index, s0)
+      r0.extend(SmsIgnoreBeginHACK0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_ignore_begin_HACK][start_index] = r0
 
     r0
   end

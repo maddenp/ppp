@@ -117,8 +117,8 @@ module Fortran
   class T < Treetop::Runtime::SyntaxNode
 
     def declare(type,var,props={})
-      dc=declaration_constructs
-      varenv=getvarenv(var,dc,false)
+      su=scoping_unit
+      varenv=getvarenv(var,su,false)
       if varenv
         fail "Variable #{var} is already defined" unless varenv["pppvar"]
       else
@@ -135,10 +135,14 @@ module Fortran
         t=raw(code,:type_declaration_stmt,root.srcfile)
         newenv=t.input.envstack.last
         newenv[var]["pppvar"]=true
+        dc=declaration_constructs
         t.parent=dc
         dc.e.insert(0,t) # prefer "dc.e.push(t)" -- see TODO
-        dc.env[var]||={}
-        dc.env[var]=newenv[var]
+        while node||=self
+          node.envref[var]=newenv[var] if node.respond_to?(:envref)
+          break if node==su
+          node=node.parent
+        end
       end
       var
     end
@@ -171,10 +175,6 @@ module Fortran
 
         end
       end
-    end
-
-    def env
-      (envsrc=ancestor(Scoping_Unit,SMS_Region))?(envsrc.envref):(self.envref)
     end
 
     def halo_offsets(decdim)
@@ -489,34 +489,34 @@ module Fortran
     def translate
       unless self.env[:sms_ignore] or self.env[:sms_serial]
         declare("logical","iam_root")
-        unless (label=self.label).empty?
-          label=self.label_delete
-        end
-        if (err=self.err)
+        err=self.err
+        label=(label=self.label.empty?)?(nil):(label)
+        label=self.label_delete if label
+        if err
           err_label_old,err_label_new=err.relabel
           err_var=err.pppvar
-        end
-        if (iostat=self.iostat)
-          use("module_decomp")
-          var=iostat.rhs
-          varenv=getvarenv(var)
-          code.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1,1,1,1,1,1,1/),ppp_max_decomposed_dims,ppp__status)")
         end
         code=[]
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
-        code.push("#{label} if (iam_root()) then")
+        code.push("#{sa(label)}if (iam_root()) then")
         if err
           code.push("#{err_var}=.false.")
         end
-        code.push("#{self}")
+        code.push("#{self}".chomp)
         if err
           code.push("goto #{continue_label=label_create}")
           code.push("#{err_label_new} #{err_var}=.true.")
           code.push("#{continue_label} continue")
         end
         code.push("endif")
+        if (iostat=self.iostat)
+          use("module_decomp")
+          var=iostat.rhs
+          varenv=getvarenv(var)
+          code.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1,1,1,1,1,1,1/),ppp_max_decomposed_dims,ppp__status)")
+        end
         if err
           varenv=getvarenv(err_var)
           code.push("call ppp_bcast(#{err_var},#{smstype(varenv["type"],varenv["kind"])},(/1,1,1,1,1,1,1/),ppp_max_decomposed_dims,ppp__status)")
@@ -547,8 +547,8 @@ module Fortran
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
-        code.push("#{label} if (iam_root()) then")
-        code.push("#{self}")
+        code.push("#{sa(label)} if (iam_root()) then")
+        code.push("#{self}".chomp)
         code.push("endif")
 # HACK start
         code.push("!sms$ignore end")

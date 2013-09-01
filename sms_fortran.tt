@@ -180,7 +180,7 @@ grammar Fortran
   end
 
   rule sms_ignore_declarative
-    sms_ignore_begin declaration_constructs sms_ignore_end <SMS_Ignore>
+    sms_ignore_begin_HACK declaration_constructs sms_ignore_end <SMS_Ignore>
   end
 
   rule sms_ignore_executable
@@ -188,15 +188,19 @@ grammar Fortran
   end
 
   rule sms_ignore_subprogram
-    sms_ignore_begin ( external_subprogram / internal_subprogram / module_subprogram ) sms_ignore_end <SMS_Ignore>
+    sms_ignore_begin_HACK ( external_subprogram / internal_subprogram / module_subprogram ) sms_ignore_end <SMS_Ignore>
   end
 
   rule sms_ignore_use
-    sms_ignore_begin use_part sms_ignore_end <SMS_Ignore>
+    sms_ignore_begin_HACK use_part sms_ignore_end <SMS_Ignore>
   end
 
   rule sms_ignore_begin
     sms_sentinel sms_t_ignore sms_t_begin t_newline &{ |e| sp_sms_ignore_begin } <SMS_Ignore_Begin>
+  end
+
+  rule sms_ignore_begin_HACK
+    sms_sentinel sms_t_ignore sms_t_begin t_newline <SMS_Ignore_Begin>
   end
 
   rule sms_ignore_end
