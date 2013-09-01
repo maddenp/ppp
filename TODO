@@ -222,3 +222,6 @@
   or the actual number?
 
 - Must handle eor=/err= inside serial region, too.
+
+- Should main-program envpush as well? Current mismatch between # of envpushes
+  and env pops
