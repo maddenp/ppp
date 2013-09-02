@@ -542,11 +542,15 @@ module Fortran
 #         use("module_decomp")
 #         var=iostat.rhs
 #         varenv=getvarenv(var)
-#         code.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1,1,1,1,1,1,1/),ppp_max_decomposed_dims,ppp__status)")
+##         code.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1,1,1,1,1,1,1/),ppp_max_decomposed_dims,ppp__status)")
+#         code.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
+#         code.push("call nnt_chkstat('ppp_bcast of #{var}',' ',ppp__status,nnt_abort_on_error,ppp__status)")
 #       end
 #       if err
 #         varenv=getvarenv(err_var)
 ##         code.push("call ppp_bcast(#{err_var},#{smstype(varenv["type"],varenv["kind"])},(/1,1,1,1,1,1,1/),ppp_max_decomposed_dims,ppp__status)")
+#         code.push("call ppp_bcast(#{err_var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
+#         code.push("call nnt_chkstat('ppp_bcast of #{err_var}',' ',ppp__status,nnt_abort_on_error,ppp__status)")
 #         code.push("if (#{err_var}) goto #{err_label_old}")
 #       end
 ## HACK start
@@ -1352,10 +1356,10 @@ module Fortran
         varenv=getvarenv(var)
         if varenv["sort"]=="_scalar"
           dims="1"
-          sizes="(/1,1,1,1,1,1,1/)"
+          sizes="(/1/)"
         else
           dims=varenv["dims"]
-          sizes="(/"+ranks.map { |r| (r>dims)?(1):("size(#{var},#{r})") }.join(",")+"/)"
+          sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
         end
 #       code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)" # masked by following HACK
 #       insert_statement_after(code,:call_stmt,newblock.e.last)                                              # masked by following HACK
@@ -1364,7 +1368,7 @@ module Fortran
         if varenv["type"]=="character"
           code="!sms$ignore begin\ncall ppp_bcast_char(#{var},#{dims},ppp__status)\n!sms$ignore end"
         else
-          code="!sms$ignore begin\ncall ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},ppp_max_decomposed_dims,ppp__status)\n!sms$ignore end"
+          code="!sms$ignore begin\ncall ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)\n!sms$ignore end"
         end
         insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
 # HACK end
