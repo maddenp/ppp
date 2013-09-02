@@ -239,3 +239,5 @@
   Open_Stmt.
 
 - Spaces after open/close/read/write keywords
+
+- Time ppp on fim routines, find long ones, profile, optimize
