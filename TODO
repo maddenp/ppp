@@ -218,6 +218,8 @@
 
 - Factor 'if (iam_root()) then' wrapping in IO statements.
 
+- Factor out common elements in implicit IO translate() methods.
+
 - Does ppp_bcast require a 7-dimension array? And should it be max_decom.._dims
   or the actual number?
 
@@ -225,3 +227,15 @@
 
 - Should main-program envpush as well? Current mismatch between # of envpushes
   and env pops
+
+- What about making calls inside serial regions to routines that do IO stmts?
+  If those IO stmts contain err=, iostat=, etc., broadcasts will hang. Can
+  we detect this at compile time and at least fail with an explanation?
+
+- Add nnt_chkstat calls after all calls into sms library.
+
+- If ppp_bcast handles logicals (test it), change type of 'pppvar' decls in
+  sms_fortran.rb to logical and use true/false in place of 1/0 in e.g. class
+  Open_Stmt.
+
+- Spaces after open/close/read/write keywords
