@@ -510,11 +510,9 @@ module Fortran
       unless self.env[:sms_ignore] or self.env[:sms_serial]
         declare("logical","iam_root")
         err=self.err
-        iostat=self.iostat
-        if err or iostat
-          use("nnt_types_module")
-        end
-        label=(label=self.label.empty?)?(nil):(label)
+        iostat_var=iostat.rhs if (iostat=self.iostat)
+        use("nnt_types_module") if err or iostat
+        label=(self.label.empty?)?(nil):(self.label)
         label=self.label_delete if label
         if err
           err_label_old,err_label_new=err.relabel
@@ -524,15 +522,8 @@ module Fortran
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
-# TODO try moving init inside iam_root block / not init'ing
-        if iostat
-          iostat_var=iostat.rhs
-          code.push("#{iostat_var}=0")
-        end
-        if err
-          code.push("#{err_var}=.false.")
-        end
         code.push("#{sa(label)}if (iam_root()) then")
+        code.push("#{err_var}=.false.") if err
         code.push("#{self}".chomp)
         if err
           code.push("goto #{continue_label=label_create}")
