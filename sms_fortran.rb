@@ -405,7 +405,7 @@ module Fortran
   class IO_Spec_Eor < IO_Spec
 
     def pppvar
-      declare("integer","#{pppvar_prefix}eor")
+      declare("logical","#{pppvar_prefix}eor")
     end
 
   end
@@ -413,7 +413,7 @@ module Fortran
   class IO_Spec_Err < IO_Spec
 
     def pppvar
-      declare("integer","#{pppvar_prefix}err")
+      declare("logical","#{pppvar_prefix}err")
     end
 
   end
@@ -524,19 +524,19 @@ module Fortran
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
-# TODO try moving init inside iam_root block
+# TODO try moving init inside iam_root block / not init'ing
         if iostat
           iostat_var=iostat.rhs
           code.push("#{iostat_var}=0")
         end
         if err
-          code.push("#{err_var}=0")
+          code.push("#{err_var}=.false.")
         end
         code.push("#{sa(label)}if (iam_root()) then")
         code.push("#{self}".chomp)
         if err
           code.push("goto #{continue_label=label_create}")
-          code.push("#{err_label_new} #{err_var}=1")
+          code.push("#{err_label_new} #{err_var}=.true.")
         end
         code.push("#{sa(continue_label)}endif")
         if iostat
@@ -547,10 +547,7 @@ module Fortran
         if err
           varenv=getvarenv(err_var)
           code.push("call ppp_bcast(#{err_var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
-# TODO try if-stmt version
-          code.push("if (#{err_var}.ne.0) then")
-          code.push("goto #{err_label_old}")
-          code.push("endif")
+          code.push("if (#{err_var}) goto #{err_label_old}")
         end
 # HACK start
         code.push("!sms$ignore end")
