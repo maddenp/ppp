@@ -682,6 +682,18 @@ module Fortran
 
   end
 
+  class IO_Stmt < T
+
+    def err
+      e[3].err
+    end
+
+    def iostat
+      e[3].iostat
+    end
+
+  end
+
   # Grammar-supporting subclasses
 
   class AC_Implied_Do_Control < T
@@ -1066,20 +1078,8 @@ module Fortran
   class Close_Spec_List_Pair < E
   end
 
-  class Close_Stmt < T
-
-    def err
-      e[3].err
-    end
-
-    def iostat
-      e[3].iostat
-    end
-
-    def to_s
-      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
-    end
-
+  class Close_Stmt < IO_Stmt
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
   end
 
   class Common_Block_Name_And_Object_List < T
@@ -1930,20 +1930,8 @@ module Fortran
     def localname() "#{e[0]}" end
   end
 
-  class Open_Stmt < T
-
-    def err
-      e[3].err
-    end
-
-    def iostat
-      e[3].iostat
-    end
-
-    def to_s
-      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
-    end
-
+  class Open_Stmt < IO_Stmt
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
   end
 
   class Optional_Stmt < T

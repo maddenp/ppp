@@ -348,53 +348,7 @@ module Fortran
 
   end
 
-  class Close_Stmt < T
-
-    def translate
-      unless self.env[:sms_ignore] or self.env[:sms_serial]
-        declare("logical","iam_root")
-        err=self.err
-        iostat_var=iostat.rhs if (iostat=self.iostat)
-        use("nnt_types_module") if err or iostat
-        label=(self.label.empty?)?(nil):(self.label)
-        label=self.label_delete if label
-        if err
-          err_label_old,err_label_new=err.relabel
-          err_var=err.pppvar
-        end
-        code=[]
-# HACK start
-        code.push("!sms$ignore begin")
-# HACK end
-        code.push("#{sa(label)}if (iam_root()) then")
-        code.push("#{err_var}=.false.") if err
-        code.push("#{self}".chomp)
-        if err
-          code.push("goto #{continue_label=label_create}")
-          code.push("#{err_label_new} #{err_var}=.true.")
-        end
-        code.push("#{sa(continue_label)}endif")
-        if iostat
-          use("module_decomp")
-          varenv=getvarenv(iostat_var)
-          code.push("call ppp_bcast(#{iostat_var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
-        end
-        if err
-          varenv=getvarenv(err_var)
-          code.push("call ppp_bcast(#{err_var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
-          code.push("if (#{err_var}) goto #{err_label_old}")
-        end
-# HACK start
-        code.push("!sms$ignore end")
-# HACK end
-        code=code.join("\n")
-# HACK start
-# Get rid of sms$ignore bracketing when legacy ppp is gone
-        replace_statement(code,:sms_ignore_executable)
-# HACK end
-      end
-    end
-
+  class Close_Stmt < IO_Stmt
   end
 
   class Entity_Decl_1 < Entity_Decl
@@ -471,6 +425,55 @@ module Fortran
 
     def pppvar
       declare("integer","#{pppvar_prefix}size")
+    end
+
+  end
+
+  class IO_Stmt < T
+
+    def translate
+      unless self.env[:sms_ignore] or self.env[:sms_serial]
+        declare("logical","iam_root")
+        err=self.err
+        iostat_var=iostat.rhs if (iostat=self.iostat)
+        use("nnt_types_module") if err or iostat
+        label=(self.label.empty?)?(nil):(self.label)
+        label=self.label_delete if label
+        if err
+          err_label_old,err_label_new=err.relabel
+          err_var=err.pppvar
+        end
+        code=[]
+# HACK start
+        code.push("!sms$ignore begin")
+# HACK end
+        code.push("#{sa(label)}if (iam_root()) then")
+        code.push("#{err_var}=.false.") if err
+        code.push("#{self}".chomp)
+        if err
+          code.push("goto #{continue_label=label_create}")
+          code.push("#{err_label_new} #{err_var}=.true.")
+        end
+        code.push("#{sa(continue_label)}endif")
+        if iostat
+          use("module_decomp")
+          varenv=getvarenv(iostat_var)
+          code.push("call ppp_bcast(#{iostat_var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
+        end
+        if err
+          varenv=getvarenv(err_var)
+          code.push("call ppp_bcast(#{err_var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
+          code.push("if (#{err_var}) goto #{err_label_old}")
+        end
+# HACK start
+        code.push("!sms$ignore end")
+# HACK end
+        code=code.join("\n")
+# HACK start
+# Get rid of sms$ignore bracketing when legacy ppp is gone
+        replace_statement(code,:sms_ignore_executable)
+# HACK end
+      end
     end
 
   end
@@ -553,53 +556,7 @@ module Fortran
 
   end
 
-  class Open_Stmt < T
-
-    def translate
-      unless self.env[:sms_ignore] or self.env[:sms_serial]
-        declare("logical","iam_root")
-        err=self.err
-        iostat_var=iostat.rhs if (iostat=self.iostat)
-        use("nnt_types_module") if err or iostat
-        label=(self.label.empty?)?(nil):(self.label)
-        label=self.label_delete if label
-        if err
-          err_label_old,err_label_new=err.relabel
-          err_var=err.pppvar
-        end
-        code=[]
-# HACK start
-        code.push("!sms$ignore begin")
-# HACK end
-        code.push("#{sa(label)}if (iam_root()) then")
-        code.push("#{err_var}=.false.") if err
-        code.push("#{self}".chomp)
-        if err
-          code.push("goto #{continue_label=label_create}")
-          code.push("#{err_label_new} #{err_var}=.true.")
-        end
-        code.push("#{sa(continue_label)}endif")
-        if iostat
-          use("module_decomp")
-          varenv=getvarenv(iostat_var)
-          code.push("call ppp_bcast(#{iostat_var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
-        end
-        if err
-          varenv=getvarenv(err_var)
-          code.push("call ppp_bcast(#{err_var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
-          code.push("if (#{err_var}) goto #{err_label_old}")
-        end
-# HACK start
-        code.push("!sms$ignore end")
-# HACK end
-        code=code.join("\n")
-# HACK start
-# Get rid of sms$ignore bracketing when legacy ppp is gone
-        replace_statement(code,:sms_ignore_executable)
-# HACK end
-      end
-    end
-
+  class Open_Stmt < IO_Stmt
   end
 
   class Print_Stmt < T
