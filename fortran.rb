@@ -1015,6 +1015,14 @@ module Fortran
     def parameter?() true end
   end
 
+  class Backspace_Stmt_1 < T
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+  end
+
+  class Backspace_Stmt_2 < T
+    def to_s() stmt("#{e[1]} #{e[2]}") end
+  end
+
   class Block_Data < Scoping_Unit
   end
 
@@ -1054,6 +1062,13 @@ module Fortran
 
   class Close_Spec_List < T
     def to_s() list_to_s end
+  end
+
+  class Close_Spec_List_Pair < E
+  end
+
+  class Close_Stmt < E
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
   end
 
   class Common_Block_Name_And_Object_List < T
@@ -1354,6 +1369,14 @@ module Fortran
     end
   end
 
+  class Endfile_Stmt_1 < T
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+  end
+
+  class Endfile_Stmt_2 < T
+    def to_s() stmt("#{e[1]} #{e[2]}") end
+  end
+
   class Entity_Decl < E
 
     def name
@@ -1588,6 +1611,14 @@ module Fortran
 
   class Inquire_Spec_List < T
     def to_s() list_to_s end
+  end
+
+  class Inquire_Stmt_1 < T
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+  end
+
+  class Inqurie_Stmt_2 < T
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}") end
   end
 
   class Intent_Stmt < T
@@ -1888,7 +1919,7 @@ module Fortran
     def localname() "#{e[0]}" end
   end
 
-  class Open_Stmt < StmtC
+  class Open_Stmt < T
 
     def err
       e[3].err
@@ -1896,6 +1927,10 @@ module Fortran
 
     def iostat
       e[3].iostat
+    end
+
+    def to_s
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
     end
 
   end
@@ -2014,7 +2049,7 @@ module Fortran
   end
 
   class Read_Stmt_1 < Read_Stmt
-    def to_s() stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
   end
 
   class Read_Stmt_2 < Read_Stmt
@@ -2044,6 +2079,13 @@ module Fortran
   class Result_Name < E
   end
 
+  class Rewind_Stmt_1 < T
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+  end
+
+  class Rewind_Stmt_2 < T
+    def to_s() stmt("#{e[1]} #{e[2]}") end
+  end
   class Save_Stmt < T
     def to_s() stmt("#{e[1]}#{e[2]}") end
   end
@@ -2192,7 +2234,7 @@ module Fortran
   end
 
   class Write_Stmt < T
-    def to_s() stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
+    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
   end
 
 end

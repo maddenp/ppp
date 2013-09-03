@@ -504,7 +504,7 @@ module Fortran
 
   end
 
-  class Open_Stmt < StmtC
+  class Open_Stmt < T
 
     def translate
       unless self.env[:sms_ignore] or self.env[:sms_serial]

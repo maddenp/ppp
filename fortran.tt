@@ -379,8 +379,8 @@ grammar Fortran
   rule backspace_stmt
     # F90:R919
 
-    label:label? t_backspace t_paren_l position_spec_list t_paren_r t_newline <StmtC> /
-    label:label? t_backspace external_file_unit t_newline <StmtJ>
+    label:label? t_backspace t_paren_l position_spec_list t_paren_r t_newline <Backspace_Stmt_1> /
+    label:label? t_backspace external_file_unit t_newline <Backspace_Stmt_2>
   end
 
   rule binary_constant
@@ -582,20 +582,24 @@ grammar Fortran
   rule close_spec
     # F90:R908
 
-    t_iostat t_equal scalar_default_int_variable <T> /
-    t_err t_equal label <T> /
+    io_spec_iostat /
+    io_spec_err /
     t_status t_equal scalar_default_char_expr <T> /
     ( t_unit t_equal )? external_file_unit <T>
   end
 
   rule close_spec_list
-    close_spec ( t_comma close_spec )* <Close_Spec_List>
+    close_spec close_spec_list_pair* <Close_Spec_List>
+  end
+
+  rule close_spec_list_pair
+    t_comma close_spec <Close_Spec_List_Pair>
   end
 
   rule close_stmt
     # F90:R907
 
-    label:label? t_close t_paren_l close_spec_list t_paren_r t_newline <StmtC>
+    label:label? t_close t_paren_l close_spec_list t_paren_r t_newline <Close_Stmt>
   end
 
   rule common_block_name
@@ -1292,8 +1296,8 @@ grammar Fortran
   rule endfile_stmt
     # F90:R920
 
-    label:label? t_endfile t_paren_l position_spec_list t_paren_r t_newline <StmtC> /
-    label:label? t_endfile external_file_unit t_newline <StmtJ>
+    label:label? t_endfile t_paren_l position_spec_list t_paren_r t_newline <Endfile_Stmt_1> /
+    label:label? t_endfile external_file_unit t_newline <Endfile_Stmt_2>
   end
 
   rule entity_decl
@@ -1777,8 +1781,8 @@ grammar Fortran
   rule inquire_stmt
     # F90:R923
 
-    label:label? t_inquire t_paren_l inquire_spec_list t_paren_r t_newline <StmtC> /
-    label:label? t_inquire t_paren_l t_iolength t_equal scalar_default_int_variable t_paren_r output_item_list t_newline <StmtC>
+    label:label? t_inquire t_paren_l inquire_spec_list t_paren_r t_newline <Inquire_Stmt_1> /
+    label:label? t_inquire t_paren_l t_iolength t_equal scalar_default_int_variable t_paren_r output_item_list t_newline <Inquire_Stmt_2>
   end
 
   rule int_expr
@@ -2724,8 +2728,8 @@ grammar Fortran
   rule rewind_stmt
     # F90:R921
 
-    label:label? t_rewind t_paren_l position_spec_list t_paren_r t_newline <StmtC> /
-    label:label? t_rewind external_file_unit t_newline <StmtJ>
+    label:label? t_rewind t_paren_l position_spec_list t_paren_r t_newline <Rewind_Stmt_1> /
+    label:label? t_rewind external_file_unit t_newline <Rewind_Stmt_2>
   end
 
   rule save_stmt

@@ -3518,7 +3518,7 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(StmtC,input, i1...index, s1)
+      r1 = instantiate_node(Backspace_Stmt_1,input, i1...index, s1)
       r1.extend(BackspaceStmt0)
     else
       @index = i1
@@ -3548,7 +3548,7 @@ module Fortran
         end
       end
       if s9.last
-        r9 = instantiate_node(StmtJ,input, i9...index, s9)
+        r9 = instantiate_node(Backspace_Stmt_2,input, i9...index, s9)
         r9.extend(BackspaceStmt1)
       else
         @index = i9
@@ -5452,34 +5452,6 @@ module Fortran
   end
 
   module CloseSpec0
-    def t_iostat
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_int_variable
-      elements[2]
-    end
-  end
-
-  module CloseSpec1
-    def t_err
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def label
-      elements[2]
-    end
-  end
-
-  module CloseSpec2
     def t_status
       elements[0]
     end
@@ -5493,7 +5465,7 @@ module Fortran
     end
   end
 
-  module CloseSpec3
+  module CloseSpec1
     def t_unit
       elements[0]
     end
@@ -5503,7 +5475,7 @@ module Fortran
     end
   end
 
-  module CloseSpec4
+  module CloseSpec2
     def external_file_unit
       elements[1]
     end
@@ -5521,103 +5493,69 @@ module Fortran
     end
 
     i0 = index
-    i1, s1 = index, []
-    r2 = _nt_t_iostat
-    s1 << r2
-    if r2
-      r3 = _nt_t_equal
-      s1 << r3
-      if r3
-        r4 = _nt_scalar_default_int_variable
-        s1 << r4
-      end
-    end
-    if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
-      r1.extend(CloseSpec0)
-    else
-      @index = i1
-      r1 = nil
-    end
+    r1 = _nt_io_spec_iostat
     if r1
       r0 = r1
     else
-      i5, s5 = index, []
-      r6 = _nt_t_err
-      s5 << r6
-      if r6
-        r7 = _nt_t_equal
-        s5 << r7
-        if r7
-          r8 = _nt_label
-          s5 << r8
-        end
-      end
-      if s5.last
-        r5 = instantiate_node(T,input, i5...index, s5)
-        r5.extend(CloseSpec1)
+      r2 = _nt_io_spec_err
+      if r2
+        r0 = r2
       else
-        @index = i5
-        r5 = nil
-      end
-      if r5
-        r0 = r5
-      else
-        i9, s9 = index, []
-        r10 = _nt_t_status
-        s9 << r10
-        if r10
-          r11 = _nt_t_equal
-          s9 << r11
-          if r11
-            r12 = _nt_scalar_default_char_expr
-            s9 << r12
+        i3, s3 = index, []
+        r4 = _nt_t_status
+        s3 << r4
+        if r4
+          r5 = _nt_t_equal
+          s3 << r5
+          if r5
+            r6 = _nt_scalar_default_char_expr
+            s3 << r6
           end
         end
-        if s9.last
-          r9 = instantiate_node(T,input, i9...index, s9)
-          r9.extend(CloseSpec2)
+        if s3.last
+          r3 = instantiate_node(T,input, i3...index, s3)
+          r3.extend(CloseSpec0)
         else
-          @index = i9
-          r9 = nil
+          @index = i3
+          r3 = nil
         end
-        if r9
-          r0 = r9
+        if r3
+          r0 = r3
         else
-          i13, s13 = index, []
-          i15, s15 = index, []
-          r16 = _nt_t_unit
-          s15 << r16
-          if r16
-            r17 = _nt_t_equal
-            s15 << r17
+          i7, s7 = index, []
+          i9, s9 = index, []
+          r10 = _nt_t_unit
+          s9 << r10
+          if r10
+            r11 = _nt_t_equal
+            s9 << r11
           end
-          if s15.last
-            r15 = instantiate_node(SyntaxNode,input, i15...index, s15)
-            r15.extend(CloseSpec3)
+          if s9.last
+            r9 = instantiate_node(SyntaxNode,input, i9...index, s9)
+            r9.extend(CloseSpec1)
           else
-            @index = i15
-            r15 = nil
+            @index = i9
+            r9 = nil
           end
-          if r15
-            r14 = r15
+          if r9
+            r8 = r9
           else
-            r14 = instantiate_node(SyntaxNode,input, index...index)
+            r8 = instantiate_node(SyntaxNode,input, index...index)
           end
-          s13 << r14
-          if r14
-            r18 = _nt_external_file_unit
-            s13 << r18
+          s7 << r8
+          if r8
+            r12 = _nt_external_file_unit
+            s7 << r12
           end
-          if s13.last
-            r13 = instantiate_node(T,input, i13...index, s13)
-            r13.extend(CloseSpec4)
+          if s7.last
+            r7 = instantiate_node(T,input, i7...index, s7)
+            r7.extend(CloseSpec2)
           else
-            @index = i13
-            r13 = nil
+            @index = i7
+            r7 = nil
           end
-          if r13
-            r0 = r13
+          if r7
+            r0 = r7
           else
             @index = i0
             r0 = nil
@@ -5632,16 +5570,6 @@ module Fortran
   end
 
   module CloseSpecList0
-    def t_comma
-      elements[0]
-    end
-
-    def close_spec
-      elements[1]
-    end
-  end
-
-  module CloseSpecList1
     def close_spec
       elements[0]
     end
@@ -5665,20 +5593,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_close_spec
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(CloseSpecList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_close_spec_list_pair
         if r3
           s2 << r3
         else
@@ -5690,13 +5605,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Close_Spec_List,input, i0...index, s0)
-      r0.extend(CloseSpecList1)
+      r0.extend(CloseSpecList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:close_spec_list][start_index] = r0
+
+    r0
+  end
+
+  module CloseSpecListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def close_spec
+      elements[1]
+    end
+  end
+
+  def _nt_close_spec_list_pair
+    start_index = index
+    if node_cache[:close_spec_list_pair].has_key?(index)
+      cached = node_cache[:close_spec_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_close_spec
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Close_Spec_List_Pair,input, i0...index, s0)
+      r0.extend(CloseSpecListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:close_spec_list_pair][start_index] = r0
 
     r0
   end
@@ -5767,7 +5723,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtC,input, i0...index, s0)
+      r0 = instantiate_node(Close_Stmt,input, i0...index, s0)
       r0.extend(CloseStmt0)
     else
       @index = i0
@@ -12574,7 +12530,7 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(StmtC,input, i1...index, s1)
+      r1 = instantiate_node(Endfile_Stmt_1,input, i1...index, s1)
       r1.extend(EndfileStmt0)
     else
       @index = i1
@@ -12604,7 +12560,7 @@ module Fortran
         end
       end
       if s9.last
-        r9 = instantiate_node(StmtJ,input, i9...index, s9)
+        r9 = instantiate_node(Endfile_Stmt_2,input, i9...index, s9)
         r9.extend(EndfileStmt1)
       else
         @index = i9
@@ -17679,7 +17635,7 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(StmtC,input, i1...index, s1)
+      r1 = instantiate_node(Inquire_Stmt_1,input, i1...index, s1)
       r1.extend(InquireStmt0)
     else
       @index = i1
@@ -17729,7 +17685,7 @@ module Fortran
         end
       end
       if s9.last
-        r9 = instantiate_node(StmtC,input, i9...index, s9)
+        r9 = instantiate_node(Inquire_Stmt_2,input, i9...index, s9)
         r9.extend(InquireStmt1)
       else
         @index = i9
@@ -26682,7 +26638,7 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(StmtC,input, i1...index, s1)
+      r1 = instantiate_node(Rewind_Stmt_1,input, i1...index, s1)
       r1.extend(RewindStmt0)
     else
       @index = i1
@@ -26712,7 +26668,7 @@ module Fortran
         end
       end
       if s9.last
-        r9 = instantiate_node(StmtJ,input, i9...index, s9)
+        r9 = instantiate_node(Rewind_Stmt_2,input, i9...index, s9)
         r9.extend(RewindStmt1)
       else
         @index = i9
