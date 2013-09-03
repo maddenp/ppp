@@ -1060,15 +1060,26 @@ module Fortran
     def to_s() list_to_s end
   end
 
-  class Close_Spec_List < T
-    def to_s() list_to_s end
+  class Close_Spec_List < IO_Spec_List
   end
 
   class Close_Spec_List_Pair < E
   end
 
-  class Close_Stmt < E
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+  class Close_Stmt < T
+
+    def err
+      e[3].err
+    end
+
+    def iostat
+      e[3].iostat
+    end
+
+    def to_s
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+    end
+
   end
 
   class Common_Block_Name_And_Object_List < T
