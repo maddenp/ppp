@@ -348,9 +348,6 @@ module Fortran
 
   end
 
-  class Close_Stmt < IO_Stmt
-  end
-
   class Entity_Decl_1 < Entity_Decl
 
     def translate
@@ -554,9 +551,6 @@ module Fortran
       end
     end
 
-  end
-
-  class Open_Stmt < IO_Stmt
   end
 
   class Print_Stmt < T

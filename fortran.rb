@@ -1027,11 +1027,11 @@ module Fortran
     def parameter?() true end
   end
 
-  class Backspace_Stmt_1 < T
+  class Backspace_Stmt_1 < IO_Stmt
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
   end
 
-  class Backspace_Stmt_2 < T
+  class Backspace_Stmt_2 < IO_Stmt
     def to_s() stmt("#{e[1]} #{e[2]}") end
   end
 
@@ -1070,6 +1070,9 @@ module Fortran
 
   class Case_Value_Range_List < T
     def to_s() list_to_s end
+  end
+
+  class Backspace_Stmt < IO_Stmt
   end
 
   class Close_Spec_List < IO_Spec_List
@@ -1380,11 +1383,11 @@ module Fortran
     end
   end
 
-  class Endfile_Stmt_1 < T
+  class Endfile_Stmt_1 < IO_Stmt
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
   end
 
-  class Endfile_Stmt_2 < T
+  class Endfile_Stmt_2 < IO_Stmt
     def to_s() stmt("#{e[1]} #{e[2]}") end
   end
 
@@ -2078,11 +2081,11 @@ module Fortran
   class Result_Name < E
   end
 
-  class Rewind_Stmt_1 < T
+  class Rewind_Stmt_1 < IO_Stmt
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
   end
 
-  class Rewind_Stmt_2 < T
+  class Rewind_Stmt_2 < IO_Stmt
     def to_s() stmt("#{e[1]} #{e[2]}") end
   end
   class Save_Stmt < T
