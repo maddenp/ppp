@@ -116,6 +116,10 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
+    def codepoint
+      "88"
+    end
+
     def declare(type,var,props={})
       su=scoping_unit
       varenv=getvarenv(var,su,false)
@@ -558,9 +562,7 @@ module Fortran
     def translate
       unless self.env[:sms_ignore] or self.env[:sms_serial]
         declare("logical","iam_root")
-        unless (label=self.label).empty?
-          label=self.label_delete
-        end
+        label=self.label_delete unless (label=self.label).empty?
         code=[]
 # HACK start
         code.push("!sms$ignore begin")
@@ -1662,6 +1664,32 @@ module Fortran
 
   class SMS_Varlist3D_6 < SMS
     def vars() [e[0]] end
+  end
+
+  class Stop_Stmt < StmtJ
+
+    def translate
+      unless self.env[:sms_ignore] or self.env[:sms_serial]
+        declare("logical","iam_root")
+        label=self.label_delete unless (label=self.label).empty?
+        code=[]
+# HACK start
+        code.push("!sms$ignore begin")
+# HACK end
+        code.push("#{sa(label)} if (iam_root()) then")
+        code.push("call nnt_stop('#{self.srcfile} codepoint #{self.codepoint}',0,ppp_abort)")
+        code.push("endif")
+# HACK start
+        code.push("!sms$ignore end")
+# HACK end
+        code=code.join("\n")
+# HACK start
+# Get rid of sms$ignore bracketing when legacy ppp is gone
+        replace_statement(code,:sms_ignore_executable)
+# HACK end
+      end
+    end
+
   end
 
 end # module Fortran

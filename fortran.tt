@@ -3023,7 +3023,7 @@ grammar Fortran
   rule stop_stmt
     # F90:R842
 
-    label:label? t_stop stop_code? t_newline <StmtJ>
+    label:label? t_stop stop_code? t_newline <Stop_Stmt>
   end
 
   rule stride

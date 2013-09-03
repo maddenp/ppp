@@ -26,13 +26,14 @@ module Fortran
   def envpop
     oldenv=@envstack.pop
     @envstack.push({}) if @envstack.empty?
+    env[:static]=oldenv[:static]
     oldenv
   end
 
   def envpush
-    labels=env.delete(:labels)
+    static=env.delete(:static)
     @envstack.push(deepcopy(env))
-    env[:labels]=labels if labels
+    env[:static]=static
   end
 
   def modenv(m)
@@ -179,8 +180,7 @@ module Fortran
 
   def sp_label(label)
     n=label[0].e.reduce("") { |m,x| m+"#{x}" }.to_i
-    env[:labels]||=Set.new
-    env[:labels].add(n)
+    (env[:static].labels||=Set.new).add(n)
     true
   end
 
@@ -495,7 +495,7 @@ module Fortran
     end
 
     def label_create
-      labels=(self.env[:labels]||=Set.new)
+      labels=(self.env[:static].labels||=Set.new)
       99999.downto(1).each do |n|
         unless labels.include?(n)
           labels.add(n)
@@ -2131,6 +2131,9 @@ module Fortran
 
   class Stmt_Function_Stmt < StmtC
     def name() "#{e[1]}" end
+  end
+
+  class Stop_Stmt < StmtJ
   end
 
   class Subroutine_Name < E

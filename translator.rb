@@ -66,7 +66,7 @@ class Translator
       super()
       @access="_default"
       @dolabels=[]
-      @envstack=[{}]
+      @envstack=[{:static=>OpenStruct.new}]
       @incdirs=incdirs
       @srcfile=srcfile
     end
