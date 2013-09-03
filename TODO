@@ -241,3 +241,5 @@
 - Spaces after open/close/read/write keywords
 
 - Time ppp on fim routines, find long ones, profile, optimize
+
+- Change pppvar (e.g. ppp__io_err) back to logical.
