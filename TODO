@@ -220,9 +220,6 @@
 
 - Factor out common elements in implicit IO translate() methods.
 
-- Does ppp_bcast require a 7-dimension array? And should it be max_decom.._dims
-  or the actual number?
-
 - Must handle eor=/err= inside serial region, too.
 
 - Should main-program envpush as well? Current mismatch between # of envpushes
@@ -234,12 +231,4 @@
 
 - Add nnt_chkstat calls after all calls into sms library.
 
-- If ppp_bcast handles logicals (test it), change type of 'pppvar' decls in
-  sms_fortran.rb to logical and use true/false in place of 1/0 in e.g. class
-  Open_Stmt.
-
-- Spaces after open/close/read/write keywords
-
 - Time ppp on fim routines, find long ones, profile, optimize
-
-- Change pppvar (e.g. ppp__io_err) back to logical.
