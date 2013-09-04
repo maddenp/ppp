@@ -377,13 +377,6 @@ class Translator
     unless conf.normalize
       raw_tree=fp.parse(n,{:root=>root})
       exit if conf.modinfo
-      return [wrap(raw_tree.to_s),raw_tree,nil] unless conf.translate
-      raw_tree.instance_variable_set(:@srcfile,srcfile)
-      raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
-      if conf.debug
-        puts "\nRAW TREE\n\n"
-        p raw_tree
-      end
       re=Regexp.new("^(.+?):in `([^\']*)'$")
       srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
       unless raw_tree
@@ -396,6 +389,13 @@ class Translator
         failmsg+="#{srcmsg}"
         fail failmsg
         return # if in server mode and did not exit in die()
+      end
+      raw_tree.instance_variable_set(:@srcfile,srcfile)
+      raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
+      return [wrap(raw_tree.to_s),raw_tree,nil] unless conf.translate
+      if conf.debug
+        puts "\nRAW TREE\n\n"
+        p raw_tree
       end
       translated_tree=(conf.translate)?(raw_tree.translate_top):(nil)
       fail "TRANSLATION FAILED" unless translated_tree
