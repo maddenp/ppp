@@ -473,7 +473,7 @@ module Fortran
         code.push("#{self}".chomp)
         code.push("goto #{success_label}") if success_label
         spec_var_true.each { |x| code.push(x) }
-        code.push("#{sa(@success_label)}endif")
+        code.push("#{sa(success_label)}endif")
         spec_var_bcast.each { |x| code.push(x) }
         spec_var_goto.each { |x| code.push(x) }
 # HACK start
