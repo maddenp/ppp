@@ -51,8 +51,9 @@ class Translator
 
       attr_accessor :envstack,:srcfile
 
-      def initialize(input,envstack)
+      def initialize(input,srcfile,envstack)
         @input=input
+        @srcfile=srcfile
         @envstack=envstack
       end
 
@@ -72,7 +73,7 @@ class Translator
     end
 
     def parse(input,options={})
-      input=Xinput.new(input,@envstack)
+      input=Xinput.new(input,@srcfile,@envstack)
       super(input,options)
     end
 

@@ -29,8 +29,8 @@ class Dehollerizer
   end
 
   def debug(x=nil)
-    lookahead=5
-    puts "DEBUG #{(x)?(x.to_s):("")} #{@s.split(//)[@i..@i+lookahead]}"
+    lookahead=20
+    puts "DEBUG #{(x)?(x.to_s+" "):("")}#{@s.split(//)[@i..@i+lookahead]}"
   end
 
   def end_of_string
@@ -156,14 +156,15 @@ class Dehollerizer
 
   def skip_comment
     fwd until see "\n" or end_of_string
-    fwd
   end
 
   def skip_dq
+    fwd
     fwd until see '"'
   end
 
   def skip_sq
+    fwd
     fwd until see "'"
   end
 

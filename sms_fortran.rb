@@ -117,7 +117,8 @@ module Fortran
   class T < Treetop::Runtime::SyntaxNode
 
     def codepoint
-      "88"
+      self.env[:static].codepoint||=0
+      self.env[:static].codepoint+=1
     end
 
     def declare(type,var,props={})
@@ -1677,7 +1678,7 @@ module Fortran
         code.push("!sms$ignore begin")
 # HACK end
         code.push("#{sa(label)} if (iam_root()) then")
-        code.push("call nnt_stop('#{self.srcfile} codepoint #{self.codepoint}',0,ppp_abort)")
+        code.push("call nnt_stop('#{sa(File.basename(self.input.srcfile))}codepoint #{self.codepoint}',0,ppp_abort)")
         code.push("endif")
 # HACK start
         code.push("!sms$ignore end")
