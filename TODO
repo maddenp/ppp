@@ -232,3 +232,10 @@
 - Add nnt_chkstat calls after all calls into sms library.
 
 - Time ppp on fim routines, find long ones, profile, optimize
+
+- Should error handling be added for translated IO statements with none? If
+  not, what happens when the root task terminates per F90:9.4.3? Do the other
+  tasks hang?
+
+- Prevent goto branching into serial regions (track, along with each used label,
+  its serial/parallel-context status and check this in post-processing.
