@@ -436,33 +436,33 @@ module Fortran
     def translate
       unless self.env[:sms_ignore] or self.env[:sms_serial]
         declare("logical","iam_root")
-        err=self.err
-        iostat_var=iostat.rhs if (iostat=self.iostat)
-        use("nnt_types_module") if err or iostat
+        spec_err=self.err
+        spec_iostat=self.iostat
+        iostat_var=spec_iostat.rhs if spec_iostat
+        use("nnt_types_module") if spec_err or spec_iostat
         label=(self.label.empty?)?(nil):(self.label)
         label=self.label_delete if label
-        if err
-          err_label_old,err_label_new=err.relabel
-          err_var=err.pppvar
+        if spec_err
+          err_label_old,err_label_new=spec_err.relabel
+          err_var=spec_err.pppvar
         end
         code=[]
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
         code.push("#{sa(label)}if (iam_root()) then")
-        code.push("#{err_var}=.false.") if err
+        code.push("#{err_var}=.false.") if spec_err
         code.push("#{self}".chomp)
-        if err
+        if spec_err
           code.push("goto #{continue_label=label_create}")
           code.push("#{err_label_new} #{err_var}=.true.")
         end
         code.push("#{sa(continue_label)}endif")
-        if iostat
-          use("module_decomp")
+        if spec_iostat
           varenv=getvarenv(iostat_var)
           code.push("call ppp_bcast(#{iostat_var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
         end
-        if err
+        if spec_err
           varenv=getvarenv(err_var)
           code.push("call ppp_bcast(#{err_var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
           code.push("if (#{err_var}) goto #{err_label_old}")
@@ -1691,6 +1691,9 @@ module Fortran
       end
     end
 
+  end
+
+  class Write_Stmt < IO_Stmt
   end
 
 end # module Fortran

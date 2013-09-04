@@ -676,6 +676,10 @@ module Fortran
       nil
     end
 
+    def size
+      list_item(IO_Spec_Size)
+    end
+
     def to_s
       list_to_s
     end
@@ -2238,7 +2242,7 @@ module Fortran
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[6].to_s.strip}") end
   end
 
-  class Write_Stmt < T
+  class Write_Stmt  < IO_Stmt
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
   end
 
