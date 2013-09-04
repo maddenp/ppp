@@ -182,6 +182,22 @@ module Fortran
       end
     end
 
+    def fixbound(varenv,var,dim,x)
+      bound=varenv["#{x}b#{dim}"]
+      fail "Bad upper bound: #{bound}" if bound=="_default" and x==:u
+      return 1 if bound=="_default" and x==:l
+      if ["_assumed","_deferred","_explicit"].include?(bound)
+        if (decdim=varenv["dim#{dim}"])
+          decomp=varenv["decomp"]
+          lu=(x==:l)?("low"):("upper")
+          return "#{decomp}__#{lu}bounds(#{decdim},#{decomp}__nestlevel)"
+        else
+          return "#{x}bound(#{var},#{dim})"
+        end
+      end
+      bound
+    end
+
     def halo_offsets(decdim)
       halo_lo=0
       halo_up=0
@@ -191,6 +207,14 @@ module Fortran
         halo_up=offsets.up
       end
       OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
+    end
+
+    def maxrank
+      7
+    end
+
+    def ranks
+      (1..maxrank)
     end
 
     def sms(s)
@@ -441,6 +465,63 @@ module Fortran
         spec_var_goto=[]
         spec_var_true=[]
         success_label=nil
+
+        out_var_gather=[]
+        gathers=[]
+        scatters=[]
+
+        if self.is_a?(Write_Stmt)
+          self.output_items.each do |x|
+            var="#{x}"
+            if (varenv=getvarenv(var,self,expected=false))
+              if (dh=varenv["decomp"])
+                gathers.push(var)
+                self.replace_item(x,Name.global(var))
+              end
+            end
+          end
+        end
+
+# TODO duplicated from SMS_Serial, factor it...
+        globals=Set.new(gathers+scatters)
+        globals.sort.each do |var|
+          varenv=getvarenv(var)
+          dims=(":"*varenv["dims"]).split("")
+          kind=varenv["kind"]
+          declare(varenv["type"],Name.global(var),{:attrs=>["allocatable"],:dims=>dims,:kind=>kind})
+        end
+
+# TODO duplicated (almost) from SMS_Serial, factor it...
+        # Gathers
+        gathers.each do |var|
+          varenv=getvarenv(var)
+          dh=varenv["decomp"]
+          dims=varenv["dims"]
+          type="(/"+smstype(varenv["type"],varenv["kind"])+"/)"
+          gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+          glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+          gstop=glubs
+          gstrt=gllbs
+          perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
+          decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/ppp_not_decomposed/)")
+          args=[]
+          args.push("#{maxrank}")
+          args.push("1")
+          args.push("#{gllbs}")
+          args.push("#{glubs}")
+          args.push("#{gstrt}")
+          args.push("#{gstop}")
+          args.push("#{perms}")
+          args.push("#{decomp}")
+          args.push("#{type}")
+          args.push(".false.") # but why?
+          args.push("#{var}")
+          args.push(Name.global(var))
+          args.push("ppp__status")
+          code="call sms_gather(#{args.join(",")})"
+          out_var_gather.push(code)
+        end
+
         [:err,:end,:eor].each do |x|
           # :err has precedence, per F90 9.4.1.6, 9.4.1.7
           if (spec=self.send(x))
@@ -454,6 +535,7 @@ module Fortran
             use("nnt_types_module")
           end
         end
+
         [:iostat,:size].each do |x|
           if (spec=self.send(x))
             var=spec.rhs
@@ -462,12 +544,15 @@ module Fortran
             use("nnt_types_module")
           end
         end
+
         my_label=(self.label.empty?)?(nil):(self.label)
         my_label=self.label_delete if my_label
+
         code=[]
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
+        out_var_gather.each { |x| code.push(x) }
         code.push("#{sa(my_label)}if (iam_root()) then")
         spec_var_false.each { |x| code.push(x) }
         code.push("#{self}".chomp)
@@ -480,7 +565,8 @@ module Fortran
         code.push("!sms$ignore end")
 # HACK end
         code=code.join("\n")
-# HACK start
+
+        # HACK start
 # Get rid of sms$ignore bracketing when legacy ppp is gone
         replace_statement(code,:sms_ignore_executable)
 # HACK end
@@ -594,31 +680,6 @@ module Fortran
   end
 
   class SMS < E
-
-    def fixbound(varenv,var,dim,x)
-      bound=varenv["#{x}b#{dim}"]
-      fail "Bad upper bound: #{bound}" if bound=="_default" and x==:u
-      return 1 if bound=="_default" and x==:l
-      if ["_assumed","_deferred","_explicit"].include?(bound)
-        if (decdim=varenv["dim#{dim}"])
-          decomp=varenv["decomp"]
-          lu=(x==:l)?("low"):("upper")
-          return "#{decomp}__#{lu}bounds(#{decdim},#{decomp}__nestlevel)"
-        else
-          return "#{x}bound(#{var},#{dim})"
-        end
-      end
-      bound
-    end
-
-    def maxrank
-      7
-    end
-
-    def ranks
-      (1..maxrank)
-    end
-
   end
 
   class SMS_Region < SMS

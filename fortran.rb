@@ -728,8 +728,18 @@ module Fortran
       list.iostat
     end
 
+    def output_items
+      (e[5].is_a?(Output_Item_List))?(e[5].output_items):([])
+    end
+
     def list
       e[3]
+    end
+
+    def replace_item(old,new)
+      output_items.each do |x|
+        replace_element(new,:expr,old) if "#{x}"=="#{old}"
+      end
     end
 
     def size
@@ -2386,11 +2396,15 @@ module Fortran
 			list_to_s
 		end
 
+    def output_items
+      [e[0]]+e[1].e.reduce([]) { |m,x| m.push(x.output_item) }
+    end
+
   end
 
   class Output_Item_List_Pair < E
 
-    def item
+    def output_item
       e[1]
 		end
 
@@ -2855,7 +2869,7 @@ module Fortran
 
   end
 
-  class Write_Stmt  < IO_Stmt
+  class Write_Stmt < IO_Stmt
     
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}")
