@@ -640,22 +640,38 @@ module Fortran
   end
 
   class E < T
-    def to_s() cat end
+    
+		def to_s
+			cat
+		end
+
   end
 
   class J < T
-    def to_s() space(true) end
+    
+		def to_s
+			space(true)
+		end
+
   end
 
   class Scoping_Unit < E
   end
 
   class StmtC < T
-    def to_s() stmt(e[1..-1].map { |x| "#{x}" }.join) end
+    
+		def to_s
+			stmt(e[1..-1].map { |x| "#{x}" }.join)
+		end
+
   end
 
   class StmtJ < T
-    def to_s() stmt(space) end
+    
+		def to_s
+			stmt(space)
+		end
+
   end
 
   # Out-of-order class definitions (must be defined before subclassed)
@@ -735,15 +751,27 @@ module Fortran
   end
 
   class AC_Value_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Access_Id_List < T
-    def names() [e[0].name]+e[1].e.reduce([]) { |m,x| m.push(x.name) } end
+
+    def names
+      [e[0].name]+e[1].e.reduce([]) { |m,x| m.push(x.name) }
+		end
+
   end
 
   class Access_Id_List_Pair < T
-    def name() "#{e[1]}" end
+
+    def name
+      "#{e[1]}"
+		end
+
   end
 
   class Access_Spec < T
@@ -774,7 +802,11 @@ module Fortran
   end
 
   class Actual_Arg_Spec_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Add_Operand < E
@@ -786,7 +818,11 @@ module Fortran
   end
 
   class Allocatable_Stmt < T
-    def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
+    
+		def to_s
+			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
+		end
+
   end
 
   class Allocate_Object < E
@@ -830,7 +866,11 @@ module Fortran
   end
 
   class Allocate_Shape_Spec_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Allocate_Stmt < StmtC
@@ -870,7 +910,11 @@ module Fortran
   end
 
   class Arithmetic_If_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}#{e[6]}#{e[7]}#{e[8]}#{e[9]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}#{e[6]}#{e[7]}#{e[8]}#{e[9]}")
+		end
+
   end
 
   class Array_Name < E
@@ -904,7 +948,11 @@ module Fortran
   end
 
   class Array_Name_And_Spec_Pair < E
-    def name() e[1].name end
+
+    def name
+      e[1].name
+		end
+
   end
 
   class Array_Names_And_Deferred_Shape_Spec_Lists < T
@@ -936,15 +984,27 @@ module Fortran
   end
 
   class Array_Section < E
-    def name() e[0].name end
+
+    def name
+      e[0].name
+		end
+
   end
 
   class Array_Spec < T
-    def spec() e[0] end
+
+    def spec
+      e[0]
+		end
+
   end
 
   class Assigned_Goto_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{ik(e[3],","," "+e[3].to_s)}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{ik(e[3],","," "+e[3].to_s)}")
+		end
+
   end
 
   class Assumed_Shape_Spec < T
@@ -1057,7 +1117,11 @@ module Fortran
   end
 
   class Attr_Spec_Dimension < E
-    def dimension?() e[2] end
+
+    def dimension?
+      e[2]
+		end
+
   end
 
   class Attr_Spec_List < Attr_Spec_Base
@@ -1099,15 +1163,27 @@ module Fortran
   end
 
   class Attr_Spec_Parameter < E
-    def parameter?() true end
+
+    def parameter?
+      true
+		end
+
   end
 
   class Backspace_Stmt_1 < IO_Stmt
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+		end
+
   end
 
   class Backspace_Stmt_2 < IO_Stmt
-    def to_s() stmt("#{e[1]} #{e[2]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}")
+		end
+
   end
 
   class Block_Data < Scoping_Unit
@@ -1128,7 +1204,11 @@ module Fortran
   end
 
   class Call_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}")
+		end
+
   end
 
   class Case_Construct_Name < E
@@ -1144,7 +1224,11 @@ module Fortran
   end
 
   class Case_Value_Range_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Backspace_Stmt < IO_Stmt
@@ -1157,37 +1241,65 @@ module Fortran
   end
 
   class Close_Stmt < IO_Stmt
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+		end
+
   end
 
   class Common_Block_Name_And_Object_List < T
-    def to_s() "#{ir(e[0],""," ")}#{e[1]}#{e[2]}" end
+    
+		def to_s
+			"#{ir(e[0],""," ")}#{e[1]}#{e[2]}"
+		end
+
   end
 
   class Common_Block_Name < E
   end
 
   class Common_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+		end
+
   end
 
   class Component_Attr_Spec_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Component_Decl_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Component_Def_Stmt < T
-    def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
+    
+		def to_s
+			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
+		end
+
   end
 
   class Component_Name < E
   end
 
   class Computed_Goto_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{ir(e[5],""," ")}#{e[6]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{ir(e[5],""," ")}#{e[6]}")
+		end
+
   end
 
   class Connect_Spec_List < IO_Spec_List
@@ -1206,7 +1318,11 @@ module Fortran
   end
 
   class Data_I_Do_Object_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Data_Ref < E
@@ -1230,15 +1346,27 @@ module Fortran
   end
 
   class Data_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}")
+		end
+
   end
 
   class Data_Stmt_Object_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Data_Stmt_Value_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Deallocate_Stmt < StmtC
@@ -1246,7 +1374,7 @@ module Fortran
 
   class Declaration_Constructs < T
 
-    def to_s()
+    def to_s
       e.reduce("") { |m,x| m+"#{x}" }
     end
 
@@ -1295,7 +1423,11 @@ module Fortran
   end
 
   class Dimension_Stmt < T
-    def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
+    
+		def to_s
+			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
+		end
+
   end
 
   class Do_Body < E
@@ -1381,7 +1513,11 @@ module Fortran
   end
 
   class End_Block_Data_Option < T
-    def to_s() space(true) end
+    
+		def to_s
+			space(true)
+		end
+
   end
 
   class End_Block_Data_Stmt < T
@@ -1430,7 +1566,11 @@ module Fortran
   end
 
   class End_Module_Option < T
-    def to_s() space(true) end
+    
+		def to_s
+			space(true)
+		end
+
   end
 
   class End_Module_Stmt < T
@@ -1489,11 +1629,19 @@ module Fortran
   end
 
   class Endfile_Stmt_1 < IO_Stmt
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+		end
+
   end
 
   class Endfile_Stmt_2 < IO_Stmt
-    def to_s() stmt("#{e[1]} #{e[2]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}")
+		end
+
   end
 
   class Entity_Decl < E
@@ -1522,7 +1670,11 @@ module Fortran
   end
 
   class Entity_Decl_2 < Entity_Decl
-    def array?() false end # need to determine array/scalar spec of named function here?
+
+    def array?
+      # need to determine array/scalar spec of named function here?
+      false
+		end
   end
 
   class Entity_Decl_Array_Spec < E
@@ -1564,11 +1716,19 @@ module Fortran
   end
 
   class Entry_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{sb(e[4])}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{sb(e[4])}")
+		end
+
   end
 
   class Equivalence_Set_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Execution_Part < E
@@ -1637,14 +1797,22 @@ module Fortran
   end
 
   class Expr_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class External_Name < E
   end
 
   class External_Name_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Function_Name < E
@@ -1722,19 +1890,35 @@ module Fortran
   end
 
   class Implicit_None_Stmt < E
-    def to_s() stmt(space)+"\n" end
+    
+		def to_s
+			stmt(space)+"\n"
+		end
+
   end
 
   class Implicit_Spec_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Implicit_Stmt < E
-    def to_s() stmt(space) end
+    
+		def to_s
+			stmt(space)
+		end
+
   end
 
   class Initialization < T
-    def to_s() "#{e[0]}#{e[1]}" end
+    
+		def to_s
+			"#{e[0]}#{e[1]}"
+		end
+
   end
 
   class Initialization_1 < Initialization
@@ -1756,23 +1940,43 @@ module Fortran
   end
 
   class Input_Item_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Inquire_Spec_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Inquire_Stmt_1 < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+		end
+
   end
 
   class Inqurie_Stmt_2 < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}")
+		end
+
   end
 
   class Intent_Stmt < T
-    def to_s() stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{ik(e[5],"::"," ")}#{e[6]}") end
+    
+		def to_s
+			stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{ik(e[5],"::"," ")}#{e[6]}")
+		end
+
   end
 
   class Interface_Body < E
@@ -1796,7 +2000,8 @@ module Fortran
 
   class Internal_Subprograms < T
 
-    def to_s()
+
+    def to_s
       e.map { |x| "#{x}" }.join
     end
 
@@ -1806,7 +2011,11 @@ module Fortran
   end
 
   class Intrinsic_Procedure_Name_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class IO_Control_Spec_List < IO_Spec_List
@@ -1816,7 +2025,11 @@ module Fortran
   end
 
   class IO_Implied_Do_Object_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class IO_Spec < E
@@ -1865,7 +2078,11 @@ module Fortran
   end
 
   class Kind_Selector < T
-    def kind() "#{e[2]}" end
+
+    def kind
+      "#{e[2]}"
+		end
+
   end
 
   class Label < T
@@ -1886,11 +2103,19 @@ module Fortran
   end
 
   class Label_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Letter_Spec_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Local_Name < E
@@ -1900,15 +2125,27 @@ module Fortran
   end
 
   class Loop_Control_1 < Loop_Control
-    def to_s() "#{ir(e[0],""," ")}#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{e[5]}" end
+    
+		def to_s
+			"#{ir(e[0],""," ")}#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{e[5]}"
+		end
+
   end
 
   class Loop_Control_2 < Loop_Control
-    def to_s() "#{ir(e[0],""," ")}#{e[1]} #{e[2]}#{e[3]}#{e[4]}" end
+    
+		def to_s
+			"#{ir(e[0],""," ")}#{e[1]} #{e[2]}#{e[3]}#{e[4]}"
+		end
+
   end
 
   class Loop_Control_Pair < T
-    def value() e[1] end
+
+    def value
+      e[1]
+		end
+
   end
 
   class Lower_Bound_Pair < T
@@ -1949,7 +2186,11 @@ module Fortran
   end
 
   class Module_Subprogram_Part < T
-    def to_s() "#{e[0]}#{e[1].e.reduce("") { |m,x| m+="#{x}" } }" end
+    
+		def to_s
+			"#{e[0]}#{e[1].e.reduce("") { |m,x| m+="#{x}" } }"
+		end
+
   end
 
   class Mult_Operand < E
@@ -1972,7 +2213,11 @@ module Fortran
   end
 
   class Named_Constant_Def < E
-    def name() e[0] end
+
+    def name
+      e[0]
+		end
+
   end
 
   class Named_Constant_Def_List < T
@@ -2104,27 +2349,51 @@ module Fortran
   end
 
   class Only_Option < T
-    def localname() "#{e[0]}" end
+
+    def localname
+      "#{e[0]}"
+		end
+
   end
 
   class Open_Stmt < IO_Stmt
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+		end
+
   end
 
   class Optional_Stmt < T
-    def to_s() stmt("#{e[1]}#{ik(e[2],"::"," ")}#{e[3]}") end
+    
+		def to_s
+			stmt("#{e[1]}#{ik(e[2],"::"," ")}#{e[3]}")
+		end
+
   end
 
   class Outer_Shared_Do_Construct < E
-    def label() e[0].label end
+
+    def label
+      e[0].label
+		end
+
   end
 
   class Output_Item_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Output_Item_List_Pair < E
-    def item() e[1] end
+
+    def item
+      e[1]
+		end
+
   end
 
   class Parenthesized_Args < E
@@ -2143,7 +2412,11 @@ module Fortran
   end
 
   class Parenthesized_Explicit_Shape_Spec_List < T
-    def abstract_boundslist() e[1].abstract_boundslist end
+
+    def abstract_boundslist
+      e[1].abstract_boundslist
+		end
+
   end
 
   class Parenthesized_Section_Subscript_List < E
@@ -2170,15 +2443,27 @@ module Fortran
   end
 
   class Pointer_Object_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Pointer_Stmt < T
-    def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
+    
+		def to_s
+			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
+		end
+
   end
 
   class Position_Spec_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Power_Op < T
@@ -2188,26 +2473,46 @@ module Fortran
   end
 
   class Prefix_Function < T
-    def to_s() e.map { |x| "#{x}" }.join(" ") end
+    
+		def to_s
+			e.map { |x| "#{x}" }.join(" ")
+		end
+
   end
 
   class Prefix_Subroutine < T
-    def to_s() e.map { |x| "#{x}" }.join(" ") end
+    
+		def to_s
+			e.map { |x| "#{x}" }.join(" ")
+		end
+
   end
 
   class Print_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}")
+		end
+
   end
 
   class Print_Stmt_Output_Item_List < T
-    def to_s() "#{e[0]}#{e[1]}" end
+    
+		def to_s
+			"#{e[0]}#{e[1]}"
+		end
+
   end
 
   class Procedure_Name < E
   end
 
   class Procedure_Name_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Program_Name < E
@@ -2224,18 +2529,30 @@ module Fortran
   end
 
   class Program_Units < T
-    def to_s() e.reduce("") { |m,x| m+="#{x}\n" }.chomp end
+    
+		def to_s
+			e.reduce("") { |m,x| m+="#{x}\n" }.chomp
+		end
+
   end
 
   class Read_Stmt < T
   end
 
   class Read_Stmt_1 < Read_Stmt
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}")
+		end
+
   end
 
   class Read_Stmt_2 < Read_Stmt
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}")
+		end
+
   end
 
   class Rename < E
@@ -2290,22 +2607,42 @@ module Fortran
   end
 
   class Rewind_Stmt_1 < IO_Stmt
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+		end
+
   end
 
   class Rewind_Stmt_2 < IO_Stmt
-    def to_s() stmt("#{e[1]} #{e[2]}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}")
+		end
+
   end
   class Save_Stmt < T
-    def to_s() stmt("#{e[1]}#{e[2]}") end
+    
+		def to_s
+			stmt("#{e[1]}#{e[2]}")
+		end
+
   end
 
   class Save_Stmt_Entity_List < T
-    def to_s() "#{ir(e[0],""," ")}#{e[1]}" end
+    
+		def to_s
+			"#{ir(e[0],""," ")}#{e[1]}"
+		end
+
   end
 
   class Saved_Entity_List < T
-    def to_s() list_to_s end
+    
+		def to_s
+			list_to_s
+		end
+
   end
 
   class Section_Subscript_List < E
@@ -2332,15 +2669,27 @@ module Fortran
   end
 
   class Specification_Part < T
-    def to_s() "\n#{cat}\n" end
+    
+		def to_s
+			"\n#{cat}\n"
+		end
+
   end
 
   class Star_Int < T
-    def kind() "#{e[1]}" end
+
+    def kind
+      "#{e[1]}"
+		end
+
   end
 
   class Stmt_Function_Stmt < StmtC
-    def name() "#{e[1]}" end
+
+    def name
+      "#{e[1]}"
+		end
+
   end
 
   class Stop_Stmt < StmtJ
@@ -2363,7 +2712,11 @@ module Fortran
   end
 
   class Substring < T
-    def name() e[0].name end
+
+    def name
+      e[0].name
+		end
+
   end
 
   class Target_Object_List < T
@@ -2382,11 +2735,19 @@ module Fortran
   end
 
   class Target_Stmt < T
-    def to_s() stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}") end
+    
+		def to_s
+			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
+		end
+
   end
 
   class Type_Declaration_Stmt < T
-    def to_s() stmt("#{e[1]}#{ir(e[2],"",ik(e[1],","," "))}#{e[3]}") end
+    
+		def to_s
+			stmt("#{e[1]}#{ir(e[2],"",ik(e[1],","," "))}#{e[3]}")
+		end
+
   end
 
   class Type_Name < E
@@ -2426,11 +2787,19 @@ module Fortran
   end
 
   class Use_Part < T
-    def to_s() "\n#{cat}\n" end
+    
+		def to_s
+			"\n#{cat}\n"
+		end
+
   end
 
   class Use_Stmt < T
-    def modulename() "#{e[2]}" end
+
+    def modulename
+      "#{e[2]}"
+		end
+
   end
 
   class Use_Stmt_1 < Use_Stmt
@@ -2479,11 +2848,19 @@ module Fortran
   end
 
   class Where_Stmt < T
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[6].to_s.strip}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[6].to_s.strip}")
+		end
+
   end
 
   class Write_Stmt  < IO_Stmt
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
+    
+		def to_s
+			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}")
+    end
+
   end
 
 end
