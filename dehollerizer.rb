@@ -1,9 +1,10 @@
 class Dehollerizer
 
   def check_hollerith_parens
-    remove_continuation
     nestlevel=0
     begin
+      remove_continuation
+      remove_comment
       case see
       when "'"     then skip_sq
       when '"'     then skip_dq
