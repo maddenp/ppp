@@ -662,6 +662,14 @@ module Fortran
 
   class IO_Spec_List < T
 
+    def end
+      list_item(IO_Spec_End)
+    end
+
+    def eor
+      list_item(IO_Spec_Eor)
+    end
+
     def err
       list_item(IO_Spec_Err)
     end
@@ -688,12 +696,28 @@ module Fortran
 
   class IO_Stmt < T
 
+    def end
+      list.end
+    end
+
+    def eor
+      list.eor
+    end
+
     def err
-      e[3].err
+      list.err
     end
 
     def iostat
-      e[3].iostat
+      list.iostat
+    end
+
+    def list
+      e[3]
+    end
+
+    def size
+      list.size
     end
 
   end
@@ -1698,7 +1722,20 @@ module Fortran
 
   end
 
+  class IO_Spec_End < IO_Spec
+
+    def relabel
+      relabel_spec(:end)
+    end
+
+  end
+
   class IO_Spec_Eor < IO_Spec
+
+    def relabel
+      relabel_spec(:eor)
+    end
+
   end
 
   class IO_Spec_Err < IO_Spec
@@ -2242,7 +2279,8 @@ module Fortran
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[6].to_s.strip}") end
   end
 
-  class Write_Stmt  < IO_Stmt
+# class Write_Stmt  < IO_Stmt
+  class Write_Stmt  < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
   end
 

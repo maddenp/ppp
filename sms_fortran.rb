@@ -407,6 +407,14 @@ module Fortran
 
   end
 
+  class IO_Spec_End < IO_Spec
+
+    def pppvar
+      declare("logical","#{pppvar_prefix}end")
+    end
+
+  end
+
   class IO_Spec_Eor < IO_Spec
 
     def pppvar
@@ -423,50 +431,51 @@ module Fortran
 
   end
 
-  class IO_Spec_Size < IO_Spec
-
-    def pppvar
-      declare("integer","#{pppvar_prefix}size")
-    end
-
-  end
-
   class IO_Stmt < T
 
     def translate
       unless self.env[:sms_ignore] or self.env[:sms_serial]
         declare("logical","iam_root")
-        spec_err=self.err
-        spec_iostat=self.iostat
-        iostat_var=spec_iostat.rhs if spec_iostat
-        use("nnt_types_module") if spec_err or spec_iostat
-        label=(self.label.empty?)?(nil):(self.label)
-        label=self.label_delete if label
-        if spec_err
-          err_label_old,err_label_new=spec_err.relabel
-          err_var=spec_err.pppvar
+        spec_var_bcast=[]
+        spec_var_false=[]
+        spec_var_goto=[]
+        spec_var_true=[]
+        success_label=nil
+        [:err,:end,:eor].each do |x|
+          # :err has precedence, per F90 9.4.1.6, 9.4.1.7
+          if (spec=self.send(x))
+            label_old,label_new=spec.send(:relabel)
+            pppvar=spec.send(:pppvar)
+            spec_var_false.push("#{pppvar}=.false.")
+            spec_var_bcast.push("call ppp_bcast(#{pppvar},nnt_logical,(/1/),1,ppp__status)")
+            spec_var_true.push("#{label_new} #{pppvar}=.true.")
+            spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
+            success_label=label_create unless success_label
+            use("nnt_types_module")
+          end
         end
+        [:iostat,:size].each do |x|
+          if (spec=self.send(x))
+            var=spec.rhs
+            varenv=getvarenv(var)
+            spec_var_bcast.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
+            use("nnt_types_module")
+          end
+        end
+        my_label=(self.label.empty?)?(nil):(self.label)
+        my_label=self.label_delete if my_label
         code=[]
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
-        code.push("#{sa(label)}if (iam_root()) then")
-        code.push("#{err_var}=.false.") if spec_err
+        code.push("#{sa(my_label)}if (iam_root()) then")
+        spec_var_false.each { |x| code.push(x) }
         code.push("#{self}".chomp)
-        if spec_err
-          code.push("goto #{continue_label=label_create}")
-          code.push("#{err_label_new} #{err_var}=.true.")
-        end
-        code.push("#{sa(continue_label)}endif")
-        if spec_iostat
-          varenv=getvarenv(iostat_var)
-          code.push("call ppp_bcast(#{iostat_var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
-        end
-        if spec_err
-          varenv=getvarenv(err_var)
-          code.push("call ppp_bcast(#{err_var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
-          code.push("if (#{err_var}) goto #{err_label_old}")
-        end
+        code.push("goto #{success_label}") if success_label
+        spec_var_true.each { |x| code.push(x) }
+        code.push("#{sa(@success_label)}endif")
+        spec_var_bcast.each { |x| code.push(x) }
+        spec_var_goto.each { |x| code.push(x) }
 # HACK start
         code.push("!sms$ignore end")
 # HACK end
@@ -1693,7 +1702,8 @@ module Fortran
 
   end
 
-  class Write_Stmt < IO_Stmt
+# class Write_Stmt < IO_Stmt
+  class Write_Stmt < T
   end
 
 end # module Fortran

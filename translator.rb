@@ -118,7 +118,7 @@ class Translator
   end
 
   def chkparse(s)
-    die "NORMALIZING PARSE FAILED" if s.nil? or s=~/^\s*$/
+    fail "NORMALIZING PARSE FAILED" if s.nil? or s=~/^\s*$/
     s
   end
       
@@ -142,11 +142,11 @@ class Translator
     @directive
   end
 
-  def die(msg,die=true,srcfile=nil)
+  def die(msg,quit=true,srcfile=nil)
     s="#{msg}"
     s+=": #{srcfile}" if srcfile
     $stderr.puts s
-    exit(1) if die
+    exit(1) if quit
   end
 
   def fix_pt_norm(s,parser,op=nil,stringmap=nil)
@@ -200,8 +200,9 @@ class Translator
   def out(s,root,srcfile,conf)
     conf=ostruct_default_merge(conf)
     translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
-    fail "Translation failed" if translated_source.empty?
-    t=vertspace(translated_source) unless conf.normalize
+    fail "TRANSLATION FAILED" if translated_source.empty?
+    translated_source=vertspace(translated_source) unless conf.normalize
+    translated_source
   end
 
   def process(s,root,srcfile,conf)
@@ -393,11 +394,11 @@ class Translator
         failmsg+="Original source: #{srcfile}\n"
         failmsg+="PARSE FAILED"
         failmsg+="#{srcmsg}"
-        die failmsg
+        fail failmsg
         return # if in server mode and did not exit in die()
       end
       translated_tree=(conf.translate)?(raw_tree.translate_top):(nil)
-      die "Translation failed" unless translated_tree
+      fail "TRANSLATION FAILED" unless translated_tree
       if conf.debug
         puts "\nTRANSLATED TREE\n\n"
         p translated_tree
@@ -412,6 +413,7 @@ class Translator
     conf=ostruct_default_merge(conf)
     conf.translate=false
     translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
+    fail "PARSE FAILED" unless raw_tree
     raw_tree
   end
 
@@ -501,6 +503,7 @@ class Translator
   def tree(s,root,srcfile,conf)
     conf=ostruct_default_merge(conf)
     translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
+    fail "TRANSLATION FAILED" unless translated_tree
     translated_tree
   end
 
