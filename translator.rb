@@ -63,11 +63,12 @@ class Translator
 
     end
 
-    def initialize(srcfile,incdirs)
+    def initialize(srcfile,incdirs,env=nil)
       super()
+      env||={:static=>OpenStruct.new}
       @access="_default"
       @dolabels=[]
-      @envstack=[{:static=>OpenStruct.new}]
+      @envstack=[env]
       @incdirs=incdirs
       @srcfile=srcfile
     end
@@ -354,7 +355,7 @@ class Translator
     end
     
     conf=ostruct_default_merge(conf)
-    fp=XFortranParser.new(srcfile,conf.incdirs)
+    fp=XFortranParser.new(srcfile,conf.incdirs,conf.env)
     s0=nil
     while s!=s0 and not s.nil?                                     # Fixed point treatment of prepsrc() and assemble()
       s0=s                                                         # for cases in which files added by 'include'
