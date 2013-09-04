@@ -47,7 +47,7 @@ module Fortran
 # HACK begin
 # Expose this when we're not bracketing stuff in sms$ignore to please legacy ppp
 #   fail "Already inside SMS$IGNORE region" if env[:sms_ignore]
-# HACK END    
+# HACK END
     envpush
     env[:sms_ignore]=true
     true
@@ -57,7 +57,7 @@ module Fortran
 # HACK begin
 # Expose this when we're not bracketing stuff in sms$ignore to please legacy ppp
 #   fail "Not inside SMS$IGNORE region" unless env[:sms_ignore]
-# HACK END    
+# HACK END
     true
   end
 
@@ -228,7 +228,7 @@ module Fortran
         code="use #{modname}"
         unless usenames.empty?
           list=[]
-          usenames.each do |x| 
+          usenames.each do |x|
            h=x.is_a?(Hash)
             localname=(h)?(x.keys.first):(nil)
             usename=(h)?(x.values.first):(x)
@@ -779,15 +779,27 @@ module Fortran
   end
 
   class SMS_Create_Decomp_Global < SMS
-    def vars() e[1].vars end
+
+    def vars
+      e[1].vars
+    end
+
   end
 
   class SMS_Create_Decomp_Halo < SMS
-    def vars() e[1].vars end
+
+    def vars
+      e[1].vars
+    end
+
   end
 
   class SMS_Create_Decomp_Regionsize < SMS
-    def regionsize() e[3] end
+
+    def regionsize
+      e[3]
+    end
+
   end
 
   class SMS_Declare_Decomp < SMS
@@ -877,15 +889,27 @@ module Fortran
   end
 
   class SMS_Distribute_Dims_1 < SMS
-    def dims() ["#{e[0]}".to_i,"#{e[2]}".to_i] end
+
+    def dims
+      ["#{e[0]}".to_i,"#{e[2]}".to_i]
+    end
+
   end
 
   class SMS_Distribute_Dims_2 < SMS
-    def dims() [nil,"#{e[1]}".to_i] end
+
+    def dims
+      [nil,"#{e[1]}".to_i]
+    end
+
   end
 
   class SMS_Distribute_Dims_3 < SMS
-    def dims() ["#{e[0]}".to_i,nil] end
+
+    def dims
+      ["#{e[0]}".to_i,nil]
+    end
+
   end
 
   class SMS_Exchange < SMS
@@ -941,7 +965,11 @@ module Fortran
   end
 
   class SMS_Halo_Comp < SMS_Region
-    def to_s() "#{e[0]}#{e[1]}#{e[2]}" end
+
+    def to_s
+      "#{e[0]}#{e[1]}#{e[2]}"
+    end
+
   end
 
   class SMS_Halo_Comp_Begin < SMS
@@ -969,11 +997,19 @@ module Fortran
   end
 
   class SMS_Halo_Comp_Pair < E
-    def lo() "#{e[1]}" end
-    def up() "#{e[3]}" end
+
+    def lo
+      "#{e[1]}"
+    end
+
+    def up
+      "#{e[3]}"
+    end
+
   end
 
   class SMS_Halo_Comp_Pairs < E
+
     def to_s
       dim1="#{e[0]}"
       dim2=(e[1].e)?("#{e[1].e[1]}"):(nil)
@@ -982,6 +1018,7 @@ module Fortran
       dims.delete_if { |x| x.nil? }
       dims.join(",")
     end
+
   end
 
   class SMS_Ignore < SMS_Region
@@ -1010,7 +1047,11 @@ module Fortran
   end
 
   class SMS_Parallel < SMS_Region
-    def to_s() "#{e[0]}#{e[1]}#{e[2]}" end
+
+    def to_s
+      "#{e[0]}#{e[1]}#{e[2]}"
+    end
+
   end
 
   class SMS_Parallel_Begin < SMS
@@ -1064,31 +1105,59 @@ module Fortran
   end
 
   class SMS_Parallel_Var_Lists_001 < T
-    def vars() [[],[],e[2].vars] end
+
+    def vars
+      [[],[],e[2].vars]
+    end
+
   end
 
   class SMS_Parallel_Var_Lists_010 < T
-    def vars() [[],e[1].vars,[]] end
+
+    def vars
+      [[],e[1].vars,[]]
+    end
+
   end
 
   class SMS_Parallel_Var_Lists_011 < T
-    def vars() [[],e[1].vars,e[3].vars] end
+
+    def vars
+      [[],e[1].vars,e[3].vars]
+    end
+
   end
 
   class SMS_Parallel_Var_Lists_100 < T
-    def vars() [e[0].vars,[],[]] end
+
+    def vars
+      [e[0].vars,[],[]]
+    end
+
   end
 
   class SMS_Parallel_Var_Lists_101 < T
-    def vars() [e[0].vars,[],e[3].vars] end
+
+    def vars
+      [e[0].vars,[],e[3].vars]
+    end
+
   end
 
   class SMS_Parallel_Var_Lists_110 < T
-    def vars() [e[0].vars,e[2].vars,[]] end
+
+    def vars
+      [e[0].vars,e[2].vars,[]]
+    end
+
   end
 
   class SMS_Parallel_Var_Lists_111 < T
-    def vars() [e[0].vars,e[2].vars,e[4].vars] end
+
+    def vars
+      [e[0].vars,e[2].vars,e[4].vars]
+    end
+
   end
 
   class SMS_Reduce < SMS
@@ -1581,10 +1650,23 @@ module Fortran
   end
 
   class SMS_To_Local_List < E
-    def decdim() "#{e[1]}" end
-    def key() "#{e[5]}" end
-    def idx() decdim.to_i end
-    def vars() e[3].vars end
+
+    def decdim
+      "#{e[1]}"
+    end
+
+    def key
+      "#{e[5]}"
+    end
+
+    def idx
+      decdim.to_i
+    end
+
+    def vars
+      e[3].vars
+    end
+
   end
 
   class SMS_To_Local_Lists < T
@@ -1653,27 +1735,50 @@ module Fortran
   end
 
   class SMS_Varlist3D_1 < SMS
-    def vars() [e[0],e[2],e[4]] end
+
+    def vars
+      [e[0],e[2],e[4]]
+    end
+
   end
 
   class SMS_Varlist3D_2 < SMS
-    def vars() [e[1],e[3]] end
+
+    def vars
+      [e[1],e[3]]
+    end
+
   end
 
   class SMS_Varlist3D_3 < SMS
-    def vars() [e[2]] end
+
+    def vars
+      [e[2]]
+    end
+
   end
 
   class SMS_Varlist3D_4 < SMS
-    def vars() [e[0],e[2]] end
+
+    def vars
+      [e[0],e[2]]
+    end
+
   end
 
   class SMS_Varlist3D_5 < SMS
-    def vars() [e[1]] end
+
+    def vars
+      [e[1]]
+    end
+
   end
 
   class SMS_Varlist3D_6 < SMS
-    def vars() [e[0]] end
+    def vars
+      [e[0]]
+    end
+
   end
 
   class Stop_Stmt < StmtJ
@@ -1702,8 +1807,7 @@ module Fortran
 
   end
 
-# class Write_Stmt < IO_Stmt
-  class Write_Stmt < T
+  class Write_Stmt < IO_Stmt
   end
 
 end # module Fortran

@@ -124,7 +124,7 @@ module Fortran
     @dolabels.pop
     true
   end
-    
+
   def sp_dolabel_push(label)
     # A non-label-do-stmt pushes the symbol :nolabel onto the stack, which must
     # not be converted to a string, to avoid matching a potential literal label
@@ -747,16 +747,30 @@ module Fortran
   end
 
   class Access_Spec < T
-    def private?() "#{text_value}"=="private" end
-    def public?() "#{text_value}"=="public" end
+
+    def private?
+      "#{text_value}"=="private"
+    end
+
+    def public?
+      "#{text_value}"=="public"
+    end
+
   end
 
   class Access_Stmt < StmtC
   end
 
   class Access_Stmt_Option < T
-    def names() e[1].names end
-    def to_s() "#{ik(e[0],"::"," ")}#{e[1]}" end
+
+    def names
+      e[1].names
+    end
+
+    def to_s
+      "#{ik(e[0],"::"," ")}#{e[1]}"
+    end
+
   end
 
   class Actual_Arg_Spec_List < T
@@ -1023,10 +1037,23 @@ module Fortran
   end
 
   class Attr_Spec_Base < E
-    def dimension?() attrany(:dimension?) end
-    def parameter?() attrany(:parameter?) end
-    def private?() attrany(:private?) end
-    def public?() attrany(:public?) end
+
+    def dimension?
+      attrany(:dimension?)
+    end
+
+    def parameter?
+      attrany(:parameter?)
+    end
+
+    def private?
+      attrany(:private?)
+    end
+
+    def public?
+      attrany(:public?)
+    end
+
   end
 
   class Attr_Spec_Dimension < E
@@ -1040,15 +1067,35 @@ module Fortran
   end
 
   class Attr_Spec_List_Pairs < Attr_Spec_Base
-    def dimension?() (e[0])?(attrany(:dimension?,e[0].e)):(false) end
-    def parameter?() (e[0])?(attrany(:parameter?,e[0].e)):(false) end
-    def private?() (e[0])?(attrany(:private?,e[0].e)):(false) end
-    def public?() (e[0])?(attrany(:public?,e[0].e)):(false) end
+
+    def dimension?
+      (e[0])?(attrany(:dimension?,e[0].e)):(false)
+    end
+
+    def parameter?
+      (e[0])?(attrany(:parameter?,e[0].e)):(false)
+    end
+
+    def private?
+      (e[0])?(attrany(:private?,e[0].e)):(false)
+    end
+
+    def public?
+      (e[0])?(attrany(:public?,e[0].e)):(false)
+    end
+
   end
 
   class Attr_Spec_Option < Attr_Spec_Base
-    def dimension?() e[1].dimension? end
-    def parameter?() e[1].parameter? end
+
+    def dimension?
+      e[1].dimension?
+    end
+
+    def parameter?
+      e[1].parameter?
+    end
+
   end
 
   class Attr_Spec_Parameter < E
@@ -1258,10 +1305,12 @@ module Fortran
   end
 
   class Do_Term_Action_Stmt < T
+
     def to_s
       unindent
       stmt(space)
     end
+
   end
 
   class Do_Term_Shared_Stmt < T
@@ -1299,30 +1348,36 @@ module Fortran
   end
 
   class Else_If_Stmt < T
+
     def to_s
       unindent
       s="\n"+stmt("#{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
       indent
       s
     end
+
   end
 
   class Else_Stmt < T
+
     def to_s
       unindent
       s="#{stmt(space)}"
       indent
       s
     end
+
   end
 
   class Elsewhere_Stmt < T
+
     def to_s
       unindent
       s=stmt(space)
       indent
       s
     end
+
   end
 
   class End_Block_Data_Option < T
@@ -1330,38 +1385,48 @@ module Fortran
   end
 
   class End_Block_Data_Stmt < T
+
     def to_s
       unindent
       stmt(space)
     end
+
   end
 
   class End_Do_Stmt < T
+
     def to_s
       unindent
       "#{stmt(space)}"
     end
+
   end
 
   class End_Function_Stmt < T
+
     def to_s
       unindent
       stmt(space)+"\n"
     end
+
   end
 
   class End_If_Stmt < T
+
     def to_s
       unindent
       "#{stmt(space)}"
     end
+
   end
 
   class End_Interface_Stmt < T
+
     def to_s
       unindent
       stmt("#{e[1]} #{e[2]}#{sb(e[3])}")+"\n"
     end
+
   end
 
   class End_Module_Option < T
@@ -1369,46 +1434,58 @@ module Fortran
   end
 
   class End_Module_Stmt < T
+
     def to_s
       unindent
       "#{stmt(space)}\n"
     end
+
   end
 
   class End_Program_Stmt < T
+
     def to_s
       unindent
       "\n"+stmt("#{e[1]}#{sb(e[3])}#{sb(e[4])}")
     end
+
   end
 
   class End_Select_Stmt < T
+
     def to_s
       unindent
       unindent
       stmt(space)
     end
+
   end
 
   class End_Subroutine_Stmt < T
+
     def to_s
       unindent
       "\n#{stmt(space)}\n"
     end
+
   end
 
   class End_Type_Stmt < T
+
     def to_s
       unindent
       stmt(space)
     end
+
   end
 
   class End_Where_Stmt < T
+
     def to_s
       unindent
       stmt(space)
     end
+
   end
 
   class Endfile_Stmt_1 < IO_Stmt
@@ -1452,21 +1529,35 @@ module Fortran
   end
 
   class Entity_Decl_List < E
+
     def varprops(distribute)
       e[0].props(distribute).merge(e[1].props(distribute))
     end
+
   end
 
   class Entity_Decl_List_Pair < T
-    def array?() e[1].array? end
-    def name() e[1].name end
-    def props(distribute) e[1].props(distribute) end
+
+    def array?
+      e[1].array?
+    end
+
+    def name
+      e[1].name
+    end
+
+    def props(distribute)
+      e[1].props(distribute)
+    end
+
   end
 
   class Entity_Decl_List_Pairs < T
+
     def props(distribute)
       e.reduce({}) { |m,x| m.merge(x.props(distribute)) }
     end
+
   end
 
   class Entry_Name < E
@@ -1563,11 +1654,13 @@ module Fortran
   end
 
   class Function_Stmt < T
+
     def to_s
       s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")
       indent
       s
     end
+
   end
 
   class Function_Subprogram < Scoping_Unit
@@ -1577,10 +1670,23 @@ module Fortran
   end
 
   class Generic_Spec < T
-    def localname() usename end
-    def name() usename end
-    def to_s() "#{e[0]} #{e[1]}#{e[2]}#{e[3]}" end
-    def usename() "#{e[2]}" end
+
+    def localname
+      usename
+    end
+
+    def name
+      usename
+    end
+
+    def to_s
+      "#{e[0]} #{e[1]}#{e[2]}#{e[3]}"
+    end
+
+    def usename
+      "#{e[2]}"
+    end
+
   end
 
   class If_Construct < E
@@ -1606,11 +1712,13 @@ module Fortran
   end
 
   class If_Then_Stmt < T
+
     def to_s
       s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
       indent
       s
     end
+
   end
 
   class Implicit_None_Stmt < E
@@ -1677,17 +1785,21 @@ module Fortran
   end
 
   class Interface_Stmt < T
+
     def to_s
       s="\n#{stmt(space)}"
       indent
       s
     end
+
   end
 
   class Internal_Subprograms < T
+
     def to_s()
       e.map { |x| "#{x}" }.join
     end
+
   end
 
   class Intrinsic_Procedure_Name < E
@@ -1956,18 +2068,39 @@ module Fortran
   end
 
   class Only < E
-    def localname() (e[0].is_a?(Only_Option))?(e[0].localname):(usename) end
-    def usename() "#{e[1]}" end
+
+    def localname
+      (e[0].is_a?(Only_Option))?(e[0].localname):(usename)
+    end
+
+    def usename
+      "#{e[1]}"
+    end
+
   end
 
   class Only_List < T
-    def localnames() e[1].e.reduce([e[0].localname]) { |m,x| m.push(x.localname) } end
-    def usenames() e[1].e.reduce([e[0].usename]) { |m,x| m.push(x.usename) } end
+
+    def localnames
+      e[1].e.reduce([e[0].localname]) { |m,x| m.push(x.localname) }
+    end
+
+    def usenames
+      e[1].e.reduce([e[0].usename]) { |m,x| m.push(x.usename) }
+    end
+
   end
 
   class Only_List_Pair < T
-    def localname() e[1].localname end
-    def usename() e[1].usename end
+
+    def localname
+      e[1].localname
+    end
+
+    def usename
+      e[1].usename
+    end
+
   end
 
   class Only_Option < T
@@ -1988,6 +2121,10 @@ module Fortran
 
   class Output_Item_List < T
     def to_s() list_to_s end
+  end
+
+  class Output_Item_List_Pair < E
+    def item() e[1] end
   end
 
   class Parenthesized_Args < E
@@ -2077,11 +2214,13 @@ module Fortran
   end
 
   class Program_Stmt < T
+
     def to_s
       s=stmt(space)
       indent
       s
     end
+
   end
 
   class Program_Units < T
@@ -2100,23 +2239,51 @@ module Fortran
   end
 
   class Rename < E
-    def localname() "#{e[0]}" end
-    def usename() "#{e[2]}" end
+
+    def localname
+      "#{e[0]}"
+    end
+
+    def usename
+      "#{e[2]}"
+    end
+
   end
 
   class Rename_List < E
-    def localnames() e[1].e.reduce([e[0].localname]) { |m,x| m.push(x.localname) } end
-    def usenames() e[1].e.reduce([e[0].usename]) { |m,x| m.push(x.usename) } end
+
+    def localnames
+      e[1].e.reduce([e[0].localname]) { |m,x| m.push(x.localname) }
+    end
+
+    def usenames
+      e[1].e.reduce([e[0].usename]) { |m,x| m.push(x.usename) }
+    end
+
   end
 
   class Rename_List_Pair < E
-    def localname() e[1].localname end
-    def usename() e[1].usename end
+
+    def localname
+      e[1].localname
+    end
+
+    def usename
+      e[1].usename
+    end
+
   end
 
   class Rename_List_Option < T
-    def localnames() e[1].localnames end
-    def usenames() e[1].usenames end
+
+    def localnames
+      e[1].localnames
+    end
+
+    def usenames
+      e[1].usenames
+    end
+
   end
 
   class Result_Name < E
@@ -2154,12 +2321,14 @@ module Fortran
   end
 
   class Select_Case_Stmt < T
+
     def to_s
       s=stmt("#{sa(e[1])}#{e[2]} #{e[3]} #{e[4]}#{e[5]}#{e[6]}")
       indent
       indent
       s
     end
+
   end
 
   class Specification_Part < T
@@ -2184,11 +2353,13 @@ module Fortran
   end
 
   class Subroutine_Stmt < T
+
     def to_s
       s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
       indent
       s
     end
+
   end
 
   class Substring < T
@@ -2222,9 +2393,19 @@ module Fortran
   end
 
   class Type_Spec < E
-    def derived?() "#{e[0]}"=="type" end
-    def kind() return (e[1].respond_to?(:kind))?(e[1].kind):("_default") end
-    def type() (derived?)?("#{e[2]}"):("#{e[0]}") end
+
+    def derived?
+      "#{e[0]}"=="type"
+    end
+
+    def kind
+      return (e[1].respond_to?(:kind))?(e[1].kind):("_default")
+    end
+
+    def type
+      (derived?)?("#{e[2]}"):("#{e[0]}")
+    end
+
   end
 
   class Upper_Bound < T
@@ -2253,34 +2434,55 @@ module Fortran
   end
 
   class Use_Stmt_1 < Use_Stmt
-    def localnames() e[3].localnames end
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}") end
-    def usenames() e[3].usenames end
+
+    def localnames
+      e[3].localnames
+    end
+
+    def to_s
+      stmt("#{e[1]} #{e[2]}#{e[3]}")
+    end
+
+    def usenames
+      e[3].usenames
+    end
+
   end
 
   class Use_Stmt_2 < Use_Stmt
-    def localnames() e[6].localnames end
-    def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}") end
-    def usenames() e[6].usenames end
+
+    def localnames
+      e[6].localnames
+    end
+
+    def to_s
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}")
+    end
+
+    def usenames
+      e[6].usenames
+    end
+
   end
 
   class Variable_Name < E
   end
 
   class Where_Construct_Stmt < T
+
     def to_s
       s=stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
       indent
       s
     end
+
   end
 
   class Where_Stmt < T
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[6].to_s.strip}") end
   end
 
-# class Write_Stmt  < IO_Stmt
-  class Write_Stmt  < T
+  class Write_Stmt  < IO_Stmt
     def to_s() stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}") end
   end
 

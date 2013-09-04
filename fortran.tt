@@ -2407,7 +2407,11 @@ grammar Fortran
   rule output_item_list
     # F90:9.4.2
 
-    output_item ( t_comma output_item )* <Output_Item_List>
+    output_item output_item_list_pair* <Output_Item_List>
+  end
+
+  rule output_item_list_pair
+    t_comma output_item <Output_Item_List_Pair>
   end
 
   rule parameter_stmt
