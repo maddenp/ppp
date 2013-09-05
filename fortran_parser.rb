@@ -18702,17 +18702,10 @@ module Fortran
   end
 
   module IoControlSpec7
-    def t_unit
+    def io_unit
       elements[0]
     end
 
-    def t_equal
-      elements[1]
-    end
-
-    def io_unit
-      elements[2]
-    end
   end
 
   def _nt_io_control_spec
@@ -18912,30 +18905,32 @@ module Fortran
                         if r36
                           r0 = r36
                         else
-                          i37, s37 = index, []
-                          r38 = _nt_t_unit
-                          s37 << r38
-                          if r38
-                            r39 = _nt_t_equal
-                            s37 << r39
-                            if r39
-                              r40 = _nt_io_unit
-                              s37 << r40
-                            end
-                          end
-                          if s37.last
-                            r37 = instantiate_node(T,input, i37...index, s37)
-                            r37.extend(IoControlSpec7)
-                          else
-                            @index = i37
-                            r37 = nil
-                          end
+                          r37 = _nt_io_spec_unit
                           if r37
                             r0 = r37
                           else
-                            r41 = _nt_io_unit
-                            if r41
-                              r0 = r41
+                            i38, s38 = index, []
+                            r39 = _nt_io_unit
+                            s38 << r39
+                            if r39
+                              if has_terminal?("", false, index)
+                                r40 = instantiate_node(SyntaxNode,input, index...(index + 0))
+                                @index += 0
+                              else
+                                terminal_parse_failure("")
+                                r40 = nil
+                              end
+                              s38 << r40
+                            end
+                            if s38.last
+                              r38 = instantiate_node(T,input, i38...index, s38)
+                              r38.extend(IoControlSpec7)
+                            else
+                              @index = i38
+                              r38 = nil
+                            end
+                            if r38
+                              r0 = r38
                             else
                               @index = i0
                               r0 = nil
@@ -19555,6 +19550,55 @@ module Fortran
     end
 
     node_cache[:io_spec_size][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecUnit0
+    def t_unit
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def io_unit
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_unit
+    start_index = index
+    if node_cache[:io_spec_unit].has_key?(index)
+      cached = node_cache[:io_spec_unit][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_unit
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_io_unit
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Unit,input, i0...index, s0)
+      r0.extend(IoSpecUnit0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_unit][start_index] = r0
 
     r0
   end

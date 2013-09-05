@@ -246,6 +246,13 @@ module Fortran
 
   end
 
+  module ExternalSubprogram2
+    def sms_ignore_subprogram
+      elements[0]
+    end
+
+  end
+
   def _nt_external_subprogram
     start_index = index
     if node_cache[:external_subprogram].has_key?(index)
@@ -310,7 +317,27 @@ module Fortran
         if r9
           r0 = r9
         else
-          r10 = _nt_sms_ignore_subprogram
+          i10, s10 = index, []
+          r11 = _nt_sms_ignore_subprogram
+          s10 << r11
+          if r11
+            i12 = index
+            r13 = lambda { |e| sp_sms_ignore }.call(s10)
+            if r13
+              @index = i12
+              r12 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r12 = nil
+            end
+            s10 << r12
+          end
+          if s10.last
+            r10 = instantiate_node(E,input, i10...index, s10)
+            r10.extend(ExternalSubprogram2)
+          else
+            @index = i10
+            r10 = nil
+          end
           if r10
             r0 = r10
           else
@@ -384,6 +411,13 @@ module Fortran
 
   end
 
+  module InternalSubprogram2
+    def sms_ignore_subprogram
+      elements[0]
+    end
+
+  end
+
   def _nt_internal_subprogram
     start_index = index
     if node_cache[:internal_subprogram].has_key?(index)
@@ -448,7 +482,27 @@ module Fortran
         if r9
           r0 = r9
         else
-          r10 = _nt_sms_ignore_subprogram
+          i10, s10 = index, []
+          r11 = _nt_sms_ignore_subprogram
+          s10 << r11
+          if r11
+            i12 = index
+            r13 = lambda { |e| sp_sms_ignore }.call(s10)
+            if r13
+              @index = i12
+              r12 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r12 = nil
+            end
+            s10 << r12
+          end
+          if s10.last
+            r10 = instantiate_node(E,input, i10...index, s10)
+            r10.extend(InternalSubprogram2)
+          else
+            @index = i10
+            r10 = nil
+          end
           if r10
             r0 = r10
           else
@@ -536,6 +590,13 @@ module Fortran
 
   end
 
+  module ModuleSubprogram2
+    def sms_ignore_subprogram
+      elements[0]
+    end
+
+  end
+
   def _nt_module_subprogram
     start_index = index
     if node_cache[:module_subprogram].has_key?(index)
@@ -600,7 +661,27 @@ module Fortran
         if r9
           r0 = r9
         else
-          r10 = _nt_sms_ignore_subprogram
+          i10, s10 = index, []
+          r11 = _nt_sms_ignore_subprogram
+          s10 << r11
+          if r11
+            i12 = index
+            r13 = lambda { |e| sp_sms_ignore }.call(s10)
+            if r13
+              @index = i12
+              r12 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r12 = nil
+            end
+            s10 << r12
+          end
+          if s10.last
+            r10 = instantiate_node(E,input, i10...index, s10)
+            r10.extend(ModuleSubprogram2)
+          else
+            @index = i10
+            r10 = nil
+          end
           if r10
             r0 = r10
           else
@@ -1022,6 +1103,13 @@ module Fortran
     r0
   end
 
+  module SmsDeclarative0
+    def sms_ignore_declarative
+      elements[0]
+    end
+
+  end
+
   def _nt_sms_declarative
     start_index = index
     if node_cache[:sms_declarative].has_key?(index)
@@ -1046,7 +1134,27 @@ module Fortran
         if r3
           r0 = r3
         else
-          r4 = _nt_sms_ignore_declarative
+          i4, s4 = index, []
+          r5 = _nt_sms_ignore_declarative
+          s4 << r5
+          if r5
+            i6 = index
+            r7 = lambda { |e| sp_sms_ignore }.call(s4)
+            if r7
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r6 = nil
+            end
+            s4 << r6
+          end
+          if s4.last
+            r4 = instantiate_node(E,input, i4...index, s4)
+            r4.extend(SmsDeclarative0)
+          else
+            @index = i4
+            r4 = nil
+          end
           if r4
             r0 = r4
           else
@@ -2221,7 +2329,7 @@ module Fortran
   end
 
   module SmsIgnoreDeclarative0
-    def sms_ignore_begin_HACK
+    def sms_ignore_begin
       elements[0]
     end
 
@@ -2246,7 +2354,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r1 = _nt_sms_ignore_begin_HACK
+    r1 = _nt_sms_ignore_begin
     s0 << r1
     if r1
       r2 = _nt_declaration_constructs
@@ -2319,7 +2427,7 @@ module Fortran
   end
 
   module SmsIgnoreSubprogram0
-    def sms_ignore_begin_HACK
+    def sms_ignore_begin
       elements[0]
     end
 
@@ -2340,7 +2448,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r1 = _nt_sms_ignore_begin_HACK
+    r1 = _nt_sms_ignore_begin
     s0 << r1
     if r1
       i2 = index
@@ -2381,7 +2489,7 @@ module Fortran
   end
 
   module SmsIgnoreUse0
-    def sms_ignore_begin_HACK
+    def sms_ignore_begin
       elements[0]
     end
 
@@ -2406,7 +2514,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r1 = _nt_sms_ignore_begin_HACK
+    r1 = _nt_sms_ignore_begin
     s0 << r1
     if r1
       r2 = _nt_use_part
@@ -2494,63 +2602,6 @@ module Fortran
     end
 
     node_cache[:sms_ignore_begin][start_index] = r0
-
-    r0
-  end
-
-  module SmsIgnoreBeginHACK0
-    def sms_sentinel
-      elements[0]
-    end
-
-    def sms_t_ignore
-      elements[1]
-    end
-
-    def sms_t_begin
-      elements[2]
-    end
-
-    def t_newline
-      elements[3]
-    end
-  end
-
-  def _nt_sms_ignore_begin_HACK
-    start_index = index
-    if node_cache[:sms_ignore_begin_HACK].has_key?(index)
-      cached = node_cache[:sms_ignore_begin_HACK][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0, s0 = index, []
-    r1 = _nt_sms_sentinel
-    s0 << r1
-    if r1
-      r2 = _nt_sms_t_ignore
-      s0 << r2
-      if r2
-        r3 = _nt_sms_t_begin
-        s0 << r3
-        if r3
-          r4 = _nt_t_newline
-          s0 << r4
-        end
-      end
-    end
-    if s0.last
-      r0 = instantiate_node(SMS_Ignore_Begin,input, i0...index, s0)
-      r0.extend(SmsIgnoreBeginHACK0)
-    else
-      @index = i0
-      r0 = nil
-    end
-
-    node_cache[:sms_ignore_begin_HACK][start_index] = r0
 
     r0
   end
@@ -5728,6 +5779,13 @@ module Fortran
     r0
   end
 
+  module UsePart0
+    def sms_ignore_use
+      elements[0]
+    end
+
+  end
+
   def _nt_use_part
     start_index = index
     if node_cache[:use_part].has_key?(index)
@@ -5750,7 +5808,27 @@ module Fortran
         if r3
           r1 = r3
         else
-          r4 = _nt_sms_ignore_use
+          i4, s4 = index, []
+          r5 = _nt_sms_ignore_use
+          s4 << r5
+          if r5
+            i6 = index
+            r7 = lambda { |e| sp_sms_ignore }.call(s4)
+            if r7
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r6 = nil
+            end
+            s4 << r6
+          end
+          if s4.last
+            r4 = instantiate_node(E,input, i4...index, s4)
+            r4.extend(UsePart0)
+          else
+            @index = i4
+            r4 = nil
+          end
           if r4
             r1 = r4
           else

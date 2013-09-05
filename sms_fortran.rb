@@ -460,15 +460,17 @@ module Fortran
     def translate
       unless self.env[:sms_ignore] or self.env[:sms_serial]
         declare("logical","iam_root")
+        gathers=[]
+        out_var_gather=[]
         spec_var_bcast=[]
         spec_var_false=[]
         spec_var_goto=[]
         spec_var_true=[]
         success_label=nil
 
-        out_var_gather=[]
-        gathers=[]
         scatters=[]
+
+        internal=(getvarenv("#{self.unit}",self,expected=false))?(true):(false)
 
         if self.is_a?(Write_Stmt)
           self.output_items.each do |x|
@@ -545,20 +547,22 @@ module Fortran
           end
         end
 
-        my_label=(self.label.empty?)?(nil):(self.label)
-        my_label=self.label_delete if my_label
+        unless internal
+          my_label=(self.label.empty?)?(nil):(self.label)
+          my_label=self.label_delete if my_label
+        end
 
         code=[]
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
         out_var_gather.each { |x| code.push(x) }
-        code.push("#{sa(my_label)}if (iam_root()) then")
+        code.push("#{sa(my_label)}if (iam_root()) then") unless internal
         spec_var_false.each { |x| code.push(x) }
         code.push("#{self}".chomp)
         code.push("goto #{success_label}") if success_label
         spec_var_true.each { |x| code.push(x) }
-        code.push("#{sa(success_label)}endif")
+        code.push("#{sa(success_label)}endif") unless internal
         spec_var_bcast.each { |x| code.push(x) }
         spec_var_goto.each { |x| code.push(x) }
 # HACK start

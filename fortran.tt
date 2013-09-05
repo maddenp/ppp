@@ -1911,8 +1911,8 @@ grammar Fortran
     t_nml t_equal namelist_group_name <T> /
     t_rec t_equal scalar_int_expr <T> /
     io_spec_size /
-    t_unit t_equal io_unit <T> /
-    io_unit
+    io_spec_unit /
+    io_unit "" <T>
   end
 
   rule io_control_spec_list
@@ -1960,6 +1960,10 @@ grammar Fortran
 
   rule io_spec_size
     t_size t_equal scalar_default_int_variable <IO_Spec_Size>
+  end
+
+  rule io_spec_unit
+    t_unit t_equal io_unit <IO_Spec_Unit>
   end
 
   rule io_unit

@@ -705,6 +705,15 @@ module Fortran
       list_to_s
     end
 
+    def unit
+      if (io_spec_unit=list_item(IO_Spec_Unit))
+        io_spec_unit.rhs
+      else
+        # If 'unit=' does not appear, the unit *must* be the first list item
+        e[0].e[0]
+      end
+    end
+
   end
 
   class IO_Stmt < T
@@ -741,6 +750,10 @@ module Fortran
 
     def size
       list.size
+    end
+
+    def unit
+      list.unit
     end
 
   end
@@ -2029,6 +2042,11 @@ module Fortran
   end
 
   class IO_Control_Spec_List_Pair < E
+
+    def io_control_spec
+      e[1]
+    end
+
   end
 
   class IO_Implied_Do_Object_List < T
@@ -2082,6 +2100,14 @@ module Fortran
   end
 
   class IO_Spec_Size < IO_Spec
+  end
+
+  class IO_Spec_Unit < IO_Spec
+
+    def unit
+      e[2]
+    end
+
   end
 
   class Kind_Selector < T
