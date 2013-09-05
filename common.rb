@@ -20,6 +20,10 @@ module Common
     node.respond_to?(attr) && node.send(attr)
   end
 
+  def deepcopy(o)
+    Marshal.load(Marshal.dump(o))
+  end
+
   def use_localnames(modulename)
     e=(self.is_a?(Fortran::T))?(use_part.env):(env)
     return [] unless e[:uses]

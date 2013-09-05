@@ -353,7 +353,7 @@ class Translator
       t[0]=t[0].sub(/^\n/,"")    # Remove blank first line
       t
     end
-    
+
     conf=ostruct_default_merge(conf)
     fp=XFortranParser.new(srcfile,conf.incdirs,conf.env)
     s0=nil

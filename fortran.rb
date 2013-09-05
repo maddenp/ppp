@@ -10,10 +10,6 @@ module Fortran
 
   include Common
 
-  def deepcopy(o)
-    Marshal.load(Marshal.dump(o))
-  end
-
   def env
     @envstack.last
   end
@@ -534,7 +530,7 @@ module Fortran
 
     def raw(code,rule,srcfile,opts={})
       opts[:env]=self.env
-      Translator.new.raw(code,rule,srcfile,opts)
+      Translator.new.raw(code,rule,srcfile,deepcopy(opts))
     end
 
     def remove
