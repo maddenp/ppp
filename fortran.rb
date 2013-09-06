@@ -757,6 +757,16 @@ module Fortran
       spec_list.err
     end
 
+    def input_items
+      if self.is_a?(Read_Stmt_1)
+        e[5].items
+      elsif self.is_a?(Read_Stmt_2)
+        e[3].items
+      else
+        []
+      end
+    end
+
     def iostat
       spec_list.iostat
     end
@@ -771,6 +781,12 @@ module Fortran
 
     def spec_list
       (e[3].is_a?(IO_Spec_List))?(e[3]):([])
+    end
+
+    def replace_input_item(old,new)
+      input_items.each do |x|
+        replace_element(new,:expr,old) if "#{x}"=="#{old}"
+      end
     end
 
     def replace_output_item(old,new)
@@ -2649,10 +2665,14 @@ module Fortran
 
   end
 
-  class Read_Stmt < T
+  class Read_Stmt < IO_Stmt
   end
 
   class Read_Stmt_1 < Read_Stmt
+
+    def items
+      (e[5].is_a?(Input_Item_List))?(e[5].items):([])
+    end
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}")
@@ -2661,6 +2681,10 @@ module Fortran
   end
 
   class Read_Stmt_2 < Read_Stmt
+
+    def items
+      (e[3].is_a?(Read_Stmt_Input_Item_List_Option))?(e[3].items):([])
+    end
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}")
