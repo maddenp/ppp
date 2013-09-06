@@ -754,7 +754,7 @@ module Fortran
     end
 
     def replace_output_item(old,new)
-      output_items.each do |x|
+      items.each do |x|
         replace_element(new,:expr,old) if "#{x}"=="#{old}"
       end
     end
@@ -2169,15 +2169,15 @@ module Fortran
 			list_to_s
 		end
 
-    def output_items
-      [e[0]]+e[1].e.reduce([]) { |m,x| m.push(x.output_item) }
+    def items
+      [e[0]]+e[1].e.reduce([]) { |m,x| m.push(x.item) }
     end
 
   end
 
   class IO_Item_List_Pair < E 
 
-    def output_item
+    def item
       e[1]
 		end
 
