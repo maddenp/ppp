@@ -1753,7 +1753,11 @@ grammar Fortran
   rule input_item_list
     # F90:9.4.2
 
-    input_item ( t_comma input_item )* <Input_Item_List>
+    input_item input_item_list_pair* <Input_Item_List>
+  end
+
+  rule input_item_list_pair
+    t_comma input_item <Input_Item_List_Pair>
   end
 
   rule inquire_spec

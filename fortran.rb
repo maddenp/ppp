@@ -2059,6 +2059,14 @@ module Fortran
 
   end
 
+  class Input_Item_List_Pair < E
+
+    def input_item
+      e[1]
+		end
+
+  end
+
   class Inquire_Spec_List < T
     
 		def to_s
