@@ -481,7 +481,7 @@ module Fortran
             if (varenv=getvarenv(var,self,expected=false))
               if (dh=varenv["decomp"])
                 gathers.push(var)
-                self.replace_item(x,Name.global(var))
+                self.replace_output_item(x,Name.global(var))
               end
             end
           end

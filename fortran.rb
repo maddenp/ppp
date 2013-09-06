@@ -749,7 +749,7 @@ module Fortran
       e[3]
     end
 
-    def replace_item(old,new)
+    def replace_output_item(old,new)
       output_items.each do |x|
         replace_element(new,:expr,old) if "#{x}"=="#{old}"
       end
