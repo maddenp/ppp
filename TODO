@@ -1,6 +1,12 @@
-- Process implicit io translations
+- Translate read_stmt.
 
-- Process sms$ignore begin/end (legacy ppp must be gone)
+- Translate inquire_stmt.
+
+- Gather/Scatter namelist variables in read/write statements.
+
+- Reformulate distribute begin/end as distribute region, translate.
+
+- Translate (remove) sms$ignore begin/end (legacy ppp must be gone)
 
 - Remove recognition of sms$ignore in inappropriate regions
 
@@ -95,8 +101,6 @@
 
 - To make all of this more useful, build an AST from the parse tree. Then, do
   translations on and produce final output from the AST.
-
-- Reformulate distribute begin/end as distribute region.
 
 - In SMS_Create_Decomp#translate, merge multiple 1..3 loops. They are as they
   are now to aid in textual comparison to legacy ppp.

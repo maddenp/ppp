@@ -461,34 +461,46 @@ module Fortran
   class IO_Stmt < T
 
     def translate
+
       unless self.env[:sms_ignore] or self.env[:sms_serial]
         declare("logical","iam_root")
-        gathers=[]
-        out_var_gather=[]
+
+        code_gather=[]
+        code_scatter=[]
         spec_var_bcast=[]
         spec_var_false=[]
         spec_var_goto=[]
         spec_var_true=[]
         success_label=nil
-
-        scatters=[]
-
-        internal=(getvarenv("#{self.unit}",self,expected=false))?(true):(false)
+        var_gather=[]
+        var_scatter=[]
 
         if self.is_a?(Write_Stmt)
           self.output_items.each do |x|
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=false))
               if (dh=varenv["decomp"])
-                gathers.push(var)
+                var_gather.push(var)
                 self.replace_output_item(x,Name.global(var))
               end
             end
           end
         end
 
+        if self.is_a?(Read_Stmt)
+          self.input_items.each do |x|
+            var="#{x}"
+            if (varenv=getvarenv(var,self,expected=true))
+              if (dh=varenv["decomp"])
+                var_scatter.push(var)
+                self.replace_input_item(x,Name.global(var))
+              end
+            end
+          end
+        end
+
 # TODO duplicated from SMS_Serial, factor it...
-        globals=Set.new(gathers+scatters)
+        globals=Set.new(var_gather+var_scatter)
         globals.sort.each do |var|
           varenv=getvarenv(var)
           dims=(":"*varenv["dims"]).split("")
@@ -498,7 +510,7 @@ module Fortran
 
 # TODO duplicated (almost) from SMS_Serial, factor it...
         # Gathers
-        gathers.each do |var|
+        var_gather.each do |var|
           varenv=getvarenv(var)
           dh=varenv["decomp"]
           dims=varenv["dims"]
@@ -524,8 +536,45 @@ module Fortran
           args.push(Name.global(var))
           args.push("ppp__status")
           code="call sms_gather(#{args.join(",")})"
-          out_var_gather.push(code)
+          code_gather.push(code)
         end
+
+# TODO duplicated (almost) from SMS_Serial, factor it...
+        # Scatters
+        var_scatter.each do |var|
+          tag="ppp__tag_#{newtag}"
+          declare("integer",tag,{:attrs=>"save"})
+          varenv=getvarenv(var)
+          dh=varenv["decomp"]
+          dims=varenv["dims"]
+          type="(/"+smstype(varenv["type"],varenv["kind"])+"/)"
+          gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+          glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+          gstop=glubs
+          gstrt=gllbs
+          halol="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
+          halou="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
+          perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
+          decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/ppp_not_decomposed/)")
+          args=[]
+          args.push("#{maxrank}")
+          args.push("1")
+          args.push("#{tag}")
+          args.push("#{gllbs}")
+          args.push("#{glubs}")
+          args.push("#{gstrt}")
+          args.push("#{gstop}")
+          args.push("#{perms}")
+          args.push("#{halol}")
+          args.push("#{halou}")
+          args.push("#{decomp}")
+          args.push("#{type}")
+          args.push(Name.global(var))
+          args.push("#{var}")
+          args.push("ppp__status")
+          code="call sms_scatter(#{args.join(",")})"
+          code_scatter.push(code)
+      end
 
         [:err,:end,:eor].each do |x|
           # :err has precedence, per F90 9.4.1.6, 9.4.1.7
@@ -550,24 +599,25 @@ module Fortran
           end
         end
 
-        unless internal
-          my_label=(self.label.empty?)?(nil):(self.label)
-          my_label=self.label_delete if my_label
-        end
-
         code=[]
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
-        out_var_gather.each { |x| code.push(x) }
-        code.push("#{sa(my_label)}if (iam_root()) then") unless internal
-        spec_var_false.each { |x| code.push(x) }
+        code.concat(code_gather)
+        internal=(getvarenv("#{self.unit}",self,expected=false))?(true):(false)
+        unless internal
+          my_label=(self.label.empty?)?(nil):(self.label)
+          my_label=self.label_delete if my_label
+          code.push("#{sa(my_label)}if (iam_root()) then")
+        end
+        code.concat(spec_var_false)
         code.push("#{self}".chomp)
         code.push("goto #{success_label}") if success_label
-        spec_var_true.each { |x| code.push(x) }
+        code.concat(spec_var_true)
         code.push("#{sa(success_label)}endif") unless internal
-        spec_var_bcast.each { |x| code.push(x) }
-        spec_var_goto.each { |x| code.push(x) }
+        code.concat(spec_var_bcast)
+        code.concat(spec_var_goto)
+        code.concat(code_scatter)
 # HACK start
         code.push("!sms$ignore end")
 # HACK end
@@ -1873,9 +1923,6 @@ module Fortran
       end
     end
 
-  end
-
-  class Write_Stmt < IO_Stmt
   end
 
 end # module Fortran
