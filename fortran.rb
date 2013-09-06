@@ -2153,11 +2153,6 @@ module Fortran
   end
 
   class IO_Control_Spec_List_Pair < E
-
-    def io_control_spec
-      e[1]
-    end
-
   end
 
   class IO_Implied_Do_Object_List < T
