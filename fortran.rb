@@ -726,26 +726,26 @@ module Fortran
   class IO_Stmt < T
 
     def end
-      list.end
+      spec_list.end
     end
 
     def eor
-      list.eor
+      spec_list.eor
     end
 
     def err
-      list.err
+      spec_list.err
     end
 
     def iostat
-      list.iostat
+      spec_list.iostat
     end
 
     def output_items
       (e[5].is_a?(Output_Item_List))?(e[5].output_items):([])
     end
 
-    def list
+    def spec_list
       e[3]
     end
 
@@ -756,11 +756,11 @@ module Fortran
     end
 
     def size
-      list.size
+      spec_list.size
     end
 
     def unit
-      list.unit
+      spec_list.unit
     end
 
   end
