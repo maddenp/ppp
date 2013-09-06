@@ -758,9 +758,9 @@ module Fortran
     end
 
     def input_items
-      if self.is_a?(Read_Stmt_1)
+      if self.is_a?(Read_Stmt_1) and e[5].is_a?(Input_Item_List)
         e[5].items
-      elsif self.is_a?(Read_Stmt_2)
+      elsif self.is_a?(Read_Stmt_2) and e[3].is_a?(Read_Stmt_Input_Item_List_Option)
         e[3].items
       else
         []

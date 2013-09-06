@@ -468,6 +468,7 @@ module Fortran
 
         code_gather=[]
         code_scatter=[]
+        internal=false
         spec_var_bcast=[]
         spec_var_false=[]
         spec_var_goto=[]
@@ -477,6 +478,7 @@ module Fortran
         var_scatter=[]
 
         if self.is_a?(Write_Stmt)
+          internal=true if getvarenv("#{self.unit}",self,expected=false)
           self.output_items.each do |x|
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=false))
@@ -605,7 +607,6 @@ module Fortran
         code.push("!sms$ignore begin")
 # HACK end
         code.concat(code_gather)
-        internal=(getvarenv("#{self.unit}",self,expected=false))?(true):(false)
         unless internal
           my_label=(self.label.empty?)?(nil):(self.label)
           my_label=self.label_delete if my_label
