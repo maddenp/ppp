@@ -774,7 +774,7 @@ module Fortran
     end
 
     def replace_output_item(old,new)
-      items.each do |x|
+      output_items.each do |x|
         replace_element(new,:expr,old) if "#{x}"=="#{old}"
       end
     end
@@ -2077,28 +2077,13 @@ module Fortran
 
   end
 
-  class Input_Item_List < T
-
-		def to_s
-			list_to_s
-		end
-
+  class Input_Item_List < IO_Item_List
   end
 
-  class Input_Item_List_Pair < E
-
-    def input_item
-      e[1]
-		end
-
+  class Input_Item_List_Pair < IO_Item_List_Pair
   end
 
-  class Inquire_Spec_List < T
-
-		def to_s
-			list_to_s
-		end
-
+  class Inquire_Spec_List < IO_Spec_List
   end
 
   class Inquire_Stmt_1 < T
