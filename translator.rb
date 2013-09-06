@@ -124,7 +124,7 @@ class Translator
     fail "NORMALIZING PARSE FAILED" if s.nil? or s=~/^\s*$/
     s
   end
-      
+
   def default_opts
     {
       :debug=>false,
@@ -297,7 +297,7 @@ class Translator
       end                                      # will always end in die() from cpp-check
       s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # replace any continuation character with generic "a"
       s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
-      @m=Stringmap.new                        
+      @m=Stringmap.new
       d=Dehollerizer.new
       s=d.process(@m,s,conf)                   # mask holleriths (also removes hollerith-important continuations)
       s=chkparse(fix_pt_norm(s,np))            # string-aware transform & parse error checking
@@ -340,7 +340,7 @@ class Translator
             a[n]=t
           end
 # HACK begin
-# We shouldn't need to left-justify directives when legacy ppp is gone          
+# We shouldn't need to left-justify directives when legacy ppp is gone
         else
           a[n]=e.sub(/^ */,"")
 # HACK end

@@ -463,6 +463,7 @@ module Fortran
     def translate
 
       unless self.env[:sms_ignore] or self.env[:sms_serial]
+
         declare("logical","iam_root")
 
         code_gather=[]

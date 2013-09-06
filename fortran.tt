@@ -2904,7 +2904,7 @@ grammar Fortran
     # F90:R831
 
     inner_shared_do_construct &{ |e| sp_dolabel_pop } <E> /
-    outer_shared_do_construct &{ |e| sp_dolabel_pop } <E> 
+    outer_shared_do_construct &{ |e| sp_dolabel_pop } <E>
   end
 
   rule sign
