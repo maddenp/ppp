@@ -149,7 +149,15 @@ module Fortran
     true
   end
 
-  def sp_function_subprogram
+  def sp_function_subprogram(function_subprogram)
+    var="#{function_subprogram.function_name}"
+    env[var]||={}
+    env[var]["access"]="_default" unless env[var]["access"]
+    env[var]["sort"]="_scalar"
+    if (type_spec=function_subprogram.function_stmt_type_spec)
+      env[var]["kind"]="#{type_spec.kind}"
+      env[var]["type"]="#{type_spec.type}"
+    end
     envpop
     true
   end
@@ -471,7 +479,7 @@ module Fortran
     end
 
     def insert_statement(code,rule,node,offset)
-      tree=raw(code,rule,@srcfile)
+      tree=self.raw(code,rule,@srcfile,{:env=>self.env})
       tree.parent=node.parent
       block=node.parent.e
       block.insert(block.index(node)+offset,tree)
@@ -529,8 +537,7 @@ module Fortran
     end
 
     def raw(code,rule,srcfile,opts={})
-      opts[:env]=self.env
-      Translator.new.raw(code,rule,srcfile,deepcopy(opts))
+      Translator.new.raw(code,rule,srcfile,opts)
     end
 
     def remove
@@ -538,7 +545,7 @@ module Fortran
     end
 
     def replace_element(code,rule,node=self)
-      tree=raw(code,rule,@srcfile,{"nl"=>false})
+      tree=self.raw(code,rule,@srcfile,{"nl"=>false,:env=>node.env})
       node=node.parent while "#{node}"=="#{node.parent}"
       tree.parent=node.parent
       block=node.parent.e
@@ -546,7 +553,7 @@ module Fortran
     end
 
     def replace_statement(code,rule,node=self)
-      tree=raw(code,rule,@srcfile)
+      tree=self.raw(code,rule,@srcfile,{:env=>node.env})
       tree.parent=node.parent
       block=node.parent.e
       block[block.index(node)]=tree
@@ -623,7 +630,7 @@ module Fortran
           new_uses={modname=>new_usenames}
           old_uses=up.env[:uses]
           up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
-          t=raw(code,:use_stmt,@srcfile)
+          t=self.raw(code,:use_stmt,@srcfile,{:env=>self.env})
           t.parent=up
           up.e.push(t)
         end
@@ -1838,10 +1845,62 @@ module Fortran
   class Function_Name < E
   end
 
+  class Function_Prefix < T
+
+    def any?(o)
+      fail "Expected string or class" unless o.is_a?(Symbol) or o.is_a?(Class)
+      e.each do |x|
+        return x if ((o.is_a?(Symbol))?("#{x}"=="#{o}"):(x.is_a?(o)))
+      end
+      nil
+    end
+
+    def elemental?
+      any?(:elemental)
+    end
+
+    def pure?
+      any?(:pure)
+    end
+
+    def recursive?
+      any?(:recursive)
+    end
+
+    def type_spec
+      any?(Type_Spec)
+    end
+
+		def to_s
+			e.map { |x| "#{x}" }.join(" ")
+		end
+
+  end
+
   class Function_Reference < E
   end
 
   class Function_Stmt < T
+
+    def elemental?
+      function_prefix.elemental?
+    end
+
+    def function_name
+      e[3]
+    end
+
+    def function_prefix
+      e[1]
+    end
+
+    def pure?
+      function_prefix.pure?
+    end
+
+    def recursive?
+      function_prefix.recursive?
+    end
 
     def to_s
       s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")
@@ -1849,9 +1908,42 @@ module Fortran
       s
     end
 
+    def type_spec
+      (function_prefix.is_a?(Function_Prefix))?(function_prefix.type_spec):(nil)
+    end
+
   end
 
   class Function_Subprogram < Scoping_Unit
+
+    def elemental?
+      function_stmt.elemental?
+    end
+
+    def function_name
+      function_stmt.function_name
+    end
+
+    def function_prefix
+      function_stmt.function_prefix
+    end
+
+    def function_stmt
+      e[0]
+    end
+
+    def pure?
+      function_stmt.pure?
+    end
+
+    def recursive?
+      function_stmt.recursive?
+    end
+
+    def function_stmt_type_spec
+      function_stmt.type_spec
+    end
+
   end
 
   class Generic_Name < E
@@ -2509,22 +2601,6 @@ module Fortran
   class Power_Op_Option < E
   end
 
-  class Prefix_Function < T
-    
-		def to_s
-			e.map { |x| "#{x}" }.join(" ")
-		end
-
-  end
-
-  class Prefix_Subroutine < T
-    
-		def to_s
-			e.map { |x| "#{x}" }.join(" ")
-		end
-
-  end
-
   class Print_Stmt < T
     
 		def to_s
@@ -2733,6 +2809,14 @@ module Fortran
   end
 
   class Subroutine_Name < E
+  end
+
+  class Subroutine_Prefix < T
+    
+		def to_s
+			e.map { |x| "#{x}" }.join(" ")
+		end
+
   end
 
   class Subroutine_Subprogram < Scoping_Unit

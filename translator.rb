@@ -63,24 +63,26 @@ class Translator
 
     end
 
-    def initialize(srcfile,incdirs,env=nil)
+    def initialize(srcfile,incdirs)
       super()
-      env||={:static=>OpenStruct.new}
       @access="_default"
       @dolabels=[]
-      @envstack=[env]
+      @envstack=[]
       @incdirs=incdirs
       @srcfile=srcfile
     end
 
-    def parse(input,options={})
+    def parse(input,env,options={})
+      env||={}
+      env[:static]=OpenStruct.new unless env[:static]
+      @envstack.push(env)
       input=Xinput.new(input,@srcfile,@envstack)
       super(input,options)
     end
 
-      def to_s
-        @input.to_s
-      end
+    def to_s
+      @input.to_s
+    end
 
   end
 
@@ -355,7 +357,7 @@ class Translator
     end
 
     conf=ostruct_default_merge(conf)
-    fp=XFortranParser.new(srcfile,conf.incdirs,conf.env)
+    fp=XFortranParser.new(srcfile,conf.incdirs)
     s0=nil
     while s!=s0 and not s.nil?                                     # Fixed point treatment of prepsrc() and assemble()
       s0=s                                                         # for cases in which files added by 'include'
@@ -376,7 +378,8 @@ class Translator
     n=normalize(s,conf)
     puts "\n#{n}" if conf.debug or conf.normalize
     unless conf.normalize
-      raw_tree=fp.parse(n,{:root=>root})
+      env=(conf.env)?(conf.env):(nil)
+      raw_tree=fp.parse(n,env,{:root=>root})
       exit if conf.modinfo
       re=Regexp.new("^(.+?):in `([^\']*)'$")
       srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
@@ -410,7 +413,7 @@ class Translator
     [t,raw_tree,translated_tree]
   end
 
-  def raw(s,root,srcfile,conf=OpenStruct.new)
+  def raw(s,root,srcfile,conf={})
     conf=ostruct_default_merge(conf)
     conf.translate=false
     translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)

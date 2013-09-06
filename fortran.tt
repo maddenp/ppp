@@ -1502,7 +1502,7 @@ grammar Fortran
     # F90:R203
 
     subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram } <E> /
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E> /
     directive
   end
 
@@ -1554,6 +1554,19 @@ grammar Fortran
     name "" <Function_Name>
   end
 
+  rule function_prefix
+    # F90:R1217 + F95:1219
+
+    function_prefix_option+ <Function_Prefix>
+  end
+
+  rule function_prefix_option
+    type_spec /
+    t_elemental /
+    t_pure /
+    t_recursive
+  end
+
   rule function_reference
     # F90:R1209
 
@@ -1563,7 +1576,7 @@ grammar Fortran
   rule function_stmt
     # F90:R1216
 
-    label:label? prefix_function? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r result_option? t_newline &{ |e| sp_function_stmt(e[5]) } <Function_Stmt>
+    label:label? function_prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r result_option? t_newline &{ |e| sp_function_stmt(e[5]) } <Function_Stmt>
   end
 
   rule function_subprogram
@@ -1862,7 +1875,7 @@ grammar Fortran
     # F90:R211
 
     subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram } <E> /
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E> /
     directive
   end
 
@@ -2216,7 +2229,7 @@ grammar Fortran
     # F90:R213
 
     subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram } <E> /
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E> /
     directive
   end
 
@@ -2532,31 +2545,6 @@ grammar Fortran
 
   rule power_op_option
     power_op mult_operand <Power_Op_Option>
-  end
-
-  rule prefix_function
-    # F90:R1217 + F95:1219
-
-    prefix_function_option+ <Prefix_Function>
-  end
-
-  rule prefix_function_option
-    type_spec /
-    t_elemental /
-    t_pure /
-    t_recursive
-  end
-
-  rule prefix_subroutine
-    # F95:1219
-
-    prefix_subroutine_option+ <Prefix_Subroutine>
-  end
-
-  rule prefix_subroutine_option
-    t_elemental /
-    t_pure /
-    t_recursive
   end
 
   rule primary
@@ -3058,10 +3046,22 @@ grammar Fortran
     name "" <Subroutine_Name>
   end
 
+  rule subroutine_prefix
+    # F95:1219
+
+    subroutine_prefix_option+ <Subroutine_Prefix>
+  end
+
+  rule subroutine_prefix_option
+    t_elemental /
+    t_pure /
+    t_recursive
+  end
+
   rule subroutine_stmt
     # F90:R1220 + F95:1222
 
-    label:label? prefix_subroutine? t_subroutine subroutine_name dummy_arg_list_option? t_newline &{ |e| sp_subroutine_stmt(e[4]) } <Subroutine_Stmt>
+    label:label? subroutine_prefix? t_subroutine subroutine_name dummy_arg_list_option? t_newline &{ |e| sp_subroutine_stmt(e[4]) } <Subroutine_Stmt>
   end
 
   rule subroutine_subprogram

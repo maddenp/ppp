@@ -14227,7 +14227,7 @@ module Fortran
       s5 << r6
       if r6
         i7 = index
-        r8 = lambda { |e| sp_function_subprogram }.call(s5)
+        r8 = lambda { |e| sp_function_subprogram(e[0]) }.call(s5)
         if r8
           @index = i7
           r7 = instantiate_node(SyntaxNode,input, index...index)
@@ -14632,6 +14632,78 @@ module Fortran
     r0
   end
 
+  def _nt_function_prefix
+    start_index = index
+    if node_cache[:function_prefix].has_key?(index)
+      cached = node_cache[:function_prefix][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    s0, i0 = [], index
+    loop do
+      r1 = _nt_function_prefix_option
+      if r1
+        s0 << r1
+      else
+        break
+      end
+    end
+    if s0.empty?
+      @index = i0
+      r0 = nil
+    else
+      r0 = instantiate_node(Function_Prefix,input, i0...index, s0)
+    end
+
+    node_cache[:function_prefix][start_index] = r0
+
+    r0
+  end
+
+  def _nt_function_prefix_option
+    start_index = index
+    if node_cache[:function_prefix_option].has_key?(index)
+      cached = node_cache[:function_prefix_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    r1 = _nt_type_spec
+    if r1
+      r0 = r1
+    else
+      r2 = _nt_t_elemental
+      if r2
+        r0 = r2
+      else
+        r3 = _nt_t_pure
+        if r3
+          r0 = r3
+        else
+          r4 = _nt_t_recursive
+          if r4
+            r0 = r4
+          else
+            @index = i0
+            r0 = nil
+          end
+        end
+      end
+    end
+
+    node_cache[:function_prefix_option][start_index] = r0
+
+    r0
+  end
+
   module FunctionReference0
     def function_name
       elements[0]
@@ -14749,7 +14821,7 @@ module Fortran
     end
     s0 << r1
     if r1
-      r4 = _nt_prefix_function
+      r4 = _nt_function_prefix
       if r4
         r3 = r4
       else
@@ -18309,7 +18381,7 @@ module Fortran
       s5 << r6
       if r6
         i7 = index
-        r8 = lambda { |e| sp_function_subprogram }.call(s5)
+        r8 = lambda { |e| sp_function_subprogram(e[0]) }.call(s5)
         if r8
           @index = i7
           r7 = instantiate_node(SyntaxNode,input, index...index)
@@ -21643,7 +21715,7 @@ module Fortran
       s5 << r6
       if r6
         i7 = index
-        r8 = lambda { |e| sp_function_subprogram }.call(s5)
+        r8 = lambda { |e| sp_function_subprogram(e[0]) }.call(s5)
         if r8
           @index = i7
           r7 = instantiate_node(SyntaxNode,input, index...index)
@@ -24779,145 +24851,6 @@ module Fortran
     end
 
     node_cache[:power_op_option][start_index] = r0
-
-    r0
-  end
-
-  def _nt_prefix_function
-    start_index = index
-    if node_cache[:prefix_function].has_key?(index)
-      cached = node_cache[:prefix_function][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    s0, i0 = [], index
-    loop do
-      r1 = _nt_prefix_function_option
-      if r1
-        s0 << r1
-      else
-        break
-      end
-    end
-    if s0.empty?
-      @index = i0
-      r0 = nil
-    else
-      r0 = instantiate_node(Prefix_Function,input, i0...index, s0)
-    end
-
-    node_cache[:prefix_function][start_index] = r0
-
-    r0
-  end
-
-  def _nt_prefix_function_option
-    start_index = index
-    if node_cache[:prefix_function_option].has_key?(index)
-      cached = node_cache[:prefix_function_option][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0 = index
-    r1 = _nt_type_spec
-    if r1
-      r0 = r1
-    else
-      r2 = _nt_t_elemental
-      if r2
-        r0 = r2
-      else
-        r3 = _nt_t_pure
-        if r3
-          r0 = r3
-        else
-          r4 = _nt_t_recursive
-          if r4
-            r0 = r4
-          else
-            @index = i0
-            r0 = nil
-          end
-        end
-      end
-    end
-
-    node_cache[:prefix_function_option][start_index] = r0
-
-    r0
-  end
-
-  def _nt_prefix_subroutine
-    start_index = index
-    if node_cache[:prefix_subroutine].has_key?(index)
-      cached = node_cache[:prefix_subroutine][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    s0, i0 = [], index
-    loop do
-      r1 = _nt_prefix_subroutine_option
-      if r1
-        s0 << r1
-      else
-        break
-      end
-    end
-    if s0.empty?
-      @index = i0
-      r0 = nil
-    else
-      r0 = instantiate_node(Prefix_Subroutine,input, i0...index, s0)
-    end
-
-    node_cache[:prefix_subroutine][start_index] = r0
-
-    r0
-  end
-
-  def _nt_prefix_subroutine_option
-    start_index = index
-    if node_cache[:prefix_subroutine_option].has_key?(index)
-      cached = node_cache[:prefix_subroutine_option][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0 = index
-    r1 = _nt_t_elemental
-    if r1
-      r0 = r1
-    else
-      r2 = _nt_t_pure
-      if r2
-        r0 = r2
-      else
-        r3 = _nt_t_recursive
-        if r3
-          r0 = r3
-        else
-          @index = i0
-          r0 = nil
-        end
-      end
-    end
-
-    node_cache[:prefix_subroutine_option][start_index] = r0
 
     r0
   end
@@ -28628,6 +28561,73 @@ module Fortran
     r0
   end
 
+  def _nt_subroutine_prefix
+    start_index = index
+    if node_cache[:subroutine_prefix].has_key?(index)
+      cached = node_cache[:subroutine_prefix][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    s0, i0 = [], index
+    loop do
+      r1 = _nt_subroutine_prefix_option
+      if r1
+        s0 << r1
+      else
+        break
+      end
+    end
+    if s0.empty?
+      @index = i0
+      r0 = nil
+    else
+      r0 = instantiate_node(Subroutine_Prefix,input, i0...index, s0)
+    end
+
+    node_cache[:subroutine_prefix][start_index] = r0
+
+    r0
+  end
+
+  def _nt_subroutine_prefix_option
+    start_index = index
+    if node_cache[:subroutine_prefix_option].has_key?(index)
+      cached = node_cache[:subroutine_prefix_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    r1 = _nt_t_elemental
+    if r1
+      r0 = r1
+    else
+      r2 = _nt_t_pure
+      if r2
+        r0 = r2
+      else
+        r3 = _nt_t_recursive
+        if r3
+          r0 = r3
+        else
+          @index = i0
+          r0 = nil
+        end
+      end
+    end
+
+    node_cache[:subroutine_prefix_option][start_index] = r0
+
+    r0
+  end
+
   module SubroutineStmt0
     def label
       elements[0]
@@ -28667,7 +28667,7 @@ module Fortran
     end
     s0 << r1
     if r1
-      r4 = _nt_prefix_subroutine
+      r4 = _nt_subroutine_prefix
       if r4
         r3 = r4
       else

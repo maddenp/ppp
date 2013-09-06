@@ -84,7 +84,10 @@ module Fortran
   end
 
   def sp_sms_serial_begin
-    fail "Already inside serial region" if env[:sms_serial]
+# HACK begin
+# Expose this when we're not bracketing stuff in sms$ignore to please legacy ppp
+#   fail "Already inside serial region" if env[:sms_serial]
+# HACK END
     envpush
     env[:sms_serial]=true
     true
@@ -137,7 +140,7 @@ module Fortran
         code+="(#{dims.join(',')})" if dims
         init=props[:init]
         code+="=#{init}" if init
-        t=raw(code,:type_declaration_stmt,root.srcfile)
+        t=self.raw(code,:type_declaration_stmt,root.srcfile,{:env=>self.env})
         newenv=t.input.envstack.last
         newenv[var]["pppvar"]=true
         dc=declaration_constructs
@@ -270,7 +273,7 @@ module Fortran
         up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
   # sub HACK start
         code=("!sms$ignore begin\n#{code}\n!sms$ignore end")
-        t=raw(code,:sms_ignore_use,@srcfile)
+        t=self.raw(code,:sms_ignore_use,@srcfile,{:env=>self.env})
         t.parent=up
         up.e.push(t)
   # sub HACK end
@@ -643,9 +646,9 @@ module Fortran
             halo_lo=halo_offsets(decdim).lo
             halo_up=halo_offsets(decdim).up
             if loop_control.is_a?(Loop_Control_1)
-              lo=raw("#{decomp}__s#{decdim}(#{loop_control.e[3]},#{halo_lo},#{decomp}__nestlevel)",:scalar_numeric_expr,@srcfile,{:nl=>false})
+              lo=self.raw("#{decomp}__s#{decdim}(#{loop_control.e[3]},#{halo_lo},#{decomp}__nestlevel)",:scalar_numeric_expr,@srcfile,{:env=>self.env,:nl=>false})
               lo.parent=loop_control
-              up=raw(",#{decomp}__e#{decdim}(#{loop_control.e[4].value},#{halo_up},#{decomp}__nestlevel)",:loop_control_pair,@srcfile,{:nl=>false})
+              up=self.raw(",#{decomp}__e#{decdim}(#{loop_control.e[4].value},#{halo_up},#{decomp}__nestlevel)",:loop_control_pair,@srcfile,{:env=>self.env,:nl=>false})
               up.parent=loop_control
               loop_control.e[3]=lo
               loop_control.e[4]=up

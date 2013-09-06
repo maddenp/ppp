@@ -38,7 +38,7 @@ grammar Fortran
     # F90:R203
 
     subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram } <E> /
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E> /
     directive /
     sms_ignore_subprogram &{ |e| sp_sms_ignore } <E>
   end
@@ -59,7 +59,7 @@ grammar Fortran
     # F90:R211
 
     subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram } <E> /
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E> /
     directive /
     sms_ignore_subprogram  &{ |e| sp_sms_ignore } <E>
   end
@@ -74,7 +74,7 @@ grammar Fortran
     # F90:R213
 
     subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram } <E> /
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E> /
     directive /
     sms_ignore_subprogram &{ |e| sp_sms_ignore } <E>
   end
@@ -150,7 +150,7 @@ grammar Fortran
     sms_create_decomp /
     sms_exchange /
     sms_halo_comp &{ |e| sp_sms_halo_comp } <E> /
-    sms_ignore_executable &{ |e| sp_sms_ignore } <E> /
+    sms_ignore_executable /
     sms_parallel &{ |e| sp_sms_parallel } <E> /
     sms_reduce /
     sms_serial &{ |e| sp_sms_serial } <E> /
@@ -184,7 +184,7 @@ grammar Fortran
   end
 
   rule sms_ignore_executable
-    sms_ignore_begin block sms_ignore_end <SMS_Ignore>
+    sms_ignore_begin block sms_ignore_end &{ |e| sp_sms_ignore } <SMS_Ignore>
   end
 
   rule sms_ignore_subprogram
