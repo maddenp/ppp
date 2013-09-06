@@ -742,11 +742,15 @@ module Fortran
     end
 
     def output_items
-      (e[5].is_a?(Output_Item_List))?(e[5].output_items):([])
+      if self.is_a?(Write_Stmt) and e[5].is_a?(Output_Item_List)
+        e[5].items
+      else
+        []
+      end
     end
 
     def spec_list
-      e[3]
+      (e[3].is_a?(IO_Spec_List))?(e[3]):([])
     end
 
     def replace_output_item(old,new)
