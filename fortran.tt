@@ -2626,7 +2626,7 @@ grammar Fortran
   end
 
   rule read_stmt_input_item_list_option
-    t_comma input_item_list <T>
+    t_comma input_item_list <Read_Stmt_Input_Item_List_Option>
   end
 
   rule real_literal_constant

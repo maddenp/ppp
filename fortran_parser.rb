@@ -25683,7 +25683,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Read_Stmt_Input_Item_List_Option,input, i0...index, s0)
       r0.extend(ReadStmtInputItemListOption0)
     else
       @index = i0

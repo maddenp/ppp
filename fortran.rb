@@ -1336,12 +1336,14 @@ module Fortran
   end
 
   class Contains_Stmt < T
+
     def to_s
       unindent
       s="\n#{stmt(space)}"
       indent
       s
     end
+
   end
 
   class Data_I_Do_Object_List < T
@@ -2673,6 +2675,14 @@ module Fortran
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}")
 		end
+
+  end
+
+  class Read_Stmt_Input_Item_List_Option
+
+    def items
+      e[1].items
+    end
 
   end
 
