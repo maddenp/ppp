@@ -2163,6 +2163,26 @@ module Fortran
 
   end
 
+  class IO_Item_List < E
+    
+		def to_s
+			list_to_s
+		end
+
+    def output_items
+      [e[0]]+e[1].e.reduce([]) { |m,x| m.push(x.output_item) }
+    end
+
+  end
+
+  class IO_Item_List_Pair < E 
+
+    def output_item
+      e[1]
+		end
+
+  end
+
   class IO_Spec < E
 
     def relabel_spec(spec)
@@ -2519,24 +2539,10 @@ module Fortran
 
   end
 
-  class Output_Item_List < T
-    
-		def to_s
-			list_to_s
-		end
-
-    def output_items
-      [e[0]]+e[1].e.reduce([]) { |m,x| m.push(x.output_item) }
-    end
-
+  class Output_Item_List < IO_Item_List
   end
 
-  class Output_Item_List_Pair < E
-
-    def output_item
-      e[1]
-		end
-
+  class Output_Item_List_Pair < IO_Item_List_Pair
   end
 
   class Parenthesized_Args < E
