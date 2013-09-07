@@ -265,3 +265,6 @@
 - It might be clearer to break IO_Stmt into several more specific classes.
   This may work better after duplication between IO_Stmt and SMS_Serial is
   factored.
+
+- Reads from internal strings (see e.g. 'read(yyyymmddhhmm(1:4),...) yeari' in
+  phy_run.F90) need not be serialized. Is it a problem if they are?
