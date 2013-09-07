@@ -259,3 +259,9 @@
   should probably be moved into the matching nodes; otherwise, care must be
   taken to do internal parses of the more general rule that calls the stack-
   altering method.
+
+- Factor duplication between IO_Stmt and SMS_Serial.
+
+- It might be clearer to break IO_Stmt into several more specific classes.
+  This may work better after duplication between IO_Stmt and SMS_Serial is
+  factored.

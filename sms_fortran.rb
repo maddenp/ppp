@@ -466,25 +466,31 @@ module Fortran
 
         declare("logical","iam_root")
 
+        code_alloc=[]
+        code_bcast=[]
+        code_dealloc=[]
         code_gather=[]
         code_scatter=[]
-        internal=false
         spec_var_bcast=[]
         spec_var_false=[]
         spec_var_goto=[]
         spec_var_true=[]
+        split=false
         success_label=nil
+        var_bcast=[]
         var_gather=[]
         var_scatter=[]
 
         if self.is_a?(Write_Stmt)
-          internal=true if getvarenv("#{self.unit}",self,expected=false)
+          split=true if getvarenv("#{self.unit}",self,expected=false)
           self.output_items.each do |x|
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=false))
               if (dh=varenv["decomp"])
+                split=true
+                global=Name.global(var)
                 var_gather.push(var)
-                self.replace_output_item(x,Name.global(var))
+                self.replace_output_item(x,global)
               end
             end
           end
@@ -495,24 +501,42 @@ module Fortran
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=true))
               if (dh=varenv["decomp"])
+                split=true
+                global=Name.global(var)
                 var_scatter.push(var)
-                self.replace_input_item(x,Name.global(var))
+                self.replace_input_item(x,global)
+              else
+                var_bcast.push(var)
               end
             end
           end
         end
 
-# TODO duplicated from SMS_Serial, factor it...
+        # Allocation & deallocation of globals
+
         globals=Set.new(var_gather+var_scatter)
         globals.sort.each do |var|
           varenv=getvarenv(var)
-          dims=(":"*varenv["dims"]).split("")
-          kind=varenv["kind"]
-          declare(varenv["type"],Name.global(var),{:attrs=>["allocatable"],:dims=>dims,:kind=>kind})
+          d=(":"*varenv["dims"]).split("")
+          k=varenv["kind"]
+          declare(varenv["type"],Name.global(var),{:attrs=>["allocatable"],:dims=>d,:kind=>k})
+          dims=varenv["dims"]
+          bounds_root=[]
+          (1..dims).each do |i|
+            bounds_root.push((decdim=varenv["dim#{i}"])?("#{fixbound(varenv,var,i,:l)}:#{fixbound(varenv,var,i,:u)}"):("lbound(#{var},#{i}):ubound(#{var},#{i})"))
+          end
+          bounds_root=bounds_root.join(",")
+          bounds_nonroot=("1"*dims).split("").join(",")
+          code_alloc.push("if (iam_root) then")
+          code_alloc.push("allocate(#{Name.global(var)}(#{bounds_root}),stat=ppp__status)")
+          code_alloc.push("else")
+          code_alloc.push("allocate(#{Name.global(var)}(#{bounds_nonroot}),stat=ppp__status)")
+          code_alloc.push("endif")
+          code_dealloc.push("deallocate(#{Name.global(var)})")
         end
 
-# TODO duplicated (almost) from SMS_Serial, factor it...
         # Gathers
+
         var_gather.each do |var|
           varenv=getvarenv(var)
           dh=varenv["decomp"]
@@ -542,8 +566,8 @@ module Fortran
           code_gather.push(code)
         end
 
-# TODO duplicated (almost) from SMS_Serial, factor it...
         # Scatters
+
         var_scatter.each do |var|
           tag="ppp__tag_#{newtag}"
           declare("integer",tag,{:attrs=>"save"})
@@ -577,7 +601,26 @@ module Fortran
           args.push("ppp__status")
           code="call sms_scatter(#{args.join(",")})"
           code_scatter.push(code)
-      end
+        end
+
+        # Broadcasts
+
+        var_bcast.each do |var|
+          varenv=getvarenv(var)
+          if varenv["sort"]=="_scalar"
+            dims="1"
+            sizes="(/1/)"
+          else
+            dims=varenv["dims"]
+            sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
+          end
+          if varenv["type"]=="character"
+            code="call ppp_bcast_char(#{var},#{dims},ppp__status)"
+          else
+            code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
+          end
+          code_bcast.push(code)
+        end
 
         [:err,:end,:eor].each do |x|
           # :err has precedence, per F90 9.4.1.6, 9.4.1.7
@@ -606,8 +649,9 @@ module Fortran
 # HACK start
         code.push("!sms$ignore begin")
 # HACK end
+        code.concat(code_alloc)
         code.concat(code_gather)
-        unless internal
+        if split
           my_label=(self.label.empty?)?(nil):(self.label)
           my_label=self.label_delete if my_label
           code.push("#{sa(my_label)}if (iam_root()) then")
@@ -616,16 +660,18 @@ module Fortran
         code.push("#{self}".chomp)
         code.push("goto #{success_label}") if success_label
         code.concat(spec_var_true)
-        code.push("#{sa(success_label)}endif") unless internal
+        code.push("#{sa(success_label)}endif") if split
         code.concat(spec_var_bcast)
         code.concat(spec_var_goto)
         code.concat(code_scatter)
+        code.concat(code_bcast)
+        code.concat(code_dealloc)
 # HACK start
         code.push("!sms$ignore end")
 # HACK end
         code=code.join("\n")
 
-        # HACK start
+# HACK start
 # Get rid of sms$ignore bracketing when legacy ppp is gone
         replace_statement(code,:sms_ignore_executable)
 # HACK end
@@ -1474,7 +1520,7 @@ module Fortran
       # size indicated by the decomposition info.
       globals.sort.each do |var|
         varenv=getvarenv(var)
-        decomp=varenv["decomp"]
+#       decomp=varenv["decomp"]
         dims=varenv["dims"]
         bounds_root=[]
         (1..dims).each do |i|
