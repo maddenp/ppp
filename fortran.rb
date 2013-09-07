@@ -2665,7 +2665,7 @@ module Fortran
 
   end
 
-  class Read_Stmt < IO_Stmt
+  class Read_Stmt < T #IO_Stmt
   end
 
   class Read_Stmt_1 < Read_Stmt

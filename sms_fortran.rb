@@ -475,14 +475,14 @@ module Fortran
         spec_var_false=[]
         spec_var_goto=[]
         spec_var_true=[]
-        split=false
+        split=true
         success_label=nil
         var_bcast=[]
         var_gather=[]
         var_scatter=[]
 
         if self.is_a?(Write_Stmt)
-          split=true if getvarenv("#{self.unit}",self,expected=false)
+          split=false if getvarenv("#{self.unit}",self,expected=false)
           self.output_items.each do |x|
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=false))
