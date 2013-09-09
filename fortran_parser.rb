@@ -9377,6 +9377,13 @@ module Fortran
     r0
   end
 
+  module DefaultCharVariable0
+    def variable
+      elements[0]
+    end
+
+  end
+
   def _nt_default_char_variable
     start_index = index
     if node_cache[:default_char_variable].has_key?(index)
@@ -9388,7 +9395,27 @@ module Fortran
       return cached
     end
 
-    r0 = _nt_variable
+    i0, s0 = index, []
+    r1 = _nt_variable
+    s0 << r1
+    if r1
+      i2 = index
+      r3 = lambda { |e| sp_default_char_variable?(e[0]) }.call(s0)
+      if r3
+        @index = i2
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(E,input, i0...index, s0)
+      r0.extend(DefaultCharVariable0)
+    else
+      @index = i0
+      r0 = nil
+    end
 
     node_cache[:default_char_variable][start_index] = r0
 
@@ -19722,6 +19749,20 @@ module Fortran
     r0
   end
 
+  module IoUnit0
+    def internal_file_unit
+      elements[0]
+    end
+
+  end
+
+  module IoUnit1
+    def external_file_unit
+      elements[0]
+    end
+
+  end
+
   def _nt_io_unit
     start_index = index
     if node_cache[:io_unit].has_key?(index)
@@ -19738,13 +19779,51 @@ module Fortran
     if r1
       r0 = r1
     else
-      r2 = _nt_external_file_unit
+      i2, s2 = index, []
+      r3 = _nt_internal_file_unit
+      s2 << r3
+      if r3
+        if has_terminal?("", false, index)
+          r4 = instantiate_node(SyntaxNode,input, index...(index + 0))
+          @index += 0
+        else
+          terminal_parse_failure("")
+          r4 = nil
+        end
+        s2 << r4
+      end
+      if s2.last
+        r2 = instantiate_node(Internal_File_Unit,input, i2...index, s2)
+        r2.extend(IoUnit0)
+      else
+        @index = i2
+        r2 = nil
+      end
       if r2
         r0 = r2
       else
-        r3 = _nt_internal_file_unit
-        if r3
-          r0 = r3
+        i5, s5 = index, []
+        r6 = _nt_external_file_unit
+        s5 << r6
+        if r6
+          if has_terminal?("", false, index)
+            r7 = instantiate_node(SyntaxNode,input, index...(index + 0))
+            @index += 0
+          else
+            terminal_parse_failure("")
+            r7 = nil
+          end
+          s5 << r7
+        end
+        if s5.last
+          r5 = instantiate_node(External_File_Unit,input, i5...index, s5)
+          r5.extend(IoUnit1)
+        else
+          @index = i5
+          r5 = nil
+        end
+        if r5
+          r0 = r5
         else
           @index = i0
           r0 = nil

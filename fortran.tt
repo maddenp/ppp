@@ -941,7 +941,7 @@ grammar Fortran
   rule default_char_variable
     # F90:R606
 
-    variable
+    variable &{ |e| sp_default_char_variable?(e[0]) } <E>
   end
 
   rule default_char_expr
@@ -1991,8 +1991,8 @@ grammar Fortran
     # F90:R901
 
     t_star /
-    external_file_unit /
-    internal_file_unit
+    internal_file_unit "" <Internal_File_Unit> /
+    external_file_unit "" <External_File_Unit>
   end
 
   rule keyword

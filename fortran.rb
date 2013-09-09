@@ -97,6 +97,22 @@ module Fortran
     true
   end
 
+  def sp_default_char_variable?(var)
+    if var.is_a?(Name)
+      # fine as-is
+    elsif var.is_a?(Data_Ref)
+      var=var.rightmost.name
+    else
+      fail "Unexpected node type"
+    end
+    varenv=env["#{var}"]
+    if varenv and varenv["type"]=="character" and varenv["kind"]=="_default"
+      true
+    else
+      nil
+    end
+  end
+
   def sp_dimension_stmt(array_names_and_specs)
     array_names_and_specs.e.each do |x|
       if x.is_a?(Array_Name_And_Spec)
@@ -1414,7 +1430,7 @@ module Fortran
 
   end
 
-  class Data_Ref < E
+  class Data_Ref < T
 
     def name
       (e[1].e.empty?)?(e[0].name):(e[1].e[-1].e[1].name)
@@ -1893,6 +1909,9 @@ module Fortran
 
   end
 
+  class External_File_Unit < E
+  end
+
   class External_Name < E
   end
 
@@ -2163,6 +2182,9 @@ module Fortran
       s
     end
 
+  end
+
+  class Internal_File_Unit < E
   end
 
   class Internal_Subprograms < T

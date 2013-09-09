@@ -203,7 +203,7 @@ class Translator
   def out(s,root,srcfile,conf)
     conf=ostruct_default_merge(conf)
     translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
-    fail "TRANSLATION FAILED" if translated_source.empty?
+    fail "TRANSLATION FAILED" if translated_source and translated_source.empty?
     translated_source=vertspace(translated_source) unless conf.normalize
     translated_source
   end
