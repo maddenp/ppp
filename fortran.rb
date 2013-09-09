@@ -209,6 +209,11 @@ module Fortran
     true
   end
 
+  def sp_namelist_group_name?(name)
+    return false unless (varenv=env["#{name}"])
+    varenv["sort"]=="_namelist"
+  end
+
   def sp_namelist_stmt(first,rest)
     rest.sets.push(first).each do |set|
       name="#{set.name}"
@@ -726,6 +731,15 @@ module Fortran
       nil
     end
 
+    def nml
+      if (io_spec_nml=list_item(IO_Spec_Nml))
+        return io_spec_nml.rhs
+      elsif e[0].is_a?(IO_Control_Spec_Unit_Nml)
+        return e[0].nml
+      end
+      nil
+    end
+
     def size
       list_item(IO_Spec_Size)
     end
@@ -771,6 +785,10 @@ module Fortran
 
     def iostat
       spec_list.iostat
+    end
+
+    def nml
+      spec_list.nml
     end
 
     def output_items
@@ -2173,6 +2191,18 @@ module Fortran
   class IO_Control_Spec_List_Pair < E
   end
 
+  class IO_Control_Spec_Unit_Nml < T
+
+    def unit
+      e[0]
+    end
+
+    def nml
+      e[2]
+    end
+
+  end
+
   class IO_Implied_Do_Object_List < T
 
 		def to_s
@@ -2221,6 +2251,9 @@ module Fortran
   end
 
   class IO_Spec_Iostat < IO_Spec
+  end
+
+  class IO_Spec_Nml < IO_Spec
   end
 
   class IO_Spec_Size < IO_Spec
@@ -2683,7 +2716,7 @@ module Fortran
 
   end
 
-  class Read_Stmt < T #IO_Stmt
+  class Read_Stmt < IO_Stmt
   end
 
   class Read_Stmt_1 < Read_Stmt

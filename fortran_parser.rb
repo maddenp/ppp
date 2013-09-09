@@ -18700,7 +18700,7 @@ module Fortran
       elements[1]
     end
 
-    def format
+    def namelist_group_name
       elements[2]
     end
 
@@ -18715,7 +18715,7 @@ module Fortran
       elements[1]
     end
 
-    def namelist_group_name
+    def format
       elements[2]
     end
 
@@ -18764,20 +18764,6 @@ module Fortran
   end
 
   module IoControlSpec5
-    def t_nml
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def namelist_group_name
-      elements[2]
-    end
-  end
-
-  module IoControlSpec6
     def t_rec
       elements[0]
     end
@@ -18791,7 +18777,7 @@ module Fortran
     end
   end
 
-  module IoControlSpec7
+  module IoControlSpec6
     def io_unit
       elements[0]
     end
@@ -18817,7 +18803,7 @@ module Fortran
       r3 = _nt_t_comma
       s1 << r3
       if r3
-        r4 = _nt_format
+        r4 = _nt_namelist_group_name
         s1 << r4
         if r4
           i5 = index
@@ -18829,11 +18815,22 @@ module Fortran
             r5 = instantiate_node(SyntaxNode,input, index...index)
           end
           s1 << r5
+          if r5
+            i7 = index
+            r8 = lambda { |e| sp_namelist_group_name?(e[2]) }.call(s1)
+            if r8
+              @index = i7
+              r7 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r7 = nil
+            end
+            s1 << r7
+          end
         end
       end
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
+      r1 = instantiate_node(IO_Control_Spec_Unit_Nml,input, i1...index, s1)
       r1.extend(IoControlSpec0)
     else
       @index = i1
@@ -18842,185 +18839,168 @@ module Fortran
     if r1
       r0 = r1
     else
-      i7, s7 = index, []
-      r8 = _nt_io_unit
-      s7 << r8
-      if r8
-        r9 = _nt_t_comma
-        s7 << r9
-        if r9
-          r10 = _nt_namelist_group_name
-          s7 << r10
-          if r10
-            i11 = index
-            r12 = _nt_t_equal
-            if r12
-              r11 = nil
+      i9, s9 = index, []
+      r10 = _nt_io_unit
+      s9 << r10
+      if r10
+        r11 = _nt_t_comma
+        s9 << r11
+        if r11
+          r12 = _nt_format
+          s9 << r12
+          if r12
+            i13 = index
+            r14 = _nt_t_equal
+            if r14
+              r13 = nil
             else
-              @index = i11
-              r11 = instantiate_node(SyntaxNode,input, index...index)
+              @index = i13
+              r13 = instantiate_node(SyntaxNode,input, index...index)
             end
-            s7 << r11
+            s9 << r13
           end
         end
       end
-      if s7.last
-        r7 = instantiate_node(T,input, i7...index, s7)
-        r7.extend(IoControlSpec1)
+      if s9.last
+        r9 = instantiate_node(T,input, i9...index, s9)
+        r9.extend(IoControlSpec1)
       else
-        @index = i7
-        r7 = nil
+        @index = i9
+        r9 = nil
       end
-      if r7
-        r0 = r7
+      if r9
+        r0 = r9
       else
-        i13, s13 = index, []
-        r14 = _nt_t_advance
-        s13 << r14
-        if r14
-          r15 = _nt_t_equal
-          s13 << r15
-          if r15
-            r16 = _nt_scalar_default_char_expr
-            s13 << r16
-          end
-        end
-        if s13.last
-          r13 = instantiate_node(T,input, i13...index, s13)
-          r13.extend(IoControlSpec2)
-        else
-          @index = i13
-          r13 = nil
-        end
-        if r13
-          r0 = r13
-        else
-          i17, s17 = index, []
-          r18 = _nt_t_io_control_spec_end
-          s17 << r18
-          if r18
-            r19 = _nt_t_equal
-            s17 << r19
-            if r19
-              r20 = _nt_label
-              s17 << r20
-            end
-          end
-          if s17.last
-            r17 = instantiate_node(T,input, i17...index, s17)
-            r17.extend(IoControlSpec3)
-          else
-            @index = i17
-            r17 = nil
-          end
+        i15, s15 = index, []
+        r16 = _nt_t_advance
+        s15 << r16
+        if r16
+          r17 = _nt_t_equal
+          s15 << r17
           if r17
-            r0 = r17
-          else
-            r21 = _nt_io_spec_eor
+            r18 = _nt_scalar_default_char_expr
+            s15 << r18
+          end
+        end
+        if s15.last
+          r15 = instantiate_node(T,input, i15...index, s15)
+          r15.extend(IoControlSpec2)
+        else
+          @index = i15
+          r15 = nil
+        end
+        if r15
+          r0 = r15
+        else
+          i19, s19 = index, []
+          r20 = _nt_t_io_control_spec_end
+          s19 << r20
+          if r20
+            r21 = _nt_t_equal
+            s19 << r21
             if r21
-              r0 = r21
+              r22 = _nt_label
+              s19 << r22
+            end
+          end
+          if s19.last
+            r19 = instantiate_node(T,input, i19...index, s19)
+            r19.extend(IoControlSpec3)
+          else
+            @index = i19
+            r19 = nil
+          end
+          if r19
+            r0 = r19
+          else
+            r23 = _nt_io_spec_eor
+            if r23
+              r0 = r23
             else
-              r22 = _nt_io_spec_err
-              if r22
-                r0 = r22
+              r24 = _nt_io_spec_err
+              if r24
+                r0 = r24
               else
-                i23, s23 = index, []
-                r24 = _nt_t_fmt
-                s23 << r24
-                if r24
-                  r25 = _nt_t_equal
-                  s23 << r25
-                  if r25
-                    r26 = _nt_format
-                    s23 << r26
+                i25, s25 = index, []
+                r26 = _nt_t_fmt
+                s25 << r26
+                if r26
+                  r27 = _nt_t_equal
+                  s25 << r27
+                  if r27
+                    r28 = _nt_format
+                    s25 << r28
                   end
                 end
-                if s23.last
-                  r23 = instantiate_node(T,input, i23...index, s23)
-                  r23.extend(IoControlSpec4)
+                if s25.last
+                  r25 = instantiate_node(T,input, i25...index, s25)
+                  r25.extend(IoControlSpec4)
                 else
-                  @index = i23
-                  r23 = nil
+                  @index = i25
+                  r25 = nil
                 end
-                if r23
-                  r0 = r23
+                if r25
+                  r0 = r25
                 else
-                  r27 = _nt_io_spec_iostat
-                  if r27
-                    r0 = r27
+                  r29 = _nt_io_spec_iostat
+                  if r29
+                    r0 = r29
                   else
-                    i28, s28 = index, []
-                    r29 = _nt_t_nml
-                    s28 << r29
-                    if r29
-                      r30 = _nt_t_equal
-                      s28 << r30
-                      if r30
-                        r31 = _nt_namelist_group_name
-                        s28 << r31
-                      end
-                    end
-                    if s28.last
-                      r28 = instantiate_node(T,input, i28...index, s28)
-                      r28.extend(IoControlSpec5)
+                    r30 = _nt_io_spec_nml
+                    if r30
+                      r0 = r30
                     else
-                      @index = i28
-                      r28 = nil
-                    end
-                    if r28
-                      r0 = r28
-                    else
-                      i32, s32 = index, []
-                      r33 = _nt_t_rec
-                      s32 << r33
-                      if r33
-                        r34 = _nt_t_equal
-                        s32 << r34
-                        if r34
-                          r35 = _nt_scalar_int_expr
-                          s32 << r35
+                      i31, s31 = index, []
+                      r32 = _nt_t_rec
+                      s31 << r32
+                      if r32
+                        r33 = _nt_t_equal
+                        s31 << r33
+                        if r33
+                          r34 = _nt_scalar_int_expr
+                          s31 << r34
                         end
                       end
-                      if s32.last
-                        r32 = instantiate_node(T,input, i32...index, s32)
-                        r32.extend(IoControlSpec6)
+                      if s31.last
+                        r31 = instantiate_node(T,input, i31...index, s31)
+                        r31.extend(IoControlSpec5)
                       else
-                        @index = i32
-                        r32 = nil
+                        @index = i31
+                        r31 = nil
                       end
-                      if r32
-                        r0 = r32
+                      if r31
+                        r0 = r31
                       else
-                        r36 = _nt_io_spec_size
-                        if r36
-                          r0 = r36
+                        r35 = _nt_io_spec_size
+                        if r35
+                          r0 = r35
                         else
-                          r37 = _nt_io_spec_unit
-                          if r37
-                            r0 = r37
+                          r36 = _nt_io_spec_unit
+                          if r36
+                            r0 = r36
                           else
-                            i38, s38 = index, []
-                            r39 = _nt_io_unit
-                            s38 << r39
-                            if r39
+                            i37, s37 = index, []
+                            r38 = _nt_io_unit
+                            s37 << r38
+                            if r38
                               if has_terminal?("", false, index)
-                                r40 = instantiate_node(SyntaxNode,input, index...(index + 0))
+                                r39 = instantiate_node(SyntaxNode,input, index...(index + 0))
                                 @index += 0
                               else
                                 terminal_parse_failure("")
-                                r40 = nil
+                                r39 = nil
                               end
-                              s38 << r40
+                              s37 << r39
                             end
-                            if s38.last
-                              r38 = instantiate_node(T,input, i38...index, s38)
-                              r38.extend(IoControlSpec7)
+                            if s37.last
+                              r37 = instantiate_node(T,input, i37...index, s37)
+                              r37.extend(IoControlSpec6)
                             else
-                              @index = i38
-                              r38 = nil
+                              @index = i37
+                              r37 = nil
                             end
-                            if r38
-                              r0 = r38
+                            if r37
+                              r0 = r37
                             else
                               @index = i0
                               r0 = nil
@@ -19591,6 +19571,55 @@ module Fortran
     end
 
     node_cache[:io_spec_iostat][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecNml0
+    def t_nml
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def namelist_group_name
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_nml
+    start_index = index
+    if node_cache[:io_spec_nml].has_key?(index)
+      cached = node_cache[:io_spec_nml][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_nml
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_namelist_group_name
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Nml,input, i0...index, s0)
+      r0.extend(IoSpecNml0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_nml][start_index] = r0
 
     r0
   end

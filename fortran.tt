@@ -1917,15 +1917,15 @@ grammar Fortran
   rule io_control_spec
     # F90:R912
 
+    io_unit t_comma namelist_group_name !t_equal &{ |e| sp_namelist_group_name?(e[2]) } <IO_Control_Spec_Unit_Nml> /
     io_unit t_comma format !t_equal <T> /
-    io_unit t_comma namelist_group_name !t_equal <T> /
     t_advance t_equal scalar_default_char_expr <T> /
     t_io_control_spec_end t_equal label <T> /
     io_spec_eor /
     io_spec_err/
     t_fmt t_equal format <T> /
     io_spec_iostat /
-    t_nml t_equal namelist_group_name <T> /
+    io_spec_nml /
     t_rec t_equal scalar_int_expr <T> /
     io_spec_size /
     io_spec_unit /
@@ -1973,6 +1973,10 @@ grammar Fortran
 
   rule io_spec_iostat
     t_iostat t_equal scalar_default_int_variable <IO_Spec_Iostat>
+  end
+
+  rule io_spec_nml
+    t_nml t_equal namelist_group_name <IO_Spec_Nml>
   end
 
   rule io_spec_size

@@ -483,6 +483,18 @@ module Fortran
 
         if self.is_a?(Write_Stmt)
           split=false if getvarenv("#{self.unit}",self,expected=false)
+          if (nml=self.nml)
+            split=true
+            nmlenv=getvarenv(nml,self,expected=true)
+            nmlenv["objects"].each do |x|
+              var="#{x}"
+              varenv=getvarenv(var,self,expected=true)
+              if varenv["decomp"]
+                var_gather.push(var)
+                self.replace_input_item(x,Name.global(var))
+              end
+            end
+          end
           self.output_items.each do |x|
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=false))
@@ -497,14 +509,28 @@ module Fortran
         end
 
         if self.is_a?(Read_Stmt)
+          split=false if getvarenv("#{self.unit}",self,expected=false)
+          if (nml=self.nml)
+            split=true
+            nmlenv=getvarenv(nml,self,expected=true)
+            nmlenv["objects"].each do |x|
+              var="#{x}"
+              varenv=getvarenv(var,self,expected=true)
+              if varenv["decomp"]
+                var_scatter.push(var)
+                self.replace_input_item(x,Name.global(var))
+              else
+                var_bcast.push(var)
+              end
+            end
+          end
           self.input_items.each do |x|
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=true))
               if (dh=varenv["decomp"])
                 split=true
-                global=Name.global(var)
                 var_scatter.push(var)
-                self.replace_input_item(x,global)
+                self.replace_input_item(x,Name.global(var))
               else
                 var_bcast.push(var)
               end
