@@ -55,10 +55,6 @@
   See t0151. May also be related to need to track, store, load user-defined type
   info.
 
-- Make implicit none mandatory! Parsing is weird w/o it. Update: Not sure if
-  this is feasible if we want to use others' libraries -- may be too much work
-  to modify old code using implicit typing.
-
 - write-stmt seems to parse wrong, 'write' recognized as Data_Ref. This could be
   a problem re: implicit translation of write io statements.
 
@@ -268,3 +264,17 @@
 
 - Reads from internal strings (see e.g. 'read(yyyymmddhhmm(1:4),...) yeari' in
   phy_run.F90) need not be serialized. Is it a problem if they are?
+
+- Deduce types of implicit variables.
+
+- If Fortran allows shadowing a use-obtained array with a local of the same
+  name, it will be critical to create a new env entry for the local, rather
+  than just updating the entry created when the module was read in. For example,
+  a variable could be a distributed read array in a use'ed module but a
+  scalar integer as a local. If the distribute info persitst in the variable's
+  env entry, it will be incorrect. Maybe: Any occurrence of a name in the
+  declaration section should immediately overwrite an existing env entry, but
+  only one time (since dimension, access, type info may all occur in separate
+  decl statements -- they can't be wiping out eachother's env entries, but
+  the first one encountered should wipe out whatever was obtained via use
+  association).
