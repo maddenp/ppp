@@ -2291,7 +2291,11 @@ grammar Fortran
   end
 
   rule namelist_group_object_list
-    namelist_group_object ( t_comma namelist_group_object )* <Namelist_Group_Object_List>
+    namelist_group_object namelist_group_object_list_pair* <Namelist_Group_Object_List>
+  end
+
+  rule namelist_group_object_list_pair
+    t_comma namelist_group_object <Namelist_Group_Object_List_Pair>
   end
 
   rule namelist_group_set
@@ -2309,7 +2313,7 @@ grammar Fortran
   rule namelist_stmt
     # F90:R543
 
-    label:label? t_namelist namelist_group_set namelist_group_sets t_newline <Namelist_Stmt>
+    label:label? t_namelist namelist_group_set namelist_group_sets t_newline &{ |e| sp_namelist_stmt(e[2],e[3]) } <Namelist_Stmt>
   end
 
   rule nonblock_do_construct
@@ -2990,7 +2994,7 @@ grammar Fortran
     external_stmt /
     intent_stmt /
     intrinsic_stmt /
-    namelist_stmt &{ |e| sp_namelist_stmt(e[0]) } <E> /
+    namelist_stmt /
     optional_stmt /
     pointer_stmt /
     save_stmt /

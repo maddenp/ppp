@@ -199,22 +199,24 @@ module Fortran
     modinfo=deepcopy(env).delete_if { |k,v| k.is_a?(Symbol) }
     # Do not export info on private objects
     modinfo.delete_if { |k,v| v["access"]=="private" }
+    f=envfile(modulename)
+    File.delete(f) if File.exist?(f)
     unless modinfo.empty?
-      File.open(envfile(modulename),"w") { |f| f.write(YAML.dump(modinfo)) }
+      File.open(f,"w") { |f| f.write(YAML.dump(modinfo)) }
     end
     envpop
     @access="_default"
     true
   end
 
-  def sp_namelist_stmt(namelist_stmt)
-    namelist_stmt.sets.each do |x|
-      name=x[0]
-      objects=x[1]
+  def sp_namelist_stmt(first,rest)
+    rest.sets.push(first).each do |set|
+      name="#{set.name}"
       env[name]||={}
       env[name]["sort"]="_namelist"
-      env[name]["objects"]=objects
+      env[name]["objects"]||=[]
       env[name]["access"]||=@access
+      set.objects.each { |object| env[name]["objects"].push("#{object}") }
     end
     true
   end
@@ -2393,7 +2395,7 @@ module Fortran
   class Namelist_Group_Object_List < T
 
     def objects
-      e[1].e.reduce(["#{e[0]}"]) { |m,x| m.push("#{x.e[1]}") }
+      e[1].e.reduce([e[0]]) { |m,x| m.push(x.object) }
     end
 
     def to_s
@@ -2402,10 +2404,26 @@ module Fortran
 
   end
 
+  class Namelist_Group_Object_List_Pair < E
+
+    def object
+      e[1]
+    end
+
+  end
+
   class Namelist_Group_Set < T
 
+    def name
+      e[1]
+    end
+
+    def objects
+      e[3].objects
+    end
+
     def set
-      ["#{e[1]}",e[3].objects]
+      [name,objects]
     end
 
     def to_s
@@ -2414,22 +2432,22 @@ module Fortran
 
   end
 
-  class Namelist_Group_Sets < E
-
-    def sets
-      e.reduce([]) { |m,x| m.push(x.set) }
-    end
-
-  end
-
   class Namelist_Group_Set_Pair < T
 
     def set
-      e[1].set
+      e[1]
     end
 
     def to_s
       "#{ir(e[0],""," ")}#{e[1]}"
+    end
+
+  end
+
+  class Namelist_Group_Sets < E
+
+    def sets
+      e.reduce([]) { |m,x| m.push(x.set) }
     end
 
   end
