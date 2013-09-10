@@ -168,6 +168,7 @@ module Fortran
   def sp_function_subprogram(function_subprogram)
     var="#{function_subprogram.function_name}"
     env[var]||={}
+    env[var]["function"]="true"
     env[var]["access"]="_default" unless env[var]["access"]
     env[var]["sort"]="_scalar"
     if (type_spec=function_subprogram.function_stmt_type_spec)

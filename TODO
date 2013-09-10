@@ -41,7 +41,7 @@
   in fortran.rb. IS THIS A GOOD IDEA?
 
 - It might be better to prefix all in-class method calls with 'self.' for
-  clarity.
+  clarity. Or better to get rid of 'self' altogether for conciseness?
 
 - Why does sms$parallel require positional variable lists, while sms$to_local
   requires numbered lists? This should be harmonized. The latter is better.
