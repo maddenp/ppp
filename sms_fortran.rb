@@ -482,9 +482,8 @@ module Fortran
         var_scatter=[]
 
         if self.is_a?(Write_Stmt)
-          if unit.is_a?(Internal_File_Unit) or env["#{unit}"]["function"]
-            split=false
-          end
+          function=(env["#{unit}"] and env["#{unit}"]["function"])
+          split=false if self.unit.is_a?(Internal_File_Unit) or function
           if (nml=self.nml)
             split=true
             nmlenv=getvarenv(nml,self,expected=true)
