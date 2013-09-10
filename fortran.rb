@@ -778,6 +778,26 @@ module Fortran
 
   class IO_Stmt < T
 
+    def access
+      spec_list.access
+    end
+
+    def action
+      spec_list.action
+    end
+
+    def blank
+      spec_list.blank
+    end
+
+    def delim
+      spec_list.delim
+    end
+
+    def direct
+      spec_list.direct
+    end
+
     def end
       spec_list.end
     end
@@ -788,6 +808,18 @@ module Fortran
 
     def err
       spec_list.err
+    end
+
+    def exist
+      spec_list.exist
+    end
+
+    def form
+      spec_list.form
+    end
+
+    def formatted
+      spec_list.formatted
     end
 
     def input_items
@@ -804,6 +836,26 @@ module Fortran
       spec_list.iostat
     end
 
+    def name
+      spec_list.name
+    end
+
+    def number
+      spec_list.number
+    end
+
+    def numbered
+      spec_list.numbered
+    end
+
+    def opened
+      spec_list.opened
+    end
+
+    def nextrec
+      spec_list.nextrec
+    end
+
     def nml
       spec_list.nml
     end
@@ -816,8 +868,24 @@ module Fortran
       end
     end
 
-    def spec_list
-      (e[3].is_a?(IO_Spec_List))?(e[3]):([])
+    def pad
+      spec_list.pad
+    end
+
+    def position
+      spec_list.position
+    end
+
+    def read
+      spec_list.read
+    end
+
+    def readwrite
+      spec_list.readwrite
+    end
+
+    def recl
+      spec_list.recl
     end
 
     def replace_input_item(old,new)
@@ -832,8 +900,20 @@ module Fortran
       end
     end
 
+    def sequential
+      spec_list.sequential
+    end
+
     def size
       spec_list.size
+    end
+
+    def spec_list
+      (e[3].is_a?(IO_Spec_List))?(e[3]):([])
+    end
+
+    def unformatted
+      spec_list.unformatted
     end
 
     def unit

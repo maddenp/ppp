@@ -481,6 +481,8 @@ module Fortran
         var_gather=[]
         var_scatter=[]
 
+        # Write_Stmt
+
         if self.is_a?(Write_Stmt)
           function=(env["#{unit}"] and env["#{unit}"]["function"])
           split=false if self.unit.is_a?(Internal_File_Unit) or function
@@ -508,6 +510,8 @@ module Fortran
             end
           end
         end
+
+        # Read_Stmt
 
         if self.is_a?(Read_Stmt)
           split=false if self.unit.is_a?(Internal_File_Unit)
@@ -650,7 +654,13 @@ module Fortran
           code_bcast.push(code)
         end
 
-        [:err,:end,:eor].each do |x|
+        # Branch-To Spec Logic
+
+        [
+          :err,
+          :end,
+          :eor
+        ].each do |x|
           # :err has precedence, per F90 9.4.1.6, 9.4.1.7
           if (spec=self.send(x))
             label_old,label_new=spec.send(:relabel)
@@ -664,7 +674,33 @@ module Fortran
           end
         end
 
-        [:iostat,:size].each do |x|
+        # Spec Var Logic
+
+        [
+          :access,
+          :action,
+          :blank,
+          :delim,
+          :direct,
+          :exist,
+          :form,
+          :formatted,
+          :iostat,
+          :name,
+          :named,
+          :nextrec,
+          :number,
+          :opened,
+          :pad,
+          :position,
+          :read,
+          :readwrite,
+          :recl,
+          :sequential,
+          :size,
+          :unformatted,
+          :write
+        ].each do |x|
           if (spec=self.send(x))
             var=spec.rhs
             varenv=getvarenv(var)
@@ -672,6 +708,8 @@ module Fortran
             use("nnt_types_module")
           end
         end
+
+        # Code Generation and Placement
 
         code=[]
 # HACK start
