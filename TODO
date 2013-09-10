@@ -278,3 +278,7 @@
   decl statements -- they can't be wiping out eachother's env entries, but
   the first one encountered should wipe out whatever was obtained via use
   association).
+
+- Need to add to env for function optional RESULT name/type (probably do at
+  close of function_subroutine, since function type may not be made explicit
+  by function_stmt).
