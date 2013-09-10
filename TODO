@@ -282,3 +282,6 @@
 - Need to add to env for function optional RESULT name/type (probably do at
   close of function_subroutine, since function type may not be made explicit
   by function_stmt).
+
+- What about e.g. 'a(1:5)=0' when 'a' is distributed and elements 1:4 are only
+  present on one task?
