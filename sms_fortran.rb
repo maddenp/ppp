@@ -156,7 +156,7 @@ module Fortran
     end
 
     def distribute_array_bounds(spec,varenv)
-      if (decomp=varenv["decomp"])
+      if (dh=varenv["decomp"])
         if spec and spec.is_a?(Explicit_Shape_Spec_List)
           cb=spec.concrete_boundslist
           newbounds=[]
@@ -164,8 +164,8 @@ module Fortran
             b=cb[i]
             arrdim=i+1
             if (decdim=varenv["dim#{arrdim}"])
-              s="#{decomp}__local_lb(#{decdim},#{decomp}__nestlevel):"+
-                "#{decomp}__local_ub(#{decdim},#{decomp}__nestlevel)"
+              s="#{dh}__local_lb(#{decdim},#{dh}__nestlevel):"+
+                "#{dh}__local_ub(#{decdim},#{dh}__nestlevel)"
             else
               s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
             end
@@ -191,9 +191,9 @@ module Fortran
       return 1 if bound=="_default" and x==:l
       if ["_assumed","_deferred","_explicit"].include?(bound)
         if (decdim=varenv["dim#{dim}"])
-          decomp=varenv["decomp"]
+          dh=varenv["decomp"]
           lu=(x==:l)?("low"):("upper")
-          return "#{decomp}__#{lu}bounds(#{decdim},#{decomp}__nestlevel)"
+          return "#{dh}__#{lu}bounds(#{decdim},#{dh}__nestlevel)"
         else
           return "#{x}bound(#{var},#{dim})"
         end
@@ -304,13 +304,13 @@ module Fortran
 #         if varenv["decomp"]
 
           varenv=getvarenv(var,self,false)
-          if varenv and (decomp=varenv["decomp"])
+          if varenv and (dh=varenv["decomp"])
             subscript_list=part_ref.subscript_list
             newdims=[]
             subscript_list.each_index do |i|
               arrdim=i+1
               if (decdim=varenv["dim#{arrdim}"])
-                newdims.push("#{decomp}__local_lb(#{decdim},#{decomp}__nestlevel):#{decomp}__local_ub(#{decdim},#{decomp}__nestlevel)")
+                newdims.push("#{dh}__local_lb(#{decdim},#{dh}__nestlevel):#{dh}__local_ub(#{decdim},#{dh}__nestlevel)")
               else
                 newdims.push("#{subscript_list[i]}")
               end
@@ -373,19 +373,25 @@ module Fortran
 #
 #   def translate
 #     if inside?(Execution_Part) and not inside?(SMS)
-#       var="#{self.name}"
-#       if (varenv=self.env["#{name}"])
+#       var="#{name}"
+#       if (varenv=self.env[var])
 #         if (dh=varenv["decomp"])
-#           puts "### array_section #{self}"
-#           self.subscript_list.each do |x|
-#             puts "    #{x}"
-#             puts "    class #{x.class}"
-#             puts "    subscript [#{x.subscript}]"
-#             puts "    lower     [#{x.lower}]"
-#             puts "    upper     [#{x.upper}]"
-#             puts "    stride    [#{x.stride}]"
+#           puts "### decomposed array #{self}"
+#           if subscript_list.empty?
+#             # deal with full array
+#           else
+#             self.subscript_list.each do |x|
+#               puts "    #{x}"
+#               puts "    class #{x.class}"
+#               puts "    subscript [#{x.subscript}]"
+#               puts "    lower     [#{x.lower}]"
+#               puts "    upper     [#{x.upper}]"
+#               puts "    stride    [#{x.stride}]"
+#             end
 #           end
 #         end
+#       else
+#         fail "'#{var}' not found in environment"
 #       end
 #     end
 #   end
@@ -828,14 +834,14 @@ module Fortran
               break
             end
           end
-          decomp=parallel.decomp
+          dh=parallel.decomp
           if decdim
             halo_lo=halo_offsets(decdim).lo
             halo_up=halo_offsets(decdim).up
             if loop_control.is_a?(Loop_Control_1)
-              lo=self.raw("#{decomp}__s#{decdim}(#{loop_control.e[3]},#{halo_lo},#{decomp}__nestlevel)",:scalar_numeric_expr,@srcfile,{:env=>self.env,:nl=>false})
+              lo=self.raw("#{dh}__s#{decdim}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)",:scalar_numeric_expr,@srcfile,{:env=>self.env,:nl=>false})
               lo.parent=loop_control
-              up=self.raw(",#{decomp}__e#{decdim}(#{loop_control.e[4].value},#{halo_up},#{decomp}__nestlevel)",:loop_control_pair,@srcfile,{:env=>self.env,:nl=>false})
+              up=self.raw(",#{dh}__e#{decdim}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)",:loop_control_pair,@srcfile,{:env=>self.env,:nl=>false})
               up.parent=loop_control
               loop_control.e[3]=lo
               loop_control.e[4]=up
@@ -907,12 +913,12 @@ module Fortran
       gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
       glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
       perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-      if (decomp=varenv["decomp"])
-        decomp="#{decomp}(#{decomp}__nestlevel)"
+      if (dh=varenv["decomp"])
+        dh="#{dh}(#{dh}__nestlevel)"
       else
-        decomp="ppp_not_decomposed"
+        dh="ppp_not_decomposed"
       end
-      code="if (sms_debugging_on()) call ppp_compare_var(#{decomp},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},ppp__status)"
+      code="if (sms_debugging_on()) call ppp_compare_var(#{dh},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},ppp__status)"
       replace_statement(code,:if_stmt)
     end
 
@@ -1072,32 +1078,32 @@ module Fortran
       #       used in specification expressions.
 
       use("nnt_types_module")
-      decomp="#{e[3]}"
-      declare("integer","#{decomp}__s3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{decomp}__s2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{decomp}__s1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{decomp}__e3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{decomp}__e2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{decomp}__e1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{decomp}__upperbounds", {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
-      declare("integer","#{decomp}__lowbounds",   {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
-      declare("integer","#{decomp}__localsize",   {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
-      declare("integer","#{decomp}__local_ub",    {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
-      declare("integer","#{decomp}__local_lb",    {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
-      declare("integer","#{decomp}__halosize",    {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
-      declare("integer","#{decomp}__globalsize",  {:dims=>%W[ppp_max_decomposed_dims #{decomp}__maxnests]})
-      declare("integer","#{decomp}__boundarytype",{:dims=>%W[ppp_max_decomposed_dims]})
-      declare("integer","#{decomp}__nestlevels",  {:dims=>%W[#{decomp}__maxnests]})
-      declare("integer",decomp,{:dims=>%W[1]})
-      declare("integer","#{decomp}__nregions")
-      declare("integer","#{decomp}__nestlevel")
-      declare("integer","#{decomp}__localhalosize")
-      declare("integer","#{decomp}__index")
-      declare("integer","#{decomp}__ignore")
-      declare("character*32","#{decomp}__decompname")
+      dh="#{e[3]}"
+      declare("integer","#{dh}__s3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{dh}__s2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{dh}__s1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{dh}__e3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{dh}__e2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{dh}__e1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{dh}__upperbounds", {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__lowbounds",   {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__localsize",   {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__local_ub",    {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__local_lb",    {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__halosize",    {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__globalsize",  {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__boundarytype",{:dims=>%W[ppp_max_decomposed_dims]})
+      declare("integer","#{dh}__nestlevels",  {:dims=>%W[#{dh}__maxnests]})
+      declare("integer",dh,{:dims=>%W[1]})
+      declare("integer","#{dh}__nregions")
+      declare("integer","#{dh}__nestlevel")
+      declare("integer","#{dh}__localhalosize")
+      declare("integer","#{dh}__index")
+      declare("integer","#{dh}__ignore")
+      declare("character*32","#{dh}__decompname")
       # HACK start: Do parameters last so they will appear first
-      declare("integer","#{decomp}__maxnests",{:attrs=>"parameter",:init=>"1"})
-      declare("integer","#{decomp}__ppp_max_regions",{:attrs=>"parameter",:init=>"1"})
+      declare("integer","#{dh}__maxnests",{:attrs=>"parameter",:init=>"1"})
+      declare("integer","#{dh}__ppp_max_regions",{:attrs=>"parameter",:init=>"1"})
       # HACK end
       remove
     end
@@ -1195,13 +1201,13 @@ module Fortran
         var=v[i].name
         varenv=getvarenv(var)
         dims=varenv["dims"]
-        decomp=varenv["decomp"]
-        dectypes.push("#{decomp}(#{decomp}__nestlevel)")
+        dh=varenv["decomp"]
+        dectypes.push("#{dh}(#{dh}__nestlevel)")
         cornerdepth.push("9999")
         ranks.each { |r| gllbs.push((r>dims)?(1):(fixbound(varenv,var,r,:l))) }
         ranks.each { |r| glubs.push((r>dims)?(1):(fixbound(varenv,var,r,:u))) }
-        ranks.each { |r| halol.push((r>dims)?(0):("#{decomp}__halosize(1,#{decomp}__nestlevel)")) }
-        ranks.each { |r| halou.push((r>dims)?(0):("#{decomp}__halosize(1,#{decomp}__nestlevel)")) }
+        ranks.each { |r| halol.push((r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)")) }
+        ranks.each { |r| halou.push((r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)")) }
         ranks.each { |r| perms.push(varenv["dim#{r}"]||0) }
         types.push(smstype(varenv["type"],varenv["kind"]))
       end
@@ -1495,7 +1501,7 @@ module Fortran
         # (probably naive) assumption that they are function or subroutine names
         # that are in the environment due to access specification.
         next unless (varenv=getvarenv(name,self,false)) and varenv["type"]
-        decomp=varenv["decomp"]
+        dh=varenv["decomp"]
         sort=varenv["sort"]
         # Conservatively assume that the default intent will apply to this
         # variable.
@@ -1508,7 +1514,7 @@ module Fortran
           if si.vars_ignore.include?(name)
             fail "'#{name}' cannot be both 'ignore' and 'out' in sms$serial"
           end
-          gathers.push(name) if decomp
+          gathers.push(name) if dh
           default=false
         end
         if si.vars_out.include?(name)
@@ -1519,7 +1525,7 @@ module Fortran
           if si.vars_ignore.include?(name)
             fail "'#{name}' cannot be both 'ignore' and 'in' sms$serial"
           end
-          ((sort=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
+          ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name)
           default=false
         end
         if default and not si.vars_ignore.include?(name)
@@ -1527,9 +1533,9 @@ module Fortran
           # of scalars, non-decomposed arrays and decomposed arrays is the same
           # as described above.
           d=si.default
-          gathers.push(name) if decomp and (d=="in" or d=="inout")
+          gathers.push(name) if dh and (d=="in" or d=="inout")
           if d=="out" or d=="inout"
-            ((sort=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
+            ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name)
           end
         end
       end
@@ -1609,7 +1615,6 @@ module Fortran
       # size indicated by the decomposition info.
       globals.sort.each do |var|
         varenv=getvarenv(var)
-#       decomp=varenv["decomp"]
         dims=varenv["dims"]
         bounds_root=[]
         (1..dims).each do |i|
