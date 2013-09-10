@@ -726,6 +726,26 @@ module Fortran
 
   class IO_Spec_List < T
 
+    def access
+      list_item(IO_Spec_Access)
+    end
+
+    def action
+      list_item(IO_Spec_Action)
+    end
+
+    def blank
+      list_item(IO_Spec_Blank)
+    end
+
+    def delim
+      list_item(IO_Spec_Delim)
+    end
+
+    def direct
+      list_item(IO_Spec_Direct)
+    end
+
     def end
       list_item(IO_Spec_End)
     end
@@ -738,6 +758,18 @@ module Fortran
       list_item(IO_Spec_Err)
     end
 
+    def exist
+      list_item(IO_Spec_Exist)
+    end
+
+    def form
+      list_item(IO_Spec_Form)
+    end
+
+    def formatted
+      list_item(IO_Spec_Formatted)
+    end
+
     def iostat
       list_item(IO_Spec_Iostat)
     end
@@ -746,6 +778,18 @@ module Fortran
       return e[0] if e[0].is_a?(spec)
       e[1].e.each { |x| return x.e[1] if x.e[1].is_a?(spec) } if e[1]
       nil
+    end
+
+    def name
+      list_item(IO_Spec_Name)
+    end
+
+    def named
+      list_item(IO_Spec_Named)
+    end
+
+    def nextrec
+      list_item(IO_Spec_Nextrec)
     end
 
     def nml
@@ -757,12 +801,48 @@ module Fortran
       nil
     end
 
+    def number
+      list_item(IO_Spec_Number)
+    end
+      
+    def opened
+      list_item(IO_Spec_Opened)
+    end
+
+    def pad
+      list_item(IO_Spec_Pad)
+    end
+
+    def position
+      list_item(IO_Spec_Position)
+    end
+
+    def read
+      list_item(IO_Spec_Read)
+    end
+
+    def readwrite
+      list_item(IO_Spec_Readwrite)
+    end
+
+    def recl
+      list_item(IO_Spec_Recl)
+    end
+
+    def sequential
+      list_item(IO_Spec_Sequential)
+    end
+
     def size
       list_item(IO_Spec_Size)
     end
 
     def to_s
       list_to_s
+    end
+
+    def unformatted
+      list_item(IO_Spec_Unformatted)
     end
 
     def unit
@@ -772,6 +852,10 @@ module Fortran
         # If 'unit=' does not appear, the unit *must* be the first list item
         e[0].e[0]
       end
+    end
+
+    def write
+      list_item(IO_Spec_Write)
     end
 
   end
@@ -838,6 +922,10 @@ module Fortran
 
     def name
       spec_list.name
+    end
+
+    def named
+      spec_list.named
     end
 
     def number
@@ -918,6 +1006,10 @@ module Fortran
 
     def unit
       spec_list.unit
+    end
+
+    def write
+      spec_list.write
     end
 
   end
@@ -2222,7 +2314,7 @@ module Fortran
   class Inquire_Spec_List < IO_Spec_List
   end
 
-  class Inquire_Stmt_1 < T
+  class Inquire_Stmt_1 < IO_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
@@ -2230,7 +2322,7 @@ module Fortran
 
   end
 
-  class Inqurie_Stmt_2 < T
+  class Inquire_Stmt_2 < IO_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}")
