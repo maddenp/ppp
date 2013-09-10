@@ -16660,328 +16660,6 @@ module Fortran
     end
   end
 
-  module InquireSpec3
-    def t_iostat
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_int_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec4
-    def t_err
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def label
-      elements[2]
-    end
-  end
-
-  module InquireSpec5
-    def t_exist
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_logical_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec6
-    def t_opened
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_logical_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec7
-    def t_number
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_int_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec8
-    def t_named
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_logical_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec9
-    def t_name
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec10
-    def t_access
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec11
-    def t_sequential
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec12
-    def t_direct
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec13
-    def t_form
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec14
-    def t_formatted
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec15
-    def t_unformatted
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec16
-    def t_recl
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_int_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec17
-    def t_nextrec
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_int_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec18
-    def t_blank
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec19
-    def t_position
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec20
-    def t_action
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec21
-    def t_read
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec22
-    def t_write
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec23
-    def t_readwrite
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec24
-    def t_delim
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
-  module InquireSpec25
-    def t_pad
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_char_variable
-      elements[2]
-    end
-  end
-
   def _nt_inquire_spec
     start_index = index
     if node_cache[:inquire_spec].has_key?(index)
@@ -17060,488 +16738,97 @@ module Fortran
         if r9
           r0 = r9
         else
-          i13, s13 = index, []
-          r14 = _nt_t_iostat
-          s13 << r14
-          if r14
-            r15 = _nt_t_equal
-            s13 << r15
-            if r15
-              r16 = _nt_scalar_default_int_variable
-              s13 << r16
-            end
-          end
-          if s13.last
-            r13 = instantiate_node(T,input, i13...index, s13)
-            r13.extend(InquireSpec3)
-          else
-            @index = i13
-            r13 = nil
-          end
+          r13 = _nt_io_spec_iostat
           if r13
             r0 = r13
           else
-            i17, s17 = index, []
-            r18 = _nt_t_err
-            s17 << r18
-            if r18
-              r19 = _nt_t_equal
-              s17 << r19
-              if r19
-                r20 = _nt_label
-                s17 << r20
-              end
-            end
-            if s17.last
-              r17 = instantiate_node(T,input, i17...index, s17)
-              r17.extend(InquireSpec4)
+            r14 = _nt_io_spec_err
+            if r14
+              r0 = r14
             else
-              @index = i17
-              r17 = nil
-            end
-            if r17
-              r0 = r17
-            else
-              i21, s21 = index, []
-              r22 = _nt_t_exist
-              s21 << r22
-              if r22
-                r23 = _nt_t_equal
-                s21 << r23
-                if r23
-                  r24 = _nt_scalar_default_logical_variable
-                  s21 << r24
-                end
-              end
-              if s21.last
-                r21 = instantiate_node(T,input, i21...index, s21)
-                r21.extend(InquireSpec5)
+              r15 = _nt_io_spec_exist
+              if r15
+                r0 = r15
               else
-                @index = i21
-                r21 = nil
-              end
-              if r21
-                r0 = r21
-              else
-                i25, s25 = index, []
-                r26 = _nt_t_opened
-                s25 << r26
-                if r26
-                  r27 = _nt_t_equal
-                  s25 << r27
-                  if r27
-                    r28 = _nt_scalar_default_logical_variable
-                    s25 << r28
-                  end
-                end
-                if s25.last
-                  r25 = instantiate_node(T,input, i25...index, s25)
-                  r25.extend(InquireSpec6)
+                r16 = _nt_io_spec_opened
+                if r16
+                  r0 = r16
                 else
-                  @index = i25
-                  r25 = nil
-                end
-                if r25
-                  r0 = r25
-                else
-                  i29, s29 = index, []
-                  r30 = _nt_t_number
-                  s29 << r30
-                  if r30
-                    r31 = _nt_t_equal
-                    s29 << r31
-                    if r31
-                      r32 = _nt_scalar_default_int_variable
-                      s29 << r32
-                    end
-                  end
-                  if s29.last
-                    r29 = instantiate_node(T,input, i29...index, s29)
-                    r29.extend(InquireSpec7)
+                  r17 = _nt_io_spec_number
+                  if r17
+                    r0 = r17
                   else
-                    @index = i29
-                    r29 = nil
-                  end
-                  if r29
-                    r0 = r29
-                  else
-                    i33, s33 = index, []
-                    r34 = _nt_t_named
-                    s33 << r34
-                    if r34
-                      r35 = _nt_t_equal
-                      s33 << r35
-                      if r35
-                        r36 = _nt_scalar_default_logical_variable
-                        s33 << r36
-                      end
-                    end
-                    if s33.last
-                      r33 = instantiate_node(T,input, i33...index, s33)
-                      r33.extend(InquireSpec8)
+                    r18 = _nt_io_spec_named
+                    if r18
+                      r0 = r18
                     else
-                      @index = i33
-                      r33 = nil
-                    end
-                    if r33
-                      r0 = r33
-                    else
-                      i37, s37 = index, []
-                      r38 = _nt_t_name
-                      s37 << r38
-                      if r38
-                        r39 = _nt_t_equal
-                        s37 << r39
-                        if r39
-                          r40 = _nt_scalar_default_char_variable
-                          s37 << r40
-                        end
-                      end
-                      if s37.last
-                        r37 = instantiate_node(T,input, i37...index, s37)
-                        r37.extend(InquireSpec9)
+                      r19 = _nt_io_spec_name
+                      if r19
+                        r0 = r19
                       else
-                        @index = i37
-                        r37 = nil
-                      end
-                      if r37
-                        r0 = r37
-                      else
-                        i41, s41 = index, []
-                        r42 = _nt_t_access
-                        s41 << r42
-                        if r42
-                          r43 = _nt_t_equal
-                          s41 << r43
-                          if r43
-                            r44 = _nt_scalar_default_char_variable
-                            s41 << r44
-                          end
-                        end
-                        if s41.last
-                          r41 = instantiate_node(T,input, i41...index, s41)
-                          r41.extend(InquireSpec10)
+                        r20 = _nt_io_spec_access
+                        if r20
+                          r0 = r20
                         else
-                          @index = i41
-                          r41 = nil
-                        end
-                        if r41
-                          r0 = r41
-                        else
-                          i45, s45 = index, []
-                          r46 = _nt_t_sequential
-                          s45 << r46
-                          if r46
-                            r47 = _nt_t_equal
-                            s45 << r47
-                            if r47
-                              r48 = _nt_scalar_default_char_variable
-                              s45 << r48
-                            end
-                          end
-                          if s45.last
-                            r45 = instantiate_node(T,input, i45...index, s45)
-                            r45.extend(InquireSpec11)
+                          r21 = _nt_io_spec_sequential
+                          if r21
+                            r0 = r21
                           else
-                            @index = i45
-                            r45 = nil
-                          end
-                          if r45
-                            r0 = r45
-                          else
-                            i49, s49 = index, []
-                            r50 = _nt_t_direct
-                            s49 << r50
-                            if r50
-                              r51 = _nt_t_equal
-                              s49 << r51
-                              if r51
-                                r52 = _nt_scalar_default_char_variable
-                                s49 << r52
-                              end
-                            end
-                            if s49.last
-                              r49 = instantiate_node(T,input, i49...index, s49)
-                              r49.extend(InquireSpec12)
+                            r22 = _nt_io_spec_direct
+                            if r22
+                              r0 = r22
                             else
-                              @index = i49
-                              r49 = nil
-                            end
-                            if r49
-                              r0 = r49
-                            else
-                              i53, s53 = index, []
-                              r54 = _nt_t_form
-                              s53 << r54
-                              if r54
-                                r55 = _nt_t_equal
-                                s53 << r55
-                                if r55
-                                  r56 = _nt_scalar_default_char_variable
-                                  s53 << r56
-                                end
-                              end
-                              if s53.last
-                                r53 = instantiate_node(T,input, i53...index, s53)
-                                r53.extend(InquireSpec13)
+                              r23 = _nt_io_spec_form
+                              if r23
+                                r0 = r23
                               else
-                                @index = i53
-                                r53 = nil
-                              end
-                              if r53
-                                r0 = r53
-                              else
-                                i57, s57 = index, []
-                                r58 = _nt_t_formatted
-                                s57 << r58
-                                if r58
-                                  r59 = _nt_t_equal
-                                  s57 << r59
-                                  if r59
-                                    r60 = _nt_scalar_default_char_variable
-                                    s57 << r60
-                                  end
-                                end
-                                if s57.last
-                                  r57 = instantiate_node(T,input, i57...index, s57)
-                                  r57.extend(InquireSpec14)
+                                r24 = _nt_io_spec_formatted
+                                if r24
+                                  r0 = r24
                                 else
-                                  @index = i57
-                                  r57 = nil
-                                end
-                                if r57
-                                  r0 = r57
-                                else
-                                  i61, s61 = index, []
-                                  r62 = _nt_t_unformatted
-                                  s61 << r62
-                                  if r62
-                                    r63 = _nt_t_equal
-                                    s61 << r63
-                                    if r63
-                                      r64 = _nt_scalar_default_char_variable
-                                      s61 << r64
-                                    end
-                                  end
-                                  if s61.last
-                                    r61 = instantiate_node(T,input, i61...index, s61)
-                                    r61.extend(InquireSpec15)
+                                  r25 = _nt_io_spec_unformatted
+                                  if r25
+                                    r0 = r25
                                   else
-                                    @index = i61
-                                    r61 = nil
-                                  end
-                                  if r61
-                                    r0 = r61
-                                  else
-                                    i65, s65 = index, []
-                                    r66 = _nt_t_recl
-                                    s65 << r66
-                                    if r66
-                                      r67 = _nt_t_equal
-                                      s65 << r67
-                                      if r67
-                                        r68 = _nt_scalar_default_int_variable
-                                        s65 << r68
-                                      end
-                                    end
-                                    if s65.last
-                                      r65 = instantiate_node(T,input, i65...index, s65)
-                                      r65.extend(InquireSpec16)
+                                    r26 = _nt_io_spec_recl
+                                    if r26
+                                      r0 = r26
                                     else
-                                      @index = i65
-                                      r65 = nil
-                                    end
-                                    if r65
-                                      r0 = r65
-                                    else
-                                      i69, s69 = index, []
-                                      r70 = _nt_t_nextrec
-                                      s69 << r70
-                                      if r70
-                                        r71 = _nt_t_equal
-                                        s69 << r71
-                                        if r71
-                                          r72 = _nt_scalar_default_int_variable
-                                          s69 << r72
-                                        end
-                                      end
-                                      if s69.last
-                                        r69 = instantiate_node(T,input, i69...index, s69)
-                                        r69.extend(InquireSpec17)
+                                      r27 = _nt_io_spec_nextrec
+                                      if r27
+                                        r0 = r27
                                       else
-                                        @index = i69
-                                        r69 = nil
-                                      end
-                                      if r69
-                                        r0 = r69
-                                      else
-                                        i73, s73 = index, []
-                                        r74 = _nt_t_blank
-                                        s73 << r74
-                                        if r74
-                                          r75 = _nt_t_equal
-                                          s73 << r75
-                                          if r75
-                                            r76 = _nt_scalar_default_char_variable
-                                            s73 << r76
-                                          end
-                                        end
-                                        if s73.last
-                                          r73 = instantiate_node(T,input, i73...index, s73)
-                                          r73.extend(InquireSpec18)
+                                        r28 = _nt_io_spec_blank
+                                        if r28
+                                          r0 = r28
                                         else
-                                          @index = i73
-                                          r73 = nil
-                                        end
-                                        if r73
-                                          r0 = r73
-                                        else
-                                          i77, s77 = index, []
-                                          r78 = _nt_t_position
-                                          s77 << r78
-                                          if r78
-                                            r79 = _nt_t_equal
-                                            s77 << r79
-                                            if r79
-                                              r80 = _nt_scalar_default_char_variable
-                                              s77 << r80
-                                            end
-                                          end
-                                          if s77.last
-                                            r77 = instantiate_node(T,input, i77...index, s77)
-                                            r77.extend(InquireSpec19)
+                                          r29 = _nt_io_spec_position
+                                          if r29
+                                            r0 = r29
                                           else
-                                            @index = i77
-                                            r77 = nil
-                                          end
-                                          if r77
-                                            r0 = r77
-                                          else
-                                            i81, s81 = index, []
-                                            r82 = _nt_t_action
-                                            s81 << r82
-                                            if r82
-                                              r83 = _nt_t_equal
-                                              s81 << r83
-                                              if r83
-                                                r84 = _nt_scalar_default_char_variable
-                                                s81 << r84
-                                              end
-                                            end
-                                            if s81.last
-                                              r81 = instantiate_node(T,input, i81...index, s81)
-                                              r81.extend(InquireSpec20)
+                                            r30 = _nt_io_spec_action
+                                            if r30
+                                              r0 = r30
                                             else
-                                              @index = i81
-                                              r81 = nil
-                                            end
-                                            if r81
-                                              r0 = r81
-                                            else
-                                              i85, s85 = index, []
-                                              r86 = _nt_t_read
-                                              s85 << r86
-                                              if r86
-                                                r87 = _nt_t_equal
-                                                s85 << r87
-                                                if r87
-                                                  r88 = _nt_scalar_default_char_variable
-                                                  s85 << r88
-                                                end
-                                              end
-                                              if s85.last
-                                                r85 = instantiate_node(T,input, i85...index, s85)
-                                                r85.extend(InquireSpec21)
+                                              r31 = _nt_io_spec_read
+                                              if r31
+                                                r0 = r31
                                               else
-                                                @index = i85
-                                                r85 = nil
-                                              end
-                                              if r85
-                                                r0 = r85
-                                              else
-                                                i89, s89 = index, []
-                                                r90 = _nt_t_write
-                                                s89 << r90
-                                                if r90
-                                                  r91 = _nt_t_equal
-                                                  s89 << r91
-                                                  if r91
-                                                    r92 = _nt_scalar_default_char_variable
-                                                    s89 << r92
-                                                  end
-                                                end
-                                                if s89.last
-                                                  r89 = instantiate_node(T,input, i89...index, s89)
-                                                  r89.extend(InquireSpec22)
+                                                r32 = _nt_io_spec_write
+                                                if r32
+                                                  r0 = r32
                                                 else
-                                                  @index = i89
-                                                  r89 = nil
-                                                end
-                                                if r89
-                                                  r0 = r89
-                                                else
-                                                  i93, s93 = index, []
-                                                  r94 = _nt_t_readwrite
-                                                  s93 << r94
-                                                  if r94
-                                                    r95 = _nt_t_equal
-                                                    s93 << r95
-                                                    if r95
-                                                      r96 = _nt_scalar_default_char_variable
-                                                      s93 << r96
-                                                    end
-                                                  end
-                                                  if s93.last
-                                                    r93 = instantiate_node(T,input, i93...index, s93)
-                                                    r93.extend(InquireSpec23)
+                                                  r33 = _nt_io_spec_readwrite
+                                                  if r33
+                                                    r0 = r33
                                                   else
-                                                    @index = i93
-                                                    r93 = nil
-                                                  end
-                                                  if r93
-                                                    r0 = r93
-                                                  else
-                                                    i97, s97 = index, []
-                                                    r98 = _nt_t_delim
-                                                    s97 << r98
-                                                    if r98
-                                                      r99 = _nt_t_equal
-                                                      s97 << r99
-                                                      if r99
-                                                        r100 = _nt_scalar_default_char_variable
-                                                        s97 << r100
-                                                      end
-                                                    end
-                                                    if s97.last
-                                                      r97 = instantiate_node(T,input, i97...index, s97)
-                                                      r97.extend(InquireSpec24)
+                                                    r34 = _nt_io_spec_delim
+                                                    if r34
+                                                      r0 = r34
                                                     else
-                                                      @index = i97
-                                                      r97 = nil
-                                                    end
-                                                    if r97
-                                                      r0 = r97
-                                                    else
-                                                      i101, s101 = index, []
-                                                      r102 = _nt_t_pad
-                                                      s101 << r102
-                                                      if r102
-                                                        r103 = _nt_t_equal
-                                                        s101 << r103
-                                                        if r103
-                                                          r104 = _nt_scalar_default_char_variable
-                                                          s101 << r104
-                                                        end
-                                                      end
-                                                      if s101.last
-                                                        r101 = instantiate_node(T,input, i101...index, s101)
-                                                        r101.extend(InquireSpec25)
-                                                      else
-                                                        @index = i101
-                                                        r101 = nil
-                                                      end
-                                                      if r101
-                                                        r0 = r101
+                                                      r35 = _nt_io_spec_pad
+                                                      if r35
+                                                        r0 = r35
                                                       else
                                                         @index = i0
                                                         r0 = nil
@@ -19455,6 +18742,251 @@ module Fortran
     r0
   end
 
+  module IoSpecAccess0
+    def t_access
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_access
+    start_index = index
+    if node_cache[:io_spec_access].has_key?(index)
+      cached = node_cache[:io_spec_access][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_access
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Access,input, i0...index, s0)
+      r0.extend(IoSpecAccess0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_access][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecAction0
+    def t_action
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_action
+    start_index = index
+    if node_cache[:io_spec_action].has_key?(index)
+      cached = node_cache[:io_spec_action][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_action
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Action,input, i0...index, s0)
+      r0.extend(IoSpecAction0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_action][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecBlank0
+    def t_blank
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_blank
+    start_index = index
+    if node_cache[:io_spec_blank].has_key?(index)
+      cached = node_cache[:io_spec_blank][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_blank
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Blank,input, i0...index, s0)
+      r0.extend(IoSpecBlank0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_blank][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecDelim0
+    def t_delim
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_delim
+    start_index = index
+    if node_cache[:io_spec_delim].has_key?(index)
+      cached = node_cache[:io_spec_delim][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_delim
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Delim,input, i0...index, s0)
+      r0.extend(IoSpecDelim0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_delim][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecDirect0
+    def t_direct
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_direct
+    start_index = index
+    if node_cache[:io_spec_direct].has_key?(index)
+      cached = node_cache[:io_spec_direct][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_direct
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Direct,input, i0...index, s0)
+      r0.extend(IoSpecDirect0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_direct][start_index] = r0
+
+    r0
+  end
+
   module IoSpecEor0
     def t_eor
       elements[0]
@@ -19553,6 +19085,153 @@ module Fortran
     r0
   end
 
+  module IoSpecExist0
+    def t_exist
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_logical_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_exist
+    start_index = index
+    if node_cache[:io_spec_exist].has_key?(index)
+      cached = node_cache[:io_spec_exist][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_exist
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_logical_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Exist,input, i0...index, s0)
+      r0.extend(IoSpecExist0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_exist][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecForm0
+    def t_form
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_form
+    start_index = index
+    if node_cache[:io_spec_form].has_key?(index)
+      cached = node_cache[:io_spec_form][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_form
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Form,input, i0...index, s0)
+      r0.extend(IoSpecForm0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_form][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecFormatted0
+    def t_formatted
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_formatted
+    start_index = index
+    if node_cache[:io_spec_formatted].has_key?(index)
+      cached = node_cache[:io_spec_formatted][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_formatted
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Formatted,input, i0...index, s0)
+      r0.extend(IoSpecFormatted0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_formatted][start_index] = r0
+
+    r0
+  end
+
   module IoSpecIostat0
     def t_iostat
       elements[0]
@@ -19598,6 +19277,153 @@ module Fortran
     end
 
     node_cache[:io_spec_iostat][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecName0
+    def t_name
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_name
+    start_index = index
+    if node_cache[:io_spec_name].has_key?(index)
+      cached = node_cache[:io_spec_name][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_name
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Name,input, i0...index, s0)
+      r0.extend(IoSpecName0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_name][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecNamed0
+    def t_named
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_logical_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_named
+    start_index = index
+    if node_cache[:io_spec_named].has_key?(index)
+      cached = node_cache[:io_spec_named][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_named
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_logical_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Named,input, i0...index, s0)
+      r0.extend(IoSpecNamed0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_named][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecNextrec0
+    def t_nextrec
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_int_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_nextrec
+    start_index = index
+    if node_cache[:io_spec_nextrec].has_key?(index)
+      cached = node_cache[:io_spec_nextrec][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_nextrec
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_int_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Nextrec,input, i0...index, s0)
+      r0.extend(IoSpecNextrec0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_nextrec][start_index] = r0
 
     r0
   end
@@ -19651,6 +19477,398 @@ module Fortran
     r0
   end
 
+  module IoSpecNumber0
+    def t_number
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_int_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_number
+    start_index = index
+    if node_cache[:io_spec_number].has_key?(index)
+      cached = node_cache[:io_spec_number][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_number
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_int_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Number,input, i0...index, s0)
+      r0.extend(IoSpecNumber0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_number][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecOpened0
+    def t_opened
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_logical_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_opened
+    start_index = index
+    if node_cache[:io_spec_opened].has_key?(index)
+      cached = node_cache[:io_spec_opened][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_opened
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_logical_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Opened,input, i0...index, s0)
+      r0.extend(IoSpecOpened0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_opened][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecPad0
+    def t_pad
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_pad
+    start_index = index
+    if node_cache[:io_spec_pad].has_key?(index)
+      cached = node_cache[:io_spec_pad][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_pad
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Pad,input, i0...index, s0)
+      r0.extend(IoSpecPad0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_pad][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecPosition0
+    def t_position
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_position
+    start_index = index
+    if node_cache[:io_spec_position].has_key?(index)
+      cached = node_cache[:io_spec_position][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_position
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Position,input, i0...index, s0)
+      r0.extend(IoSpecPosition0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_position][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecRead0
+    def t_read
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_read
+    start_index = index
+    if node_cache[:io_spec_read].has_key?(index)
+      cached = node_cache[:io_spec_read][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_read
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Read,input, i0...index, s0)
+      r0.extend(IoSpecRead0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_read][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecReadwrite0
+    def t_readwrite
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_readwrite
+    start_index = index
+    if node_cache[:io_spec_readwrite].has_key?(index)
+      cached = node_cache[:io_spec_readwrite][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_readwrite
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Readwrite,input, i0...index, s0)
+      r0.extend(IoSpecReadwrite0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_readwrite][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecRecl0
+    def t_recl
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_int_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_recl
+    start_index = index
+    if node_cache[:io_spec_recl].has_key?(index)
+      cached = node_cache[:io_spec_recl][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_recl
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_int_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Recl,input, i0...index, s0)
+      r0.extend(IoSpecRecl0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_recl][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecSequential0
+    def t_sequential
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_sequential
+    start_index = index
+    if node_cache[:io_spec_sequential].has_key?(index)
+      cached = node_cache[:io_spec_sequential][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_sequential
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Sequential,input, i0...index, s0)
+      r0.extend(IoSpecSequential0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_sequential][start_index] = r0
+
+    r0
+  end
+
   module IoSpecSize0
     def t_size
       elements[0]
@@ -19700,6 +19918,55 @@ module Fortran
     r0
   end
 
+  module IoSpecUnformatted0
+    def t_unformatted
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_unformatted
+    start_index = index
+    if node_cache[:io_spec_unformatted].has_key?(index)
+      cached = node_cache[:io_spec_unformatted][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_unformatted
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Unformatted,input, i0...index, s0)
+      r0.extend(IoSpecUnformatted0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_unformatted][start_index] = r0
+
+    r0
+  end
+
   module IoSpecUnit0
     def t_unit
       elements[0]
@@ -19745,6 +20012,55 @@ module Fortran
     end
 
     node_cache[:io_spec_unit][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecWrite0
+    def t_write
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_default_char_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_write
+    start_index = index
+    if node_cache[:io_spec_write].has_key?(index)
+      cached = node_cache[:io_spec_write][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_write
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_default_char_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(IO_Spec_Write,input, i0...index, s0)
+      r0.extend(IoSpecWrite0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_write][start_index] = r0
 
     r0
   end

@@ -2249,6 +2249,21 @@ module Fortran
 
   end
 
+  class IO_Spec_Access < IO_Spec
+  end
+
+  class IO_Spec_Action < IO_Spec
+  end
+
+  class IO_Spec_Blank < IO_Spec
+  end
+
+  class IO_Spec_Delim < IO_Spec
+  end
+
+  class IO_Spec_Direct < IO_Spec
+  end
+
   class IO_Spec_End < IO_Spec
 
     def relabel
@@ -2273,13 +2288,58 @@ module Fortran
 
   end
 
+  class IO_Spec_Exist < IO_Spec
+  end
+
+  class IO_Spec_Form < IO_Spec
+  end
+
+  class IO_Spec_Formatted < IO_Spec
+  end
+
   class IO_Spec_Iostat < IO_Spec
+  end
+
+  class IO_Spec_Name < IO_Spec
+  end
+
+  class IO_Spec_Named < IO_Spec
+  end
+
+  class IO_Spec_Nextrec < IO_Spec
   end
 
   class IO_Spec_Nml < IO_Spec
   end
 
+  class IO_Spec_Number < IO_Spec
+  end
+
+  class IO_Spec_Opened < IO_Spec
+  end
+
+  class IO_Spec_Pad < IO_Spec
+  end
+
+  class IO_Spec_Position < IO_Spec
+  end
+
+  class IO_Spec_Read < IO_Spec
+  end
+
+  class IO_Spec_Readwrite < IO_Spec
+  end
+
+  class IO_Spec_Recl < IO_Spec
+  end
+
+  class IO_Spec_Sequential < IO_Spec
+  end
+
   class IO_Spec_Size < IO_Spec
+  end
+
+  class IO_Spec_Unformatted < IO_Spec
   end
 
   class IO_Spec_Unit < IO_Spec
@@ -2288,6 +2348,9 @@ module Fortran
       e[2]
     end
 
+  end
+
+  class IO_Spec_Write < IO_Spec
   end
 
   class Kind_Selector < T

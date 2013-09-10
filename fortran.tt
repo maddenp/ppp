@@ -1766,29 +1766,29 @@ grammar Fortran
     external_file_unit &t_comma <T> /
     t_unit t_equal external_file_unit <T> /
     t_file t_equal file_name_expr <T> /
-    t_iostat t_equal scalar_default_int_variable <T> /
-    t_err t_equal label <T> /
-    t_exist t_equal scalar_default_logical_variable <T> /
-    t_opened t_equal scalar_default_logical_variable <T> /
-    t_number t_equal scalar_default_int_variable <T> /
-    t_named t_equal scalar_default_logical_variable <T> /
-    t_name t_equal scalar_default_char_variable <T> /
-    t_access t_equal scalar_default_char_variable <T> /
-    t_sequential t_equal scalar_default_char_variable <T> /
-    t_direct t_equal scalar_default_char_variable <T> /
-    t_form t_equal scalar_default_char_variable <T> /
-    t_formatted t_equal scalar_default_char_variable <T> /
-    t_unformatted t_equal scalar_default_char_variable <T> /
-    t_recl t_equal scalar_default_int_variable <T> /
-    t_nextrec t_equal scalar_default_int_variable <T> /
-    t_blank t_equal scalar_default_char_variable <T> /
-    t_position t_equal scalar_default_char_variable <T> /
-    t_action t_equal scalar_default_char_variable <T> /
-    t_read t_equal scalar_default_char_variable <T> /
-    t_write t_equal scalar_default_char_variable <T> /
-    t_readwrite t_equal scalar_default_char_variable <T> /
-    t_delim t_equal scalar_default_char_variable <T> /
-    t_pad t_equal scalar_default_char_variable <T>
+    io_spec_iostat /
+    io_spec_err /
+    io_spec_exist /
+    io_spec_opened /
+    io_spec_number /
+    io_spec_named /
+    io_spec_name /
+    io_spec_access /
+    io_spec_sequential /
+    io_spec_direct /
+    io_spec_form /
+    io_spec_formatted /
+    io_spec_unformatted /
+    io_spec_recl /
+    io_spec_nextrec /
+    io_spec_blank /
+    io_spec_position /
+    io_spec_action /
+    io_spec_read /
+    io_spec_write /
+    io_spec_readwrite /
+    io_spec_delim /
+    io_spec_pad
   end
 
   rule inquire_spec_list
@@ -1963,6 +1963,26 @@ grammar Fortran
     io_implied_do_object ( t_comma io_implied_do_object )* <IO_Implied_Do_Object_List>
   end
 
+  rule io_spec_access
+    t_access t_equal scalar_default_char_variable <IO_Spec_Access>
+  end
+
+  rule io_spec_action
+    t_action t_equal scalar_default_char_variable <IO_Spec_Action>
+  end
+
+  rule io_spec_blank
+    t_blank t_equal scalar_default_char_variable <IO_Spec_Blank>
+  end
+
+  rule io_spec_delim
+    t_delim t_equal scalar_default_char_variable <IO_Spec_Delim>
+  end
+
+  rule io_spec_direct
+    t_direct t_equal scalar_default_char_variable <IO_Spec_Direct>
+  end
+
   rule io_spec_eor
     t_eor t_equal label <IO_Spec_Eor>
   end
@@ -1971,20 +1991,84 @@ grammar Fortran
     t_err t_equal label <IO_Spec_Err>
   end
 
+  rule io_spec_exist
+    t_exist t_equal scalar_default_logical_variable <IO_Spec_Exist>
+  end
+
+  rule io_spec_form
+    t_form t_equal scalar_default_char_variable <IO_Spec_Form>
+  end
+
+  rule io_spec_formatted
+    t_formatted t_equal scalar_default_char_variable <IO_Spec_Formatted>
+  end
+
   rule io_spec_iostat
     t_iostat t_equal scalar_default_int_variable <IO_Spec_Iostat>
+  end
+
+  rule io_spec_name
+    t_name t_equal scalar_default_char_variable <IO_Spec_Name>
+  end
+
+  rule io_spec_named
+    t_named t_equal scalar_default_logical_variable <IO_Spec_Named>
+  end
+
+  rule io_spec_nextrec
+    t_nextrec t_equal scalar_default_int_variable <IO_Spec_Nextrec>
   end
 
   rule io_spec_nml
     t_nml t_equal namelist_group_name <IO_Spec_Nml>
   end
 
+  rule io_spec_number
+    t_number t_equal scalar_default_int_variable <IO_Spec_Number>
+  end
+
+  rule io_spec_opened
+    t_opened t_equal scalar_default_logical_variable <IO_Spec_Opened>
+  end
+
+  rule io_spec_pad
+    t_pad t_equal scalar_default_char_variable <IO_Spec_Pad>
+  end
+
+  rule io_spec_position
+    t_position t_equal scalar_default_char_variable <IO_Spec_Position>
+  end
+
+  rule io_spec_read
+    t_read t_equal scalar_default_char_variable <IO_Spec_Read>
+  end
+
+  rule io_spec_readwrite
+    t_readwrite t_equal scalar_default_char_variable <IO_Spec_Readwrite>
+  end
+
+  rule io_spec_recl
+    t_recl t_equal scalar_default_int_variable <IO_Spec_Recl>
+  end
+
+  rule io_spec_sequential
+    t_sequential t_equal scalar_default_char_variable <IO_Spec_Sequential>
+  end
+
   rule io_spec_size
     t_size t_equal scalar_default_int_variable <IO_Spec_Size>
   end
 
+  rule io_spec_unformatted
+    t_unformatted t_equal scalar_default_char_variable <IO_Spec_Unformatted>
+  end
+
   rule io_spec_unit
     t_unit t_equal io_unit <IO_Spec_Unit>
+  end
+
+  rule io_spec_write
+    t_write t_equal scalar_default_char_variable <IO_Spec_Write>
   end
 
   rule io_unit
