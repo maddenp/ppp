@@ -1261,9 +1261,17 @@ module Fortran
 
   class Array_Section < E
 
+    def data_ref
+      e[0]
+    end
+
     def name
-      e[0].name
+      data_ref.name
 		end
+
+    def subscript_list
+      data_ref.subscript_list
+    end
 
   end
 
@@ -1606,15 +1614,19 @@ module Fortran
   class Data_Ref < T
 
     def name
-      (e[1].e.empty?)?(e[0].name):(e[1].e[-1].e[1].name)
+      rightmost.name
+    end
+
+    def part_ref
+      rightmost
     end
 
     def rightmost
-      if e[1].e.empty?
-        e[0]
-      else
-        e[1].e[-1].e[1]
-      end
+      (e[1].e.empty?)?(e[0]):(e[1].e[-1].e[1])
+    end
+
+    def subscript_list
+      part_ref.subscript_list
     end
 
     def to_s
@@ -2887,7 +2899,11 @@ module Fortran
   class Part_Ref < E
 
     def name
-      e[0].name
+      part_name.name
+    end
+
+    def part_name
+      e[0]
     end
 
     def subscript_list
@@ -3099,6 +3115,26 @@ module Fortran
 
   end
 
+  class Section_Subscript < E
+
+    def lower
+      (e[0].respond_to?(:lower))?(e[0].lower):(nil)
+    end
+
+    def stride
+      (e[0].respond_to?(:stride))?(e[0].stride):(nil)
+    end
+
+    def subscript
+      (e[0].respond_to?(:subscript))?(e[0].subscript):(nil)
+    end
+
+    def upper
+      (e[0].respond_to?(:upper))?(e[0].upper):(nil)
+    end
+
+  end
+
   class Section_Subscript_List < E
 
     def subscript_list
@@ -3169,6 +3205,54 @@ module Fortran
       s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
       indent
       s
+    end
+
+  end
+
+  class Subscript < E
+
+    def lower
+      nil
+    end
+
+    def stride
+      nil
+    end
+
+    def subscript
+      e[0].subscript
+    end
+
+    def uppper
+      nil
+    end
+
+  end
+
+  class Subscript_Triplet < E
+
+    def lower
+      (e[0].is_a?(Subscript))?(e[0]):(nil)
+    end
+
+    def stride
+      (e[3].is_a?(Subscript_Triplet_Stride_Option))?(e[3].stride):(1)
+    end
+
+    def subscript
+      nil
+    end
+
+    def upper
+      (e[2].is_a?(Subscript))?(e[2]):(nil)
+    end
+
+  end
+
+  class Subscript_Triplet_Stride_Option < E
+
+    def stride
+      e[1]
     end
 
   end
@@ -3297,6 +3381,26 @@ module Fortran
   end
 
   class Variable_Name < E
+  end
+
+  class Vector_Subscript < E
+
+    def lower
+      nil
+    end
+
+    def stride
+      nil
+    end
+
+    def subscript
+      e[0]
+    end
+
+    def upper
+      nil
+    end
+
   end
 
   class Where_Construct_Stmt < T

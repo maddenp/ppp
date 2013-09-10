@@ -27804,6 +27804,27 @@ module Fortran
     r0
   end
 
+  module SectionSubscript0
+    def subscript_triplet
+      elements[0]
+    end
+
+  end
+
+  module SectionSubscript1
+    def vector_subscript
+      elements[0]
+    end
+
+  end
+
+  module SectionSubscript2
+    def subscript
+      elements[0]
+    end
+
+  end
+
   def _nt_section_subscript
     start_index = index
     if node_cache[:section_subscript].has_key?(index)
@@ -27816,17 +27837,74 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_subscript_triplet
+    i1, s1 = index, []
+    r2 = _nt_subscript_triplet
+    s1 << r2
+    if r2
+      if has_terminal?("", false, index)
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
+      else
+        terminal_parse_failure("")
+        r3 = nil
+      end
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(Section_Subscript,input, i1...index, s1)
+      r1.extend(SectionSubscript0)
+    else
+      @index = i1
+      r1 = nil
+    end
     if r1
       r0 = r1
     else
-      r2 = _nt_vector_subscript
-      if r2
-        r0 = r2
+      i4, s4 = index, []
+      r5 = _nt_vector_subscript
+      s4 << r5
+      if r5
+        if has_terminal?("", false, index)
+          r6 = instantiate_node(SyntaxNode,input, index...(index + 0))
+          @index += 0
+        else
+          terminal_parse_failure("")
+          r6 = nil
+        end
+        s4 << r6
+      end
+      if s4.last
+        r4 = instantiate_node(Section_Subscript,input, i4...index, s4)
+        r4.extend(SectionSubscript1)
       else
-        r3 = _nt_subscript
-        if r3
-          r0 = r3
+        @index = i4
+        r4 = nil
+      end
+      if r4
+        r0 = r4
+      else
+        i7, s7 = index, []
+        r8 = _nt_subscript
+        s7 << r8
+        if r8
+          if has_terminal?("", false, index)
+            r9 = instantiate_node(SyntaxNode,input, index...(index + 0))
+            @index += 0
+          else
+            terminal_parse_failure("")
+            r9 = nil
+          end
+          s7 << r9
+        end
+        if s7.last
+          r7 = instantiate_node(Section_Subscript,input, i7...index, s7)
+          r7.extend(SectionSubscript2)
+        else
+          @index = i7
+          r7 = nil
+        end
+        if r7
+          r0 = r7
         else
           @index = i0
           r0 = nil
@@ -29233,6 +29311,13 @@ module Fortran
     r0
   end
 
+  module Subscript0
+    def scalar_int_expr
+      elements[0]
+    end
+
+  end
+
   def _nt_subscript
     start_index = index
     if node_cache[:subscript].has_key?(index)
@@ -29244,7 +29329,26 @@ module Fortran
       return cached
     end
 
-    r0 = _nt_scalar_int_expr
+    i0, s0 = index, []
+    r1 = _nt_scalar_int_expr
+    s0 << r1
+    if r1
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
+      else
+        terminal_parse_failure("")
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Subscript,input, i0...index, s0)
+      r0.extend(Subscript0)
+    else
+      @index = i0
+      r0 = nil
+    end
 
     node_cache[:subscript][start_index] = r0
 
@@ -29252,16 +29356,6 @@ module Fortran
   end
 
   module SubscriptTriplet0
-    def t_colon
-      elements[0]
-    end
-
-    def stride
-      elements[1]
-    end
-  end
-
-  module SubscriptTriplet1
     def t_colon
       elements[1]
     end
@@ -29299,20 +29393,7 @@ module Fortran
         end
         s0 << r4
         if r4
-          i7, s7 = index, []
-          r8 = _nt_t_colon
-          s7 << r8
-          if r8
-            r9 = _nt_stride
-            s7 << r9
-          end
-          if s7.last
-            r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
-            r7.extend(SubscriptTriplet0)
-          else
-            @index = i7
-            r7 = nil
-          end
+          r7 = _nt_subscript_triplet_stride_option
           if r7
             r6 = r7
           else
@@ -29323,14 +29404,55 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(SubscriptTriplet1)
+      r0 = instantiate_node(Subscript_Triplet,input, i0...index, s0)
+      r0.extend(SubscriptTriplet0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:subscript_triplet][start_index] = r0
+
+    r0
+  end
+
+  module SubscriptTripletStrideOption0
+    def t_colon
+      elements[0]
+    end
+
+    def stride
+      elements[1]
+    end
+  end
+
+  def _nt_subscript_triplet_stride_option
+    start_index = index
+    if node_cache[:subscript_triplet_stride_option].has_key?(index)
+      cached = node_cache[:subscript_triplet_stride_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_colon
+    s0 << r1
+    if r1
+      r2 = _nt_stride
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Subscript_Triplet_Stride_Option,input, i0...index, s0)
+      r0.extend(SubscriptTripletStrideOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:subscript_triplet_stride_option][start_index] = r0
 
     r0
   end
@@ -34759,6 +34881,13 @@ module Fortran
     r0
   end
 
+  module VectorSubscript0
+    def int_expr
+      elements[0]
+    end
+
+  end
+
   def _nt_vector_subscript
     start_index = index
     if node_cache[:vector_subscript].has_key?(index)
@@ -34770,7 +34899,26 @@ module Fortran
       return cached
     end
 
-    r0 = _nt_int_expr
+    i0, s0 = index, []
+    r1 = _nt_int_expr
+    s0 << r1
+    if r1
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
+      else
+        terminal_parse_failure("")
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Vector_Subscript,input, i0...index, s0)
+      r0.extend(VectorSubscript0)
+    else
+      @index = i0
+      r0 = nil
+    end
 
     node_cache[:vector_subscript][start_index] = r0
 

@@ -2977,9 +2977,9 @@ grammar Fortran
   rule section_subscript
     # F90:R618
 
-    subscript_triplet /
-    vector_subscript /
-    subscript
+    subscript_triplet "" <Section_Subscript> /
+    vector_subscript "" <Section_Subscript> /
+    subscript "" <Section_Subscript>
   end
 
   rule section_subscript_list
@@ -3169,13 +3169,17 @@ grammar Fortran
   rule subscript
     # F90:R617
 
-    scalar_int_expr
+    scalar_int_expr "" <Subscript>
   end
 
   rule subscript_triplet
     # F90:R619
 
-    subscript? t_colon subscript? ( t_colon stride )? <T>
+    subscript? t_colon subscript? subscript_triplet_stride_option? <Subscript_Triplet>
+  end
+
+  rule subscript_triplet_stride_option
+    t_colon stride <Subscript_Triplet_Stride_Option>
   end
 
   rule subobject
@@ -3905,7 +3909,7 @@ grammar Fortran
   rule vector_subscript
     # F90:R621
 
-    int_expr
+    int_expr "" <Vector_Subscript>
   end
 
   rule where_assignment_stmt_block

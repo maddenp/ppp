@@ -46,7 +46,7 @@ module Fortran
   def sp_sms_ignore_begin
 # HACK begin
 # Expose this when we're not bracketing stuff in sms$ignore to please legacy ppp
-#   fail "Already inside SMS$IGNORE region" if env[:sms_ignore]
+#   fail "Already inside sms$ignore region" if env[:sms_ignore]
 # HACK END
     envpush
     env[:sms_ignore]=true
@@ -56,7 +56,7 @@ module Fortran
   def sp_sms_ignore_end
 # HACK begin
 # Expose this when we're not bracketing stuff in sms$ignore to please legacy ppp
-#   fail "Not inside SMS$IGNORE region" unless env[:sms_ignore]
+#   fail "Not inside sms$ignore region" unless env[:sms_ignore]
 # HACK END
     true
   end
@@ -368,6 +368,29 @@ module Fortran
   end
 
 # HACK end
+
+# class Array_Section < E
+#
+#   def translate
+#     if inside?(Execution_Part) and not inside?(SMS)
+#       var="#{self.name}"
+#       if (varenv=self.env["#{name}"])
+#         if (dh=varenv["decomp"])
+#           puts "### array_section #{self}"
+#           self.subscript_list.each do |x|
+#             puts "    #{x}"
+#             puts "    class #{x.class}"
+#             puts "    subscript [#{x.subscript}]"
+#             puts "    lower     [#{x.lower}]"
+#             puts "    upper     [#{x.upper}]"
+#             puts "    stride    [#{x.stride}]"
+#           end
+#         end
+#       end
+#     end
+#   end
+#
+# end
 
   class Array_Name_And_Spec < E
 
@@ -764,7 +787,7 @@ module Fortran
     end
 
     def translate
-      # sms$to_local handling
+      # Handle sms$to_local
       if tolocal=self.env[:sms_to_local] and p=tolocal[name]
         case p.key
         when "lbound"
@@ -774,12 +797,12 @@ module Fortran
           se="e#{p.decdim}"
           halo_offset=halo_offsets(p.decdim).up
         else
-          fail "Unrecognized SMS$TO_LOCAL key: #{p.key}"
+          fail "Unrecognized sms$to_local key: #{p.key}"
         end
         code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
         replace_element(code,:expr)
       end
-      # sms$serial handling
+      # Handle sms$serial
       if inside?(SMS_Serial) and not inside?(SMS_Serial_Begin)
         if (varenv=self.env["#{self}"])
           unless varenv["parameter"]
@@ -1404,14 +1427,14 @@ module Fortran
 
     def translate
       nvars=vars.size
-      fail "SMS$REDUCE supports reduction of 25 variables max" if nvars>25
+      fail "sms$reduce supports reduction of 25 variables max" if nvars>25
       use("module_decomp")
       sizes=[]
       types=[]
       nvars.times do |i|
         var=vars[i]
         varenv=getvarenv(var)
-        fail "SMS$REDUCE inapplicable to distributed array '#{var}'" if varenv["decomp"]
+        fail "sms$reduce inapplicable to distributed array '#{var}'" if varenv["decomp"]
         sizes.push((varenv["sort"]=="_array")?("size(#{var})"):("1"))
         types.push(smstype(varenv["type"],varenv["kind"]))
       end
@@ -1460,7 +1483,7 @@ module Fortran
       bcasts=[]
       gathers=[]
       scatters=[]
-      # Get the serial info recorded when the SMS$SERIAL ... BEGIN statement.
+      # Get the serial info recorded when the sms$serial ... begin statement.
       # was parsed.
       si=self.env[:sms_serial_info]
       # Iterate over the set of names that occurred in the region. Note that
@@ -1483,7 +1506,7 @@ module Fortran
           # for a gather *if* it is decomposed; and note that the default intent
           # does not apply.
           if si.vars_ignore.include?(name)
-            fail "'#{name}' cannot be both 'ignore' and 'out' in SMS$SERIAL"
+            fail "'#{name}' cannot be both 'ignore' and 'out' in sms$serial"
           end
           gathers.push(name) if decomp
           default=false
@@ -1494,7 +1517,7 @@ module Fortran
           # non-decomposed arrays for broadcast, and decomposed arrays for a
           # scatter; and note that the default intent does not apply.
           if si.vars_ignore.include?(name)
-            fail "'#{name}' cannot be both 'ignore' and 'in' SMS$SERIAL"
+            fail "'#{name}' cannot be both 'ignore' and 'in' sms$serial"
           end
           ((sort=="_scalar"||!decomp)?(bcasts):(scatters)).push(name)
           default=false
