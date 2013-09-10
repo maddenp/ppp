@@ -2243,7 +2243,7 @@ module Fortran
     end
 
     def rhs
-      "#{e[2]}"
+      e[2]
     end
 
   end
