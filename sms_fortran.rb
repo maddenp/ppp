@@ -391,7 +391,7 @@ module Fortran
 #       bound
 #     end
 #
-#     if inside?(Execution_Part) and not inside?(SMS)
+#     if inside?(Assignment_Stmt) and not inside?(Call_Stmt,Function_Reference,SMS)
 #       var="#{name}"
 #       fail "'#{var}' not found in environment" unless (varenv=self.env[var])
 #       return unless (dh=varenv["decomp"])
@@ -421,9 +421,9 @@ module Fortran
 #         end
 #       end
 #       p bounds
-#       boundslist=bounds.each { |x| "#{x[0]}:#{x[1]}" }.join(",")
+#       boundslist=(1..dims).map{ |dim| "#{bounds[dim][0]}:#{bounds[dim][1]}" }.join(",")
 #       code="#{var}(#{boundslist})"
-#       puts "### code: #{code}"
+#       replace_element(code,:array_section)
 #     end
 #   end
 #
@@ -541,36 +541,6 @@ module Fortran
         var_gather=[]
         var_scatter=[]
 
-        # Write_Stmt
-
-        if self.is_a?(Write_Stmt)
-          function=(env["#{unit}"] and env["#{unit}"]["function"])
-          split=false if self.unit.is_a?(Internal_File_Unit) or function
-          if (nml=self.nml)
-            split=true
-            nmlenv=getvarenv(nml,self,expected=true)
-            nmlenv["objects"].each do |x|
-              var="#{x}"
-              varenv=getvarenv(var,self,expected=true)
-              if varenv["decomp"]
-                var_gather.push(var)
-                self.replace_input_item(x,Name.global(var))
-              end
-            end
-          end
-          self.output_items.each do |x|
-            var="#{x}"
-            if (varenv=getvarenv(var,self,expected=false))
-              if (dh=varenv["decomp"])
-                split=true
-                global=Name.global(var)
-                var_gather.push(var)
-                self.replace_output_item(x,global)
-              end
-            end
-          end
-        end
-
         # Read_Stmt
 
         if self.is_a?(Read_Stmt)
@@ -599,6 +569,52 @@ module Fortran
                 self.replace_input_item(x,Name.global(var))
               else
                 var_bcast.push(var) if split
+              end
+            end
+          end
+        end
+
+        # Print_Stmt
+
+        if self.is_a?(Print_Stmt)
+          self.output_items.each do |x|
+            var="#{x}"
+            if (varenv=getvarenv(var,self,expected=false))
+              if (dh=varenv["decomp"])
+                split=true
+                global=Name.global(var)
+                var_gather.push(var)
+                self.replace_output_item(x,global)
+              end
+            end
+          end
+        end
+
+        # Write_Stmt
+
+        if self.is_a?(Write_Stmt)
+          function=(env["#{unit}"] and env["#{unit}"]["function"])
+          split=false if self.unit.is_a?(Internal_File_Unit) or function
+          if (nml=self.nml)
+            split=true
+            nmlenv=getvarenv(nml,self,expected=true)
+            nmlenv["objects"].each do |x|
+              var="#{x}"
+              varenv=getvarenv(var,self,expected=true)
+              if varenv["decomp"]
+                var_gather.push(var)
+                self.replace_input_item(x,Name.global(var))
+              end
+            end
+          end
+          self.output_items.each do |x|
+            var="#{x}"
+            if (varenv=getvarenv(var,self,expected=false))
+              if (dh=varenv["decomp"])
+                split=true
+                global=Name.global(var)
+                var_gather.push(var)
+                self.replace_output_item(x,global)
               end
             end
           end
@@ -714,61 +730,65 @@ module Fortran
           code_bcast.push(code)
         end
 
-        # Branch-To Spec Logic
+        unless (self.is_a?(Print_Stmt))
 
-        [
-          :err,
-          :end,
-          :eor
-        ].each do |x|
-          # :err has precedence, per F90 9.4.1.6, 9.4.1.7
-          if (spec=self.send(x))
-            label_old,label_new=spec.send(:relabel)
-            pppvar=spec.send(:pppvar)
-            spec_var_false.push("#{pppvar}=.false.")
-            spec_var_bcast.push("call ppp_bcast(#{pppvar},nnt_logical,(/1/),1,ppp__status)")
-            spec_var_true.push("#{label_new} #{pppvar}=.true.")
-            spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
-            success_label=label_create unless success_label
-            use("nnt_types_module")
+          # Branch-To Spec Logic
+
+          [
+            :err,
+            :end,
+            :eor
+          ].each do |x|
+            # :err has precedence, per F90 9.4.1.6, 9.4.1.7
+            if (spec=self.send(x))
+              label_old,label_new=spec.send(:relabel)
+              pppvar=spec.send(:pppvar)
+              spec_var_false.push("#{pppvar}=.false.")
+              spec_var_bcast.push("call ppp_bcast(#{pppvar},nnt_logical,(/1/),1,ppp__status)")
+              spec_var_true.push("#{label_new} #{pppvar}=.true.")
+              spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
+              success_label=label_create unless success_label
+              use("nnt_types_module")
+            end
           end
-        end
 
-        # Spec Var Logic
+          # Spec Var Logic
 
-        [
-          :access,
-          :action,
-          :blank,
-          :delim,
-          :direct,
-          :exist,
-          :form,
-          :formatted,
-          :iostat,
-          :name,
-          :named,
-          :nextrec,
-          :number,
-          :opened,
-          :pad,
-          :position,
-          :read,
-          :readwrite,
-          :recl,
-          :sequential,
-          :size,
-          :unformatted,
-          :write
-        ].each do |x|
-          if (spec=self.send(x))
-            var=spec.rhs
-            varenv=getvarenv(var)
-            spec_var_bcast.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
-            use("nnt_types_module")
+          [
+            :access,
+            :action,
+            :blank,
+            :delim,
+            :direct,
+            :exist,
+            :form,
+            :formatted,
+            :iostat,
+            :name,
+            :named,
+            :nextrec,
+            :number,
+            :opened,
+            :pad,
+            :position,
+            :read,
+            :readwrite,
+            :recl,
+            :sequential,
+            :size,
+            :unformatted,
+            :write
+          ].each do |x|
+            if (spec=self.send(x))
+              var=spec.rhs
+              varenv=getvarenv(var)
+              spec_var_bcast.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
+              use("nnt_types_module")
+            end
           end
-        end
 
+        end
+          
         # Code Generation and Placement
 
         code=[]
@@ -884,30 +904,7 @@ module Fortran
 
   end
 
-  class Print_Stmt < T
-
-    def translate
-      unless self.env[:sms_ignore] or self.env[:sms_serial]
-        declare("logical","iam_root")
-        label=self.label_delete unless (label=self.label).empty?
-        code=[]
-# HACK start
-        code.push("!sms$ignore begin")
-# HACK end
-        code.push("#{sa(label)} if (iam_root()) then")
-        code.push("#{self}".chomp)
-        code.push("endif")
-# HACK start
-        code.push("!sms$ignore end")
-# HACK end
-        code=code.join("\n")
-# HACK start
-# Get rid of sms$ignore bracketing when legacy ppp is gone
-        replace_statement(code,:sms_ignore_executable)
-# HACK end
-      end
-    end
-
+  class Print_Stmt < IO_Stmt
   end
 
   class SMS < E

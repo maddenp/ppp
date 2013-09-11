@@ -2850,7 +2850,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtC,input, i0...index, s0)
+      r0 = instantiate_node(Assignment_Stmt,input, i0...index, s0)
       r0.extend(AssignmentStmt0)
     else
       @index = i0

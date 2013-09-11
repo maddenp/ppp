@@ -316,7 +316,7 @@ grammar Fortran
   rule assignment_stmt
     # F90:R735
 
-    label:label? variable t_equal expr t_newline <StmtC>
+    label:label? variable t_equal expr t_newline <Assignment_Stmt>
   end
 
   rule assumed_shape_spec

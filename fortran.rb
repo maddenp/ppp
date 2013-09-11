@@ -1291,6 +1291,9 @@ module Fortran
 
   end
 
+  class Assignment_Stmt < StmtC
+  end
+
   class Assumed_Shape_Spec < T
 
     def abstract_bounds
@@ -2942,7 +2945,11 @@ module Fortran
   class Power_Op_Option < E
   end
 
-  class Print_Stmt < T
+  class Print_Stmt < IO_Stmt
+
+    def output_items
+      (e[3].is_a?(Print_Stmt_Output_Item_List))?(e[3].items):([])
+    end
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}")
@@ -2950,9 +2957,17 @@ module Fortran
 
   end
 
-  class Print_Stmt_Output_Item_List < T
+  class Print_Stmt_Output_Item_List < E
 
-		def to_s
+    def items
+      output_item_list.items
+    end
+
+    def output_item_list
+      e[1]
+    end
+
+    def to_s
 			"#{e[0]}#{e[1]}"
 		end
 
