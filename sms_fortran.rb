@@ -372,21 +372,43 @@ module Fortran
 # class Array_Section < E
 #
 #   def translate
+#
+#     def getlb(var,dim,cb=nil)
+#       varenv=env[var]
+#       if (decdim=varenv["dim#{dim}"])
+#         dh=varenv["decomp"]
+#         if cb
+#           lb=""
+#         else
+#           lb="#{dh}__s1(#{dh}__lowbounds(#{decdim},#{dh}__nestlevel),0,#{dh}__nestlevel)"
+#         end
+#       else
+#         lb="lbound(#{var},#{i})"
+#       end
+#     end
+#
 #     if inside?(Execution_Part) and not inside?(SMS)
 #       var="#{name}"
 #       if (varenv=self.env[var])
 #         if (dh=varenv["decomp"])
 #           puts "### decomposed array #{self}"
-#           if subscript_list.empty?
-#             # deal with full array
-#           else
-#             self.subscript_list.each do |x|
-#               puts "    #{x}"
-#               puts "    class #{x.class}"
-#               puts "    subscript [#{x.subscript}]"
-#               puts "    lower     [#{x.lower}]"
-#               puts "    upper     [#{x.upper}]"
-#               puts "    stride    [#{x.stride}]"
+#           dims=varenv["dims"]
+#           sl=subscript_list
+#           bounds=[]
+#           (1..dims).each do |i|
+#             puts "### #{i}"
+#             if subscript_list.empty?
+#               puts "### no subscript info"
+#               lo=
+#             else
+#               self.subscript_list.each do |x|
+#                 puts "    #{x}"
+#                 puts "    class #{x.class}"
+#                 puts "    subscript [#{x.subscript}]"
+#                 puts "    lower     [#{x.lower}]"
+#                 puts "    upper     [#{x.upper}]"
+#                 puts "    stride    [#{x.stride}]"
+#               end
 #             end
 #           end
 #         end
