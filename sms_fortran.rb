@@ -386,45 +386,62 @@ module Fortran
 #         end
 #         bound="#{a1}(#{a2},0,#{nl})"
 #       else
-#         bound="#{lu}bound(#{var},#{dim})"
+#         bound="" # "#{lu}bound(#{var},#{dim})"
 #       end
 #       bound
 #     end
 #
-#     if inside?(Assignment_Stmt) and not inside?(Call_Stmt,Function_Reference,SMS)
+#     if inside?(Assignment_Stmt) and not inside?(Function_Reference,SMS)
 #       var="#{name}"
 #       fail "'#{var}' not found in environment" unless (varenv=self.env[var])
 #       return unless (dh=varenv["decomp"])
 #       bounds=[]
 #       dims=varenv["dims"]
-#       if (dh=varenv["decomp"])
-#         puts "### decomposed array #{self}"
-#         sl=subscript_list
+#       puts "### decomposed array #{self}"
+#       if subscript_list.empty?
+#         puts "### no subscript info"
+#         lo=getbound(var,dim,:l)
+#         hi=getbound(var,dim,:u)
+#         puts "### #{dim} lo #{lo}"
+#         puts "### #{dim} hi #{hi}"
+#         boundslist="#{lo}:#{hi}"
+#       else
 #         (1..dims).each do |dim|
-#           if sl.empty?
-#             puts "### no subscript info"
-#             lo=getbound(var,dim,:l)
-#             hi=getbound(var,dim,:u)
-#             puts "### #{dim} lo: #{lo}"
-#             puts "### #{dim} hi: #{hi}"
-#             bounds[dim]=[lo,hi]
-#           else
-#             sl.each do |x|
-##               puts "    #{x}"
-##               puts "    class #{x.class}"
-##               puts "    subscript [#{x.subscript}]"
-##               puts "    lower     [#{x.lower}]"
-##               puts "    upper     [#{x.upper}]"
-##               puts "    stride    [#{x.stride}]"
+#           s=subscript_list[dim-1]
+#           puts "    #{s}"
+#           puts "    class #{s.class}"
+#           if s.is_a?(Subscript)
+#             puts "### Subscript"
+#             puts "    subscript [#{s.subscript}]"
+#             if varenv["dim#{dim}"]
+#               fail "Single-element subscript not supported for distributed arrays"
 #             end
+#             bounds[dim]="#{s.subscript}"
+#           elsif s.is_a?(Subscript_Triplet)
+#             puts "### Subscript_Triplet"
+#             puts "    lower     [#{s.lower}]"
+#             puts "    upper     [#{s.upper}]"
+#             puts "    stride    [#{s.stride}]"
+#             lo=(s.lower)?(getbound(var,dim,:l,s.lower)):(nil)
+#             hi=(s.upper)?(getbound(var,dim,:u,s.upper)):(nil)
+#             triplet="#{lo}:#{hi}"
+#             puts "### triplet #{triplet}"
+#             puts "### #{dim} lo #{lo}"
+#             puts "### #{dim} hi #{hi}"
+#             bounds[dim]="#{lo}:#{hi}"
+#           elsif s.is_a?(Vector_Subscript)
+#             fail "How did we get here? Please report!"
+#           else
+#             fail "Unexpected node: #{s.class}"
 #           end
+#           puts "### bounds #{dim} [#{bounds[dim]}]"
 #         end
+#         boundslist=(1..dims).map{ |dim| bounds[dim] }.join(",")
+#         puts "### boundslist #{boundslist}"
 #       end
-#       p bounds
-#       boundslist=(1..dims).map{ |dim| "#{bounds[dim][0]}:#{bounds[dim][1]}" }.join(",")
-#       code="#{var}(#{boundslist})"
-#       replace_element(code,:array_section)
 #     end
+##     code="#{var}(#{boundslist})"
+##     replace_element(code,:array_section)
 #   end
 #
 # end

@@ -3130,26 +3130,6 @@ module Fortran
 
   end
 
-  class Section_Subscript < E
-
-    def lower
-      (e[0].respond_to?(:lower))?(e[0].lower):(nil)
-    end
-
-    def stride
-      (e[0].respond_to?(:stride))?(e[0].stride):(nil)
-    end
-
-    def subscript
-      (e[0].respond_to?(:subscript))?(e[0].subscript):(nil)
-    end
-
-    def upper
-      (e[0].respond_to?(:upper))?(e[0].upper):(nil)
-    end
-
-  end
-
   class Section_Subscript_List < E
 
     def subscript_list
@@ -3226,20 +3206,8 @@ module Fortran
 
   class Subscript < E
 
-    def lower
-      nil
-    end
-
-    def stride
-      nil
-    end
-
     def subscript
-      e[0].subscript
-    end
-
-    def uppper
-      nil
+      e[0]
     end
 
   end
@@ -3252,10 +3220,6 @@ module Fortran
 
     def stride
       (e[3].is_a?(Subscript_Triplet_Stride_Option))?(e[3].stride):(1)
-    end
-
-    def subscript
-      nil
     end
 
     def upper
@@ -3400,20 +3364,8 @@ module Fortran
 
   class Vector_Subscript < E
 
-    def lower
-      nil
-    end
-
-    def stride
-      nil
-    end
-
     def subscript
       e[0]
-    end
-
-    def upper
-      nil
     end
 
   end

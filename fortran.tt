@@ -2976,10 +2976,15 @@ grammar Fortran
 
   rule section_subscript
     # F90:R618
+    #
+    # Note: The vector_subscript choice will probably never be selected without
+    # parsing improvements. Choices 'subscript' and 'vector_subscript' should be
+    # distinguished, per R617 and R621, by the status of the element as a scalar
+    # or an array, respectively. This information is not available here, now.
 
-    subscript_triplet "" <Section_Subscript> /
-    vector_subscript "" <Section_Subscript> /
-    subscript "" <Section_Subscript>
+    subscript_triplet /
+    subscript /
+    vector_subscript
   end
 
   rule section_subscript_list
