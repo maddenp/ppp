@@ -373,48 +373,57 @@ module Fortran
 #
 #   def translate
 #
-#     def getlb(var,dim,cb=nil)
+#     def getbound(var,dim,lu,cb=nil)
 #       varenv=env[var]
 #       if (decdim=varenv["dim#{dim}"])
 #         dh=varenv["decomp"]
+#         nl="#{dh}__nestlevel"
+#         a1="#{dh}__#{(lu==:l)?('s'):('e')}1"
 #         if cb
-#           lb=""
+#           a2="#{cb}"
 #         else
-#           lb="#{dh}__s1(#{dh}__lowbounds(#{decdim},#{dh}__nestlevel),0,#{dh}__nestlevel)"
+#           a2="#{dh}__#{(lu==:l)?('low'):('upper')}bounds(#{decdim},#{nl})"
 #         end
+#         bound="#{a1}(#{a2},0,#{nl})"
 #       else
-#         lb="lbound(#{var},#{i})"
+#         bound="#{lu}bound(#{var},#{dim})"
 #       end
+#       bound
 #     end
 #
 #     if inside?(Execution_Part) and not inside?(SMS)
 #       var="#{name}"
-#       if (varenv=self.env[var])
-#         if (dh=varenv["decomp"])
-#           puts "### decomposed array #{self}"
-#           dims=varenv["dims"]
-#           sl=subscript_list
-#           bounds=[]
-#           (1..dims).each do |i|
-#             puts "### #{i}"
-#             if subscript_list.empty?
-#               puts "### no subscript info"
-#               lo=
-#             else
-#               self.subscript_list.each do |x|
-#                 puts "    #{x}"
-#                 puts "    class #{x.class}"
-#                 puts "    subscript [#{x.subscript}]"
-#                 puts "    lower     [#{x.lower}]"
-#                 puts "    upper     [#{x.upper}]"
-#                 puts "    stride    [#{x.stride}]"
-#               end
+#       fail "'#{var}' not found in environment" unless (varenv=self.env[var])
+#       return unless (dh=varenv["decomp"])
+#       bounds=[]
+#       dims=varenv["dims"]
+#       if (dh=varenv["decomp"])
+#         puts "### decomposed array #{self}"
+#         sl=subscript_list
+#         (1..dims).each do |dim|
+#           if sl.empty?
+#             puts "### no subscript info"
+#             lo=getbound(var,dim,:l)
+#             hi=getbound(var,dim,:u)
+#             puts "### #{dim} lo: #{lo}"
+#             puts "### #{dim} hi: #{hi}"
+#             bounds[dim]=[lo,hi]
+#           else
+#             sl.each do |x|
+##               puts "    #{x}"
+##               puts "    class #{x.class}"
+##               puts "    subscript [#{x.subscript}]"
+##               puts "    lower     [#{x.lower}]"
+##               puts "    upper     [#{x.upper}]"
+##               puts "    stride    [#{x.stride}]"
 #             end
 #           end
 #         end
-#       else
-#         fail "'#{var}' not found in environment"
 #       end
+#       p bounds
+#       boundslist=bounds.each { |x| "#{x[0]}:#{x[1]}" }.join(",")
+#       code="#{var}(#{boundslist})"
+#       puts "### code: #{code}"
 #     end
 #   end
 #
