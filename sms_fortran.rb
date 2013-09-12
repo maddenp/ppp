@@ -369,82 +369,57 @@ module Fortran
 
 # HACK end
 
-# class Array_Section < E
-#
-#   def translate
-#
-#     def getbound(var,dim,lu,cb=nil)
-#       varenv=env[var]
-#       if (decdim=varenv["dim#{dim}"])
-#         dh=varenv["decomp"]
-#         nl="#{dh}__nestlevel"
-#         a1="#{dh}__#{(lu==:l)?('s'):('e')}1"
-#         if cb
-#           a2="#{cb}"
-#         else
-#           a2="#{dh}__#{(lu==:l)?('low'):('upper')}bounds(#{decdim},#{nl})"
-#         end
-#         bound="#{a1}(#{a2},0,#{nl})"
-#       else
-#         bound="" # "#{lu}bound(#{var},#{dim})"
-#       end
-#       bound
-#     end
-#
-#     if inside?(Assignment_Stmt) and not inside?(Function_Reference,SMS)
-#       var="#{name}"
-#       fail "'#{var}' not found in environment" unless (varenv=self.env[var])
-#       return unless (dh=varenv["decomp"])
-#       bounds=[]
-#       dims=varenv["dims"]
-#       puts "### decomposed array #{self}"
-#       if subscript_list.empty?
-#         puts "### no subscript info"
-#         lo=getbound(var,dim,:l)
-#         hi=getbound(var,dim,:u)
-#         puts "### #{dim} lo #{lo}"
-#         puts "### #{dim} hi #{hi}"
-#         boundslist="#{lo}:#{hi}"
-#       else
-#         (1..dims).each do |dim|
-#           s=subscript_list[dim-1]
-#           puts "    #{s}"
-#           puts "    class #{s.class}"
-#           if s.is_a?(Subscript)
-#             puts "### Subscript"
-#             puts "    subscript [#{s.subscript}]"
-#             if varenv["dim#{dim}"]
-#               fail "Single-element subscript not supported for distributed arrays"
-#             end
-#             bounds[dim]="#{s.subscript}"
-#           elsif s.is_a?(Subscript_Triplet)
-#             puts "### Subscript_Triplet"
-#             puts "    lower     [#{s.lower}]"
-#             puts "    upper     [#{s.upper}]"
-#             puts "    stride    [#{s.stride}]"
-#             lo=(s.lower)?(getbound(var,dim,:l,s.lower)):(nil)
-#             hi=(s.upper)?(getbound(var,dim,:u,s.upper)):(nil)
-#             triplet="#{lo}:#{hi}"
-#             puts "### triplet #{triplet}"
-#             puts "### #{dim} lo #{lo}"
-#             puts "### #{dim} hi #{hi}"
-#             bounds[dim]="#{lo}:#{hi}"
-#           elsif s.is_a?(Vector_Subscript)
-#             fail "How did we get here? Please report!"
-#           else
-#             fail "Unexpected node: #{s.class}"
-#           end
-#           puts "### bounds #{dim} [#{bounds[dim]}]"
-#         end
-#         boundslist=(1..dims).map{ |dim| bounds[dim] }.join(",")
-#         puts "### boundslist #{boundslist}"
-#       end
-#     end
-##     code="#{var}(#{boundslist})"
-##     replace_element(code,:array_section)
-#   end
-#
-# end
+  class Array_Section < E
+
+    def translate
+
+      def getbound(var,dim,lu,cb=nil)
+        varenv=env[var]
+        return "#{cb}" unless (decdim=varenv["dim#{dim}"])
+        dh=varenv["decomp"]
+        nl="#{dh}__nestlevel"
+        a1="#{dh}__#{(lu==:l)?('s'):('e')}1" # why '1'? generalize?
+        a2="#{dh}__#{(lu==:l)?('low'):('upper')}bounds(#{decdim},#{nl})"
+        "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
+      end
+
+      if inside?(Assignment_Stmt) and not inside?(Function_Reference,SMS)
+        var="#{name}"
+        fail "'#{var}' not found in environment" unless (varenv=self.env[var])
+        return unless (dh=varenv["decomp"])
+        bounds=[]
+        (1..varenv["dims"]).each do |dim|
+          if (s=subscript_list[dim-1])
+            if s.is_a?(Subscript)
+              if varenv["dim#{dim}"]
+                msg=""
+                msg+="Distributed-array subscript may not be scalar: "
+                msg+="dimension #{dim } ('#{s}') of array '#{var}'"
+                fail msg
+              end
+              bounds[dim]="#{s.subscript}"
+            elsif s.is_a?(Subscript_Triplet)
+              lo=getbound(var,dim,:l,s.lower)
+              hi=getbound(var,dim,:u,s.upper)
+              triplet="#{lo}:#{hi}"
+              triplet+=":#{s.stride}" if s.stride
+              bounds[dim]="#{lo}:#{hi}"
+            elsif s.is_a?(Vector_Subscript)
+              fail "How did we get here? Please report!"
+            else
+              fail "Unexpected node: #{s.class}"
+            end
+          else
+            bounds[dim]=boundslist=getbound(var,dim,:l)+":"+getbound(var,dim,:u)
+          end
+        end
+        boundslist=(1..varenv["dims"]).map{ |dim| bounds[dim] }.join(",")
+        code="#{var}(#{boundslist})"
+        replace_element(code,:array_section)
+      end
+    end
+
+  end
 
   class Array_Name_And_Spec < E
 
