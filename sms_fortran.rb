@@ -369,6 +369,17 @@ module Fortran
 
 # HACK end
 
+  class Array_Name_And_Spec < E
+
+    def translate
+      var="#{e[0]}"
+      spec=e[2].spec
+      varenv=getvarenv(var)
+      distribute_array_bounds(spec,varenv)
+    end
+
+  end
+
   class Array_Section < E
 
     def translate
@@ -417,17 +428,6 @@ module Fortran
         code="#{var}(#{boundslist})"
         replace_element(code,:array_section)
       end
-    end
-
-  end
-
-  class Array_Name_And_Spec < E
-
-    def translate
-      var="#{e[0]}"
-      spec=e[2].spec
-      varenv=getvarenv(var)
-      distribute_array_bounds(spec,varenv)
     end
 
   end
