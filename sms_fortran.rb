@@ -386,31 +386,23 @@ module Fortran
       if inside?(Assignment_Stmt) and not inside?(Function_Reference,SMS)
         var="#{name}"
         fail "'#{var}' not found in environment" unless (varenv=self.env[var])
-        return unless (dh=varenv["decomp"])
+        return unless varenv["decomp"]
         bounds=[]
         (1..varenv["dims"]).each do |dim|
           if (s=subscript_list[dim-1])
             if s.is_a?(Subscript)
-              if varenv["dim#{dim}"]
-                msg=""
-                msg+="Distributed-array subscript may not be scalar: "
-                msg+="dimension #{dim } ('#{s}') of array '#{var}'"
-                fail msg
-              end
               bounds[dim]="#{s.subscript}"
             elsif s.is_a?(Subscript_Triplet)
-              lo=getbound(var,dim,:l,s.lower)
-              hi=getbound(var,dim,:u,s.upper)
-              triplet="#{lo}:#{hi}"
-              triplet+=":#{s.stride}" if s.stride
-              bounds[dim]="#{lo}:#{hi}"
+              b=getbound(var,dim,:l,s.lower)+":"+getbound(var,dim,:u,s.upper)
+              b+=":#{s.stride}" if s.stride and "#{s.stride}"!="1"
+              bounds[dim]=b
             elsif s.is_a?(Vector_Subscript)
               fail "How did we get here? Please report!"
             else
-              fail "Unexpected node: #{s.class}"
+              bounds[dim]="#{s}"
             end
           else
-            bounds[dim]=boundslist=getbound(var,dim,:l)+":"+getbound(var,dim,:u)
+            bounds[dim]=getbound(var,dim,:l)+":"+getbound(var,dim,:u)
           end
         end
         boundslist=(1..varenv["dims"]).map{ |dim| bounds[dim] }.join(",")
@@ -431,6 +423,20 @@ module Fortran
     end
 
   end
+
+# HACK begin
+# Prevent legacy ppp from re-processing assignment statements. Remove this one
+# legacy ppp is out of the loop.
+
+  class Assignment_Stmt < StmtC
+    def translate
+      code="!sms$ignore begin\n#{self}\n!sms$ignore end"
+      replace_statement(code,:sms_ignore_executable)
+    end
+
+  end
+
+# HACK end
 
   class Entity_Decl_1 < Entity_Decl
 
