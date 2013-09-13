@@ -2147,6 +2147,11 @@ module Fortran
   end
 
   class Function_Reference < E
+
+    def name
+      e[0]
+    end
+
   end
 
   class Function_Stmt < T

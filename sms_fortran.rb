@@ -212,6 +212,13 @@ module Fortran
       OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
     end
 
+    def intrinsic?(function_name)
+      unless defined?(@intrinsics)
+        @intrinsics=Set.new(File.open("intrinsics").read.split)
+      end
+      @intrinsics.include?("#{function_name}")
+    end
+
     def maxrank
       7
     end
@@ -383,7 +390,11 @@ module Fortran
         "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
       end
 
-      if inside?(Assignment_Stmt) and not inside?(Function_Reference,SMS)
+      if inside?(Assignment_Stmt,Function_Reference)
+        return if inside?(SMS_Ignore,SMS_Serial)
+        if (f=ancestor(Function_Reference))
+          return unless intrinsic?(f.name)
+        end
         var="#{name}"
         fail "'#{var}' not found in environment" unless (varenv=self.env[var])
         return unless varenv["decomp"]
