@@ -392,7 +392,7 @@ module Fortran
       end
 
       if inside?(Assignment_Stmt)
-        return if inside?(SMS)
+        return if inside?(SMS_Ignore,SMS_Serial)
         if (f=ancestor(Function_Reference))
           return unless intrinsic?(f.name)
         end
