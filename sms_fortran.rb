@@ -214,7 +214,8 @@ module Fortran
 
     def intrinsic?(function_name)
       unless defined?(@intrinsics)
-        @intrinsics=Set.new(File.open("intrinsics").read.split)
+        f=File.join(File.dirname(File.expand_path($0)),"intrinsics")
+        @intrinsics=Set.new(File.open(f).read.split)
       end
       @intrinsics.include?("#{function_name}")
     end
@@ -390,8 +391,8 @@ module Fortran
         "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
       end
 
-      if inside?(Assignment_Stmt,Function_Reference)
-        return if inside?(SMS_Ignore,SMS_Serial)
+      if inside?(Assignment_Stmt)
+        return if inside?(SMS)
         if (f=ancestor(Function_Reference))
           return unless intrinsic?(f.name)
         end
