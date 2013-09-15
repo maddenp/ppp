@@ -279,3 +279,8 @@
 
 - What about e.g. 'a(1:5)=0' when 'a' is distributed and elements 1:4 are only
   present on one task?
+
+- In grammar class methods that return an optional element (execution_part() of
+  Main_Program e.g.) check *there* for expected class vs SyntaxNode and return
+  nil for the latter (i.e. the optional element is not present). This factors
+  the knowledge about the grammar into the appropriate class.

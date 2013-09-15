@@ -617,7 +617,7 @@ module Fortran
     end
 
     def specification_part
-      scoping_unit.e[1]
+      ((self.is_a?(Scoping_Unit))?(self):(scoping_unit)).e[1]
     end
 
     def stmt(s)
@@ -2631,6 +2631,11 @@ module Fortran
   end
 
   class Main_Program < Scoping_Unit
+
+    def execution_part
+      (e[2].is_a?(Execution_Part))?(e[2]):(nil)
+    end
+
   end
 
   class Module < Scoping_Unit

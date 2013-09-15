@@ -836,6 +836,21 @@ module Fortran
 
   end
 
+  class Main_Program < Scoping_Unit
+
+    def translate
+      use("nnt_types_module")
+      if (ep=execution_part)
+        block=ep.e
+        code="call sms_start(ppp__status)"
+        insert_statement_before(code,:call_stmt,block.first)
+        code="call nnt_stop('#{sa(File.basename(self.input.srcfile))}codepoint #{self.codepoint}',0,ppp_exit)"
+        insert_statement_after(code,:call_stmt,block.last)
+      end
+    end
+
+  end
+
   class Name < T
 
     def self.global(name)
