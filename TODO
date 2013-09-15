@@ -1,9 +1,3 @@
-- Translate read_stmt.
-
-- Translate inquire_stmt.
-
-- Gather/Scatter namelist variables in read/write statements.
-
 - Reformulate distribute begin/end as distribute region, translate.
 
 - Translate (remove) sms$ignore begin/end (legacy ppp must be gone)
