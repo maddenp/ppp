@@ -1,3 +1,5 @@
+- Get rid of Excecution_Part#tranlate hack.
+
 - Translate (remove) sms$ignore begin/end (legacy ppp must be gone)
 
 - Remove recognition of sms$ignore in inappropriate regions
