@@ -13596,7 +13596,7 @@ module Fortran
         break
       end
     end
-    r0 = instantiate_node(E,input, i0...index, s0)
+    r0 = instantiate_node(Execution_Part_Construct,input, i0...index, s0)
 
     node_cache[:execution_part_construct][start_index] = r0
 

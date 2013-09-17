@@ -1533,6 +1533,11 @@ module Fortran
     end
 
     def translate
+      # Get old block. Note that 'begin' and 'end' nodes have already been
+      # removed, so the only element remaining is the block. If the serial
+      # region is empty, we can simply return.
+      oldblock=e[0]
+      return if oldblock.e.empty?
       use("module_decomp")
 # HACK start
 # Uncomment this when legacy ppp is gone, and remove Executable_Part#translate.
@@ -1606,9 +1611,7 @@ module Fortran
         node.globalize if node.is_a?(Name) and to_globalize.include?("#{node}")
       end
       globalize(e[0],gathers+scatters)
-      # Wrap old block in conditional. Note that 'begin' and 'end' nodes have
-      # already been removed, so the only element remaining is the block.
-      oldblock=e[0]
+      # Wrap old block in conditional.
       code=[]
 # HACK start
       code.push("!sms$ignore begin")

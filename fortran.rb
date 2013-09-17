@@ -2051,6 +2051,9 @@ module Fortran
   class Execution_Part < E
   end
 
+  class Execution_Part_Construct < E
+  end
+
   class Explicit_Shape_Spec < T
 
     def abstract_bounds

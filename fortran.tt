@@ -1415,7 +1415,7 @@ grammar Fortran
   rule execution_part_construct
     # F90:R209
 
-    execution_part_construct_item* <E>
+    execution_part_construct_item* <Execution_Part_Construct>
   end
 
   rule execution_part_construct_item
