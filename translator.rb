@@ -180,9 +180,9 @@ class Translator
       d=Dehollerizer.new
       s=d.process(@m,s,conf)            # mask holleriths (only if not already done in fixed2free)
     end
-    s=s.gsub(directive,'@\1')           # hide directives
     s=s.gsub(/\t/," ")                  # tabs to spaces
     s=s.gsub(/^ +/,"")                  # remove leading whitespace
+    s=s.gsub(directive,'@\1')           # hide directives
     s=s.gsub(/ +$/,"")                  # remove trailing whitespace
     s=s.gsub(/^ *!.*$\n/,"")            # remove full-line comments
     s=s.gsub(/^[ \t]*\n/,'')            # remove blank lines (continuation statement issue fix)
