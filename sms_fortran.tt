@@ -40,7 +40,7 @@ grammar Fortran
     subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
     function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E> /
     directive /
-    sms_ignore_subprogram &{ |e| sp_sms_ignore } <E>
+    sms_ignore_subprogram
   end
 
   rule implicit_part
@@ -61,7 +61,7 @@ grammar Fortran
     subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
     function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E> /
     directive /
-    sms_ignore_subprogram  &{ |e| sp_sms_ignore } <E>
+    sms_ignore_subprogram
   end
 
   rule label
@@ -76,7 +76,7 @@ grammar Fortran
     subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
     function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E> /
     directive /
-    sms_ignore_subprogram &{ |e| sp_sms_ignore } <E>
+    sms_ignore_subprogram
   end
 
   rule sms_barrier
@@ -106,7 +106,7 @@ grammar Fortran
   rule sms_declarative
     sms_declare_decomp /
     sms_distribute /
-    sms_ignore_declarative &{ |e| sp_sms_ignore } <E>
+    sms_ignore_declarative
   end
 
   rule sms_declare_decomp
@@ -179,7 +179,7 @@ grammar Fortran
   end
 
   rule sms_ignore_declarative
-    sms_ignore_begin declaration_constructs sms_ignore_end <SMS_Ignore>
+    sms_ignore_begin declaration_constructs sms_ignore_end &{ |e| sp_sms_ignore } <SMS_Ignore>
   end
 
   rule sms_ignore_executable
@@ -187,11 +187,11 @@ grammar Fortran
   end
 
   rule sms_ignore_subprogram
-    sms_ignore_begin ( external_subprogram / internal_subprogram / module_subprogram ) sms_ignore_end <SMS_Ignore>
+    sms_ignore_begin ( external_subprogram / internal_subprogram / module_subprogram ) sms_ignore_end &{ |e| sp_sms_ignore } <SMS_Ignore>
   end
 
   rule sms_ignore_use
-    sms_ignore_begin use_part sms_ignore_end <SMS_Ignore>
+    sms_ignore_begin use_part sms_ignore_end &{ |e| sp_sms_ignore } <SMS_Ignore>
   end
 
   rule sms_ignore_begin
@@ -451,7 +451,7 @@ grammar Fortran
   end
 
   rule use_part
-    ( use_stmt / directive / sms_ignore_use &{ |e| sp_sms_ignore } <E> )* <Use_Part>
+    ( use_stmt / directive / sms_ignore_use )* <Use_Part>
   end
 
 end

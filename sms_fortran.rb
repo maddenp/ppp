@@ -168,6 +168,7 @@ module Fortran
       return unless spec # why would spec be nil?
       return unless dh=varenv["decomp"]
       return unless [Assumed_Shape_Spec_List,Explicit_Shape_Spec_List].include?(spec.class)
+      use("module_decomp")
       newbounds=[]
       if spec.is_a?(Explicit_Shape_Spec_List)
         cb=spec.concrete_boundslist
@@ -325,6 +326,7 @@ module Fortran
 
           varenv=getvarenv(var,self,false)
           if varenv and (dh=varenv["decomp"])
+            use("module_decomp")
             subscript_list=part_ref.subscript_list
             newdims=[]
             subscript_list.each_index do |i|
@@ -2101,6 +2103,7 @@ module Fortran
 
     def translate
       unless self.env[:sms_ignore] or self.env[:sms_serial]
+        use("module_decomp")
         declare("logical","iam_root")
         label=self.label_delete unless (label=self.label).empty?
         code=[]
