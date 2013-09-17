@@ -548,18 +548,16 @@ module Fortran
 
       unless self.env[:sms_ignore] or self.env[:sms_serial]
 
-        declare("logical","iam_root")
-
         code_alloc=[]
         code_bcast=[]
         code_dealloc=[]
         code_gather=[]
         code_scatter=[]
+        onroot=true
         spec_var_bcast=[]
         spec_var_false=[]
         spec_var_goto=[]
         spec_var_true=[]
-        split=true
         success_label=nil
         var_bcast=[]
         var_gather=[]
@@ -568,9 +566,9 @@ module Fortran
         # Read_Stmt
 
         if self.is_a?(Read_Stmt)
-          split=false if self.unit.is_a?(Internal_File_Unit)
+          onroot=false if self.unit.is_a?(Internal_File_Unit)
           if (nml=self.nml)
-            split=true
+            onroot=true
             nmlenv=getvarenv(nml,self,expected=true)
             nmlenv["objects"].each do |x|
               var="#{x}"
@@ -588,11 +586,11 @@ module Fortran
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=true))
               if (dh=varenv["decomp"])
-                split=true
+                onroot=true
                 var_scatter.push(var)
                 self.replace_input_item(x,Name.global(var))
               else
-                var_bcast.push(var) if split
+                var_bcast.push(var) if onroot
               end
             end
           end
@@ -605,7 +603,7 @@ module Fortran
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=false))
               if (dh=varenv["decomp"])
-                split=true
+                onroot=true
                 global=Name.global(var)
                 var_gather.push(var)
                 self.replace_output_item(x,global)
@@ -618,9 +616,9 @@ module Fortran
 
         if self.is_a?(Write_Stmt)
           function=(env["#{unit}"] and env["#{unit}"]["function"])
-          split=false if self.unit.is_a?(Internal_File_Unit) or function
+          onroot=false if self.unit.is_a?(Internal_File_Unit) or function
           if (nml=self.nml)
-            split=true
+            onroot=true
             nmlenv=getvarenv(nml,self,expected=true)
             nmlenv["objects"].each do |x|
               var="#{x}"
@@ -635,7 +633,7 @@ module Fortran
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=false))
               if (dh=varenv["decomp"])
-                split=true
+                onroot=true
                 global=Name.global(var)
                 var_gather.push(var)
                 self.replace_output_item(x,global)
@@ -643,6 +641,8 @@ module Fortran
             end
           end
         end
+
+        declare("logical","iam_root") if onroot
 
         # Allocation & deallocation of globals
 
@@ -821,7 +821,7 @@ module Fortran
 # HACK end
         code.concat(code_alloc)
         code.concat(code_gather)
-        if split
+        if onroot
           my_label=(self.label.empty?)?(nil):(self.label)
           my_label=self.label_delete if my_label
           code.push("#{sa(my_label)}if (iam_root()) then")
@@ -830,7 +830,7 @@ module Fortran
         code.push("#{self}".chomp)
         code.push("goto #{success_label}") if success_label
         code.concat(spec_var_true)
-        code.push("#{sa(success_label)}endif") if split
+        code.push("#{sa(success_label)}endif") if onroot
         code.concat(spec_var_bcast)
         code.concat(spec_var_goto)
         code.concat(code_scatter)
