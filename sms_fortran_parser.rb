@@ -1126,41 +1126,36 @@ module Fortran
     if r1
       r0 = r1
     else
-      r2 = _nt_sms_distribute_begin
+      r2 = _nt_sms_distribute
       if r2
         r0 = r2
       else
-        r3 = _nt_sms_distribute_end
+        i3, s3 = index, []
+        r4 = _nt_sms_ignore_declarative
+        s3 << r4
+        if r4
+          i5 = index
+          r6 = lambda { |e| sp_sms_ignore }.call(s3)
+          if r6
+            @index = i5
+            r5 = instantiate_node(SyntaxNode,input, index...index)
+          else
+            r5 = nil
+          end
+          s3 << r5
+        end
+        if s3.last
+          r3 = instantiate_node(E,input, i3...index, s3)
+          r3.extend(SmsDeclarative0)
+        else
+          @index = i3
+          r3 = nil
+        end
         if r3
           r0 = r3
         else
-          i4, s4 = index, []
-          r5 = _nt_sms_ignore_declarative
-          s4 << r5
-          if r5
-            i6 = index
-            r7 = lambda { |e| sp_sms_ignore }.call(s4)
-            if r7
-              @index = i6
-              r6 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r6 = nil
-            end
-            s4 << r6
-          end
-          if s4.last
-            r4 = instantiate_node(E,input, i4...index, s4)
-            r4.extend(SmsDeclarative0)
-          else
-            @index = i4
-            r4 = nil
-          end
-          if r4
-            r0 = r4
-          else
-            @index = i0
-            r0 = nil
-          end
+          @index = i0
+          r0 = nil
         end
       end
     end
@@ -1315,6 +1310,55 @@ module Fortran
     end
 
     node_cache[:sms_decomp_name][start_index] = r0
+
+    r0
+  end
+
+  module SmsDistribute0
+    def sms_distribute_begin
+      elements[0]
+    end
+
+    def declaration_constructs
+      elements[1]
+    end
+
+    def sms_distribute_end
+      elements[2]
+    end
+  end
+
+  def _nt_sms_distribute
+    start_index = index
+    if node_cache[:sms_distribute].has_key?(index)
+      cached = node_cache[:sms_distribute][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_distribute_begin
+    s0 << r1
+    if r1
+      r2 = _nt_declaration_constructs
+      s0 << r2
+      if r2
+        r3 = _nt_sms_distribute_end
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Distribute,input, i0...index, s0)
+      r0.extend(SmsDistribute0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_distribute][start_index] = r0
 
     r0
   end

@@ -3092,6 +3092,13 @@ module Fortran
   end
 
   module AttrSpec1
+    def t_allocatable
+      elements[0]
+    end
+
+  end
+
+  module AttrSpec2
     def t_dimension
       elements[0]
     end
@@ -3109,7 +3116,7 @@ module Fortran
     end
   end
 
-  module AttrSpec2
+  module AttrSpec3
     def t_intent
       elements[0]
     end
@@ -3166,83 +3173,102 @@ module Fortran
       if r4
         r0 = r4
       else
-        r5 = _nt_t_allocatable
+        i5, s5 = index, []
+        r6 = _nt_t_allocatable
+        s5 << r6
+        if r6
+          if has_terminal?("", false, index)
+            r7 = instantiate_node(SyntaxNode,input, index...(index + 0))
+            @index += 0
+          else
+            terminal_parse_failure("")
+            r7 = nil
+          end
+          s5 << r7
+        end
+        if s5.last
+          r5 = instantiate_node(Attr_Spec_Allocatable,input, i5...index, s5)
+          r5.extend(AttrSpec1)
+        else
+          @index = i5
+          r5 = nil
+        end
         if r5
           r0 = r5
         else
-          i6, s6 = index, []
-          r7 = _nt_t_dimension
-          s6 << r7
-          if r7
-            r8 = _nt_t_paren_l
-            s6 << r8
-            if r8
-              r9 = _nt_array_spec
-              s6 << r9
-              if r9
-                r10 = _nt_t_paren_r
-                s6 << r10
+          i8, s8 = index, []
+          r9 = _nt_t_dimension
+          s8 << r9
+          if r9
+            r10 = _nt_t_paren_l
+            s8 << r10
+            if r10
+              r11 = _nt_array_spec
+              s8 << r11
+              if r11
+                r12 = _nt_t_paren_r
+                s8 << r12
               end
             end
           end
-          if s6.last
-            r6 = instantiate_node(Attr_Spec_Dimension,input, i6...index, s6)
-            r6.extend(AttrSpec1)
+          if s8.last
+            r8 = instantiate_node(Attr_Spec_Dimension,input, i8...index, s8)
+            r8.extend(AttrSpec2)
           else
-            @index = i6
-            r6 = nil
+            @index = i8
+            r8 = nil
           end
-          if r6
-            r0 = r6
+          if r8
+            r0 = r8
           else
-            r11 = _nt_t_external
-            if r11
-              r0 = r11
+            r13 = _nt_t_external
+            if r13
+              r0 = r13
             else
-              i12, s12 = index, []
-              r13 = _nt_t_intent
-              s12 << r13
-              if r13
-                r14 = _nt_t_paren_l
-                s12 << r14
-                if r14
-                  r15 = _nt_intent_spec
-                  s12 << r15
-                  if r15
-                    r16 = _nt_t_paren_r
-                    s12 << r16
+              i14, s14 = index, []
+              r15 = _nt_t_intent
+              s14 << r15
+              if r15
+                r16 = _nt_t_paren_l
+                s14 << r16
+                if r16
+                  r17 = _nt_intent_spec
+                  s14 << r17
+                  if r17
+                    r18 = _nt_t_paren_r
+                    s14 << r18
                   end
                 end
               end
-              if s12.last
-                r12 = instantiate_node(T,input, i12...index, s12)
-                r12.extend(AttrSpec2)
+              if s14.last
+                r14 = instantiate_node(T,input, i14...index, s14)
+                r14.extend(AttrSpec3)
               else
-                @index = i12
-                r12 = nil
+                @index = i14
+                r14 = nil
               end
-              if r12
-                r0 = r12
+              if r14
+                r0 = r14
               else
-                r17 = _nt_t_intrinsic
-                if r17
-                  r0 = r17
+                r19 = _nt_t_intrinsic
+                if r19
+                  r0 = r19
                 else
-                  r18 = _nt_t_optional
-                  if r18
-                    r0 = r18
+                  r20 = _nt_t_optional
+                  if r20
+                    r0 = r20
                   else
-                    r19 = _nt_t_pointer
-                    if r19
-                      r0 = r19
+                    r21 = _nt_t_pointer
+                    if r21
+                      r0 = r21
                     else
-                      r20 = _nt_t_save
-                      if r20
-                        r0 = r20
+                      r22 = _nt_t_save
+                      if r22
+                        r0 = r22
                       else
-                        r21 = _nt_t_target
-                        if r21
-                          r0 = r21
+                        r23 = _nt_t_target
+                        if r23
+                          r0 = r23
                         else
                           @index = i0
                           r0 = nil

@@ -301,6 +301,9 @@ module Fortran
         array_props(array_spec,p,@distribute)
       end
     end
+    if attrchk(attr_spec_option,:allocatable?)
+      varprops.each { |v,p| p["allocatable"]="_true" }
+    end
     if attrchk(attr_spec_option,:parameter?)
       varprops.each { |v,p| p["parameter"]="_true" }
     end
@@ -318,6 +321,7 @@ module Fortran
       p["kind"]=type_spec.kind
       if env[:allocatable] and env[:allocatable].include?(v)
         p.keys.each { |k| p[k]="_deferred" if k=~/[lu]b\d+/ }
+        p["allocatable"]="_true"
       end
       varenv.merge!(p)
     end
@@ -452,10 +456,6 @@ module Fortran
         return n if classes.any? { |x| n.is_a?(x) }
       end while n=n.parent
       nil
-    end
-
-    def attrany(attr,e=nil)
-      (e||self.e).reduce(false) { |m,x| m||=attrchk(x,attr) }
     end
 
     def declaration_constructs
@@ -1383,7 +1383,23 @@ module Fortran
 
   end
 
+  class Attr_Spec_Allocatable < E
+
+    def allocatable?
+      true
+    end
+
+  end
+
   class Attr_Spec_Base < E
+
+    def allocatable?
+      attrany(:allocatable?)
+    end
+
+    def attrany(attr,e=nil)
+      (e||self.e).reduce(false) { |m,x| m||=attrchk(x,attr) }
+    end
 
     def dimension?
       attrany(:dimension?)
@@ -1419,6 +1435,10 @@ module Fortran
 
   class Attr_Spec_List_Pairs < Attr_Spec_Base
 
+    def allocatable?
+      (e[0])?(attrany(:allocatable?,e[0].e)):(false)
+    end
+
     def dimension?
       (e[0])?(attrany(:dimension?,e[0].e)):(false)
     end
@@ -1438,6 +1458,10 @@ module Fortran
   end
 
   class Attr_Spec_Option < Attr_Spec_Base
+
+    def allocatable?
+      e[1].allocatable?
+    end
 
     def dimension?
       e[1].dimension?
@@ -1981,7 +2005,7 @@ module Fortran
 
   end
 
-  class Entity_Decl_List_Pair < T
+  class Entity_Decl_List_Pair < E
 
     def array?
       e[1].array?
@@ -1997,7 +2021,7 @@ module Fortran
 
   end
 
-  class Entity_Decl_List_Pairs < T
+  class Entity_Decl_List_Pairs < E
 
     def props(distribute)
       e.reduce({}) { |m,x| m.merge(x.props(distribute)) }

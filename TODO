@@ -284,3 +284,5 @@
   Main_Program e.g.) check *there* for expected class vs SyntaxNode and return
   nil for the latter (i.e. the optional element is not present). This factors
   the knowledge about the grammar into the appropriate class.
+
+- Refactor distribute_array_bounds() in sms_fortran.rb.

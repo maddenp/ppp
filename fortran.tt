@@ -348,7 +348,7 @@ grammar Fortran
 
     t_parameter "" <Attr_Spec_Parameter> /
     access_spec /
-    t_allocatable /
+    t_allocatable "" <Attr_Spec_Allocatable> /
     t_dimension t_paren_l array_spec t_paren_r <Attr_Spec_Dimension> /
     t_external /
     t_intent t_paren_l intent_spec t_paren_r <T> /

@@ -3,6 +3,11 @@ require "set"
 module Fortran
 
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
+
+    # Do not push an environment here. The declarations that appear inside an
+    # sms$distribute region belong to the environment belonging to the enclosing
+    # scoping unit.
+
     fail "Already inside distribute region" if @distribute
     @distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
     sms_distribute_dims.dims.each { |x| @distribute["dim"].push(x) }
@@ -10,6 +15,10 @@ module Fortran
   end
 
   def sp_sms_distribute_end
+
+    # Do not pop the environment stack here, because the matching 'begin' does
+    # not push one.
+
     fail "Not inside distribute region" unless @distribute
     @distribute=nil
     true
@@ -156,33 +165,36 @@ module Fortran
     end
 
     def distribute_array_bounds(spec,varenv)
-      if (dh=varenv["decomp"])
-        if spec and spec.is_a?(Explicit_Shape_Spec_List)
-          cb=spec.concrete_boundslist
-          newbounds=[]
-          cb.each_index do |i|
-            b=cb[i]
-            arrdim=i+1
-            if (decdim=varenv["dim#{arrdim}"])
-              s="#{dh}__local_lb(#{decdim},#{dh}__nestlevel):"+
-                "#{dh}__local_ub(#{decdim},#{dh}__nestlevel)"
-            else
-              s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
-            end
-            newbounds.push(s)
+      return unless spec # why would spec be nil?
+      return unless dh=varenv["decomp"]
+      return unless [Assumed_Shape_Spec_List,Explicit_Shape_Spec_List].include?(spec.class)
+      newbounds=[]
+      if spec.is_a?(Explicit_Shape_Spec_List)
+        cb=spec.concrete_boundslist
+        cb.each_index do |i|
+          b=cb[i]
+          arrdim=i+1
+          if (decdim=varenv["dim#{arrdim}"])
+            s="#{dh}__local_lb(#{decdim},#{dh}__nestlevel):"+
+              "#{dh}__local_ub(#{decdim},#{dh}__nestlevel)"
+          else
+            s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
           end
-          code=newbounds.join(",")
-
-# HACK start
-
-# Uncomment when legacy ppp doesn't neeed to translate distribute
-
-#         replace_element(code,:array_spec,spec)
-
-# HACK end
-
+          newbounds.push(s)
+        end
+      elsif spec.is_a?(Assumed_Shape_Spec_List)
+        (1..varenv["dims"].to_i).each do |i|
+          arrdim=i
+          if (decdim=varenv["dim#{arrdim}"]) and not varenv["allocatable"]
+            s="#{dh}__local_lb(#{decdim},#{dh}__nestlevel):"
+          else
+            s=":"
+          end
+          newbounds.push(s)
         end
       end
+      code=newbounds.join(",")
+      replace_element(code,:array_spec,spec)
     end
 
     def fixbound(varenv,var,dim,x)
@@ -1166,21 +1178,18 @@ module Fortran
   class SMS_Decomp_Name < SMS
   end
 
+  class SMS_Distribute < SMS_Region
+  end
+
   class SMS_Distribute_Begin < SMS
 
     def to_s
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
-# HACK start
-
-# Uncomment when legacy ppp doesn't neeed to translate distribute
-
-#   def translate
-#     remove
-#   end
-
-# HACK end
+    def translate
+      remove
+    end
 
   end
 
@@ -1190,15 +1199,9 @@ module Fortran
       sms("#{e[2]}")
     end
 
-# HACK start
-
-# Uncomment when legacy ppp doesn't neeed to translate distribute
-
-#   def translate
-#     remove
-#   end
-
-# HACK end
+    def translate
+      remove
+    end
 
   end
 
