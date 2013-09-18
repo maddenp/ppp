@@ -264,45 +264,6 @@ module Fortran
       fail "No NNT type defined for '#{type}#{kind}'"
     end
 
-# HACK start
-
-# This overrides T#use in fortran.rb to provide sms$ignore wraps for peaceful
-# coexistence with legacy ppp, for now. Remove this HACK when legacy ppp is
-# removed from build chain.
-
-    def use(modname,usenames=[])
-      unless uses?(modname,:all)
-        new_usenames=[]
-        code="use #{modname}"
-        unless usenames.empty?
-          list=[]
-          usenames.each do |x|
-           h=x.is_a?(Hash)
-            localname=(h)?(x.keys.first):(nil)
-            usename=(h)?(x.values.first):(x)
-            unless uses?(modname,usename)
-              list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
-              new_usenames.push([localname||usename,usename])
-            end
-          end
-          code+=((list.empty?)?(""):(",only:#{list.join(",")}"))
-        end
-        up=use_part
-        new_usenames=[[:all]] if new_usenames.empty?
-        new_uses={modname=>new_usenames}
-        old_uses=up.env[:uses]
-        up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
-  # sub HACK start
-        code=("!sms$ignore begin\n#{code}\n!sms$ignore end")
-        t=self.raw(code,:sms_ignore_use,@srcfile,{:env=>self.env})
-        t.parent=up
-        up.e.push(t)
-  # sub HACK end
-      end
-    end
-
-# HACK end
-
   end # class T
 
   class Allocate_Object < E
@@ -794,9 +755,6 @@ module Fortran
         # Code Generation and Placement
 
         code=[]
-# HACK start
-        code.push("!sms$ignore begin")
-# HACK end
         code.concat(code_alloc)
         code.concat(code_gather)
         if onroot
@@ -814,15 +772,8 @@ module Fortran
         code.concat(code_scatter)
         code.concat(code_bcast)
         code.concat(code_dealloc)
-# HACK start
-        code.push("!sms$ignore end")
-# HACK end
         code=code.join("\n")
-
-# HACK start
-# Get rid of sms$ignore bracketing when legacy ppp is gone
-        replace_statement(code,:sms_ignore_executable)
-# HACK end
+        replace_statement(code,:block)
       end
     end
 
@@ -2081,20 +2032,11 @@ module Fortran
         declare("logical","iam_root")
         label=self.label_delete unless (label=self.label).empty?
         code=[]
-# HACK start
-        code.push("!sms$ignore begin")
-# HACK end
         code.push("#{sa(label)} if (iam_root()) then")
         code.push("call nnt_stop('#{sa(File.basename(self.input.srcfile))}codepoint #{self.codepoint}',0,ppp_abort)")
         code.push("endif")
-# HACK start
-        code.push("!sms$ignore end")
-# HACK end
         code=code.join("\n")
-# HACK start
-# Get rid of sms$ignore bracketing when legacy ppp is gone
-        replace_statement(code,:sms_ignore_executable)
-# HACK end
+        replace_statement(code,:block)
       end
     end
 
