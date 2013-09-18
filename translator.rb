@@ -339,11 +339,6 @@ class Translator
 #           end
             a[n]=t
           end
-# HACK begin
-# We shouldn't need to left-justify directives when legacy ppp is gone
-        else
-          a[n]=e.sub(/^ */,"")
-# HACK end
         end
       end
       s=a.join("\n")
