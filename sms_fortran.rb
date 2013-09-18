@@ -450,20 +450,6 @@ module Fortran
 
   end
 
-# HACK begin
-# Prevent legacy ppp from re-processing assignment statements. Remove this one
-# legacy ppp is out of the loop.
-
-  class Assignment_Stmt < StmtC
-    def translate
-      code="!sms$ignore begin\n#{self}\n!sms$ignore end"
-      replace_statement(code,:sms_ignore_executable)
-    end
-
-  end
-
-# HACK end
-
   class Entity_Decl_1 < Entity_Decl
 
     def translate
@@ -488,14 +474,6 @@ module Fortran
     end
 
   end
-
-# HACK start
-  class Execution_Part
-    def translate
-      declare("logical","iam_root")
-    end
-  end
-# HACK end
 
   class If_Stmt < T
 
@@ -1024,7 +1002,7 @@ module Fortran
       stmts=[]
       stmts.push(["#{n}=1",:assignment_stmt])
       stmts.push(["#{d}__nregions=1",:assignment_stmt])
-      # See TODO about this multiple-loop HACK. Merge these loops when legacy ppp is gone...
+      # See TODO about merging these loops when legacy ppp is gone...
       # See TODO about this being essentially hardwired to work with FIM
       max.times do |i|
         dim=i+1
@@ -1539,14 +1517,7 @@ module Fortran
       oldblock=e[0]
       return if oldblock.e.empty?
       use("module_decomp")
-# HACK start
-# Uncomment this when legacy ppp is gone, and remove Executable_Part#translate.
-# For now, we need to declare iam_root everywhere in case legacy ppp needs it,
-# though in the working FIMsrc/fim/horizontal/Makefile, we're deleting any
-# definition legacy ppp makes, to avoid duplicate declarations (legacy ppp does
-# not check for an existing declaration).
-#     declare("logical","iam_root")
-# HACK end
+      declare("logical","iam_root")
       # Initially, we don't know which variables will need to be gathered,
       # scattered, or broadcast.
       bcasts=[]
