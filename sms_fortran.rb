@@ -741,8 +741,8 @@ module Fortran
   class Main_Program < Scoping_Unit
 
     def translate
-      use("nnt_types_module")
       if (ep=execution_part)
+        use("nnt_types_module")
         block=ep.e
         code="call sms_start(ppp__status)"
         insert_statement_before(code,:call_stmt,block.first)
