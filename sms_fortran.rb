@@ -638,7 +638,7 @@ module Fortran
             sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
           end
           if varenv["type"]=="character"
-            code="call ppp_bcast_char(#{var},#{dims},ppp__status)"
+            code="call ppp_bcast_char(#{var},size(#{var}),ppp__status)"
           else
             code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
           end
