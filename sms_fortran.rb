@@ -300,18 +300,6 @@ module Fortran
             end
             code="#{var}(#{newdims.join(",")})"
             replace_element(code,:allocate_object)
-
-# HACK start
-
-            # See comment for class Allocate_Stmt, below. Here we just mark the
-            # parent allocate statemnt to hide later, since it contains at least
-            # one set of translated array bounds.
-
-            allocate_stmt=ancestor(Allocate_Stmt)
-            allocate_stmt.instance_variable_set(:@smsignore,true)
-
-# HACK end
-
           end
         else
           fail "Did not expect to parse a variable_name here -- thought it was broken!"
@@ -322,35 +310,6 @@ module Fortran
     end
 
   end
-
-# HACK start
-
-  # For now, legacy ppp still needs to see sms$distribute directives, so it
-  # may think that it needs to translate allocate statements with distributed
-  # arrays, though the translation will have already been done in class
-  # Allocate_Object, above. So, wrap the allocate statement in an sms$ignore
-  # block, and summarize in a do-block to we can do a one-for-one statement-
-  # tree replacement.
-
-  class Allocate_Stmt < StmtC
-
-    def translate
-      if self.instance_variable_get(:@smsignore)
-        code=[]
-        code.push("do")
-        code.push("!sms$ignore begin")
-        code.push("#{self}")
-        code.push("!sms$ignore end")
-        code.push("exit")
-        code.push("enddo")
-        code=code.join("\n")
-        replace_statement(code,:block_do_construct)
-      end
-    end
-
-  end
-
-# HACK end
 
   class Array_Section < E
 
@@ -1535,20 +1494,11 @@ module Fortran
       globalize(e[0],gathers+scatters)
       # Wrap old block in conditional.
       code=[]
-# HACK start
-      code.push("!sms$ignore begin")
-# HACK end
       code.push("if (iam_root()) then")
       code.push("#{oldblock}")
       code.push("endif")
-# HACK start
-      code.push("!sms$ignore end")
-# HACK end
       code=code.join("\n")
-#     t=replace_statement(code,:block,oldblock) # masked by following HACK
-# HACK start
-      t=replace_statement(code,:sms_ignore_executable,oldblock)
-# HACK end
+      t=replace_statement(code,:block,oldblock)
       newblock=e[0]
       # Insert statements for the necessary gathers, scatters and broadcasts.
       # Declaration of globally-sized variables
@@ -1585,12 +1535,8 @@ module Fortran
         args.push("#{var}")
         args.push(Name.global(var))
         args.push("ppp__status")
-#       code="call sms_gather(#{args.join(",")})"                 # masked by following HACK
-#       insert_statement_before(code,:call_stmt,newblock.e.first) # masked by following HACK
-# HACK start
-        code="!sms$ignore begin\ncall sms_gather(#{args.join(",")})\n!sms$ignore end"
-        insert_statement_before(code,:sms_ignore_executable,newblock.e.first)
-# HACK end
+        code="call sms_gather(#{args.join(",")})"
+        insert_statement_before(code,:call_stmt,newblock.e.first)
       end
       # Allocation of globally-sized variables. On non-root tasks, allocate all
       # dimensions at unit size. On the root task, allocate the non-decomposed
@@ -1606,22 +1552,13 @@ module Fortran
         bounds_root=bounds_root.join(",")
         bounds_nonroot=("1"*dims).split("").join(",")
         code=[]
-# HACK start
-        code.push("!sms$ignore begin")
-# HACK end
         code.push("if (iam_root()) then")
         code.push("allocate(#{Name.global(var)}(#{bounds_root}),stat=ppp__status)")
         code.push("else")
         code.push("allocate(#{Name.global(var)}(#{bounds_nonroot}),stat=ppp__status)")
         code.push("endif")
-# HACK start
-      code.push("!sms$ignore end")
-# HACK end
         code=code.join("\n")
-#       insert_statement_before(code,:if_construct,newblock.e.first) # masked by following HACK
-# HACK start
-        insert_statement_before(code,:sms_ignore_executable,newblock.e.first)
-# HACK end
+        insert_statement_before(code,:if_construct,newblock.e.first)
       end
       # Scatters
       scatters.each do |var|
@@ -1655,12 +1592,8 @@ module Fortran
         args.push(Name.global(var))
         args.push("#{var}")
         args.push("ppp__status")
-#       code="call sms_scatter(#{args.join(",")})"              # masked by following HACK
-#       insert_statement_after(code,:call_stmt,newblock.e.last) # masked by following HACK
-# HACK start
-        code="!sms$ignore begin\ncall sms_scatter(#{args.join(",")})\n!sms$ignore end"
-        insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
-# HACK end
+        code="call sms_scatter(#{args.join(",")})"
+        insert_statement_after(code,:call_stmt,newblock.e.last)
       end
       # Broadcasts
       bcasts.each do |var|
@@ -1672,26 +1605,17 @@ module Fortran
           dims=varenv["dims"]
           sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
         end
-#       code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)" # masked by following HACK
-#       insert_statement_after(code,:call_stmt,newblock.e.last)                                              # masked by following HACK
-# HACK start
-        # NOTE: Need both cases when hack is undone...
         if varenv["type"]=="character"
-          code="!sms$ignore begin\ncall ppp_bcast_char(#{var},#{dims},ppp__status)\n!sms$ignore end"
+          code="call ppp_bcast_char(#{var},#{dims},ppp__status)"
         else
-          code="!sms$ignore begin\ncall ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)\n!sms$ignore end"
+          code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
         end
-        insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
-# HACK end
+        insert_statement_after(code,:call_stmt,newblock.e.last)
       end
       # Deallocation of globally-sized variables
       globals.sort.each do |var|
-#       code="deallocate(ppp__g_#{var})"                              # masked by following HACK
-#       insert_statement_after(code,:deallocate_stmt,newblock.e.last) # masked by following HACK
-# HACK start
-        code="!sms$ignore begin\ndeallocate(#{Name.global(var)})\n!sms$ignore end"
-        insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
-# HACK end
+        code="deallocate(ppp__g_#{var})"
+        insert_statement_after(code,:deallocate_stmt,newblock.e.last)
       end
     end
 

@@ -464,7 +464,7 @@ module Fortran
 
     def declare(type,name,props={})
       # Override in *_fortran.rb, restrictions on allowable definitions may
-      # differ between applications. It may be acceptable to simply ignore
+      # differ between applications. It may be acceptable to simply disregard
       # a request to define an already-defined variable, in which case a single
       # method suitable for all applications could be defined here.
     end

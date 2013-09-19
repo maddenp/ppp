@@ -1,10 +1,4 @@
-- Get rid of Excecution_Part#tranlate hack.
-
 - Do not roll out if-construct if sms$serial region is empty.
-
-- Maybe do not *remove* nodes. For example, in SMS_Serial#translate, position of
-  'block' changes when begin/end stmts are removed. Why not just leave them and
-  override their to_s() (maybe conditionally) or replace them with SyntaxNodes?
 
 - Translate (remove) sms$ignore begin/end (legacy ppp must be gone)
 
@@ -26,6 +20,8 @@
   necessary.
 
 - Remove various HACKS and deal with any fallout.
+
+- Must handle eor=/err= inside serial region, too.
 
 - Carefully consider the cases where an envpop'ing sp_* method is called from
   a grammar rule other than the one whose parse was requested and try to make
@@ -231,8 +227,6 @@
 
 - Factor out common elements in implicit IO translate() methods.
 
-- Must handle eor=/err= inside serial region, too.
-
 - Should main-program envpush as well? Current mismatch between # of envpushes
   and env pops
 
@@ -291,4 +285,13 @@
 
 - Refactor distribute_array_bounds() in sms_fortran.rb.
 
-- 'codepoint' text needs to refer to the correct (post-processed file name).
+- 'codepoint' text needs to refer to the correct (post-processed file name). Or
+   maybe insert a hash of the source file, which should be unique (enough).
+
+- Maybe do not *remove* nodes. For example, in SMS_Serial#translate, position of
+  'block' changes when begin/end stmts are removed. Why not just leave them and
+  override their to_s() (maybe conditionally) or replace them with SyntaxNodes?
+
+- Shouldnt 4th arg to ppp_bcast be a scalar, instead of an array?
+
+- Pros/Cons of e.g. env[:serial] vs inside?(SMS_Serial)? Standardize on one?
