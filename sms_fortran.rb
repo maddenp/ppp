@@ -630,16 +630,17 @@ module Fortran
 
         var_bcast.each do |var|
           varenv=getvarenv(var)
-          if varenv["sort"]=="_scalar"
-            dims="1"
-            sizes="(/1/)"
-          else
-            dims=varenv["dims"]
-            sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
-          end
           if varenv["type"]=="character"
-            code="call ppp_bcast_char(#{var},size(#{var}),ppp__status)"
+            arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
+            code="call ppp_bcast_char(#{var},#{arg2},ppp__status)"
           else
+            if varenv["sort"]=="_scalar"
+              dims="1"
+              sizes="(/1/)"
+            else
+              dims=varenv["dims"]
+              sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
+            end
             code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
           end
           code_bcast.push(code)
@@ -1587,16 +1588,17 @@ module Fortran
       # Broadcasts
       bcasts.each do |var|
         varenv=getvarenv(var)
-        if varenv["sort"]=="_scalar"
-          dims="1"
-          sizes="(/1/)"
-        else
-          dims=varenv["dims"]
-          sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
-        end
         if varenv["type"]=="character"
-          code="call ppp_bcast_char(#{var},#{dims},ppp__status)"
+          arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
+          code="call ppp_bcast_char(#{var},#{arg2},ppp__status)"
         else
+          if varenv["sort"]=="_scalar"
+            dims="1"
+            sizes="(/1/)"
+          else
+            dims=varenv["dims"]
+            sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
+        end
           code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
         end
         insert_statement_after(code,:call_stmt,newblock.e.last)
