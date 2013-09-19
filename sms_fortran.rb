@@ -223,7 +223,7 @@ module Fortran
       self.env[:static].marker||=0
       m=(self.env[:static].marker+=1)
       f=File.basename(self.input.srcfile)
-      "See translated #{f} marker #{m}"
+      "#{f} (translation) marker #{m}"
     end
 
     def maxrank
