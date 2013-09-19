@@ -119,11 +119,6 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
-    def codepoint
-      self.env[:static].codepoint||=0
-      self.env[:static].codepoint+=1
-    end
-
     def declare(type,var,props={})
       su=scoping_unit
       varenv=getvarenv(var,su,false)
@@ -222,6 +217,13 @@ module Fortran
         @intrinsics=Set.new(File.open(f).read.split)
       end
       @intrinsics.include?("#{function_name}")
+    end
+
+    def marker
+      self.env[:static].marker||=0
+      m=(self.env[:static].marker+=1)
+      f=File.basename(self.input.srcfile)
+      "See translated #{f} marker #{m}"
     end
 
     def maxrank
@@ -661,7 +663,7 @@ module Fortran
               spec_var_true.push("#{label_new} #{pppvar}=.true.")
               spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
               success_label=label_create unless success_label
-              use("nnt_types_module")
+              use("module_decomp")
             end
           end
 
@@ -696,7 +698,7 @@ module Fortran
               var=spec.rhs
               varenv=getvarenv(var)
               spec_var_bcast.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,ppp__status)")
-              use("nnt_types_module")
+              use("module_decomp")
             end
           end
 
@@ -733,11 +735,11 @@ module Fortran
 
     def translate
       if (ep=execution_part)
-        use("nnt_types_module")
+        use("module_decomp")
         block=ep.e
         code="call sms_start(ppp__status)"
         insert_statement_before(code,:call_stmt,block.first)
-        code="call nnt_stop('#{sa(File.basename(self.input.srcfile))}codepoint #{self.codepoint}',0,ppp_exit)"
+        code="call nnt_stop('#{marker}',0,ppp_exit)"
         insert_statement_after(code,:call_stmt,block.last)
       end
     end
@@ -834,7 +836,7 @@ module Fortran
   class SMS_Barrier < SMS
 
     def translate
-      use("nnt_types_module")
+      use("module_decomp")
       code="call ppp_barrier(ppp__status)"
       replace_statement(code,:call_stmt)
     end
@@ -849,7 +851,6 @@ module Fortran
 
     def translate
       use("module_decomp")
-      use("nnt_types_module")
       declare("logical","sms_debugging_on")
       var="#{e[3].name}"
       varenv=getvarenv(var)
@@ -897,7 +898,6 @@ module Fortran
       d="#{decomp}"
       n="#{decomp}__nestlevel"
       use("module_decomp")
-      use("nnt_types_module")
       declare("integer","ppp__periodicusedupper",{:dims=>%W[ppp_max_decomposed_dims]})
       declare("integer","ppp__periodicusedlower",{:dims=>%W[ppp_max_decomposed_dims]})
       stmts=[]
@@ -1118,7 +1118,6 @@ module Fortran
 
     def translate
       use("module_decomp")
-      use("nnt_types_module")
       tag="ppp__tag_#{newtag}"
       declare("integer",tag,{:attrs=>"save"})
       v=[e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
@@ -1771,7 +1770,7 @@ module Fortran
     end
 
     def translate
-      use("nnt_types_module")
+      use("module_decomp")
       code="call sms_set_communicator(#{e[3]},ppp__status)"
       replace_statement(code,:call_stmt)
     end
@@ -1880,7 +1879,7 @@ module Fortran
       var="#{e[3]}"
       fail "No module info found for variable '#{var}'" unless (varenv=getvarenv(var))
       fail "No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
-      use("nnt_types_module")
+      use("module_decomp")
       stmts=[]
       stmts.push(["call sms_unstructuredgrid(#{dh},size(#{var},1),#{var})",:call_stmt])
       stmts.push(["call ppp_get_collapsed_halo_size(#{dh}(#{dh}__nestlevel),1,1,#{dh}__localhalosize,ppp__status)",:call_stmt])
@@ -1942,12 +1941,12 @@ module Fortran
 
     def translate
       unless self.env[:sms_ignore] or self.env[:sms_serial]
-        use("nnt_types_module")
+        use("module_decomp")
         declare("logical","iam_root")
         label=self.label_delete unless (label=self.label).empty?
         code=[]
         code.push("#{sa(label)} if (iam_root()) then")
-        code.push("call nnt_stop('#{sa(File.basename(self.input.srcfile))}codepoint #{self.codepoint}',0,ppp_abort)")
+        code.push("call nnt_stop('#{marker}',0,ppp_abort)")
         code.push("endif")
         code=code.join("\n")
         replace_statement(code,:block)
