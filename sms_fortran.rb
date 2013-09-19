@@ -4,8 +4,8 @@ module Fortran
 
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
 
-    # Do not push an environment here. The declarations that appear inside an
-    # sms$distribute region belong to the environment belonging to the enclosing
+    # Do not push an environment here. The declarations that appear inside a
+    # distribute region belong to the environment belonging to the enclosing
     # scoping unit.
 
     fail "Already inside distribute region" if @distribute
@@ -53,20 +53,14 @@ module Fortran
   end
 
   def sp_sms_ignore_begin
-# HACK begin
-# Expose this when we're not bracketing stuff in sms$ignore to please legacy ppp
-#   fail "Already inside sms$ignore region" if env[:sms_ignore]
-# HACK END
+    fail "Already inside ignore region" if env[:sms_ignore]
     envpush
     env[:sms_ignore]=true
     true
   end
 
   def sp_sms_ignore_end
-# HACK begin
-# Expose this when we're not bracketing stuff in sms$ignore to please legacy ppp
-#   fail "Not inside sms$ignore region" unless env[:sms_ignore]
-# HACK END
+    fail "Not inside ignore region" unless env[:sms_ignore]
     true
   end
 
@@ -93,10 +87,7 @@ module Fortran
   end
 
   def sp_sms_serial_begin
-# HACK begin
-# Expose this when we're not bracketing stuff in sms$ignore to please legacy ppp
-#   fail "Already inside serial region" if env[:sms_serial]
-# HACK END
+    fail "Already inside serial region" if env[:sms_serial]
     envpush
     env[:sms_serial]=true
     true
@@ -771,7 +762,7 @@ module Fortran
     end
 
     def translate
-      # Handle sms$to_local
+      # Handle to_local
       if tolocal=self.env[:sms_to_local] and p=tolocal[name]
         case p.key
         when "lbound"
@@ -781,12 +772,12 @@ module Fortran
           se="e#{p.decdim}"
           halo_offset=halo_offsets(p.decdim).up
         else
-          fail "Unrecognized sms$to_local key: #{p.key}"
+          fail "Unrecognized to_local key: #{p.key}"
         end
         code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
         replace_element(code,:expr)
       end
-      # Handle sms$serial
+      # Handle serial
       if inside?(SMS_Serial) and not inside?(SMS_Serial_Begin)
         if (varenv=self.env["#{self}"])
           unless varenv["parameter"]
@@ -1026,7 +1017,7 @@ module Fortran
 
     def translate
 
-      # NOTE: Currently, declare() inserts new declarations at the *top* of the
+      # HACK: Currently, declare() inserts new declarations at the *top* of the
       #       decl section, so that they will appear in the opposite of the
       #       order of declare() calls. This is stupid and has to be fixed. For
       #       now, take care below that parameters are declared before they are
@@ -1379,14 +1370,14 @@ module Fortran
 
     def translate
       nvars=vars.size
-      fail "sms$reduce supports reduction of 25 variables max" if nvars>25
+      fail "reduce supports reduction of 25 variables max" if nvars>25
       use("module_decomp")
       sizes=[]
       types=[]
       nvars.times do |i|
         var=vars[i]
         varenv=getvarenv(var)
-        fail "sms$reduce inapplicable to distributed array '#{var}'" if varenv["decomp"]
+        fail "reduce inapplicable to distributed array '#{var}'" if varenv["decomp"]
         sizes.push((varenv["sort"]=="_array")?("size(#{var})"):("1"))
         types.push(smstype(varenv["type"],varenv["kind"]))
       end
@@ -1433,8 +1424,7 @@ module Fortran
       bcasts=[]
       gathers=[]
       scatters=[]
-      # Get the serial info recorded when the sms$serial ... begin statement.
-      # was parsed.
+      # Get the serial info recorded when the serial_begin statement was parsed.
       si=self.env[:sms_serial_info]
       # Iterate over the set of names that occurred in the region. Note that
       # we do not yet know whether the names are variables (they might e.g. be
@@ -1456,7 +1446,7 @@ module Fortran
           # for a gather *if* it is decomposed; and note that the default intent
           # does not apply.
           if si.vars_ignore.include?(name)
-            fail "'#{name}' cannot be both 'ignore' and 'out' in sms$serial"
+            fail "'#{name}' cannot be both 'ignore' and 'out' in serial region"
           end
           gathers.push(name) if dh
           default=false
@@ -1467,7 +1457,7 @@ module Fortran
           # non-decomposed arrays for broadcast, and decomposed arrays for a
           # scatter; and note that the default intent does not apply.
           if si.vars_ignore.include?(name)
-            fail "'#{name}' cannot be both 'ignore' and 'in' sms$serial"
+            fail "'#{name}' cannot be both 'ignore' and 'in' in serial region"
           end
           ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name)
           default=false
@@ -1952,7 +1942,7 @@ module Fortran
 
     def translate
       unless self.env[:sms_ignore] or self.env[:sms_serial]
-        use("module_decomp")
+        use("nnt_types_module")
         declare("logical","iam_root")
         label=self.label_delete unless (label=self.label).empty?
         code=[]
