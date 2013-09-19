@@ -3,6 +3,11 @@ require "set"
 module Fortran
 
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
+
+    # Do not push an environment here. The declarations that appear inside an
+    # sms$distribute region belong to the environment belonging to the enclosing
+    # scoping unit.
+
     fail "Already inside distribute region" if @distribute
     @distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
     sms_distribute_dims.dims.each { |x| @distribute["dim"].push(x) }
@@ -10,6 +15,10 @@ module Fortran
   end
 
   def sp_sms_distribute_end
+
+    # Do not pop the environment stack here, because the matching 'begin' does
+    # not push one.
+
     fail "Not inside distribute region" unless @distribute
     @distribute=nil
     true
@@ -156,33 +165,37 @@ module Fortran
     end
 
     def distribute_array_bounds(spec,varenv)
-      if (dh=varenv["decomp"])
-        if spec and spec.is_a?(Explicit_Shape_Spec_List)
-          cb=spec.concrete_boundslist
-          newbounds=[]
-          cb.each_index do |i|
-            b=cb[i]
-            arrdim=i+1
-            if (decdim=varenv["dim#{arrdim}"])
-              s="#{dh}__local_lb(#{decdim},#{dh}__nestlevel):"+
-                "#{dh}__local_ub(#{decdim},#{dh}__nestlevel)"
-            else
-              s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
-            end
-            newbounds.push(s)
+      return unless spec # why would spec be nil?
+      return unless dh=varenv["decomp"]
+      return unless [Assumed_Shape_Spec_List,Explicit_Shape_Spec_List].include?(spec.class)
+      use("module_decomp")
+      newbounds=[]
+      if spec.is_a?(Explicit_Shape_Spec_List)
+        cb=spec.concrete_boundslist
+        cb.each_index do |i|
+          b=cb[i]
+          arrdim=i+1
+          if (decdim=varenv["dim#{arrdim}"])
+            s="#{dh}__local_lb(#{decdim},#{dh}__nestlevel):"+
+              "#{dh}__local_ub(#{decdim},#{dh}__nestlevel)"
+          else
+            s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
           end
-          code=newbounds.join(",")
-
-# HACK start
-
-# Uncomment when legacy ppp doesn't neeed to translate distribute
-
-#         replace_element(code,:array_spec,spec)
-
-# HACK end
-
+          newbounds.push(s)
+        end
+      elsif spec.is_a?(Assumed_Shape_Spec_List)
+        (1..varenv["dims"].to_i).each do |i|
+          arrdim=i
+          if (decdim=varenv["dim#{arrdim}"]) and not varenv["allocatable"]
+            s="#{dh}__local_lb(#{decdim},#{dh}__nestlevel):"
+          else
+            s=":"
+          end
+          newbounds.push(s)
         end
       end
+      code=newbounds.join(",")
+      replace_element(code,:array_spec,spec)
     end
 
     def fixbound(varenv,var,dim,x)
@@ -214,7 +227,8 @@ module Fortran
 
     def intrinsic?(function_name)
       unless defined?(@intrinsics)
-        @intrinsics=Set.new(File.open("intrinsics").read.split)
+        f=File.join(File.dirname(File.expand_path($0)),"intrinsics")
+        @intrinsics=Set.new(File.open(f).read.split)
       end
       @intrinsics.include?("#{function_name}")
     end
@@ -250,45 +264,6 @@ module Fortran
       fail "No NNT type defined for '#{type}#{kind}'"
     end
 
-# HACK start
-
-# This overrides T#use in fortran.rb to provide sms$ignore wraps for peaceful
-# coexistence with legacy ppp, for now. Remove this HACK when legacy ppp is
-# removed from build chain.
-
-    def use(modname,usenames=[])
-      unless uses?(modname,:all)
-        new_usenames=[]
-        code="use #{modname}"
-        unless usenames.empty?
-          list=[]
-          usenames.each do |x|
-           h=x.is_a?(Hash)
-            localname=(h)?(x.keys.first):(nil)
-            usename=(h)?(x.values.first):(x)
-            unless uses?(modname,usename)
-              list.push(((h)?("#{localname}=>#{usename}"):("#{usename}")))
-              new_usenames.push([localname||usename,usename])
-            end
-          end
-          code+=((list.empty?)?(""):(",only:#{list.join(",")}"))
-        end
-        up=use_part
-        new_usenames=[[:all]] if new_usenames.empty?
-        new_uses={modname=>new_usenames}
-        old_uses=up.env[:uses]
-        up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
-  # sub HACK start
-        code=("!sms$ignore begin\n#{code}\n!sms$ignore end")
-        t=self.raw(code,:sms_ignore_use,@srcfile,{:env=>self.env})
-        t.parent=up
-        up.e.push(t)
-  # sub HACK end
-      end
-    end
-
-# HACK end
-
   end # class T
 
   class Allocate_Object < E
@@ -312,6 +287,7 @@ module Fortran
 
           varenv=getvarenv(var,self,false)
           if varenv and (dh=varenv["decomp"])
+            use("module_decomp")
             subscript_list=part_ref.subscript_list
             newdims=[]
             subscript_list.each_index do |i|
@@ -324,18 +300,6 @@ module Fortran
             end
             code="#{var}(#{newdims.join(",")})"
             replace_element(code,:allocate_object)
-
-# HACK start
-
-            # See comment for class Allocate_Stmt, below. Here we just mark the
-            # parent allocate statemnt to hide later, since it contains at least
-            # one set of translated array bounds.
-
-            allocate_stmt=ancestor(Allocate_Stmt)
-            allocate_stmt.instance_variable_set(:@smsignore,true)
-
-# HACK end
-
           end
         else
           fail "Did not expect to parse a variable_name here -- thought it was broken!"
@@ -346,35 +310,6 @@ module Fortran
     end
 
   end
-
-# HACK start
-
-  # For now, legacy ppp still needs to see sms$distribute directives, so it
-  # may think that it needs to translate allocate statements with distributed
-  # arrays, though the translation will have already been done in class
-  # Allocate_Object, above. So, wrap the allocate statement in an sms$ignore
-  # block, and summarize in a do-block to we can do a one-for-one statement-
-  # tree replacement.
-
-  class Allocate_Stmt < StmtC
-
-    def translate
-      if self.instance_variable_get(:@smsignore)
-        code=[]
-        code.push("do")
-        code.push("!sms$ignore begin")
-        code.push("#{self}")
-        code.push("!sms$ignore end")
-        code.push("exit")
-        code.push("enddo")
-        code=code.join("\n")
-        replace_statement(code,:block_do_construct)
-      end
-    end
-
-  end
-
-# HACK end
 
   class Array_Section < E
 
@@ -390,7 +325,7 @@ module Fortran
         "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
       end
 
-      if inside?(Assignment_Stmt,Function_Reference)
+      if inside?(Assignment_Stmt)
         return if inside?(SMS_Ignore,SMS_Serial)
         if (f=ancestor(Function_Reference))
           return unless intrinsic?(f.name)
@@ -435,20 +370,6 @@ module Fortran
 
   end
 
-# HACK begin
-# Prevent legacy ppp from re-processing assignment statements. Remove this one
-# legacy ppp is out of the loop.
-
-  class Assignment_Stmt < StmtC
-    def translate
-      code="!sms$ignore begin\n#{self}\n!sms$ignore end"
-      replace_statement(code,:sms_ignore_executable)
-    end
-
-  end
-
-# HACK end
-
   class Entity_Decl_1 < Entity_Decl
 
     def translate
@@ -473,14 +394,6 @@ module Fortran
     end
 
   end
-
-# HACK start
-  class Execution_Part
-    def translate
-      declare("logical","iam_root")
-    end
-  end
-# HACK end
 
   class If_Stmt < T
 
@@ -533,18 +446,16 @@ module Fortran
 
       unless self.env[:sms_ignore] or self.env[:sms_serial]
 
-        declare("logical","iam_root")
-
         code_alloc=[]
         code_bcast=[]
         code_dealloc=[]
         code_gather=[]
         code_scatter=[]
+        onroot=true
         spec_var_bcast=[]
         spec_var_false=[]
         spec_var_goto=[]
         spec_var_true=[]
-        split=true
         success_label=nil
         var_bcast=[]
         var_gather=[]
@@ -553,9 +464,9 @@ module Fortran
         # Read_Stmt
 
         if self.is_a?(Read_Stmt)
-          split=false if self.unit.is_a?(Internal_File_Unit)
+          onroot=false if self.unit.is_a?(Internal_File_Unit)
           if (nml=self.nml)
-            split=true
+            onroot=true
             nmlenv=getvarenv(nml,self,expected=true)
             nmlenv["objects"].each do |x|
               var="#{x}"
@@ -573,11 +484,11 @@ module Fortran
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=true))
               if (dh=varenv["decomp"])
-                split=true
+                onroot=true
                 var_scatter.push(var)
                 self.replace_input_item(x,Name.global(var))
               else
-                var_bcast.push(var) if split
+                var_bcast.push(var) if onroot
               end
             end
           end
@@ -590,7 +501,7 @@ module Fortran
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=false))
               if (dh=varenv["decomp"])
-                split=true
+                onroot=true
                 global=Name.global(var)
                 var_gather.push(var)
                 self.replace_output_item(x,global)
@@ -603,9 +514,9 @@ module Fortran
 
         if self.is_a?(Write_Stmt)
           function=(env["#{unit}"] and env["#{unit}"]["function"])
-          split=false if self.unit.is_a?(Internal_File_Unit) or function
+          onroot=false if self.unit.is_a?(Internal_File_Unit) or function
           if (nml=self.nml)
-            split=true
+            onroot=true
             nmlenv=getvarenv(nml,self,expected=true)
             nmlenv["objects"].each do |x|
               var="#{x}"
@@ -620,7 +531,7 @@ module Fortran
             var="#{x}"
             if (varenv=getvarenv(var,self,expected=false))
               if (dh=varenv["decomp"])
-                split=true
+                onroot=true
                 global=Name.global(var)
                 var_gather.push(var)
                 self.replace_output_item(x,global)
@@ -628,6 +539,8 @@ module Fortran
             end
           end
         end
+
+        declare("logical","iam_root") if onroot
 
         # Allocation & deallocation of globals
 
@@ -801,12 +714,9 @@ module Fortran
         # Code Generation and Placement
 
         code=[]
-# HACK start
-        code.push("!sms$ignore begin")
-# HACK end
         code.concat(code_alloc)
         code.concat(code_gather)
-        if split
+        if onroot
           my_label=(self.label.empty?)?(nil):(self.label)
           my_label=self.label_delete if my_label
           code.push("#{sa(my_label)}if (iam_root()) then")
@@ -815,21 +725,29 @@ module Fortran
         code.push("#{self}".chomp)
         code.push("goto #{success_label}") if success_label
         code.concat(spec_var_true)
-        code.push("#{sa(success_label)}endif") if split
+        code.push("#{sa(success_label)}endif") if onroot
         code.concat(spec_var_bcast)
         code.concat(spec_var_goto)
         code.concat(code_scatter)
         code.concat(code_bcast)
         code.concat(code_dealloc)
-# HACK start
-        code.push("!sms$ignore end")
-# HACK end
         code=code.join("\n")
+        replace_statement(code,:block)
+      end
+    end
 
-# HACK start
-# Get rid of sms$ignore bracketing when legacy ppp is gone
-        replace_statement(code,:sms_ignore_executable)
-# HACK end
+  end
+
+  class Main_Program < Scoping_Unit
+
+    def translate
+      use("nnt_types_module")
+      if (ep=execution_part)
+        block=ep.e
+        code="call sms_start(ppp__status)"
+        insert_statement_before(code,:call_stmt,block.first)
+        code="call nnt_stop('#{sa(File.basename(self.input.srcfile))}codepoint #{self.codepoint}',0,ppp_exit)"
+        insert_statement_after(code,:call_stmt,block.last)
       end
     end
 
@@ -994,7 +912,7 @@ module Fortran
       stmts=[]
       stmts.push(["#{n}=1",:assignment_stmt])
       stmts.push(["#{d}__nregions=1",:assignment_stmt])
-      # See TODO about this multiple-loop HACK. Merge these loops when legacy ppp is gone...
+      # See TODO about merging these loops when legacy ppp is gone...
       # See TODO about this being essentially hardwired to work with FIM
       max.times do |i|
         dim=i+1
@@ -1150,21 +1068,18 @@ module Fortran
   class SMS_Decomp_Name < SMS
   end
 
+  class SMS_Distribute < SMS_Region
+  end
+
   class SMS_Distribute_Begin < SMS
 
     def to_s
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
-# HACK start
-
-# Uncomment when legacy ppp doesn't neeed to translate distribute
-
-#   def translate
-#     remove
-#   end
-
-# HACK end
+    def translate
+      remove
+    end
 
   end
 
@@ -1174,15 +1089,9 @@ module Fortran
       sms("#{e[2]}")
     end
 
-# HACK start
-
-# Uncomment when legacy ppp doesn't neeed to translate distribute
-
-#   def translate
-#     remove
-#   end
-
-# HACK end
+    def translate
+      remove
+    end
 
   end
 
@@ -1512,15 +1421,13 @@ module Fortran
     end
 
     def translate
+      # Get old block. Note that 'begin' and 'end' nodes have already been
+      # removed, so the only element remaining is the block. If the serial
+      # region is empty, we can simply return.
+      oldblock=e[0]
+      return if oldblock.e.empty?
       use("module_decomp")
-# HACK start
-# Uncomment this when legacy ppp is gone, and remove Executable_Part#translate.
-# For now, we need to declare iam_root everywhere in case legacy ppp needs it,
-# though in the working FIMsrc/fim/horizontal/Makefile, we're deleting any
-# definition legacy ppp makes, to avoid duplicate declarations (legacy ppp does
-# not check for an existing declaration).
-#     declare("logical","iam_root")
-# HACK end
+      declare("logical","iam_root")
       # Initially, we don't know which variables will need to be gathered,
       # scattered, or broadcast.
       bcasts=[]
@@ -1585,24 +1492,13 @@ module Fortran
         node.globalize if node.is_a?(Name) and to_globalize.include?("#{node}")
       end
       globalize(e[0],gathers+scatters)
-      # Wrap old block in conditional. Note that 'begin' and 'end' nodes have
-      # already been removed, so the only element remaining is the block.
-      oldblock=e[0]
+      # Wrap old block in conditional.
       code=[]
-# HACK start
-      code.push("!sms$ignore begin")
-# HACK end
       code.push("if (iam_root()) then")
       code.push("#{oldblock}")
       code.push("endif")
-# HACK start
-      code.push("!sms$ignore end")
-# HACK end
       code=code.join("\n")
-#     t=replace_statement(code,:block,oldblock) # masked by following HACK
-# HACK start
-      t=replace_statement(code,:sms_ignore_executable,oldblock)
-# HACK end
+      t=replace_statement(code,:block,oldblock)
       newblock=e[0]
       # Insert statements for the necessary gathers, scatters and broadcasts.
       # Declaration of globally-sized variables
@@ -1639,12 +1535,8 @@ module Fortran
         args.push("#{var}")
         args.push(Name.global(var))
         args.push("ppp__status")
-#       code="call sms_gather(#{args.join(",")})"                 # masked by following HACK
-#       insert_statement_before(code,:call_stmt,newblock.e.first) # masked by following HACK
-# HACK start
-        code="!sms$ignore begin\ncall sms_gather(#{args.join(",")})\n!sms$ignore end"
-        insert_statement_before(code,:sms_ignore_executable,newblock.e.first)
-# HACK end
+        code="call sms_gather(#{args.join(",")})"
+        insert_statement_before(code,:call_stmt,newblock.e.first)
       end
       # Allocation of globally-sized variables. On non-root tasks, allocate all
       # dimensions at unit size. On the root task, allocate the non-decomposed
@@ -1660,22 +1552,13 @@ module Fortran
         bounds_root=bounds_root.join(",")
         bounds_nonroot=("1"*dims).split("").join(",")
         code=[]
-# HACK start
-        code.push("!sms$ignore begin")
-# HACK end
         code.push("if (iam_root()) then")
         code.push("allocate(#{Name.global(var)}(#{bounds_root}),stat=ppp__status)")
         code.push("else")
         code.push("allocate(#{Name.global(var)}(#{bounds_nonroot}),stat=ppp__status)")
         code.push("endif")
-# HACK start
-      code.push("!sms$ignore end")
-# HACK end
         code=code.join("\n")
-#       insert_statement_before(code,:if_construct,newblock.e.first) # masked by following HACK
-# HACK start
-        insert_statement_before(code,:sms_ignore_executable,newblock.e.first)
-# HACK end
+        insert_statement_before(code,:if_construct,newblock.e.first)
       end
       # Scatters
       scatters.each do |var|
@@ -1709,12 +1592,8 @@ module Fortran
         args.push(Name.global(var))
         args.push("#{var}")
         args.push("ppp__status")
-#       code="call sms_scatter(#{args.join(",")})"              # masked by following HACK
-#       insert_statement_after(code,:call_stmt,newblock.e.last) # masked by following HACK
-# HACK start
-        code="!sms$ignore begin\ncall sms_scatter(#{args.join(",")})\n!sms$ignore end"
-        insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
-# HACK end
+        code="call sms_scatter(#{args.join(",")})"
+        insert_statement_after(code,:call_stmt,newblock.e.last)
       end
       # Broadcasts
       bcasts.each do |var|
@@ -1726,26 +1605,17 @@ module Fortran
           dims=varenv["dims"]
           sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
         end
-#       code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)" # masked by following HACK
-#       insert_statement_after(code,:call_stmt,newblock.e.last)                                              # masked by following HACK
-# HACK start
-        # NOTE: Need both cases when hack is undone...
         if varenv["type"]=="character"
-          code="!sms$ignore begin\ncall ppp_bcast_char(#{var},#{dims},ppp__status)\n!sms$ignore end"
+          code="call ppp_bcast_char(#{var},#{dims},ppp__status)"
         else
-          code="!sms$ignore begin\ncall ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)\n!sms$ignore end"
+          code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},ppp__status)"
         end
-        insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
-# HACK end
+        insert_statement_after(code,:call_stmt,newblock.e.last)
       end
       # Deallocation of globally-sized variables
       globals.sort.each do |var|
-#       code="deallocate(ppp__g_#{var})"                              # masked by following HACK
-#       insert_statement_after(code,:deallocate_stmt,newblock.e.last) # masked by following HACK
-# HACK start
-        code="!sms$ignore begin\ndeallocate(#{Name.global(var)})\n!sms$ignore end"
-        insert_statement_after(code,:sms_ignore_executable,newblock.e.last)
-# HACK end
+        code="deallocate(ppp__g_#{var})"
+        insert_statement_after(code,:deallocate_stmt,newblock.e.last)
       end
     end
 
@@ -2082,23 +1952,15 @@ module Fortran
 
     def translate
       unless self.env[:sms_ignore] or self.env[:sms_serial]
+        use("module_decomp")
         declare("logical","iam_root")
         label=self.label_delete unless (label=self.label).empty?
         code=[]
-# HACK start
-        code.push("!sms$ignore begin")
-# HACK end
         code.push("#{sa(label)} if (iam_root()) then")
         code.push("call nnt_stop('#{sa(File.basename(self.input.srcfile))}codepoint #{self.codepoint}',0,ppp_abort)")
         code.push("endif")
-# HACK start
-        code.push("!sms$ignore end")
-# HACK end
         code=code.join("\n")
-# HACK start
-# Get rid of sms$ignore bracketing when legacy ppp is gone
-        replace_statement(code,:sms_ignore_executable)
-# HACK end
+        replace_statement(code,:block)
       end
     end
 
