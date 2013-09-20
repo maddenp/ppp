@@ -1,5 +1,3 @@
-- Translate (remove) sms$ignore begin/end (legacy ppp must be gone)
-
 - Remove recognition of sms$ignore in inappropriate regions
 
 - Consider which sms_ignore_* rules are actually needed. Certainly _executable,
@@ -279,3 +277,5 @@
 
 - declare() is naive. What about declaring an array with the same type as an
   already-declared scalar? Need more flexibility...
+
+- Factor more sms text out into T#sms_* methods.
