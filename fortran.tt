@@ -930,8 +930,7 @@ grammar Fortran
     parameter_stmt /
     format_stmt /
     entry_stmt /
-    stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <E> /
-    directive
+    stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <E>
   end
 
   rule declaration_constructs
@@ -1502,8 +1501,7 @@ grammar Fortran
     # F90:R203
 
     subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E> /
-    directive
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E>
   end
 
   rule file_name_expr
@@ -1689,8 +1687,7 @@ grammar Fortran
     # and the availibility of 3rd-party syntax-checking compilers, it is not
     # enforced here.
 
-    implicit_part_stmt+ <E> /
-    directive
+    implicit_part_stmt+ <E>
   end
 
   rule implicit_part_stmt
@@ -1879,8 +1876,7 @@ grammar Fortran
     # F90:R211
 
     subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E> /
-    directive
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E>
   end
 
   rule internal_subprograms
@@ -2321,8 +2317,7 @@ grammar Fortran
     # F90:R213
 
     subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E> /
-    directive
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E>
   end
 
   rule module_subprogram_part
@@ -3887,7 +3882,7 @@ grammar Fortran
   end
 
   rule use_part
-    ( use_stmt / directive )* <Use_Part>
+    use_stmt* <Use_Part>
   end
 
   rule use_stmt

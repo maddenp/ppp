@@ -1,6 +1,5 @@
 program t
   implicit none
-! use omp_lib
   integer::id,nthreads,omp_get_thread_num
 !$omp parallel private(nthreads,id)
   id=omp_get_thread_num()

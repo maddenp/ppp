@@ -9355,13 +9355,8 @@ module Fortran
                   if r8
                     r0 = r8
                   else
-                    r12 = _nt_directive
-                    if r12
-                      r0 = r12
-                    else
-                      @index = i0
-                      r0 = nil
-                    end
+                    @index = i0
+                    r0 = nil
                   end
                 end
               end
@@ -14299,13 +14294,8 @@ module Fortran
       if r5
         r0 = r5
       else
-        r9 = _nt_directive
-        if r9
-          r0 = r9
-        else
-          @index = i0
-          r0 = nil
-        end
+        @index = i0
+        r0 = nil
       end
     end
 
@@ -16010,32 +16000,20 @@ module Fortran
       return cached
     end
 
-    i0 = index
-    s1, i1 = [], index
+    s0, i0 = [], index
     loop do
-      r2 = _nt_implicit_part_stmt
-      if r2
-        s1 << r2
+      r1 = _nt_implicit_part_stmt
+      if r1
+        s0 << r1
       else
         break
       end
     end
-    if s1.empty?
-      @index = i1
-      r1 = nil
+    if s0.empty?
+      @index = i0
+      r0 = nil
     else
-      r1 = instantiate_node(E,input, i1...index, s1)
-    end
-    if r1
-      r0 = r1
-    else
-      r3 = _nt_directive
-      if r3
-        r0 = r3
-      else
-        @index = i0
-        r0 = nil
-      end
+      r0 = instantiate_node(E,input, i0...index, s0)
     end
 
     node_cache[:implicit_part][start_index] = r0
@@ -17758,13 +17736,8 @@ module Fortran
       if r5
         r0 = r5
       else
-        r9 = _nt_directive
-        if r9
-          r0 = r9
-        else
-          @index = i0
-          r0 = nil
-        end
+        @index = i0
+        r0 = nil
       end
     end
 
@@ -22202,13 +22175,8 @@ module Fortran
       if r5
         r0 = r5
       else
-        r9 = _nt_directive
-        if r9
-          r0 = r9
-        else
-          @index = i0
-          r0 = nil
-        end
+        @index = i0
+        r0 = nil
       end
     end
 
@@ -34540,19 +34508,7 @@ module Fortran
 
     s0, i0 = [], index
     loop do
-      i1 = index
-      r2 = _nt_use_stmt
-      if r2
-        r1 = r2
-      else
-        r3 = _nt_directive
-        if r3
-          r1 = r3
-        else
-          @index = i1
-          r1 = nil
-        end
-      end
+      r1 = _nt_use_stmt
       if r1
         s0 << r1
       else
