@@ -1,3 +1,10 @@
+- Remove 'continue' shims in fim.
+
+- Remove sms$ignore around 'type' blocks?
+
+- Does the envfile from a module that uses another module contain the info from
+  the other module? Should it?
+
 - When sms$ignore is gone, reconsider places where 'rule directive' can apply in
   non-SMS grammar. Currently, to allow for a Fortran-only parser that still
   accepts SMS directives that appear in 'weird' places (like sms$ignore
@@ -29,16 +36,13 @@
 
 - Sort envfile output for easy xxdiff comparison.
 
-- Does the envfile from a module that uses another module contain the info from
-  the other module? Should it?
-
 - .env file does not contain items added during translation, (true?) e.g.
   module_decomp.env does not even *exist*, much less contain the items added
   during translation.
 
 - Error needed when compare_var variable is not distributed or no mod info
 
-- WHERE may need (automatic?) parallel treatment.
+- where-stmt may need (automatic?) parallel treatment.
 
 - implicit-do constructs may require parallel treatment.
 
@@ -57,9 +61,6 @@
 - It might be better to prefix all in-class method calls with 'self.' for
   clarity. Or better to get rid of 'self' altogether for conciseness?
 
-- Why does sms$parallel require positional variable lists, while sms$to_local
-  requires numbered lists? This should be harmonized. The latter is better.
-
 - rule variable is broken: See parse tree for program 'i=1\nend'. 'i' is parsed
   as data_ref. It seems that some mechanism to differentiate between user-
   defined and intrinsic types is needed. Also, probably user-defined type
@@ -71,9 +72,6 @@
 
 - translate() on SMS_Unstructured_Grid cannot possibly be correct in the general
   case, right?
-
-- After replacing an element or statement, walk up tree replacing text_value
-  with new version while ancestor text_value = *old* replaced node's text_value?
 
 - IIRC, parsing of allocate_object is broken, in that the variable_name option
   (2nd choice) will never be chosen because structure_component always matches.
@@ -113,9 +111,6 @@
   or SyntaxNode subclasses. That is, should we convert to strings as early as
   possible, or delay until a string is absolutely required? Probably the latter.
 
-- sms$serial ought to give diagnostic information about which variables it will
-  gather, scatter or broadcast, so that users can tune the directive.
-
 - sms$serial should complain about in/out/inout intent of variables that never
   occur in the region. Or should we force bcast/gather/scatter of these?
 
@@ -132,9 +127,6 @@
 
 - translate_children() -- do we need 'if e' & compact & 'if x'?
 
-- In fail tests for improperly nested regions, use SMS$DIRECTIVE names instead
-  of generic descriptions.
-
 - In getvarenv(), give more verbose information about why a failure has occurred
   and what to do about it (e.g. .env file is not available, so get dependencies
   right, or write your own .env file, only ask ppp to operate on appropriate
@@ -144,7 +136,8 @@
   etc.
 
 - Need SMS library function that takes type and kind arguemnts and returns the
-  correct nnt_ type to use in library calls.
+  correct nnt_ type to use in library calls. There's some hack in fimppp now to
+  remove a user-defined kind -- this needs to be undone and to work correctly.
 
 - In SMS_Serial#translate, what should halo[l|u] be when dh is nil?
 
@@ -181,9 +174,6 @@
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
 
-- Use cpp for sms extensions (esp. in grammars), rather than including files
-  on top of one another?
-
 - Re-enable continuation lines check, deal with looooong exchange in dyn_init.
   Are the array literals as compact as possible (e.g. do we need all 7 dims, all
   25 (?) MAX_PPP_VARS)? Better yet, make exchange use a begin/queue-multiple/end
@@ -203,8 +193,6 @@
   If those IO stmts contain err=, iostat=, etc., broadcasts will hang. Can
   we detect this at compile time and at least fail with an explanation?
 
-- Add nnt_chkstat calls after all calls into sms library.
-
 - Time ppp on fim routines, find long ones, profile, optimize
 
 - Should error handling be added for translated IO statements with none? If
@@ -222,9 +210,6 @@
 - It might be clearer to break IO_Stmt into several more specific classes.
   This may work better after duplication between IO_Stmt and SMS_Serial is
   factored.
-
-- Reads from internal strings (see e.g. 'read(yyyymmddhhmm(1:4),...) yeari' in
-  phy_run.F90) need not be serialized. Is it a problem if they are?
 
 - Deduce types of implicit variables.
 
@@ -245,7 +230,7 @@
   by function_stmt).
 
 - What about e.g. 'a(1:5)=0' when 'a' is distributed and elements 1:4 are only
-  present on one task?
+  present on one task? This is probably ok due to s1/e1 behavior, but check...
 
 - In grammar class methods that return an optional element (execution_part() of
   Main_Program e.g.) check *there* for expected class vs SyntaxNode and return
@@ -254,16 +239,14 @@
 
 - Refactor distribute_array_bounds() in sms_fortran.rb.
 
-- 'codepoint' text needs to refer to the correct (post-processed file name). Or
-   maybe insert a hash of the source file, which should be unique (enough).
-
 - Maybe do not *remove* nodes. For example, in SMS_Serial#translate, position of
   'block' changes when begin/end stmts are removed. Why not just leave them and
   override their to_s() (maybe conditionally) or replace them with SyntaxNodes?
   Maybe redefine to_s method to return empty string? Change remote() to
   silence()?
 
-- Shouldnt 4th arg to ppp_bcast be a scalar, instead of an array?
+- Shouldnt 4th arg to ppp_bcast be a scalar, instead of an array? Or is this
+  about the 3rd arg, which is different between bcast and bcast_char?
 
 - Pros/Cons of e.g. env[:serial] vs inside?(SMS_Serial)? Standardize on one?
 
