@@ -140,7 +140,7 @@ module Fortran
         newenv[var]["pppvar"]=true
         dc=declaration_constructs
         t.parent=dc
-        dc.e.insert(0,t) # prefer "dc.e.push(t)" -- see TODO
+        dc.e.push(t)
         while node||=self
           node.envref[var]=newenv[var] if node.respond_to?(:envref)
           break if node==su
@@ -899,8 +899,8 @@ module Fortran
       d="#{decomp}"
       n="#{decomp}__nestlevel"
       use("module_decomp")
-      declare("integer","ppp__periodicusedupper",{:dims=>%W[ppp_max_decomposed_dims]})
       declare("integer","ppp__periodicusedlower",{:dims=>%W[ppp_max_decomposed_dims]})
+      declare("integer","ppp__periodicusedupper",{:dims=>%W[ppp_max_decomposed_dims]})
       stmts=[]
       stmts.push(["#{n}=1",:assignment_stmt])
       stmts.push(["#{d}__nregions=1",:assignment_stmt])
@@ -1017,41 +1017,32 @@ module Fortran
     end
 
     def translate
-
-      # HACK: Currently, declare() inserts new declarations at the *top* of the
-      #       decl section, so that they will appear in the opposite of the
-      #       order of declare() calls. This is stupid and has to be fixed. For
-      #       now, take care below that parameters are declared before they are
-      #       used in specification expressions.
-
       use("nnt_types_module")
       dh="#{e[3]}"
-      declare("integer","#{dh}__s3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__s2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__s1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__e3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__e2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__e1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__upperbounds", {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__lowbounds",   {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__localsize",   {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__local_ub",    {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__local_lb",    {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__halosize",    {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__globalsize",  {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__boundarytype",{:dims=>%W[ppp_max_decomposed_dims]})
-      declare("integer","#{dh}__nestlevels",  {:dims=>%W[#{dh}__maxnests]})
-      declare("integer",dh,{:dims=>%W[1]})
-      declare("integer","#{dh}__nregions")
-      declare("integer","#{dh}__nestlevel")
-      declare("integer","#{dh}__localhalosize")
-      declare("integer","#{dh}__index")
-      declare("integer","#{dh}__ignore")
-      declare("character*32","#{dh}__decompname")
-      # HACK start: Do parameters last so they will appear first
       declare("integer","#{dh}__maxnests",{:attrs=>"parameter",:init=>"1"})
       declare("integer","#{dh}__ppp_max_regions",{:attrs=>"parameter",:init=>"1"})
-      # HACK end
+      declare("character*32","#{dh}__decompname")
+      declare("integer","#{dh}__boundarytype",{:dims=>%W[ppp_max_decomposed_dims]})
+      declare("integer","#{dh}__e1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{dh}__e2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{dh}__e3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{dh}__globalsize",  {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__halosize",    {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__ignore")
+      declare("integer","#{dh}__index")
+      declare("integer","#{dh}__local_lb",    {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__local_ub",    {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__localhalosize")
+      declare("integer","#{dh}__localsize",   {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__lowbounds",   {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__nestlevel")
+      declare("integer","#{dh}__nestlevels",  {:dims=>%W[#{dh}__maxnests]})
+      declare("integer","#{dh}__nregions")
+      declare("integer","#{dh}__s1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{dh}__s2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{dh}__s3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{dh}__upperbounds", {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer",dh,{:dims=>%W[1]})
       remove
     end
 
@@ -1433,9 +1424,9 @@ module Fortran
       # function or subroutine names.
       si.names_in_region.sort.each do |name|
         # Skip names with no entries in the environemnt, i.e. that are not
-        # variables. HACK: Also skip names with no type information, on the
-        # (probably naive) assumption that they are function or subroutine names
-        # that are in the environment due to access specification.
+        # variables. Also skip names with no type information, on the (probably
+        # naive) assumption that they are function or subroutine names that are
+        # in the environment due to access specification.
         next unless (varenv=getvarenv(name,self,false)) and varenv["type"]
         dh=varenv["decomp"]
         sort=varenv["sort"]

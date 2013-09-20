@@ -467,6 +467,7 @@ module Fortran
       # differ between applications. It may be acceptable to simply disregard
       # a request to define an already-defined variable, in which case a single
       # method suitable for all applications could be defined here.
+      fail "Fortran#declare not implemented"
     end
 
     def env

@@ -17,8 +17,6 @@
   'directive' appears in rule positions where it should not eventually be
   necessary.
 
-- Remove various HACKS and deal with any fallout.
-
 - Must handle eor=/err= inside serial region, too.
 
 - Carefully consider the cases where an envpop'ing sp_* method is called from
@@ -49,14 +47,6 @@
 - Use ppp__status in calls into sms library to abort on error. nnt_chkstat
 
 - Check status on all allocates rolled out by ppp.
-
-- In declare(), use push(tree) instead of insert(0,tree) to insert new
-  declarations at the END of the declarations list. Unfortunately, the old
-  ppp breaks (fim:cnuity.F90) with the declaration at the end -- can't see
-  the break between declaration and execution.
-
-- declare() is naive. What about declaring an array with the same type as an
-  already-declared scalar? Need more flexibility...
 
 - Error needed when compare_var variable is not distributed or no mod info
 
@@ -106,10 +96,6 @@
   the tree in unsound ways). It may be better to use the block_do_construct
   trick (do\n...exit\nend do", replacing a single statement.
 
-- Fortran#declare needs to insert new declarations at the *bottom* of the decl
-  section, not at the top, so that declare() calls can be made, intuitively, in
-  the required order.
-
 - To make all of this more useful, build an AST from the parse tree. Then, do
   translations on and produce final output from the AST.
 
@@ -137,9 +123,6 @@
   or SyntaxNode subclasses. That is, should we convert to strings as early as
   possible, or delay until a string is absolutely required? Probably the latter.
 
-- Try to find out which directives actually require module_decomp and/or
-  nnt_types_module and limit rolled-out 'declare' calls.
-
 - sms$serial ought to give diagnostic information about which variables it will
   gather, scatter or broadcast, so that users can tune the directive.
 
@@ -156,8 +139,6 @@
   'standard' behavior is to exit with an error if an expected name is not found,
   so this is divergent. Worse, it may be *wrong* as function names may
   eventually appear in the environment (to note their type).
-
-- Should T#declare in fortran.rb exist? Should it abort if called?
 
 - translate_children() -- do we need 'if e' & compact & 'if x'?
 
@@ -295,3 +276,6 @@
 - Shouldnt 4th arg to ppp_bcast be a scalar, instead of an array?
 
 - Pros/Cons of e.g. env[:serial] vs inside?(SMS_Serial)? Standardize on one?
+
+- declare() is naive. What about declaring an array with the same type as an
+  already-declared scalar? Need more flexibility...
