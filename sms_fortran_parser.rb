@@ -310,13 +310,8 @@ module Fortran
         if r9
           r0 = r9
         else
-          r10 = _nt_sms_ignore_subprogram
-          if r10
-            r0 = r10
-          else
-            @index = i0
-            r0 = nil
-          end
+          @index = i0
+          r0 = nil
         end
       end
     end
@@ -366,100 +361,6 @@ module Fortran
     end
 
     node_cache[:implicit_part][start_index] = r0
-
-    r0
-  end
-
-  module InternalSubprogram0
-    def subroutine_subprogram
-      elements[0]
-    end
-
-  end
-
-  module InternalSubprogram1
-    def function_subprogram
-      elements[0]
-    end
-
-  end
-
-  def _nt_internal_subprogram
-    start_index = index
-    if node_cache[:internal_subprogram].has_key?(index)
-      cached = node_cache[:internal_subprogram][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0 = index
-    i1, s1 = index, []
-    r2 = _nt_subroutine_subprogram
-    s1 << r2
-    if r2
-      i3 = index
-      r4 = lambda { |e| sp_subroutine_subprogram }.call(s1)
-      if r4
-        @index = i3
-        r3 = instantiate_node(SyntaxNode,input, index...index)
-      else
-        r3 = nil
-      end
-      s1 << r3
-    end
-    if s1.last
-      r1 = instantiate_node(E,input, i1...index, s1)
-      r1.extend(InternalSubprogram0)
-    else
-      @index = i1
-      r1 = nil
-    end
-    if r1
-      r0 = r1
-    else
-      i5, s5 = index, []
-      r6 = _nt_function_subprogram
-      s5 << r6
-      if r6
-        i7 = index
-        r8 = lambda { |e| sp_function_subprogram(e[0]) }.call(s5)
-        if r8
-          @index = i7
-          r7 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r7 = nil
-        end
-        s5 << r7
-      end
-      if s5.last
-        r5 = instantiate_node(E,input, i5...index, s5)
-        r5.extend(InternalSubprogram1)
-      else
-        @index = i5
-        r5 = nil
-      end
-      if r5
-        r0 = r5
-      else
-        r9 = _nt_directive
-        if r9
-          r0 = r9
-        else
-          r10 = _nt_sms_ignore_subprogram
-          if r10
-            r0 = r10
-          else
-            @index = i0
-            r0 = nil
-          end
-        end
-      end
-    end
-
-    node_cache[:internal_subprogram][start_index] = r0
 
     r0
   end
@@ -518,100 +419,6 @@ module Fortran
     end
 
     node_cache[:label][start_index] = r0
-
-    r0
-  end
-
-  module ModuleSubprogram0
-    def subroutine_subprogram
-      elements[0]
-    end
-
-  end
-
-  module ModuleSubprogram1
-    def function_subprogram
-      elements[0]
-    end
-
-  end
-
-  def _nt_module_subprogram
-    start_index = index
-    if node_cache[:module_subprogram].has_key?(index)
-      cached = node_cache[:module_subprogram][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0 = index
-    i1, s1 = index, []
-    r2 = _nt_subroutine_subprogram
-    s1 << r2
-    if r2
-      i3 = index
-      r4 = lambda { |e| sp_subroutine_subprogram }.call(s1)
-      if r4
-        @index = i3
-        r3 = instantiate_node(SyntaxNode,input, index...index)
-      else
-        r3 = nil
-      end
-      s1 << r3
-    end
-    if s1.last
-      r1 = instantiate_node(E,input, i1...index, s1)
-      r1.extend(ModuleSubprogram0)
-    else
-      @index = i1
-      r1 = nil
-    end
-    if r1
-      r0 = r1
-    else
-      i5, s5 = index, []
-      r6 = _nt_function_subprogram
-      s5 << r6
-      if r6
-        i7 = index
-        r8 = lambda { |e| sp_function_subprogram(e[0]) }.call(s5)
-        if r8
-          @index = i7
-          r7 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r7 = nil
-        end
-        s5 << r7
-      end
-      if s5.last
-        r5 = instantiate_node(E,input, i5...index, s5)
-        r5.extend(ModuleSubprogram1)
-      else
-        @index = i5
-        r5 = nil
-      end
-      if r5
-        r0 = r5
-      else
-        r9 = _nt_directive
-        if r9
-          r0 = r9
-        else
-          r10 = _nt_sms_ignore_subprogram
-          if r10
-            r0 = r10
-          else
-            @index = i0
-            r0 = nil
-          end
-        end
-      end
-    end
-
-    node_cache[:module_subprogram][start_index] = r0
 
     r0
   end
@@ -1042,13 +849,8 @@ module Fortran
       if r2
         r0 = r2
       else
-        r3 = _nt_sms_ignore_declarative
-        if r3
-          r0 = r3
-        else
-          @index = i0
-          r0 = nil
-        end
+        @index = i0
+        r0 = nil
       end
     end
 
@@ -1755,7 +1557,7 @@ module Fortran
             if r5
               r0 = r5
             else
-              r9 = _nt_sms_ignore_executable
+              r9 = _nt_sms_ignore
               if r9
                 r0 = r9
               else
@@ -2237,68 +2039,7 @@ module Fortran
     r0
   end
 
-  module SmsIgnoreDeclarative0
-    def sms_ignore_begin
-      elements[0]
-    end
-
-    def declaration_constructs
-      elements[1]
-    end
-
-    def sms_ignore_end
-      elements[2]
-    end
-
-  end
-
-  def _nt_sms_ignore_declarative
-    start_index = index
-    if node_cache[:sms_ignore_declarative].has_key?(index)
-      cached = node_cache[:sms_ignore_declarative][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0, s0 = index, []
-    r1 = _nt_sms_ignore_begin
-    s0 << r1
-    if r1
-      r2 = _nt_declaration_constructs
-      s0 << r2
-      if r2
-        r3 = _nt_sms_ignore_end
-        s0 << r3
-        if r3
-          i4 = index
-          r5 = lambda { |e| sp_sms_ignore }.call(s0)
-          if r5
-            @index = i4
-            r4 = instantiate_node(SyntaxNode,input, index...index)
-          else
-            r4 = nil
-          end
-          s0 << r4
-        end
-      end
-    end
-    if s0.last
-      r0 = instantiate_node(SMS_Ignore,input, i0...index, s0)
-      r0.extend(SmsIgnoreDeclarative0)
-    else
-      @index = i0
-      r0 = nil
-    end
-
-    node_cache[:sms_ignore_declarative][start_index] = r0
-
-    r0
-  end
-
-  module SmsIgnoreExecutable0
+  module SmsIgnore0
     def sms_ignore_begin
       elements[0]
     end
@@ -2313,10 +2054,10 @@ module Fortran
 
   end
 
-  def _nt_sms_ignore_executable
+  def _nt_sms_ignore
     start_index = index
-    if node_cache[:sms_ignore_executable].has_key?(index)
-      cached = node_cache[:sms_ignore_executable][index]
+    if node_cache[:sms_ignore].has_key?(index)
+      cached = node_cache[:sms_ignore][index]
       if cached
         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
@@ -2348,148 +2089,13 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(SMS_Ignore,input, i0...index, s0)
-      r0.extend(SmsIgnoreExecutable0)
+      r0.extend(SmsIgnore0)
     else
       @index = i0
       r0 = nil
     end
 
-    node_cache[:sms_ignore_executable][start_index] = r0
-
-    r0
-  end
-
-  module SmsIgnoreSubprogram0
-    def sms_ignore_begin
-      elements[0]
-    end
-
-    def sms_ignore_end
-      elements[2]
-    end
-
-  end
-
-  def _nt_sms_ignore_subprogram
-    start_index = index
-    if node_cache[:sms_ignore_subprogram].has_key?(index)
-      cached = node_cache[:sms_ignore_subprogram][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0, s0 = index, []
-    r1 = _nt_sms_ignore_begin
-    s0 << r1
-    if r1
-      i2 = index
-      r3 = _nt_external_subprogram
-      if r3
-        r2 = r3
-      else
-        r4 = _nt_internal_subprogram
-        if r4
-          r2 = r4
-        else
-          r5 = _nt_module_subprogram
-          if r5
-            r2 = r5
-          else
-            @index = i2
-            r2 = nil
-          end
-        end
-      end
-      s0 << r2
-      if r2
-        r6 = _nt_sms_ignore_end
-        s0 << r6
-        if r6
-          i7 = index
-          r8 = lambda { |e| sp_sms_ignore }.call(s0)
-          if r8
-            @index = i7
-            r7 = instantiate_node(SyntaxNode,input, index...index)
-          else
-            r7 = nil
-          end
-          s0 << r7
-        end
-      end
-    end
-    if s0.last
-      r0 = instantiate_node(SMS_Ignore,input, i0...index, s0)
-      r0.extend(SmsIgnoreSubprogram0)
-    else
-      @index = i0
-      r0 = nil
-    end
-
-    node_cache[:sms_ignore_subprogram][start_index] = r0
-
-    r0
-  end
-
-  module SmsIgnoreUse0
-    def sms_ignore_begin
-      elements[0]
-    end
-
-    def use_part
-      elements[1]
-    end
-
-    def sms_ignore_end
-      elements[2]
-    end
-
-  end
-
-  def _nt_sms_ignore_use
-    start_index = index
-    if node_cache[:sms_ignore_use].has_key?(index)
-      cached = node_cache[:sms_ignore_use][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0, s0 = index, []
-    r1 = _nt_sms_ignore_begin
-    s0 << r1
-    if r1
-      r2 = _nt_use_part
-      s0 << r2
-      if r2
-        r3 = _nt_sms_ignore_end
-        s0 << r3
-        if r3
-          i4 = index
-          r5 = lambda { |e| sp_sms_ignore }.call(s0)
-          if r5
-            @index = i4
-            r4 = instantiate_node(SyntaxNode,input, index...index)
-          else
-            r4 = nil
-          end
-          s0 << r4
-        end
-      end
-    end
-    if s0.last
-      r0 = instantiate_node(SMS_Ignore,input, i0...index, s0)
-      r0.extend(SmsIgnoreUse0)
-    else
-      @index = i0
-      r0 = nil
-    end
-
-    node_cache[:sms_ignore_use][start_index] = r0
+    node_cache[:sms_ignore][start_index] = r0
 
     r0
   end
@@ -5732,50 +5338,6 @@ module Fortran
     end
 
     node_cache[:sms_var_list][start_index] = r0
-
-    r0
-  end
-
-  def _nt_use_part
-    start_index = index
-    if node_cache[:use_part].has_key?(index)
-      cached = node_cache[:use_part][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    s0, i0 = [], index
-    loop do
-      i1 = index
-      r2 = _nt_use_stmt
-      if r2
-        r1 = r2
-      else
-        r3 = _nt_directive
-        if r3
-          r1 = r3
-        else
-          r4 = _nt_sms_ignore_use
-          if r4
-            r1 = r4
-          else
-            @index = i1
-            r1 = nil
-          end
-        end
-      end
-      if r1
-        s0 << r1
-      else
-        break
-      end
-    end
-    r0 = instantiate_node(Use_Part,input, i0...index, s0)
-
-    node_cache[:use_part][start_index] = r0
 
     r0
   end

@@ -1,19 +1,13 @@
-- Remove recognition of sms$ignore in inappropriate regions
-
-- Consider which sms_ignore_* rules are actually needed. Certainly _executable,
-  but possibly not _declarative, _use or _implicit. Get rid of what isn't
-  necessary.
-
-- When the legacy ppp is removed from the build chain, remove the sms$ignore
-  region being inserted by use(), which is only an interim shim to keep legacy
-  ppp from freaking out.
-
 - When sms$ignore is gone, reconsider places where 'rule directive' can apply in
   non-SMS grammar. Currently, to allow for a Fortran-only parser that still
   accepts SMS directives that appear in 'weird' places (like sms$ignore
   directives that appear outside any declarative or executable context),
   'directive' appears in rule positions where it should not eventually be
   necessary.
+
+- Use ppp__status in calls into sms library to abort on error. nnt_chkstat
+
+- Check status on all allocates rolled out by ppp.
 
 - Must handle eor=/err= inside serial region, too.
 
@@ -42,13 +36,11 @@
   module_decomp.env does not even *exist*, much less contain the items added
   during translation.
 
-- Use ppp__status in calls into sms library to abort on error. nnt_chkstat
-
-- Check status on all allocates rolled out by ppp.
-
 - Error needed when compare_var variable is not distributed or no mod info
 
 - WHERE may need (automatic?) parallel treatment.
+
+- implicit-do constructs may require parallel treatment.
 
 - Are distributed array assignments e.g.
     !sms$distribute (dh,1) begin

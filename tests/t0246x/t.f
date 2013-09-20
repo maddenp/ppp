@@ -2,8 +2,8 @@
       call s
       end program t
       
-*sms$ignore begin
       subroutine s
+*sms$ignore begin
       print '(a)','hello'
-      end subroutine s
 Csms$ignore end
+      end subroutine s
