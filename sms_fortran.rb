@@ -1229,6 +1229,7 @@ module Fortran
     end
 
     def translate
+      remove
     end
 
   end
@@ -1240,6 +1241,7 @@ module Fortran
     end
 
     def translate
+      remove
     end
 
   end
