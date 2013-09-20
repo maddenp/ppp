@@ -5,13 +5,6 @@
 - Does the envfile from a module that uses another module contain the info from
   the other module? Should it?
 
-- When sms$ignore is gone, reconsider places where 'rule directive' can apply in
-  non-SMS grammar. Currently, to allow for a Fortran-only parser that still
-  accepts SMS directives that appear in 'weird' places (like sms$ignore
-  directives that appear outside any declarative or executable context),
-  'directive' appears in rule positions where it should not eventually be
-  necessary.
-
 - Use ppp__status in calls into sms library to abort on error. nnt_chkstat
 
 - Check status on all allocates rolled out by ppp.
