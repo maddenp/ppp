@@ -247,3 +247,7 @@
   already-declared scalar? Need more flexibility...
 
 - Factor more sms text out into T#sms_* methods.
+
+- Optimization: When processing a file, hash read-in module files so that a
+  repeat use (e.g. in another subroutine in that module) need not read from
+  disk again.
