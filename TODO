@@ -251,3 +251,5 @@
 - Optimization: When processing a file, hash read-in module files so that a
   repeat use (e.g. in another subroutine in that module) need not read from
   disk again.
+
+- stop-stmt in serial region needs to bring down all tasks.
