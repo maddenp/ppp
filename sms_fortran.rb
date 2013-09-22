@@ -474,7 +474,7 @@ module Fortran
             onroot=true
             nmlenv=getvarenv(nml,self,expected=true)
             nmlenv["objects"].each do |x|
-              var="#{x}"
+              var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
               if (varenv=getvarenv(var,self,expected=false))
                 if varenv["decomp"]
                   var_scatter.push(var)
@@ -486,7 +486,7 @@ module Fortran
             end
           end
           self.input_items.each do |x|
-            var="#{x}"
+            var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
             if (varenv=getvarenv(var,self,expected=true))
               if (dh=varenv["decomp"])
                 onroot=true
@@ -503,7 +503,7 @@ module Fortran
 
         if self.is_a?(Print_Stmt)
           self.output_items.each do |x|
-            var="#{x}"
+            var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
             if (varenv=getvarenv(var,self,expected=false))
               if (dh=varenv["decomp"])
                 onroot=true
@@ -524,7 +524,7 @@ module Fortran
             onroot=true
             nmlenv=getvarenv(nml,self,expected=true)
             nmlenv["objects"].each do |x|
-              var="#{x}"
+              var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
               varenv=getvarenv(var,self,expected=true)
               if varenv["decomp"]
                 var_gather.push(var)
@@ -533,7 +533,7 @@ module Fortran
             end
           end
           self.output_items.each do |x|
-            var="#{x}"
+            var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
             if (varenv=getvarenv(var,self,expected=false))
               if (dh=varenv["decomp"])
                 onroot=true
@@ -562,7 +562,7 @@ module Fortran
           end
           bounds_root=bounds_root.join(",")
           bounds_nonroot=("1"*dims).split("").join(",")
-          code_alloc.push("if (#{sms_rootcheck}) then")
+          code_alloc.push("if (#{sms_rootcheck}()) then")
           code_alloc.push("allocate(#{Name.global(var)}(#{bounds_root}),stat=#{sms_statusvar})")
           code_alloc.push("else")
           code_alloc.push("allocate(#{Name.global(var)}(#{bounds_nonroot}),stat=#{sms_statusvar})")
