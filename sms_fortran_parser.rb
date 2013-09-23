@@ -1595,36 +1595,46 @@ module Fortran
                       if r19
                         r0 = r19
                       else
-                        i20, s20 = index, []
-                        r21 = _nt_sms_to_local
-                        s20 << r21
-                        if r21
-                          i22 = index
-                          r23 = lambda { |e| sp_sms_to_local }.call(s20)
-                          if r23
-                            @index = i22
-                            r22 = instantiate_node(SyntaxNode,input, index...index)
-                          else
-                            r22 = nil
-                          end
-                          s20 << r22
-                        end
-                        if s20.last
-                          r20 = instantiate_node(E,input, i20...index, s20)
-                          r20.extend(SmsExecutable3)
-                        else
-                          @index = i20
-                          r20 = nil
-                        end
+                        r20 = _nt_sms_start
                         if r20
                           r0 = r20
                         else
-                          r24 = _nt_sms_unstructured_grid
-                          if r24
-                            r0 = r24
+                          r21 = _nt_sms_stop
+                          if r21
+                            r0 = r21
                           else
-                            @index = i0
-                            r0 = nil
+                            i22, s22 = index, []
+                            r23 = _nt_sms_to_local
+                            s22 << r23
+                            if r23
+                              i24 = index
+                              r25 = lambda { |e| sp_sms_to_local }.call(s22)
+                              if r25
+                                @index = i24
+                                r24 = instantiate_node(SyntaxNode,input, index...index)
+                              else
+                                r24 = nil
+                              end
+                              s22 << r24
+                            end
+                            if s22.last
+                              r22 = instantiate_node(E,input, i22...index, s22)
+                              r22.extend(SmsExecutable3)
+                            else
+                              @index = i22
+                              r22 = nil
+                            end
+                            if r22
+                              r0 = r22
+                            else
+                              r26 = _nt_sms_unstructured_grid
+                              if r26
+                                r0 = r26
+                              else
+                                @index = i0
+                                r0 = nil
+                              end
+                            end
                           end
                         end
                       end
@@ -3815,6 +3825,104 @@ module Fortran
     r0
   end
 
+  module SmsStart0
+    def sms_sentinel
+      elements[0]
+    end
+
+    def sms_t_start
+      elements[1]
+    end
+
+    def t_newline
+      elements[2]
+    end
+  end
+
+  def _nt_sms_start
+    start_index = index
+    if node_cache[:sms_start].has_key?(index)
+      cached = node_cache[:sms_start][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_sentinel
+    s0 << r1
+    if r1
+      r2 = _nt_sms_t_start
+      s0 << r2
+      if r2
+        r3 = _nt_t_newline
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Start,input, i0...index, s0)
+      r0.extend(SmsStart0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_start][start_index] = r0
+
+    r0
+  end
+
+  module SmsStop0
+    def sms_sentinel
+      elements[0]
+    end
+
+    def sms_t_stop
+      elements[1]
+    end
+
+    def t_newline
+      elements[2]
+    end
+  end
+
+  def _nt_sms_stop
+    start_index = index
+    if node_cache[:sms_stop].has_key?(index)
+      cached = node_cache[:sms_stop][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_sentinel
+    s0 << r1
+    if r1
+      r2 = _nt_sms_t_stop
+      s0 << r2
+      if r2
+        r3 = _nt_t_newline
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Stop,input, i0...index, s0)
+      r0.extend(SmsStop0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_stop][start_index] = r0
+
+    r0
+  end
+
   def _nt_sms_string
     start_index = index
     if node_cache[:sms_string].has_key?(index)
@@ -4369,6 +4477,54 @@ module Fortran
     end
 
     node_cache[:sms_t_set_communicator][start_index] = r0
+
+    r0
+  end
+
+  def _nt_sms_t_start
+    start_index = index
+    if node_cache[:sms_t_start].has_key?(index)
+      cached = node_cache[:sms_t_start][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("start", false, index)
+      r0 = instantiate_node(T,input, index...(index + 5))
+      @index += 5
+    else
+      terminal_parse_failure("start")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_start][start_index] = r0
+
+    r0
+  end
+
+  def _nt_sms_t_stop
+    start_index = index
+    if node_cache[:sms_t_stop].has_key?(index)
+      cached = node_cache[:sms_t_stop][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("stop", false, index)
+      r0 = instantiate_node(T,input, index...(index + 4))
+      @index += 4
+    else
+      terminal_parse_failure("stop")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_stop][start_index] = r0
 
     r0
   end

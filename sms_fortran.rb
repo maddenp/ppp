@@ -744,21 +744,6 @@ module Fortran
 
   end
 
-  class Main_Program < Scoping_Unit
-
-    def translate
-      if (ep=execution_part)
-        use(sms_decompmod)
-        block=ep.e
-        code="call sms_start(#{sms_statusvar})"
-        insert_statement_before(code,:call_stmt,block.first)
-        code="call nnt_stop('#{marker}',0,ppp_exit)"
-        insert_statement_after(code,:call_stmt,block.last)
-      end
-    end
-
-  end
-
   class Name < T
 
     def self.global(name)
@@ -1779,6 +1764,26 @@ module Fortran
     def translate
       use(sms_decompmod)
       code="call sms_set_communicator(#{e[3]},#{sms_statusvar})"
+      replace_statement(code,:call_stmt)
+    end
+
+  end
+
+  class SMS_Start < SMS
+
+    def translate
+      use(sms_decompmod)
+      code="call sms_start(#{sms_statusvar})"
+      replace_statement(code,:call_stmt)
+    end
+
+  end
+  
+  class SMS_Stop < SMS
+
+    def translate
+      use(sms_decompmod)
+      code="call nnt_stop('#{marker}',0,ppp_exit)"
       replace_statement(code,:call_stmt)
     end
 

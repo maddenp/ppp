@@ -131,6 +131,8 @@ grammar Fortran
     sms_reduce /
     sms_serial &{ |e| sp_sms_serial } <E> /
     sms_set_communicator /
+    sms_start /
+    sms_stop /
     sms_to_local &{ |e| sp_sms_to_local } <E> /
     sms_unstructured_grid
   end
@@ -260,6 +262,14 @@ grammar Fortran
     sms_sentinel sms_t_set_communicator t_paren_l variable_name t_paren_r t_newline <SMS_Set_Communicator>
   end
 
+  rule sms_start
+    sms_sentinel sms_t_start t_newline <SMS_Start>
+  end
+
+  rule sms_stop
+    sms_sentinel sms_t_stop t_newline <SMS_Stop>
+  end
+
   rule sms_string
     char_literal_constant_dq /
     char_literal_constant_sq
@@ -351,6 +361,14 @@ grammar Fortran
 
   rule sms_t_set_communicator
     "set_communicator" <T>
+  end
+
+  rule sms_t_start
+    "start" <T>
+  end
+
+  rule sms_t_stop
+    "stop" <T>
   end
 
   rule sms_t_sum
