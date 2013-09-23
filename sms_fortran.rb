@@ -1010,7 +1010,7 @@ module Fortran
   class SMS_Declare_Decomp < SMS
 
     def to_s
-      sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}#{e[8]}")
+      sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}")
     end
 
     def translate
@@ -1043,6 +1043,9 @@ module Fortran
       remove
     end
 
+  end
+
+  class SMS_Declare_Decomp_Unstructured_Option < E
   end
 
   class SMS_Decomp_Name < SMS

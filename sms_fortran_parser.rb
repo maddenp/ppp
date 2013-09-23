@@ -862,20 +862,12 @@ module Fortran
       elements[5]
     end
 
-    def t_colon
-      elements[6]
-    end
-
-    def sms_t_unstructured
+    def t_paren_r
       elements[7]
     end
 
-    def t_paren_r
-      elements[8]
-    end
-
     def t_newline
-      elements[9]
+      elements[8]
     end
   end
 
@@ -909,18 +901,19 @@ module Fortran
               r6 = _nt_scalar_int_literal_constant
               s0 << r6
               if r6
-                r7 = _nt_t_colon
+                r8 = _nt_sms_declare_decomp_unstructured_option
+                if r8
+                  r7 = r8
+                else
+                  r7 = instantiate_node(SyntaxNode,input, index...index)
+                end
                 s0 << r7
                 if r7
-                  r8 = _nt_sms_t_unstructured
-                  s0 << r8
-                  if r8
-                    r9 = _nt_t_paren_r
-                    s0 << r9
-                    if r9
-                      r10 = _nt_t_newline
-                      s0 << r10
-                    end
+                  r9 = _nt_t_paren_r
+                  s0 << r9
+                  if r9
+                    r10 = _nt_t_newline
+                    s0 << r10
                   end
                 end
               end
@@ -938,6 +931,47 @@ module Fortran
     end
 
     node_cache[:sms_declare_decomp][start_index] = r0
+
+    r0
+  end
+
+  module SmsDeclareDecompUnstructuredOption0
+    def t_colon
+      elements[0]
+    end
+
+    def sms_t_unstructured
+      elements[1]
+    end
+  end
+
+  def _nt_sms_declare_decomp_unstructured_option
+    start_index = index
+    if node_cache[:sms_declare_decomp_unstructured_option].has_key?(index)
+      cached = node_cache[:sms_declare_decomp_unstructured_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_colon
+    s0 << r1
+    if r1
+      r2 = _nt_sms_t_unstructured
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Declare_Decomp_Unstructured_Option,input, i0...index, s0)
+      r0.extend(SmsDeclareDecompUnstructuredOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_declare_decomp_unstructured_option][start_index] = r0
 
     r0
   end

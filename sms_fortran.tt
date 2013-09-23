@@ -87,7 +87,11 @@ grammar Fortran
   end
 
   rule sms_declare_decomp
-    sms_sentinel sms_t_declare_decomp t_paren_l sms_decomp_name t_comma scalar_int_literal_constant t_colon sms_t_unstructured t_paren_r t_newline <SMS_Declare_Decomp>
+    sms_sentinel sms_t_declare_decomp t_paren_l sms_decomp_name t_comma scalar_int_literal_constant sms_declare_decomp_unstructured_option? t_paren_r t_newline <SMS_Declare_Decomp>
+  end
+
+  rule sms_declare_decomp_unstructured_option
+    t_colon sms_t_unstructured <SMS_Declare_Decomp_Unstructured_Option>
   end
 
   rule sms_decomp_name
