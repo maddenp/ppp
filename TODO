@@ -1,7 +1,3 @@
-- Remove 'continue' shims in fim.
-
-- Remove sms$ignore around 'type' blocks?
-
 - Does the envfile from a module that uses another module contain the info from
   the other module? Should it?
 
