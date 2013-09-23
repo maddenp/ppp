@@ -136,6 +136,8 @@
 
 ### REFACTORING
 
+- In sms_commtag, instead of working at root node, use env[:static]?
+
 - Factor duplication between IO_Stmt and SMS_Serial.
 
 - It might be clearer to break IO_Stmt into several more specific classes.

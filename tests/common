@@ -21,7 +21,7 @@ STEM=$(basename $(TEST))
 TARGETS=clean comp $(EXE_NEW) $(EXE_OLD) $(OUT_NEW) $(OUT_OLD) translation
 TEST=$(wildcard t.f t.f90)
 TMPFILE=tmpfile
-TOCLEAN=$(OUT_NEW) $(EXE_NEW) $(EXE_OLD) $(OUT_NEW) $(TMPFILE) $(TRANSLATION) a.out *.env *.mod *.o
+TOCLEAN=$(OUT_NEW) $(EXE_NEW) $(EXE_OLD) $(OUT_NEW) $(TMPFILE) $(TRANSLATION) a.out *.env *.mod *.o *.sms
 TRANSLATION=$(STEM)_ppp.f90
 
 # dynamic settings

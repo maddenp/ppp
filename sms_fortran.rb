@@ -242,16 +242,42 @@ module Fortran
       "#{e[0]}#{e[1]} #{s}\n"
     end
 
+    def sms_commtag
+      r=root
+      t=0
+      t=r.instance_variable_get(:@tag)+1 if r.instance_variable_defined?(:@tag)
+      r.instance_variable_set(:@tag,t)
+      "sms__tag_#{@tag}"
+    end
+
     def sms_decompmod
       "module_decomp"
     end
 
+    def sms_global_name(name)
+      p="sms__global_"
+      n="#{name}"
+      maxnamelen=31
+      tokeep=maxnamelen-p.size-1
+      return "#{p}#{n}" if n.size<=tokeep
+      @@global_names={} unless defined?(@@global_names)
+      return @@global_names[n] if @@global_names[n]
+      @@global_index=0 unless defined?(@@global_index)
+      p="#{p}#{@@global_index+=1}_"
+      tokeep=maxnamelen-p.size-1
+      @@global_names[n]=p+n[0..tokeep]
+    end
+
+    def sms_global_prefix
+      
+    end
+
     def sms_rootcheck
-      "iam_root"
+      "sms__i_am_root"
     end
 
     def sms_statusvar
-      "ppp__status"
+      "sms__status"
     end
 
     def smstype(type,kind)
@@ -420,7 +446,7 @@ module Fortran
   class IO_Spec
 
     def pppvar_prefix
-      "ppp__io_"
+      "sms__io_"
     end
 
   end
@@ -483,7 +509,7 @@ module Fortran
               if (varenv=getvarenv(var,self,expected=false))
                 if varenv["decomp"]
                   var_scatter.push(var)
-                  self.replace_input_item(x,Name.global(var))
+                  self.replace_input_item(x,sms_global_name(var))
                 else
                   var_bcast.push(var)
                 end
@@ -496,7 +522,7 @@ module Fortran
               if (dh=varenv["decomp"])
                 onroot=true
                 var_scatter.push(var)
-                self.replace_input_item(x,Name.global(var))
+                self.replace_input_item(x,sms_global_name(var))
               else
                 var_bcast.push(var) if onroot
               end
@@ -512,7 +538,7 @@ module Fortran
             if (varenv=getvarenv(var,self,expected=false))
               if (dh=varenv["decomp"])
                 onroot=true
-                global=Name.global(var)
+                global=sms_global_name(var)
                 var_gather.push(var)
                 self.replace_output_item(x,global)
               end
@@ -533,7 +559,7 @@ module Fortran
               varenv=getvarenv(var,self,expected=true)
               if varenv["decomp"]
                 var_gather.push(var)
-                self.replace_input_item(x,Name.global(var))
+                self.replace_input_item(x,sms_global_name(var))
               end
             end
           end
@@ -542,7 +568,7 @@ module Fortran
             if (varenv=getvarenv(var,self,expected=false))
               if (dh=varenv["decomp"])
                 onroot=true
-                global=Name.global(var)
+                global=sms_global_name(var)
                 var_gather.push(var)
                 self.replace_output_item(x,global)
               end
@@ -559,7 +585,7 @@ module Fortran
           varenv=getvarenv(var)
           d=(":"*varenv["dims"]).split("")
           k=varenv["kind"]
-          declare(varenv["type"],Name.global(var),{:attrs=>["allocatable"],:dims=>d,:kind=>k})
+          declare(varenv["type"],sms_global_name(var),{:attrs=>["allocatable"],:dims=>d,:kind=>k})
           dims=varenv["dims"]
           bounds_root=[]
           (1..dims).each do |i|
@@ -568,11 +594,11 @@ module Fortran
           bounds_root=bounds_root.join(",")
           bounds_nonroot=("1"*dims).split("").join(",")
           code_alloc.push("if (#{sms_rootcheck}()) then")
-          code_alloc.push("allocate(#{Name.global(var)}(#{bounds_root}),stat=#{sms_statusvar})")
+          code_alloc.push("allocate(#{sms_global_name(var)}(#{bounds_root}),stat=#{sms_statusvar})")
           code_alloc.push("else")
-          code_alloc.push("allocate(#{Name.global(var)}(#{bounds_nonroot}),stat=#{sms_statusvar})")
+          code_alloc.push("allocate(#{sms_global_name(var)}(#{bounds_nonroot}),stat=#{sms_statusvar})")
           code_alloc.push("endif")
-          code_dealloc.push("deallocate(#{Name.global(var)})")
+          code_dealloc.push("deallocate(#{sms_global_name(var)})")
         end
 
         # Gathers
@@ -588,7 +614,7 @@ module Fortran
           gstop=glubs
           gstrt=gllbs
           perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-          decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/ppp_not_decomposed/)")
+          decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
           args=[]
           args.push("#{maxrank}")
           args.push("1")
@@ -601,7 +627,7 @@ module Fortran
           args.push("#{type}")
           args.push(".false.") # but why?
           args.push("#{var}")
-          args.push(Name.global(var))
+          args.push(sms_global_name(var))
           args.push(sms_statusvar)
           code="call sms_gather(#{args.join(",")})"
           code_gather.push(code)
@@ -611,7 +637,7 @@ module Fortran
 
         var_scatter.each do |var|
           need_decompmod=true
-          tag="ppp__tag_#{newtag}"
+          tag=sms_commtag
           declare("integer",tag,{:attrs=>"save"})
           varenv=getvarenv(var)
           dh=varenv["decomp"]
@@ -624,7 +650,7 @@ module Fortran
           halol="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
           halou="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
           perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-          decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/ppp_not_decomposed/)")
+          decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
           args=[]
           args.push("#{maxrank}")
           args.push("1")
@@ -638,7 +664,7 @@ module Fortran
           args.push("#{halou}")
           args.push("#{decomp}")
           args.push("#{type}")
-          args.push(Name.global(var))
+          args.push(sms_global_name(var))
           args.push("#{var}")
           args.push(sms_statusvar)
           code="call sms_scatter(#{args.join(",")})"
@@ -652,7 +678,7 @@ module Fortran
           varenv=getvarenv(var)
           if varenv["type"]=="character"
             arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
-            code="call ppp_bcast_char(#{var},#{arg2},#{sms_statusvar})"
+            code="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
           else
             if varenv["sort"]=="_scalar"
               dims="1"
@@ -661,7 +687,7 @@ module Fortran
               dims=varenv["dims"]
               sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
             end
-            code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
+            code="call sms__bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
           end
           code_bcast.push(code)
         end
@@ -680,7 +706,7 @@ module Fortran
               label_old,label_new=spec.send(:relabel)
               pppvar=spec.send(:pppvar)
               spec_var_false.push("#{pppvar}=.false.")
-              spec_var_bcast.push("call ppp_bcast(#{pppvar},nnt_logical,(/1/),1,#{sms_statusvar})")
+              spec_var_bcast.push("call sms__bcast(#{pppvar},nnt_logical,(/1/),1,#{sms_statusvar})")
               spec_var_true.push("#{label_new} #{pppvar}=.true.")
               spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
               success_label=label_create unless success_label
@@ -718,7 +744,7 @@ module Fortran
             if (spec=self.send(x))
               var=spec.rhs
               varenv=getvarenv(var)
-              spec_var_bcast.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
+              spec_var_bcast.push("call sms__bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
               need_decompmod=true
             end
           end
@@ -755,18 +781,8 @@ module Fortran
 
   class Name < T
 
-    def self.global(name)
-      n=name.to_s
-      return "ppp__g_#{n}" if n.size<=24
-      @@g={} unless defined?(@@g)
-      return @@g[n] if @@g[n]
-      @@index=0 unless defined?(@@index)
-      prefix="ppp__g_#{@@index+=1}_"
-      @@g[n]=prefix+n[0..29-prefix.size]
-    end
-
     def globalize
-      code=Name.global(self)
+      code=sms_global_name(self)
       replace_element(code,:name)
     end
 
@@ -844,7 +860,7 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      code="call ppp_barrier(#{sms_statusvar})"
+      code="call sms__barrier(#{sms_statusvar})"
       replace_statement(code,:call_stmt)
     end
 
@@ -870,9 +886,9 @@ module Fortran
       if (dh=varenv["decomp"])
         dh="#{dh}(#{dh}__nestlevel)"
       else
-        dh="ppp_not_decomposed"
+        dh="sms__not_decomposed"
       end
-      code="if (sms_debugging_on()) call ppp_compare_var(#{dh},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},#{sms_statusvar})"
+      code="if (sms_debugging_on()) call sms__compare_var(#{dh},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},#{sms_statusvar})"
       replace_statement(code,:if_stmt)
     end
 
@@ -905,8 +921,8 @@ module Fortran
       d="#{decomp}"
       n="#{decomp}__nestlevel"
       use(sms_decompmod)
-      declare("integer","ppp__periodicusedlower",{:dims=>%W[ppp_max_decomposed_dims]})
-      declare("integer","ppp__periodicusedupper",{:dims=>%W[ppp_max_decomposed_dims]})
+      declare("integer","sms__periodicusedlower",{:dims=>%W[ppp_max_decomposed_dims]})
+      declare("integer","sms__periodicusedupper",{:dims=>%W[ppp_max_decomposed_dims]})
       stmts=[]
       stmts.push(["#{n}=1",:assignment_stmt])
       stmts.push(["#{d}__nregions=1",:assignment_stmt])
@@ -946,8 +962,8 @@ module Fortran
         dim=i+1
         g=global[i]
         if g
-          stmts.push(["ppp__periodicusedlower(:)=#{d}__lowbounds(:,#{dim})",:assignment_stmt])
-          stmts.push(["ppp__periodicusedupper(:)=#{d}__upperbounds(:,#{dim})",:assignment_stmt])
+          stmts.push(["sms__periodicusedlower(:)=#{d}__lowbounds(:,#{dim})",:assignment_stmt])
+          stmts.push(["sms__periodicusedupper(:)=#{d}__upperbounds(:,#{dim})",:assignment_stmt])
         end
       end
       stmts.push(["#{d}__decompname='#{d}'",:assignment_stmt])
@@ -957,10 +973,10 @@ module Fortran
         "#{d}__globalsize(1,#{n})",
         "#{d}__halosize(1,#{n})",
         "#{d}__lowbounds(1,#{n})",
-        "ppp_null_decomp",
+        "sms__null_decomp",
         "#{d}__localsize(1,#{n})",
-        "ppp__periodicusedlower(1)",
-        "ppp__periodicusedupper(1)",
+        "sms__periodicusedlower(1)",
+        "sms__periodicusedupper(1)",
         "#{d}__local_lb(1,#{n})",
         "#{d}__local_ub(1,#{n})",
         "#{d}__decompname",
@@ -970,7 +986,7 @@ module Fortran
         "regionsize",
         sms_statusvar
       ]
-      stmts.push(["call ppp_decomp(#{args.join(',')})",:call_stmt])
+      stmts.push(["call sms__decomp(#{args.join(',')})",:call_stmt])
       s=""
       s+="do #{d}__index=0,0\n"
       args=[
@@ -984,7 +1000,7 @@ module Fortran
         "#{d}__nregions",
         sms_statusvar
       ]
-      s+="call ppp_loops_op(#{args.join(',')})\n"
+      s+="call sms__loops_op(#{args.join(',')})\n"
       s+="end do\n"
       stmts.push([s,:block_do_construct])
       replace_statements(stmts)
@@ -1119,7 +1135,7 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      tag="ppp__tag_#{newtag}"
+      tag=sms_commtag
       declare("integer",tag,{:attrs=>"save"})
       v=[e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
       nvars=v.size
@@ -1156,7 +1172,7 @@ module Fortran
       halou="reshape((/#{halou.join(",")}/),(/#{nvars},#{maxrank}/))"
       perms="reshape((/#{perms.join(",")}/),(/#{nvars},#{maxrank}/))"
       types="(/#{types.join(",")}/)"
-      code="call ppp_exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},#{sms_statusvar},#{vars},#{names})"
+      code="call sms__exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},#{sms_statusvar},#{vars},#{names})"
       replace_statement(code,:call_stmt)
     end
 
@@ -1499,7 +1515,7 @@ module Fortran
         varenv=getvarenv(var)
         dims=(":"*varenv["dims"]).split("")
         kind=varenv["kind"]
-        declare(varenv["type"],Name.global(var),{:attrs=>["allocatable"],:dims=>dims,:kind=>kind})
+        declare(varenv["type"],sms_global_name(var),{:attrs=>["allocatable"],:dims=>dims,:kind=>kind})
       end
       # Gathers
       gathers.each do |var|
@@ -1512,7 +1528,7 @@ module Fortran
         gstop=glubs
         gstrt=gllbs
         perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/ppp_not_decomposed/)")
+        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
         args=[]
         args.push("#{maxrank}")
         args.push("1")
@@ -1525,7 +1541,7 @@ module Fortran
         args.push("#{type}")
         args.push(".false.") # but why?
         args.push("#{var}")
-        args.push(Name.global(var))
+        args.push(sms_global_name(var))
         args.push(sms_statusvar)
         code="call sms_gather(#{args.join(",")})"
         insert_statement_before(code,:call_stmt,newblock.e.first)
@@ -1545,16 +1561,16 @@ module Fortran
         bounds_nonroot=("1"*dims).split("").join(",")
         code=[]
         code.push("if (#{sms_rootcheck}()) then")
-        code.push("allocate(#{Name.global(var)}(#{bounds_root}),stat=#{sms_statusvar})")
+        code.push("allocate(#{sms_global_name(var)}(#{bounds_root}),stat=#{sms_statusvar})")
         code.push("else")
-        code.push("allocate(#{Name.global(var)}(#{bounds_nonroot}),stat=#{sms_statusvar})")
+        code.push("allocate(#{sms_global_name(var)}(#{bounds_nonroot}),stat=#{sms_statusvar})")
         code.push("endif")
         code=code.join("\n")
         insert_statement_before(code,:if_construct,newblock.e.first)
       end
       # Scatters
       scatters.each do |var|
-        tag="ppp__tag_#{newtag}"
+        tag=sms_commtag
         declare("integer",tag,{:attrs=>"save"})
         varenv=getvarenv(var)
         dh=varenv["decomp"]
@@ -1567,7 +1583,7 @@ module Fortran
         halol="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
         halou="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
         perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/ppp_not_decomposed/)")
+        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
         args=[]
         args.push("#{maxrank}")
         args.push("1")
@@ -1581,7 +1597,7 @@ module Fortran
         args.push("#{halou}")
         args.push("#{decomp}")
         args.push("#{type}")
-        args.push(Name.global(var))
+        args.push(sms_global_name(var))
         args.push("#{var}")
         args.push(sms_statusvar)
         code="call sms_scatter(#{args.join(",")})"
@@ -1592,7 +1608,7 @@ module Fortran
         varenv=getvarenv(var)
         if varenv["type"]=="character"
           arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
-          code="call ppp_bcast_char(#{var},#{arg2},#{sms_statusvar})"
+          code="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
         else
           if varenv["sort"]=="_scalar"
             dims="1"
@@ -1601,13 +1617,13 @@ module Fortran
             dims=varenv["dims"]
             sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
         end
-          code="call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
+          code="call sms__bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
         end
         insert_statement_after(code,:call_stmt,newblock.e.last)
       end
       # Deallocation of globally-sized variables
       globals.sort.each do |var|
-        code="deallocate(ppp__g_#{var})"
+        code="deallocate(#{sms_global_name(var)})"
         insert_statement_after(code,:deallocate_stmt,newblock.e.last)
       end
     end
@@ -1795,7 +1811,7 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      code="call nnt_stop('#{marker}',0,ppp_exit)"
+      code="call nnt_stop('#{marker}',0,sms__exit)"
       replace_statement(code,:call_stmt)
     end
 
@@ -1970,7 +1986,7 @@ module Fortran
         label=self.label_delete unless (label=self.label).empty?
         code=[]
         code.push("#{sa(label)} if (#{sms_rootcheck}()) then")
-        code.push("call nnt_stop('#{marker}',0,ppp_abort)")
+        code.push("call nnt_stop('#{marker}',0,sms__abort)")
         code.push("endif")
         code=code.join("\n")
         replace_statement(code,:block)

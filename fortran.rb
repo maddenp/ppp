@@ -558,13 +558,6 @@ module Fortran
       s
     end
 
-    def newtag
-      r=root
-      t=0
-      t=r.instance_variable_get(:@tag)+1 if r.instance_variable_defined?(:@tag)
-      r.instance_variable_set(:@tag,t)
-    end
-
     def raw(code,rule,srcfile,opts={})
       Translator.new.raw(code,rule,srcfile,opts)
     end
