@@ -14,9 +14,13 @@ module Fortran
     @envstack.last
   end
 
+  def envext
+    ".env"
+  end
+
   def envfile(m,d=nil)
     d=(defined?(@srcfile))?(File.dirname(@srcfile)):(".") if d.nil?
-    File.join(File.expand_path(d),"#{m}.env")
+    File.join(File.expand_path(d),"#{m}#{envext}")
   end
 
   def envpop

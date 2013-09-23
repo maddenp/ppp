@@ -2,6 +2,10 @@ require "set"
 
 module Fortran
 
+  def envext
+    ".sms"
+  end
+
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
 
     # Do not push an environment here. The declarations that appear inside a
