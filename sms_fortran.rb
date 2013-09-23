@@ -456,6 +456,7 @@ module Fortran
         code_dealloc=[]
         code_gather=[]
         code_scatter=[]
+        need_decompmod=false
         onroot=true
         spec_var_bcast=[]
         spec_var_false=[]
@@ -573,6 +574,7 @@ module Fortran
         # Gathers
 
         var_gather.each do |var|
+          need_decompmod=true
           varenv=getvarenv(var)
           dh=varenv["decomp"]
           dims=varenv["dims"]
@@ -604,6 +606,7 @@ module Fortran
         # Scatters
 
         var_scatter.each do |var|
+          need_decompmod=true
           tag="ppp__tag_#{newtag}"
           declare("integer",tag,{:attrs=>"save"})
           varenv=getvarenv(var)
@@ -641,6 +644,7 @@ module Fortran
         # Broadcasts
 
         var_bcast.each do |var|
+          need_decompmod=true
           varenv=getvarenv(var)
           if varenv["type"]=="character"
             arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
@@ -676,7 +680,7 @@ module Fortran
               spec_var_true.push("#{label_new} #{pppvar}=.true.")
               spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
               success_label=label_create unless success_label
-              use(sms_decompmod)
+              need_decompmod=true
             end
           end
 
@@ -711,7 +715,7 @@ module Fortran
               var=spec.rhs
               varenv=getvarenv(var)
               spec_var_bcast.push("call ppp_bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
-              use(sms_decompmod)
+              need_decompmod=true
             end
           end
 
@@ -719,6 +723,7 @@ module Fortran
           
         # Code Generation and Placement
 
+        use(sms_decompmod) if need_decompmod
         code=[]
         code.concat(code_alloc)
         code.concat(code_gather)
