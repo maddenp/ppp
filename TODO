@@ -37,7 +37,8 @@
 
 - where-stmt may need (automatic?) parallel treatment.
 
-- implicit-do constructs may require parallel treatment.
+- implicit-do constructs may require parallel treatment. See e.g. outFMTed.F90
+  in FIM, where a serial region is currently required.
 
 - Are distributed array assignments e.g.
     !sms$distribute (dh,1) begin
