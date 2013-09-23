@@ -1,5 +1,5 @@
 - Does the envfile from a module that uses another module contain the info from
-  the other module? Should it?
+  the other module? Should it? IT SHOULD AND DOES.
 
 - Use ppp__status in calls into sms library to abort on error. nnt_chkstat
 
