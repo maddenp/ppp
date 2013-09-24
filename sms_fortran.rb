@@ -629,7 +629,7 @@ module Fortran
           args.push("#{var}")
           args.push(sms_global_name(var))
           args.push(sms_statusvar)
-          code="call sms_gather(#{args.join(",")})"
+          code="call sms__gather(#{args.join(",")})"
           code_gather.push(code)
         end
 
@@ -667,7 +667,7 @@ module Fortran
           args.push(sms_global_name(var))
           args.push("#{var}")
           args.push(sms_statusvar)
-          code="call sms_scatter(#{args.join(",")})"
+          code="call sms__scatter(#{args.join(",")})"
           code_scatter.push(code)
         end
 
@@ -874,7 +874,7 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      declare("logical","sms_debugging_on")
+      declare("logical","sms__debugging_on")
       var="#{e[3].name}"
       varenv=getvarenv(var)
       dims=varenv["dims"]
@@ -888,7 +888,7 @@ module Fortran
       else
         dh="sms__not_decomposed"
       end
-      code="if (sms_debugging_on()) call sms__compare_var(#{dh},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},#{sms_statusvar})"
+      code="if (sms__debugging_on()) call sms__compare_var(#{dh},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},#{sms_statusvar})"
       replace_statement(code,:if_stmt)
     end
 
@@ -921,8 +921,8 @@ module Fortran
       d="#{decomp}"
       n="#{decomp}__nestlevel"
       use(sms_decompmod)
-      declare("integer","sms__periodicusedlower",{:dims=>%W[ppp_max_decomposed_dims]})
-      declare("integer","sms__periodicusedupper",{:dims=>%W[ppp_max_decomposed_dims]})
+      declare("integer","sms__periodicusedlower",{:dims=>%W[sms__max_decomposed_dims]})
+      declare("integer","sms__periodicusedupper",{:dims=>%W[sms__max_decomposed_dims]})
       stmts=[]
       stmts.push(["#{n}=1",:assignment_stmt])
       stmts.push(["#{d}__nregions=1",:assignment_stmt])
@@ -981,9 +981,9 @@ module Fortran
         "#{d}__local_ub(1,#{n})",
         "#{d}__decompname",
         "#{d}(#{n})",
-        "ppp_max_decomposed_dims",
-        "sms_unstructured",
-        "regionsize",
+        "sms__max_decomposed_dims",
+        "sms__unstructured",
+        "regionsize", # WHAT IS THIS?
         sms_statusvar
       ]
       stmts.push(["call sms__decomp(#{args.join(',')})",:call_stmt])
@@ -1044,26 +1044,26 @@ module Fortran
       declare("integer","#{dh}__maxnests",{:attrs=>"parameter",:init=>"1"})
       declare("integer","#{dh}__ppp_max_regions",{:attrs=>"parameter",:init=>"1"})
       declare("character*32","#{dh}__decompname")
-      declare("integer","#{dh}__boundarytype",{:dims=>%W[ppp_max_decomposed_dims]})
+      declare("integer","#{dh}__boundarytype",{:dims=>%W[sms__max_decomposed_dims]})
       declare("integer","#{dh}__e1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
       declare("integer","#{dh}__e2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
       declare("integer","#{dh}__e3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__globalsize",  {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__halosize",    {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__globalsize",  {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__halosize",    {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
       declare("integer","#{dh}__ignore")
       declare("integer","#{dh}__index")
-      declare("integer","#{dh}__local_lb",    {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__local_ub",    {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__local_lb",    {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__local_ub",    {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
       declare("integer","#{dh}__localhalosize")
-      declare("integer","#{dh}__localsize",   {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__lowbounds",   {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__localsize",   {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__lowbounds",   {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
       declare("integer","#{dh}__nestlevel")
       declare("integer","#{dh}__nestlevels",  {:dims=>%W[#{dh}__maxnests]})
       declare("integer","#{dh}__nregions")
       declare("integer","#{dh}__s1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
       declare("integer","#{dh}__s2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
       declare("integer","#{dh}__s3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__upperbounds", {:dims=>%W[ppp_max_decomposed_dims #{dh}__maxnests]})
+      declare("integer","#{dh}__upperbounds", {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
       declare("integer",dh,{:dims=>%W[1]})
       remove
     end
@@ -1401,7 +1401,7 @@ module Fortran
       end
       sizes="(/#{sizes.join(",")}/)"
       types="(/#{types.join(",")}/)"
-      code="call ppp_reduce_#{nvars}(#{sizes},#{types},nnt_#{op},#{sms_statusvar},#{vars.join(',')})"
+      code="call sms__reduce_#{nvars}(#{sizes},#{types},nnt_#{op},#{sms_statusvar},#{vars.join(',')})"
       replace_statement(code,:call_stmt)
     end
 
@@ -1543,7 +1543,7 @@ module Fortran
         args.push("#{var}")
         args.push(sms_global_name(var))
         args.push(sms_statusvar)
-        code="call sms_gather(#{args.join(",")})"
+        code="call sms__gather(#{args.join(",")})"
         insert_statement_before(code,:call_stmt,newblock.e.first)
       end
       # Allocation of globally-sized variables. On non-root tasks, allocate all
@@ -1600,7 +1600,7 @@ module Fortran
         args.push(sms_global_name(var))
         args.push("#{var}")
         args.push(sms_statusvar)
-        code="call sms_scatter(#{args.join(",")})"
+        code="call sms__scatter(#{args.join(",")})"
         insert_statement_after(code,:call_stmt,newblock.e.last)
       end
       # Broadcasts
@@ -1791,7 +1791,7 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      code="call sms_set_communicator(#{e[3]},#{sms_statusvar})"
+      code="call sms__set_communicator(#{e[3]},#{sms_statusvar})"
       replace_statement(code,:call_stmt)
     end
 
@@ -1801,7 +1801,7 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      code="call sms_start(#{sms_statusvar})"
+      code="call sms__start(#{sms_statusvar})"
       replace_statement(code,:call_stmt)
     end
 
@@ -1811,7 +1811,7 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      code="call nnt_stop('#{marker}',0,sms__exit)"
+      code="call sms__stop('#{marker}',0,sms__exit)"
       replace_statement(code,:call_stmt)
     end
 
@@ -1921,8 +1921,8 @@ module Fortran
       fail "No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
       use(sms_decompmod)
       stmts=[]
-      stmts.push(["call sms_unstructuredgrid(#{dh},size(#{var},1),#{var})",:call_stmt])
-      stmts.push(["call ppp_get_collapsed_halo_size(#{dh}(#{dh}__nestlevel),1,1,#{dh}__localhalosize,#{sms_statusvar})",:call_stmt])
+      stmts.push(["call sms__unstructuredgrid(#{dh},size(#{var},1),#{var})",:call_stmt])
+      stmts.push(["call sms__get_collapsed_halo_size(#{dh}(#{dh}__nestlevel),1,1,#{dh}__localhalosize,#{sms_statusvar})",:call_stmt])
       stmts.push(["#{dh}__s1(1,1,#{dh}__nestlevel)=#{dh}__s1(1,0,#{dh}__nestlevel)",:assignment_stmt])
       stmts.push(["#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),1,#{dh}__nestlevel)=#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),0,#{dh}__nestlevel)+#{dh}__localhalosize",:assignment_stmt])
       replace_statements(stmts)
@@ -1986,7 +1986,7 @@ module Fortran
         label=self.label_delete unless (label=self.label).empty?
         code=[]
         code.push("#{sa(label)} if (#{sms_rootcheck}()) then")
-        code.push("call nnt_stop('#{marker}',0,sms__abort)")
+        code.push("call sms__stop('#{marker}',0,sms__abort)")
         code.push("endif")
         code=code.join("\n")
         replace_statement(code,:block)
