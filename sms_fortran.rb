@@ -12,7 +12,7 @@ module Fortran
     # distribute region belong to the environment belonging to the enclosing
     # scoping unit.
 
-    fail "Already inside distribute region" if @distribute
+    fail "ERROR: Already inside distribute region" if @distribute
     @distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
     sms_distribute_dims.dims.each { |x| @distribute["dim"].push(x) }
     true
@@ -23,7 +23,7 @@ module Fortran
     # Do not pop the environment stack here, because the matching 'begin' does
     # not push one.
 
-    fail "Not inside distribute region" unless @distribute
+    fail "ERROR: Not inside distribute region" unless @distribute
     @distribute=nil
     true
   end
@@ -34,8 +34,8 @@ module Fortran
   end
 
   def sp_sms_halo_comp_begin(halo_comp_pairs)
-    fail "Halo computation invalid outside parallel region" unless env[:sms_parallel]
-    fail "Already inside halo-computation region" if env[:sms_halo_comp]
+    fail "ERROR: Halo computation invalid outside parallel region" unless env[:sms_parallel]
+    fail "ERROR: Already inside halo-computation region" if env[:sms_halo_comp]
     envpush
     dims={}
     dims[1]=halo_comp_pairs.e[0]
@@ -47,7 +47,7 @@ module Fortran
   end
 
   def sp_sms_halo_comp_end
-    fail "Not inside halo-computation region" unless env[:sms_halo_comp]
+    fail "ERROR: Not inside halo-computation region" unless env[:sms_halo_comp]
     true
   end
 
@@ -57,14 +57,14 @@ module Fortran
   end
 
   def sp_sms_ignore_begin
-    fail "Already inside ignore region" if env[:sms_ignore]
+    fail "ERROR: Already inside ignore region" if env[:sms_ignore]
     envpush
     env[:sms_ignore]=true
     true
   end
 
   def sp_sms_ignore_end
-    fail "Not inside ignore region" unless env[:sms_ignore]
+    fail "ERROR: Not inside ignore region" unless env[:sms_ignore]
     true
   end
 
@@ -74,14 +74,14 @@ module Fortran
   end
 
   def sp_sms_parallel_begin(sms_decomp_name,sms_parallel_var_lists)
-    fail "Already inside parallel region" if env[:sms_parallel]
+    fail "ERROR: Already inside parallel region" if env[:sms_parallel]
     envpush
     env[:sms_parallel]=OpenStruct.new({:decomp=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
     true
   end
 
   def sp_sms_parallel_end
-    fail "Not inside parallel region" unless env[:sms_parallel]
+    fail "ERROR: Not inside parallel region" unless env[:sms_parallel]
     true
   end
 
@@ -91,14 +91,14 @@ module Fortran
   end
 
   def sp_sms_serial_begin
-    fail "Already inside serial region" if env[:sms_serial]
+    fail "ERROR: Already inside serial region" if env[:sms_serial]
     envpush
     env[:sms_serial]=true
     true
   end
 
   def sp_sms_serial_end
-    fail "Not inside serial region" unless env[:sms_serial]
+    fail "ERROR: Not inside serial region" unless env[:sms_serial]
     true
   end
 
@@ -108,7 +108,7 @@ module Fortran
   end
 
   def sp_sms_to_local_begin(sms_decomp_name,sms_to_local_lists)
-    fail "Already inside to_local region" if env[:sms_to_local]
+    fail "ERROR: Already inside to_local region" if env[:sms_to_local]
     envpush
     env[:sms_to_local]=sms_to_local_lists.vars.each do |var,props|
       props.dh="#{sms_decomp_name}"
@@ -117,7 +117,7 @@ module Fortran
   end
 
   def sp_sms_to_local_end
-    fail "Not inside to_local region" unless env[:sms_to_local]
+    fail "ERROR: Not inside to_local region" unless env[:sms_to_local]
     true
   end
 
@@ -127,7 +127,7 @@ module Fortran
       su=scoping_unit
       varenv=getvarenv(var,su,false)
       if varenv
-        fail "Variable #{var} is already defined" unless varenv["pppvar"]
+        fail "ERROR: Variable #{var} is already defined" unless varenv["pppvar"]
       else
         kind=props[:kind]
         kind=([nil,"_default"].include?(kind))?(""):("(kind=#{kind})")
@@ -190,7 +190,7 @@ module Fortran
 
     def fixbound(varenv,var,dim,x)
       bound=varenv["#{x}b#{dim}"]
-      fail "Bad upper bound: #{bound}" if bound=="_default" and x==:u
+      fail "ERROR: Bad upper bound: #{bound}" if bound=="_default" and x==:u
       return 1 if bound=="_default" and x==:l
       if ["_assumed","_deferred","_explicit"].include?(bound)
         if (decdim=varenv["dim#{dim}"])
@@ -251,7 +251,7 @@ module Fortran
     end
 
     def sms_decompmod
-      "module_decomp"
+      "sms__decomp"
     end
 
     def sms_global_name(name)
@@ -296,7 +296,7 @@ module Fortran
       when "real"
         return (kind)?("sms__type_r#{kind}"):("sms__type_real")
       end
-      fail "No SMS type defined for '#{type}#{kind}'"
+      fail "ERROR: No SMS type defined for '#{type}#{kind}'"
     end
 
   end # class T
@@ -337,7 +337,7 @@ module Fortran
             replace_element(code,:allocate_object)
           end
         else
-          fail "Did not expect to parse a variable_name here -- thought it was broken!"
+          fail "ERROR: Did not expect to parse a variable_name here -- thought it was broken!"
         end
       else
         # Do not translate inside a deallocate_stmt
@@ -366,7 +366,7 @@ module Fortran
           return unless intrinsic?(f.name)
         end
         var="#{name}"
-        fail "'#{var}' not found in environment" unless (varenv=self.env[var])
+        fail "ERROR: '#{var}' not found in environment" unless (varenv=self.env[var])
         return unless varenv["decomp"]
         bounds=[]
         (1..varenv["dims"]).each do |dim|
@@ -779,6 +779,22 @@ module Fortran
 
   end
 
+  class Main_Program < Scoping_Unit
+
+    def translate
+      static_check
+    end
+
+  end
+
+  class Module < Scoping_Unit
+
+    def translate
+      static_check
+    end
+
+  end
+
   class Name < T
 
     def globalize
@@ -797,7 +813,7 @@ module Fortran
           se="e#{p.decdim}"
           halo_offset=halo_offsets(p.decdim).up
         else
-          fail "Unrecognized to_local key: #{p.key}"
+          fail "ERROR: Unrecognized to_local key: #{p.key}"
         end
         code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
         replace_element(code,:expr)
@@ -848,6 +864,32 @@ module Fortran
   end
 
   class Print_Stmt < IO_Stmt
+  end
+
+  class Scoping_Unit < E
+
+    def static_check
+
+      # Only for use with Main_Program & Module. Iterate over environment items,
+      # skipping any whose keys are symbols (i.e. ppp metadata, not program
+      # variables), are scalars or are not decomposed. If any explicit bounds
+      # are found, exit with error. In the declaration sections of main programs
+      # or modules, distributed arrays must be allocatable: Their translated
+      # bounds contain references to non-static data structures that have no
+      # compile-time values.
+
+      self.env.each do |k,v|
+        next if k.is_a?(Symbol) or not v["sort"]=="_array" or not v["decomp"]
+        (1..v["dims"].to_i).each do |dim|
+          ["lb","ub"].each do |lub|
+            if (b=v["#{lub}#{dim}"]) and b=="_explicit"
+              fail "ERROR: Static distributed array ('#{k}') not supported"
+            end
+          end
+        end
+      end
+    end
+
   end
 
   class SMS < E
@@ -986,7 +1028,7 @@ module Fortran
         "regionsize", # WHAT IS THIS?
         sms_statusvar
       ]
-      stmts.push(["call sms__decomp(#{args.join(',')})",:call_stmt])
+      stmts.push(["call sms__create_decomp(#{args.join(',')})",:call_stmt])
       s=""
       s+="do #{d}__index=0,0\n"
       args=[
@@ -1388,14 +1430,14 @@ module Fortran
 
     def translate
       nvars=vars.size
-      fail "reduce supports reduction of 25 variables max" if nvars>25
+      fail "ERROR: reduce supports reduction of 25 variables max" if nvars>25
       use(sms_decompmod)
       sizes=[]
       types=[]
       nvars.times do |i|
         var=vars[i]
         varenv=getvarenv(var)
-        fail "reduce inapplicable to distributed array '#{var}'" if varenv["decomp"]
+        fail "ERROR: reduce inapplicable to distributed array '#{var}'" if varenv["decomp"]
         sizes.push((varenv["sort"]=="_array")?("size(#{var})"):("1"))
         types.push(sms_type(varenv["type"],varenv["kind"]))
       end
@@ -1464,7 +1506,7 @@ module Fortran
           # for a gather *if* it is decomposed; and note that the default intent
           # does not apply.
           if si.vars_ignore.include?(name)
-            fail "'#{name}' cannot be both 'ignore' and 'out' in serial region"
+            fail "ERROR: '#{name}' cannot be both 'ignore' and 'out' in serial region"
           end
           gathers.push(name) if dh
           default=false
@@ -1475,7 +1517,7 @@ module Fortran
           # non-decomposed arrays for broadcast, and decomposed arrays for a
           # scatter; and note that the default intent does not apply.
           if si.vars_ignore.include?(name)
-            fail "'#{name}' cannot be both 'ignore' and 'in' in serial region"
+            fail "ERROR: '#{name}' cannot be both 'ignore' and 'in' in serial region"
           end
           ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name)
           default=false
@@ -1917,8 +1959,8 @@ module Fortran
 
     def translate
       var="#{e[3]}"
-      fail "No module info found for variable '#{var}'" unless (varenv=getvarenv(var))
-      fail "No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
+      fail "ERROR: No module info found for variable '#{var}'" unless (varenv=getvarenv(var))
+      fail "ERROR: No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
       use(sms_decompmod)
       stmts=[]
       stmts.push(["call sms__unstructuredgrid(#{dh},size(#{var},1),#{var})",:call_stmt])

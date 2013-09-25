@@ -42,7 +42,7 @@ module Fortran
       begin
         return YAML.load(File.open(f))
       rescue Exception=>ex
-        s="#{ex.message}\n"
+        s="ERROR: #{ex.message}\n"
         s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }
         s+="Error reading #{f}"
         fail s
@@ -107,7 +107,7 @@ module Fortran
     elsif var.is_a?(Data_Ref)
       var=var.rightmost.name
     else
-      fail "Unexpected node type"
+      fail "ERROR: Unexpected node type"
     end
     varenv=env["#{var}"]
     if varenv and varenv["type"]=="character" and varenv["kind"]=="_default"
@@ -471,7 +471,7 @@ module Fortran
       # differ between applications. It may be acceptable to simply disregard
       # a request to define an already-defined variable, in which case a single
       # method suitable for all applications could be defined here.
-      fail "Fortran#declare not implemented"
+      fail "ERROR: Fortran#declare not implemented"
     end
 
     def env
@@ -484,7 +484,7 @@ module Fortran
 
     def getvarenv(name,node=self,expected=true)
       unless (varenv=node.env["#{name}"])
-        fail "'#{name}' not found in environment" if expected
+        fail "ERROR: '#{name}' not found in environment" if expected
       end
       varenv
     end
@@ -535,7 +535,7 @@ module Fortran
           return n
         end
       end
-      fail "No unused labels available"
+      fail "ERROR: No unused labels available"
     end
 
     def label_delete
@@ -2142,7 +2142,7 @@ module Fortran
   class Function_Prefix < T
 
     def any?(o)
-      fail "Expected string or class" unless o.is_a?(Symbol) or o.is_a?(Class)
+      fail "ERROR: Expected string or class" unless o.is_a?(Symbol) or o.is_a?(Class)
       e.each do |x|
         return x if ((o.is_a?(Symbol))?("#{x}"=="#{o}"):(x.is_a?(o)))
       end
