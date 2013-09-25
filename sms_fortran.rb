@@ -280,23 +280,23 @@ module Fortran
       "sms__status"
     end
 
-    def smstype(type,kind)
+    def sms_type(type,kind)
       kind=nil if kind=="_default"
       case type
       when "character"
-        return "nnt_bytes"
+        return "sms__type_bytes"
       when "complex"
-        return (kind)?("nnt_c#{kind}"):("nnt_complex")
+        return (kind)?("sms__type_c#{kind}"):("sms__type_complex")
       when "doubleprecision"
-        return "nnt_doubleprecision"
+        return "sms__type_doubleprecision"
       when "integer"
-        return (kind)?("nnt_i#{kind}"):("nnt_integer")
+        return (kind)?("sms__type_i#{kind}"):("sms__type_integer")
       when "logical"
-        return (kind)?("nnt_l#{kind}"):("nnt_logical")
+        return (kind)?("sms__type_l#{kind}"):("sms__type_logical")
       when "real"
-        return (kind)?("nnt_r#{kind}"):("nnt_real")
+        return (kind)?("sms__type_r#{kind}"):("sms__type_real")
       end
-      fail "No NNT type defined for '#{type}#{kind}'"
+      fail "No SMS type defined for '#{type}#{kind}'"
     end
 
   end # class T
@@ -608,7 +608,7 @@ module Fortran
           varenv=getvarenv(var)
           dh=varenv["decomp"]
           dims=varenv["dims"]
-          type="(/"+smstype(varenv["type"],varenv["kind"])+"/)"
+          type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
           gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
           glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
           gstop=glubs
@@ -642,7 +642,7 @@ module Fortran
           varenv=getvarenv(var)
           dh=varenv["decomp"]
           dims=varenv["dims"]
-          type="(/"+smstype(varenv["type"],varenv["kind"])+"/)"
+          type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
           gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
           glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
           gstop=glubs
@@ -687,7 +687,7 @@ module Fortran
               dims=varenv["dims"]
               sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
             end
-            code="call sms__bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
+            code="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
           end
           code_bcast.push(code)
         end
@@ -706,7 +706,7 @@ module Fortran
               label_old,label_new=spec.send(:relabel)
               pppvar=spec.send(:pppvar)
               spec_var_false.push("#{pppvar}=.false.")
-              spec_var_bcast.push("call sms__bcast(#{pppvar},nnt_logical,(/1/),1,#{sms_statusvar})")
+              spec_var_bcast.push("call sms__bcast(#{pppvar},sms__type_logical,(/1/),1,#{sms_statusvar})")
               spec_var_true.push("#{label_new} #{pppvar}=.true.")
               spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
               success_label=label_create unless success_label
@@ -744,7 +744,7 @@ module Fortran
             if (spec=self.send(x))
               var=spec.rhs
               varenv=getvarenv(var)
-              spec_var_bcast.push("call sms__bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
+              spec_var_bcast.push("call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
               need_decompmod=true
             end
           end
@@ -879,7 +879,7 @@ module Fortran
       varenv=getvarenv(var)
       dims=varenv["dims"]
       str="#{e[5]}"
-      type=smstype(varenv["type"],varenv["kind"])
+      type=sms_type(varenv["type"],varenv["kind"])
       gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
       glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
       perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
@@ -948,7 +948,7 @@ module Fortran
       end
       max.times do |i|
         dim=i+1
-        stmts.push(["#{d}__boundarytype(#{dim})=nnt_nonperiodic_bdy",:assignment_stmt])
+        stmts.push(["#{d}__boundarytype(#{dim})=sms__nonperiodic_bdy",:assignment_stmt])
       end
       max.times do |i|
         dim=i+1
@@ -968,7 +968,7 @@ module Fortran
       end
       stmts.push(["#{d}__decompname='#{d}'",:assignment_stmt])
       args=[
-        "nnt_decomp_1",
+        "sms__decomp_1",
         "#{d}__boundarytype",
         "#{d}__globalsize(1,#{n})",
         "#{d}__halosize(1,#{n})",
@@ -1039,7 +1039,7 @@ module Fortran
     end
 
     def translate
-      use("nnt_types_module")
+      use("sms__types_module")
       dh="#{e[3]}"
       declare("integer","#{dh}__maxnests",{:attrs=>"parameter",:init=>"1"})
       declare("integer","#{dh}__ppp_max_regions",{:attrs=>"parameter",:init=>"1"})
@@ -1162,7 +1162,7 @@ module Fortran
         ranks.each { |r| halol.push((r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)")) }
         ranks.each { |r| halou.push((r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)")) }
         ranks.each { |r| perms.push(varenv["dim#{r}"]||0) }
-        types.push(smstype(varenv["type"],varenv["kind"]))
+        types.push(sms_type(varenv["type"],varenv["kind"]))
       end
       cornerdepth="(/#{cornerdepth.join(",")}/)"
       dectypes="(/#{dectypes.join(",")}/)"
@@ -1397,11 +1397,11 @@ module Fortran
         varenv=getvarenv(var)
         fail "reduce inapplicable to distributed array '#{var}'" if varenv["decomp"]
         sizes.push((varenv["sort"]=="_array")?("size(#{var})"):("1"))
-        types.push(smstype(varenv["type"],varenv["kind"]))
+        types.push(sms_type(varenv["type"],varenv["kind"]))
       end
       sizes="(/#{sizes.join(",")}/)"
       types="(/#{types.join(",")}/)"
-      code="call sms__reduce_#{nvars}(#{sizes},#{types},nnt_#{op},#{sms_statusvar},#{vars.join(',')})"
+      code="call sms__reduce_#{nvars}(#{sizes},#{types},sms__op_#{op},#{sms_statusvar},#{vars.join(',')})"
       replace_statement(code,:call_stmt)
     end
 
@@ -1522,7 +1522,7 @@ module Fortran
         varenv=getvarenv(var)
         dh=varenv["decomp"]
         dims=varenv["dims"]
-        type="(/"+smstype(varenv["type"],varenv["kind"])+"/)"
+        type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
         gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
         glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
         gstop=glubs
@@ -1575,7 +1575,7 @@ module Fortran
         varenv=getvarenv(var)
         dh=varenv["decomp"]
         dims=varenv["dims"]
-        type="(/"+smstype(varenv["type"],varenv["kind"])+"/)"
+        type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
         gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
         glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
         gstop=glubs
@@ -1617,7 +1617,7 @@ module Fortran
             dims=varenv["dims"]
             sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
         end
-          code="call sms__bcast(#{var},#{smstype(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
+          code="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
         end
         insert_statement_after(code,:call_stmt,newblock.e.last)
       end
