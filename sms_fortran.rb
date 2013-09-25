@@ -129,12 +129,17 @@ module Fortran
       if varenv
         fail "ERROR: Variable #{var} is already defined" unless varenv["pppvar"]
       else
+        lenopt=""
+        if props[:len]
+          fail "ERROR: 'len' property incompatible with type '#{type}'" unless type=="character"
+          lenopt="(len=#{props[:len]})"
+        end
         kind=props[:kind]
         kind=([nil,"_default"].include?(kind))?(""):("(kind=#{kind})")
         attrs=props[:attrs]||[]
         attrs=[attrs] unless attrs.is_a?(Array)
         attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
-        code="#{type}#{kind}#{attrs}::#{var}"
+        code="#{type}#{kind}#{lenopt}#{attrs}::#{var}"
         dims=props[:dims]
         code+="(#{dims.join(',')})" if dims
         init=props[:init]
@@ -247,7 +252,7 @@ module Fortran
       t=0
       t=r.instance_variable_get(:@tag)+1 if r.instance_variable_defined?(:@tag)
       r.instance_variable_set(:@tag,t)
-      "sms__tag_#{@tag}"
+      "sms__tag_#{t}"
     end
 
     def sms_decompmod
@@ -584,8 +589,11 @@ module Fortran
         globals.sort.each do |var|
           varenv=getvarenv(var)
           d=(":"*varenv["dims"]).split("")
+          t=varenv["type"]
           k=varenv["kind"]
-          declare(varenv["type"],sms_global_name(var),{:attrs=>["allocatable"],:dims=>d,:kind=>k})
+          l=(t=="character")?("len(#{var})"):(nil)
+          props={:attrs=>["allocatable"],:dims=>d,:kind=>k,:len=>l}
+          declare(t,sms_global_name(var),props)
           dims=varenv["dims"]
           bounds_root=[]
           (1..dims).each do |i|
@@ -1472,39 +1480,53 @@ module Fortran
     end
 
     def translate
+
       # Get old block. Note that 'begin' and 'end' nodes have already been
       # removed, so the only element remaining is the block. If the serial
       # region is empty, we can simply return.
+
       oldblock=e[0]
       return if oldblock.e.empty?
       use(sms_decompmod)
       declare("logical",sms_rootcheck)
+
       # Initially, we don't know which variables will need to be gathered,
       # scattered, or broadcast.
+
       bcasts=[]
       gathers=[]
       scatters=[]
+
       # Get the serial info recorded when the serial_begin statement was parsed.
+
       si=self.env[:sms_serial_info]
+
       # Iterate over the set of names that occurred in the region. Note that
       # we do not yet know whether the names are variables (they might e.g. be
       # function or subroutine names.
+
       si.names_in_region.sort.each do |name|
+
         # Skip names with no entries in the environemnt, i.e. that are not
         # variables. Also skip names with no type information, on the (probably
         # naive) assumption that they are function or subroutine names that are
         # in the environment due to access specification.
+
         next unless (varenv=getvarenv(name,self,false)) and varenv["type"]
         dh=varenv["decomp"]
         sort=varenv["sort"]
+
         # Conservatively assume that the default intent will apply to this
         # variable.
+
         default=true
         if si.vars_in.include?(name)
+
           # Explicit 'in' intent was specified for this variable: Ensure that
           # conflicting 'ignore' intent was not specified; schedule the variable
           # for a gather *if* it is decomposed; and note that the default intent
           # does not apply.
+
           if si.vars_ignore.include?(name)
             fail "ERROR: '#{name}' cannot be both 'ignore' and 'out' in serial region"
           end
@@ -1512,10 +1534,12 @@ module Fortran
           default=false
         end
         if si.vars_out.include?(name)
+
           # Explicit 'out' intent was specified for this variable. Ensure that
           # conflicting 'ignore' intent was not specified; schedule scalars and
           # non-decomposed arrays for broadcast, and decomposed arrays for a
           # scatter; and note that the default intent does not apply.
+
           if si.vars_ignore.include?(name)
             fail "ERROR: '#{name}' cannot be both 'ignore' and 'in' in serial region"
           end
@@ -1523,9 +1547,11 @@ module Fortran
           default=false
         end
         if default and not si.vars_ignore.include?(name)
+
           # If no explicit intent was specified, the default applies. Treatment
           # of scalars, non-decomposed arrays and decomposed arrays is the same
           # as described above.
+
           d=si.default
           gathers.push(name) if dh and (d=="in" or d=="inout")
           if d=="out" or d=="inout"
@@ -1533,16 +1559,20 @@ module Fortran
           end
         end
       end
+
       # Walk the subtree representing the serial region's body and replace the
       # names of all scattered/gathered variables with their global versions.
       # Note that 'begin' and 'end' nodes have already been removed, so the only
       # element remaining is the block.
+
       def globalize(node,to_globalize)
         node.e.each { |x| globalize(x,to_globalize) } if node.e
         node.globalize if node.is_a?(Name) and to_globalize.include?("#{node}")
       end
       globalize(e[0],gathers+scatters)
+
       # Wrap old block in conditional.
+
       code=[]
       code.push("if (#{sms_rootcheck}()) then")
       code.push("#{oldblock}")
@@ -1550,16 +1580,24 @@ module Fortran
       code=code.join("\n")
       t=replace_statement(code,:block,oldblock)
       newblock=e[0]
+
       # Insert statements for the necessary gathers, scatters and broadcasts.
+
       # Declaration of globally-sized variables
+
       globals=Set.new(gathers+scatters)
       globals.sort.each do |var|
         varenv=getvarenv(var)
         dims=(":"*varenv["dims"]).split("")
         kind=varenv["kind"]
-        declare(varenv["type"],sms_global_name(var),{:attrs=>["allocatable"],:dims=>dims,:kind=>kind})
+        type=varenv["type"]
+        len=(type=="character")?("len(#{var})"):(nil)
+        props={:attrs=>["allocatable"],:dims=>dims,:kind=>kind,:len=>len}
+        declare(type,sms_global_name(var),props)
       end
+
       # Gathers
+
       gathers.each do |var|
         varenv=getvarenv(var)
         dh=varenv["decomp"]
@@ -1588,10 +1626,12 @@ module Fortran
         code="call sms__gather(#{args.join(",")})"
         insert_statement_before(code,:call_stmt,newblock.e.first)
       end
+
       # Allocation of globally-sized variables. On non-root tasks, allocate all
       # dimensions at unit size. On the root task, allocate the non-decomposed
       # dimensions at local size, and the decomposed dimensions at the global
       # size indicated by the decomposition info.
+
       globals.sort.each do |var|
         varenv=getvarenv(var)
         dims=varenv["dims"]
@@ -1610,7 +1650,9 @@ module Fortran
         code=code.join("\n")
         insert_statement_before(code,:if_construct,newblock.e.first)
       end
+
       # Scatters
+
       scatters.each do |var|
         tag=sms_commtag
         declare("integer",tag,{:attrs=>"save"})
@@ -1645,7 +1687,9 @@ module Fortran
         code="call sms__scatter(#{args.join(",")})"
         insert_statement_after(code,:call_stmt,newblock.e.last)
       end
+
       # Broadcasts
+
       bcasts.each do |var|
         varenv=getvarenv(var)
         if varenv["type"]=="character"
@@ -1663,7 +1707,9 @@ module Fortran
         end
         insert_statement_after(code,:call_stmt,newblock.e.last)
       end
+
       # Deallocation of globally-sized variables
+
       globals.sort.each do |var|
         code="deallocate(#{sms_global_name(var)})"
         insert_statement_after(code,:deallocate_stmt,newblock.e.last)
