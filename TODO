@@ -190,9 +190,6 @@
 
 ### TRANSLATION
 
-- When handling iostat in IO statements, condition post-i_am_root bcasts and
-  scatters on 'if (iostat.eq.0) ...'
-
 - Use ppp__status in calls into sms library to abort on error. nnt_chkstat
 
 - Check status on all allocates rolled out by ppp.

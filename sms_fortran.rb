@@ -491,6 +491,7 @@ module Fortran
         code_dealloc=[]
         code_gather=[]
         code_scatter=[]
+        iostat=nil
         need_decompmod=false
         onroot=true
         spec_var_bcast=[]
@@ -581,6 +582,66 @@ module Fortran
           end
         end
 
+        unless (self.is_a?(Print_Stmt))
+
+          # Branch-To Spec Logic
+
+          [
+            :err,
+            :end,
+            :eor
+          ].each do |x|
+            # :err has precedence, per F90 9.4.1.6, 9.4.1.7
+            if (spec=self.send(x))
+              label_old,label_new=spec.send(:relabel)
+              pppvar=spec.send(:pppvar)
+              spec_var_false.push("#{pppvar}=.false.")
+              spec_var_bcast.push("call sms__bcast(#{pppvar},sms__type_logical,(/1/),1,#{sms_statusvar})")
+              spec_var_true.push("#{label_new} #{pppvar}=.true.")
+              spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
+              success_label=label_create unless success_label
+              need_decompmod=true
+            end
+          end
+
+          # Spec Var Logic
+
+          [
+            :access,
+            :action,
+            :blank,
+            :delim,
+            :direct,
+            :exist,
+            :form,
+            :formatted,
+            :iostat,
+            :name,
+            :named,
+            :nextrec,
+            :number,
+            :opened,
+            :pad,
+            :position,
+            :read,
+            :readwrite,
+            :recl,
+            :sequential,
+            :size,
+            :unformatted,
+            :write
+          ].each do |x|
+            if (spec=self.send(x))
+              var=spec.rhs
+              varenv=getvarenv(var)
+              spec_var_bcast.push("call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
+              need_decompmod=true
+              iostat=var if x==:iostat
+            end
+          end
+
+        end
+          
         declare("logical",sms_rootcheck) if onroot
 
         # Allocation & deallocation of globals
@@ -637,7 +698,9 @@ module Fortran
           args.push("#{var}")
           args.push(sms_global_name(var))
           args.push(sms_statusvar)
-          code="call sms__gather(#{args.join(",")})"
+          code=""
+          code+="if (#{iostat}.eq.0) " if iostat
+          code+="call sms__gather(#{args.join(",")})"
           code_gather.push(code)
         end
 
@@ -675,7 +738,9 @@ module Fortran
           args.push(sms_global_name(var))
           args.push("#{var}")
           args.push(sms_statusvar)
-          code="call sms__scatter(#{args.join(",")})"
+          code=""
+          code+="if (#{iostat}.eq.0) " if iostat
+          code+="call sms__scatter(#{args.join(",")})"
           code_scatter.push(code)
         end
 
@@ -695,70 +760,13 @@ module Fortran
               dims=varenv["dims"]
               sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
             end
-            code="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
+            code=""
+            code+="if (#{iostat}.eq.0) " if iostat
+            code+="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
           end
           code_bcast.push(code)
         end
 
-        unless (self.is_a?(Print_Stmt))
-
-          # Branch-To Spec Logic
-
-          [
-            :err,
-            :end,
-            :eor
-          ].each do |x|
-            # :err has precedence, per F90 9.4.1.6, 9.4.1.7
-            if (spec=self.send(x))
-              label_old,label_new=spec.send(:relabel)
-              pppvar=spec.send(:pppvar)
-              spec_var_false.push("#{pppvar}=.false.")
-              spec_var_bcast.push("call sms__bcast(#{pppvar},sms__type_logical,(/1/),1,#{sms_statusvar})")
-              spec_var_true.push("#{label_new} #{pppvar}=.true.")
-              spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
-              success_label=label_create unless success_label
-              need_decompmod=true
-            end
-          end
-
-          # Spec Var Logic
-
-          [
-            :access,
-            :action,
-            :blank,
-            :delim,
-            :direct,
-            :exist,
-            :form,
-            :formatted,
-            :iostat,
-            :name,
-            :named,
-            :nextrec,
-            :number,
-            :opened,
-            :pad,
-            :position,
-            :read,
-            :readwrite,
-            :recl,
-            :sequential,
-            :size,
-            :unformatted,
-            :write
-          ].each do |x|
-            if (spec=self.send(x))
-              var=spec.rhs
-              varenv=getvarenv(var)
-              spec_var_bcast.push("call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
-              need_decompmod=true
-            end
-          end
-
-        end
-          
         # Code Generation and Placement
 
         use(sms_decompmod) if need_decompmod
