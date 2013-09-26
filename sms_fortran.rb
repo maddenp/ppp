@@ -123,6 +123,54 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
+    def alloc_dealloc_globals(globals)
+      code_alloc=[]
+      code_dealloc=[]
+      globals.sort.each do |var|
+        varenv=getvarenv(var)
+        d=(":"*varenv["dims"]).split("")
+        t=varenv["type"]
+        k=varenv["kind"]
+        l=(t=="character")?("len(#{var})"):(nil)
+        props={:attrs=>["allocatable"],:dims=>d,:kind=>k,:len=>l}
+        declare(t,sms_global_name(var),props)
+        dims=varenv["dims"]
+        bounds_root=[]
+        (1..dims).each do |i|
+          bounds_root.push((decdim=varenv["dim#{i}"])?("#{fixbound(varenv,var,i,:l)}:#{fixbound(varenv,var,i,:u)}"):("lbound(#{var},#{i}):ubound(#{var},#{i})"))
+        end
+        bounds_root=bounds_root.join(",")
+        bounds_nonroot=("1"*dims).split("").join(",")
+        gvar=sms_global_name(var)
+        svar=sms_statusvar
+        code_alloc.push("if (#{sms_rootcheck}()) then")
+        code_alloc.push("allocate(#{gvar}(#{bounds_root}),stat=#{svar})")
+        code_alloc.push("else")
+        code_alloc.push("allocate(#{gvar}(#{bounds_nonroot}),stat=#{svar})")
+        code_alloc.push("endif")
+        code_alloc.push(check_allocate(gvar,svar))
+        code_dealloc.push("deallocate(#{gvar},stat=#{svar})")
+        code_dealloc.push(check_deallocate(gvar,svar))
+      end
+      [code_alloc,code_dealloc]
+    end
+
+    def check_allocate(datavar,statusvar)
+      check_op(statusvar,1,"\"Allocation of '#{datavar}' failed\"")
+    end
+
+    def check_deallocate(datavar,statusvar)
+      check_op(statusvar,1,"\"Deallocation of '#{datavar}' failed\"")
+    end
+
+    def check_op(statusvar,retcode,msg)
+      code=""
+      code+="if (#{statusvar}.ne.0) then\n"
+      code+="write (*,'(a)') #{msg}\n"
+      code+="#{sms_stop(retcode)}\n"
+      code+="endif"
+    end
+
     def declare(type,var,props={})
       su=scoping_unit
       varenv=getvarenv(var,su,false)
@@ -285,6 +333,12 @@ module Fortran
       "sms__status"
     end
 
+    def sms_stop(retcode)
+      use(sms_decompmod)
+      retvar=(retcode==0)?("sms__exit"):("sms__abort")
+      "call sms__stop('#{marker}',#{retcode},#{retvar})"
+    end
+    
     def sms_type(type,kind)
       kind=nil if kind=="_default"
       case type
@@ -486,9 +540,7 @@ module Fortran
 
       unless self.env[:sms_ignore] or self.env[:sms_serial]
 
-        code_alloc=[]
         code_bcast=[]
-        code_dealloc=[]
         code_gather=[]
         code_scatter=[]
         iostat=nil
@@ -644,31 +696,9 @@ module Fortran
           
         declare("logical",sms_rootcheck) if onroot
 
-        # Allocation & deallocation of globals
+        # Collect code for allocation & deallocation of globals.
 
-        globals=Set.new(var_gather+var_scatter)
-        globals.sort.each do |var|
-          varenv=getvarenv(var)
-          d=(":"*varenv["dims"]).split("")
-          t=varenv["type"]
-          k=varenv["kind"]
-          l=(t=="character")?("len(#{var})"):(nil)
-          props={:attrs=>["allocatable"],:dims=>d,:kind=>k,:len=>l}
-          declare(t,sms_global_name(var),props)
-          dims=varenv["dims"]
-          bounds_root=[]
-          (1..dims).each do |i|
-            bounds_root.push((decdim=varenv["dim#{i}"])?("#{fixbound(varenv,var,i,:l)}:#{fixbound(varenv,var,i,:u)}"):("lbound(#{var},#{i}):ubound(#{var},#{i})"))
-          end
-          bounds_root=bounds_root.join(",")
-          bounds_nonroot=("1"*dims).split("").join(",")
-          code_alloc.push("if (#{sms_rootcheck}()) then")
-          code_alloc.push("allocate(#{sms_global_name(var)}(#{bounds_root}),stat=#{sms_statusvar})")
-          code_alloc.push("else")
-          code_alloc.push("allocate(#{sms_global_name(var)}(#{bounds_nonroot}),stat=#{sms_statusvar})")
-          code_alloc.push("endif")
-          code_dealloc.push("deallocate(#{sms_global_name(var)})")
-        end
+        code_alloc,code_dealloc=alloc_dealloc_globals(Set.new(var_gather+var_scatter))
 
         # Gathers
 
@@ -698,9 +728,7 @@ module Fortran
           args.push("#{var}")
           args.push(sms_global_name(var))
           args.push(sms_statusvar)
-          code=""
-          code+="if (#{iostat}.eq.0) " if iostat
-          code+="call sms__gather(#{args.join(",")})"
+          code="call sms__gather(#{args.join(",")})"
           code_gather.push(code)
         end
 
@@ -798,7 +826,7 @@ module Fortran
   class Main_Program < Scoping_Unit
 
     def translate
-      static_check
+      check_static
     end
 
   end
@@ -806,7 +834,7 @@ module Fortran
   class Module < Scoping_Unit
 
     def translate
-      static_check
+      check_static
     end
 
   end
@@ -884,7 +912,7 @@ module Fortran
 
   class Scoping_Unit < E
 
-    def static_check
+    def check_static
 
       # Only for use with Main_Program & Module. Iterate over environment items,
       # skipping any whose keys are symbols (i.e. ppp metadata, not program
@@ -984,8 +1012,6 @@ module Fortran
       stmts=[]
       stmts.push(["#{n}=1",:assignment_stmt])
       stmts.push(["#{d}__nregions=1",:assignment_stmt])
-      # See TODO about merging these loops when legacy ppp is gone...
-      # See TODO about this being essentially hardwired to work with FIM
       max.times do |i|
         dim=i+1
         g=global[i]
@@ -1579,18 +1605,6 @@ module Fortran
       end
       globalize(e[0],gathers+scatters)
 
-      # Wrap old block in conditional.
-
-      code=[]
-      code.push("if (#{sms_rootcheck}()) then")
-      code.push("#{oldblock}")
-      code.push("endif")
-      code=code.join("\n")
-      t=replace_statement(code,:block,oldblock)
-      newblock=e[0]
-
-      # Insert statements for the necessary gathers, scatters and broadcasts.
-
       # Declaration of globally-sized variables
 
       globals=Set.new(gathers+scatters)
@@ -1603,6 +1617,16 @@ module Fortran
         props={:attrs=>["allocatable"],:dims=>dims,:kind=>kind,:len=>len}
         declare(type,sms_global_name(var),props)
       end
+
+      code=[]
+
+      # Collect code for allocation and deallocation of globals.
+
+      code_alloc,code_dealloc=alloc_dealloc_globals(globals)
+
+      # Allocations
+
+      code.concat(code_alloc)
 
       # Gathers
 
@@ -1631,34 +1655,13 @@ module Fortran
         args.push("#{var}")
         args.push(sms_global_name(var))
         args.push(sms_statusvar)
-        code="call sms__gather(#{args.join(",")})"
-        insert_statement_before(code,:call_stmt,newblock.e.first)
+        code.push("call sms__gather(#{args.join(",")})")
       end
 
-      # Allocation of globally-sized variables. On non-root tasks, allocate all
-      # dimensions at unit size. On the root task, allocate the non-decomposed
-      # dimensions at local size, and the decomposed dimensions at the global
-      # size indicated by the decomposition info.
+      # Wrap serial-region code in conditional.
 
-      globals.sort.each do |var|
-        varenv=getvarenv(var)
-        dims=varenv["dims"]
-        bounds_root=[]
-        (1..dims).each do |i|
-          bounds_root.push((decdim=varenv["dim#{i}"])?("#{fixbound(varenv,var,i,:l)}:#{fixbound(varenv,var,i,:u)}"):("lbound(#{var},#{i}):ubound(#{var},#{i})"))
-        end
-        bounds_root=bounds_root.join(",")
-        bounds_nonroot=("1"*dims).split("").join(",")
-        code=[]
-        code.push("if (#{sms_rootcheck}()) then")
-        code.push("allocate(#{sms_global_name(var)}(#{bounds_root}),stat=#{sms_statusvar})")
-        code.push("else")
-        code.push("allocate(#{sms_global_name(var)}(#{bounds_nonroot}),stat=#{sms_statusvar})")
-        code.push("endif")
-        code=code.join("\n")
-        insert_statement_before(code,:if_construct,newblock.e.first)
-      end
-
+      code.push("if (#{sms_rootcheck}()) then\n#{oldblock}endif")
+      
       # Scatters
 
       scatters.each do |var|
@@ -1692,8 +1695,7 @@ module Fortran
         args.push(sms_global_name(var))
         args.push("#{var}")
         args.push(sms_statusvar)
-        code="call sms__scatter(#{args.join(",")})"
-        insert_statement_after(code,:call_stmt,newblock.e.last)
+        code.push("call sms__scatter(#{args.join(",")})")
       end
 
       # Broadcasts
@@ -1702,7 +1704,7 @@ module Fortran
         varenv=getvarenv(var)
         if varenv["type"]=="character"
           arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
-          code="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
+          bcast="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
         else
           if varenv["sort"]=="_scalar"
             dims="1"
@@ -1711,17 +1713,19 @@ module Fortran
             dims=varenv["dims"]
             sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
         end
-          code="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
+          bcast="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
         end
-        insert_statement_after(code,:call_stmt,newblock.e.last)
+        code.push(bcast)
       end
 
       # Deallocation of globally-sized variables
 
-      globals.sort.each do |var|
-        code="deallocate(#{sms_global_name(var)})"
-        insert_statement_after(code,:deallocate_stmt,newblock.e.last)
-      end
+      code.concat(code_dealloc)
+
+      # Replace serial region with new code block.
+
+      replace_statement(code.join("\n"),:block)
+
     end
 
   end # class SMS_Serial
@@ -1906,9 +1910,7 @@ module Fortran
   class SMS_Stop < SMS
 
     def translate
-      use(sms_decompmod)
-      code="call sms__stop('#{marker}',0,sms__exit)"
-      replace_statement(code,:call_stmt)
+      replace_statement(sms_stop(0),:call_stmt)
     end
 
   end

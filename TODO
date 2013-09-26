@@ -35,6 +35,9 @@
 
 ### ERROR CHECKING / REPORTING
 
+- In T#check_op, print MPI rank when stopping -- any task may fail to allocate
+  and need to bring down the run.
+
 - In getvarenv(), give more verbose information about why a failure has occurred
   and what to do about it (e.g. .env file is not available, so get dependencies
   right, or write your own .env file, only ask ppp to operate on appropriate
