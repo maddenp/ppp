@@ -779,7 +779,9 @@ module Fortran
           varenv=getvarenv(var)
           if varenv["type"]=="character"
             arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
-            code="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
+            code=""
+            code+="if (#{iostat}.eq.0) " if iostat
+            code+="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
           else
             if varenv["sort"]=="_scalar"
               dims="1"
