@@ -2,8 +2,8 @@
 
 - Sort envfile output for easy xxdiff comparison.
 
-- .env file does not contain items added during translation, (true?) e.g.
-  module_decomp.env does not even *exist*, much less contain the items added
+* .sms file does not contain items added during translation, (true?) e.g.
+  module_decomp.sms does not even *exist*, much less contain the items added
   during translation.
 
 - Stop tracking kind. Pass only *type* to MPI-calling SMS routines and, in the
@@ -11,36 +11,40 @@
   run-time determination of MPI type to use. Get rid of related kind() methods
   in fortran.rb. IS THIS A GOOD IDEA?
 
-- Should derived types provided by modules appear in .env files (probably!), and
+- Should derived types provided by modules appear in .sms files (probably!), and
   how?
 
-- Can we replace env with OpenStruct? What does that look like serialized to
-  YAML? Is it human readable/writeable?
+* Consider:
 
-- If Fortran allows shadowing a use-obtained array with a local of the same
-  name, it will be critical to create a new env entry for the local, rather
-  than just updating the entry created when the module was read in. For example,
-  a variable could be a distributed read array in a use'ed module but a
-  scalar integer as a local. If the distribute info persitst in the variable's
-  env entry, it will be incorrect. Maybe: Any occurrence of a name in the
-  declaration section should immediately overwrite an existing env entry, but
-  only one time (since dimension, access, type info may all occur in separate
-  decl statements -- they can't be wiping out eachother's env entries, but
-  the first one encountered should wipe out whatever was obtained via use
-  association).
+  program p
+    real::x(3)=(/1,2,3/)
+    call s
+  contains
+    subroutine s
+      integer::x=88
+      print *,x
+    end subroutine s
+  end program p
 
-- Need to add to env for function optional RESULT name/type (probably do at
+  The definition of x in s should replace (not append to / overwrite) the
+  definition in p. If, for example, x in p had a kind attribute, it would
+  persist, incorrectly, in the copy of the environment created for s. Or,
+  if x were distributed in p, the decomp information would incorrectly
+  persist. Maybe: Any occurrence of a name in the declaration section should
+  immediately overwrite an existing env entry, but only one time (since
+  dimension, access, type info may all occur in separate decl statements --
+  they can't be wiping out eachother's env entries, but the first one
+  encountered should wipe out whatever was obtained via use association).
+
+* Need to add to env for function optional RESULT name/type (probably do at
   close of function_subroutine, since function type may not be made explicit
   by function_stmt).
 
 ### ERROR CHECKING / REPORTING
 
-- In T#check_op, print MPI rank when stopping -- any task may fail to allocate
-  and need to bring down the run.
-
 - In getvarenv(), give more verbose information about why a failure has occurred
-  and what to do about it (e.g. .env file is not available, so get dependencies
-  right, or write your own .env file, only ask ppp to operate on appropriate
+  and what to do about it (e.g. .sms file is not available, so get dependencies
+  right, or write your own .sms file, only ask ppp to operate on appropriate
   variables, etc.)
 
 - Error needed when compare_var variable is not distributed or no mod info
@@ -87,19 +91,17 @@
 
 ### OPTIMIZATION
 
-- Optimization: When processing a file, hash read-in module files so that a
-  repeat use (e.g. in another subroutine in that module) need not read from
-  disk again.
+* When processing a file, hash read-in module files so that a repeat use (e.g.
+  in another subroutine in that module) need not read from disk again.
 
-- Optimization: Instead of deepcopy on env, chain hashes with ancestorlookup
-  mechanism.
+* Instead of deepcopy on env, chain hashes with ancestor lookup mechanism.
 
 - read_stmt, write_stmt et al are not function calls, so we *do* know which of
   their arguments may be modified during a call (e.g. iostat's variable can,
   file's variable cannot) we we can limit bcast/gather/scatter of these in a
   serial region.
 
-- Time ppp on fim routines, find long ones, profile, optimize
+* Time ppp on fim routines, find long ones, profile, optimize
 
 ### PARSING
 
@@ -143,7 +145,7 @@
 
 - Factor duplication between IO_Stmt and SMS_Serial.
 
-- It might be clearer to break IO_Stmt into several more specific classes.
+- It might be cleaner to break IO_Stmt into several more specific classes.
   This may work better after duplication between IO_Stmt and SMS_Serial is
   factored.
 
@@ -164,9 +166,6 @@
 
 - In SMS_Create_Decomp#translate, merge multiple 1..3 loops. They are as they
   are now to aid in textual comparison to legacy ppp.
-
-- Make nnt_/ppp_/sms_ namespace consistent. Ensure that any rolled-out names
-  adhere to whatever standard is chosen.
 
 - In fortran.rb/sms_fortran.rb, standardize when methods on nodes return strings
   or SyntaxNode subclasses. That is, should we convert to strings as early as
@@ -193,19 +192,17 @@
 
 ### TRANSLATION
 
-- Use ppp__status in calls into sms library to abort on error. nnt_chkstat
+* Use ppp__status in calls into sms library to abort on error. nnt_chkstat
 
-- Check status on all allocates rolled out by ppp.
+* stop-stmt in serial region needs to bring down all tasks.
 
-- stop-stmt in serial region needs to bring down all tasks.
+* Must handle eor=/err= inside serial region, too.
 
-- Must handle eor=/err= inside serial region, too.
-
-- Should error handling be added for translated IO statements with none? If
+* Should error handling be added for translated IO statements with none? If
   not, what happens when the root task terminates per F90:9.4.3? Do the other
   tasks hang?
 
-- Prevent goto branching into serial regions (track, along with each used label,
+* Prevent goto branching into serial regions (track, along with each used label,
   its serial/parallel-context status and check this in post-processing.
 
 - Does sms_gather() really need all 7 dims (see e.g. gather rollout in
@@ -249,7 +246,7 @@
   If those IO stmts contain err=, iostat=, etc., broadcasts will hang. Can
   we detect this at compile time and at least fail with an explanation?
 
-- Shouldnt 4th arg to ppp_bcast be a scalar, instead of an array? Or is this
+* Shouldnt 4th arg to ppp_bcast be a scalar, instead of an array? Or is this
   about the 3rd arg, which is different between bcast and bcast_char?
 
 - translate_children() -- do we need 'if e' & compact & 'if x'?
@@ -271,4 +268,3 @@
   override their to_s() (maybe conditionally) or replace them with SyntaxNodes?
   Maybe redefine to_s method to return empty string? Change remote() to
   silence()?
-
