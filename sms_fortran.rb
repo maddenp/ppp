@@ -156,17 +156,19 @@ module Fortran
     end
 
     def check_allocate(datavar,statusvar)
-      check_op(statusvar,1,"\"Allocation of '#{datavar}' failed\"")
+      check_op(statusvar,1,"Allocation of '#{datavar}' failed")
     end
 
     def check_deallocate(datavar,statusvar)
-      check_op(statusvar,1,"\"Deallocation of '#{datavar}' failed\"")
+      check_op(statusvar,1,"Deallocation of '#{datavar}' failed")
     end
 
     def check_op(statusvar,retcode,msg)
+      declare("integer",sms_rankvar)
       code=""
       code+="if (#{statusvar}.ne.0) then\n"
-      code+="write (*,'(a)') #{msg}\n"
+      code+="call nnt_me(#{sms_rankvar})\n"
+      code+="write (*,'(a,i0)') \"#{msg} on MPI rank \",#{sms_rankvar}\n"
       code+="#{sms_stop(retcode)}\n"
       code+="endif"
     end
@@ -323,6 +325,10 @@ module Fortran
 
     def sms_global_prefix
       
+    end
+
+    def sms_rankvar
+      "sms__rank"
     end
 
     def sms_rootcheck
