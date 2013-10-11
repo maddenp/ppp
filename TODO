@@ -145,10 +145,6 @@
 
 - Factor duplication between IO_Stmt and SMS_Serial.
 
-- It might be cleaner to break IO_Stmt into several more specific classes.
-  This may work better after duplication between IO_Stmt and SMS_Serial is
-  factored.
-
 - Factor 'if (iam_root()) then' wrapping in IO statements.
 
 - Factor out common elements in implicit IO translate() methods.

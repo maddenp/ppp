@@ -324,7 +324,7 @@ module Fortran
     end
 
     def sms_global_prefix
-      
+
     end
 
     def sms_rankvar
@@ -344,7 +344,7 @@ module Fortran
       retvar=(retcode==0)?("sms__exit"):("sms__abort")
       "call sms__stop('#{marker}',#{retcode},#{retvar})"
     end
-    
+
     def sms_type(type,kind)
       kind=nil if kind=="_default"
       case type
@@ -470,6 +470,16 @@ module Fortran
 
   end
 
+  class Close_Stmt < IO_Stmt
+
+    def translate
+      return if self.env[:sms_ignore] or self.env[:sms_serial]
+      self.io_stmt_init
+      self.io_stmt_common
+    end
+
+  end
+
   class Entity_Decl_1 < Entity_Decl
 
     def translate
@@ -542,290 +552,210 @@ module Fortran
 
   class IO_Stmt < T
 
-    def translate
-
-      unless self.env[:sms_ignore] or self.env[:sms_serial]
-
-        code_bcast=[]
-        code_gather=[]
-        code_scatter=[]
-        iostat=nil
-        need_decompmod=false
-        onroot=true
-        spec_var_bcast=[]
-        spec_var_false=[]
-        spec_var_goto=[]
-        spec_var_true=[]
-        success_label=nil
-        var_bcast=[]
-        var_gather=[]
-        var_scatter=[]
-
-        # Read_Stmt
-
-        if self.is_a?(Read_Stmt)
-          onroot=false if self.unit.is_a?(Internal_File_Unit)
-          if (nml=self.nml)
-            onroot=true
-            nmlenv=getvarenv(nml,self,expected=true)
-            nmlenv["objects"].each do |x|
-              var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-              if (varenv=getvarenv(var,self,expected=false))
-                if varenv["decomp"]
-                  var_scatter.push(var)
-                  self.replace_input_item(x,sms_global_name(var))
-                else
-                  var_bcast.push(var)
-                end
-              end
-            end
-          end
-          self.input_items.each do |x|
-            var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-            if (varenv=getvarenv(var,self,expected=true))
-              if (dh=varenv["decomp"])
-                onroot=true
-                var_scatter.push(var)
-                self.replace_input_item(x,sms_global_name(var))
-              else
-                var_bcast.push(var) if onroot
-              end
-            end
-          end
-        end
-
-        # Print_Stmt
-
-        if self.is_a?(Print_Stmt)
-          self.output_items.each do |x|
-            var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-            if (varenv=getvarenv(var,self,expected=false))
-              if (dh=varenv["decomp"])
-                onroot=true
-                global=sms_global_name(var)
-                var_gather.push(var)
-                self.replace_output_item(x,global)
-              end
-            end
-          end
-        end
-
-        # Write_Stmt
-
-        if self.is_a?(Write_Stmt)
-          function=(env["#{unit}"] and env["#{unit}"]["function"])
-          onroot=false if self.unit.is_a?(Internal_File_Unit) or function
-          if (nml=self.nml)
-            onroot=true
-            nmlenv=getvarenv(nml,self,expected=true)
-            nmlenv["objects"].each do |x|
-              var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-              varenv=getvarenv(var,self,expected=true)
-              if varenv["decomp"]
-                var_gather.push(var)
-                self.replace_input_item(x,sms_global_name(var))
-              end
-            end
-          end
-          self.output_items.each do |x|
-            var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-            if (varenv=getvarenv(var,self,expected=false))
-              if (dh=varenv["decomp"])
-                onroot=true
-                global=sms_global_name(var)
-                var_gather.push(var)
-                self.replace_output_item(x,global)
-              end
-            end
-          end
-        end
-
-        unless (self.is_a?(Print_Stmt))
-
-          # Branch-To Spec Logic
-
-          [
-            :err,
-            :end,
-            :eor
-          ].each do |x|
-            # :err has precedence, per F90 9.4.1.6, 9.4.1.7
-            if (spec=self.send(x))
-              label_old,label_new=spec.send(:relabel)
-              pppvar=spec.send(:pppvar)
-              spec_var_false.push("#{pppvar}=.false.")
-              spec_var_bcast.push("call sms__bcast(#{pppvar},sms__type_logical,(/1/),1,#{sms_statusvar})")
-              spec_var_true.push("#{label_new} #{pppvar}=.true.")
-              spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
-              success_label=label_create unless success_label
-              need_decompmod=true
-            end
-          end
-
-          # Spec Var Logic
-
-          [
-            :access,
-            :action,
-            :blank,
-            :delim,
-            :direct,
-            :exist,
-            :form,
-            :formatted,
-            :iostat,
-            :name,
-            :named,
-            :nextrec,
-            :number,
-            :opened,
-            :pad,
-            :position,
-            :read,
-            :readwrite,
-            :recl,
-            :sequential,
-            :size,
-            :unformatted,
-            :write
-          ].each do |x|
-            if (spec=self.send(x))
-              var=spec.rhs
-              varenv=getvarenv(var)
-              spec_var_bcast.push("call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
-              need_decompmod=true
-              iostat=var if x==:iostat
-            end
-          end
-
-        end
-          
-        declare("logical",sms_rootcheck) if onroot
-
-        # Collect code for allocation & deallocation of globals.
-
-        code_alloc,code_dealloc=alloc_dealloc_globals(Set.new(var_gather+var_scatter))
-
-        # Gathers
-
-        var_gather.each do |var|
-          need_decompmod=true
-          varenv=getvarenv(var)
-          dh=varenv["decomp"]
-          dims=varenv["dims"]
-          type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
-          gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
-          glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
-          gstop=glubs
-          gstrt=gllbs
-          perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-          decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
-          args=[]
-          args.push("#{maxrank}")
-          args.push("1")
-          args.push("#{gllbs}")
-          args.push("#{glubs}")
-          args.push("#{gstrt}")
-          args.push("#{gstop}")
-          args.push("#{perms}")
-          args.push("#{decomp}")
-          args.push("#{type}")
-          args.push(".false.") # but why?
-          args.push("#{var}")
-          args.push(sms_global_name(var))
-          args.push(sms_statusvar)
-          code="call sms__gather(#{args.join(",")})"
-          code_gather.push(code)
-        end
-
-        # Scatters
-
-        var_scatter.each do |var|
-          need_decompmod=true
-          tag=sms_commtag
-          declare("integer",tag,{:attrs=>"save"})
-          varenv=getvarenv(var)
-          dh=varenv["decomp"]
-          dims=varenv["dims"]
-          type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
-          gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
-          glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
-          gstop=glubs
-          gstrt=gllbs
-          halol="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
-          halou="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
-          perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-          decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
-          args=[]
-          args.push("#{maxrank}")
-          args.push("1")
-          args.push("#{tag}")
-          args.push("#{gllbs}")
-          args.push("#{glubs}")
-          args.push("#{gstrt}")
-          args.push("#{gstop}")
-          args.push("#{perms}")
-          args.push("#{halol}")
-          args.push("#{halou}")
-          args.push("#{decomp}")
-          args.push("#{type}")
-          args.push(sms_global_name(var))
-          args.push("#{var}")
-          args.push(sms_statusvar)
+    def io_stmt_bcasts
+      @var_bcast.each do |var|
+        @need_decompmod=true
+        varenv=getvarenv(var)
+        if varenv["type"]=="character"
+          arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
           code=""
-          code+="if (#{iostat}.eq.0) " if iostat
-          code+="call sms__scatter(#{args.join(",")})"
-          code_scatter.push(code)
-        end
-
-        # Broadcasts
-
-        var_bcast.each do |var|
-          need_decompmod=true
-          varenv=getvarenv(var)
-          if varenv["type"]=="character"
-            arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
-            code=""
-            code+="if (#{iostat}.eq.0) " if iostat
-            code+="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
+          code+="if (#{@iostat}.eq.0) " if @iostat
+          code+="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
+        else
+          if varenv["sort"]=="_scalar"
+            dims="1"
+            sizes="(/1/)"
           else
-            if varenv["sort"]=="_scalar"
-              dims="1"
-              sizes="(/1/)"
-            else
-              dims=varenv["dims"]
-              sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
-            end
-            code=""
-            code+="if (#{iostat}.eq.0) " if iostat
-            code+="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
+            dims=varenv["dims"]
+            sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
           end
-          code_bcast.push(code)
+          code=""
+          code+="if (#{@iostat}.eq.0) " if @iostat
+          code+="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
         end
+        @code_bcast.push(code)
+      end
+    end
 
-        # Code Generation and Placement
-
-        use(sms_decompmod) if need_decompmod
-        code=[]
-        code.concat(code_alloc)
-        code.concat(code_gather)
-        if onroot
-          my_label=(self.label.empty?)?(nil):(self.label)
-          my_label=self.label_delete if my_label
-          code.push("#{sa(my_label)}if (#{sms_rootcheck}()) then")
+    def io_stmt_branch_to_logic
+      [
+        :err,
+        :end,
+        :eor
+      ].each do |x|
+        # :err has precedence, per F90 9.4.1.6, 9.4.1.7
+        if (spec=self.send(x))
+          label_old,label_new=spec.send(:relabel)
+          pppvar=spec.send(:pppvar)
+          @spec_var_false.push("#{pppvar}=.false.")
+          @spec_var_bcast.push("call sms__bcast(#{pppvar},sms__type_logical,(/1/),1,#{sms_statusvar})")
+          @spec_var_true.push("#{label_new} #{pppvar}=.true.")
+          @spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
+          @success_label=label_create unless @success_label
+          @need_decompmod=true
         end
-        code.concat(spec_var_false)
-        code.push("#{self}".chomp)
-        code.push("goto #{success_label}") if success_label
-        code.concat(spec_var_true)
-        code.push("#{sa(success_label)}endif") if onroot
-        code.concat(spec_var_bcast)
-        code.concat(spec_var_goto)
-        code.concat(code_scatter)
-        code.concat(code_bcast)
-        code.concat(code_dealloc)
-        code=code.join("\n")
-        replace_statement(code,:block)
+      end
+    end
+
+    def io_stmt_codegen
+      use(sms_decompmod) if @need_decompmod
+      code=[]
+      code.concat(@code_alloc)
+      code.concat(@code_gather)
+      if @onroot
+        my_label=(self.label.empty?)?(nil):(self.label)
+        my_label=self.label_delete if my_label
+        code.push("#{sa(my_label)}if (#{sms_rootcheck}()) then")
+      end
+      code.concat(@spec_var_false)
+      code.push("#{self}".chomp)
+      code.push("goto #{@success_label}") if @success_label
+      code.concat(@spec_var_true)
+      code.push("#{sa(@success_label)}endif") if @onroot
+      code.concat(@spec_var_bcast)
+      code.concat(@spec_var_goto)
+      code.concat(@code_scatter)
+      code.concat(@code_bcast)
+      code.concat(@code_dealloc)
+      code=code.join("\n")
+      replace_statement(code,:block)
+    end
+
+    def io_stmt_common
+      unless self.is_a?(Print_Stmt)
+        self.io_stmt_branch_to_logic
+        self.io_stmt_var_set_logic
+      end
+      declare("logical",sms_rootcheck) if @onroot
+      @code_alloc,@code_dealloc=alloc_dealloc_globals(Set.new(@var_gather+@var_scatter))
+      self.io_stmt_gathers
+      self.io_stmt_scatters
+      self.io_stmt_bcasts
+      self.io_stmt_codegen
+    end
+
+    def io_stmt_gathers
+      @var_gather.each do |var|
+        @need_decompmod=true
+        varenv=getvarenv(var)
+        dh=varenv["decomp"]
+        dims=varenv["dims"]
+        type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
+        gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+        glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+        gstop=glubs
+        gstrt=gllbs
+        perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
+        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
+        args=[]
+        args.push("#{maxrank}")
+        args.push("1")
+        args.push("#{gllbs}")
+        args.push("#{glubs}")
+        args.push("#{gstrt}")
+        args.push("#{gstop}")
+        args.push("#{perms}")
+        args.push("#{decomp}")
+        args.push("#{type}")
+        args.push(".false.") # but why?
+        args.push("#{var}")
+        args.push(sms_global_name(var))
+        args.push(sms_statusvar)
+        code="call sms__gather(#{args.join(",")})"
+        @code_gather.push(code)
+      end
+    end
+
+    def io_stmt_init
+      @code_bcast=[]
+      @code_gather=[]
+      @code_scatter=[]
+      @iostat=nil
+      @need_decompmod=false
+      @onroot=true
+      @spec_var_bcast=[]
+      @spec_var_false=[]
+      @spec_var_goto=[]
+      @spec_var_true=[]
+      @success_label=nil
+      @var_bcast=[]
+      @var_gather=[]
+      @var_scatter=[]
+    end
+
+    def io_stmt_scatters
+      @var_scatter.each do |var|
+        @need_decompmod=true
+        tag=sms_commtag
+        declare("integer",tag,{:attrs=>"save"})
+        varenv=getvarenv(var)
+        dh=varenv["decomp"]
+        dims=varenv["dims"]
+        type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
+        gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+        glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+        gstop=glubs
+        gstrt=gllbs
+        halol="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
+        halou="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
+        perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
+        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
+        args=[]
+        args.push("#{maxrank}")
+        args.push("1")
+        args.push("#{tag}")
+        args.push("#{gllbs}")
+        args.push("#{glubs}")
+        args.push("#{gstrt}")
+        args.push("#{gstop}")
+        args.push("#{perms}")
+        args.push("#{halol}")
+        args.push("#{halou}")
+        args.push("#{decomp}")
+        args.push("#{type}")
+        args.push(sms_global_name(var))
+        args.push("#{var}")
+        args.push(sms_statusvar)
+        code=""
+        code+="if (#{@iostat}.eq.0) " if @iostat
+        code+="call sms__scatter(#{args.join(",")})"
+        @code_scatter.push(code)
+      end
+    end
+
+    def io_stmt_var_set_logic
+      [
+        :access,
+        :action,
+        :blank,
+        :delim,
+        :direct,
+        :exist,
+        :form,
+        :formatted,
+        :iostat,
+        :name,
+        :named,
+        :nextrec,
+        :number,
+        :opened,
+        :pad,
+        :position,
+        :read,
+        :readwrite,
+        :recl,
+        :sequential,
+        :size,
+        :unformatted,
+        :write
+      ].each do |x|
+        if (spec=self.send(x))
+          var=spec.rhs
+          varenv=getvarenv(var)
+          @spec_var_bcast.push("call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
+          @need_decompmod=true
+          @iostat=var if x==:iostat
+        end
       end
     end
 
@@ -915,7 +845,73 @@ module Fortran
 
   end
 
+  class Open_Stmt < IO_Stmt
+
+    def translate
+      return if self.env[:sms_ignore] or self.env[:sms_serial]
+      self.io_stmt_init
+      self.io_stmt_common
+    end
+
+  end
+
   class Print_Stmt < IO_Stmt
+
+    def translate
+      return if self.env[:sms_ignore] or self.env[:sms_serial]
+      self.io_stmt_init
+      self.output_items.each do |x|
+        var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
+        if (varenv=getvarenv(var,self,expected=false))
+          if (dh=varenv["decomp"])
+            @onroot=true
+            global=sms_global_name(var)
+            @var_gather.push(var)
+            self.replace_output_item(x,global)
+          end
+        end
+      end
+      self.io_stmt_common
+    end
+
+  end
+
+  class Read_Stmt < IO_Stmt
+
+    def translate
+      return if self.env[:sms_ignore] or self.env[:sms_serial]
+      self.io_stmt_init
+      @onroot=false if self.unit.is_a?(Internal_File_Unit)
+      if (nml=self.nml)
+        @onroot=true
+        nmlenv=getvarenv(nml,self,expected=true)
+        nmlenv["objects"].each do |x|
+          var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
+          if (varenv=getvarenv(var,self,expected=false))
+            if varenv["decomp"]
+              @var_scatter.push(var)
+              self.replace_input_item(x,sms_global_name(var))
+            else
+              @var_bcast.push(var)
+            end
+          end
+        end
+      end
+      self.input_items.each do |x|
+        var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
+        if (varenv=getvarenv(var,self,expected=true))
+          if (dh=varenv["decomp"])
+            @onroot=true
+            @var_scatter.push(var)
+            self.replace_input_item(x,sms_global_name(var))
+          else
+            @var_bcast.push(var) if @onroot
+          end
+        end
+      end
+      self.io_stmt_common
+    end
+
   end
 
   class Scoping_Unit < E
@@ -1669,7 +1665,7 @@ module Fortran
       # Wrap serial-region code in conditional.
 
       code.push("if (#{sms_rootcheck}()) then\n#{oldblock}endif")
-      
+
       # Scatters
 
       scatters.each do |var|
@@ -1720,7 +1716,7 @@ module Fortran
           else
             dims=varenv["dims"]
             sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
-        end
+          end
           bcast="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
         end
         code.push(bcast)
@@ -1914,7 +1910,7 @@ module Fortran
     end
 
   end
-  
+
   class SMS_Stop < SMS
 
     def translate
@@ -2097,6 +2093,41 @@ module Fortran
         code=code.join("\n")
         replace_statement(code,:block)
       end
+    end
+
+  end
+
+  class Write_Stmt < IO_Stmt
+
+    def translate
+      return if self.env[:sms_ignore] or self.env[:sms_serial]
+      self.io_stmt_init
+      function=(env["#{unit}"] and env["#{unit}"]["function"])
+      @onroot=false if self.unit.is_a?(Internal_File_Unit) or function
+      if (nml=self.nml)
+        @onroot=true
+        nmlenv=getvarenv(nml,self,expected=true)
+        nmlenv["objects"].each do |x|
+          var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
+          varenv=getvarenv(var,self,expected=true)
+          if varenv["decomp"]
+            @var_gather.push(var)
+            self.replace_input_item(x,sms_global_name(var))
+          end
+        end
+      end
+      self.output_items.each do |x|
+        var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
+        if (varenv=getvarenv(var,self,expected=false))
+          if (dh=varenv["decomp"])
+            @onroot=true
+            global=sms_global_name(var)
+            @var_gather.push(var)
+            self.replace_output_item(x,global)
+          end
+        end
+      end
+      self.io_stmt_common
     end
 
   end
