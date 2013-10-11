@@ -141,27 +141,29 @@
 
 ### REFACTORING
 
-- In sms_commtag, instead of working at root node, use env[:static]?
-
-- Factor duplication between IO_Stmt and SMS_Serial.
-
 - Factor 'if (iam_root()) then' wrapping in IO statements.
 
 - Factor out common elements in implicit IO translate() methods.
-
-- Re-enable continuation lines check, deal with looooong exchange in dyn_init.
-  Are the array literals as compact as possible (e.g. do we need all 7 dims, all
-  25 (?) MAX_PPP_VARS)? Better yet, make exchange use a begin/queue-multiple/end
-  buffering scheme, which avoids limits on exchange vars and minimized the size
-  of each call into the SMS library.
 
 - In sms_fortran.rb SMS_Serial#translate, factor varenv["dim#{r}"] & similar.
 
 - It might be better to prefix all in-class method calls with 'self.' for
   clarity. Or better to get rid of 'self' altogether for conciseness?
 
+- Refactor distribute_array_bounds() in sms_fortran.rb.
+
+- Get rid of class T and all uses? E seems much safer... Or use T & NT?
+
+- In sms_commtag, instead of working at root node, use env[:static]?
+
 - In SMS_Create_Decomp#translate, merge multiple 1..3 loops. They are as they
   are now to aid in textual comparison to legacy ppp.
+
+- Re-enable continuation lines check, deal with looooong exchange in dyn_init.
+  Are the array literals as compact as possible (e.g. do we need all 7 dims, all
+  25 (?) MAX_PPP_VARS)? Better yet, make exchange use a begin/queue-multiple/end
+  buffering scheme, which avoids limits on exchange vars and minimized the size
+  of each call into the SMS library.
 
 - In fortran.rb/sms_fortran.rb, standardize when methods on nodes return strings
   or SyntaxNode subclasses. That is, should we convert to strings as early as
@@ -170,14 +172,8 @@
 - Factor array-literal creation for sms_compare_var, esms_exhcange, sms_serial,
   etc.
 
-- Refactor SMS_Serial#translate!
-
 - In sms_fortran.rb, 'names_in_region' should be 'vars_in_region' and should
   be just that -- not function or subroutine names, not parameter names, etc.
-
-- Get rid of class T and all uses? E seems much safer... Or use T & NT?
-
-- Refactor distribute_array_bounds() in sms_fortran.rb.
 
 - Pros/Cons of e.g. env[:serial] vs inside?(SMS_Serial)? Standardize on one?
 

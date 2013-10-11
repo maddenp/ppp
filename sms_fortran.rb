@@ -173,6 +173,106 @@ module Fortran
       code+="endif"
     end
 
+    def code_bcast(vars,iostat=nil)
+      code_array=[]
+      vars.each do |var|
+        varenv=getvarenv(var)
+        if varenv["type"]=="character"
+          arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
+          code=""
+          code+="if (#{iostat}.eq.0) " if iostat
+          code+="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
+        else
+          if varenv["sort"]=="_scalar"
+            dims="1"
+            sizes="(/1/)"
+          else
+            dims=varenv["dims"]
+            sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
+          end
+          code=""
+          code+="if (#{iostat}.eq.0) " if iostat
+          code+="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
+        end
+        code_array.push(code)
+      end
+      code_array
+    end
+
+    def code_gather(vars)
+      code_array=[]
+      vars.each do |var|
+        varenv=getvarenv(var)
+        dh=varenv["decomp"]
+        dims=varenv["dims"]
+        type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
+        gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+        glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+        gstop=glubs
+        gstrt=gllbs
+        perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
+        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
+        args=[]
+        args.push("#{maxrank}")
+        args.push("1")
+        args.push("#{gllbs}")
+        args.push("#{glubs}")
+        args.push("#{gstrt}")
+        args.push("#{gstop}")
+        args.push("#{perms}")
+        args.push("#{decomp}")
+        args.push("#{type}")
+        args.push(".false.") # but why?
+        args.push("#{var}")
+        args.push(sms_global_name(var))
+        args.push(sms_statusvar)
+        code="call sms__gather(#{args.join(",")})"
+        code_array.push(code)
+      end
+      code_array
+    end
+
+    def code_scatter(vars,iostat=nil)
+      code_array=[]
+      vars.each do |var|
+        tag=sms_commtag
+        declare("integer",tag,{:attrs=>"save"})
+        varenv=getvarenv(var)
+        dh=varenv["decomp"]
+        dims=varenv["dims"]
+        type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
+        gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+        glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+        gstop=glubs
+        gstrt=gllbs
+        halol="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
+        halou="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
+        perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
+        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
+        args=[]
+        args.push("#{maxrank}")
+        args.push("1")
+        args.push("#{tag}")
+        args.push("#{gllbs}")
+        args.push("#{glubs}")
+        args.push("#{gstrt}")
+        args.push("#{gstop}")
+        args.push("#{perms}")
+        args.push("#{halol}")
+        args.push("#{halou}")
+        args.push("#{decomp}")
+        args.push("#{type}")
+        args.push(sms_global_name(var))
+        args.push("#{var}")
+        args.push(sms_statusvar)
+        code=""
+        code+="if (#{iostat}.eq.0) " if iostat
+        code+="call sms__scatter(#{args.join(",")})"
+        code_array.push(code)
+      end
+      code_array
+    end
+
     def declare(type,var,props={})
       su=scoping_unit
       varenv=getvarenv(var,su,false)
@@ -553,28 +653,8 @@ module Fortran
   class IO_Stmt < T
 
     def io_stmt_bcasts
-      @var_bcast.each do |var|
-        @need_decompmod=true
-        varenv=getvarenv(var)
-        if varenv["type"]=="character"
-          arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
-          code=""
-          code+="if (#{@iostat}.eq.0) " if @iostat
-          code+="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
-        else
-          if varenv["sort"]=="_scalar"
-            dims="1"
-            sizes="(/1/)"
-          else
-            dims=varenv["dims"]
-            sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
-          end
-          code=""
-          code+="if (#{@iostat}.eq.0) " if @iostat
-          code+="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
-        end
-        @code_bcast.push(code)
-      end
+      @need_decompmod=true unless @var_bcast.empty?
+      @code_bcast.concat(code_bcast(@var_bcast,@iostat))
     end
 
     def io_stmt_branch_to_logic
@@ -635,35 +715,8 @@ module Fortran
     end
 
     def io_stmt_gathers
-      @var_gather.each do |var|
-        @need_decompmod=true
-        varenv=getvarenv(var)
-        dh=varenv["decomp"]
-        dims=varenv["dims"]
-        type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
-        gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
-        glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
-        gstop=glubs
-        gstrt=gllbs
-        perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
-        args=[]
-        args.push("#{maxrank}")
-        args.push("1")
-        args.push("#{gllbs}")
-        args.push("#{glubs}")
-        args.push("#{gstrt}")
-        args.push("#{gstop}")
-        args.push("#{perms}")
-        args.push("#{decomp}")
-        args.push("#{type}")
-        args.push(".false.") # but why?
-        args.push("#{var}")
-        args.push(sms_global_name(var))
-        args.push(sms_statusvar)
-        code="call sms__gather(#{args.join(",")})"
-        @code_gather.push(code)
-      end
+      @need_decompmod=true unless @var_gather.empty?
+      @code_gather.concat(code_gather(@var_gather))
     end
 
     def io_stmt_init
@@ -684,43 +737,8 @@ module Fortran
     end
 
     def io_stmt_scatters
-      @var_scatter.each do |var|
-        @need_decompmod=true
-        tag=sms_commtag
-        declare("integer",tag,{:attrs=>"save"})
-        varenv=getvarenv(var)
-        dh=varenv["decomp"]
-        dims=varenv["dims"]
-        type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
-        gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
-        glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
-        gstop=glubs
-        gstrt=gllbs
-        halol="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
-        halou="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
-        perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
-        args=[]
-        args.push("#{maxrank}")
-        args.push("1")
-        args.push("#{tag}")
-        args.push("#{gllbs}")
-        args.push("#{glubs}")
-        args.push("#{gstrt}")
-        args.push("#{gstop}")
-        args.push("#{perms}")
-        args.push("#{halol}")
-        args.push("#{halou}")
-        args.push("#{decomp}")
-        args.push("#{type}")
-        args.push(sms_global_name(var))
-        args.push("#{var}")
-        args.push(sms_statusvar)
-        code=""
-        code+="if (#{@iostat}.eq.0) " if @iostat
-        code+="call sms__scatter(#{args.join(",")})"
-        @code_scatter.push(code)
-      end
+      @need_decompmod=true unless @var_scatter.empty?
+      @code_scatter.concat(code_scatter(@var_scatter,@iostat))
     end
 
     def io_stmt_var_set_logic
@@ -1628,102 +1646,13 @@ module Fortran
 
       code_alloc,code_dealloc=alloc_dealloc_globals(globals)
 
-      # Allocations
+      # Concatenate code.
 
       code.concat(code_alloc)
-
-      # Gathers
-
-      gathers.each do |var|
-        varenv=getvarenv(var)
-        dh=varenv["decomp"]
-        dims=varenv["dims"]
-        type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
-        gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
-        glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
-        gstop=glubs
-        gstrt=gllbs
-        perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
-        args=[]
-        args.push("#{maxrank}")
-        args.push("1")
-        args.push("#{gllbs}")
-        args.push("#{glubs}")
-        args.push("#{gstrt}")
-        args.push("#{gstop}")
-        args.push("#{perms}")
-        args.push("#{decomp}")
-        args.push("#{type}")
-        args.push(".false.") # but why?
-        args.push("#{var}")
-        args.push(sms_global_name(var))
-        args.push(sms_statusvar)
-        code.push("call sms__gather(#{args.join(",")})")
-      end
-
-      # Wrap serial-region code in conditional.
-
+      code.concat(code_gather(gathers))
       code.push("if (#{sms_rootcheck}()) then\n#{oldblock}endif")
-
-      # Scatters
-
-      scatters.each do |var|
-        tag=sms_commtag
-        declare("integer",tag,{:attrs=>"save"})
-        varenv=getvarenv(var)
-        dh=varenv["decomp"]
-        dims=varenv["dims"]
-        type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
-        gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
-        glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
-        gstop=glubs
-        gstrt=gllbs
-        halol="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
-        halou="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
-        perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
-        args=[]
-        args.push("#{maxrank}")
-        args.push("1")
-        args.push("#{tag}")
-        args.push("#{gllbs}")
-        args.push("#{glubs}")
-        args.push("#{gstrt}")
-        args.push("#{gstop}")
-        args.push("#{perms}")
-        args.push("#{halol}")
-        args.push("#{halou}")
-        args.push("#{decomp}")
-        args.push("#{type}")
-        args.push(sms_global_name(var))
-        args.push("#{var}")
-        args.push(sms_statusvar)
-        code.push("call sms__scatter(#{args.join(",")})")
-      end
-
-      # Broadcasts
-
-      bcasts.each do |var|
-        varenv=getvarenv(var)
-        if varenv["type"]=="character"
-          arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
-          bcast="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
-        else
-          if varenv["sort"]=="_scalar"
-            dims="1"
-            sizes="(/1/)"
-          else
-            dims=varenv["dims"]
-            sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
-          end
-          bcast="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
-        end
-        code.push(bcast)
-      end
-
-      # Deallocation of globally-sized variables
-
+      code.concat(code_scatter(scatters))
+      code.concat(code_bcast(bcasts))
       code.concat(code_dealloc)
 
       # Replace serial region with new code block.
@@ -1732,7 +1661,7 @@ module Fortran
 
     end
 
-  end # class SMS_Serial
+  end
 
   class SMS_Serial_Begin < SMS
 
