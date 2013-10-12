@@ -137,7 +137,7 @@ module Fortran
         dims=varenv["dims"]
         bounds_root=[]
         (1..dims).each do |i|
-          bounds_root.push((decdim=varenv["dim#{i}"])?("#{fixbound(varenv,var,i,:l)}:#{fixbound(varenv,var,i,:u)}"):("lbound(#{var},#{i}):ubound(#{var},#{i})"))
+          bounds_root.push((decdim(varenv,i))?("#{fixbound(varenv,var,i,:l)}:#{fixbound(varenv,var,i,:u)}"):("lbound(#{var},#{i}):ubound(#{var},#{i})"))
         end
         bounds_root=bounds_root.join(",")
         bounds_nonroot=("1"*dims).split("").join(",")
@@ -177,26 +177,38 @@ module Fortran
       code_array=[]
       vars.each do |var|
         varenv=getvarenv(var)
-        if varenv["type"]=="character"
-          arg2=(varenv["sort"]=="_scalar")?("1"):("size(#{var})")
+        sort=varenv["sort"]
+        type=varenv["type"]
+        if type=="character"
+          arg2=(sort=="_scalar")?("1"):("size(#{var})")
           code=""
           code+="if (#{iostat}.eq.0) " if iostat
           code+="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
         else
-          if varenv["sort"]=="_scalar"
+          if sort=="_scalar"
             dims="1"
             sizes="(/1/)"
           else
             dims=varenv["dims"]
             sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
           end
+          kind=varenv["kind"]
           code=""
           code+="if (#{iostat}.eq.0) " if iostat
-          code+="call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},#{sizes},#{dims},#{sms_statusvar})"
+          code+="call sms__bcast(#{var},#{sms_type(type,kind)},#{sizes},#{dims},#{sms_statusvar})"
         end
         code_array.push(code)
       end
       code_array
+    end
+
+    def code_decomp(dh,sort)
+      unless sort==:array or sort==:scalar
+        fail "ERROR: sort must be :array or :scalar"
+      end
+      dh=(dh)?("#{dh}(#{dh}__nestlevel)"):("sms__not_decomposed")
+      dh="(/#{dh}/)" if sort==:array
+      dh
     end
 
     def code_gather(vars)
@@ -205,13 +217,13 @@ module Fortran
         varenv=getvarenv(var)
         dh=varenv["decomp"]
         dims=varenv["dims"]
-        type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
-        gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
-        glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+        type=code_type(varenv,:array)
+        gllbs=code_global_lower_bounds(varenv,var,dims)
+        glubs=code_global_upper_bounds(varenv,var,dims)
         gstop=glubs
         gstrt=gllbs
-        perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
+        perms=code_perms(varenv)
+        decomp=code_decomp(dh,:array)
         args=[]
         args.push("#{maxrank}")
         args.push("1")
@@ -232,6 +244,23 @@ module Fortran
       code_array
     end
 
+    def code_global_lower_bounds(varenv,var,dims)
+      "(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+    end
+
+    def code_global_upper_bounds(varenv,var,dims)
+      "(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+    end
+
+    def code_local_bound(dh,dd,lu)
+      fail "ERROR: lu must be :l or :u" unless lu==:l or lu==:u
+      "#{dh}__local_#{lu}b(#{dd},#{dh}__nestlevel)"
+    end
+
+    def code_perms(varenv)
+      "(/"+ranks.map { |r| decdim(varenv,r)||0 }.join(",")+"/)"
+    end
+
     def code_scatter(vars,iostat=nil)
       code_array=[]
       vars.each do |var|
@@ -240,15 +269,15 @@ module Fortran
         varenv=getvarenv(var)
         dh=varenv["decomp"]
         dims=varenv["dims"]
-        type="(/"+sms_type(varenv["type"],varenv["kind"])+"/)"
-        gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
-        glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+        type=code_type(varenv,:array)
+        gllbs=code_global_lower_bounds(varenv,var,dims)
+        glubs=code_global_upper_bounds(varenv,var,dims)
         gstop=glubs
         gstrt=gllbs
-        halol="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
-        halou="(/"+ranks.map { |r| (varenv["dim#{r}"])?("#{dh}__halosize(#{varenv["dim#{r}"]},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
-        perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-        decomp=(dh)?("(/#{dh}(#{dh}__nestlevel)/)"):("(/sms__not_decomposed/)")
+        halol="(/"+ranks.map { |r| (dd=decdim(varenv,r))?("#{dh}__halosize(#{dd},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
+        halou="(/"+ranks.map { |r| (dd=decdim(varenv,r))?("#{dh}__halosize(#{dd},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
+        perms=code_perms(varenv)
+        decomp=code_decomp(dh,:array)
         args=[]
         args.push("#{maxrank}")
         args.push("1")
@@ -271,6 +300,21 @@ module Fortran
         code_array.push(code)
       end
       code_array
+    end
+
+    def code_type(varenv,sort)
+      unless sort==:array or sort==:scalar
+        fail "ERROR: sort must be :array or :scalar"
+      end
+      code=""
+      code+="(/" if sort==:array
+      code+=sms_type(varenv["type"],varenv["kind"])
+      code+="/)" if sort==:array
+      code
+    end
+
+    def decdim(varenv,r)
+      varenv["dim#{r}"]
     end
 
     def declare(type,var,props={})
@@ -320,9 +364,8 @@ module Fortran
         cb.each_index do |i|
           b=cb[i]
           arrdim=i+1
-          if (decdim=varenv["dim#{arrdim}"])
-            s="#{dh}__local_lb(#{decdim},#{dh}__nestlevel):"+
-              "#{dh}__local_ub(#{decdim},#{dh}__nestlevel)"
+          if (dd=decdim(varenv,arrdim))
+            s=code_local_bound(dh,dd,:l)+":"+code_local_bound(dh,dd,:u)
           else
             s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
           end
@@ -331,8 +374,8 @@ module Fortran
       elsif spec.is_a?(Assumed_Shape_Spec_List)
         (1..varenv["dims"].to_i).each do |i|
           arrdim=i
-          if (decdim=varenv["dim#{arrdim}"]) and not varenv["allocatable"]
-            s="#{dh}__local_lb(#{decdim},#{dh}__nestlevel):"
+          if (dd=decdim(varenv,arrdim)) and not varenv["allocatable"]
+            s=code_local_bound(dh,dd,:l)+":"
           else
             s=":"
           end
@@ -348,10 +391,10 @@ module Fortran
       fail "ERROR: Bad upper bound: #{bound}" if bound=="_default" and x==:u
       return 1 if bound=="_default" and x==:l
       if ["_assumed","_deferred","_explicit"].include?(bound)
-        if (decdim=varenv["dim#{dim}"])
+        if (dd=decdim(varenv,dim))
           dh=varenv["decomp"]
           lu=(x==:l)?("low"):("upper")
-          return "#{dh}__#{lu}bounds(#{decdim},#{dh}__nestlevel)"
+          return "#{dh}__#{lu}bounds(#{dd},#{dh}__nestlevel)"
         else
           return "#{x}bound(#{var},#{dim})"
         end
@@ -359,11 +402,11 @@ module Fortran
       bound
     end
 
-    def halo_offsets(decdim)
+    def halo_offsets(dd)
       halo_lo=0
       halo_up=0
       if halocomp=self.env[:sms_halo_comp]
-        offsets=halocomp[decdim]
+        offsets=halocomp[dd]
         halo_lo=offsets.lo
         halo_up=offsets.up
       end
@@ -492,8 +535,8 @@ module Fortran
             newdims=[]
             subscript_list.each_index do |i|
               arrdim=i+1
-              if (decdim=varenv["dim#{arrdim}"])
-                newdims.push("#{dh}__local_lb(#{decdim},#{dh}__nestlevel):#{dh}__local_ub(#{decdim},#{dh}__nestlevel)")
+              if (dd=decdim(varenv,arrdim))
+                newdims.push(code_local_bound(dh,dd,:l)+":"+code_local_bound(dh,dd,:u))
               else
                 newdims.push("#{subscript_list[i]}")
               end
@@ -517,11 +560,11 @@ module Fortran
 
       def getbound(var,dim,lu,cb=nil)
         varenv=env[var]
-        return "#{cb}" unless (decdim=varenv["dim#{dim}"])
+        return "#{cb}" unless (dd=decdim(varenv,dim))
         dh=varenv["decomp"]
         nl="#{dh}__nestlevel"
         a1="#{dh}__#{(lu==:l)?('s'):('e')}1" # why '1'? generalize?
-        a2="#{dh}__#{(lu==:l)?('low'):('upper')}bounds(#{decdim},#{nl})"
+        a2="#{dh}__#{(lu==:l)?('low'):('upper')}bounds(#{dd},#{nl})"
         "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
       end
 
@@ -807,11 +850,11 @@ module Fortran
       if tolocal=self.env[:sms_to_local] and p=tolocal[name]
         case p.key
         when "lbound"
-          se="s#{p.decdim}"
-          halo_offset=halo_offsets(p.decdim).lo
+          se="s#{p.dd}"
+          halo_offset=halo_offsets(p.dd).lo
         when "ubound"
-          se="e#{p.decdim}"
-          halo_offset=halo_offsets(p.decdim).up
+          se="e#{p.dd}"
+          halo_offset=halo_offsets(p.dd).up
         else
           fail "ERROR: Unrecognized to_local key: #{p.key}"
         end
@@ -837,21 +880,21 @@ module Fortran
         if parallel=self.env[:sms_parallel]
           loop_control=e[3]
           loop_var="#{loop_control.e[1]}"
-          decdim=nil
+          dd=nil
           [0,1,2].each do |i|
             if parallel.vars[i].include?(loop_var)
-              decdim=i+1
+              dd=i+1
               break
             end
           end
           dh=parallel.decomp
-          if decdim
-            halo_lo=halo_offsets(decdim).lo
-            halo_up=halo_offsets(decdim).up
+          if dd
+            halo_lo=halo_offsets(dd).lo
+            halo_up=halo_offsets(dd).up
             if loop_control.is_a?(Loop_Control_1)
-              lo=self.raw("#{dh}__s#{decdim}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)",:scalar_numeric_expr,@srcfile,{:env=>self.env,:nl=>false})
+              lo=self.raw("#{dh}__s#{dd}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)",:scalar_numeric_expr,@srcfile,{:env=>self.env,:nl=>false})
               lo.parent=loop_control
-              up=self.raw(",#{dh}__e#{decdim}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)",:loop_control_pair,@srcfile,{:env=>self.env,:nl=>false})
+              up=self.raw(",#{dh}__e#{dd}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)",:loop_control_pair,@srcfile,{:env=>self.env,:nl=>false})
               up.parent=loop_control
               loop_control.e[3]=lo
               loop_control.e[4]=up
@@ -987,15 +1030,11 @@ module Fortran
       varenv=getvarenv(var)
       dims=varenv["dims"]
       str="#{e[5]}"
-      type=sms_type(varenv["type"],varenv["kind"])
-      gllbs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
-      glubs="(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
-      perms="(/"+ranks.map { |r| varenv["dim#{r}"]||0 }.join(",")+"/)"
-      if (dh=varenv["decomp"])
-        dh="#{dh}(#{dh}__nestlevel)"
-      else
-        dh="sms__not_decomposed"
-      end
+      type=code_type(varenv,:scalar)
+      gllbs=code_global_lower_bounds(varenv,var,dims)
+      glubs=code_global_upper_bounds(varenv,var,dims)
+      perms=code_perms(varenv)
+      dh=code_decomp(varenv["decomp"],:scalar)
       code="if (sms__debugging_on()) call sms__compare_var(#{dh},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},#{sms_statusvar})"
       replace_statement(code,:if_stmt)
     end
@@ -1083,8 +1122,8 @@ module Fortran
         "#{d}__localsize(1,#{n})",
         "sms__periodicusedlower(1)",
         "sms__periodicusedupper(1)",
-        "#{d}__local_lb(1,#{n})",
-        "#{d}__local_ub(1,#{n})",
+        code_local_bound(d,1,:l),
+        code_local_bound(d,1,:u),
         "#{d}__decompname",
         "#{d}(#{n})",
         "sms__max_decomposed_dims",
@@ -1267,7 +1306,7 @@ module Fortran
         ranks.each { |r| glubs.push((r>dims)?(1):(fixbound(varenv,var,r,:u))) }
         ranks.each { |r| halol.push((r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)")) }
         ranks.each { |r| halou.push((r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)")) }
-        ranks.each { |r| perms.push(varenv["dim#{r}"]||0) }
+        ranks.each { |r| perms.push(decdim(varenv,r)||0) }
         types.push(sms_type(varenv["type"],varenv["kind"]))
       end
       cornerdepth="(/#{cornerdepth.join(",")}/)"
@@ -1878,7 +1917,7 @@ module Fortran
 
   class SMS_To_Local_List < E
 
-    def decdim
+    def dd
       "#{e[1]}"
     end
 
@@ -1887,7 +1926,7 @@ module Fortran
     end
 
     def idx
-      decdim.to_i
+      dd.to_i
     end
 
     def vars
@@ -1912,7 +1951,7 @@ module Fortran
     def vars
       def rec(list,v)
         list.vars.each do |x|
-          v[x]=OpenStruct.new({:decdim=>list.idx,:key=>list.key})
+          v[x]=OpenStruct.new({:dd=>list.idx,:key=>list.key})
         end
       end
       v={}

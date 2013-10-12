@@ -6,11 +6,6 @@
   module_decomp.sms does not even *exist*, much less contain the items added
   during translation.
 
-- Stop tracking kind. Pass only *type* to MPI-calling SMS routines and, in the
-  latter, use mpi_sizeof() + mpi_type_match_size() in the library to make a
-  run-time determination of MPI type to use. Get rid of related kind() methods
-  in fortran.rb. IS THIS A GOOD IDEA?
-
 - Should derived types provided by modules appear in .sms files (probably!), and
   how?
 
@@ -141,23 +136,18 @@
 
 ### REFACTORING
 
-- Factor 'if (iam_root()) then' wrapping in IO statements.
+- Factor array-literal creation for sms_compare_var, sms_exhcange, sms_serial,
+  etc.
 
-- Factor out common elements in implicit IO translate() methods.
-
-- In sms_fortran.rb SMS_Serial#translate, factor varenv["dim#{r}"] & similar.
+- In SMS_Create_Decomp#translate, merge multiple 1..3 loops. They are as they
+  are now to aid in textual comparison to legacy ppp.
 
 - It might be better to prefix all in-class method calls with 'self.' for
   clarity. Or better to get rid of 'self' altogether for conciseness?
 
-- Refactor distribute_array_bounds() in sms_fortran.rb.
-
 - Get rid of class T and all uses? E seems much safer... Or use T & NT?
 
 - In sms_commtag, instead of working at root node, use env[:static]?
-
-- In SMS_Create_Decomp#translate, merge multiple 1..3 loops. They are as they
-  are now to aid in textual comparison to legacy ppp.
 
 - Re-enable continuation lines check, deal with looooong exchange in dyn_init.
   Are the array literals as compact as possible (e.g. do we need all 7 dims, all
@@ -168,9 +158,6 @@
 - In fortran.rb/sms_fortran.rb, standardize when methods on nodes return strings
   or SyntaxNode subclasses. That is, should we convert to strings as early as
   possible, or delay until a string is absolutely required? Probably the latter.
-
-- Factor array-literal creation for sms_compare_var, esms_exhcange, sms_serial,
-  etc.
 
 - In sms_fortran.rb, 'names_in_region' should be 'vars_in_region' and should
   be just that -- not function or subroutine names, not parameter names, etc.
