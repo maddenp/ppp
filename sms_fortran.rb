@@ -1076,27 +1076,15 @@ module Fortran
       max.times do |i|
         dim=i+1
         g=global[i]
+        h=halo[i]
         if g
           stmts.push(["allocate(#{d}__s#{dim}(1:1,0:1,#{d}__maxnests))",:allocate_stmt])
           stmts.push(["allocate(#{d}__e#{dim}(#{g}:#{g},0:1,#{d}__maxnests))",:allocate_stmt])
         end
         stmts.push(["#{d}__globalsize(#{dim},#{n})=#{(g)?(g):(1)}",:assignment_stmt])
-      end
-      max.times do |i|
-        dim=i+1
         stmts.push(["#{d}__localsize(#{dim},#{n})=0",:assignment_stmt])
-      end
-      max.times do |i|
-        dim=i+1
-        h=halo[i]
         stmts.push(["#{d}__halosize(#{dim},#{n})=#{(h)?(h):(0)}",:assignment_stmt])
-      end
-      max.times do |i|
-        dim=i+1
         stmts.push(["#{d}__boundarytype(#{dim})=sms__nonperiodic_bdy",:assignment_stmt])
-      end
-      max.times do |i|
-        dim=i+1
         stmts.push(["#{d}__lowbounds(#{dim},#{n})=1",:assignment_stmt])
       end
       max.times do |i|

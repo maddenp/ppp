@@ -136,12 +136,6 @@
 
 ### REFACTORING
 
-- Factor array-literal creation for sms_compare_var, sms_exhcange, sms_serial,
-  etc.
-
-- In SMS_Create_Decomp#translate, merge multiple 1..3 loops. They are as they
-  are now to aid in textual comparison to legacy ppp.
-
 - It might be better to prefix all in-class method calls with 'self.' for
   clarity. Or better to get rid of 'self' altogether for conciseness?
 
