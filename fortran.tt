@@ -2689,7 +2689,7 @@ grammar Fortran
   rule program_stmt
     # F90:R1102
 
-    label:label? t_program program_name t_newline <Program_Stmt>
+    label:label? t_program program_name t_newline &{ |e| sp_program_stmt } <Program_Stmt>
   end
 
   rule program_unit

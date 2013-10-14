@@ -212,6 +212,11 @@ module Fortran
     true
   end
 
+  def sp_module_stmt
+    envpush
+    true
+  end
+
   def sp_namelist_group_name?(name)
     return false unless (varenv=env["#{name}"])
     varenv["sort"]=="_namelist"
@@ -238,15 +243,15 @@ module Fortran
     ("#{node.label}"==@dolabels.last)?(true):(false)
   end
 
-  def sp_module_stmt
-    envpush
-    true
-  end
-
   def sp_parameter_stmt(named_constant_def_list)
     named_constant_def_list.names.each do |x|
       varsetprop(x,"parameter","_true")
     end
+    true
+  end
+
+  def sp_program_stmt
+    envpush
     true
   end
 
@@ -464,13 +469,6 @@ module Fortran
       scoping_unit.e[2]
     end
 
-    def getvarenv(name,node=self,expected=true)
-      unless (varenv=node.env["#{name}"])
-        fail "ERROR: '#{name}' not found in environment" if expected
-      end
-      varenv
-    end
-
     def ik(e,c,a)
       # identity keep: If the [e]lement's string form equals the [c]ontrol
       # string, return the element itself; otherwise return the [a]lternate.
@@ -639,6 +637,24 @@ module Fortran
           up.e.push(t)
         end
       end
+    end
+
+    def varenv_chk(name,node=self,expected=true)
+      n="#{name}"
+      unless (varenv=node.env[n])
+        fail "ERROR: '#{n}' not found in environment" if expected
+      end
+      [n,varenv]
+    end
+
+    def varenv_del(name,node=self,expected=true)
+      n,varenv=varenv_chk(name,node,expected)
+      node.env.delete(n)
+    end
+
+    def varenv_get(name,node=self,expected=true)
+      n,varenv=varenv_chk(name,node,expected)
+      varenv
     end
 
     def to_s
@@ -1314,7 +1330,7 @@ module Fortran
       unless ok
         code="#{self}"
         replace_element(code,:deferred_shape_spec_list)
-        varenv=getvarenv(array_name)
+        varenv=varenv_get(array_name)
         varenv.keys.each { |k| varenv[k]="_deferred" if k=~/[lu]b\d+/ }
       end
     end

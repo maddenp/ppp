@@ -123,7 +123,7 @@ module Fortran
       code_alloc=[]
       code_dealloc=[]
       globals.sort.each do |var|
-        varenv=getvarenv(var)
+        varenv=varenv_get(var)
         d=(":"*varenv["dims"]).split("")
         t=varenv["type"]
         k=varenv["kind"]
@@ -172,7 +172,7 @@ module Fortran
     def code_bcast(vars,iostat=nil)
       code_array=[]
       vars.each do |var|
-        varenv=getvarenv(var)
+        varenv=varenv_get(var)
         sort=varenv["sort"]
         type=varenv["type"]
         if type=="character"
@@ -210,7 +210,7 @@ module Fortran
     def code_gather(vars)
       code_array=[]
       vars.each do |var|
-        varenv=getvarenv(var)
+        varenv=varenv_get(var)
         dh=varenv["decomp"]
         dims=varenv["dims"]
         type=code_type(varenv,:array)
@@ -262,7 +262,7 @@ module Fortran
       vars.each do |var|
         tag=sms_commtag
         declare("integer",tag,{:attrs=>"save"})
-        varenv=getvarenv(var)
+        varenv=varenv_get(var)
         dh=varenv["decomp"]
         dims=varenv["dims"]
         type=code_type(varenv,:array)
@@ -315,39 +315,41 @@ module Fortran
 
     def declare(type,var,props={})
       su=scoping_unit
-      varenv=getvarenv(var,su,false)
-      if varenv
-        fail "ERROR: Variable #{var} is already defined" unless varenv["pppvar"]
-      else
-        lenopt=""
-        if props[:len]
-          fail "ERROR: 'len' property incompatible with type '#{type}'" unless type=="character"
-          lenopt="(len=#{props[:len]})"
+      varenv=varenv_get(var,su,false)
+      if varenv and not varenv["pppvar"]
+        fail "ERROR: Variable #{var} is already defined"
+      end
+      varenv_del(var,su,false)
+      lenopt=""
+      if props[:len]
+        unless type=="character"
+          fail "ERROR: 'len' property incompatible with type '#{type}'"
         end
-        kind=props[:kind]
-        kind=([nil,"_default"].include?(kind))?(""):("(kind=#{kind})")
-        attrs=props[:attrs]||[]
-        attrs=[attrs] unless attrs.is_a?(Array)
-        attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
-        code="#{type}#{kind}#{lenopt}#{attrs}::#{var}"
-        dims=props[:dims]
-        code+="(#{dims.join(',')})" if dims
-        init=props[:init]
-        code+="=#{init}" if init
-        t=raw(code,:type_declaration_stmt,root.srcfile,{:env=>env})
-        newenv=t.input.envstack.last
-        newenv[var]["pppvar"]=true
-        dc=declaration_constructs
-        t.parent=dc
-        dc.e.push(t)
-        while node||=self
-          node.envref[var]=newenv[var] if node.respond_to?(:envref)
-          break if node==su
-          node=node.parent
-        end
-        if su.is_a?(Module)
-          write_envfile(su.name,su.envref)
-        end
+        lenopt="(len=#{props[:len]})"
+      end
+      kind=props[:kind]
+      kind=([nil,"_default"].include?(kind))?(""):("(kind=#{kind})")
+      attrs=props[:attrs]||[]
+      attrs=[attrs] unless attrs.is_a?(Array)
+      attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
+      code="#{type}#{kind}#{lenopt}#{attrs}::#{var}"
+      dims=props[:dims]
+      code+="(#{dims.join(',')})" if dims
+      init=props[:init]
+      code+="=#{init}" if init
+      t=raw(code,:type_declaration_stmt,root.srcfile,{:env=>env})
+      newenv=t.input.envstack.last
+      newenv[var]["pppvar"]=true
+      dc=declaration_constructs
+      t.parent=dc
+      dc.e.push(t)
+      while node||=self
+        node.envref[var]=newenv[var] if node.respond_to?(:envref)
+        break if node==su
+        node=node.parent
+      end
+      if su.is_a?(Module)
+        write_envfile(su.name,su.envref)
       end
       var
     end
@@ -524,10 +526,10 @@ module Fortran
 # the environment and then... Can we have a decomposed array inside a derived
 # type? A decomposed array *of* dervived type, yes -- but the components?
 
-#         varenv=getvarenv(var)
+#         varenv=varenv_get(var)
 #         if varenv["decomp"]
 
-          varenv=getvarenv(var,self,false)
+          varenv=varenv_get(var,self,false)
           if varenv and (dh=varenv["decomp"])
             use(sms_decompmod)
             subscript_list=part_ref.subscript_list
@@ -606,7 +608,7 @@ module Fortran
     def translate
       var="#{e[0]}"
       spec=e[2].spec
-      varenv=getvarenv(var)
+      varenv=varenv_get(var)
       distribute_array_bounds(spec,varenv)
     end
 
@@ -626,7 +628,7 @@ module Fortran
 
     def translate
       var="#{e[0]}"
-      varenv=getvarenv(var)
+      varenv=varenv_get(var)
       spec=nil
       if varenv["sort"]=="_array"
         if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
@@ -811,7 +813,7 @@ module Fortran
       ].each do |x|
         if (spec=send(x))
           var=spec.rhs
-          varenv=getvarenv(var)
+          varenv=varenv_get(var)
           @spec_var_bcast.push("call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
           @need_decompmod=true
           @iostat=var if x==:iostat
@@ -922,7 +924,7 @@ module Fortran
       io_stmt_init
       output_items.each do |x|
         var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-        if (varenv=getvarenv(var,self,expected=false))
+        if (varenv=varenv_get(var,self,expected=false))
           if (dh=varenv["decomp"])
             @onroot=true
             global=sms_global_name(var)
@@ -944,10 +946,10 @@ module Fortran
       @onroot=false if unit.is_a?(Internal_File_Unit)
       if (namelist_name=nml)
         @onroot=true
-        nmlenv=getvarenv(namelist_name,self,expected=true)
+        nmlenv=varenv_get(namelist_name,self,expected=true)
         nmlenv["objects"].each do |x|
           var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-          if (varenv=getvarenv(var,self,expected=false))
+          if (varenv=varenv_get(var,self,expected=false))
             if varenv["decomp"]
               @var_scatter.push(var)
               replace_input_item(x,sms_global_name(var))
@@ -959,7 +961,7 @@ module Fortran
       end
       input_items.each do |x|
         var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-        if (varenv=getvarenv(var,self,expected=true))
+        if (varenv=varenv_get(var,self,expected=true))
           if (dh=varenv["decomp"])
             @onroot=true
             @var_scatter.push(var)
@@ -1026,7 +1028,7 @@ module Fortran
       use(sms_decompmod)
       declare("logical","sms__debugging_on")
       var="#{e[3].name}"
-      varenv=getvarenv(var)
+      varenv=varenv_get(var)
       dims=varenv["dims"]
       str="#{e[5]}"
       type=code_type(varenv,:scalar)
@@ -1284,7 +1286,7 @@ module Fortran
       varenv=nil
       (0..nvars-1).each do |i|
         var=v[i].name
-        varenv=getvarenv(var)
+        varenv=varenv_get(var)
         dims=varenv["dims"]
         dh=varenv["decomp"]
         dectypes.push("#{dh}(#{dh}__nestlevel)")
@@ -1526,7 +1528,7 @@ module Fortran
       types=[]
       nvars.times do |i|
         var=vars[i]
-        varenv=getvarenv(var)
+        varenv=varenv_get(var)
         fail "ERROR: reduce inapplicable to distributed array '#{var}'" if varenv["decomp"]
         sizes.push((varenv["sort"]=="_array")?("size(#{var})"):("1"))
         types.push(sms_type(varenv["type"],varenv["kind"]))
@@ -1594,7 +1596,7 @@ module Fortran
         # naive) assumption that they are function or subroutine names that are
         # in the environment due to access specification.
 
-        next unless (varenv=getvarenv(name,self,false)) and varenv["type"]
+        next unless (varenv=varenv_get(name,self,false)) and varenv["type"]
         dh=varenv["decomp"]
         sort=varenv["sort"]
 
@@ -1657,7 +1659,7 @@ module Fortran
 
       globals=Set.new(gathers+scatters)
       globals.sort.each do |var|
-        varenv=getvarenv(var)
+        varenv=varenv_get(var)
         dims=(":"*varenv["dims"]).split("")
         kind=varenv["kind"]
         type=varenv["type"]
@@ -1974,7 +1976,7 @@ module Fortran
 
     def translate
       var="#{e[3]}"
-      fail "ERROR: No module info found for variable '#{var}'" unless (varenv=getvarenv(var))
+      fail "ERROR: No module info found for variable '#{var}'" unless (varenv=varenv_get(var))
       fail "ERROR: No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
       use(sms_decompmod)
       stmts=[]
@@ -2061,10 +2063,10 @@ module Fortran
       @onroot=false if unit.is_a?(Internal_File_Unit) or function
       if (namelist_name=nml)
         @onroot=true
-        nmlenv=getvarenv(namelist_name,self,expected=true)
+        nmlenv=varenv_get(namelist_name,self,expected=true)
         nmlenv["objects"].each do |x|
           var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-          varenv=getvarenv(var,self,expected=true)
+          varenv=varenv_get(var,self,expected=true)
           if varenv["decomp"]
             @var_gather.push(var)
             replace_input_item(x,sms_global_name(var))
@@ -2073,7 +2075,7 @@ module Fortran
       end
       output_items.each do |x|
         var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-        if (varenv=getvarenv(var,self,expected=false))
+        if (varenv=varenv_get(var,self,expected=false))
           if (dh=varenv["decomp"])
             @onroot=true
             global=sms_global_name(var)

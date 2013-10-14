@@ -1,8 +1,5 @@
 ### ENVIRONMENT
 
-- Should derived types provided by modules appear in .sms files (probably!), and
-  how?
-
 * Consider:
 
   program p
@@ -30,6 +27,9 @@
   by function_stmt).
 
 - Sort envfile output for easy xxdiff comparison.
+
+- Should derived types provided by modules appear in .sms files (probably!), and
+  how?
 
 ### ERROR CHECKING / REPORTING
 

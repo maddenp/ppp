@@ -25751,6 +25751,7 @@ module Fortran
     def t_newline
       elements[3]
     end
+
   end
 
   def _nt_program_stmt
@@ -25781,6 +25782,17 @@ module Fortran
         if r4
           r5 = _nt_t_newline
           s0 << r5
+          if r5
+            i6 = index
+            r7 = lambda { |e| sp_program_stmt }.call(s0)
+            if r7
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r6 = nil
+            end
+            s0 << r6
+          end
         end
       end
     end
