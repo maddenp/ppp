@@ -372,7 +372,7 @@ module Fortran
   end
 
   def use_usenames(modulename)
-    e=(self.is_a?(T))?(use_part.env):(env)
+    e=(is_a?(T))?(use_part.env):(env)
     return [] unless e[:uses]
     e[:uses][modulename].map { |x| x[1] }
   end
@@ -393,7 +393,7 @@ module Fortran
 
     def cat
       # concatenate elements' string representations
-      (e)?(self.e.map { |x| "#{x}" }.join):("")
+      (e)?(e.map { |x| "#{x}" }.join):("")
     end
 
     def post_common
@@ -455,7 +455,7 @@ module Fortran
     end
 
     def ancestor(*classes)
-      n=self.parent
+      n=parent
       begin
         return n if classes.any? { |x| n.is_a?(x) }
       end while n=n.parent
@@ -475,7 +475,7 @@ module Fortran
     end
 
     def env
-      self.envref
+      envref
     end
 
     def execution_part
@@ -508,7 +508,7 @@ module Fortran
     end
 
     def insert_statement(code,rule,node,offset)
-      tree=self.raw(code,rule,@srcfile,{:env=>self.env})
+      tree=raw(code,rule,@srcfile,{:env=>env})
       tree.parent=node.parent
       block=node.parent.e
       block.insert(block.index(node)+offset,tree)
@@ -528,7 +528,7 @@ module Fortran
     end
 
     def label_create
-      labels=(self.env[:static].labels||=Set.new)
+      labels=(env[:static].labels||=Set.new)
       99999.downto(1).each do |n|
         unless labels.include?(n)
           labels.add(n)
@@ -539,9 +539,9 @@ module Fortran
     end
 
     def label_delete
-      return nil if (label=self.label).empty?
-      self.e[0]=Treetop::Runtime::SyntaxNode.new("",nil)
-      label
+      return nil if (l=label).empty?
+      e[0]=Treetop::Runtime::SyntaxNode.new("",nil)
+      l
     end
 
     def level
@@ -563,11 +563,11 @@ module Fortran
     end
 
     def remove
-      self.parent.e[self.parent.e.index(self)]=nil
+      parent.e[parent.e.index(self)]=nil
     end
 
     def replace_element(code,rule,node=self)
-      tree=self.raw(code,rule,@srcfile,{"nl"=>false,:env=>node.env})
+      tree=raw(code,rule,@srcfile,{"nl"=>false,:env=>node.env})
       node=node.parent while "#{node}"=="#{node.parent}"
       tree.parent=node.parent
       block=node.parent.e
@@ -575,7 +575,7 @@ module Fortran
     end
 
     def replace_statement(code,rule,node=self)
-      tree=self.raw(code,rule,@srcfile,{:env=>node.env})
+      tree=raw(code,rule,@srcfile,{:env=>node.env})
       tree.parent=node.parent
       block=node.parent.e
       block[block.index(node)]=tree
@@ -610,12 +610,12 @@ module Fortran
     end
 
     def space(all=false)
-      a=(all)?(self.e):(self.e[1..-1])
+      a=(all)?(e):(e[1..-1])
       a.map { |x| "#{x}" }.join(" ").strip
     end
 
     def specification_part
-      ((self.is_a?(Scoping_Unit))?(self):(scoping_unit)).e[1]
+      ((is_a?(Scoping_Unit))?(self):(scoping_unit)).e[1]
     end
 
     def stmt(s)
@@ -652,7 +652,7 @@ module Fortran
           new_uses={modname=>new_usenames}
           old_uses=up.env[:uses]
           up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
-          t=self.raw(code,:use_stmt,@srcfile,{:env=>self.env})
+          t=raw(code,:use_stmt,@srcfile,{:env=>env})
           t.parent=up
           up.e.push(t)
         end
@@ -905,9 +905,9 @@ module Fortran
     end
 
     def input_items
-      if self.is_a?(Read_Stmt_1) and e[5].is_a?(Input_Item_List)
+      if is_a?(Read_Stmt_1) and e[5].is_a?(Input_Item_List)
         e[5].items
-      elsif self.is_a?(Read_Stmt_2) and e[3].is_a?(Read_Stmt_Input_Item_List_Option)
+      elsif is_a?(Read_Stmt_2) and e[3].is_a?(Read_Stmt_Input_Item_List_Option)
         e[3].items
       else
         []
@@ -947,7 +947,7 @@ module Fortran
     end
 
     def output_items
-      if self.is_a?(Write_Stmt) and e[5].is_a?(Output_Item_List)
+      if is_a?(Write_Stmt) and e[5].is_a?(Output_Item_List)
         e[5].items
       else
         []
@@ -1322,12 +1322,12 @@ module Fortran
 
     def post
       ok=true
-      if (entity_decl=self.ancestor(Entity_Decl))
+      if (entity_decl=ancestor(Entity_Decl))
         array_name=entity_decl.name
-        ok=(self.env[:args] and self.env[:args].include?(array_name))?(true):(false)
-      elsif (entity_decl=self.ancestor(Array_Name_And_Spec))
+        ok=(env[:args] and env[:args].include?(array_name))?(true):(false)
+      elsif (entity_decl=ancestor(Array_Name_And_Spec))
         array_name=entity_decl.name
-        ok=(self.env["#{array_name}"]["lb1"]=="_deferred")?(false):(true)
+        ok=(env["#{array_name}"]["lb1"]=="_deferred")?(false):(true)
       end
       unless ok
         code="#{self}"
@@ -1395,8 +1395,8 @@ module Fortran
       attrany(:allocatable?)
     end
 
-    def attrany(attr,e=nil)
-      (e||self.e).reduce(false) { |m,x| m||=attrchk(x,attr) }
+    def attrany(attr,e1=nil)
+      (e1||e).reduce(false) { |m,x| m||=attrchk(x,attr) }
     end
 
     def dimension?
@@ -1770,7 +1770,7 @@ module Fortran
       unindent
       n=self
       while (n=n.ancestor(Outer_Shared_Do_Construct))
-        unindent if n.label==self.label
+        unindent if n.label==label
       end
       cat
     end
@@ -2454,9 +2454,9 @@ module Fortran
   class IO_Spec < E
 
     def relabel_spec(spec)
-      old=self.rhs
+      old=rhs
       new=label_create
-      replace_element("#{new}",:label,self.e[2])
+      replace_element("#{new}",:label,e[2])
       [old,new]
     end
 

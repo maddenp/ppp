@@ -136,9 +136,6 @@
 
 ### REFACTORING
 
-- It might be better to prefix all in-class method calls with 'self.' for
-  clarity. Or better to get rid of 'self' altogether for conciseness?
-
 - Get rid of class T and all uses? E seems much safer... Or use T & NT?
 
 - In sms_commtag, instead of working at root node, use env[:static]?

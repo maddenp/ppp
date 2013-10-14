@@ -25,7 +25,7 @@ module Common
   end
 
   def use_localnames(modulename)
-    e=(self.is_a?(Fortran::T))?(use_part.env):(env)
+    e=(is_a?(Fortran::T))?(use_part.env):(env)
     return [] unless e[:uses]
     e[:uses][modulename].map { |x| x[0] }
   end
@@ -35,7 +35,7 @@ module Common
   end
 
   def uses?(modname,usename)
-    e=(self.is_a?(Fortran::T))?(use_part.env):(env)
+    e=(is_a?(Fortran::T))?(use_part.env):(env)
     return false unless e[:uses]
     (e[:uses][modname])?(use_localnames(modname).include?(usename)):(false)
   end

@@ -338,7 +338,7 @@ module Fortran
         code+="(#{dims.join(',')})" if dims
         init=props[:init]
         code+="=#{init}" if init
-        t=self.raw(code,:type_declaration_stmt,root.srcfile,{:env=>self.env})
+        t=raw(code,:type_declaration_stmt,root.srcfile,{:env=>env})
         newenv=t.input.envstack.last
         newenv[var]["pppvar"]=true
         dc=declaration_constructs
@@ -405,7 +405,7 @@ module Fortran
     def halo_offsets(dd)
       halo_lo=0
       halo_up=0
-      if halocomp=self.env[:sms_halo_comp]
+      if halocomp=env[:sms_halo_comp]
         offsets=halocomp[dd]
         halo_lo=offsets.lo
         halo_up=offsets.up
@@ -422,9 +422,9 @@ module Fortran
     end
 
     def marker
-      self.env[:static].marker||=0
-      m=(self.env[:static].marker+=1)
-      f=File.basename(self.input.srcfile)
+      env[:static].marker||=0
+      m=(env[:static].marker+=1)
+      f=File.basename(input.srcfile)
       "#{f} (translation) marker #{m}"
     end
 
@@ -574,7 +574,7 @@ module Fortran
           return unless intrinsic?(f.name)
         end
         var="#{name}"
-        fail "ERROR: '#{var}' not found in environment" unless (varenv=self.env[var])
+        fail "ERROR: '#{var}' not found in environment" unless (varenv=env[var])
         return unless varenv["decomp"]
         bounds=[]
         (1..varenv["dims"]).each do |dim|
@@ -616,9 +616,9 @@ module Fortran
   class Close_Stmt < IO_Stmt
 
     def translate
-      return if self.env[:sms_ignore] or self.env[:sms_serial]
-      self.io_stmt_init
-      self.io_stmt_common
+      return if env[:sms_ignore] or env[:sms_serial]
+      io_stmt_init
+      io_stmt_common
     end
 
   end
@@ -652,8 +652,8 @@ module Fortran
 
     def translate
       code=[]
-      code.push("#{self.label} #{self.prefix} then")
-      code.push("#{self.action}")
+      code.push("#{label} #{prefix} then")
+      code.push("#{action}")
       code.push("endif")
       code=code.join("\n")
       replace_statement(code,:if_construct)
@@ -707,7 +707,7 @@ module Fortran
         :eor
       ].each do |x|
         # :err has precedence, per F90 9.4.1.6, 9.4.1.7
-        if (spec=self.send(x))
+        if (spec=send(x))
           label_old,label_new=spec.send(:relabel)
           pppvar=spec.send(:pppvar)
           @spec_var_false.push("#{pppvar}=.false.")
@@ -726,8 +726,8 @@ module Fortran
       code.concat(@code_alloc)
       code.concat(@code_gather)
       if @onroot
-        my_label=(self.label.empty?)?(nil):(self.label)
-        my_label=self.label_delete if my_label
+        my_label=(label.empty?)?(nil):(label)
+        my_label=label_delete if my_label
         code.push("#{sa(my_label)}if (#{sms_rootcheck}()) then")
       end
       code.concat(@spec_var_false)
@@ -745,16 +745,16 @@ module Fortran
     end
 
     def io_stmt_common
-      unless self.is_a?(Print_Stmt)
-        self.io_stmt_branch_to_logic
-        self.io_stmt_var_set_logic
+      unless is_a?(Print_Stmt)
+        io_stmt_branch_to_logic
+        io_stmt_var_set_logic
       end
       declare("logical",sms_rootcheck) if @onroot
       @code_alloc,@code_dealloc=alloc_dealloc_globals(Set.new(@var_gather+@var_scatter))
-      self.io_stmt_gathers
-      self.io_stmt_scatters
-      self.io_stmt_bcasts
-      self.io_stmt_codegen
+      io_stmt_gathers
+      io_stmt_scatters
+      io_stmt_bcasts
+      io_stmt_codegen
     end
 
     def io_stmt_gathers
@@ -810,7 +810,7 @@ module Fortran
         :unformatted,
         :write
       ].each do |x|
-        if (spec=self.send(x))
+        if (spec=send(x))
           var=spec.rhs
           varenv=getvarenv(var)
           @spec_var_bcast.push("call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
@@ -847,7 +847,7 @@ module Fortran
 
     def translate
       # Handle to_local
-      if tolocal=self.env[:sms_to_local] and p=tolocal[name]
+      if tolocal=env[:sms_to_local] and p=tolocal[name]
         case p.key
         when "lbound"
           se="s#{p.dd}"
@@ -863,9 +863,9 @@ module Fortran
       end
       # Handle serial
       if inside?(SMS_Serial) and not inside?(SMS_Serial_Begin)
-        if (varenv=self.env["#{self}"])
+        if (varenv=env["#{self}"])
           unless varenv["parameter"]
-            self.env[:sms_serial_info].names_in_region.add("#{self}")
+            env[:sms_serial_info].names_in_region.add("#{self}")
           end
         end
       end
@@ -876,8 +876,8 @@ module Fortran
   class Nonlabel_Do_Stmt < T
 
     def translate
-      unless self.env[:sms_serial]
-        if parallel=self.env[:sms_parallel]
+      unless env[:sms_serial]
+        if parallel=env[:sms_parallel]
           loop_control=e[3]
           loop_var="#{loop_control.e[1]}"
           dd=nil
@@ -892,9 +892,9 @@ module Fortran
             halo_lo=halo_offsets(dd).lo
             halo_up=halo_offsets(dd).up
             if loop_control.is_a?(Loop_Control_1)
-              lo=self.raw("#{dh}__s#{dd}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)",:scalar_numeric_expr,@srcfile,{:env=>self.env,:nl=>false})
+              lo=raw("#{dh}__s#{dd}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)",:scalar_numeric_expr,@srcfile,{:env=>env,:nl=>false})
               lo.parent=loop_control
-              up=self.raw(",#{dh}__e#{dd}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)",:loop_control_pair,@srcfile,{:env=>self.env,:nl=>false})
+              up=raw(",#{dh}__e#{dd}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)",:loop_control_pair,@srcfile,{:env=>env,:nl=>false})
               up.parent=loop_control
               loop_control.e[3]=lo
               loop_control.e[4]=up
@@ -909,9 +909,9 @@ module Fortran
   class Open_Stmt < IO_Stmt
 
     def translate
-      return if self.env[:sms_ignore] or self.env[:sms_serial]
-      self.io_stmt_init
-      self.io_stmt_common
+      return if env[:sms_ignore] or env[:sms_serial]
+      io_stmt_init
+      io_stmt_common
     end
 
   end
@@ -919,20 +919,20 @@ module Fortran
   class Print_Stmt < IO_Stmt
 
     def translate
-      return if self.env[:sms_ignore] or self.env[:sms_serial]
-      self.io_stmt_init
-      self.output_items.each do |x|
+      return if env[:sms_ignore] or env[:sms_serial]
+      io_stmt_init
+      output_items.each do |x|
         var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
         if (varenv=getvarenv(var,self,expected=false))
           if (dh=varenv["decomp"])
             @onroot=true
             global=sms_global_name(var)
             @var_gather.push(var)
-            self.replace_output_item(x,global)
+            replace_output_item(x,global)
           end
         end
       end
-      self.io_stmt_common
+      io_stmt_common
     end
 
   end
@@ -940,37 +940,37 @@ module Fortran
   class Read_Stmt < IO_Stmt
 
     def translate
-      return if self.env[:sms_ignore] or self.env[:sms_serial]
-      self.io_stmt_init
-      @onroot=false if self.unit.is_a?(Internal_File_Unit)
-      if (nml=self.nml)
+      return if env[:sms_ignore] or env[:sms_serial]
+      io_stmt_init
+      @onroot=false if unit.is_a?(Internal_File_Unit)
+      if (namelist_name=nml)
         @onroot=true
-        nmlenv=getvarenv(nml,self,expected=true)
+        nmlenv=getvarenv(namelist_name,self,expected=true)
         nmlenv["objects"].each do |x|
           var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
           if (varenv=getvarenv(var,self,expected=false))
             if varenv["decomp"]
               @var_scatter.push(var)
-              self.replace_input_item(x,sms_global_name(var))
+              replace_input_item(x,sms_global_name(var))
             else
               @var_bcast.push(var)
             end
           end
         end
       end
-      self.input_items.each do |x|
+      input_items.each do |x|
         var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
         if (varenv=getvarenv(var,self,expected=true))
           if (dh=varenv["decomp"])
             @onroot=true
             @var_scatter.push(var)
-            self.replace_input_item(x,sms_global_name(var))
+            replace_input_item(x,sms_global_name(var))
           else
             @var_bcast.push(var) if @onroot
           end
         end
       end
-      self.io_stmt_common
+      io_stmt_common
     end
 
   end
@@ -987,7 +987,7 @@ module Fortran
       # bounds contain references to non-static data structures that have no
       # compile-time values.
 
-      self.env.each do |k,v|
+      env.each do |k,v|
         next if k.is_a?(Symbol) or not v["sort"]=="_array" or not v["decomp"]
         (1..v["dims"].to_i).each do |dim|
           ["lb","ub"].each do |lub|
@@ -1582,7 +1582,7 @@ module Fortran
 
       # Get the serial info recorded when the serial_begin statement was parsed.
 
-      si=self.env[:sms_serial_info]
+      si=env[:sms_serial_info]
 
       # Iterate over the set of names that occurred in the region. Note that
       # we do not yet know whether the names are variables (they might e.g. be
@@ -1697,13 +1697,13 @@ module Fortran
     end
 
     def translate
-      si=self.env[:sms_serial_info]=OpenStruct.new
+      si=env[:sms_serial_info]=OpenStruct.new
       si.default=("#{e[2]}".empty?)?("inout"):(e[2].default)
       si.names_in_region=Set.new
       si.vars_ignore=("#{e[2]}".empty?)?([]):(e[2].vars_ignore)
       si.vars_in=("#{e[2]}".empty?)?([]):(e[2].vars_in)
       si.vars_out=("#{e[2]}".empty?)?([]):(e[2].vars_out)
-      parent.env[:sms_serial_info]=self.env[:sms_serial_info]
+      parent.env[:sms_serial_info]=env[:sms_serial_info]
       remove
     end
 
@@ -2038,12 +2038,12 @@ module Fortran
   class Stop_Stmt < StmtJ
 
     def translate
-      unless self.env[:sms_ignore] or self.env[:sms_serial]
+      unless env[:sms_ignore] or env[:sms_serial]
         use(sms_decompmod)
         declare("logical",sms_rootcheck)
-        label=self.label_delete unless (label=self.label).empty?
+        l=label_delete unless (l=label).empty?
         code=[]
-        code.push("#{sa(label)} if (#{sms_rootcheck}()) then")
+        code.push("#{sa(l)} if (#{sms_rootcheck}()) then")
         code.push("call sms__stop('#{marker}',0,sms__abort)")
         code.push("endif")
         code=code.join("\n")
@@ -2056,34 +2056,34 @@ module Fortran
   class Write_Stmt < IO_Stmt
 
     def translate
-      return if self.env[:sms_ignore] or self.env[:sms_serial]
-      self.io_stmt_init
+      return if env[:sms_ignore] or env[:sms_serial]
+      io_stmt_init
       function=(env["#{unit}"] and env["#{unit}"]["function"])
-      @onroot=false if self.unit.is_a?(Internal_File_Unit) or function
-      if (nml=self.nml)
+      @onroot=false if unit.is_a?(Internal_File_Unit) or function
+      if (namelist_name=nml)
         @onroot=true
-        nmlenv=getvarenv(nml,self,expected=true)
+        nmlenv=getvarenv(namelist_name,self,expected=true)
         nmlenv["objects"].each do |x|
           var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
           varenv=getvarenv(var,self,expected=true)
           if varenv["decomp"]
             @var_gather.push(var)
-            self.replace_input_item(x,sms_global_name(var))
+            replace_input_item(x,sms_global_name(var))
           end
         end
       end
-      self.output_items.each do |x|
+      output_items.each do |x|
         var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
         if (varenv=getvarenv(var,self,expected=false))
           if (dh=varenv["decomp"])
             @onroot=true
             global=sms_global_name(var)
             @var_gather.push(var)
-            self.replace_output_item(x,global)
+            replace_output_item(x,global)
           end
         end
       end
-      self.io_stmt_common
+      io_stmt_common
     end
 
   end
