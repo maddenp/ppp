@@ -316,40 +316,41 @@ module Fortran
     def declare(type,var,props={})
       su=scoping_unit
       varenv=varenv_get(var,su,false)
-      if varenv and not varenv["pppvar"]
-        fail "ERROR: Variable #{var} is already defined"
-      end
-      varenv_del(var,su,false)
-      lenopt=""
-      if props[:len]
-        unless type=="character"
-          fail "ERROR: 'len' property incompatible with type '#{type}'"
+      if varenv
+        fail "ERROR: Variable #{var} is already defined" unless varenv["pppvar"]
+      else
+        varenv_del(var,su,false)
+        lenopt=""
+        if props[:len]
+          unless type=="character"
+            fail "ERROR: 'len' property incompatible with type '#{type}'"
+          end
+          lenopt="(len=#{props[:len]})"
         end
-        lenopt="(len=#{props[:len]})"
-      end
-      kind=props[:kind]
-      kind=([nil,"_default"].include?(kind))?(""):("(kind=#{kind})")
-      attrs=props[:attrs]||[]
-      attrs=[attrs] unless attrs.is_a?(Array)
-      attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
-      code="#{type}#{kind}#{lenopt}#{attrs}::#{var}"
-      dims=props[:dims]
-      code+="(#{dims.join(',')})" if dims
-      init=props[:init]
-      code+="=#{init}" if init
-      t=raw(code,:type_declaration_stmt,root.srcfile,{:env=>env})
-      newenv=t.input.envstack.last
-      newenv[var]["pppvar"]=true
-      dc=declaration_constructs
-      t.parent=dc
-      dc.e.push(t)
-      while node||=self
-        node.envref[var]=newenv[var] if node.respond_to?(:envref)
-        break if node==su
-        node=node.parent
-      end
-      if su.is_a?(Module)
-        write_envfile(su.name,su.envref)
+        kind=props[:kind]
+        kind=([nil,"_default"].include?(kind))?(""):("(kind=#{kind})")
+        attrs=props[:attrs]||[]
+        attrs=[attrs] unless attrs.is_a?(Array)
+        attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
+        code="#{type}#{kind}#{lenopt}#{attrs}::#{var}"
+        dims=props[:dims]
+        code+="(#{dims.join(',')})" if dims
+        init=props[:init]
+        code+="=#{init}" if init
+        t=raw(code,:type_declaration_stmt,root.srcfile,{:env=>env})
+        newenv=t.input.envstack.last
+        newenv[var]["pppvar"]=true
+        dc=declaration_constructs
+        t.parent=dc
+        dc.e.push(t)
+        while node||=self
+          node.envref[var]=newenv[var] if node.respond_to?(:envref)
+          break if node==su
+          node=node.parent
+        end
+        if su.is_a?(Module)
+          write_envfile(su.name,su.envref)
+        end
       end
       var
     end
