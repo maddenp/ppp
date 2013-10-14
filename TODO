@@ -1,11 +1,5 @@
 ### ENVIRONMENT
 
-- Sort envfile output for easy xxdiff comparison.
-
-* .sms file does not contain items added during translation, (true?) e.g.
-  module_decomp.sms does not even *exist*, much less contain the items added
-  during translation.
-
 - Should derived types provided by modules appear in .sms files (probably!), and
   how?
 
@@ -34,6 +28,8 @@
 * Need to add to env for function optional RESULT name/type (probably do at
   close of function_subroutine, since function type may not be made explicit
   by function_stmt).
+
+- Sort envfile output for easy xxdiff comparison.
 
 ### ERROR CHECKING / REPORTING
 
@@ -91,12 +87,17 @@
 
 * Instead of deepcopy on env, chain hashes with ancestor lookup mechanism.
 
+* Time ppp on fim routines, find long ones, profile, optimize
+
 - read_stmt, write_stmt et al are not function calls, so we *do* know which of
   their arguments may be modified during a call (e.g. iostat's variable can,
   file's variable cannot) we we can limit bcast/gather/scatter of these in a
   serial region.
 
-* Time ppp on fim routines, find long ones, profile, optimize
+- write_envfile is called by declare() whenever something is added to a module.
+  This creates a lot of IO if many programmtic delcarations are performed. It
+  would be better to do this once -- maybe as a post-translation walk that calls
+  write_envfile for each module encountered.
 
 ### PARSING
 

@@ -14,15 +14,6 @@ module Fortran
     @envstack.last
   end
 
-  def envext
-    ".env"
-  end
-
-  def envfile(m,d=nil)
-    d=(defined?(@srcfile))?(File.dirname(@srcfile)):(".") if d.nil?
-    File.join(File.expand_path(d),"#{m}#{envext}")
-  end
-
   def envpop
     oldenv=@envstack.pop
     @envstack.push({}) if @envstack.empty?
@@ -215,16 +206,7 @@ module Fortran
   end
 
   def sp_module(_module)
-    modulename=_module.e[0].name
-    # Do not export symbol keys, which are for internal purposes only
-    modinfo=deepcopy(env).delete_if { |k,v| k.is_a?(Symbol) }
-    # Do not export info on private objects
-    modinfo.delete_if { |k,v| v["access"]=="private" }
-    f=envfile(modulename)
-    File.delete(f) if File.exist?(f)
-    unless modinfo.empty?
-      File.open(f,"w") { |f| f.write(YAML.dump(modinfo)) }
-    end
+    write_envfile(_module.name,env)
     envpop
     @access="_default"
     true
@@ -2664,6 +2646,11 @@ module Fortran
   end
 
   class Module < Scoping_Unit
+
+    def name
+      e[0].name
+    end
+
   end
 
   class Module_Name < E

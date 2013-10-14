@@ -2,10 +2,6 @@ require "set"
 
 module Fortran
 
-  def envext
-    ".sms"
-  end
-
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
 
     # Do not push an environment here. The declarations that appear inside a
@@ -348,6 +344,9 @@ module Fortran
           node.envref[var]=newenv[var] if node.respond_to?(:envref)
           break if node==su
           node=node.parent
+        end
+        if su.is_a?(Module)
+          write_envfile(su.name,su.envref)
         end
       end
       var

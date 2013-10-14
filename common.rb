@@ -24,6 +24,15 @@ module Common
     Marshal.load(Marshal.dump(o))
   end
 
+  def envext
+    ".sms"
+  end
+
+  def envfile(m,d=nil)
+    d=File.dirname(@srcfile||".")
+    File.join(File.expand_path(d),"#{m}#{envext}")
+  end
+
   def use_localnames(modulename)
     e=(is_a?(Fortran::T))?(use_part.env):(env)
     return [] unless e[:uses]
@@ -38,6 +47,19 @@ module Common
     e=(is_a?(Fortran::T))?(use_part.env):(env)
     return false unless e[:uses]
     (e[:uses][modname])?(use_localnames(modname).include?(usename)):(false)
+  end
+
+  def write_envfile(modulename,_env)
+    modinfo=deepcopy(_env)
+    # Do not export symbol keys, which are for internal purposes only
+    modinfo.delete_if { |k,v| k.is_a?(Symbol) }
+    # Do not export info on private objects
+    modinfo.delete_if { |k,v| v["access"]=="private" }
+    f=envfile(modulename)
+    File.delete(f) if File.exist?(f)
+    unless modinfo.empty?
+      File.open(f,"w") { |f| f.write(YAML.dump(modinfo)) }
+    end
   end
 
 end
