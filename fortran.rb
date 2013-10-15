@@ -269,6 +269,7 @@ module Fortran
 
   def sp_parameter_stmt(named_constant_def_list)
     named_constant_def_list.names.each do |x|
+      redef(x)
       varsetprop(x,"parameter","_true")
     end
     true
@@ -2373,6 +2374,9 @@ module Fortran
 			list_to_s
 		end
 
+  end
+
+  class Implicit_Spec_List_Pair < E
   end
 
   class Implicit_Stmt < E

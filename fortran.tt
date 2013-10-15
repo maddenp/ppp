@@ -1711,7 +1711,11 @@ grammar Fortran
   end
 
   rule implicit_spec_list
-    implicit_spec ( t_comma implicit_spec )* <Implicit_Spec_List>
+    implicit_spec implicit_spec_list_pair* <Implicit_Spec_List>
+  end
+
+  rule implicit_spec_list_pair
+    t_comma implicit_spec <Implicit_Spec_List_Pair>
   end
 
   rule implicit_stmt
