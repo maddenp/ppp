@@ -1081,7 +1081,7 @@ module Fortran
   class Access_Id_List < T
 
     def names
-      e[1].e.reduce([e[0]]) { |m,x| m.push(x.name) }
+      e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
 		end
 
   end
@@ -1089,7 +1089,7 @@ module Fortran
   class Access_Id_List_Pair < T
 
     def name
-      "#{e[1]}"
+      e[1]
 		end
 
   end
@@ -2323,6 +2323,11 @@ module Fortran
   end
 
   class Generic_Name < E
+
+    def name
+      e[0]
+    end
+
   end
 
   class Generic_Spec < T
@@ -3503,6 +3508,11 @@ module Fortran
   end
 
   class Use_Name < E
+
+    def name
+      e[0]
+    end
+
   end
 
   class Use_Part < T
