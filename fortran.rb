@@ -30,10 +30,12 @@ module Fortran
   end
 
   def modenv(m)
+    @modenv_cache||={}
+    return @modenv_cache[m] if @modenv_cache.has_key?(m)
     if d=@incdirs.find_all { |x| File.exist?(envfile(m,x)) }[0]
       f=envfile(m,d)
       begin
-        return YAML.load(File.open(f))
+        return @modenv_cache[m]=YAML.load(File.open(f))
       rescue Exception=>ex
         s="ERROR: #{ex.message}\n"
         s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }

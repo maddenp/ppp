@@ -51,9 +51,6 @@
 
 ### OPTIMIZATION
 
-* When processing a file, hash read-in module files so that a repeat use (e.g.
-  in another subroutine in that module) need not read from disk again.
-
 * Time ppp on fim routines, find long ones, profile, optimize
 
 * Instead of deepcopy on env, chain hashes with ancestor lookup mechanism. This
