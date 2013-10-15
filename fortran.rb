@@ -170,8 +170,9 @@ module Fortran
     "#{@dolabels[-1]}"=="#{@dolabels[-2]}"
   end
 
-  def sp_function_stmt(dummy_arg_name_list)
+  def sp_function_stmt(function_name,dummy_arg_name_list)
     envpush
+    (env["#{function_name}"]||={})["function"]=true
     if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
       first="#{dummy_arg_name_list.e[0]}"
       rest=dummy_arg_name_list.e[1].e
@@ -182,14 +183,13 @@ module Fortran
 
   def sp_function_subprogram(function_subprogram)
     var="#{function_subprogram.function_name}"
-    env[var]||={}
-    env[var]["function"]="true"
-    env[var]["access"]="_default" unless env[var]["access"]
-    env[var]["sort"]="_scalar"
+    varenv=(env[var]||={})
+    varenv["sort"]||="_scalar"
     if (type_spec=function_subprogram.function_stmt_type_spec)
-      env[var]["kind"]="#{type_spec.kind}"
-      env[var]["type"]="#{type_spec.type}"
+      varenv["kind"]="#{type_spec.kind}"
+      varenv["type"]="#{type_spec.type}"
     end
+    varenv["access"]=@access unless varenv["access"]
     envpop
     true
   end
@@ -231,6 +231,10 @@ module Fortran
   end
 
   def sp_module(_module)
+    fn_env=_module.subprograms.reduce({}) do |m,x|
+      m.merge(x.env.select { |k,v| v.is_a?(Hash) and v["function"] })
+    end
+    env.merge!(fn_env)
     write_envfile(_module.name,env)
     envpop
     @access="_default"
@@ -330,7 +334,7 @@ module Fortran
   end
 
   def sp_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
-    entity_decl_list.names.each { |x| redef(x) }
+    entity_decl_list.names.each { |x| redef(x) unless (varenv=env["#{x}"]) and varenv["function"] }
     varprops=entity_decl_list.varprops(@distribute)
     if x=attrchk(attr_spec_option,:dimension?)
       array_spec=x.e[0]
@@ -393,6 +397,7 @@ module Fortran
       varprop=x[1]
       localname=use_localname(m,varname)
       if uses?(m,:all) or uses?(m,localname)
+        varprop["access"]=(e=env[varname] and a=e["access"])?(a):(@access)
         env[localname]=varprop
       end
     end
@@ -2270,6 +2275,10 @@ module Fortran
       e[1]
     end
 
+    def name
+      e[3].name
+    end
+
     def pure?
       function_prefix.pure?
     end
@@ -2306,6 +2315,10 @@ module Fortran
 
     def function_stmt
       e[0]
+    end
+
+    def name
+      e[0].name
     end
 
     def pure?
@@ -2754,6 +2767,10 @@ module Fortran
       e[0].name
     end
 
+    def subprograms
+      (e[2].is_a?(Module_Subprogram_Part))?(e[2].subprograms):([])
+    end
+
   end
 
   class Module_Name < E
@@ -2773,11 +2790,39 @@ module Fortran
 
   end
 
+  class Module_Subprogram_Function < E
+
+    def env
+      e[0].env
+    end
+
+    def name
+      e[0].name
+    end
+
+  end
+
   class Module_Subprogram_Part < T
+
+    def subprograms
+      e[1].e
+    end
 
 		def to_s
 			"#{e[0]}#{e[1].e.reduce("") { |m,x| m+="#{x}" } }"
 		end
+
+  end
+
+  class Module_Subprogram_Subroutine < E
+
+    def env
+      e[0].env
+    end
+
+    def name
+      e[0].name
+    end
 
   end
 
@@ -3380,6 +3425,11 @@ module Fortran
   end
 
   class Subroutine_Name < E
+
+    def name
+      e[0]
+    end
+
   end
 
   class Subroutine_Prefix < T
@@ -3391,9 +3441,18 @@ module Fortran
   end
 
   class Subroutine_Subprogram < Scoping_Unit
+
+    def name
+      e[0].name
+    end
+
   end
 
   class Subroutine_Stmt < T
+
+    def name
+      e[3].name
+    end
 
     def to_s
       s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")

@@ -4,9 +4,13 @@
   close of function_subroutine, since function type may not be made explicit
   by function_stmt).
 
-- Sort envfile output for easy xxdiff comparison.
-
 - Derived types provided by modules should appear in envfiles.
+
+- Don't use OpenStruct for static (see e.g. select in sp_module, where special
+  code is needed to avoid calling [] on an OpenStruct. Use only Hash in env.
+
+- Change 'function' key (with true value) to 'subprogram' with 'function' and
+  'subroutine' values, and start recording module subroutines in env.
 
 ### ERROR CHECKING / REPORTING
 
@@ -127,6 +131,8 @@
   already-declared scalar? Need more flexibility...
 
 - Factor more sms text out into T#sms_* methods.
+
+- varprop -> varenv?
 
 ### TRANSLATION
 

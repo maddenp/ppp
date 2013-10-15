@@ -1578,7 +1578,7 @@ grammar Fortran
   rule function_stmt
     # F90:R1216
 
-    label:label? function_prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r result_option? t_newline &{ |e| sp_function_stmt(e[5]) } <Function_Stmt>
+    label:label? function_prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r result_option? t_newline &{ |e| sp_function_stmt(e[3],e[5]) } <Function_Stmt>
   end
 
   rule function_subprogram
@@ -2324,8 +2324,8 @@ grammar Fortran
   rule module_subprogram
     # F90:R213
 
-    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E>
+    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <Module_Subprogram_Subroutine> /
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <Module_Subprogram_Function>
   end
 
   rule module_subprogram_part
