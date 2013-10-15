@@ -170,9 +170,12 @@ module Fortran
     "#{@dolabels[-1]}"=="#{@dolabels[-2]}"
   end
 
-  def sp_function_stmt(function_name,dummy_arg_name_list)
+  def sp_function_stmt(function_name,dummy_arg_name_list,result_option)
     envpush
     (env["#{function_name}"]||={})["function"]=true
+    if result_option.is_a?(Result_Option)
+      env[:result]="#{result_option.name}"
+    end
     if dummy_arg_name_list.is_a?(Dummy_Arg_Name_List)
       first="#{dummy_arg_name_list.e[0]}"
       rest=dummy_arg_name_list.e[1].e
@@ -185,11 +188,14 @@ module Fortran
     var="#{function_subprogram.function_name}"
     varenv=(env[var]||={})
     varenv["sort"]||="_scalar"
+    access=varenv["access"]||@access
     if (type_spec=function_subprogram.function_stmt_type_spec)
       varenv["kind"]="#{type_spec.kind}"
       varenv["type"]="#{type_spec.type}"
+    elsif (result=env[:result])
+      varenv.merge!(env["#{result}"])
     end
-    varenv["access"]=@access unless varenv["access"]
+    varenv["access"]=access
     envpop
     true
   end
@@ -3301,6 +3307,19 @@ module Fortran
   end
 
   class Result_Name < E
+
+    def name
+      e[0]
+    end
+
+  end
+
+  class Result_Option < E
+
+    def name
+      e[2].name
+    end
+
   end
 
   class Rewind_Stmt_1 < IO_Stmt

@@ -1,16 +1,12 @@
 ### ENVIRONMENT
 
-* Need to add to env for function optional RESULT name/type (probably do at
-  close of function_subroutine, since function type may not be made explicit
-  by function_stmt).
-
-- Derived types provided by modules should appear in envfiles.
-
 - Don't use OpenStruct for static (see e.g. select in sp_module, where special
   code is needed to avoid calling [] on an OpenStruct. Use only Hash in env.
 
 - Change 'function' key (with true value) to 'subprogram' with 'function' and
   'subroutine' values, and start recording module subroutines in env.
+
+- Derived types provided by modules should appear in envfiles.
 
 ### ERROR CHECKING / REPORTING
 

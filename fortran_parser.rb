@@ -14922,7 +14922,7 @@ module Fortran
                     s0 << r13
                     if r13
                       i14 = index
-                      r15 = lambda { |e| sp_function_stmt(e[3],e[5]) }.call(s0)
+                      r15 = lambda { |e| sp_function_stmt(e[3],e[5],e[7]) }.call(s0)
                       if r15
                         @index = i14
                         r14 = instantiate_node(SyntaxNode,input, index...index)
@@ -27023,7 +27023,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Result_Option,input, i0...index, s0)
       r0.extend(ResultOption0)
     else
       @index = i0
