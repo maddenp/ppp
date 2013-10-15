@@ -921,7 +921,6 @@ module Fortran
   class Print_Stmt < IO_Stmt
 
     def translate
-p env #PM#
       return if env[:sms_ignore] or env[:sms_serial]
       io_stmt_init
       output_items.each do |x|
