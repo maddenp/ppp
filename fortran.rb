@@ -244,6 +244,7 @@ module Fortran
   def sp_namelist_stmt(first,rest)
     rest.sets.push(first).each do |set|
       name="#{set.name}"
+      redef(name)
       env[name]||={}
       env[name]["sort"]="_namelist"
       env[name]["objects"]||=[]
@@ -2799,6 +2800,11 @@ module Fortran
   end
 
   class Namelist_Group_Name < E
+
+    def name
+      e[0]
+    end
+
   end
 
   class Namelist_Group_Object_List < T
@@ -2824,7 +2830,7 @@ module Fortran
   class Namelist_Group_Set < T
 
     def name
-      e[1]
+      e[1].name
     end
 
     def objects
@@ -2843,6 +2849,10 @@ module Fortran
 
   class Namelist_Group_Set_Pair < T
 
+    def name
+      e[1].name
+    end
+
     def set
       e[1]
     end
@@ -2854,6 +2864,10 @@ module Fortran
   end
 
   class Namelist_Group_Sets < E
+
+    def names
+      sets.reduce([]) { |m,x| m.push(x.name) }
+    end
 
     def sets
       e.reduce([]) { |m,x| m.push(x.set) }
