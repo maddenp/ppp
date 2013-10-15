@@ -55,6 +55,12 @@ module Fortran
   end
   
   def sp_access_stmt(access_spec,access_stmt_option)
+    if access_stmt_option.is_a?(Access_Stmt_Option)
+      names=access_stmt_option.names
+    else
+      names=[]
+    end
+    names.each { |x| redef(x) }
     if access_spec.private?
       p="private"
     elsif access_spec.public?
@@ -324,6 +330,7 @@ module Fortran
   end
 
   def sp_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
+    entity_decl_list.names.each { |x| redef(x) }
     varprops=entity_decl_list.varprops(@distribute)
     if x=attrchk(attr_spec_option,:dimension?)
       array_spec=x.e[0]
@@ -346,12 +353,12 @@ module Fortran
       varprops.each { |v,p| p["access"]=@access }
     end
     varprops.each do |v,p|
-      redef(v)
-      varenv=(env[v]||={})
+      name="#{v}"
+      varenv=(env[name]||={})
       ["access","sort"].each { |x| p.delete(x) if varenv.include?(x) }
       p["type"]=type_spec.type
       p["kind"]=type_spec.kind
-      if env[:allocatable] and env[:allocatable].include?(v)
+      if env[:allocatable] and env[:allocatable].include?(name)
         p.keys.each { |k| p[k]="_deferred" if k=~/[lu]b\d+/ }
         p["allocatable"]="_true"
       end
@@ -680,7 +687,7 @@ module Fortran
       end
     end
 
-    def varenv_chk(name,node=self,expected=true)
+    def varenv_chk(name,node,expected)
       n="#{name}"
       unless (varenv=node.env[n])
         fail "ERROR: '#{n}' not found in environment" if expected
@@ -1367,11 +1374,11 @@ module Fortran
     def post
       ok=true
       if (entity_decl=ancestor(Entity_Decl))
-        array_name=entity_decl.name
+        array_name="#{entity_decl.name}"
         ok=(env[:args] and env[:args].include?(array_name))?(true):(false)
       elsif (entity_decl=ancestor(Array_Name_And_Spec))
-        array_name=entity_decl.name
-        ok=(env["#{array_name}"]["lb1"]=="_deferred")?(false):(true)
+        array_name="#{entity_decl.name}"
+        ok=(env[array_name]["lb1"]=="_deferred")?(false):(true)
       end
       unless ok
         code="#{self}"
@@ -2023,7 +2030,7 @@ module Fortran
   class Entity_Decl < E
 
     def name
-      "#{e[0]}"
+      e[0].name
     end
 
     def props(distribute)
@@ -2057,6 +2064,10 @@ module Fortran
   end
 
   class Entity_Decl_List < E
+
+    def names
+      e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
+    end
 
     def varprops(distribute)
       e[0].props(distribute).merge(e[1].props(distribute))
@@ -2198,6 +2209,11 @@ module Fortran
   end
 
   class Function_Name < E
+
+    def name
+      e[0]
+    end
+
   end
 
   class Function_Prefix < T

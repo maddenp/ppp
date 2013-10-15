@@ -628,7 +628,7 @@ module Fortran
   class Entity_Decl_1 < Entity_Decl
 
     def translate
-      var="#{e[0]}"
+      var="#{name}"
       varenv=varenv_get(var)
       spec=nil
       if varenv["sort"]=="_array"
