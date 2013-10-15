@@ -1,35 +1,12 @@
 ### ENVIRONMENT
 
-* Consider:
-
-  program p
-    real::x(3)=(/1,2,3/)
-    call s
-  contains
-    subroutine s
-      integer::x=88
-      print *,x
-    end subroutine s
-  end program p
-
-  The definition of x in s should replace (not append to / overwrite) the
-  definition in p. If, for example, x in p had a kind attribute, it would
-  persist, incorrectly, in the copy of the environment created for s. Or,
-  if x were distributed in p, the decomp information would incorrectly
-  persist. Maybe: Any occurrence of a name in the declaration section should
-  immediately overwrite an existing env entry, but only one time (since
-  dimension, access, type info may all occur in separate decl statements --
-  they can't be wiping out eachother's env entries, but the first one
-  encountered should wipe out whatever was obtained via use association).
-
 * Need to add to env for function optional RESULT name/type (probably do at
   close of function_subroutine, since function type may not be made explicit
   by function_stmt).
 
 - Sort envfile output for easy xxdiff comparison.
 
-- Should derived types provided by modules appear in .sms files (probably!), and
-  how?
+- Derived types provided by modules should appear in envfiles.
 
 ### ERROR CHECKING / REPORTING
 
@@ -85,7 +62,8 @@
 * When processing a file, hash read-in module files so that a repeat use (e.g.
   in another subroutine in that module) need not read from disk again.
 
-* Instead of deepcopy on env, chain hashes with ancestor lookup mechanism.
+* Instead of deepcopy on env, chain hashes with ancestor lookup mechanism. This
+  may obsolete the redef mechanism -- be sure to clean that up if so.
 
 * Time ppp on fim routines, find long ones, profile, optimize
 
@@ -100,9 +78,6 @@
   write_envfile for each module encountered.
 
 ### PARSING
-
-- Should main-program envpush as well? Current mismatch between # of envpushes
-  and env pops
 
 - write-stmt seems to parse wrong, 'write' recognized as Data_Ref. This could be
   a problem re: implicit translation of write io statements.
