@@ -10,11 +10,6 @@
 
 ### ERROR CHECKING / REPORTING
 
-- In getvarenv(), give more verbose information about why a failure has occurred
-  and what to do about it (e.g. .sms file is not available, so get dependencies
-  right, or write your own .sms file, only ask ppp to operate on appropriate
-  variables, etc.)
-
 - Error needed when compare_var variable is not distributed or no mod info
 
 - sms$serial should complain about in/out/inout intent of variables that never
@@ -40,9 +35,6 @@
   taken to do internal parses of the more general rule that calls the stack-
   altering method.
 
-- Why are some SMS API routines ppp_* (e.g. ppp_bcast) and some sms_* (e.g.
-  sms_scatter)? Can this please be made consistent?
-
 ### NEW FEATURES
 
 - where-stmt may need (automatic?) parallel treatment.
@@ -62,10 +54,10 @@
 * When processing a file, hash read-in module files so that a repeat use (e.g.
   in another subroutine in that module) need not read from disk again.
 
+* Time ppp on fim routines, find long ones, profile, optimize
+
 * Instead of deepcopy on env, chain hashes with ancestor lookup mechanism. This
   may obsolete the redef mechanism -- be sure to clean that up if so.
-
-* Time ppp on fim routines, find long ones, profile, optimize
 
 - read_stmt, write_stmt et al are not function calls, so we *do* know which of
   their arguments may be modified during a call (e.g. iostat's variable can,
@@ -78,6 +70,8 @@
   write_envfile for each module encountered.
 
 ### PARSING
+
+- Deduce types of implicit variables.
 
 - write-stmt seems to parse wrong, 'write' recognized as Data_Ref. This could be
   a problem re: implicit translation of write io statements.
@@ -99,8 +93,6 @@
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
 
-- Deduce types of implicit variables.
-
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
   label, but also labels further down in the stack? That would also be an error,
   right?
@@ -114,6 +106,10 @@
 
 - Get rid of class T and all uses? E seems much safer... Or use T & NT?
 
+- In fortran.rb/sms_fortran.rb, standardize when methods on nodes return strings
+  or SyntaxNode subclasses. That is, should we convert to strings as early as
+  possible, or delay until a string is absolutely required? Probably the latter.
+
 - In sms_commtag, instead of working at root node, use env[:static]?
 
 - Re-enable continuation lines check, deal with looooong exchange in dyn_init.
@@ -121,10 +117,6 @@
   25 (?) MAX_PPP_VARS)? Better yet, make exchange use a begin/queue-multiple/end
   buffering scheme, which avoids limits on exchange vars and minimized the size
   of each call into the SMS library.
-
-- In fortran.rb/sms_fortran.rb, standardize when methods on nodes return strings
-  or SyntaxNode subclasses. That is, should we convert to strings as early as
-  possible, or delay until a string is absolutely required? Probably the latter.
 
 - In sms_fortran.rb, 'names_in_region' should be 'vars_in_region' and should
   be just that -- not function or subroutine names, not parameter names, etc.
@@ -162,7 +154,7 @@
 
 - In SMS_Reduce#translate, build out case statement for the other supported
   nnt_* types. BUT, maybe we should be querying MPI for this information in the
-  SMS library (see e.g. bugzilla bug #21.
+  SMS library (see e.g. bugzilla bug #21).
 
 - In SMS_Serial#translate, there's a potential issue in that a Name may be
   e.g. a function or subroutine name, in which case it may not (will not?)
@@ -179,11 +171,6 @@
   user-defined kinds can be transparently supported.
 
 - In SMS_Serial#translate, what should halo[l|u] be when dh is nil?
-
-- See "BUG" comment in SMS_Serial#translate.
-
-- Is/are other halol/halou roll-out(s) correct? sms$exchange? All positions 0
-  except for decomposed dim?
 
 - Hardcoded '1's referring to decomposition elements should be looked up from
   env.
@@ -203,9 +190,6 @@
   the tree in unsound ways). It may be better to use the block_do_construct
   trick (do\n...exit\nend do", replacing a single statement.
 
-- To make all of this more useful, build an AST from the parse tree. Then, do
-  translations on and produce final output from the AST.
-
 - replace_element may also be unsound, as it removes nodes from the tree.
   Instead, maybe walk up the tree and update text_value components?
 
@@ -214,3 +198,6 @@
   override their to_s() (maybe conditionally) or replace them with SyntaxNodes?
   Maybe redefine to_s method to return empty string? Change remote() to
   silence()?
+
+- To make all of this more useful, build an AST from the parse tree. Then, do
+  translations on and produce final output from the AST.
