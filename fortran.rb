@@ -25,6 +25,8 @@ module Fortran
     static=env.delete(:static)
     @envstack.push(deepcopy(env))
     env[:static]=static
+    @redefs={}
+    nil
   end
 
   def modenv(m)
@@ -42,6 +44,16 @@ module Fortran
     {}
   end
 
+  def redef(var)
+    var="#{var}" unless var.is_a?(String)
+    if defined?(@redefs)
+      unless @redefs[var]
+        env.delete(var)
+        @redefs[var]=true
+      end
+    end
+  end
+  
   def sp_access_stmt(access_spec,access_stmt_option)
     if access_spec.private?
       p="private"
@@ -65,6 +77,7 @@ module Fortran
     a=array_names_and_deferred_shape_spec_lists
     env[:allocatable]||=[]
     a.names.each do |var|
+      redef(var)
       # Record that this var has been marked allocatable, which means that it
       # must be an array with deferred bounds.
       env[:allocatable].push(var)
@@ -112,6 +125,7 @@ module Fortran
     array_names_and_specs.e.each do |x|
       if x.is_a?(Array_Name_And_Spec)
         var=x.name
+        redef(var)
         array_spec=x.spec.e[0]
         env[var]||={}
         env[var].merge!(array_props(array_spec,{},@distribute))
@@ -189,6 +203,11 @@ module Fortran
     true
   end
 
+  def sp_intent_stmt(dummy_arg_name_list)
+    dummy_arg_name_list.names.each { |x| redef(x) }
+    true
+  end
+
   def sp_is_array?(node)
     return false unless node.respond_to?(:name)
     vargetprop(node.name,"sort")=="_array"
@@ -243,6 +262,11 @@ module Fortran
     ("#{node.label}"==@dolabels.last)?(true):(false)
   end
 
+  def sp_optional_stmt(dummy_arg_name_list)
+    dummy_arg_name_list.names.each { |x| redef(x) }
+    true
+  end
+
   def sp_parameter_stmt(named_constant_def_list)
     named_constant_def_list.names.each do |x|
       varsetprop(x,"parameter","_true")
@@ -250,8 +274,20 @@ module Fortran
     true
   end
 
+  def sp_pointer_stmt(object_names_and_spec_lists)
+    object_names_and_spec_lists.names.each { |x| redef x }
+    true
+  end
+
   def sp_program_stmt
     envpush
+    true
+  end
+
+  def sp_save_stmt(save_stmt_entity_list)
+    if save_stmt_entity_list.is_a?(Save_Stmt_Entity_List)
+      save_stmt_entity_list.names.each { |x| redef x }
+    end
     true
   end
 
@@ -275,10 +311,12 @@ module Fortran
 
   def sp_target_stmt(target_object_list)
     target_object_list.objects.each do |x|
-      if x.is_a?(Array_Name_And_Spec)
-        var=x.name
-        varsetprop(var,"sort","_array")
+      unless x.is_a?(Array_Name_And_Spec) or x.is_a?(Variable_Name)
+        fail "ERROR: Unexpected node type"
       end
+      var=x.name
+      varsetprop(var,"sort","_array") if x.is_a?(Array_Name_And_Spec)
+      redef(var)
     end
     true
   end
@@ -306,6 +344,7 @@ module Fortran
       varprops.each { |v,p| p["access"]=@access }
     end
     varprops.each do |v,p|
+      redef(v)
       varenv=(env[v]||={})
       ["access","sort"].each { |x| p.delete(x) if varenv.include?(x) }
       p["type"]=type_spec.type
@@ -1033,7 +1072,7 @@ module Fortran
   class Access_Id_List < T
 
     def names
-      [e[0].name]+e[1].e.reduce([]) { |m,x| m.push(x.name) }
+      e[1].e.reduce([e[0]]) { |m,x| m.push(x.name) }
 		end
 
   end
@@ -1059,6 +1098,11 @@ module Fortran
   end
 
   class Access_Stmt < StmtC
+
+    def names
+      (e[2].is_a?(Access_Stmt_Option))?(e[2].names):([])
+    end
+
   end
 
   class Access_Stmt_Option < T
@@ -1564,6 +1608,11 @@ module Fortran
   end
 
   class Common_Block_Name < E
+
+    def name
+      e[0]
+    end
+
   end
 
   class Common_Stmt < T
@@ -1786,8 +1835,20 @@ module Fortran
 
   class Dummy_Arg_Name_List < T
 
+    def names
+      e[1].e.reduce([e[0]]) { |m,x| m.push(x.name) }
+    end
+
     def to_s
-      e[1].e.reduce("#{e[0]}") { |m,x| m+"#{x.e[0]}#{x.e[1]}" }
+      list_to_s
+    end
+
+  end
+
+  class Dummy_Arg_Name_List_Pair < E
+
+    def name
+      e[1]
     end
 
   end
@@ -2827,6 +2888,35 @@ module Fortran
   end
 
   class Object_Name < E
+
+    def name
+      e[0]
+    end
+
+  end
+
+  class Object_Name_And_Spec_List < E
+
+    def name
+      e[0].name
+    end
+
+  end
+
+  class Object_Name_And_Spec_List_Pair < E
+
+    def name
+      e[1].name
+    end
+
+  end
+
+  class Object_Names_And_Spec_Lists < T
+
+    def names
+      e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
+    end
+
   end
 
   class Only < E
@@ -3154,17 +3244,49 @@ module Fortran
 
   class Save_Stmt_Entity_List < T
 
+    def names
+      e[1].names
+		end
+
 		def to_s
 			"#{ir(e[0],""," ")}#{e[1]}"
 		end
 
   end
 
+  class Saved_Entity_1 < E
+
+    def name
+      e[0].name
+    end
+
+  end
+
+  class Saved_Entity_2 < E
+
+    def name
+      e[1].name
+    end
+
+  end
+
   class Saved_Entity_List < T
+
+    def names
+      e[1].e.reduce([e[0]]) { |m,x| m.push(x.name) }
+    end
 
 		def to_s
 			list_to_s
 		end
+
+  end
+
+  class Saved_Entity_List_Pair < E
+
+    def name
+      e[1].name
+    end
 
   end
 
@@ -3398,6 +3520,11 @@ module Fortran
   end
 
   class Variable_Name < E
+
+    def name
+      e[0]
+    end
+
   end
 
   class Vector_Subscript < E

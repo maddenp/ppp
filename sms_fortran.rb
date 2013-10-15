@@ -119,7 +119,7 @@ module Fortran
 
   class T < Treetop::Runtime::SyntaxNode
 
-    def alloc_dealloc_globals(globals)
+    def code_alloc_dealloc_globals(globals)
       code_alloc=[]
       code_dealloc=[]
       globals.sort.each do |var|
@@ -752,7 +752,7 @@ module Fortran
         io_stmt_var_set_logic
       end
       declare("logical",sms_rootcheck) if @onroot
-      @code_alloc,@code_dealloc=alloc_dealloc_globals(Set.new(@var_gather+@var_scatter))
+      @code_alloc,@code_dealloc=code_alloc_dealloc_globals(Set.new(@var_gather+@var_scatter))
       io_stmt_gathers
       io_stmt_scatters
       io_stmt_bcasts
@@ -921,6 +921,7 @@ module Fortran
   class Print_Stmt < IO_Stmt
 
     def translate
+p env #PM#
       return if env[:sms_ignore] or env[:sms_serial]
       io_stmt_init
       output_items.each do |x|
@@ -1673,7 +1674,7 @@ module Fortran
 
       # Collect code for allocation and deallocation of globals.
 
-      code_alloc,code_dealloc=alloc_dealloc_globals(globals)
+      code_alloc,code_dealloc=code_alloc_dealloc_globals(globals)
 
       # Concatenate code.
 

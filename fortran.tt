@@ -37,10 +37,10 @@ grammar Fortran
   end
 
   rule access_id_list
-    access_id access_id_pair* <Access_Id_List>
+    access_id access_id_list_pair* <Access_Id_List>
   end
 
-  rule access_id_pair
+  rule access_id_list_pair
     t_comma access_id <Access_Id_List_Pair>
   end
 
@@ -1139,7 +1139,11 @@ grammar Fortran
   end
 
   rule dummy_arg_name_list
-    dummy_arg_name ( t_comma dummy_arg_name )* <Dummy_Arg_Name_List>
+    dummy_arg_name dummy_arg_name_list_pair* <Dummy_Arg_Name_List>
+  end
+
+  rule dummy_arg_name_list_pair
+    t_comma dummy_arg_name <Dummy_Arg_Name_List_Pair>
   end
 
   rule else_construct
@@ -1834,7 +1838,7 @@ grammar Fortran
   rule intent_stmt
     # F90:R519
 
-    label:label? t_intent t_paren_l intent_spec t_paren_r double_colon? dummy_arg_name_list t_newline <Intent_Stmt>
+    label:label? t_intent t_paren_l intent_spec t_paren_r double_colon? dummy_arg_name_list t_newline &{ |e| sp_intent_stmt(e[6]) } <Intent_Stmt>
   end
 
   rule interface_block
@@ -2441,15 +2445,15 @@ grammar Fortran
   end
 
   rule object_name_and_spec_list
-    object_name parenthesized_deferred_shape_spec_list? <E>
+    object_name parenthesized_deferred_shape_spec_list? <Object_Name_And_Spec_List>
   end
 
   rule object_name_and_spec_list_pair
-    t_comma object_name_and_spec_list <E>
+    t_comma object_name_and_spec_list <Object_Name_And_Spec_List_Pair>
   end
 
   rule object_names_and_spec_lists
-    object_name_and_spec_list object_name_and_spec_list_pair* <T>
+    object_name_and_spec_list object_name_and_spec_list_pair* <Object_Names_And_Spec_Lists>
   end
 
   rule octal_constant
@@ -2486,7 +2490,7 @@ grammar Fortran
   rule optional_stmt
     # F90:R520
 
-    label:label? t_optional double_colon? dummy_arg_name_list t_newline <Optional_Stmt>
+    label:label? t_optional double_colon? dummy_arg_name_list t_newline &{ |e| sp_optional_stmt(e[3]) } <Optional_Stmt>
   end
 
   rule or_op
@@ -2603,7 +2607,7 @@ grammar Fortran
   rule pointer_stmt
     # F90:R527
 
-    label:label? t_pointer double_colon? object_names_and_spec_lists t_newline <Pointer_Stmt>
+    label:label? t_pointer double_colon? object_names_and_spec_lists t_newline &{ |e| sp_pointer_stmt(e[3]) } <Pointer_Stmt>
   end
 
   rule position_edit_desc
@@ -2822,7 +2826,7 @@ grammar Fortran
   rule save_stmt
     # F90:R523
 
-    label:label? t_save save_stmt_entity_list? t_newline <Save_Stmt>
+    label:label? t_save save_stmt_entity_list? t_newline &{ |e| sp_save_stmt(e[2]) } <Save_Stmt>
   end
 
   rule save_stmt_entity_list
@@ -2832,12 +2836,16 @@ grammar Fortran
   rule saved_entity
     # F90:R524
 
-    object_name /
-    t_slash common_block_name t_slash <E>
+    object_name "" <Saved_Entity_1> /
+    t_slash common_block_name t_slash <Saved_Entity_2>
   end
 
   rule saved_entity_list
-    saved_entity ( t_comma saved_entity )* <Saved_Entity_List>
+    saved_entity saved_entity_list_pair* <Saved_Entity_List>
+  end
+
+  rule saved_entity_list_pair
+    t_comma saved_entity <Saved_Entity_List_Pair>
   end
 
   rule scalar_char_constant
