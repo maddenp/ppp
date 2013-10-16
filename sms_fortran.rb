@@ -178,7 +178,7 @@ module Fortran
         if type=="character"
           arg2=(sort=="_scalar")?("1"):("size(#{var})")
           code_array.push("if (#{iostat}.eq.0) then") if iostat
-          code_array.push("call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})")
+          code_array.push(sms_bcast_char(var,arg2))
           code_array.push(sms_chkstat)
           code_array.push("endif") if iostat
         else
@@ -191,7 +191,7 @@ module Fortran
           end
           kind=varenv["kind"]
           code_array.push("if (#{iostat}.eq.0) then") if iostat
-          code_array.push("call sms__bcast(#{var},#{sms_type(type,kind)},#{sizes},#{dims},#{sms_statusvar})")
+          code_array.push(sms_bcast(var,sms_type(type,kind),sizes,dims))
           code_array.push(sms_chkstat)
           code_array.push("endif") if iostat
         end
@@ -442,6 +442,14 @@ module Fortran
 
     def sms(s)
       "#{e[0]}#{e[1]} #{s}\n"
+    end
+
+    def sms_bcast(var,type,sizes,dims)
+      "call sms__bcast(#{var},#{type},#{sizes},#{dims},#{sms_statusvar})"
+    end
+
+    def sms_bcast_char(var,arg2)
+      "call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
     end
 
     def sms_chkstat
@@ -719,7 +727,7 @@ module Fortran
           label_old,label_new=spec.send(:relabel)
           pppvar=spec.send(:pppvar)
           @spec_var_false.push("#{pppvar}=.false.")
-          @spec_var_bcast.push("call sms__bcast(#{pppvar},sms__type_logical,(/1/),1,#{sms_statusvar})")
+          @spec_var_bcast.push(sms_bcast(pppvar,"sms__type_logical","(/1/)",1))
           @spec_var_bcast.push(sms_chkstat)
           @spec_var_true.push("#{label_new} #{pppvar}=.true.")
           @spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
@@ -822,7 +830,7 @@ module Fortran
         if (spec=send(x))
           var=spec.rhs
           varenv=varenv_get(var)
-          @spec_var_bcast.push("call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
+          @spec_var_bcast.push(sms_bcast(var,sms_type(varenv["type"],varenv["kind"]),"(/1/)",1))
           @spec_var_bcast.push(sms_chkstat)
           @need_decompmod=true
           @iostat=var if x==:iostat
