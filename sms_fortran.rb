@@ -2073,17 +2073,19 @@ module Fortran
   class Stop_Stmt < StmtJ
 
     def translate
-      unless env[:sms_ignore] or env[:sms_serial]
+      return if env[:sms_ignore]
+      l=label_delete unless (l=label).empty?
+      code_array=[]
+      if env[:sms_serial]
+        code_array.push(sms_stop(1))
+      else
         use(sms_decompmod)
         declare("logical",sms_rootcheck)
-        l=label_delete unless (l=label).empty?
-        code=[]
-        code.push("#{sa(l)} if (#{sms_rootcheck}()) then")
-        code.push("call sms__stop('#{marker}',0,sms__abort)")
-        code.push("endif")
-        code=code.join("\n")
-        replace_statement(code,:block)
+        code_array.push("#{sa(l)} if (#{sms_rootcheck}()) then")
+        code_array.push(sms_stop(1))
+        code_array.push("endif")
       end
+      replace_statement(code_array.join("\n"),:block)
     end
 
   end

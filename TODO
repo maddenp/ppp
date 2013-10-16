@@ -129,16 +129,14 @@
 
 ### TRANSLATION
 
-* stop-stmt in serial region needs to bring down all tasks.
+* Prevent goto branching into serial regions (track, along with each used label,
+  its serial/parallel-context status and check this in post-processing.
 
 * Must handle eor=/err= inside serial region, too.
 
 * Should error handling be added for translated IO statements with none? If
   not, what happens when the root task terminates per F90:9.4.3? Do the other
   tasks hang?
-
-* Prevent goto branching into serial regions (track, along with each used label,
-  its serial/parallel-context status and check this in post-processing.
 
 - Does sms_gather() really need all 7 dims (see e.g. gather rollout in
   Write_Stmt or SMS_Serial.
