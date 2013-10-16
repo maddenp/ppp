@@ -172,14 +172,5 @@
   trick (do\n...exit\nend do", replacing a single statement. Or, better yet,
   just parse as :block. Seems to work elsewhere...
 
-- replace_element may also be unsound, as it removes nodes from the tree.
-  Instead, maybe walk up the tree and update text_value components?
-
-- Maybe do not *remove* nodes. For example, in SMS_Serial#translate, position of
-  'block' changes when begin/end stmts are removed. Why not just leave them and
-  override their to_s() (maybe conditionally) or replace them with SyntaxNodes?
-  Maybe redefine to_s method to return empty string? Change remote() to
-  silence()?
-
 - To make all of this more useful, build an AST from the parse tree. Then, do
   translations on and produce final output from the AST.
