@@ -472,10 +472,7 @@ module Fortran
     end
 
     def translate_children
-      if e
-        e.each { |x| x.translate_common if x }
-        e.compact!
-      end
+      e.each { |x| x.translate_common if x } if e
       self
     end
 
@@ -601,10 +598,6 @@ module Fortran
 
     def raw(code,rule,srcfile,opts={})
       Translator.new.raw(code,rule,srcfile,opts)
-    end
-
-    def remove
-      parent.e[parent.e.index(self)]=nil
     end
 
     def replace_element(code,rule,node=self)

@@ -1224,7 +1224,6 @@ module Fortran
       declare("integer","#{dh}__s3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
       declare("integer","#{dh}__upperbounds", {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
       declare("integer",dh,{:dims=>%W[1]})
-      remove
     end
 
   end
@@ -1244,20 +1243,12 @@ module Fortran
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
-    def translate
-      remove
-    end
-
   end
 
   class SMS_Distribute_End < SMS
 
     def to_s
       sms("#{e[2]}")
-    end
-
-    def translate
-      remove
     end
 
   end
@@ -1353,20 +1344,12 @@ module Fortran
       sms("#{e[2]}#{e[3]}#{e[4]} #{e[5]}")
     end
 
-    def translate
-      remove
-    end
-
   end
 
   class SMS_Halo_Comp_End < SMS
 
     def to_s
       sms("#{e[2]}")
-    end
-
-    def translate
-      remove
     end
 
   end
@@ -1405,20 +1388,12 @@ module Fortran
       sms("#{e[2]}")
     end
 
-    def translate
-      remove
-    end
-
   end
 
   class SMS_Ignore_End < SMS
 
     def to_s
       sms("#{e[2]}")
-    end
-
-    def translate
-      remove
     end
 
   end
@@ -1437,20 +1412,12 @@ module Fortran
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
-    def translate
-      remove
-    end
-
   end
 
   class SMS_Parallel_End < SMS
 
     def to_s
       sms("#{e[2]}")
-    end
-
-    def translate
-      remove
     end
 
   end
@@ -1594,11 +1561,9 @@ module Fortran
 
     def translate
 
-      # Get old block. Note that 'begin' and 'end' nodes have already been
-      # removed, so the only element remaining is the block. If the serial
-      # region is empty, we can simply return.
-
-      oldblock=e[0]
+      serial_begin=e[0]
+      oldblock=e[1]
+      serial_end=e[2]
       return if oldblock.e.empty?
       use(sms_decompmod)
       declare("logical",sms_rootcheck)
@@ -1675,14 +1640,12 @@ module Fortran
 
       # Walk the subtree representing the serial region's body and replace the
       # names of all scattered/gathered variables with their global versions.
-      # Note that 'begin' and 'end' nodes have already been removed, so the only
-      # element remaining is the block.
 
       def globalize(node,to_globalize)
         node.e.each { |x| globalize(x,to_globalize) } if node.e
         node.globalize if node.is_a?(Name) and to_globalize.include?("#{node}")
       end
-      globalize(e[0],gathers+scatters)
+      globalize(e[1],gathers+scatters)
 
       # Declaration of globally-sized variables
 
@@ -1707,13 +1670,14 @@ module Fortran
 
       code.concat(code_alloc)
       code.concat(code_gather(gathers))
-      code.push("if (#{sms_rootcheck}()) then\n#{oldblock}endif")
+      code.push("if (#{sms_rootcheck}()) then\n#{serial_begin}\n#{oldblock}#{serial_end}\nendif")
       code.concat(code_scatter(scatters))
       code.concat(code_bcast(bcasts))
       code.concat(code_dealloc)
 
       # Replace serial region with new code block.
 
+      env[:sms_serial]=false
       replace_statement(code.join("\n"),:block)
 
     end
@@ -1734,7 +1698,6 @@ module Fortran
       si.vars_in=("#{e[2]}".empty?)?([]):(e[2].vars_in)
       si.vars_out=("#{e[2]}".empty?)?([]):(e[2].vars_out)
       parent.env[:sms_serial_info]=env[:sms_serial_info]
-      remove
     end
 
   end
@@ -1815,10 +1778,6 @@ module Fortran
 
     def to_s
       sms("#{e[2]}")
-    end
-
-    def translate
-      remove
     end
 
   end
@@ -1919,20 +1878,12 @@ module Fortran
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
-    def translate
-      remove
-    end
-
   end
 
   class SMS_To_Local_End < SMS
 
     def to_s
       sms("#{e[2]}")
-    end
-
-    def translate
-      remove
     end
 
   end
