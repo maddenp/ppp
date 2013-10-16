@@ -123,14 +123,11 @@
 - declare() is naive. What about declaring an array with the same type as an
   already-declared scalar? Need more flexibility...
 
-- Factor more sms text out into T#sms_* methods.
+- Factor more sms text out into T#sms_* methods (esp library calls).
 
 - varprop -> varenv?
 
 ### TRANSLATION
-
-* Shouldnt 4th arg to ppp_bcast be a scalar, instead of an array? Or is this
-  about the 3rd arg, which is different between bcast and bcast_char?
 
 * stop-stmt in serial region needs to bring down all tasks.
 
