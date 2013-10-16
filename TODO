@@ -37,7 +37,8 @@
 
 ### NEW FEATURES
 
-- where-stmt may need (automatic?) parallel treatment.
+- Does where-stmt need (automatic?) parallel treatment? Now it will operate
+  on halo memory as well.
 
 - implicit-do constructs may require parallel treatment. See e.g. outFMTed.F90
   in FIM, where a serial region is currently required.
@@ -122,6 +123,8 @@
 
 ### TRANSLATION
 
+* translate_children() -- do we need 'if e' & compact & 'if x'?
+
 * Prevent goto branching into serial regions (track, along with each used label,
   its serial/parallel-context status and check this in post-processing.
 
@@ -131,18 +134,21 @@
   not, what happens when the root task terminates per F90:9.4.3? Do the other
   tasks hang?
 
+* In SMS_Reduce#translate, build out case statement for the other supported
+  nnt_* types. BUT, maybe we should be querying MPI for this information in the
+  SMS library (see e.g. bugzilla bug #21).
+
+* Need SMS library function that takes type and kind arguemnts and returns the
+  correct nnt_ type to use in library calls. There's some hack in fimppp now to
+  remove a user-defined kind -- this needs to be undone and to work correctly.
+  BUT see bugzilla bug #21 re: SMS querying MPI for this information so that
+  user-defined kinds can be transparently supported.
+
 - Does sms_gather() really need all 7 dims (see e.g. gather rollout in
   Write_Stmt or SMS_Serial.
 
-- SMS_Unstructured_Grid#translate cannot possibly be correct in the general
-  case, right?
-
 - SMS_Create_Decomp#translate is only valid for one decomposed dimension. Extend
   it to handle three.
-
-- In SMS_Reduce#translate, build out case statement for the other supported
-  nnt_* types. BUT, maybe we should be querying MPI for this information in the
-  SMS library (see e.g. bugzilla bug #21).
 
 - In SMS_Serial#translate, there's a potential issue in that a Name may be
   e.g. a function or subroutine name, in which case it may not (will not?)
@@ -151,12 +157,6 @@
   'standard' behavior is to exit with an error if an expected name is not found,
   so this is divergent. Worse, it may be *wrong* as function names may
   eventually appear in the environment (to note their type).
-
-- Need SMS library function that takes type and kind arguemnts and returns the
-  correct nnt_ type to use in library calls. There's some hack in fimppp now to
-  remove a user-defined kind -- this needs to be undone and to work correctly.
-  BUT see bugzilla bug #21 re: SMS querying MPI for this information so that
-  user-defined kinds can be transparently supported.
 
 - In SMS_Serial#translate, what should halo[l|u] be when dh is nil?
 
@@ -167,13 +167,12 @@
   If those IO stmts contain err=, iostat=, etc., broadcasts will hang. Can
   we detect this at compile time and at least fail with an explanation?
 
-- translate_children() -- do we need 'if e' & compact & 'if x'?
-
 ### TREE
 
 - Fortran#replace_statements (plural) may be problematic (i.e. it might modify
   the tree in unsound ways). It may be better to use the block_do_construct
-  trick (do\n...exit\nend do", replacing a single statement.
+  trick (do\n...exit\nend do", replacing a single statement. Or, better yet,
+  just parse as :block. Seems to work elsewhere...
 
 - replace_element may also be unsound, as it removes nodes from the tree.
   Instead, maybe walk up the tree and update text_value components?
