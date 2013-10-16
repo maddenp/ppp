@@ -129,7 +129,8 @@
 
 ### TRANSLATION
 
-* Use ppp__status in calls into sms library to abort on error. nnt_chkstat
+* Shouldnt 4th arg to ppp_bcast be a scalar, instead of an array? Or is this
+  about the 3rd arg, which is different between bcast and bcast_char?
 
 * stop-stmt in serial region needs to bring down all tasks.
 
@@ -177,9 +178,6 @@
 - What about making calls inside serial regions to routines that do IO stmts?
   If those IO stmts contain err=, iostat=, etc., broadcasts will hang. Can
   we detect this at compile time and at least fail with an explanation?
-
-* Shouldnt 4th arg to ppp_bcast be a scalar, instead of an array? Or is this
-  about the 3rd arg, which is different between bcast and bcast_char?
 
 - translate_children() -- do we need 'if e' & compact & 'if x'?
 

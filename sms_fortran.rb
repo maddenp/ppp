@@ -177,9 +177,10 @@ module Fortran
         type=varenv["type"]
         if type=="character"
           arg2=(sort=="_scalar")?("1"):("size(#{var})")
-          code=""
-          code+="if (#{iostat}.eq.0) " if iostat
-          code+="call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
+          code_array.push("if (#{iostat}.eq.0) then") if iostat
+          code_array.push("call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})")
+          code_array.push(sms_chkstat)
+          code_array.push("endif") if iostat
         else
           if sort=="_scalar"
             dims="1"
@@ -189,11 +190,11 @@ module Fortran
             sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
           end
           kind=varenv["kind"]
-          code=""
-          code+="if (#{iostat}.eq.0) " if iostat
-          code+="call sms__bcast(#{var},#{sms_type(type,kind)},#{sizes},#{dims},#{sms_statusvar})"
+          code_array.push("if (#{iostat}.eq.0) then") if iostat
+          code_array.push("call sms__bcast(#{var},#{sms_type(type,kind)},#{sizes},#{dims},#{sms_statusvar})")
+          code_array.push(sms_chkstat)
+          code_array.push("endif") if iostat
         end
-        code_array.push(code)
       end
       code_array
     end
@@ -234,8 +235,8 @@ module Fortran
         args.push("#{var}")
         args.push(sms_global_name(var))
         args.push(sms_statusvar)
-        code="call sms__gather(#{args.join(",")})"
-        code_array.push(code)
+        code_array.push("call sms__gather(#{args.join(",")})")
+        code_array.push(sms_chkstat)
       end
       code_array
     end
@@ -294,6 +295,7 @@ module Fortran
         code+="if (#{iostat}.eq.0) " if iostat
         code+="call sms__scatter(#{args.join(",")})"
         code_array.push(code)
+        code_array.push(sms_chkstat)
       end
       code_array
     end
@@ -440,6 +442,10 @@ module Fortran
 
     def sms(s)
       "#{e[0]}#{e[1]} #{s}\n"
+    end
+
+    def sms_chkstat
+      "call sms__chkstat('#{marker}',' ',#{sms_statusvar},sms__abort_on_error,#{sms_statusvar})"
     end
 
     def sms_commtag
@@ -714,6 +720,7 @@ module Fortran
           pppvar=spec.send(:pppvar)
           @spec_var_false.push("#{pppvar}=.false.")
           @spec_var_bcast.push("call sms__bcast(#{pppvar},sms__type_logical,(/1/),1,#{sms_statusvar})")
+          @spec_var_bcast.push(sms_chkstat)
           @spec_var_true.push("#{label_new} #{pppvar}=.true.")
           @spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
           @success_label=label_create unless @success_label
@@ -816,6 +823,7 @@ module Fortran
           var=spec.rhs
           varenv=varenv_get(var)
           @spec_var_bcast.push("call sms__bcast(#{var},#{sms_type(varenv["type"],varenv["kind"])},(/1/),1,#{sms_statusvar})")
+          @spec_var_bcast.push(sms_chkstat)
           @need_decompmod=true
           @iostat=var if x==:iostat
         end
@@ -1013,8 +1021,10 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      code="call sms__barrier(#{sms_statusvar})"
-      replace_statement(code,:call_stmt)
+      code_array=[]
+      code_array.push("call sms__barrier(#{sms_statusvar})")
+      code_array.push(sms_chkstat)
+      replace_statement(code_array.join("\n"),:block)
     end
 
   end
@@ -1037,8 +1047,12 @@ module Fortran
       glubs=code_global_upper_bounds(varenv,var,dims)
       perms=code_perms(varenv)
       dh=code_decomp(varenv["decomp"],:scalar)
-      code="if (sms__debugging_on()) call sms__compare_var(#{dh},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},#{sms_statusvar})"
-      replace_statement(code,:if_stmt)
+      code_array=[]
+      code_array.push("if (sms__debugging_on()) then")
+      code_array.push("call sms__compare_var(#{dh},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},#{sms_statusvar})")
+      code_array.push(sms_chkstat)
+      code_array.push("endif")
+      replace_statement(code_array.join("\n"),:block)
     end
 
   end
@@ -1122,6 +1136,7 @@ module Fortran
         sms_statusvar
       ]
       stmts.push(["call sms__create_decomp(#{args.join(',')})",:call_stmt])
+      stmts.push([sms_chkstat,:call_stmt])
       s=""
       s+="do #{d}__index=0,0\n"
       args=[
@@ -1136,6 +1151,7 @@ module Fortran
         sms_statusvar
       ]
       s+="call sms__loops_op(#{args.join(',')})\n"
+      s+=sms_chkstat+"\n"
       s+="end do\n"
       stmts.push([s,:block_do_construct])
       replace_statements(stmts)
@@ -1307,8 +1323,10 @@ module Fortran
       halou="reshape((/#{halou.join(",")}/),(/#{nvars},#{maxrank}/))"
       perms="reshape((/#{perms.join(",")}/),(/#{nvars},#{maxrank}/))"
       types="(/#{types.join(",")}/)"
-      code="call sms__exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},#{sms_statusvar},#{vars},#{names})"
-      replace_statement(code,:call_stmt)
+      code_array=[]
+      code_array.push("call sms__exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},#{sms_statusvar},#{vars},#{names})")
+      code_array.push(sms_chkstat)
+      replace_statement(code_array.join("\n"),:block)
     end
 
   end
@@ -1536,8 +1554,10 @@ module Fortran
       end
       sizes="(/#{sizes.join(",")}/)"
       types="(/#{types.join(",")}/)"
-      code="call sms__reduce_#{nvars}(#{sizes},#{types},sms__op_#{op},#{sms_statusvar},#{vars.join(',')})"
-      replace_statement(code,:call_stmt)
+      code_array=[]
+      code_array.push("call sms__reduce_#{nvars}(#{sizes},#{types},sms__op_#{op},#{sms_statusvar},#{vars.join(',')})")
+      code_array.push(sms_chkstat)
+      replace_statement(code_array.join("\n"),:block)
     end
 
     def vars
@@ -1853,8 +1873,10 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      code="call sms__set_communicator(#{e[3]},#{sms_statusvar})"
-      replace_statement(code,:call_stmt)
+      code_array=[]
+      code_array.push("call sms__set_communicator(#{e[3]},#{sms_statusvar})")
+      code_array.push(sms_chkstat)
+      replace_statement(code_array.join("\n"),:block)
     end
 
   end
@@ -1863,8 +1885,10 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      code="call sms__start(#{sms_statusvar})"
-      replace_statement(code,:call_stmt)
+      code_array=[]
+      code_array.push("call sms__start(#{sms_statusvar})")
+      code_array.push(sms_chkstat)
+      replace_statement(code_array.join("\n"),:block)
     end
 
   end
@@ -1983,6 +2007,7 @@ module Fortran
       stmts=[]
       stmts.push(["call sms__unstructuredgrid(#{dh},size(#{var},1),#{var})",:call_stmt])
       stmts.push(["call sms__get_collapsed_halo_size(#{dh}(#{dh}__nestlevel),1,1,#{dh}__localhalosize,#{sms_statusvar})",:call_stmt])
+      stmts.push([sms_chkstat,:call_stmt])
       stmts.push(["#{dh}__s1(1,1,#{dh}__nestlevel)=#{dh}__s1(1,0,#{dh}__nestlevel)",:assignment_stmt])
       stmts.push(["#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),1,#{dh}__nestlevel)=#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),0,#{dh}__nestlevel)+#{dh}__localhalosize",:assignment_stmt])
       replace_statements(stmts)
