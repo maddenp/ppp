@@ -608,17 +608,12 @@ module Fortran
       block[block.index(node)]=tree
     end
 
-    def replace_statement(code,rule,node=self)
-      tree=raw(code,rule,@srcfile,{:env=>node.env})
-      tree.parent=node.parent
-      block=node.parent.e
-      block[block.index(node)]=tree
-    end
-
-    def replace_statements(stmt_pairs,node=self)
-      p=stmt_pairs.shift
-      s=replace_statement(p[0],p[1],node)
-      stmt_pairs.each { |p| s=insert_statement_after(p[0],p[1],s) }
+    def replace_statement(code,rule=:block)
+      code=code.join("\n") if code.is_a?(Array)
+      tree=raw(code,rule,@srcfile,{:env=>self.env})
+      tree.parent=self.parent
+      block=self.parent.e
+      block[block.index(self)]=tree
     end
 
     def root

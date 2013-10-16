@@ -167,10 +167,5 @@
 
 ### TREE
 
-- Fortran#replace_statements (plural) may be problematic (i.e. it might modify
-  the tree in unsound ways). It may be better to use the block_do_construct
-  trick (do\n...exit\nend do", replacing a single statement. Or, better yet,
-  just parse as :block. Seems to work elsewhere...
-
 - To make all of this more useful, build an AST from the parse tree. Then, do
   translations on and produce final output from the AST.

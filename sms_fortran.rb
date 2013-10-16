@@ -170,17 +170,17 @@ module Fortran
     end
 
     def code_bcast(vars,iostat=nil)
-      code_array=[]
+      code=[]
       vars.each do |var|
         varenv=varenv_get(var)
         sort=varenv["sort"]
         type=varenv["type"]
         if type=="character"
           arg2=(sort=="_scalar")?("1"):("size(#{var})")
-          code_array.push("if (#{iostat}.eq.0) then") if iostat
-          code_array.push(sms_bcast_char(var,arg2))
-          code_array.push(sms_chkstat)
-          code_array.push("endif") if iostat
+          code.push("if (#{iostat}.eq.0) then") if iostat
+          code.push(sms_bcast_char(var,arg2))
+          code.push(sms_chkstat)
+          code.push("endif") if iostat
         else
           if sort=="_scalar"
             dims="1"
@@ -190,13 +190,13 @@ module Fortran
             sizes="(/"+(1..dims.to_i).map { |r| "size(#{var},#{r})" }.join(",")+"/)"
           end
           kind=varenv["kind"]
-          code_array.push("if (#{iostat}.eq.0) then") if iostat
-          code_array.push(sms_bcast(var,sms_type(type,kind),sizes,dims))
-          code_array.push(sms_chkstat)
-          code_array.push("endif") if iostat
+          code.push("if (#{iostat}.eq.0) then") if iostat
+          code.push(sms_bcast(var,sms_type(type,kind),sizes,dims))
+          code.push(sms_chkstat)
+          code.push("endif") if iostat
         end
       end
-      code_array
+      code
     end
 
     def code_decomp(dh,sort)
@@ -209,7 +209,7 @@ module Fortran
     end
 
     def code_gather(vars)
-      code_array=[]
+      code=[]
       vars.each do |var|
         varenv=varenv_get(var)
         dh=varenv["decomp"]
@@ -235,10 +235,10 @@ module Fortran
         args.push("#{var}")
         args.push(sms_global_name(var))
         args.push(sms_statusvar)
-        code_array.push("call sms__gather(#{args.join(",")})")
-        code_array.push(sms_chkstat)
+        code.push("call sms__gather(#{args.join(",")})")
+        code.push(sms_chkstat)
       end
-      code_array
+      code
     end
 
     def code_global_lower_bounds(varenv,var,dims)
@@ -259,7 +259,7 @@ module Fortran
     end
 
     def code_scatter(vars,iostat=nil)
-      code_array=[]
+      code=[]
       vars.each do |var|
         tag=sms_commtag
         declare("integer",tag,{:attrs=>"save"})
@@ -291,13 +291,13 @@ module Fortran
         args.push(sms_global_name(var))
         args.push("#{var}")
         args.push(sms_statusvar)
-        code=""
-        code+="if (#{iostat}.eq.0) " if iostat
-        code+="call sms__scatter(#{args.join(",")})"
-        code_array.push(code)
-        code_array.push(sms_chkstat)
+        stmt=""
+        stmt+="if (#{iostat}.eq.0) " if iostat
+        stmt+="call sms__scatter(#{args.join(",")})"
+        code.push(stmt)
+        code.push(sms_chkstat)
       end
-      code_array
+      code
     end
 
     def code_type(varenv,sort)
@@ -671,7 +671,6 @@ module Fortran
       code.push("#{label} #{prefix} then")
       code.push("#{action}")
       code.push("endif")
-      code=code.join("\n")
       replace_statement(code,:if_construct)
     end
 
@@ -757,8 +756,7 @@ module Fortran
       code.concat(@code_scatter)
       code.concat(@code_bcast)
       code.concat(@code_dealloc)
-      code=code.join("\n")
-      replace_statement(code,:block)
+      replace_statement(code)
     end
 
     def io_stmt_common
@@ -1029,10 +1027,10 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      code_array=[]
-      code_array.push("call sms__barrier(#{sms_statusvar})")
-      code_array.push(sms_chkstat)
-      replace_statement(code_array.join("\n"),:block)
+      code=[]
+      code.push("call sms__barrier(#{sms_statusvar})")
+      code.push(sms_chkstat)
+      replace_statement(code)
     end
 
   end
@@ -1055,12 +1053,12 @@ module Fortran
       glubs=code_global_upper_bounds(varenv,var,dims)
       perms=code_perms(varenv)
       dh=code_decomp(varenv["decomp"],:scalar)
-      code_array=[]
-      code_array.push("if (sms__debugging_on()) then")
-      code_array.push("call sms__compare_var(#{dh},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},#{sms_statusvar})")
-      code_array.push(sms_chkstat)
-      code_array.push("endif")
-      replace_statement(code_array.join("\n"),:block)
+      code=[]
+      code.push("if (sms__debugging_on()) then")
+      code.push("call sms__compare_var(#{dh},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},#{sms_statusvar})")
+      code.push(sms_chkstat)
+      code.push("endif")
+      replace_statement(code)
     end
 
   end
@@ -1094,36 +1092,36 @@ module Fortran
       use(sms_decompmod)
       declare("integer","sms__periodicusedlower",{:dims=>%W[sms__max_decomposed_dims]})
       declare("integer","sms__periodicusedupper",{:dims=>%W[sms__max_decomposed_dims]})
-      stmts=[]
-      stmts.push(["#{n}=1",:assignment_stmt])
-      stmts.push(["#{d}__nregions=1",:assignment_stmt])
+      code=[]
+      code.push("#{n}=1")
+      code.push("#{d}__nregions=1")
       max.times do |i|
         dim=i+1
         g=global[i]
         h=halo[i]
         if g
-          stmts.push(["allocate(#{d}__s#{dim}(1:1,0:1,#{d}__maxnests))",:allocate_stmt])
-          stmts.push(["allocate(#{d}__e#{dim}(#{g}:#{g},0:1,#{d}__maxnests))",:allocate_stmt])
+          code.push("allocate(#{d}__s#{dim}(1:1,0:1,#{d}__maxnests))")
+          code.push("allocate(#{d}__e#{dim}(#{g}:#{g},0:1,#{d}__maxnests))")
         end
-        stmts.push(["#{d}__globalsize(#{dim},#{n})=#{(g)?(g):(1)}",:assignment_stmt])
-        stmts.push(["#{d}__localsize(#{dim},#{n})=0",:assignment_stmt])
-        stmts.push(["#{d}__halosize(#{dim},#{n})=#{(h)?(h):(0)}",:assignment_stmt])
-        stmts.push(["#{d}__boundarytype(#{dim})=sms__nonperiodic_bdy",:assignment_stmt])
-        stmts.push(["#{d}__lowbounds(#{dim},#{n})=1",:assignment_stmt])
+        code.push("#{d}__globalsize(#{dim},#{n})=#{(g)?(g):(1)}")
+        code.push("#{d}__localsize(#{dim},#{n})=0")
+        code.push("#{d}__halosize(#{dim},#{n})=#{(h)?(h):(0)}")
+        code.push("#{d}__boundarytype(#{dim})=sms__nonperiodic_bdy")
+        code.push("#{d}__lowbounds(#{dim},#{n})=1")
       end
       max.times do |i|
         dim=i+1
-        stmts.push(["#{d}__upperbounds(#{dim},#{n})=#{d}__globalsize(#{dim},#{n})+#{d}__lowbounds(#{dim},#{n})-1",:assignment_stmt])
+        code.push("#{d}__upperbounds(#{dim},#{n})=#{d}__globalsize(#{dim},#{n})+#{d}__lowbounds(#{dim},#{n})-1")
       end
       max.times do |i|
         dim=i+1
         g=global[i]
         if g
-          stmts.push(["sms__periodicusedlower(:)=#{d}__lowbounds(:,#{dim})",:assignment_stmt])
-          stmts.push(["sms__periodicusedupper(:)=#{d}__upperbounds(:,#{dim})",:assignment_stmt])
+          code.push("sms__periodicusedlower(:)=#{d}__lowbounds(:,#{dim})")
+          code.push("sms__periodicusedupper(:)=#{d}__upperbounds(:,#{dim})")
         end
       end
-      stmts.push(["#{d}__decompname='#{d}'",:assignment_stmt])
+      code.push("#{d}__decompname='#{d}'")
       args=[
         "sms__decomp_1",
         "#{d}__boundarytype",
@@ -1143,10 +1141,9 @@ module Fortran
         "regionsize", # WHAT IS THIS?
         sms_statusvar
       ]
-      stmts.push(["call sms__create_decomp(#{args.join(',')})",:call_stmt])
-      stmts.push([sms_chkstat,:call_stmt])
-      s=""
-      s+="do #{d}__index=0,0\n"
+      code.push("call sms__create_decomp(#{args.join(',')})")
+      code.push(sms_chkstat)
+      code.push("do #{d}__index=0,0")
       args=[
         "#{d}(#{n})",
         "1",
@@ -1158,11 +1155,10 @@ module Fortran
         "#{d}__nregions",
         sms_statusvar
       ]
-      s+="call sms__loops_op(#{args.join(',')})\n"
-      s+=sms_chkstat+"\n"
-      s+="end do\n"
-      stmts.push([s,:block_do_construct])
-      replace_statements(stmts)
+      code.push("call sms__loops_op(#{args.join(',')})")
+      code.push(sms_chkstat)
+      code.push("end do")
+      replace_statement(code)
     end
 
   end
@@ -1322,10 +1318,10 @@ module Fortran
       halou="reshape((/#{halou.join(",")}/),(/#{nvars},#{maxrank}/))"
       perms="reshape((/#{perms.join(",")}/),(/#{nvars},#{maxrank}/))"
       types="(/#{types.join(",")}/)"
-      code_array=[]
-      code_array.push("call sms__exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},#{sms_statusvar},#{vars},#{names})")
-      code_array.push(sms_chkstat)
-      replace_statement(code_array.join("\n"),:block)
+      code=[]
+      code.push("call sms__exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},#{sms_statusvar},#{vars},#{names})")
+      code.push(sms_chkstat)
+      replace_statement(code)
     end
 
   end
@@ -1529,10 +1525,10 @@ module Fortran
       end
       sizes="(/#{sizes.join(",")}/)"
       types="(/#{types.join(",")}/)"
-      code_array=[]
-      code_array.push("call sms__reduce_#{nvars}(#{sizes},#{types},sms__op_#{op},#{sms_statusvar},#{vars.join(',')})")
-      code_array.push(sms_chkstat)
-      replace_statement(code_array.join("\n"),:block)
+      code=[]
+      code.push("call sms__reduce_#{nvars}(#{sizes},#{types},sms__op_#{op},#{sms_statusvar},#{vars.join(',')})")
+      code.push(sms_chkstat)
+      replace_statement(code)
     end
 
     def vars
@@ -1678,7 +1674,7 @@ module Fortran
       # Replace serial region with new code block.
 
       env[:sms_serial]=false
-      replace_statement(code.join("\n"),:block)
+      replace_statement(code)
 
     end
 
@@ -1840,10 +1836,10 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      code_array=[]
-      code_array.push("call sms__set_communicator(#{e[3]},#{sms_statusvar})")
-      code_array.push(sms_chkstat)
-      replace_statement(code_array.join("\n"),:block)
+      code=[]
+      code.push("call sms__set_communicator(#{e[3]},#{sms_statusvar})")
+      code.push(sms_chkstat)
+      replace_statement(code)
     end
 
   end
@@ -1852,10 +1848,10 @@ module Fortran
 
     def translate
       use(sms_decompmod)
-      code_array=[]
-      code_array.push("call sms__start(#{sms_statusvar})")
-      code_array.push(sms_chkstat)
-      replace_statement(code_array.join("\n"),:block)
+      code=[]
+      code.push("call sms__start(#{sms_statusvar})")
+      code.push(sms_chkstat)
+      replace_statement(code)
     end
 
   end
@@ -1863,7 +1859,8 @@ module Fortran
   class SMS_Stop < SMS
 
     def translate
-      replace_statement(sms_stop(0),:call_stmt)
+      code=sms_stop(0)
+      replace_statement(code,:call_stmt)
     end
 
   end
@@ -1963,13 +1960,13 @@ module Fortran
       fail "ERROR: No module info found for variable '#{var}'" unless (varenv=varenv_get(var))
       fail "ERROR: No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
       use(sms_decompmod)
-      stmts=[]
-      stmts.push(["call sms__unstructuredgrid(#{dh},size(#{var},1),#{var})",:call_stmt])
-      stmts.push(["call sms__get_collapsed_halo_size(#{dh}(#{dh}__nestlevel),1,1,#{dh}__localhalosize,#{sms_statusvar})",:call_stmt])
-      stmts.push([sms_chkstat,:call_stmt])
-      stmts.push(["#{dh}__s1(1,1,#{dh}__nestlevel)=#{dh}__s1(1,0,#{dh}__nestlevel)",:assignment_stmt])
-      stmts.push(["#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),1,#{dh}__nestlevel)=#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),0,#{dh}__nestlevel)+#{dh}__localhalosize",:assignment_stmt])
-      replace_statements(stmts)
+      code=[]
+      code.push("call sms__unstructuredgrid(#{dh},size(#{var},1),#{var})")
+      code.push("call sms__get_collapsed_halo_size(#{dh}(#{dh}__nestlevel),1,1,#{dh}__localhalosize,#{sms_statusvar})")
+      code.push(sms_chkstat)
+      code.push("#{dh}__s1(1,1,#{dh}__nestlevel)=#{dh}__s1(1,0,#{dh}__nestlevel)")
+      code.push("#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),1,#{dh}__nestlevel)=#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),0,#{dh}__nestlevel)+#{dh}__localhalosize")
+      replace_statement(code)
     end
 
   end
@@ -2026,17 +2023,17 @@ module Fortran
     def translate
       return if env[:sms_ignore]
       l=label_delete unless (l=label).empty?
-      code_array=[]
+      code=[]
       if env[:sms_serial]
-        code_array.push(sms_stop(1))
+        code.push(sms_stop(1))
       else
         use(sms_decompmod)
         declare("logical",sms_rootcheck)
-        code_array.push("#{sa(l)} if (#{sms_rootcheck}()) then")
-        code_array.push(sms_stop(1))
-        code_array.push("endif")
+        code.push("#{sa(l)} if (#{sms_rootcheck}()) then")
+        code.push(sms_stop(1))
+        code.push("endif")
       end
-      replace_statement(code_array.join("\n"),:block)
+      replace_statement(code)
     end
 
   end
