@@ -42,13 +42,6 @@
 - implicit-do constructs may require parallel treatment. See e.g. outFMTed.F90
   in FIM, where a serial region is currently required.
 
-- Are distributed array assignments e.g.
-    !sms$distribute (dh,1) begin
-    integer::a(100)
-    !sms$distribute end
-    a=0
-  supported?
-
 ### OPTIMIZATION
 
 * Time ppp on fim routines, find long ones, profile, optimize
