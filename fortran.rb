@@ -10,6 +10,10 @@ module Fortran
 
   include Common
 
+  def add_branch_target(label)
+    (env[:static].branch_targets||=Set.new).add("#{label}")
+  end
+
   def env
     @envstack.last
   end
@@ -101,6 +105,10 @@ module Fortran
       end
     end
     true
+  end
+
+  def sp_arithmetic_if_stmt(label1,label2,label3)
+    [label1,label2,label3].each { |x| add_branch_target(x) }
   end
 
   def sp_block_data
@@ -202,6 +210,11 @@ module Fortran
     true
   end
 
+  def sp_goto_stmt(label)
+    add_branch_target(label)
+    true
+  end
+
   def sp_hollerith_check_count
     @hollerith_count+=1
     (@hollerith_count>@hollerith_size)?(false):(true)
@@ -222,6 +235,21 @@ module Fortran
     true
   end
 
+  def sp_io_spec_end(label)
+    add_branch_target(label)
+    true
+  end
+
+  def sp_io_spec_eor(label)
+    add_branch_target(label)
+    true
+  end
+
+  def sp_io_spec_err(label)
+    add_branch_target(label)
+    true
+  end
+
   def sp_is_array?(node)
     return false unless node.respond_to?(:name)
     vargetprop(node.name,"sort")=="_array"
@@ -231,6 +259,11 @@ module Fortran
     n=label[0].e.reduce("") { |m,x| m+"#{x}" }.to_i
     (env[:static].labels||=Set.new).add(n)
     true
+  end
+
+  def sp_label_list(first,rest)
+    add_branch_target(first)
+    rest.e.each { |x| add_branch_target(x.label) }
   end
 
   def sp_main_program
@@ -1336,7 +1369,7 @@ module Fortran
   class Assigned_Goto_Stmt < T
 
 		def to_s
-			stmt("#{e[1]} #{e[2]}#{ik(e[3],","," "+e[3].to_s)}")
+			stmt("#{e[1]} #{e[2]}#{ik(e[3],","," ")}#{e[4]}")
 		end
 
   end
@@ -2691,9 +2724,21 @@ module Fortran
 
   class Label_List < T
 
+    def labels
+      e[1].e.reduce([e[0].label]) { |m,x| m.push(x.label) }
+    end
+
 		def to_s
 			list_to_s
 		end
+
+  end
+
+  class Label_List_Pair < E
+
+    def label
+      e[1]
+    end
 
   end
 

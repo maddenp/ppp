@@ -227,7 +227,7 @@ grammar Fortran
   rule arithmetic_if_stmt
     # F90:R840
 
-    label:label? t_if t_paren_l scalar_numeric_expr t_paren_r label t_comma label t_comma label t_newline <Arithmetic_If_Stmt>
+    label:label? t_if t_paren_l scalar_numeric_expr t_paren_r label t_comma label t_comma label t_newline &{ |e| sp_arithmetic_if_stmt(e[5],e[7],e[9]) } <Arithmetic_If_Stmt>
   end
 
   rule array_constructor
@@ -306,7 +306,7 @@ grammar Fortran
   rule assigned_goto_stmt
     # F90:R839
 
-    label:label? t_goto scalar_int_variable assigned_goto_stmt_label_list? t_newline <Assigned_Goto_Stmt>
+    label:label? t_goto scalar_int_variable t_comma? assigned_goto_stmt_label_list? t_newline <Assigned_Goto_Stmt>
   end
 
   rule assigned_goto_stmt_label_list
@@ -1616,7 +1616,7 @@ grammar Fortran
   rule goto_stmt
     # F90:R836
 
-    label:label? t_goto label t_newline <StmtJ>
+    label:label? t_goto label t_newline &{ |e| sp_goto_stmt(e[2]) } <Goto_Stmt>
   end
 
   rule hex_constant
@@ -1924,7 +1924,7 @@ grammar Fortran
     io_unit t_comma namelist_group_name !t_equal &{ |e| sp_namelist_group_name?(e[2]) } <IO_Control_Spec_Unit_Nml> /
     io_unit t_comma format !t_equal <T> /
     t_advance t_equal scalar_default_char_expr <T> /
-    t_io_control_spec_end t_equal label <T> /
+    io_spec_end /
     io_spec_eor /
     io_spec_err/
     t_fmt t_equal format <T> /
@@ -1987,12 +1987,16 @@ grammar Fortran
     t_direct t_equal scalar_default_char_variable <IO_Spec_Direct>
   end
 
+  rule io_spec_end
+    t_io_control_spec_end t_equal label &{ |e| sp_io_spec_end(e[2]) } <IO_Spec_End>
+  end
+
   rule io_spec_eor
-    t_eor t_equal label <IO_Spec_Eor>
+    t_eor t_equal label &{ |e| sp_io_spec_eor(e[2]) } <IO_Spec_Eor>
   end
 
   rule io_spec_err
-    t_err t_equal label <IO_Spec_Err>
+    t_err t_equal label &{ |e| sp_io_spec_err(e[2]) } <IO_Spec_Err>
   end
 
   rule io_spec_exist
@@ -2127,7 +2131,11 @@ grammar Fortran
   end
 
   rule label_list
-    label ( t_comma label )* <Label_List>
+    label label_list_pair* &{ |e| sp_label_list(e[0],e[1]) } <Label_List>
+  end
+
+  rule label_list_pair
+    t_comma label <Label_List_Pair>
   end
 
   rule len_pair
@@ -2942,7 +2950,7 @@ grammar Fortran
   rule scalar_int_variable
     # Multiple uses (not explicitly defined)
 
-    variable
+    scalar_variable_name
   end
 
   rule scalar_logical_expr

@@ -664,6 +664,9 @@ module Fortran
 
   end
 
+  class Goto_Stmt < StmtJ
+  end
+
   class If_Stmt < T
 
     def translate
@@ -833,6 +836,25 @@ module Fortran
           @need_decompmod=true
           @iostat=var if x==:iostat
         end
+      end
+    end
+
+  end
+
+  class Label < T
+
+    def branch_target?
+      return false unless (branch_targets=env[:static].branch_targets)
+      branch_targets.include?("#{self}")
+    end
+
+    def stmt_label?
+      parent.e[0]==self
+    end
+
+    def translate
+      if stmt_label? and branch_target? and inside?(SMS_Serial)
+        fail "ERROR: Serial-region statement labeled '#{self}' may not be a branch target"
       end
     end
 
@@ -1641,7 +1663,8 @@ module Fortran
         node.e.each { |x| globalize(x,to_globalize) } if node.e
         node.globalize if node.is_a?(Name) and to_globalize.include?("#{node}")
       end
-      globalize(e[1],gathers+scatters)
+
+      globalize(oldblock,gathers+scatters)
 
       # Declaration of globally-sized variables
 
