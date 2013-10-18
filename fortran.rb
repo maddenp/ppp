@@ -1645,9 +1645,6 @@ module Fortran
 
   end
 
-  class Backspace_Stmt < IO_Stmt
-  end
-
   class Close_Spec_List < IO_Spec_List
   end
 

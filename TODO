@@ -121,7 +121,7 @@
 
 ### TRANSLATION
 
-* Must handle eor=/err= inside serial region, too.
+* Must handle end=/eor=/err= inside serial region, too.
 
 * Should error handling be added for translated IO statements with none? If
   not, what happens when the root task terminates per F90:9.4.3? Do the other
