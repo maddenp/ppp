@@ -125,8 +125,7 @@
 
 * Prevent goto branching into serial regions (track, along with each used label,
   its serial/parallel-context status and check this in post-processing.
-  PARTIALLY DONE: Still need to handle assign-stmt and case where branch target
-  is inside the same serial region (which should be allowed).
+  PARTIALLY DONE: Still need to handle assign-stmt case.
 
 * Must handle eor=/err= inside serial region, too.
 

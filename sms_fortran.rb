@@ -843,9 +843,9 @@ module Fortran
 
   class Label < T
 
-    def branch_target?
-      return false unless (branch_targets=env[:static].branch_targets)
-      branch_targets.include?("#{self}")
+    def branch_targets
+      return [] unless (bt=env[:static].branch_targets)
+      bt["#{self}"]
     end
 
     def stmt_label?
@@ -853,8 +853,12 @@ module Fortran
     end
 
     def translate
-      if stmt_label? and branch_target? and inside?(SMS_Serial)
-        fail "ERROR: Serial-region statement labeled '#{self}' may not be a branch target"
+      if stmt_label? and (bt=branch_targets) and (s=ancestor(SMS_Serial))
+        bt.each do |label|
+          unless label.ancestor(SMS_Serial)==s
+            fail "ERROR: Branch to statement labeled '#{self}' from outside serial region"
+          end
+        end
       end
     end
 

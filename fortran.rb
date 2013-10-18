@@ -11,7 +11,9 @@ module Fortran
   include Common
 
   def add_branch_target(label)
-    (env[:static].branch_targets||=Set.new).add("#{label}")
+    branch_targets=(env[:static].branch_targets||={})
+    label_array=(branch_targets["#{label}"]||=[])
+    label_array.push(label)
   end
 
   def env
