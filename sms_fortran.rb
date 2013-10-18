@@ -843,6 +843,16 @@ module Fortran
 
   class Label < T
 
+    def assignments
+      return [] unless (am=env[:static].assign_map)
+      am["#{self}"]
+    end
+
+    def assigned_goto_targets
+      return [] unless (agt=env[:static].assigned_goto_targets||={})
+      agt
+    end
+
     def branch_targets
       return [] unless (bt=env[:static].branch_targets)
       bt["#{self}"]
@@ -853,12 +863,31 @@ module Fortran
     end
 
     def translate
-      if stmt_label? and (bt=branch_targets) and (s=ancestor(SMS_Serial))
-        bt.each do |label|
-          unless label.ancestor(SMS_Serial)==s
-            fail "ERROR: Branch to statement labeled '#{self}' from outside serial region"
+      f=false
+      if stmt_label? and (my_serial_region=ancestor(SMS_Serial))
+        if (bt=branch_targets)
+          bt.each do |label|
+            unless label.ancestor(SMS_Serial)==my_serial_region
+              f=true
+              break
+            end
           end
         end
+        if (agt=assigned_goto_targets)
+          assignments.each do |var|
+            if (targets=agt[var])
+              targets.each do |target|
+                unless target.ancestor(SMS_Serial)==my_serial_region
+                  f=true
+                  break
+                end
+              end
+            end
+          end
+        end
+      end
+      if f
+        fail "ERROR: Branch to statement labeled '#{self}' from outside serial region"
       end
     end
 

@@ -300,13 +300,13 @@ grammar Fortran
   rule assign_stmt
     # F90:R838
 
-    label:label? t_assign label t_to scalar_int_variable t_newline <StmtJ>
+    label:label? t_assign label t_to scalar_int_variable t_newline &{ |e| sp_assign_stmt(e[2],e[4]) } <Assign_Stmt>
   end
 
   rule assigned_goto_stmt
     # F90:R839
 
-    label:label? t_goto scalar_int_variable t_comma? assigned_goto_stmt_label_list? t_newline <Assigned_Goto_Stmt>
+    label:label? t_goto scalar_int_variable t_comma? assigned_goto_stmt_label_list? t_newline &{ |e| sp_assigned_goto_stmt(e[2]) } <Assigned_Goto_Stmt>
   end
 
   rule assigned_goto_stmt_label_list

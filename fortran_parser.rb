@@ -2621,6 +2621,7 @@ module Fortran
     def t_newline
       elements[5]
     end
+
   end
 
   def _nt_assign_stmt
@@ -2657,13 +2658,24 @@ module Fortran
             if r6
               r7 = _nt_t_newline
               s0 << r7
+              if r7
+                i8 = index
+                r9 = lambda { |e| sp_assign_stmt(e[2],e[4]) }.call(s0)
+                if r9
+                  @index = i8
+                  r8 = instantiate_node(SyntaxNode,input, index...index)
+                else
+                  r8 = nil
+                end
+                s0 << r8
+              end
             end
           end
         end
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtJ,input, i0...index, s0)
+      r0 = instantiate_node(Assign_Stmt,input, i0...index, s0)
       r0.extend(AssignStmt0)
     else
       @index = i0
@@ -2691,6 +2703,7 @@ module Fortran
     def t_newline
       elements[5]
     end
+
   end
 
   def _nt_assigned_goto_stmt
@@ -2737,6 +2750,17 @@ module Fortran
             if r7
               r9 = _nt_t_newline
               s0 << r9
+              if r9
+                i10 = index
+                r11 = lambda { |e| sp_assigned_goto_stmt(e[2]) }.call(s0)
+                if r11
+                  @index = i10
+                  r10 = instantiate_node(SyntaxNode,input, index...index)
+                else
+                  r10 = nil
+                end
+                s0 << r10
+              end
             end
           end
         end

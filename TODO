@@ -123,10 +123,6 @@
 
 ### TRANSLATION
 
-* Prevent goto branching into serial regions (track, along with each used label,
-  its serial/parallel-context status and check this in post-processing.
-  PARTIALLY DONE: Still need to handle assign-stmt case.
-
 * Must handle eor=/err= inside serial region, too.
 
 * Should error handling be added for translated IO statements with none? If

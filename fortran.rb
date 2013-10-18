@@ -109,8 +109,23 @@ module Fortran
     true
   end
 
+  def sp_assign_stmt(label,scalar_int_variable)
+    assign_map=(env[:static].assign_map||={})
+    var_array=(assign_map["#{label}"]||=Set.new)
+    var_array.add("#{scalar_int_variable}")
+    true
+  end
+
+  def sp_assigned_goto_stmt(scalar_int_variable)
+    assigned_goto_targets=(env[:static].assigned_goto_targets||={})
+    var_array=(assigned_goto_targets["#{scalar_int_variable}"]||=[])
+    var_array.push(scalar_int_variable)
+    true
+  end
+
   def sp_arithmetic_if_stmt(label1,label2,label3)
     [label1,label2,label3].each { |x| add_branch_target(x) }
+    true
   end
 
   def sp_block_data
@@ -1366,6 +1381,9 @@ module Fortran
       e[0]
 		end
 
+  end
+
+  class Assign_Stmt < StmtJ
   end
 
   class Assigned_Goto_Stmt < T
