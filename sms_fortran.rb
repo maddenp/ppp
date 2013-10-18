@@ -53,14 +53,14 @@ module Fortran
   end
 
   def sp_sms_ignore_begin
-    fail "ERROR: Already inside ignore region" if env[:sms_ignore]
+    fail "ERROR: Already inside ignore region" if sms_ignore
     envpush
     env[:sms_ignore]=true
     true
   end
 
   def sp_sms_ignore_end
-    fail "ERROR: Not inside ignore region" unless env[:sms_ignore]
+    fail "ERROR: Not inside ignore region" unless sms_ignore
     true
   end
 
@@ -87,14 +87,14 @@ module Fortran
   end
 
   def sp_sms_serial_begin
-    fail "ERROR: Already inside serial region" if env[:sms_serial]
+    fail "ERROR: Already inside serial region" if sms_serial
     envpush
     env[:sms_serial]=true
     true
   end
 
   def sp_sms_serial_end
-    fail "ERROR: Not inside serial region" unless env[:sms_serial]
+    fail "ERROR: Not inside serial region" unless sms_serial
     true
   end
 
@@ -482,10 +482,6 @@ module Fortran
       @@global_names[n]=p+n[0..tokeep]
     end
 
-    def sms_global_prefix
-
-    end
-
     def sms_rankvar
       "sms__rank"
     end
@@ -585,7 +581,7 @@ module Fortran
       end
 
       if inside?(Assignment_Stmt)
-        return if inside?(SMS_Ignore,SMS_Serial)
+        return if sms_ignore or sms_serial
         if (f=ancestor(Function_Reference))
           return unless intrinsic?(f.name)
         end
@@ -632,7 +628,7 @@ module Fortran
   class Close_Stmt < IO_Stmt
 
     def translate
-      return if env[:sms_ignore] or env[:sms_serial]
+      return if sms_ignore or sms_serial
       io_stmt_init
       io_stmt_common
     end
@@ -933,7 +929,7 @@ module Fortran
         replace_element(code,:expr)
       end
       # Handle serial
-      if inside?(SMS_Serial) and not inside?(SMS_Serial_Begin)
+      if sms_serial and not inside?(SMS_Serial_Begin)
         if (varenv=env["#{self}"])
           unless varenv["parameter"]
             env[:sms_serial_info].names_in_region.add("#{self}")
@@ -947,7 +943,7 @@ module Fortran
   class Nonlabel_Do_Stmt < T
 
     def translate
-      unless env[:sms_serial]
+      unless sms_serial
         if parallel=env[:sms_parallel]
           loop_control=e[3]
           loop_var="#{loop_control.e[1]}"
@@ -980,7 +976,7 @@ module Fortran
   class Open_Stmt < IO_Stmt
 
     def translate
-      return if env[:sms_ignore] or env[:sms_serial]
+      return if sms_ignore or sms_serial
       io_stmt_init
       io_stmt_common
     end
@@ -990,7 +986,7 @@ module Fortran
   class Print_Stmt < IO_Stmt
 
     def translate
-      return if env[:sms_ignore] or env[:sms_serial]
+      return if sms_ignore or sms_serial
       io_stmt_init
       output_items.each do |x|
         var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
@@ -1011,7 +1007,7 @@ module Fortran
   class Read_Stmt < IO_Stmt
 
     def translate
-      return if env[:sms_ignore] or env[:sms_serial]
+      return if sms_ignore or sms_serial
       io_stmt_init
       @onroot=false if unit.is_a?(Internal_File_Unit)
       if (namelist_name=nml)
@@ -2077,10 +2073,10 @@ module Fortran
   class Stop_Stmt < StmtJ
 
     def translate
-      return if env[:sms_ignore]
+      return if sms_ignore
       l=label_delete unless (l=label).empty?
       code=[]
-      if env[:sms_serial]
+      if sms_serial
         code.push(sms_stop(1))
       else
         use(sms_decompmod)
@@ -2097,7 +2093,7 @@ module Fortran
   class Write_Stmt < IO_Stmt
 
     def translate
-      return if env[:sms_ignore] or env[:sms_serial]
+      return if sms_ignore or sms_serial
       io_stmt_init
       function=(env["#{unit}"] and env["#{unit}"]["function"])
       @onroot=false if unit.is_a?(Internal_File_Unit) or function

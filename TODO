@@ -112,8 +112,6 @@
 - In sms_fortran.rb, 'names_in_region' should be 'vars_in_region' and should
   be just that -- not function or subroutine names, not parameter names, etc.
 
-- Pros/Cons of e.g. env[:serial] vs inside?(SMS_Serial)? Standardize on one?
-
 - declare() is naive. What about declaring an array with the same type as an
   already-declared scalar? Need more flexibility...
 
@@ -157,10 +155,6 @@
 
 - Hardcoded '1's referring to decomposition elements should be looked up from
   env.
-
-- What about making calls inside serial regions to routines that do IO stmts?
-  If those IO stmts contain err=, iostat=, etc., broadcasts will hang. Can
-  we detect this at compile time and at least fail with an explanation?
 
 ### TREE
 

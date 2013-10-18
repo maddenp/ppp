@@ -33,6 +33,14 @@ module Common
     File.join(File.expand_path(d),"#{m}#{envext}")
   end
 
+  def sms_ignore
+    env[:sms_ignore]
+  end
+
+  def sms_serial
+    env[:sms_serial]
+  end
+
   def use_localnames(modulename)
     e=(is_a?(Fortran::T))?(use_part.env):(env)
     return [] unless e[:uses]
