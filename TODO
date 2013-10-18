@@ -121,7 +121,21 @@
 
 ### TRANSLATION
 
-* Must handle end=/eor=/err= inside serial region, too.
+* Here's a problem:
+
+  program p
+  !sms$distribute (dh,1) begin
+    integer,allocatable::i(:)
+  !sms$distribute end
+    goto 99
+  99 print *,i
+  end program p
+
+  In the transltion, the goto skips over the gather of 'i'. Need to move the
+  label up, maybe onto a continue statement?
+
+* Must handle end=/eor=/err= inside serial region, too. Maybe this is simpler:
+  You may not branch into or out of a serial region. Is that practical?
 
 * In SMS_Reduce#translate, build out case statement for the other supported
   nnt_* types. BUT, maybe we should be querying MPI for this information in the
