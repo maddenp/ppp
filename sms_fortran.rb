@@ -738,13 +738,14 @@ module Fortran
     def io_stmt_codegen
       use(sms_decompmod) if @need_decompmod
       code=[]
-      code.concat(@code_alloc)
-      code.concat(@code_gather)
       if @onroot
         my_label=(label.empty?)?(nil):(label)
         my_label=label_delete if my_label
-        code.push("#{sa(my_label)}if (#{sms_rootcheck}()) then")
+        code.push("#{my_label} continue") if my_label
       end
+      code.concat(@code_alloc)
+      code.concat(@code_gather)
+      code.push("if (#{sms_rootcheck}()) then") if @onroot
       code.concat(@spec_var_false)
       code.push("#{self}".chomp)
       code.push("goto #{@success_label}") if @success_label
