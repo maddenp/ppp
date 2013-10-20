@@ -1518,7 +1518,7 @@ grammar Fortran
     # F90:R913
 
     default_char_expr /
-    label /
+    label "" <Format_Label> /
     t_star /
     scalar_default_int_variable
   end
@@ -2121,7 +2121,7 @@ grammar Fortran
   rule label
     # F90:R313
 
-    t_digit 1..5 <Label>
+    t_digit 1..5 &{ |e| sp_label(e[0]) } <Label>
   end
 
   rule label_do_stmt

@@ -60,6 +60,12 @@
   would be better to do this once -- maybe as a post-translation walk that calls
   write_envfile for each module encountered.
 
+- Could env[:sms_serial] have as its value the serial-region node, to avoid
+  searching up the tree for it in translate() contexts? IIRC, the value now
+  is simply 'true', but a reference to the node might be more useful. See e.g.
+  ancestor(SMS_Serial) in Label#translate: env[:sms_serial] could return the
+  same object.
+
 ### PARSING
 
 - Deduce types of implicit variables.
@@ -119,10 +125,18 @@
 
 - varprop -> varenv?
 
+- Could some logic be simplified by splitting Label class into Stmt_Label and
+  Branch_Label? (And maybe Format_Label?)
+
 ### TRANSLATION
 
 * Must handle end=/eor=/err= inside serial region, too. Maybe this is simpler:
   You may not branch into or out of a serial region. Is that practical?
+
+* 'assign' targets and labels are unique per scoping unit, so neither belongs in
+  evn[:static]. Also, these must not be inherited by subscopes, so must be
+  removed before deepcopy (or whatever mechanism takes its place). Or, store
+  scoping-unit info, e.g.: env[:assign_map][scoping_unit][#{label}]=...
 
 * In SMS_Reduce#translate, build out case statement for the other supported
   nnt_* types. BUT, maybe we should be querying MPI for this information in the
@@ -133,6 +147,8 @@
   remove a user-defined kind -- this needs to be undone and to work correctly.
   BUT see bugzilla bug #21 re: SMS querying MPI for this information so that
   user-defined kinds can be transparently supported.
+
+- Must handle assigned goto out of serial region.
 
 - Does sms_gather() really need all 7 dims (see e.g. gather rollout in
   Write_Stmt or SMS_Serial.
@@ -152,6 +168,12 @@
 
 - Hardcoded '1's referring to decomposition elements should be looked up from
   env.
+
+- Since "Leading zeros are not significant in distinguishing between statement
+  labels", leading zeros should be stripped when using strigified label nodes
+  as keys in hashes.
+
+- Consider R1213 alt-return-spec in re: branching into / out of serial region.
 
 ### TREE
 

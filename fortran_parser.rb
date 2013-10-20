@@ -14385,6 +14385,13 @@ module Fortran
     r0
   end
 
+  module Format0
+    def label
+      elements[0]
+    end
+
+  end
+
   def _nt_format
     start_index = index
     if node_cache[:format].has_key?(index)
@@ -14401,17 +14408,36 @@ module Fortran
     if r1
       r0 = r1
     else
-      r2 = _nt_label
+      i2, s2 = index, []
+      r3 = _nt_label
+      s2 << r3
+      if r3
+        if has_terminal?("", false, index)
+          r4 = instantiate_node(SyntaxNode,input, index...(index + 0))
+          @index += 0
+        else
+          terminal_parse_failure("")
+          r4 = nil
+        end
+        s2 << r4
+      end
+      if s2.last
+        r2 = instantiate_node(Format_Label,input, i2...index, s2)
+        r2.extend(Format0)
+      else
+        @index = i2
+        r2 = nil
+      end
       if r2
         r0 = r2
       else
-        r3 = _nt_t_star
-        if r3
-          r0 = r3
+        r5 = _nt_t_star
+        if r5
+          r0 = r5
         else
-          r4 = _nt_scalar_default_int_variable
-          if r4
-            r0 = r4
+          r6 = _nt_scalar_default_int_variable
+          if r6
+            r0 = r6
           else
             @index = i0
             r0 = nil
@@ -20521,6 +20547,9 @@ module Fortran
     r0
   end
 
+  module Label0
+  end
+
   def _nt_label
     start_index = index
     if node_cache[:label].has_key?(index)
@@ -20532,23 +20561,43 @@ module Fortran
       return cached
     end
 
-    s0, i0 = [], index
+    i0, s0 = index, []
+    s1, i1 = [], index
     loop do
-      r1 = _nt_t_digit
-      if r1
-        s0 << r1
+      r2 = _nt_t_digit
+      if r2
+        s1 << r2
       else
         break
       end
-      if s0.size == 5
+      if s1.size == 5
         break
       end
     end
-    if s0.size < 1
+    if s1.size < 1
+      @index = i1
+      r1 = nil
+    else
+      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+    end
+    s0 << r1
+    if r1
+      i3 = index
+      r4 = lambda { |e| sp_label(e[0]) }.call(s0)
+      if r4
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r3 = nil
+      end
+      s0 << r3
+    end
+    if s0.last
+      r0 = instantiate_node(Label,input, i0...index, s0)
+      r0.extend(Label0)
+    else
       @index = i0
       r0 = nil
-    else
-      r0 = instantiate_node(Label,input, i0...index, s0)
     end
 
     node_cache[:label][start_index] = r0

@@ -660,9 +660,6 @@ module Fortran
 
   end
 
-  class Goto_Stmt < StmtJ
-  end
-
   class If_Stmt < T
 
     def translate
@@ -840,17 +837,24 @@ module Fortran
 
   class Label < T
 
-    def assignments
+    def assigns
+      # An array of integer variable names (Strings) assigned to this label.
       return [] unless (am=env[:static].assign_map)
       am["#{self}"]
     end
 
     def assigned_goto_targets
+      # An array of instances of integer variable nodes representing (due to
+      # assign statements) branches to this label. The nodes are *syntactically*
+      # identical, but belong to distinct statements.
       return [] unless (agt=env[:static].assigned_goto_targets||={})
       agt
     end
 
     def branch_targets
+      # An array of instances of label nodes representing branches to this
+      # label. The nodes are *syntactically* identical, but belong to distinct
+      # statements.
       return [] unless (bt=env[:static].branch_targets)
       bt["#{self}"]
     end
@@ -860,31 +864,36 @@ module Fortran
     end
 
     def translate
-      f=false
-      if stmt_label? and (my_serial_region=ancestor(SMS_Serial))
-        if (bt=branch_targets)
-          bt.each do |label|
-            unless label.ancestor(SMS_Serial)==my_serial_region
-              f=true
-              break
+      # TODO try begin/throw/rescue here
+      if (my_serial_region=ancestor(SMS_Serial))
+        err=false
+        if stmt_label?
+          if (bt=branch_targets)
+            bt.each do |label|
+              unless label.ancestor(SMS_Serial)==my_serial_region
+                err=true
+                break
+              end
             end
           end
-        end
-        if (agt=assigned_goto_targets)
-          assignments.each do |var|
-            if (targets=agt[var])
-              targets.each do |target|
-                unless target.ancestor(SMS_Serial)==my_serial_region
-                  f=true
-                  break
+          if not err and (agt=assigned_goto_targets)
+            assigns.each do |var|
+              if (targets=agt[var])
+                targets.each do |target|
+                  unless target.ancestor(SMS_Serial)==my_serial_region
+                    err=true
+                    break
+                  end
                 end
               end
             end
           end
+          if err
+            fail "ERROR: Branch to statement labeled '#{self}' from outside serial region"
+          end
+#       elsif not inside?(Format_Label)
+#         fail "ERROR: Branch out of serial region not permitted"
         end
-      end
-      if f
-        fail "ERROR: Branch to statement labeled '#{self}' from outside serial region"
       end
     end
 

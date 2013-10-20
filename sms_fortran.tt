@@ -51,12 +51,6 @@ grammar Fortran
     implicit_part_stmt+ <E>
   end
 
-  rule label
-    # F90:R313
-
-    t_digit 1..5 &{ |e| sp_label(e) } <Label>
-  end
-
   rule sms_barrier
     sms_sentinel sms_t_barrier t_newline <SMS_Barrier>
   end

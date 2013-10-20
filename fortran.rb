@@ -273,7 +273,7 @@ module Fortran
   end
 
   def sp_label(label)
-    n=label[0].e.reduce("") { |m,x| m+"#{x}" }.to_i
+    n=label.e.reduce("") { |m,x| m+"#{x}" }.to_i
     (env[:static].labels||=Set.new).add(n)
     true
   end
@@ -2259,6 +2259,9 @@ module Fortran
 
   end
 
+  class Format_Label < E
+  end
+
   class Function_Name < E
 
     def name
@@ -2407,6 +2410,9 @@ module Fortran
       "#{e[2]}"
     end
 
+  end
+
+  class Goto_Stmt < StmtJ
   end
 
   class If_Construct < E
