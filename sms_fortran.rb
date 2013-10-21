@@ -835,7 +835,7 @@ module Fortran
 
   end
 
-  class Label_Stmt < T
+  class Label_Stmt < Label
 
     def errmsg(in_serial_region)
       io=(in_serial_region)?("out"):("in")

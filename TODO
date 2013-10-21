@@ -60,6 +60,9 @@
   would be better to do this once -- maybe as a post-translation walk that calls
   write_envfile for each module encountered.
 
+- Memoize to_s? Some of these are called many times for hash keys and so. Should
+  be no need to compute string version more than once, right?
+
 ### PARSING
 
 - Deduce types of implicit variables.
@@ -120,10 +123,6 @@
 - varprop -> varenv?
 
 ### TRANSLATION
-
-* Since "Leading zeros are not significant in distinguishing between statement
-  labels", leading zeros should be stripped when using strigified label nodes
-  as keys in hashes.
 
 * 'assign' targets and labels are unique per scoping unit, so neither belongs in
   evn[:static]. Also, these must not be inherited by subscopes, so must be

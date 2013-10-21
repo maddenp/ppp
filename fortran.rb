@@ -2733,15 +2733,20 @@ module Fortran
   end
 
   class Label < T
+
+    def to_s
+      text_value.to_i.to_s
+    end
+
   end
 
-  class Label_Assign < T
+  class Label_Assign < Label
   end
 
-  class Label_Branch < T
+  class Label_Branch < Label
   end
 
-  class Label_Format < T
+  class Label_Format < Label
   end
 
   class Label_Do_Stmt < T
@@ -2778,7 +2783,7 @@ module Fortran
 
   end
 
-  class Label_Stmt < T
+  class Label_Stmt < Label
   end
 
   class Letter_Spec_List < T
