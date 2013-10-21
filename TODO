@@ -49,7 +49,8 @@
   searching up the tree for it in translate() contexts? IIRC, the value now
   is simply 'true', but a reference to the node might be more useful. See e.g.
   ancestor(SMS_Serial) in Label#translate: env[:sms_serial] could return the
-  same object.
+  same object. NO, BECAUSE THE SERIAL-REGION NODE DOES NOT YET EXIST WHEN THE
+  PARSER SETS env[:sms_serial].
 
 * Time ppp on fim routines, find long ones, profile, optimize
 
