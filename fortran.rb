@@ -2259,9 +2259,6 @@ module Fortran
 
   end
 
-  class Format_Label < E
-  end
-
   class Function_Name < E
 
     def name
@@ -2731,6 +2728,15 @@ module Fortran
   class Label < T
   end
 
+  class Label_Assign < T
+  end
+
+  class Label_Branch < T
+  end
+
+  class Label_Format < T
+  end
+
   class Label_Do_Stmt < T
 
     def label
@@ -2763,6 +2769,9 @@ module Fortran
       e[1]
     end
 
+  end
+
+  class Label_Stmt < T
   end
 
   class Letter_Spec_List < T
@@ -3213,6 +3222,9 @@ module Fortran
 			list_to_s
 		end
 
+  end
+
+  class Position_Spec_List_Pair < E
   end
 
   class Power_Op < T

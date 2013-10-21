@@ -835,12 +835,12 @@ module Fortran
 
   end
 
-  class Label < T
+  class Label_Stmt < T
 
     def assigns
       # An array of integer variable names (Strings) assigned to this label.
-      return [] unless (am=env[:static].assign_map)
-      am["#{self}"]
+      return Set.new unless (am=env[:static].assign_map) and (a=am["#{self}"])
+      a
     end
 
     def assigned_goto_targets
@@ -859,40 +859,24 @@ module Fortran
       bt["#{self}"]
     end
 
-    def stmt_label?
-      parent.e[0]==self
+    def errmsg
+      "ERROR: Branch to statement labeled '#{self}' from outside serial region"
     end
 
     def translate
-      # TODO try begin/throw/rescue here
-      if (my_serial_region=ancestor(SMS_Serial))
-        err=false
-        if stmt_label?
-          if (bt=branch_targets)
-            bt.each do |label|
-              unless label.ancestor(SMS_Serial)==my_serial_region
-                err=true
-                break
-              end
+      return unless (my_serial_region=ancestor(SMS_Serial))
+      # Handle branches via numeric labels.
+      branch_targets.each do |label|
+        fail errmsg unless label.ancestor(SMS_Serial)==my_serial_region
+      end
+      # Handle branches via assigned goto statements.
+      if (agt=assigned_goto_targets)
+        assigns.each do |var|
+          if (targets=agt[var])
+            targets.each do |target|
+              fail errmsg unless target.ancestor(SMS_Serial)==my_serial_region
             end
           end
-          if not err and (agt=assigned_goto_targets)
-            assigns.each do |var|
-              if (targets=agt[var])
-                targets.each do |target|
-                  unless target.ancestor(SMS_Serial)==my_serial_region
-                    err=true
-                    break
-                  end
-                end
-              end
-            end
-          end
-          if err
-            fail "ERROR: Branch to statement labeled '#{self}' from outside serial region"
-          end
-#       elsif not inside?(Format_Label)
-#         fail "ERROR: Branch out of serial region not permitted"
         end
       end
     end

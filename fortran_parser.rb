@@ -475,7 +475,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -1107,7 +1107,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -1623,7 +1623,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -1843,7 +1843,7 @@ module Fortran
       elements[0]
     end
 
-    def label
+    def label_branch
       elements[1]
     end
   end
@@ -1863,7 +1863,7 @@ module Fortran
     r1 = _nt_t_star
     s0 << r1
     if r1
-      r2 = _nt_label
+      r2 = _nt_label_branch
       s0 << r2
     end
     if s0.last
@@ -1880,7 +1880,7 @@ module Fortran
   end
 
   module ArithmeticIfStmt0
-    def label1
+    def label
       elements[0]
     end
 
@@ -1900,7 +1900,7 @@ module Fortran
       elements[4]
     end
 
-    def label2
+    def label_branch1
       elements[5]
     end
 
@@ -1908,7 +1908,7 @@ module Fortran
       elements[6]
     end
 
-    def label3
+    def label_branch2
       elements[7]
     end
 
@@ -1916,7 +1916,7 @@ module Fortran
       elements[8]
     end
 
-    def label4
+    def label_branch3
       elements[9]
     end
 
@@ -1938,7 +1938,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -1958,19 +1958,19 @@ module Fortran
             r6 = _nt_t_paren_r
             s0 << r6
             if r6
-              r7 = _nt_label
+              r7 = _nt_label_branch
               s0 << r7
               if r7
                 r8 = _nt_t_comma
                 s0 << r8
                 if r8
-                  r9 = _nt_label
+                  r9 = _nt_label_branch
                   s0 << r9
                   if r9
                     r10 = _nt_t_comma
                     s0 << r10
                     if r10
-                      r11 = _nt_label
+                      r11 = _nt_label_branch
                       s0 << r11
                       if r11
                         r12 = _nt_t_newline
@@ -2598,7 +2598,7 @@ module Fortran
   end
 
   module AssignStmt0
-    def label1
+    def label
       elements[0]
     end
 
@@ -2606,7 +2606,7 @@ module Fortran
       elements[1]
     end
 
-    def label2
+    def label_assign
       elements[2]
     end
 
@@ -2636,7 +2636,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -2647,7 +2647,7 @@ module Fortran
       r3 = _nt_t_assign
       s0 << r3
       if r3
-        r4 = _nt_label
+        r4 = _nt_label_assign
         s0 << r4
         if r4
           r5 = _nt_t_to
@@ -2718,7 +2718,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -2871,7 +2871,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -3561,7 +3561,7 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
-    r3 = _nt_label
+    r3 = _nt_label_stmt
     if r3
       r2 = r3
     else
@@ -3599,7 +3599,7 @@ module Fortran
       r0 = r1
     else
       i9, s9 = index, []
-      r11 = _nt_label
+      r11 = _nt_label_stmt
       if r11
         r10 = r11
       else
@@ -3957,7 +3957,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -4134,7 +4134,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -4453,7 +4453,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -5766,7 +5766,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -6181,7 +6181,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -6714,7 +6714,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -6949,7 +6949,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -7630,7 +7630,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -7684,7 +7684,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -7839,7 +7839,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -8722,7 +8722,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -9280,7 +9280,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -9953,7 +9953,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -10122,7 +10122,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -11261,7 +11261,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -11375,7 +11375,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -11479,7 +11479,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -11584,7 +11584,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -11677,7 +11677,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -11731,7 +11731,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -11837,7 +11837,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -11900,7 +11900,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -11967,7 +11967,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -12077,7 +12077,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -12137,7 +12137,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -12284,7 +12284,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -12351,7 +12351,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -12461,7 +12461,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -12528,7 +12528,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -12613,7 +12613,7 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
-    r3 = _nt_label
+    r3 = _nt_label_stmt
     if r3
       r2 = r3
     else
@@ -12651,7 +12651,7 @@ module Fortran
       r0 = r1
     else
       i9, s9 = index, []
-      r11 = _nt_label
+      r11 = _nt_label_stmt
       if r11
         r10 = r11
       else
@@ -13020,7 +13020,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -13420,7 +13420,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -13727,7 +13727,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -14251,7 +14251,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -14385,13 +14385,6 @@ module Fortran
     r0
   end
 
-  module Format0
-    def label
-      elements[0]
-    end
-
-  end
-
   def _nt_format
     start_index = index
     if node_cache[:format].has_key?(index)
@@ -14408,36 +14401,17 @@ module Fortran
     if r1
       r0 = r1
     else
-      i2, s2 = index, []
-      r3 = _nt_label
-      s2 << r3
-      if r3
-        if has_terminal?("", false, index)
-          r4 = instantiate_node(SyntaxNode,input, index...(index + 0))
-          @index += 0
-        else
-          terminal_parse_failure("")
-          r4 = nil
-        end
-        s2 << r4
-      end
-      if s2.last
-        r2 = instantiate_node(Format_Label,input, i2...index, s2)
-        r2.extend(Format0)
-      else
-        @index = i2
-        r2 = nil
-      end
+      r2 = _nt_label_format
       if r2
         r0 = r2
       else
-        r5 = _nt_t_star
-        if r5
-          r0 = r5
+        r3 = _nt_t_star
+        if r3
+          r0 = r3
         else
-          r6 = _nt_scalar_default_int_variable
-          if r6
-            r0 = r6
+          r4 = _nt_scalar_default_int_variable
+          if r4
+            r0 = r4
           else
             @index = i0
             r0 = nil
@@ -14664,7 +14638,7 @@ module Fortran
   end
 
   module FormatStmt0
-    def label
+    def label_format
       elements[0]
     end
 
@@ -14693,7 +14667,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r1 = _nt_label
+    r1 = _nt_label_format
     s0 << r1
     if r1
       r2 = _nt_t_format
@@ -14945,7 +14919,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -15310,7 +15284,7 @@ module Fortran
   end
 
   module GotoStmt0
-    def label1
+    def label
       elements[0]
     end
 
@@ -15318,7 +15292,7 @@ module Fortran
       elements[1]
     end
 
-    def label2
+    def label_branch
       elements[2]
     end
 
@@ -15340,7 +15314,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -15351,7 +15325,7 @@ module Fortran
       r3 = _nt_t_goto
       s0 << r3
       if r3
-        r4 = _nt_label
+        r4 = _nt_label_branch
         s0 << r4
         if r4
           r5 = _nt_t_newline
@@ -15884,7 +15858,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -16007,7 +15981,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -16407,7 +16381,7 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
-    r3 = _nt_label
+    r3 = _nt_label_stmt
     if r3
       r2 = r3
     else
@@ -16437,7 +16411,7 @@ module Fortran
       r0 = r1
     else
       i7, s7 = index, []
-      r9 = _nt_label
+      r9 = _nt_label_stmt
       if r9
         r8 = r9
       else
@@ -17134,7 +17108,7 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
-    r3 = _nt_label
+    r3 = _nt_label_stmt
     if r3
       r2 = r3
     else
@@ -17172,7 +17146,7 @@ module Fortran
       r0 = r1
     else
       i9, s9 = index, []
-      r11 = _nt_label
+      r11 = _nt_label_stmt
       if r11
         r10 = r11
       else
@@ -17429,7 +17403,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -17697,7 +17671,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -18103,7 +18077,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -19095,7 +19069,7 @@ module Fortran
       elements[1]
     end
 
-    def label
+    def label_branch
       elements[2]
     end
 
@@ -19119,7 +19093,7 @@ module Fortran
       r2 = _nt_t_equal
       s0 << r2
       if r2
-        r3 = _nt_label
+        r3 = _nt_label_branch
         s0 << r3
         if r3
           i4 = index
@@ -19156,7 +19130,7 @@ module Fortran
       elements[1]
     end
 
-    def label
+    def label_branch
       elements[2]
     end
 
@@ -19180,7 +19154,7 @@ module Fortran
       r2 = _nt_t_equal
       s0 << r2
       if r2
-        r3 = _nt_label
+        r3 = _nt_label_branch
         s0 << r3
         if r3
           i4 = index
@@ -19217,7 +19191,7 @@ module Fortran
       elements[1]
     end
 
-    def label
+    def label_branch
       elements[2]
     end
 
@@ -19241,7 +19215,7 @@ module Fortran
       r2 = _nt_t_equal
       s0 << r2
       if r2
-        r3 = _nt_label
+        r3 = _nt_label_branch
         s0 << r3
         if r3
           i4 = index
@@ -20605,6 +20579,94 @@ module Fortran
     r0
   end
 
+  module LabelAssign0
+    def label
+      elements[0]
+    end
+
+  end
+
+  def _nt_label_assign
+    start_index = index
+    if node_cache[:label_assign].has_key?(index)
+      cached = node_cache[:label_assign][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_label
+    s0 << r1
+    if r1
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
+      else
+        terminal_parse_failure("")
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Label_Assign,input, i0...index, s0)
+      r0.extend(LabelAssign0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:label_assign][start_index] = r0
+
+    r0
+  end
+
+  module LabelBranch0
+    def label
+      elements[0]
+    end
+
+  end
+
+  def _nt_label_branch
+    start_index = index
+    if node_cache[:label_branch].has_key?(index)
+      cached = node_cache[:label_branch][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_label
+    s0 << r1
+    if r1
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
+      else
+        terminal_parse_failure("")
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Label_Branch,input, i0...index, s0)
+      r0.extend(LabelBranch0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:label_branch][start_index] = r0
+
+    r0
+  end
+
   module LabelDoStmt0
     def label1
       elements[0]
@@ -20636,7 +20698,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -20697,8 +20759,52 @@ module Fortran
     r0
   end
 
-  module LabelList0
+  module LabelFormat0
     def label
+      elements[0]
+    end
+
+  end
+
+  def _nt_label_format
+    start_index = index
+    if node_cache[:label_format].has_key?(index)
+      cached = node_cache[:label_format][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_label
+    s0 << r1
+    if r1
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
+      else
+        terminal_parse_failure("")
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Label_Format,input, i0...index, s0)
+      r0.extend(LabelFormat0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:label_format][start_index] = r0
+
+    r0
+  end
+
+  module LabelList0
+    def label_branch
       elements[0]
     end
 
@@ -20716,7 +20822,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r1 = _nt_label
+    r1 = _nt_label_branch
     s0 << r1
     if r1
       s2, i2 = [], index
@@ -20760,7 +20866,7 @@ module Fortran
       elements[0]
     end
 
-    def label
+    def label_branch
       elements[1]
     end
   end
@@ -20780,7 +20886,7 @@ module Fortran
     r1 = _nt_t_comma
     s0 << r1
     if r1
-      r2 = _nt_label
+      r2 = _nt_label_branch
       s0 << r2
     end
     if s0.last
@@ -20792,6 +20898,50 @@ module Fortran
     end
 
     node_cache[:label_list_pair][start_index] = r0
+
+    r0
+  end
+
+  module LabelStmt0
+    def label
+      elements[0]
+    end
+
+  end
+
+  def _nt_label_stmt
+    start_index = index
+    if node_cache[:label_stmt].has_key?(index)
+      cached = node_cache[:label_stmt][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_label
+    s0 << r1
+    if r1
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
+      else
+        terminal_parse_failure("")
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Label_Stmt,input, i0...index, s0)
+      r0.extend(LabelStmt0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:label_stmt][start_index] = r0
 
     r0
   end
@@ -22201,7 +22351,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -22295,7 +22445,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -23068,7 +23218,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -23199,7 +23349,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -23367,7 +23517,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -23955,7 +24105,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -24026,7 +24176,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -24308,7 +24458,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -24856,7 +25006,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -24927,7 +25077,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -25094,7 +25244,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -25308,34 +25458,6 @@ module Fortran
     end
   end
 
-  module PositionSpec2
-    def t_iostat
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_default_int_variable
-      elements[2]
-    end
-  end
-
-  module PositionSpec3
-    def t_err
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def label
-      elements[2]
-    end
-  end
-
   def _nt_position_spec
     start_index = index
     if node_cache[:position_spec].has_key?(index)
@@ -25393,47 +25515,13 @@ module Fortran
       if r5
         r0 = r5
       else
-        i9, s9 = index, []
-        r10 = _nt_t_iostat
-        s9 << r10
-        if r10
-          r11 = _nt_t_equal
-          s9 << r11
-          if r11
-            r12 = _nt_scalar_default_int_variable
-            s9 << r12
-          end
-        end
-        if s9.last
-          r9 = instantiate_node(T,input, i9...index, s9)
-          r9.extend(PositionSpec2)
-        else
-          @index = i9
-          r9 = nil
-        end
+        r9 = _nt_io_spec_iostat
         if r9
           r0 = r9
         else
-          i13, s13 = index, []
-          r14 = _nt_t_err
-          s13 << r14
-          if r14
-            r15 = _nt_t_equal
-            s13 << r15
-            if r15
-              r16 = _nt_label
-              s13 << r16
-            end
-          end
-          if s13.last
-            r13 = instantiate_node(SyntaxNode,input, i13...index, s13)
-            r13.extend(PositionSpec3)
-          else
-            @index = i13
-            r13 = nil
-          end
-          if r13
-            r0 = r13
+          r10 = _nt_io_spec_err
+          if r10
+            r0 = r10
           else
             @index = i0
             r0 = nil
@@ -25448,16 +25536,6 @@ module Fortran
   end
 
   module PositionSpecList0
-    def t_comma
-      elements[0]
-    end
-
-    def position_spec
-      elements[1]
-    end
-  end
-
-  module PositionSpecList1
     def position_spec
       elements[0]
     end
@@ -25481,20 +25559,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_position_spec
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(PositionSpecList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_position_spec_list_pair
         if r3
           s2 << r3
         else
@@ -25506,13 +25571,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Position_Spec_List,input, i0...index, s0)
-      r0.extend(PositionSpecList1)
+      r0.extend(PositionSpecList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:position_spec_list][start_index] = r0
+
+    r0
+  end
+
+  module PositionSpecListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def position_spec
+      elements[1]
+    end
+  end
+
+  def _nt_position_spec_list_pair
+    start_index = index
+    if node_cache[:position_spec_list_pair].has_key?(index)
+      cached = node_cache[:position_spec_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_position_spec
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Position_Spec_List_Pair,input, i0...index, s0)
+      r0.extend(PositionSpecListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:position_spec_list_pair][start_index] = r0
 
     r0
   end
@@ -25667,7 +25773,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -25771,7 +25877,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -26027,7 +26133,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -26280,7 +26386,7 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
-    r3 = _nt_label
+    r3 = _nt_label_stmt
     if r3
       r2 = r3
     else
@@ -26327,7 +26433,7 @@ module Fortran
       r0 = r1
     else
       i11, s11 = index, []
-      r13 = _nt_label
+      r13 = _nt_label_stmt
       if r13
         r12 = r13
       else
@@ -27250,7 +27356,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -27344,7 +27450,7 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
-    r3 = _nt_label
+    r3 = _nt_label_stmt
     if r3
       r2 = r3
     else
@@ -27382,7 +27488,7 @@ module Fortran
       r0 = r1
     else
       i9, s9 = index, []
-      r11 = _nt_label
+      r11 = _nt_label_stmt
       if r11
         r10 = r11
       else
@@ -27448,7 +27554,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -28274,7 +28380,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -29029,7 +29135,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -29155,7 +29261,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -29427,7 +29533,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -34004,7 +34110,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -34087,7 +34193,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -34914,7 +35020,7 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
-    r3 = _nt_label
+    r3 = _nt_label_stmt
     if r3
       r2 = r3
     else
@@ -34964,7 +35070,7 @@ module Fortran
       r0 = r1
     else
       i11, s11 = index, []
-      r13 = _nt_label
+      r13 = _nt_label_stmt
       if r13
         r12 = r13
       else
@@ -35281,7 +35387,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -35359,7 +35465,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
@@ -35448,7 +35554,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r2 = _nt_label
+    r2 = _nt_label_stmt
     if r2
       r1 = r2
     else
