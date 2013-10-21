@@ -837,44 +837,27 @@ module Fortran
 
   class Label_Stmt < T
 
-    def assigns
-      # An array of integer variable names (Strings) assigned to this label.
-      return Set.new unless (am=env[:static].assign_map) and (a=am["#{self}"])
-      a
-    end
-
-    def assigned_goto_targets
-      # An array of instances of integer variable nodes representing (due to
-      # assign statements) branches to this label. The nodes are *syntactically*
-      # identical, but belong to distinct statements.
-      return [] unless (agt=env[:static].assigned_goto_targets||={})
-      agt
-    end
-
-    def branch_targets
-      # An array of instances of label nodes representing branches to this
-      # label. The nodes are *syntactically* identical, but belong to distinct
-      # statements.
-      return [] unless (bt=env[:static].branch_targets)
-      bt["#{self}"]
-    end
-
-    def errmsg
-      "ERROR: Branch to statement labeled '#{self}' from outside serial region"
+    def errmsg(in_serial_region)
+      io=(in_serial_region)?("out"):("in")
+      "ERROR: Branch to statement labeled '#{self}' from #{io}side serial region"
     end
 
     def translate
-      return unless (my_serial_region=ancestor(SMS_Serial))
+      my_serial_region=ancestor(SMS_Serial)
       # Handle branches via numeric labels.
-      branch_targets.each do |label|
-        fail errmsg unless label.ancestor(SMS_Serial)==my_serial_region
+      ((env[:static].branch_targets||{})["#{self}"]||[]).each do |label|
+        unless label.ancestor(SMS_Serial)==my_serial_region
+          fail errmsg(my_serial_region)
+        end
       end
       # Handle branches via assigned goto statements.
-      if (agt=assigned_goto_targets)
-        assigns.each do |var|
+      if (agt=env[:static].assigned_goto_targets)
+        ((env[:static].assign_map||{})["#{self}"]||[]).each do |var|
           if (targets=agt[var])
             targets.each do |target|
-              fail errmsg unless target.ancestor(SMS_Serial)==my_serial_region
+              unless target.ancestor(SMS_Serial)==my_serial_region
+                fail errmsg(my_serial_region)
+              end
             end
           end
         end

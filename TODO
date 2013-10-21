@@ -138,6 +138,14 @@
   removed before deepcopy (or whatever mechanism takes its place). Or, store
   scoping-unit info, e.g.: env[:assign_map][scoping_unit][#{label}]=...
 
+* Must handle assigned goto out of serial region.
+
+* Since "Leading zeros are not significant in distinguishing between statement
+  labels", leading zeros should be stripped when using strigified label nodes
+  as keys in hashes.
+
+* Consider R1213 alt-return-spec in re: branching into / out of serial region.
+
 * In SMS_Reduce#translate, build out case statement for the other supported
   nnt_* types. BUT, maybe we should be querying MPI for this information in the
   SMS library (see e.g. bugzilla bug #21).
@@ -148,7 +156,9 @@
   BUT see bugzilla bug #21 re: SMS querying MPI for this information so that
   user-defined kinds can be transparently supported.
 
-- Must handle assigned goto out of serial region.
+* Reduce methods on class Label_Stmt or move into class Label (and update
+  inheritance on classes Label_Branch et al) depending on which ones turn out to
+  be useful elsewhere.
 
 - Does sms_gather() really need all 7 dims (see e.g. gather rollout in
   Write_Stmt or SMS_Serial.
@@ -168,12 +178,6 @@
 
 - Hardcoded '1's referring to decomposition elements should be looked up from
   env.
-
-- Since "Leading zeros are not significant in distinguishing between statement
-  labels", leading zeros should be stripped when using strigified label nodes
-  as keys in hashes.
-
-- Consider R1213 alt-return-spec in re: branching into / out of serial region.
 
 ### TREE
 
