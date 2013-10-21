@@ -11,7 +11,7 @@ module Fortran
   include Common
 
   def add_branch_target(label)
-    branch_targets=(env[:static].branch_targets||={})
+    branch_targets=(env[:branch_targets]||={})
     label_array=(branch_targets["#{label}"]||=[])
     label_array.push(label)
   end
@@ -20,19 +20,36 @@ module Fortran
     @envstack.last
   end
 
-  def envpop
+  def envpop(scope_change=true)
     oldenv=@envstack.pop
     @envstack.push({}) if @envstack.empty?
     env[:static]=oldenv[:static]
+    unless scope_change
+      env_scope_items.each { |k| env[k]=oldenv[k] }
+    end
     oldenv
   end
 
-  def envpush
-    static=env.delete(:static)
+  def envpush(scope_change=true)
+    keep={}
+    keep[:static]=env.delete(:static)
+    env_scope_items.each do |k|
+      if (v=env.delete(k))
+        keep[k]=v unless scope_change
+      end
+    end
     @envstack.push(deepcopy(env))
-    env[:static]=static
+    keep.each { |k,v| env[k]=v }
     @redefs={}
     nil
+  end
+
+  def env_scope_items
+    [
+      :assign_map,
+      :assigned_goto_targets,
+      :branch_targets
+    ]
   end
 
   def modenv(m)
@@ -114,14 +131,14 @@ module Fortran
   end
 
   def sp_assign_stmt(label,scalar_int_variable)
-    assign_map=(env[:static].assign_map||={})
+    assign_map=(env[:assign_map]||={})
     var_array=(assign_map["#{label}"]||=Set.new)
     var_array.add("#{scalar_int_variable}")
     true
   end
 
   def sp_assigned_goto_stmt(scalar_int_variable)
-    assigned_goto_targets=(env[:static].assigned_goto_targets||={})
+    assigned_goto_targets=(env[:assigned_goto_targets]||={})
     var_array=(assigned_goto_targets["#{scalar_int_variable}"]||=[])
     var_array.push(scalar_int_variable)
     true

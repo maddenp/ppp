@@ -25,14 +25,14 @@ module Fortran
   end
 
   def sp_sms_halo_comp
-    envpop
+    envpop(false)
     true
   end
 
   def sp_sms_halo_comp_begin(halo_comp_pairs)
     fail "ERROR: Halo computation invalid outside parallel region" unless env[:sms_parallel]
     fail "ERROR: Already inside halo-computation region" if env[:sms_halo_comp]
-    envpush
+    envpush(false)
     dims={}
     dims[1]=halo_comp_pairs.e[0]
     dims[2]=halo_comp_pairs.e[1].e[1] if halo_comp_pairs.e[1].e
@@ -48,13 +48,13 @@ module Fortran
   end
 
   def sp_sms_ignore
-    envpop
+    envpop(false)
     true
   end
 
   def sp_sms_ignore_begin
     fail "ERROR: Already inside ignore region" if sms_ignore
-    envpush
+    envpush(false)
     env[:sms_ignore]=true
     true
   end
@@ -65,13 +65,13 @@ module Fortran
   end
 
   def sp_sms_parallel
-    envpop
+    envpop(false)
     true
   end
 
   def sp_sms_parallel_begin(sms_decomp_name,sms_parallel_var_lists)
     fail "ERROR: Already inside parallel region" if env[:sms_parallel]
-    envpush
+    envpush(false)
     env[:sms_parallel]=OpenStruct.new({:decomp=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
     true
   end
@@ -82,13 +82,13 @@ module Fortran
   end
 
   def sp_sms_serial
-    envpop
+    envpop(false)
     true
   end
 
   def sp_sms_serial_begin
     fail "ERROR: Already inside serial region" if sms_serial
-    envpush
+    envpush(false)
     env[:sms_serial]=true
     true
   end
@@ -99,13 +99,13 @@ module Fortran
   end
 
   def sp_sms_to_local
-    envpop
+    envpop(false)
     true
   end
 
   def sp_sms_to_local_begin(sms_decomp_name,sms_to_local_lists)
     fail "ERROR: Already inside to_local region" if env[:sms_to_local]
-    envpush
+    envpush(false)
     env[:sms_to_local]=sms_to_local_lists.vars.each do |var,props|
       props.dh="#{sms_decomp_name}"
     end
@@ -845,14 +845,14 @@ module Fortran
     def translate
       my_serial_region=ancestor(SMS_Serial)
       # Handle branches via numeric labels.
-      ((env[:static].branch_targets||{})["#{self}"]||[]).each do |label|
+      ((env[:branch_targets]||{})["#{self}"]||[]).each do |label|
         unless label.ancestor(SMS_Serial)==my_serial_region
           fail errmsg(my_serial_region)
         end
       end
       # Handle branches via assigned goto statements.
-      if (agt=env[:static].assigned_goto_targets)
-        ((env[:static].assign_map||{})["#{self}"]||[]).each do |var|
+      if (agt=env[:assigned_goto_targets])
+        ((env[:assign_map]||{})["#{self}"]||[]).each do |var|
           if (targets=agt[var])
             targets.each do |target|
               unless target.ancestor(SMS_Serial)==my_serial_region

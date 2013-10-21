@@ -124,11 +124,6 @@
 
 ### TRANSLATION
 
-* 'assign' targets and labels are unique per scoping unit, so neither belongs in
-  evn[:static]. Also, these must not be inherited by subscopes, so must be
-  removed before deepcopy (or whatever mechanism takes its place). Or, store
-  scoping-unit info, e.g.: env[:assign_map][scoping_unit][#{label}]=...
-
 * In SMS_Reduce#translate, build out case statement for the other supported
   nnt_* types. BUT, maybe we should be querying MPI for this information in the
   SMS library (see e.g. bugzilla bug #21).
