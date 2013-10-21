@@ -221,7 +221,7 @@ grammar Fortran
   rule alt_return_spec
     # F90:R1214
 
-    t_star label_branch <T>
+    t_star label_branch &{ |e| sp_alt_return_spec(e[1]) } <Alt_Return_Spec>
   end
 
   rule arithmetic_if_stmt

@@ -1846,6 +1846,7 @@ module Fortran
     def label_branch
       elements[1]
     end
+
   end
 
   def _nt_alt_return_spec
@@ -1865,9 +1866,20 @@ module Fortran
     if r1
       r2 = _nt_label_branch
       s0 << r2
+      if r2
+        i3 = index
+        r4 = lambda { |e| sp_alt_return_spec(e[1]) }.call(s0)
+        if r4
+          @index = i3
+          r3 = instantiate_node(SyntaxNode,input, index...index)
+        else
+          r3 = nil
+        end
+        s0 << r3
+      end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Alt_Return_Spec,input, i0...index, s0)
       r0.extend(AltReturnSpec0)
     else
       @index = i0

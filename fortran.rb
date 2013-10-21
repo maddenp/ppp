@@ -109,6 +109,10 @@ module Fortran
     true
   end
 
+  def sp_alt_return_spec(label)
+    add_branch_target(label)
+  end
+
   def sp_assign_stmt(label,scalar_int_variable)
     assign_map=(env[:static].assign_map||={})
     var_array=(assign_map["#{label}"]||=Set.new)
@@ -1283,6 +1287,9 @@ module Fortran
       list_to_s
     end
 
+  end
+
+  class Alt_Return_Spec < E
   end
 
   class Arithmetic_If_Stmt < T
