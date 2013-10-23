@@ -48,7 +48,8 @@
 * Time ppp on fim routines, find long ones, profile, optimize
 
 * Instead of deepcopy on env, chain hashes with ancestor lookup mechanism. This
-  may obsolete the redef mechanism -- be sure to clean that up if so.
+  may obsolete the redef mechanism -- be sure to clean that up if so. Is this
+  a performance issue?
 
 - read_stmt, write_stmt et al are not function calls, so we *do* know which of
   their arguments may be modified during a call (e.g. iostat's variable can,
@@ -123,16 +124,6 @@
 - varprop -> varenv?
 
 ### TRANSLATION
-
-* In SMS_Reduce#translate, build out case statement for the other supported
-  nnt_* types. BUT, maybe we should be querying MPI for this information in the
-  SMS library (see e.g. bugzilla bug #21).
-
-* Need SMS library function that takes type and kind arguemnts and returns the
-  correct nnt_ type to use in library calls. There's some hack in fimppp now to
-  remove a user-defined kind -- this needs to be undone and to work correctly.
-  BUT see bugzilla bug #21 re: SMS querying MPI for this information so that
-  user-defined kinds can be transparently supported.
 
 - Does sms_gather() really need all 7 dims (see e.g. gather rollout in
   Write_Stmt or SMS_Serial.

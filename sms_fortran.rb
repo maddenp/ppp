@@ -191,7 +191,7 @@ module Fortran
           end
           kind=varenv["kind"]
           code.push("if (#{iostat}.eq.0) then") if iostat
-          code.push(sms_bcast(var,sms_type(type,kind),sizes,dims))
+          code.push(sms_bcast(var,sms_type(var),sizes,dims))
           code.push(sms_chkstat)
           code.push("endif") if iostat
         end
@@ -214,7 +214,7 @@ module Fortran
         varenv=varenv_get(var)
         dh=varenv["decomp"]
         dims=varenv["dims"]
-        type=code_type(varenv,:array)
+        type=code_type(var,varenv,:array)
         gllbs=code_global_lower_bounds(varenv,var,dims)
         glubs=code_global_upper_bounds(varenv,var,dims)
         gstop=glubs
@@ -266,7 +266,7 @@ module Fortran
         varenv=varenv_get(var)
         dh=varenv["decomp"]
         dims=varenv["dims"]
-        type=code_type(varenv,:array)
+        type=code_type(var,varenv,:array)
         gllbs=code_global_lower_bounds(varenv,var,dims)
         glubs=code_global_upper_bounds(varenv,var,dims)
         gstop=glubs
@@ -300,13 +300,13 @@ module Fortran
       code
     end
 
-    def code_type(varenv,sort)
+    def code_type(var,varenv,sort)
       unless sort==:array or sort==:scalar
         fail "ERROR: sort must be :array or :scalar"
       end
       code=""
       code+="(/" if sort==:array
-      code+=sms_type(varenv["type"],varenv["kind"])
+      code+=sms_type(var)
       code+="/)" if sort==:array
       code
     end
@@ -500,23 +500,8 @@ module Fortran
       "call sms__stop('#{marker}',#{retcode},#{retvar})"
     end
 
-    def sms_type(type,kind)
-      kind=nil if kind=="_default"
-      case type
-      when "character"
-        return "sms__type_bytes"
-      when "complex"
-        return (kind)?("sms__type_c#{kind}"):("sms__type_complex")
-      when "doubleprecision"
-        return "sms__type_doubleprecision"
-      when "integer"
-        return (kind)?("sms__type_i#{kind}"):("sms__type_integer")
-      when "logical"
-        return (kind)?("sms__type_l#{kind}"):("sms__type_logical")
-      when "real"
-        return (kind)?("sms__type_r#{kind}"):("sms__type_real")
-      end
-      fail "ERROR: No SMS type defined for '#{type}#{kind}'"
+    def sms_type(var)
+      "sms__typeget(#{var})"
     end
 
   end # class T
@@ -825,7 +810,7 @@ module Fortran
         if (spec=send(x))
           var=spec.rhs
           varenv=varenv_get(var)
-          @spec_var_bcast.push(sms_bcast(var,sms_type(varenv["type"],varenv["kind"]),"(/1/)",1))
+          @spec_var_bcast.push(sms_bcast(var,sms_type(var),"(/1/)",1))
           @spec_var_bcast.push(sms_chkstat)
           @need_decompmod=true
           @iostat=var if x==:iostat
@@ -1076,7 +1061,7 @@ module Fortran
       varenv=varenv_get(var)
       dims=varenv["dims"]
       str="#{e[5]}"
-      type=code_type(varenv,:scalar)
+      type=code_type(var,varenv,:scalar)
       gllbs=code_global_lower_bounds(varenv,var,dims)
       glubs=code_global_upper_bounds(varenv,var,dims)
       perms=code_perms(varenv)
@@ -1336,7 +1321,7 @@ module Fortran
         ranks.each { |r| halol.push((r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)")) }
         ranks.each { |r| halou.push((r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)")) }
         ranks.each { |r| perms.push(decdim(varenv,r)||0) }
-        types.push(sms_type(varenv["type"],varenv["kind"]))
+        types.push(sms_type(var))
       end
       cornerdepth="(/#{cornerdepth.join(",")}/)"
       dectypes="(/#{dectypes.join(",")}/)"
@@ -1549,7 +1534,7 @@ module Fortran
         varenv=varenv_get(var)
         fail "ERROR: reduce inapplicable to distributed array '#{var}'" if varenv["decomp"]
         sizes.push((varenv["sort"]=="_array")?("size(#{var})"):("1"))
-        types.push(sms_type(varenv["type"],varenv["kind"]))
+        types.push(sms_type(var))
       end
       sizes="(/#{sizes.join(",")}/)"
       types="(/#{types.join(",")}/)"
