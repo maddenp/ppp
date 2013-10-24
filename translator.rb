@@ -173,30 +173,36 @@ class Translator
   end
 
   def normalize(s,conf)
+    safe=conf.safe # only true for internal parses
     np=XNormalizerParser.new
     np.update(Normfree)
     unless conf.fixed
       @m=Stringmap.new
-      d=Dehollerizer.new
-      s=d.process(@m,s,conf)            # mask holleriths (only if not already done in fixed2free)
+      unless safe
+        d=Dehollerizer.new
+        s=d.process(@m,s,conf)  # mask holleriths
+      end
     end
-    s=s.gsub(/\t/," ")                  # tabs to spaces
-    s=s.gsub(/^ +/,"")                  # remove leading whitespace
-    s=s.gsub(directive,'@\1')           # hide directives
-    s=s.gsub(/ +$/,"")                  # remove trailing whitespace
-    s=s.gsub(/^ *!.*$\n/,"")            # remove full-line comments
-    s=s.gsub(/^[ \t]*\n/,'')            # remove blank lines (continuation statement issue fix)
-    s=chkparse(fix_pt_norm(s,np,1,@m))  # string-aware transform
-    s=s.gsub(/& *\n *&?/,"")            # join continuation lines
-    s=chkparse(np.parse(s,2,@m).to_s)   # mask original strings
-    s=s.downcase                        # lower-case text only
-    s=s.gsub(/ +/,"")                   # remove spaces
-    s=restore_strings(s,@m)             # restore strings
-    s=s.sub(/^\n+/,"")                  # remove leading newlines
-    s=s+"\n" if s[-1]!="\n" and conf.nl # append final newline if required
-    s=s.chomp unless conf.nl            # remove final newline if forbidden
-    s=s.gsub(/^@(.*)/i,'!\1')           # show directives
-    s=s.gsub(/^ *\n/,"")                # remove blank lines
+    nq=(not s=~/['"]/)          # no quotes
+    unless safe
+      s=s.gsub(/\t/," ")        # tabs to spaces
+      s=s.gsub(/^ +/,"")        # remove leading whitespace
+      s=s.gsub(directive,'@\1') # hide directives
+      s=s.gsub(/ +$/,"")        # remove trailing whitespace
+      s=s.gsub(/^ *!.*$\n/,"")  # remove full-line comments
+      s=s.gsub(/^[ \t]*\n/,'')  # remove blank lines
+    end
+    s=chkparse(fix_pt_norm(s,np,1,@m)) unless safe and nq # string-aware xform
+    s=s.gsub(/& *\n *&?/,"") unless safe                  # join continuations
+    s=chkparse(np.parse(s,2,@m).to_s) unless safe and nq  # mask strings
+    s=s.downcase unless safe                              # lower-case text only
+    s=s.gsub(/ +/,"")                                     # remove spaces
+    s=restore_strings(s,@m) unless safe and nq            # restore strings
+    s=s.sub(/^\n+/,"") unless safe                        # rm leading newlines
+    s=s+"\n" if s[-1]!="\n" and conf.nl                   # add final newline?
+    s=s.chomp unless conf.nl                              # rm final newline?
+    s=s.gsub(/^@(.*)/i,'!\1')                             # show directives
+    s=s.gsub(/^ *\n/,"")                                  # remove blank lines
     s
   end
 
@@ -354,11 +360,13 @@ class Translator
     conf=ostruct_default_merge(conf)
     fp=XFortranParser.new(srcfile,conf.incdirs)
     s0=nil
-    while s!=s0 and not s.nil?                                     # Fixed point treatment of prepsrc() and assemble()
-      s0=s                                                         # for cases in which files added by 'include'
-      s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and conf.fixed # statements or '!sms$insert include' statements
-      s=prepsrc_free(s) if defined?(prepsrc_free)                  # also contain such a statement; this follows the path
-      s=assemble(s,[srcfile],conf.incdirs)                         # until all souce has been appropriately inserted
+    unless conf.safe # internal parse
+      while s!=s0 and not s.nil?                                     # Fixed point treatment of prepsrc() and assemble()
+        s0=s                                                         # for cases in which files added by 'include'
+        s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and conf.fixed # statements or '!sms$insert include' statements
+        s=prepsrc_free(s) if defined?(prepsrc_free)                  # also contain such a statement; this follows the path
+        s=assemble(s,[srcfile],conf.incdirs)                         # until all souce has been appropriately inserted
+      end
     end
     if conf.debug
       puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}"
@@ -368,7 +376,7 @@ class Translator
       s=fixed2free(s,conf)
       puts "#{s}\n\n" if conf.debug
     end
-    cppcheck(s) # When a continuation warning in fixed2free is shown, cppcheck will exit in die()
+    cppcheck(s) unless conf.safe # internal parse
     puts "NORMALIZED FORM\n" if conf.debug
     n=normalize(s,conf)
     puts "\n#{n}" if conf.debug or conf.normalize
@@ -376,9 +384,9 @@ class Translator
       env=(conf.env)?(conf.env):(nil)
       raw_tree=fp.parse(n,env,{:root=>root})
       exit if conf.modinfo
-      re=Regexp.new("^(.+?):in `([^\']*)'$")
-      srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
       unless raw_tree
+        re=Regexp.new("^(.+?):in `([^\']*)'$")
+        srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
         na=n.split("\n")
         na.each_index { |i| $stderr.puts "#{i+1} #{na[i]}" }
         failmsg=""
@@ -390,7 +398,7 @@ class Translator
         return # if in server mode and did not exit in die()
       end
       raw_tree.instance_variable_set(:@srcfile,srcfile)
-      raw_tree=raw_tree.post_top if raw_tree # post-process raw tree
+      raw_tree=raw_tree.post_top # post-process raw tree
       return [wrap(raw_tree.to_s),raw_tree,nil] unless conf.translate
       if conf.debug
         puts "\nRAW TREE\n\n"
@@ -409,7 +417,11 @@ class Translator
   end
 
   def raw(s,root,srcfile,conf={})
+    # Should only be called on code generated by ppp following conventions like:
+    # no holleriths, no comments, all lower case, etc. Review normalize() to see
+    # which transformations are done on code marked "safe".
     conf=ostruct_default_merge(conf)
+    conf.safe=true
     conf.translate=false
     translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
     fail "PARSE FAILED" unless raw_tree
