@@ -183,11 +183,13 @@ class Translator
         s=d.process(@m,s,conf)  # mask holleriths
       end
     end
-    nq=(not s=~/['"]/)          # no quotes
+    nq=(not s=~/['"]/)          # no quotes?
     unless safe
       s=s.gsub(/\t/," ")        # tabs to spaces
       s=s.gsub(/^ +/,"")        # remove leading whitespace
-      s=s.gsub(directive,'@\1') # hide directives
+    end
+    s=s.gsub(directive,'@\1')   # hide directives
+    unless safe
       s=s.gsub(/ +$/,"")        # remove trailing whitespace
       s=s.gsub(/^ *!.*$\n/,"")  # remove full-line comments
       s=s.gsub(/^[ \t]*\n/,'')  # remove blank lines
@@ -200,7 +202,7 @@ class Translator
     s=restore_strings(s,@m) unless safe and nq            # restore strings
     s=s.sub(/^\n+/,"") unless safe                        # rm leading newlines
     s=s+"\n" if s[-1]!="\n" and conf.nl                   # add final newline?
-    s=s.chomp unless conf.nl                              # rm final newline?
+    s=s.chomp unless conf.nl                              # del final newline?
     s=s.gsub(/^@(.*)/i,'!\1')                             # show directives
     s=s.gsub(/^ *\n/,"")                                  # remove blank lines
     s
