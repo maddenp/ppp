@@ -11,10 +11,11 @@ b=$(basename $p)
 
 tool=$(echo $b | sed 's/s$//')
 
-cruby="ruby"
-jruby="java -Djruby.compile.invokedynamic=true -Djruby.compile.mode=OFF -jar $d/jruby.jar"
+test -n "$SMS__JAVA" && java="$SMS__JAVA" || java="java"
+test -n "$SMS__RUBY" &&  mri="$SMS__RUBY" ||  mri="ruby"
+jruby="$java -Djruby.compile.invokedynamic=true -Djruby.compile.mode=OFF -jar $d/jruby.jar"
 
-engine="$cruby"
+engine="$mri" # mri or jruby
 
 # Command-line arguments
 

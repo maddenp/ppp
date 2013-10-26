@@ -1,5 +1,13 @@
-#!/usr/bin/env ruby
+#!/bin/bash
 
-$: << File.dirname($0)
-require "translator"
-Translator.new.go($0,ARGV)
+p=$(readlink $0) || p=$0
+d=$(dirname  $p)
+b=$(basename $p)
+
+test -n "$SMS__JAVA" && java="$SMS__JAVA" || java="java"
+test -n "$SMS__RUBY" &&  mri="$SMS__RUBY" ||  mri="ruby"
+jruby="$java -server -jar $d/jruby.jar"
+
+engine="$mri" # mri or jruby
+
+$engine $b.rb $@

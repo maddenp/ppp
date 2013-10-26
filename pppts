@@ -4,9 +4,10 @@ p=$(readlink $0) || p=$0
 d=$(dirname  $p)
 b=$(basename $p)
 
-cruby="ruby"
-jruby="java -server -jar $d/jruby.jar"
+test -n "$SMS__JAVA" && java="$SMS__JAVA" || java="java"
+test -n "$SMS__RUBY" &&  mri="$SMS__RUBY" ||  mri="ruby"
+jruby="$java -server -jar $d/jruby.jar"
 
-engine="$cruby"
+engine="$mri" # mri or jruby
 
 cd $d && $engine $b.rb $@
