@@ -10,4 +10,4 @@ jruby="$java -server -jar $d/jruby.jar"
 
 engine="$mri" # mri or jruby
 
-$engine $b.rb $@
+$engine $d/$b.rb $@
