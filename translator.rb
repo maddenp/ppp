@@ -137,12 +137,12 @@ class Translator
   end
 
   def directive
-    unless @directive
+    unless defined?(@@directive)
       f=File.join(File.dirname(File.expand_path($0)),"sentinels")
       d=File.open(f,"rb").read.gsub(/\$/,'\$').split("\n").join("|")
-      @directive=Regexp.new("^\s*!((#{d}).*)",true)
+      @@directive=Regexp.new("^\s*!((#{d}).*)",true)
     end
-    @directive
+    @@directive
   end
 
   def die(msg,quit=true,srcfile=nil)
