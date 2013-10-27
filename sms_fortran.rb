@@ -426,8 +426,9 @@ module Fortran
     end
 
     def marker
-      env[:static].marker||=0
-      m=(env[:static].marker+=1)
+      s=env[:static]
+      s[:marker]||=0
+      m=(s[:marker]+=1)
       f=File.basename(input.srcfile)
       "#{f} (translation) marker #{m}"
     end
@@ -458,8 +459,8 @@ module Fortran
 
     def sms_commtag
       s=env[:static]
-      s.tag||=-1
-      "sms__tag_#{s.tag+=1}"
+      s[:tag]||=-1
+      "sms__tag_#{s[:tag]+=1}"
     end
 
     def sms_decompmod

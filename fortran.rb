@@ -300,7 +300,7 @@ module Fortran
 
   def sp_label(label)
     n=label.e.reduce("") { |m,x| m+"#{x}" }.to_i
-    (env[:static].labels||=Set.new).add(n)
+    (env[:static][:labels]||=Set.new).add(n)
     true
   end
 
@@ -316,7 +316,7 @@ module Fortran
 
   def sp_module(_module)
     fn_env=_module.subprograms.reduce({}) do |m,x|
-      m.merge(x.env.select { |k,v| v.is_a?(Hash) and v["function"] })
+      m.merge(x.env.select { |k,v| x=="#{x.name}" and v["function"] })
     end
     env.merge!(fn_env)
     write_envfile(_module.name,env)
@@ -617,8 +617,8 @@ module Fortran
 
     def indent
       s=env[:static]
-      s.level||=0
-      s.level+=1
+      s[:level]||=0
+      s[:level]+=1
     end
 
     def insert_statement(code,rule,node,offset)
@@ -642,7 +642,7 @@ module Fortran
     end
 
     def label_create
-      labels=(env[:static].labels||=Set.new)
+      labels=(env[:static][:labels]||=Set.new)
       99999.downto(1).each do |n|
         unless labels.include?(n)
           labels.add(n)
@@ -659,7 +659,7 @@ module Fortran
     end
 
     def level
-      env[:static].level||=0
+      env[:static][:level]||=0
     end
 
     def list_to_s
@@ -719,8 +719,8 @@ module Fortran
 
     def unindent
       s=env[:static]
-      s.level||=0
-      s.level-=1 if s.level>0
+      s[:level]||=0
+      s[:level]-=1 if s[:level]>0
     end
 
     def use(modname,usenames=[])
