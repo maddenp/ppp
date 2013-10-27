@@ -17571,6 +17571,7 @@ module Fortran
     def end_subroutine_stmt
       elements[2]
     end
+
   end
 
   module InterfaceBody1
@@ -17581,6 +17582,7 @@ module Fortran
     def end_function_stmt
       elements[2]
     end
+
   end
 
   def _nt_interface_body
@@ -17609,6 +17611,17 @@ module Fortran
       if r3
         r5 = _nt_end_subroutine_stmt
         s1 << r5
+        if r5
+          i6 = index
+          r7 = lambda { |e| sp_interface_body }.call(s1)
+          if r7
+            @index = i6
+            r6 = instantiate_node(SyntaxNode,input, index...index)
+          else
+            r6 = nil
+          end
+          s1 << r6
+        end
       end
     end
     if s1.last
@@ -17621,31 +17634,42 @@ module Fortran
     if r1
       r0 = r1
     else
-      i6, s6 = index, []
-      r7 = _nt_function_stmt
-      s6 << r7
-      if r7
-        r9 = _nt_specification_part
-        if r9
-          r8 = r9
+      i8, s8 = index, []
+      r9 = _nt_function_stmt
+      s8 << r9
+      if r9
+        r11 = _nt_specification_part
+        if r11
+          r10 = r11
         else
-          r8 = instantiate_node(SyntaxNode,input, index...index)
+          r10 = instantiate_node(SyntaxNode,input, index...index)
         end
-        s6 << r8
-        if r8
-          r10 = _nt_end_function_stmt
-          s6 << r10
+        s8 << r10
+        if r10
+          r12 = _nt_end_function_stmt
+          s8 << r12
+          if r12
+            i13 = index
+            r14 = lambda { |e| sp_interface_body }.call(s8)
+            if r14
+              @index = i13
+              r13 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r13 = nil
+            end
+            s8 << r13
+          end
         end
       end
-      if s6.last
-        r6 = instantiate_node(Interface_Body_2,input, i6...index, s6)
-        r6.extend(InterfaceBody1)
+      if s8.last
+        r8 = instantiate_node(Interface_Body_2,input, i8...index, s8)
+        r8.extend(InterfaceBody1)
       else
-        @index = i6
-        r6 = nil
+        @index = i8
+        r8 = nil
       end
-      if r6
-        r0 = r6
+      if r8
+        r0 = r8
       else
         @index = i0
         r0 = nil

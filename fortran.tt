@@ -1858,8 +1858,8 @@ grammar Fortran
   rule interface_body
     # F90:R1204
 
-    subroutine_stmt specification_part? end_subroutine_stmt <Interface_Body_1> /
-    function_stmt specification_part? end_function_stmt <Interface_Body_2>
+    subroutine_stmt specification_part? end_subroutine_stmt &{ |e| sp_interface_body } <Interface_Body_1> /
+    function_stmt specification_part? end_function_stmt &{ |e| sp_interface_body } <Interface_Body_2>
   end
 
   rule interface_stmt

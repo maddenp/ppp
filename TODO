@@ -99,8 +99,6 @@
   or SyntaxNode subclasses. That is, should we convert to strings as early as
   possible, or delay until a string is absolutely required? Probably the latter.
 
-- In sms_commtag, instead of working at root node, use env[:static]?
-
 - Re-enable continuation lines check, deal with looooong exchange in dyn_init.
   Are the array literals as compact as possible (e.g. do we need all 7 dims, all
   25 (?) MAX_PPP_VARS)? Better yet, make exchange use a begin/queue-multiple/end

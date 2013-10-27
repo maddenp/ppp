@@ -273,6 +273,11 @@ module Fortran
     true
   end
 
+  def sp_interface_body
+    envpop
+    true
+  end
+
   def sp_io_spec_end(label)
     add_branch_target(label)
     true
@@ -611,9 +616,9 @@ module Fortran
     end
 
     def indent
-      r=root
-      l=root.level
-      r.instance_variable_set(:@level,l+1)
+      s=env[:static]
+      s.level||=0
+      s.level+=1
     end
 
     def insert_statement(code,rule,node,offset)
@@ -654,11 +659,7 @@ module Fortran
     end
 
     def level
-      r=root
-      unless r.instance_variable_defined?(:@level)
-        r.instance_variable_set(:@level,0)
-      end
-      r.instance_variable_get(:@level)
+      env[:static].level||=0
     end
 
     def list_to_s
@@ -687,12 +688,6 @@ module Fortran
       block[block.index(self)]=tree
     end
 
-    def root
-      n=self
-      n=n.parent while n.parent
-      n
-    end
-
     def sa(e)
       # space after: If the [e]lement's string form is empty, return that; else
       # return its string form with a trailing space appended.
@@ -719,14 +714,13 @@ module Fortran
     end
 
     def stmt(s)
-      l=level||0
-      (" "*2*l)+(("#{sa(e[0])}"+s.chomp).strip)+"\n"
+      (" "*2*level)+(("#{sa(e[0])}"+s.chomp).strip)+"\n"
     end
 
     def unindent
-      r=root
-      l=root.level
-      r.instance_variable_set(:@level,l-1) if l>0
+      s=env[:static]
+      s.level||=0
+      s.level-=1 if s.level>0
     end
 
     def use(modname,usenames=[])

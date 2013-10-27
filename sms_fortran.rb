@@ -339,7 +339,7 @@ module Fortran
         code+="(#{dims.join(',')})" if dims
         init=props[:init]
         code+="=#{init}" if init
-        t=raw(code,:type_declaration_stmt,root.srcfile,{:env=>env})
+        t=raw(code,:type_declaration_stmt,input.srcfile,{:env=>env})
         newenv=t.input.envstack.last
         newenv[var]["pppvar"]=true
         dc=declaration_constructs
@@ -457,11 +457,9 @@ module Fortran
     end
 
     def sms_commtag
-      r=root
-      t=0
-      t=r.instance_variable_get(:@tag)+1 if r.instance_variable_defined?(:@tag)
-      r.instance_variable_set(:@tag,t)
-      "sms__tag_#{t}"
+      s=env[:static]
+      s.tag||=-1
+      "sms__tag_#{s.tag+=1}"
     end
 
     def sms_decompmod
