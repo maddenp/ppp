@@ -418,11 +418,12 @@ module Fortran
     end
 
     def intrinsic?(function_name)
-      unless defined?(@intrinsics)
+      s=env[:static]
+      unless (intrinsics=s[:intrinsics])
         f=File.join(File.dirname(File.expand_path($0)),"intrinsics")
-        @intrinsics=Set.new(File.open(f).read.split)
+        intrinsics=(s[:intrinsics]=Set.new(File.open(f).read.split))
       end
-      @intrinsics.include?("#{function_name}")
+      intrinsics.include?("#{function_name}")
     end
 
     def marker
