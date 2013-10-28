@@ -520,37 +520,22 @@ module Fortran
       (e)?(e.map { |x| "#{x}" }.join):("")
     end
 
-    def post_common
-      post_children
-      post if respond_to?(:post)
-    end
-
-    def post_children
-      e.each { |x| x.post_common if x } if e
-      self
-    end
-
-    def post_top
-      post_common
-      self
-    end
-
     def to_s
       ""
     end
 
-    def translate_common
-      translate_children
-      translate if respond_to?(:translate)
+    def xform_common(method)
+      xform_children(method)
+      send(method) if respond_to?(method)
     end
 
-    def translate_children
-      e.each { |x| x.translate_common if x } if e
+    def xform_children(method)
+      e.each { |x| x.xform_common(method) if x } if e
       self
     end
 
-    def translate_top
-      translate_common
+    def xform_top(method)
+      xform_common(method)
       self
     end
 

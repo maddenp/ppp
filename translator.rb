@@ -398,13 +398,13 @@ class Translator
         return # if in server mode and did not exit in die()
       end
       raw_tree.instance_variable_set(:@srcfile,srcfile)
-      raw_tree=raw_tree.post_top # post-process raw tree
+      raw_tree=raw_tree.xform_top(:post) # post-process raw tree
       return [wrap(raw_tree.to_s),raw_tree,nil] unless conf.translate
       if conf.debug
         puts "\nRAW TREE\n\n"
         p raw_tree
       end
-      translated_tree=(conf.translate)?(raw_tree.translate_top):(nil)
+      translated_tree=(conf.translate)?(raw_tree.xform_top(:translate)):(nil)
       fail "TRANSLATION FAILED" unless translated_tree
       if conf.debug
         puts "\nTRANSLATED TREE\n\n"
