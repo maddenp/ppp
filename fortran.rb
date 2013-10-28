@@ -796,7 +796,7 @@ module Fortran
 
   # Out-of-order class definitions (must be defined before subclassed)
 
-  class IO_Item_List < NT
+  class Io_Item_List < NT
 
 		def to_s
 			list_to_s
@@ -808,7 +808,7 @@ module Fortran
 
   end
 
-  class IO_Item_List_Pair < NT
+  class Io_Item_List_Pair < NT
 
     def item
       e[1]
@@ -816,54 +816,54 @@ module Fortran
 
   end
 
-  class IO_Spec_List < T
+  class Io_Spec_List < T
 
     def access
-      list_item(IO_Spec_Access)
+      list_item(Io_Spec_Access)
     end
 
     def action
-      list_item(IO_Spec_Action)
+      list_item(Io_Spec_Action)
     end
 
     def blank
-      list_item(IO_Spec_Blank)
+      list_item(Io_Spec_Blank)
     end
 
     def delim
-      list_item(IO_Spec_Delim)
+      list_item(Io_Spec_Delim)
     end
 
     def direct
-      list_item(IO_Spec_Direct)
+      list_item(Io_Spec_Direct)
     end
 
     def end
-      list_item(IO_Spec_End)
+      list_item(Io_Spec_End)
     end
 
     def eor
-      list_item(IO_Spec_Eor)
+      list_item(Io_Spec_Eor)
     end
 
     def err
-      list_item(IO_Spec_Err)
+      list_item(Io_Spec_Err)
     end
 
     def exist
-      list_item(IO_Spec_Exist)
+      list_item(Io_Spec_Exist)
     end
 
     def form
-      list_item(IO_Spec_Form)
+      list_item(Io_Spec_Form)
     end
 
     def formatted
-      list_item(IO_Spec_Formatted)
+      list_item(Io_Spec_Formatted)
     end
 
     def iostat
-      list_item(IO_Spec_Iostat)
+      list_item(Io_Spec_Iostat)
     end
 
     def list_item(spec)
@@ -873,60 +873,60 @@ module Fortran
     end
 
     def name
-      list_item(IO_Spec_Name)
+      list_item(Io_Spec_Name)
     end
 
     def named
-      list_item(IO_Spec_Named)
+      list_item(Io_Spec_Named)
     end
 
     def nextrec
-      list_item(IO_Spec_Nextrec)
+      list_item(Io_Spec_Nextrec)
     end
 
     def nml
-      if (io_spec_nml=list_item(IO_Spec_Nml))
+      if (io_spec_nml=list_item(Io_Spec_Nml))
         return io_spec_nml.rhs
-      elsif e[0].is_a?(IO_Control_Spec_Unit_Nml)
+      elsif e[0].is_a?(Io_Control_Spec_Unit_Nml)
         return e[0].nml
       end
       nil
     end
 
     def number
-      list_item(IO_Spec_Number)
+      list_item(Io_Spec_Number)
     end
       
     def opened
-      list_item(IO_Spec_Opened)
+      list_item(Io_Spec_Opened)
     end
 
     def pad
-      list_item(IO_Spec_Pad)
+      list_item(Io_Spec_Pad)
     end
 
     def position
-      list_item(IO_Spec_Position)
+      list_item(Io_Spec_Position)
     end
 
     def read
-      list_item(IO_Spec_Read)
+      list_item(Io_Spec_Read)
     end
 
     def readwrite
-      list_item(IO_Spec_Readwrite)
+      list_item(Io_Spec_Readwrite)
     end
 
     def recl
-      list_item(IO_Spec_Recl)
+      list_item(Io_Spec_Recl)
     end
 
     def sequential
-      list_item(IO_Spec_Sequential)
+      list_item(Io_Spec_Sequential)
     end
 
     def size
-      list_item(IO_Spec_Size)
+      list_item(Io_Spec_Size)
     end
 
     def to_s
@@ -934,11 +934,11 @@ module Fortran
     end
 
     def unformatted
-      list_item(IO_Spec_Unformatted)
+      list_item(Io_Spec_Unformatted)
     end
 
     def unit
-      if (io_spec_unit=list_item(IO_Spec_Unit))
+      if (io_spec_unit=list_item(Io_Spec_Unit))
         io_spec_unit.rhs
       else
         # If 'unit=' does not appear, the unit *must* be the first list item
@@ -947,12 +947,12 @@ module Fortran
     end
 
     def write
-      list_item(IO_Spec_Write)
+      list_item(Io_Spec_Write)
     end
 
   end
 
-  class IO_Stmt < T
+  class Io_Stmt < T
 
     def access
       spec_list.access
@@ -1089,7 +1089,7 @@ module Fortran
     end
 
     def spec_list
-      (e[3].is_a?(IO_Spec_List))?(e[3]):([])
+      (e[3].is_a?(Io_Spec_List))?(e[3]):([])
     end
 
     def unformatted
@@ -1584,7 +1584,7 @@ module Fortran
 
   end
 
-  class Backspace_Stmt_1 < IO_Stmt
+  class Backspace_Stmt_1 < Io_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
@@ -1592,7 +1592,7 @@ module Fortran
 
   end
 
-  class Backspace_Stmt_2 < IO_Stmt
+  class Backspace_Stmt_2 < Io_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}")
@@ -1645,13 +1645,13 @@ module Fortran
 
   end
 
-  class Close_Spec_List < IO_Spec_List
+  class Close_Spec_List < Io_Spec_List
   end
 
   class Close_Spec_List_Pair < NT
   end
 
-  class Close_Stmt < IO_Stmt
+  class Close_Stmt < Io_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
@@ -1718,7 +1718,7 @@ module Fortran
 
   end
 
-  class Connect_Spec_List < IO_Spec_List
+  class Connect_Spec_List < Io_Spec_List
   end
 
   class Connect_Spec_List_Pair < NT
@@ -2062,7 +2062,7 @@ module Fortran
 
   end
 
-  class Endfile_Stmt_1 < IO_Stmt
+  class Endfile_Stmt_1 < Io_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
@@ -2070,7 +2070,7 @@ module Fortran
 
   end
 
-  class Endfile_Stmt_2 < IO_Stmt
+  class Endfile_Stmt_2 < Io_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}")
@@ -2497,16 +2497,16 @@ module Fortran
 
   end
 
-  class Input_Item_List < IO_Item_List
+  class Input_Item_List < Io_Item_List
   end
 
-  class Input_Item_List_Pair < IO_Item_List_Pair
+  class Input_Item_List_Pair < Io_Item_List_Pair
   end
 
-  class Inquire_Spec_List < IO_Spec_List
+  class Inquire_Spec_List < Io_Spec_List
   end
 
-  class Inquire_Stmt_1 < IO_Stmt
+  class Inquire_Stmt_1 < Io_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
@@ -2514,7 +2514,7 @@ module Fortran
 
   end
 
-  class Inquire_Stmt_2 < IO_Stmt
+  class Inquire_Stmt_2 < Io_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}")
@@ -2572,13 +2572,13 @@ module Fortran
 
   end
 
-  class IO_Control_Spec_List < IO_Spec_List
+  class Io_Control_Spec_List < Io_Spec_List
   end
 
-  class IO_Control_Spec_List_Pair < NT
+  class Io_Control_Spec_List_Pair < NT
   end
 
-  class IO_Control_Spec_Unit_Nml < T
+  class Io_Control_Spec_Unit_Nml < T
 
     def unit
       e[0]
@@ -2590,7 +2590,7 @@ module Fortran
 
   end
 
-  class IO_Implied_Do_Object_List < T
+  class Io_Implied_Do_Object_List < T
 
 		def to_s
 			list_to_s
@@ -2598,7 +2598,7 @@ module Fortran
 
   end
 
-  class IO_Spec < NT
+  class Io_Spec < NT
 
     def relabel_spec(spec)
       old=rhs
@@ -2613,22 +2613,22 @@ module Fortran
 
   end
 
-  class IO_Spec_Access < IO_Spec
+  class Io_Spec_Access < Io_Spec
   end
 
-  class IO_Spec_Action < IO_Spec
+  class Io_Spec_Action < Io_Spec
   end
 
-  class IO_Spec_Blank < IO_Spec
+  class Io_Spec_Blank < Io_Spec
   end
 
-  class IO_Spec_Delim < IO_Spec
+  class Io_Spec_Delim < Io_Spec
   end
 
-  class IO_Spec_Direct < IO_Spec
+  class Io_Spec_Direct < Io_Spec
   end
 
-  class IO_Spec_End < IO_Spec
+  class Io_Spec_End < Io_Spec
 
     def relabel
       relabel_spec(:end)
@@ -2636,7 +2636,7 @@ module Fortran
 
   end
 
-  class IO_Spec_Eor < IO_Spec
+  class Io_Spec_Eor < Io_Spec
 
     def relabel
       relabel_spec(:eor)
@@ -2644,7 +2644,7 @@ module Fortran
 
   end
 
-  class IO_Spec_Err < IO_Spec
+  class Io_Spec_Err < Io_Spec
 
     def relabel
       relabel_spec(:err)
@@ -2652,61 +2652,61 @@ module Fortran
 
   end
 
-  class IO_Spec_Exist < IO_Spec
+  class Io_Spec_Exist < Io_Spec
   end
 
-  class IO_Spec_Form < IO_Spec
+  class Io_Spec_Form < Io_Spec
   end
 
-  class IO_Spec_Formatted < IO_Spec
+  class Io_Spec_Formatted < Io_Spec
   end
 
-  class IO_Spec_Iostat < IO_Spec
+  class Io_Spec_Iostat < Io_Spec
   end
 
-  class IO_Spec_Name < IO_Spec
+  class Io_Spec_Name < Io_Spec
   end
 
-  class IO_Spec_Named < IO_Spec
+  class Io_Spec_Named < Io_Spec
   end
 
-  class IO_Spec_Nextrec < IO_Spec
+  class Io_Spec_Nextrec < Io_Spec
   end
 
-  class IO_Spec_Nml < IO_Spec
+  class Io_Spec_Nml < Io_Spec
   end
 
-  class IO_Spec_Number < IO_Spec
+  class Io_Spec_Number < Io_Spec
   end
 
-  class IO_Spec_Opened < IO_Spec
+  class Io_Spec_Opened < Io_Spec
   end
 
-  class IO_Spec_Pad < IO_Spec
+  class Io_Spec_Pad < Io_Spec
   end
 
-  class IO_Spec_Position < IO_Spec
+  class Io_Spec_Position < Io_Spec
   end
 
-  class IO_Spec_Read < IO_Spec
+  class Io_Spec_Read < Io_Spec
   end
 
-  class IO_Spec_Readwrite < IO_Spec
+  class Io_Spec_Readwrite < Io_Spec
   end
 
-  class IO_Spec_Recl < IO_Spec
+  class Io_Spec_Recl < Io_Spec
   end
 
-  class IO_Spec_Sequential < IO_Spec
+  class Io_Spec_Sequential < Io_Spec
   end
 
-  class IO_Spec_Size < IO_Spec
+  class Io_Spec_Size < Io_Spec
   end
 
-  class IO_Spec_Unformatted < IO_Spec
+  class Io_Spec_Unformatted < Io_Spec
   end
 
-  class IO_Spec_Unit < IO_Spec
+  class Io_Spec_Unit < Io_Spec
 
     def unit
       e[2]
@@ -2714,7 +2714,7 @@ module Fortran
 
   end
 
-  class IO_Spec_Write < IO_Spec
+  class Io_Spec_Write < Io_Spec
   end
 
   class Kind_Selector < T
@@ -3125,7 +3125,7 @@ module Fortran
 
   end
 
-  class Open_Stmt < IO_Stmt
+  class Open_Stmt < Io_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
@@ -3149,10 +3149,10 @@ module Fortran
 
   end
 
-  class Output_Item_List < IO_Item_List
+  class Output_Item_List < Io_Item_List
   end
 
-  class Output_Item_List_Pair < IO_Item_List_Pair
+  class Output_Item_List_Pair < Io_Item_List_Pair
   end
 
   class Parenthesized_Args < NT
@@ -3238,7 +3238,7 @@ module Fortran
   class Power_Op_Option < NT
   end
 
-  class Print_Stmt < IO_Stmt
+  class Print_Stmt < Io_Stmt
 
     def output_items
       (e[3].is_a?(Print_Stmt_Output_Item_List))?(e[3].items):([])
@@ -3298,7 +3298,7 @@ module Fortran
 
   end
 
-  class Read_Stmt < IO_Stmt
+  class Read_Stmt < Io_Stmt
   end
 
   class Read_Stmt_1 < Read_Stmt
@@ -3397,7 +3397,7 @@ module Fortran
 
   end
 
-  class Rewind_Stmt_1 < IO_Stmt
+  class Rewind_Stmt_1 < Io_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
@@ -3405,7 +3405,7 @@ module Fortran
 
   end
 
-  class Rewind_Stmt_2 < IO_Stmt
+  class Rewind_Stmt_2 < Io_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}")
@@ -3750,7 +3750,7 @@ module Fortran
 
   end
 
-  class Write_Stmt < IO_Stmt
+  class Write_Stmt < Io_Stmt
 
 		def to_s
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}")

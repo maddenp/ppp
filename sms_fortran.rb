@@ -610,7 +610,7 @@ module Fortran
 
   end
 
-  class Close_Stmt < IO_Stmt
+  class Close_Stmt < Io_Stmt
 
     def translate
       return if sms_ignore or sms_serial
@@ -657,7 +657,7 @@ module Fortran
 
   end
 
-  class IO_Spec
+  class Io_Spec
 
     def pppvar_prefix
       "sms__io_"
@@ -665,7 +665,7 @@ module Fortran
 
   end
 
-  class IO_Spec_End < IO_Spec
+  class Io_Spec_End < Io_Spec
 
     def pppvar
       declare("logical","#{pppvar_prefix}end")
@@ -673,7 +673,7 @@ module Fortran
 
   end
 
-  class IO_Spec_Eor < IO_Spec
+  class Io_Spec_Eor < Io_Spec
 
     def pppvar
       declare("logical","#{pppvar_prefix}eor")
@@ -681,7 +681,7 @@ module Fortran
 
   end
 
-  class IO_Spec_Err < IO_Spec
+  class Io_Spec_Err < Io_Spec
 
     def pppvar
       declare("logical","#{pppvar_prefix}err")
@@ -689,7 +689,7 @@ module Fortran
 
   end
 
-  class IO_Stmt < T
+  class Io_Stmt < T
 
     def io_stmt_bcasts
       @need_decompmod=true unless @var_bcast.empty?
@@ -935,7 +935,7 @@ module Fortran
 
   end
 
-  class Open_Stmt < IO_Stmt
+  class Open_Stmt < Io_Stmt
 
     def translate
       return if sms_ignore or sms_serial
@@ -945,7 +945,7 @@ module Fortran
 
   end
 
-  class Print_Stmt < IO_Stmt
+  class Print_Stmt < Io_Stmt
 
     def translate
       return if sms_ignore or sms_serial
@@ -966,7 +966,7 @@ module Fortran
 
   end
 
-  class Read_Stmt < IO_Stmt
+  class Read_Stmt < Io_Stmt
 
     def translate
       return if sms_ignore or sms_serial
@@ -2052,7 +2052,7 @@ module Fortran
 
   end
 
-  class Write_Stmt < IO_Stmt
+  class Write_Stmt < Io_Stmt
 
     def translate
       return if sms_ignore or sms_serial
