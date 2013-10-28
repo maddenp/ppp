@@ -29,6 +29,9 @@
 
 ### OPTIMIZATION
 
+- Memoize to_s? Some of these are called many times for hash keys and so. Should
+  be no need to compute string version more than once, right?
+
 - read_stmt, write_stmt et al are not function calls, so we *do* know which of
   their arguments may be modified during a call (e.g. iostat's variable can,
   file's variable cannot) we we can limit bcast/gather/scatter of these in a
@@ -39,14 +42,20 @@
   would be better to do this once -- maybe as a post-translation walk that calls
   write_envfile for each module encountered.
 
-- Memoize to_s? Some of these are called many times for hash keys and so. Should
-  be no need to compute string version more than once, right?
-
 ### PARSING
 
 - Use replace_element in Nonlabel_Do_Stmt in place of raw() calls?
 
 - Deduce types of implicit variables.
+
+- In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
+  label, but also labels further down in the stack? That would also be an error,
+  right?
+
+- In grammar class methods that return an optional element (execution_part() of
+  Main_Program e.g.) check *there* for expected class vs SyntaxNode and return
+  nil for the latter (i.e. the optional element is not present). This factors
+  the knowledge about the grammar into the appropriate class.
 
 - write-stmt seems to parse wrong, 'write' recognized as Data_Ref. This could be
   a problem re: implicit translation of write io statements.
@@ -68,16 +77,11 @@
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
 
-- In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
-  label, but also labels further down in the stack? That would also be an error,
-  right?
-
-- In grammar class methods that return an optional element (execution_part() of
-  Main_Program e.g.) check *there* for expected class vs SyntaxNode and return
-  nil for the latter (i.e. the optional element is not present). This factors
-  the knowledge about the grammar into the appropriate class.
-
 ### REFACTORING
+
+- Many rules are mapped to T nodes (for convenience, as their normalized
+  text_value is fine for output) but should be NT nodes, with appropriate to_s
+  methods defined.
 
 - In fortran.rb/sms_fortran.rb, standardize when methods on nodes return strings
   or SyntaxNode subclasses. That is, should we convert to strings as early as
@@ -96,10 +100,6 @@
   already-declared scalar? Need more flexibility...
 
 - Factor more sms text out into T sms_* methods (esp library calls).
-
-- Many rules are mapped to T nodes (for convenience, as their normalized
-  text_value is fine for output) but should be NT nodes, with appropriate to_s
-  methods defined.
 
 ### TRANSLATION
 
@@ -120,7 +120,9 @@
 - In SMS_Serial translate, what should halo[l|u] be when dh is nil?
 
 - Hardcoded '1's referring to decomposition elements should be looked up from
-  env.
+  env. See translate() for SMS_Declare_Decomp, SMS_Unstructured_Grid,
+  Array_Section, SMS_Create_Decomp. In SMS_Declare_Decomp translate, roll out
+  as many e{n}/s{n} arrays as needed for the decomposition.
 
 ### TREE
 

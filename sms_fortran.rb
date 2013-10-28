@@ -561,7 +561,7 @@ module Fortran
         return "#{cb}" unless (dd=decdim(varenv,dim))
         dh=varenv["decomp"]
         nl="#{dh}__nestlevel"
-        a1="#{dh}__#{(lu==:l)?('s'):('e')}1" # why '1'? generalize?
+        a1="#{dh}__#{(lu==:l)?('s'):('e')}1"
         a2="#{dh}__#{(lu==:l)?('low'):('upper')}bounds(#{dd},#{nl})"
         "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
       end
@@ -1215,8 +1215,6 @@ module Fortran
       declare("character*32","#{dh}__decompname")
       declare("integer","#{dh}__boundarytype",{:dims=>%W[sms__max_decomposed_dims]})
       declare("integer","#{dh}__e1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__e2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__e3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
       declare("integer","#{dh}__globalsize",  {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
       declare("integer","#{dh}__halosize",    {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
       declare("integer","#{dh}__ignore")
@@ -1230,8 +1228,6 @@ module Fortran
       declare("integer","#{dh}__nestlevels",  {:dims=>%W[#{dh}__maxnests]})
       declare("integer","#{dh}__nregions")
       declare("integer","#{dh}__s1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__s2",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__s3",{:attrs=>["allocatable"],:dims=>%W[: : :]})
       declare("integer","#{dh}__upperbounds", {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
       declare("integer",dh,{:dims=>%W[1]})
     end
