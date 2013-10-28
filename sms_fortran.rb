@@ -1510,6 +1510,23 @@ module Fortran
 
   end
 
+  class SMS_Rank < SMS
+
+    def var
+      e[2]
+    end
+
+    def translate
+      varenv=varenv_get(var)
+      unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
+        fail "ERROR: rank query's argument must be an integer scalar"
+      end
+      code="call sms__rank(#{var})"
+      replace_statement(code)
+    end
+
+  end
+
   class SMS_Reduce < SMS
 
     def op

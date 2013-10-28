@@ -119,6 +119,7 @@ grammar Fortran
     sms_halo_comp &{ |e| sp_env_pullup(e[0]) } <NT> /
     sms_ignore /
     sms_parallel &{ |e| sp_env_pullup(e[0]) } <NT> /
+    sms_rank /
     sms_reduce /
     sms_serial &{ |e| sp_env_pullup(e[0]) } <NT> /
     sms_set_communicator /
@@ -185,6 +186,10 @@ grammar Fortran
     sms_parallel_var_list t_comma t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_101> /
     sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_110> /
     sms_parallel_var_list "" <SMS_Parallel_Var_Lists_100>
+  end
+
+  rule sms_rank
+    sms_sentinel sms_t_rank scalar_int_variable t_newline <SMS_Rank>
   end
 
   rule sms_reduce
@@ -336,6 +341,10 @@ grammar Fortran
 
   rule sms_t_parallel
     "parallel" <T>
+  end
+
+  rule sms_t_rank
+    "rank" <T>
   end
 
   rule sms_t_reduce
