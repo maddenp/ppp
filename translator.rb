@@ -137,12 +137,10 @@ class Translator
   end
 
   def directive
-    unless defined?(@@directive)
-      f=File.join(File.dirname(File.expand_path($0)),"sentinels")
-      d=File.open(f,"rb").read.gsub(/\$/,'\$').split("\n").join("|")
-      @@directive=Regexp.new("^\s*!((#{d}).*)",true)
-    end
-    @@directive
+    return @@directive if defined?(@@directive)
+    f=File.join(File.dirname(File.expand_path($0)),"sentinels")
+    d=File.open(f,"rb").read.gsub(/\$/,'\$').split("\n").join("|")
+    @@directive=Regexp.new("^\s*!((#{d}).*)",true)
   end
 
   def die(msg,quit=true,srcfile=nil)
