@@ -163,7 +163,7 @@ module Fortran
       declare("integer",sms_rankvar)
       code=""
       code+="if (#{statusvar}.ne.0) then\n"
-      code+="call sms__rank(#{sms_rankvar})\n"
+      code+="call sms__rankget(#{sms_rankvar})\n"
       code+="write (*,'(a,i0)') \"#{msg} on MPI rank \",#{sms_rankvar}\n"
       code+="#{sms_stop(retcode)}\n"
       code+="endif"
@@ -1521,11 +1521,14 @@ module Fortran
     end
 
     def translate
-      varenv=varenv_get(var)
-      unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
-        fail "ERROR: rank query's argument must be an integer scalar"
+      # Check the sort and type of the indicated variable, if it exists in the
+      # environment. If not, carry on and hope for the best.
+      if (varenv=varenv_get(var))
+        unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
+          fail "ERROR: rank query's argument must be an integer scalar"
+        end
       end
-      code="call sms__rank(#{var})"
+      code="call sms__rankget(#{var})"
       replace_statement(code)
     end
 
