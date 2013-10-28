@@ -232,12 +232,12 @@ module Fortran
     true
   end
 
-  def sp_function_subprogram(function_subprogram)
-    var="#{function_subprogram.function_name}"
+  def sp_function_subprogram(function_stmt)
+    var="#{function_stmt.name}"
     varenv=(env[var]||={})
     varenv["sort"]||="_scalar"
     access=varenv["access"]||@access
-    if (type_spec=function_subprogram.function_stmt_type_spec)
+    if (type_spec=function_stmt.type_spec)
       varenv["kind"]="#{type_spec.kind}"
       varenv["type"]="#{type_spec.type}"
     elsif (result=env[:result])
@@ -314,12 +314,14 @@ module Fortran
     true
   end
 
-  def sp_module(_module)
-    fn_env=_module.subprograms.reduce({}) do |m,x|
-      m.merge(x.env.select { |k,v| x=="#{x.name}" and v["function"] })
+  def sp_module(module_stmt,module_subprogram_part)
+    if module_subprogram_part.is_a?(Module_Subprogram_Part)
+      fn_env=module_subprogram_part.subprograms.reduce({}) do |m,x|
+        m.merge(x.env.select { |k,v| x=="#{x.name}" and v["function"] })
+      end
+      env.merge!(fn_env)
+      write_envfile(module_stmt.name,env)
     end
-    env.merge!(fn_env)
-    write_envfile(_module.name,env)
     envpop
     @access="_default"
     true

@@ -405,7 +405,7 @@ grammar Fortran
   rule block_data
     # F90:R1110
 
-    block_data_stmt specification_part? end_block_data_stmt <Block_Data>
+    block_data_stmt specification_part? end_block_data_stmt &{ |e| sp_block_data } <Block_Data>
   end
 
   rule block_data_name
@@ -1504,8 +1504,8 @@ grammar Fortran
   rule external_subprogram
     # F90:R203
 
-    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <NT> /
-    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <NT>
+    subroutine_subprogram /
+    function_subprogram
   end
 
   rule file_name_expr
@@ -1584,7 +1584,7 @@ grammar Fortran
   rule function_subprogram
     # F90:R1215
 
-    function_stmt specification_part? execution_part? internal_subprogram_part? end_function_stmt <Function_Subprogram>
+    function_stmt specification_part? execution_part? internal_subprogram_part? end_function_stmt &{ |e| sp_function_subprogram(e[0]) } <Function_Subprogram>
   end
 
   rule generic_name
@@ -1883,8 +1883,8 @@ grammar Fortran
   rule internal_subprogram
     # F90:R211
 
-    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <NT> /
-    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <NT>
+    subroutine_subprogram /
+    function_subprogram
   end
 
   rule internal_subprograms
@@ -2308,7 +2308,7 @@ grammar Fortran
   rule main_program
     # F90:R1101
 
-    program_stmt? specification_part? execution_part? internal_subprogram_part? end_program_stmt <Main_Program>
+    program_stmt? specification_part? execution_part? internal_subprogram_part? end_program_stmt &{ |e| sp_main_program } <Main_Program>
   end
 
   rule mask_expr
@@ -2320,7 +2320,7 @@ grammar Fortran
   rule module
     # F90:R1104
 
-    module_stmt specification_part? module_subprogram_part? end_module_stmt <Module>
+    module_stmt specification_part? module_subprogram_part? end_module_stmt &{ |e| sp_module(e[0],e[2]) } <Module>
   end
 
   rule module_name
@@ -2348,8 +2348,8 @@ grammar Fortran
   rule module_subprogram
     # F90:R213
 
-    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <Module_Subprogram_Subroutine> /
-    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <Module_Subprogram_Function>
+    subroutine_subprogram "" <Module_Subprogram_Subroutine> /
+    function_subprogram "" <Module_Subprogram_Function>
   end
 
   rule module_subprogram_part
@@ -2732,9 +2732,9 @@ grammar Fortran
     # F90:R202
 
     external_subprogram /
-    module &{ |e| sp_module(e[0]) } <NT> /
-    block_data &{ |e| sp_block_data } <NT> /
-    main_program &{ |e| sp_main_program } <NT>
+    module /
+    block_data /
+    main_program
   end
 
   rule program_units
@@ -3203,7 +3203,7 @@ grammar Fortran
   rule subroutine_subprogram
     # F90:R1219
 
-    subroutine_stmt specification_part? execution_part? internal_subprogram_part? end_subroutine_stmt <Subroutine_Subprogram>
+    subroutine_stmt specification_part? execution_part? internal_subprogram_part? end_subroutine_stmt &{ |e| sp_subroutine_subprogram } <Subroutine_Subprogram>
   end
 
   rule subscript

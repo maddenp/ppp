@@ -33,13 +33,6 @@ grammar Fortran
     directive
   end
 
-  rule external_subprogram
-    # F90:R203
-
-    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <NT> /
-    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <NT>
-  end
-
   rule implicit_part
     # F90:R205
     #
@@ -123,20 +116,20 @@ grammar Fortran
     sms_compare_var /
     sms_create_decomp /
     sms_exchange /
-    sms_halo_comp &{ |e| sp_sms_halo_comp } <NT> /
+    sms_halo_comp /
     sms_ignore /
-    sms_parallel &{ |e| sp_sms_parallel } <NT> /
+    sms_parallel /
     sms_reduce /
-    sms_serial &{ |e| sp_sms_serial } <NT> /
+    sms_serial /
     sms_set_communicator /
     sms_start /
     sms_stop /
-    sms_to_local &{ |e| sp_sms_to_local } <NT> /
+    sms_to_local /
     sms_unstructured_grid
   end
 
   rule sms_halo_comp
-    sms_halo_comp_begin block sms_halo_comp_end <SMS_Halo_Comp>
+    sms_halo_comp_begin block sms_halo_comp_end &{ |e| sp_sms_halo_comp } <SMS_Halo_Comp>
   end
 
   rule sms_halo_comp_begin
@@ -168,7 +161,7 @@ grammar Fortran
   end
 
   rule sms_parallel
-    sms_parallel_begin block sms_parallel_end <SMS_Parallel>
+    sms_parallel_begin block sms_parallel_end &{ |e| sp_sms_parallel } <SMS_Parallel>
   end
 
   rule sms_parallel_begin
@@ -213,7 +206,7 @@ grammar Fortran
   end
 
   rule sms_serial
-    sms_serial_begin block sms_serial_end <SMS_Serial>
+    sms_serial_begin block sms_serial_end &{ |e| sp_sms_serial } <SMS_Serial>
   end
 
   rule sms_serial_begin
@@ -390,7 +383,7 @@ grammar Fortran
   end
 
   rule sms_to_local
-    sms_to_local_begin block sms_to_local_end <SMS_To_Local>
+    sms_to_local_begin block sms_to_local_end &{ |e| sp_sms_to_local } <SMS_To_Local>
   end
 
   rule sms_to_local_begin

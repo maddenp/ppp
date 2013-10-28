@@ -19,19 +19,6 @@
 
 - Implement a continuation scheme (following Fortran!) for SMS directives.
 
-- Carefully consider the cases where an envpop'ing sp_* method is called from
-  a grammar rule other than the one whose parse was requested and try to make
-  these consistent and correct. For example, previously, sp_sms_ignore was
-  called from the sms_ignore_executable option of the sms_executable rule,
-  which meant that the env stack (pushed by the sms_ignore_begin rule) would
-  not be popped if a parse of :sms_ignore_executable was requested! It would
-  have been necessary to request a parse of the more general sms_executable
-  rule (and let the parser discover that sms_ignore_executable is the match)
-  in order to get the env stack popped. So, sp_* methods altering the env stack
-  should probably be moved into the matching nodes; otherwise, care must be
-  taken to do internal parses of the more general rule that calls the stack-
-  altering method.
-
 ### NEW FEATURES
 
 - Does where-stmt need implicit parallelization? Currently, it operates on halo
@@ -56,6 +43,8 @@
   be no need to compute string version more than once, right?
 
 ### PARSING
+
+- Use replace_element in Nonlabel_Do_Stmt in place of raw() calls?
 
 - Deduce types of implicit variables.
 
@@ -106,7 +95,7 @@
 - declare() is naive. What about declaring an array with the same type as an
   already-declared scalar? Need more flexibility...
 
-- Factor more sms text out into T#sms_* methods (esp library calls).
+- Factor more sms text out into T sms_* methods (esp library calls).
 
 - varprop -> varenv?
 
@@ -119,10 +108,10 @@
 - Does sms_gather() really need all 7 dims (see e.g. gather rollout in
   Write_Stmt or SMS_Serial.
 
-- SMS_Create_Decomp#translate is only valid for one decomposed dimension. Extend
+- SMS_Create_Decomp translate is only valid for one decomposed dimension. Extend
   it to handle three.
 
-- In SMS_Serial#translate, there's a potential issue in that a Name may be
+- In SMS_Serial translate, there's a potential issue in that a Name may be
   e.g. a function or subroutine name, in which case it may not (will not?)
   appear in the environment. For now, ignore the Name if it's not in the
   environment, which prevents translation of non-variable names. Note that
@@ -130,7 +119,7 @@
   so this is divergent. Worse, it may be *wrong* as function names may
   eventually appear in the environment (to note their type).
 
-- In SMS_Serial#translate, what should halo[l|u] be when dh is nil?
+- In SMS_Serial translate, what should halo[l|u] be when dh is nil?
 
 - Hardcoded '1's referring to decomposition elements should be looked up from
   env.

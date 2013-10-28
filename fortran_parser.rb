@@ -3852,6 +3852,7 @@ module Fortran
     def end_block_data_stmt
       elements[2]
     end
+
   end
 
   def _nt_block_data
@@ -3879,6 +3880,17 @@ module Fortran
       if r2
         r4 = _nt_end_block_data_stmt
         s0 << r4
+        if r4
+          i5 = index
+          r6 = lambda { |e| sp_block_data }.call(s0)
+          if r6
+            @index = i5
+            r5 = instantiate_node(SyntaxNode,input, index...index)
+          else
+            r5 = nil
+          end
+          s0 << r5
+        end
       end
     end
     if s0.last
@@ -14295,20 +14307,6 @@ module Fortran
     r0
   end
 
-  module ExternalSubprogram0
-    def subroutine_subprogram
-      elements[0]
-    end
-
-  end
-
-  module ExternalSubprogram1
-    def function_subprogram
-      elements[0]
-    end
-
-  end
-
   def _nt_external_subprogram
     start_index = index
     if node_cache[:external_subprogram].has_key?(index)
@@ -14321,53 +14319,13 @@ module Fortran
     end
 
     i0 = index
-    i1, s1 = index, []
-    r2 = _nt_subroutine_subprogram
-    s1 << r2
-    if r2
-      i3 = index
-      r4 = lambda { |e| sp_subroutine_subprogram }.call(s1)
-      if r4
-        @index = i3
-        r3 = instantiate_node(SyntaxNode,input, index...index)
-      else
-        r3 = nil
-      end
-      s1 << r3
-    end
-    if s1.last
-      r1 = instantiate_node(NT,input, i1...index, s1)
-      r1.extend(ExternalSubprogram0)
-    else
-      @index = i1
-      r1 = nil
-    end
+    r1 = _nt_subroutine_subprogram
     if r1
       r0 = r1
     else
-      i5, s5 = index, []
-      r6 = _nt_function_subprogram
-      s5 << r6
-      if r6
-        i7 = index
-        r8 = lambda { |e| sp_function_subprogram(e[0]) }.call(s5)
-        if r8
-          @index = i7
-          r7 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r7 = nil
-        end
-        s5 << r7
-      end
-      if s5.last
-        r5 = instantiate_node(NT,input, i5...index, s5)
-        r5.extend(ExternalSubprogram1)
-      else
-        @index = i5
-        r5 = nil
-      end
-      if r5
-        r0 = r5
+      r2 = _nt_function_subprogram
+      if r2
+        r0 = r2
       else
         @index = i0
         r0 = nil
@@ -15017,6 +14975,7 @@ module Fortran
     def end_function_stmt
       elements[4]
     end
+
   end
 
   def _nt_function_subprogram
@@ -15060,6 +15019,17 @@ module Fortran
           if r6
             r8 = _nt_end_function_stmt
             s0 << r8
+            if r8
+              i9 = index
+              r10 = lambda { |e| sp_function_subprogram(e[0]) }.call(s0)
+              if r10
+                @index = i9
+                r9 = instantiate_node(SyntaxNode,input, index...index)
+              else
+                r9 = nil
+              end
+              s0 << r9
+            end
           end
         end
       end
@@ -17803,20 +17773,6 @@ module Fortran
     r0
   end
 
-  module InternalSubprogram0
-    def subroutine_subprogram
-      elements[0]
-    end
-
-  end
-
-  module InternalSubprogram1
-    def function_subprogram
-      elements[0]
-    end
-
-  end
-
   def _nt_internal_subprogram
     start_index = index
     if node_cache[:internal_subprogram].has_key?(index)
@@ -17829,53 +17785,13 @@ module Fortran
     end
 
     i0 = index
-    i1, s1 = index, []
-    r2 = _nt_subroutine_subprogram
-    s1 << r2
-    if r2
-      i3 = index
-      r4 = lambda { |e| sp_subroutine_subprogram }.call(s1)
-      if r4
-        @index = i3
-        r3 = instantiate_node(SyntaxNode,input, index...index)
-      else
-        r3 = nil
-      end
-      s1 << r3
-    end
-    if s1.last
-      r1 = instantiate_node(NT,input, i1...index, s1)
-      r1.extend(InternalSubprogram0)
-    else
-      @index = i1
-      r1 = nil
-    end
+    r1 = _nt_subroutine_subprogram
     if r1
       r0 = r1
     else
-      i5, s5 = index, []
-      r6 = _nt_function_subprogram
-      s5 << r6
-      if r6
-        i7 = index
-        r8 = lambda { |e| sp_function_subprogram(e[0]) }.call(s5)
-        if r8
-          @index = i7
-          r7 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r7 = nil
-        end
-        s5 << r7
-      end
-      if s5.last
-        r5 = instantiate_node(NT,input, i5...index, s5)
-        r5.extend(InternalSubprogram1)
-      else
-        @index = i5
-        r5 = nil
-      end
-      if r5
-        r0 = r5
+      r2 = _nt_function_subprogram
+      if r2
+        r0 = r2
       else
         @index = i0
         r0 = nil
@@ -22167,6 +22083,7 @@ module Fortran
     def end_program_stmt
       elements[4]
     end
+
   end
 
   def _nt_main_program
@@ -22215,6 +22132,17 @@ module Fortran
           if r7
             r9 = _nt_end_program_stmt
             s0 << r9
+            if r9
+              i10 = index
+              r11 = lambda { |e| sp_main_program }.call(s0)
+              if r11
+                @index = i10
+                r10 = instantiate_node(SyntaxNode,input, index...index)
+              else
+                r10 = nil
+              end
+              s0 << r10
+            end
           end
         end
       end
@@ -22258,6 +22186,7 @@ module Fortran
     def end_module_stmt
       elements[3]
     end
+
   end
 
   def _nt_module
@@ -22293,6 +22222,17 @@ module Fortran
         if r4
           r6 = _nt_end_module_stmt
           s0 << r6
+          if r6
+            i7 = index
+            r8 = lambda { |e| sp_module(e[0],e[2]) }.call(s0)
+            if r8
+              @index = i7
+              r7 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r7 = nil
+            end
+            s0 << r7
+          end
         end
       end
     end
@@ -22554,12 +22494,11 @@ module Fortran
     r2 = _nt_subroutine_subprogram
     s1 << r2
     if r2
-      i3 = index
-      r4 = lambda { |e| sp_subroutine_subprogram }.call(s1)
-      if r4
-        @index = i3
-        r3 = instantiate_node(SyntaxNode,input, index...index)
+      if has_terminal?("", false, index)
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
       else
+        terminal_parse_failure("")
         r3 = nil
       end
       s1 << r3
@@ -22574,29 +22513,28 @@ module Fortran
     if r1
       r0 = r1
     else
-      i5, s5 = index, []
-      r6 = _nt_function_subprogram
-      s5 << r6
-      if r6
-        i7 = index
-        r8 = lambda { |e| sp_function_subprogram(e[0]) }.call(s5)
-        if r8
-          @index = i7
-          r7 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r7 = nil
-        end
-        s5 << r7
-      end
-      if s5.last
-        r5 = instantiate_node(Module_Subprogram_Function,input, i5...index, s5)
-        r5.extend(ModuleSubprogram1)
-      else
-        @index = i5
-        r5 = nil
-      end
+      i4, s4 = index, []
+      r5 = _nt_function_subprogram
+      s4 << r5
       if r5
-        r0 = r5
+        if has_terminal?("", false, index)
+          r6 = instantiate_node(SyntaxNode,input, index...(index + 0))
+          @index += 0
+        else
+          terminal_parse_failure("")
+          r6 = nil
+        end
+        s4 << r6
+      end
+      if s4.last
+        r4 = instantiate_node(Module_Subprogram_Function,input, i4...index, s4)
+        r4.extend(ModuleSubprogram1)
+      else
+        @index = i4
+        r4 = nil
+      end
+      if r4
+        r0 = r4
       else
         @index = i0
         r0 = nil
@@ -26212,27 +26150,6 @@ module Fortran
     r0
   end
 
-  module ProgramUnit0
-    def module
-      elements[0]
-    end
-
-  end
-
-  module ProgramUnit1
-    def block_data
-      elements[0]
-    end
-
-  end
-
-  module ProgramUnit2
-    def main_program
-      elements[0]
-    end
-
-  end
-
   def _nt_program_unit
     start_index = index
     if node_cache[:program_unit].has_key?(index)
@@ -26249,77 +26166,17 @@ module Fortran
     if r1
       r0 = r1
     else
-      i2, s2 = index, []
-      r3 = _nt_module
-      s2 << r3
-      if r3
-        i4 = index
-        r5 = lambda { |e| sp_module(e[0]) }.call(s2)
-        if r5
-          @index = i4
-          r4 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r4 = nil
-        end
-        s2 << r4
-      end
-      if s2.last
-        r2 = instantiate_node(NT,input, i2...index, s2)
-        r2.extend(ProgramUnit0)
-      else
-        @index = i2
-        r2 = nil
-      end
+      r2 = _nt_module
       if r2
         r0 = r2
       else
-        i6, s6 = index, []
-        r7 = _nt_block_data
-        s6 << r7
-        if r7
-          i8 = index
-          r9 = lambda { |e| sp_block_data }.call(s6)
-          if r9
-            @index = i8
-            r8 = instantiate_node(SyntaxNode,input, index...index)
-          else
-            r8 = nil
-          end
-          s6 << r8
-        end
-        if s6.last
-          r6 = instantiate_node(NT,input, i6...index, s6)
-          r6.extend(ProgramUnit1)
+        r3 = _nt_block_data
+        if r3
+          r0 = r3
         else
-          @index = i6
-          r6 = nil
-        end
-        if r6
-          r0 = r6
-        else
-          i10, s10 = index, []
-          r11 = _nt_main_program
-          s10 << r11
-          if r11
-            i12 = index
-            r13 = lambda { |e| sp_main_program }.call(s10)
-            if r13
-              @index = i12
-              r12 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r12 = nil
-            end
-            s10 << r12
-          end
-          if s10.last
-            r10 = instantiate_node(NT,input, i10...index, s10)
-            r10.extend(ProgramUnit2)
-          else
-            @index = i10
-            r10 = nil
-          end
-          if r10
-            r0 = r10
+          r4 = _nt_main_program
+          if r4
+            r0 = r4
           else
             @index = i0
             r0 = nil
@@ -29638,6 +29495,7 @@ module Fortran
     def end_subroutine_stmt
       elements[4]
     end
+
   end
 
   def _nt_subroutine_subprogram
@@ -29681,6 +29539,17 @@ module Fortran
           if r6
             r8 = _nt_end_subroutine_stmt
             s0 << r8
+            if r8
+              i9 = index
+              r10 = lambda { |e| sp_subroutine_subprogram }.call(s0)
+              if r10
+                @index = i9
+                r9 = instantiate_node(SyntaxNode,input, index...index)
+              else
+                r9 = nil
+              end
+              s0 << r9
+            end
           end
         end
       end
