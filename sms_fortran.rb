@@ -652,7 +652,7 @@ module Fortran
       code.push("#{label} #{prefix} then")
       code.push("#{action}")
       code.push("endif")
-      replace_statement(code,:if_construct)
+      replace_statement(code)
     end
 
   end
@@ -1874,7 +1874,7 @@ module Fortran
 
     def translate
       code=sms_stop(0)
-      replace_statement(code,:call_stmt)
+      replace_statement(code)
     end
 
   end

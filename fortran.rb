@@ -646,9 +646,9 @@ module Fortran
       block[block.index(node)]=tree
     end
 
-    def replace_statement(code,rule=:block)
+    def replace_statement(code)
       code=code.join("\n") if code.is_a?(Array)
-      tree=raw(code,rule,@srcfile,{:env=>self.env})
+      tree=raw(code,:block,@srcfile,{:env=>self.env})
       tree.parent=self.parent
       block=self.parent.e
       block[block.index(self)]=tree
