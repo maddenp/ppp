@@ -1504,8 +1504,8 @@ grammar Fortran
   rule external_subprogram
     # F90:R203
 
-    subroutine_subprogram /
-    function_subprogram
+    subroutine_subprogram &{ |e| sp_env_pullup(e[0]) } <NT> /
+    function_subprogram &{ |e| sp_env_pullup(e[0]) } <NT> 
   end
 
   rule file_name_expr
@@ -1883,8 +1883,8 @@ grammar Fortran
   rule internal_subprogram
     # F90:R211
 
-    subroutine_subprogram /
-    function_subprogram
+    subroutine_subprogram &{ |e| sp_env_pullup(e[0]) } <NT> /
+    function_subprogram &{ |e| sp_env_pullup(e[0]) } <NT> 
   end
 
   rule internal_subprograms
@@ -2348,8 +2348,8 @@ grammar Fortran
   rule module_subprogram
     # F90:R213
 
-    subroutine_subprogram "" <Module_Subprogram_Subroutine> /
-    function_subprogram "" <Module_Subprogram_Function>
+    subroutine_subprogram &{ |e| sp_env_pullup(e[0]) } <Module_Subprogram_Subroutine> /
+    function_subprogram &{ |e| sp_env_pullup(e[0]) } <Module_Subprogram_Function>
   end
 
   rule module_subprogram_part
@@ -2732,9 +2732,9 @@ grammar Fortran
     # F90:R202
 
     external_subprogram /
-    module /
-    block_data /
-    main_program
+    module &{ |e| sp_env_pullup(e[0]) } <NT> /
+    block_data &{ |e| sp_env_pullup(e[0]) } <NT> /
+    main_program &{ |e| sp_env_pullup(e[0]) } <NT> 
   end
 
   rule program_units

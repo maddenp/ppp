@@ -345,11 +345,12 @@ module Fortran
         dc=declaration_constructs
         t.parent=dc
         dc.e.push(t)
-        while node||=self
+        node=self
+        begin
           node.envref[var]=newenv[var] if node.respond_to?(:envref)
           break if node==su
           node=node.parent
-        end
+        end while true
         if su.is_a?(Module)
           write_envfile(su.name,su.envref)
         end

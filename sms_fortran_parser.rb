@@ -1347,6 +1347,34 @@ module Fortran
     r0
   end
 
+  module SmsExecutable0
+    def sms_halo_comp
+      elements[0]
+    end
+
+  end
+
+  module SmsExecutable1
+    def sms_parallel
+      elements[0]
+    end
+
+  end
+
+  module SmsExecutable2
+    def sms_serial
+      elements[0]
+    end
+
+  end
+
+  module SmsExecutable3
+    def sms_to_local
+      elements[0]
+    end
+
+  end
+
   def _nt_sms_executable
     start_index = index
     if node_cache[:sms_executable].has_key?(index)
@@ -1375,45 +1403,125 @@ module Fortran
           if r4
             r0 = r4
           else
-            r5 = _nt_sms_halo_comp
+            i5, s5 = index, []
+            r6 = _nt_sms_halo_comp
+            s5 << r6
+            if r6
+              i7 = index
+              r8 = lambda { |e| sp_env_pullup(e[0]) }.call(s5)
+              if r8
+                @index = i7
+                r7 = instantiate_node(SyntaxNode,input, index...index)
+              else
+                r7 = nil
+              end
+              s5 << r7
+            end
+            if s5.last
+              r5 = instantiate_node(NT,input, i5...index, s5)
+              r5.extend(SmsExecutable0)
+            else
+              @index = i5
+              r5 = nil
+            end
             if r5
               r0 = r5
             else
-              r6 = _nt_sms_ignore
-              if r6
-                r0 = r6
+              r9 = _nt_sms_ignore
+              if r9
+                r0 = r9
               else
-                r7 = _nt_sms_parallel
-                if r7
-                  r0 = r7
-                else
-                  r8 = _nt_sms_reduce
-                  if r8
-                    r0 = r8
+                i10, s10 = index, []
+                r11 = _nt_sms_parallel
+                s10 << r11
+                if r11
+                  i12 = index
+                  r13 = lambda { |e| sp_env_pullup(e[0]) }.call(s10)
+                  if r13
+                    @index = i12
+                    r12 = instantiate_node(SyntaxNode,input, index...index)
                   else
-                    r9 = _nt_sms_serial
-                    if r9
-                      r0 = r9
-                    else
-                      r10 = _nt_sms_set_communicator
-                      if r10
-                        r0 = r10
+                    r12 = nil
+                  end
+                  s10 << r12
+                end
+                if s10.last
+                  r10 = instantiate_node(NT,input, i10...index, s10)
+                  r10.extend(SmsExecutable1)
+                else
+                  @index = i10
+                  r10 = nil
+                end
+                if r10
+                  r0 = r10
+                else
+                  r14 = _nt_sms_reduce
+                  if r14
+                    r0 = r14
+                  else
+                    i15, s15 = index, []
+                    r16 = _nt_sms_serial
+                    s15 << r16
+                    if r16
+                      i17 = index
+                      r18 = lambda { |e| sp_env_pullup(e[0]) }.call(s15)
+                      if r18
+                        @index = i17
+                        r17 = instantiate_node(SyntaxNode,input, index...index)
                       else
-                        r11 = _nt_sms_start
-                        if r11
-                          r0 = r11
+                        r17 = nil
+                      end
+                      s15 << r17
+                    end
+                    if s15.last
+                      r15 = instantiate_node(NT,input, i15...index, s15)
+                      r15.extend(SmsExecutable2)
+                    else
+                      @index = i15
+                      r15 = nil
+                    end
+                    if r15
+                      r0 = r15
+                    else
+                      r19 = _nt_sms_set_communicator
+                      if r19
+                        r0 = r19
+                      else
+                        r20 = _nt_sms_start
+                        if r20
+                          r0 = r20
                         else
-                          r12 = _nt_sms_stop
-                          if r12
-                            r0 = r12
+                          r21 = _nt_sms_stop
+                          if r21
+                            r0 = r21
                           else
-                            r13 = _nt_sms_to_local
-                            if r13
-                              r0 = r13
+                            i22, s22 = index, []
+                            r23 = _nt_sms_to_local
+                            s22 << r23
+                            if r23
+                              i24 = index
+                              r25 = lambda { |e| sp_env_pullup(e[0]) }.call(s22)
+                              if r25
+                                @index = i24
+                                r24 = instantiate_node(SyntaxNode,input, index...index)
+                              else
+                                r24 = nil
+                              end
+                              s22 << r24
+                            end
+                            if s22.last
+                              r22 = instantiate_node(NT,input, i22...index, s22)
+                              r22.extend(SmsExecutable3)
                             else
-                              r14 = _nt_sms_unstructured_grid
-                              if r14
-                                r0 = r14
+                              @index = i22
+                              r22 = nil
+                            end
+                            if r22
+                              r0 = r22
+                            else
+                              r26 = _nt_sms_unstructured_grid
+                              if r26
+                                r0 = r26
                               else
                                 @index = i0
                                 r0 = nil

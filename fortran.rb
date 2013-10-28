@@ -218,6 +218,13 @@ module Fortran
     "#{@dolabels[-1]}"=="#{@dolabels[-2]}"
   end
 
+  def sp_env_pullup(node)
+    if node.e[0].respond_to?(:envref) and (x=node.e[0].envref)
+      node.envref=x
+    end
+    true
+  end
+
   def sp_function_stmt(function_name,dummy_arg_name_list,result_option)
     envpush
     (env["#{function_name}"]||={})["function"]=true
@@ -320,8 +327,10 @@ module Fortran
         m.merge(x.env.select { |k,v| x=="#{x.name}" and v["function"] })
       end
       env.merge!(fn_env)
-      write_envfile(module_stmt.name,env)
     end
+    # The environment has already been modified by processing the module's
+    # specification-part, part, so always write out the module file.
+    write_envfile(module_stmt.name,env)
     envpop
     @access="_default"
     true
