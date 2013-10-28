@@ -418,7 +418,7 @@ module Fortran
     end
 
     def intrinsic?(function_name)
-      s=env[:static]
+      s=env[:global]
       unless (intrinsics=s[:intrinsics])
         f=File.join(File.dirname(File.expand_path($0)),"intrinsics")
         intrinsics=(s[:intrinsics]=Set.new(File.open(f).read.split))
@@ -427,7 +427,7 @@ module Fortran
     end
 
     def marker
-      s=env[:static]
+      s=env[:global]
       s[:marker]||=0
       m=(s[:marker]+=1)
       f=File.basename(input.srcfile)
@@ -459,7 +459,7 @@ module Fortran
     end
 
     def sms_commtag
-      s=env[:static]
+      s=env[:global]
       s[:tag]||=-1
       "sms__tag_#{s[:tag]+=1}"
     end

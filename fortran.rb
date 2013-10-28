@@ -23,7 +23,7 @@ module Fortran
   def envpop(scope_change=true)
     oldenv=@envstack.pop
     @envstack.push({}) if @envstack.empty?
-    env[:static]=oldenv[:static]
+    env[:global]=oldenv[:global]
     unless scope_change
       env_scope_items.each { |k| env[k]=oldenv[k] }
     end
@@ -32,7 +32,7 @@ module Fortran
 
   def envpush(scope_change=true)
     keep={}
-    keep[:static]=env.delete(:static)
+    keep[:global]=env.delete(:global)
     env_scope_items.each do |k|
       if (v=env.delete(k))
         keep[k]=v unless scope_change
@@ -300,7 +300,7 @@ module Fortran
 
   def sp_label(label)
     n=label.e.reduce("") { |m,x| m+"#{x}" }.to_i
-    (env[:static][:labels]||=Set.new).add(n)
+    (env[:global][:labels]||=Set.new).add(n)
     true
   end
 
@@ -616,7 +616,7 @@ module Fortran
     end
 
     def indent
-      s=env[:static]
+      s=env[:global]
       s[:level]||=0
       s[:level]+=1
     end
@@ -642,7 +642,7 @@ module Fortran
     end
 
     def label_create
-      labels=(env[:static][:labels]||=Set.new)
+      labels=(env[:global][:labels]||=Set.new)
       99999.downto(1).each do |n|
         unless labels.include?(n)
           labels.add(n)
@@ -659,7 +659,7 @@ module Fortran
     end
 
     def level
-      env[:static][:level]||=0
+      env[:global][:level]||=0
     end
 
     def list_to_s
@@ -718,7 +718,7 @@ module Fortran
     end
 
     def unindent
-      s=env[:static]
+      s=env[:global]
       s[:level]||=0
       s[:level]-=1 if s[:level]>0
     end
