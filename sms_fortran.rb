@@ -506,7 +506,7 @@ module Fortran
 
   end # class T
 
-  class Allocate_Object < E
+  class Allocate_Object < NT
 
     def translate
       if inside?(Allocate_Stmt)
@@ -551,7 +551,7 @@ module Fortran
 
   end
 
-  class Array_Section < E
+  class Array_Section < NT
 
     def translate
 
@@ -599,7 +599,7 @@ module Fortran
 
   end
 
-  class Array_Name_And_Spec < E
+  class Array_Name_And_Spec < NT
 
     def translate
       var="#{e[0]}"
@@ -1004,7 +1004,7 @@ module Fortran
 
   end
 
-  class Scoping_Unit < E
+  class Scoping_Unit < NT
 
     def check_static
 
@@ -1030,7 +1030,7 @@ module Fortran
 
   end
 
-  class SMS < E
+  class SMS < NT
   end
 
   class SMS_Region < SMS
@@ -1237,7 +1237,7 @@ module Fortran
 
   end
 
-  class SMS_Declare_Decomp_Unstructured_Option < E
+  class SMS_Declare_Decomp_Unstructured_Option < NT
   end
 
   class SMS_Decomp_Name < SMS
@@ -1363,7 +1363,7 @@ module Fortran
 
   end
 
-  class SMS_Halo_Comp_Pair < E
+  class SMS_Halo_Comp_Pair < NT
 
     def lo
       "#{e[1]}"
@@ -1375,7 +1375,7 @@ module Fortran
 
   end
 
-  class SMS_Halo_Comp_Pairs < E
+  class SMS_Halo_Comp_Pairs < NT
 
     def to_s
       dim1="#{e[0]}"
@@ -1431,7 +1431,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_List_1 < E
+  class SMS_Parallel_Var_List_1 < NT
 
     def to_s
       s="#{e[0]}#{e[1]}"
@@ -1445,7 +1445,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_List_2 < E
+  class SMS_Parallel_Var_List_2 < NT
 
     def to_s
       "#{e[0]}"
@@ -1899,7 +1899,7 @@ module Fortran
 
   end
 
-  class SMS_To_Local_List < E
+  class SMS_To_Local_List < NT
 
     def dd
       "#{e[1]}"
@@ -1949,7 +1949,7 @@ module Fortran
 
   end
 
-  class SMS_Var_List < E
+  class SMS_Var_List < NT
 
     def to_s
       v=["#{e[0]}"]

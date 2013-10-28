@@ -9,7 +9,7 @@ grammar Fortran
   rule ac_implied_do
     # F90:R433
 
-    t_paren_l ac_value_list t_comma ac_implied_do_control t_paren_r <E>
+    t_paren_l ac_value_list t_comma ac_implied_do_control t_paren_r <NT>
   end
 
   rule ac_implied_do_control
@@ -22,7 +22,7 @@ grammar Fortran
     # F90:R432
 
     ac_implied_do /
-    expr !t_equal <E>
+    expr !t_equal <NT>
   end
 
   rule ac_value_list
@@ -100,7 +100,7 @@ grammar Fortran
   rule action_term_do_construct
     # F90:R827
 
-    label_do_stmt !{ |e| sp_dolabel_repeat? } do_body do_term_action_stmt <E>
+    label_do_stmt !{ |e| sp_dolabel_repeat? } do_body do_term_action_stmt <NT>
   end
 
   rule actual_arg
@@ -116,7 +116,7 @@ grammar Fortran
   rule actual_arg_spec
     # F90:R1211
 
-    keyword_option actual_arg <E>
+    keyword_option actual_arg <NT>
   end
 
   rule actual_arg_spec_list
@@ -175,7 +175,7 @@ grammar Fortran
   rule allocate_shape_spec
     # F90:R626
 
-    ( allocate_lower_bound t_colon )? allocate_upper_bound <E>
+    ( allocate_lower_bound t_colon )? allocate_upper_bound <NT>
   end
 
   rule allocate_shape_spec_list
@@ -185,7 +185,7 @@ grammar Fortran
   end
 
   rule allocate_stat_construct
-    t_comma t_stat t_equal stat_variable <E>
+    t_comma t_stat t_equal stat_variable <NT>
   end
 
   rule allocate_stmt
@@ -233,7 +233,7 @@ grammar Fortran
   rule array_constructor
     # F90:R431
 
-    t_paren_l t_slash ac_value_list t_slash t_paren_r <E>
+    t_paren_l t_slash ac_value_list t_slash t_paren_r <NT>
   end
 
   rule array_element
@@ -427,7 +427,7 @@ grammar Fortran
     # a repeat, as that would require more than one end-do-stmt with the same
     # label, which is not permitted.
 
-    do_stmt !{ |e| sp_dolabel_repeat? } do_block end_do <E>
+    do_stmt !{ |e| sp_dolabel_repeat? } do_block end_do <NT>
   end
 
   rule boz_literal_constant
@@ -447,7 +447,7 @@ grammar Fortran
   rule case_construct
     # F90:R808
 
-    select_case_stmt case_stmt_construct_block end_select_stmt <E>
+    select_case_stmt case_stmt_construct_block end_select_stmt <NT>
   end
 
   rule case_construct_name
@@ -474,7 +474,7 @@ grammar Fortran
   end
 
   rule case_selector_range
-    t_paren_l case_value_range_list t_paren_r <E>
+    t_paren_l case_value_range_list t_paren_r <NT>
   end
 
   rule case_stmt
@@ -484,11 +484,11 @@ grammar Fortran
   end
 
   rule case_stmt_construct
-    case_stmt block <E>
+    case_stmt block <NT>
   end
 
   rule case_stmt_construct_block
-    case_stmt_construct* <E>
+    case_stmt_construct* <NT>
   end
 
   rule case_value
@@ -613,7 +613,7 @@ grammar Fortran
   end
 
   rule common_block_name_and_object_lists
-    common_block_name_and_object_list* <E>
+    common_block_name_and_object_list* <NT>
   end
 
   rule common_block_name_triplet
@@ -631,15 +631,15 @@ grammar Fortran
   end
 
   rule common_block_object_list
-    common_block_object common_block_object_pairs <E>
+    common_block_object common_block_object_pairs <NT>
   end
 
   rule common_block_object_pair
-    t_comma common_block_object <E>
+    t_comma common_block_object <NT>
   end
 
   rule common_block_object_pairs
-    common_block_object_pair* <E>
+    common_block_object_pair* <NT>
   end
 
   rule common_stmt
@@ -665,7 +665,7 @@ grammar Fortran
     # F90:R427 + F95:R426 + F03:R441
 
     t_pointer /
-    t_dimension t_paren_l component_array_spec t_paren_r <E> /
+    t_dimension t_paren_l component_array_spec t_paren_r <NT> /
     t_allocatable
   end
 
@@ -680,7 +680,7 @@ grammar Fortran
   rule component_decl
     # F90:R429 + F95:R428
 
-    component_name parenthesized_component_array_spec? ( t_star char_length )? component_initialization? <E>
+    component_name parenthesized_component_array_spec? ( t_star char_length )? component_initialization? <NT>
   end
 
   rule component_decl_list
@@ -694,13 +694,13 @@ grammar Fortran
   end
 
   rule component_def_stmts
-    component_def_stmt+ <E>
+    component_def_stmt+ <NT>
   end
 
   rule component_initialization
     # F95:R429
 
-    t_equal initialization_expr <E> /
+    t_equal initialization_expr <NT> /
     t_point null_function_ref <T>
   end
 
@@ -821,8 +821,8 @@ grammar Fortran
   rule data_i_do_object
     # F90:R536
 
-    array_element !t_equal <E> /
-    scalar_structure_component !t_equal <E> /
+    array_element !t_equal <NT> /
+    scalar_structure_component !t_equal <NT> /
     data_implied_do
   end
 
@@ -885,19 +885,19 @@ grammar Fortran
   rule data_stmt_set
     # F90:R530
 
-    data_stmt_object_list t_slash data_stmt_value_list t_slash <E>
+    data_stmt_object_list t_slash data_stmt_value_list t_slash <NT>
   end
 
   rule data_stmt_set_list
-    data_stmt_set data_stmt_set_list_pairs <E>
+    data_stmt_set data_stmt_set_list_pairs <NT>
   end
 
   rule data_stmt_set_list_pair
-    t_comma? data_stmt_set <E>
+    t_comma? data_stmt_set <NT>
   end
 
   rule data_stmt_set_list_pairs
-    data_stmt_set_list_pair* <E>
+    data_stmt_set_list_pair* <NT>
   end
 
   rule data_stmt_value
@@ -930,7 +930,7 @@ grammar Fortran
     parameter_stmt /
     format_stmt /
     entry_stmt /
-    stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <E>
+    stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <NT>
   end
 
   rule declaration_constructs
@@ -940,7 +940,7 @@ grammar Fortran
   rule default_char_variable
     # F90:R606
 
-    variable &{ |e| sp_default_char_variable?(e[0]) } <E>
+    variable &{ |e| sp_default_char_variable?(e[0]) } <NT>
   end
 
   rule default_char_expr
@@ -998,7 +998,7 @@ grammar Fortran
   rule derived_type_def
     # F90:R422
 
-    derived_type_stmt private_sequence_stmts component_def_stmts end_type_stmt <E>
+    derived_type_stmt private_sequence_stmts component_def_stmts end_type_stmt <NT>
   end
 
   rule derived_type_stmt
@@ -1129,7 +1129,7 @@ grammar Fortran
   end
 
   rule dummy_arg_list_option
-    t_paren_l dummy_arg_list? t_paren_r <E>
+    t_paren_l dummy_arg_list? t_paren_r <NT>
   end
 
   rule dummy_arg_name
@@ -1147,15 +1147,15 @@ grammar Fortran
   end
 
   rule else_construct
-    else_stmt block <E>
+    else_stmt block <NT>
   end
 
   rule else_if_construct
-    else_if_construct_element+ <E>
+    else_if_construct_element+ <NT>
   end
 
   rule else_if_construct_element
-    else_if_stmt block <E>
+    else_if_stmt block <NT>
   end
 
   rule else_if_stmt
@@ -1184,7 +1184,7 @@ grammar Fortran
   end
 
   rule elsewhere_construct
-    elsewhere_stmt where_assignment_stmt_block <E>
+    elsewhere_stmt where_assignment_stmt_block <NT>
   end
 
   rule elsewhere_stmt
@@ -1357,7 +1357,7 @@ grammar Fortran
   rule equiv_operand
     # F90:R715
 
-    not_op? level_4_expr <E>
+    not_op? level_4_expr <NT>
   end
 
   rule equivalence_object
@@ -1504,8 +1504,8 @@ grammar Fortran
   rule external_subprogram
     # F90:R203
 
-    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E>
+    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <NT> /
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <NT>
   end
 
   rule file_name_expr
@@ -1667,7 +1667,7 @@ grammar Fortran
   end
 
   rule if_then_construct
-    if_then_stmt block <E>
+    if_then_stmt block <NT>
   end
 
   rule if_then_stmt
@@ -1691,7 +1691,7 @@ grammar Fortran
     # and the availibility of 3rd-party syntax-checking compilers, it is not
     # enforced here.
 
-    implicit_part_stmt+ <E>
+    implicit_part_stmt+ <NT>
   end
 
   rule implicit_part_stmt
@@ -1848,11 +1848,11 @@ grammar Fortran
   rule interface_block
     # F90:R1201
 
-    interface_stmt interface_bodies module_procedure_stmts end_interface_stmt <E>
+    interface_stmt interface_bodies module_procedure_stmts end_interface_stmt <NT>
   end
 
   rule interface_bodies
-    interface_body* <E>
+    interface_body* <NT>
   end
 
   rule interface_body
@@ -1877,14 +1877,14 @@ grammar Fortran
   rule internal_subprogram_part
     # F90:R210
 
-    contains_stmt internal_subprograms <E>
+    contains_stmt internal_subprograms <NT>
   end
 
   rule internal_subprogram
     # F90:R211
 
-    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E>
+    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <NT> /
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <NT>
   end
 
   rule internal_subprograms
@@ -1947,7 +1947,7 @@ grammar Fortran
   rule io_implied_do
     # F90:R916
 
-    t_paren_l io_implied_do_object_list t_comma io_implied_do_control t_paren_r <E>
+    t_paren_l io_implied_do_object_list t_comma io_implied_do_control t_paren_r <NT>
   end
 
   rule io_implied_do_control
@@ -1959,8 +1959,8 @@ grammar Fortran
   rule io_implied_do_object
     # F90:R917
 
-    output_item !t_equal <E> /
-    input_item !t_equal <E>
+    output_item !t_equal <NT> /
+    input_item !t_equal <NT>
   end
 
   rule io_implied_do_object_list
@@ -2179,7 +2179,7 @@ grammar Fortran
   rule level_1_expr
     # F90:R703
 
-    defined_unary_op? primary <E>
+    defined_unary_op? primary <NT>
   end
 
   rule level_2_expr
@@ -2188,7 +2188,7 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_2_expr? add_op )? add_operand
 
-    add_op? add_operand level_2_expr? <E>
+    add_op? add_operand level_2_expr? <NT>
   end
 
   rule level_3_expr
@@ -2197,11 +2197,11 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_3_expr concat_op )? level_2_expr
 
-    level_2_expr level_3_expr_option? <E>
+    level_2_expr level_3_expr_option? <NT>
   end
 
   rule level_3_expr_option
-    concat_op level_3_expr <E>
+    concat_op level_3_expr <NT>
   end
 
   rule level_4_expr
@@ -2210,11 +2210,11 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_3_expr rel_op )? level_3_expr
 
-    level_3_expr level_4_expr_option? <E>
+    level_3_expr level_4_expr_option? <NT>
   end
 
   rule level_4_expr_option
-    rel_op level_3_expr <E>
+    rel_op level_3_expr <NT>
   end
 
   rule level_5_expr
@@ -2223,7 +2223,7 @@ grammar Fortran
     # Note: Left-recursive rule implied by standard:
     # ( level_5_expr equiv_op)? equiv_operand
 
-    equiv_operand level_5_expr_option? <E>
+    equiv_operand level_5_expr_option? <NT>
   end
 
   rule level_5_expr_option
@@ -2336,7 +2336,7 @@ grammar Fortran
   end
 
   rule module_procedure_stmts
-    module_procedure_stmt* <E>
+    module_procedure_stmt* <NT>
   end
 
   rule module_stmt
@@ -2434,7 +2434,7 @@ grammar Fortran
   rule nonblock_do_construct
     # F90:R826
 
-    outer_shared_do_construct !{ |e| sp_dolabel_repeat? } <E> /
+    outer_shared_do_construct !{ |e| sp_dolabel_repeat? } <NT> /
     action_term_do_construct
   end
 
@@ -2590,7 +2590,7 @@ grammar Fortran
   end
 
   rule parenthesized_expr
-    t_paren_l expr t_paren_r <E>
+    t_paren_l expr t_paren_r <NT>
   end
 
   rule parenthesized_section_subscript_list
@@ -2703,7 +2703,7 @@ grammar Fortran
   end
 
   rule private_sequence_stmts
-    private_sequence_stmt* <E>
+    private_sequence_stmt* <NT>
   end
 
   rule procedure_name
@@ -2732,9 +2732,9 @@ grammar Fortran
     # F90:R202
 
     external_subprogram /
-    module &{ |e| sp_module(e[0]) } <E> /
-    block_data &{ |e| sp_block_data } <E> /
-    main_program &{ |e| sp_main_program } <E>
+    module &{ |e| sp_module(e[0]) } <NT> /
+    block_data &{ |e| sp_block_data } <NT> /
+    main_program &{ |e| sp_main_program } <NT>
   end
 
   rule program_units
@@ -3035,8 +3035,8 @@ grammar Fortran
   rule shared_term_do_construct
     # F90:R831
 
-    inner_shared_do_construct &{ |e| sp_dolabel_pop } <E> /
-    outer_shared_do_construct &{ |e| sp_dolabel_pop } <E>
+    inner_shared_do_construct &{ |e| sp_dolabel_pop } <NT> /
+    outer_shared_do_construct &{ |e| sp_dolabel_pop } <NT>
   end
 
   rule sign
@@ -3173,7 +3173,7 @@ grammar Fortran
   rule structure_constructor
     # F90:R430
 
-    type_name t_paren_l expr_list t_paren_r <E>
+    type_name t_paren_l expr_list t_paren_r <NT>
   end
 
   rule subroutine_name
@@ -3244,7 +3244,7 @@ grammar Fortran
   end
 
   rule substring_range_triplet
-    t_paren_l substring_range t_paren_r <E>
+    t_paren_l substring_range t_paren_r <NT>
   end
 
   rule t_access
@@ -3953,13 +3953,13 @@ grammar Fortran
   end
 
   rule where_assignment_stmt_block
-    assignment_stmt* <E>
+    assignment_stmt* <NT>
   end
 
   rule where_construct
     # F90:R739
 
-    where_construct_stmt where_assignment_stmt_block elsewhere_construct? end_where_stmt <E>
+    where_construct_stmt where_assignment_stmt_block elsewhere_construct? end_where_stmt <NT>
   end
 
   rule where_construct_stmt

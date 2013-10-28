@@ -10,7 +10,7 @@ grammar Fortran
     parameter_stmt /
     format_stmt /
     entry_stmt /
-    stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <E> /
+    stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <NT> /
     sms_declarative
   end
 
@@ -36,8 +36,8 @@ grammar Fortran
   rule external_subprogram
     # F90:R203
 
-    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <E> /
-    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <E>
+    subroutine_subprogram &{ |e| sp_subroutine_subprogram } <NT> /
+    function_subprogram &{ |e| sp_function_subprogram(e[0]) } <NT>
   end
 
   rule implicit_part
@@ -48,7 +48,7 @@ grammar Fortran
     # and the availibility of 3rd-party syntax-checking compilers, it is not
     # enforced here.
 
-    implicit_part_stmt+ <E>
+    implicit_part_stmt+ <NT>
   end
 
   rule sms_barrier
@@ -123,15 +123,15 @@ grammar Fortran
     sms_compare_var /
     sms_create_decomp /
     sms_exchange /
-    sms_halo_comp &{ |e| sp_sms_halo_comp } <E> /
+    sms_halo_comp &{ |e| sp_sms_halo_comp } <NT> /
     sms_ignore /
-    sms_parallel &{ |e| sp_sms_parallel } <E> /
+    sms_parallel &{ |e| sp_sms_parallel } <NT> /
     sms_reduce /
-    sms_serial &{ |e| sp_sms_serial } <E> /
+    sms_serial &{ |e| sp_sms_serial } <NT> /
     sms_set_communicator /
     sms_start /
     sms_stop /
-    sms_to_local &{ |e| sp_sms_to_local } <E> /
+    sms_to_local &{ |e| sp_sms_to_local } <NT> /
     sms_unstructured_grid
   end
 

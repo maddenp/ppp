@@ -759,14 +759,6 @@ module Fortran
 
   end
 
-  class E < T
-
-		def to_s
-			cat
-		end
-
-  end
-
   class J < T
 
 		def to_s
@@ -775,7 +767,15 @@ module Fortran
 
   end
 
-  class Scoping_Unit < E
+  class NT < T
+
+		def to_s
+			cat
+		end
+
+  end
+
+  class Scoping_Unit < NT
   end
 
   class StmtC < T
@@ -796,7 +796,7 @@ module Fortran
 
   # Out-of-order class definitions (must be defined before subclassed)
 
-  class IO_Item_List < E
+  class IO_Item_List < NT
 
 		def to_s
 			list_to_s
@@ -808,7 +808,7 @@ module Fortran
 
   end
 
-  class IO_Item_List_Pair < E
+  class IO_Item_List_Pair < NT
 
     def item
       e[1]
@@ -1182,7 +1182,7 @@ module Fortran
 
   end
 
-  class Add_Operand < E
+  class Add_Operand < NT
 
     def to_s
       "#{e[0]}"+((e[1].e)?("#{e[1].e[0]}#{e[1].e[1]}"):(""))
@@ -1198,7 +1198,7 @@ module Fortran
 
   end
 
-  class Allocate_Object < E
+  class Allocate_Object < NT
 
     def item
       e[1]
@@ -1258,7 +1258,7 @@ module Fortran
 
   end
 
-  class Allocation < E
+  class Allocation < NT
 
     def name
       e[0].name
@@ -1282,7 +1282,7 @@ module Fortran
 
   end
 
-  class Alt_Return_Spec < E
+  class Alt_Return_Spec < NT
   end
 
   class Arithmetic_If_Stmt < T
@@ -1293,10 +1293,10 @@ module Fortran
 
   end
 
-  class Array_Name < E
+  class Array_Name < NT
   end
 
-  class Array_Name_And_Deferred_Shape_Spec_List < E
+  class Array_Name_And_Deferred_Shape_Spec_List < NT
 
     def array_spec
       (e[1].respond_to?(:array_spec))?(e[1].array_spec):(nil)
@@ -1308,10 +1308,10 @@ module Fortran
 
   end
 
-  class Array_Name_And_Deferred_Shape_Spec_List_Pair < E
+  class Array_Name_And_Deferred_Shape_Spec_List_Pair < NT
   end
 
-  class Array_Name_And_Spec < E
+  class Array_Name_And_Spec < NT
 
     def name
       "#{e[0]}"
@@ -1323,7 +1323,7 @@ module Fortran
 
   end
 
-  class Array_Name_And_Spec_Pair < E
+  class Array_Name_And_Spec_Pair < NT
 
     def name
       e[1].name
@@ -1359,7 +1359,7 @@ module Fortran
 
   end
 
-  class Array_Section < E
+  class Array_Section < NT
 
     def data_ref
       e[0]
@@ -1486,7 +1486,7 @@ module Fortran
 
   end
 
-  class Attr_Spec_Allocatable < E
+  class Attr_Spec_Allocatable < NT
 
     def allocatable?
       true
@@ -1494,7 +1494,7 @@ module Fortran
 
   end
 
-  class Attr_Spec_Base < E
+  class Attr_Spec_Base < NT
 
     def allocatable?
       attrany(:allocatable?)
@@ -1522,7 +1522,7 @@ module Fortran
 
   end
 
-  class Attr_Spec_Dimension < E
+  class Attr_Spec_Dimension < NT
 
     def dimension?
       e[2]
@@ -1576,7 +1576,7 @@ module Fortran
 
   end
 
-  class Attr_Spec_Parameter < E
+  class Attr_Spec_Parameter < NT
 
     def parameter?
       true
@@ -1603,7 +1603,7 @@ module Fortran
   class Block_Data < Scoping_Unit
   end
 
-  class Block_Data_Name < E
+  class Block_Data_Name < NT
   end
 
   class Block_Data_Stmt < T
@@ -1614,7 +1614,7 @@ module Fortran
     end
   end
 
-  class Block_Do_Construct < E
+  class Block_Do_Construct < NT
   end
 
   class Call_Stmt < T
@@ -1625,7 +1625,7 @@ module Fortran
 
   end
 
-  class Case_Construct_Name < E
+  class Case_Construct_Name < NT
   end
 
   class Case_Stmt < T
@@ -1648,7 +1648,7 @@ module Fortran
   class Close_Spec_List < IO_Spec_List
   end
 
-  class Close_Spec_List_Pair < E
+  class Close_Spec_List_Pair < NT
   end
 
   class Close_Stmt < IO_Stmt
@@ -1667,7 +1667,7 @@ module Fortran
 
   end
 
-  class Common_Block_Name < E
+  class Common_Block_Name < NT
 
     def name
       e[0]
@@ -1707,7 +1707,7 @@ module Fortran
 
   end
 
-  class Component_Name < E
+  class Component_Name < NT
   end
 
   class Computed_Goto_Stmt < T
@@ -1721,7 +1721,7 @@ module Fortran
   class Connect_Spec_List < IO_Spec_List
   end
 
-  class Connect_Spec_List_Pair < E
+  class Connect_Spec_List_Pair < NT
   end
 
   class Contains_Stmt < T
@@ -1852,10 +1852,10 @@ module Fortran
 
   end
 
-  class Do_Body < E
+  class Do_Body < NT
   end
 
-  class Do_Construct_Name < E
+  class Do_Construct_Name < NT
   end
 
   class Do_Term_Action_Stmt < T
@@ -1890,7 +1890,7 @@ module Fortran
   class Dummy_Arg_List < T
   end
 
-  class Dummy_Arg_Name < E
+  class Dummy_Arg_Name < NT
   end
 
   class Dummy_Arg_Name_List < T
@@ -1905,7 +1905,7 @@ module Fortran
 
   end
 
-  class Dummy_Arg_Name_List_Pair < E
+  class Dummy_Arg_Name_List_Pair < NT
 
     def name
       e[1]
@@ -2078,7 +2078,7 @@ module Fortran
 
   end
 
-  class Entity_Decl < E
+  class Entity_Decl < NT
 
     def name
       e[0].name
@@ -2111,10 +2111,10 @@ module Fortran
 		end
   end
 
-  class Entity_Decl_Array_Spec < E
+  class Entity_Decl_Array_Spec < NT
   end
 
-  class Entity_Decl_List < E
+  class Entity_Decl_List < NT
 
     def names
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
@@ -2126,7 +2126,7 @@ module Fortran
 
   end
 
-  class Entity_Decl_List_Pair < E
+  class Entity_Decl_List_Pair < NT
 
     def array?
       e[1].array?
@@ -2142,7 +2142,7 @@ module Fortran
 
   end
 
-  class Entity_Decl_List_Pairs < E
+  class Entity_Decl_List_Pairs < NT
 
     def props(distribute)
       e.reduce({}) { |m,x| m.merge(x.props(distribute)) }
@@ -2150,7 +2150,7 @@ module Fortran
 
   end
 
-  class Entry_Name < E
+  class Entry_Name < NT
   end
 
   class Entry_Stmt < T
@@ -2169,10 +2169,10 @@ module Fortran
 
   end
 
-  class Execution_Part < E
+  class Execution_Part < NT
   end
 
-  class Execution_Part_Construct < E
+  class Execution_Part_Construct < NT
   end
 
   class Explicit_Shape_Spec < T
@@ -2229,7 +2229,7 @@ module Fortran
 
   end
 
-  class Expr < E
+  class Expr < NT
 
     def to_s
       "#{e[0]}"+((e[1].e)?("#{e[1].e[0]}#{e[1].e[1]}"):(""))
@@ -2245,10 +2245,10 @@ module Fortran
 
   end
 
-  class External_File_Unit < E
+  class External_File_Unit < NT
   end
 
-  class External_Name < E
+  class External_Name < NT
   end
 
   class External_Name_List < T
@@ -2259,7 +2259,7 @@ module Fortran
 
   end
 
-  class Function_Name < E
+  class Function_Name < NT
 
     def name
       e[0]
@@ -2299,7 +2299,7 @@ module Fortran
 
   end
 
-  class Function_Reference < E
+  class Function_Reference < NT
 
     def name
       e[0]
@@ -2381,7 +2381,7 @@ module Fortran
 
   end
 
-  class Generic_Name < E
+  class Generic_Name < NT
 
     def name
       e[0]
@@ -2412,10 +2412,10 @@ module Fortran
   class Goto_Stmt < StmtJ
   end
 
-  class If_Construct < E
+  class If_Construct < NT
   end
 
-  class If_Construct_Name < E
+  class If_Construct_Name < NT
   end
 
   class If_Stmt < T
@@ -2444,7 +2444,7 @@ module Fortran
 
   end
 
-  class Implicit_None_Stmt < E
+  class Implicit_None_Stmt < NT
 
 		def to_s
 			stmt(space)+"\n"
@@ -2460,10 +2460,10 @@ module Fortran
 
   end
 
-  class Implicit_Spec_List_Pair < E
+  class Implicit_Spec_List_Pair < NT
   end
 
-  class Implicit_Stmt < E
+  class Implicit_Stmt < NT
 
 		def to_s
 			stmt(space)
@@ -2530,7 +2530,7 @@ module Fortran
 
   end
 
-  class Interface_Body < E
+  class Interface_Body < NT
   end
 
   class Interface_Body_1 < Interface_Body
@@ -2549,7 +2549,7 @@ module Fortran
 
   end
 
-  class Internal_File_Unit < E
+  class Internal_File_Unit < NT
   end
 
   class Internal_Subprograms < T
@@ -2561,7 +2561,7 @@ module Fortran
 
   end
 
-  class Intrinsic_Procedure_Name < E
+  class Intrinsic_Procedure_Name < NT
   end
 
   class Intrinsic_Procedure_Name_List < T
@@ -2575,7 +2575,7 @@ module Fortran
   class IO_Control_Spec_List < IO_Spec_List
   end
 
-  class IO_Control_Spec_List_Pair < E
+  class IO_Control_Spec_List_Pair < NT
   end
 
   class IO_Control_Spec_Unit_Nml < T
@@ -2598,7 +2598,7 @@ module Fortran
 
   end
 
-  class IO_Spec < E
+  class IO_Spec < NT
 
     def relabel_spec(spec)
       old=rhs
@@ -2768,7 +2768,7 @@ module Fortran
 
   end
 
-  class Label_List_Pair < E
+  class Label_List_Pair < NT
 
     def label
       e[1]
@@ -2787,7 +2787,7 @@ module Fortran
 
   end
 
-  class Local_Name < E
+  class Local_Name < NT
   end
 
   class Loop_Control < T
@@ -2851,7 +2851,7 @@ module Fortran
 
   end
 
-  class Module_Name < E
+  class Module_Name < NT
   end
 
   class Module_Stmt < T
@@ -2868,7 +2868,7 @@ module Fortran
 
   end
 
-  class Module_Subprogram_Function < E
+  class Module_Subprogram_Function < NT
 
     def env
       e[0].env
@@ -2892,7 +2892,7 @@ module Fortran
 
   end
 
-  class Module_Subprogram_Subroutine < E
+  class Module_Subprogram_Subroutine < NT
 
     def env
       e[0].env
@@ -2904,7 +2904,7 @@ module Fortran
 
   end
 
-  class Mult_Operand < E
+  class Mult_Operand < NT
 
     def to_s
       "#{e[0]}#{e[1]}"
@@ -2920,10 +2920,10 @@ module Fortran
 
   end
 
-  class Named_Constant < E
+  class Named_Constant < NT
   end
 
-  class Named_Constant_Def < E
+  class Named_Constant_Def < NT
 
     def name
       e[0]
@@ -2943,7 +2943,7 @@ module Fortran
 
   end
 
-  class Namelist_Group_Name < E
+  class Namelist_Group_Name < NT
 
     def name
       e[0]
@@ -2963,7 +2963,7 @@ module Fortran
 
   end
 
-  class Namelist_Group_Object_List_Pair < E
+  class Namelist_Group_Object_List_Pair < NT
 
     def object
       e[1]
@@ -3007,7 +3007,7 @@ module Fortran
 
   end
 
-  class Namelist_Group_Sets < E
+  class Namelist_Group_Sets < NT
 
     def names
       sets.reduce([]) { |m,x| m.push(x.name) }
@@ -3031,7 +3031,7 @@ module Fortran
 
   end
 
-  class Nonblock_Do_Construct < E
+  class Nonblock_Do_Construct < NT
 
     def label
       e[0].label
@@ -3049,7 +3049,7 @@ module Fortran
 
   end
 
-  class Object_Name < E
+  class Object_Name < NT
 
     def name
       e[0]
@@ -3057,7 +3057,7 @@ module Fortran
 
   end
 
-  class Object_Name_And_Spec_List < E
+  class Object_Name_And_Spec_List < NT
 
     def name
       e[0].name
@@ -3065,7 +3065,7 @@ module Fortran
 
   end
 
-  class Object_Name_And_Spec_List_Pair < E
+  class Object_Name_And_Spec_List_Pair < NT
 
     def name
       e[1].name
@@ -3081,7 +3081,7 @@ module Fortran
 
   end
 
-  class Only < E
+  class Only < NT
 
     def localname
       (e[0].is_a?(Only_Option))?(e[0].localname):(usename)
@@ -3141,7 +3141,7 @@ module Fortran
 
   end
 
-  class Outer_Shared_Do_Construct < E
+  class Outer_Shared_Do_Construct < NT
 
     def label
       e[0].label
@@ -3155,7 +3155,7 @@ module Fortran
   class Output_Item_List_Pair < IO_Item_List_Pair
   end
 
-  class Parenthesized_Args < E
+  class Parenthesized_Args < NT
   end
 
   class Parenthesized_Deferred_Shape_Spec_List < T
@@ -3178,7 +3178,7 @@ module Fortran
 
   end
 
-  class Parenthesized_Section_Subscript_List < E
+  class Parenthesized_Section_Subscript_List < NT
 
     def subscript_list
       e[1].subscript_list
@@ -3186,10 +3186,10 @@ module Fortran
 
   end
 
-  class Part_Name < E
+  class Part_Name < NT
   end
 
-  class Part_Ref < E
+  class Part_Ref < NT
 
     def name
       part_name.name
@@ -3229,13 +3229,13 @@ module Fortran
 
   end
 
-  class Position_Spec_List_Pair < E
+  class Position_Spec_List_Pair < NT
   end
 
   class Power_Op < T
   end
 
-  class Power_Op_Option < E
+  class Power_Op_Option < NT
   end
 
   class Print_Stmt < IO_Stmt
@@ -3250,7 +3250,7 @@ module Fortran
 
   end
 
-  class Print_Stmt_Output_Item_List < E
+  class Print_Stmt_Output_Item_List < NT
 
     def items
       output_item_list.items
@@ -3266,7 +3266,7 @@ module Fortran
 
   end
 
-  class Procedure_Name < E
+  class Procedure_Name < NT
   end
 
   class Procedure_Name_List < T
@@ -3277,7 +3277,7 @@ module Fortran
 
   end
 
-  class Program_Name < E
+  class Program_Name < NT
   end
 
   class Program_Stmt < T
@@ -3333,7 +3333,7 @@ module Fortran
 
   end
 
-  class Rename < E
+  class Rename < NT
 
     def localname
       "#{e[0]}"
@@ -3345,7 +3345,7 @@ module Fortran
 
   end
 
-  class Rename_List < E
+  class Rename_List < NT
 
     def localnames
       e[1].e.reduce([e[0].localname]) { |m,x| m.push(x.localname) }
@@ -3357,7 +3357,7 @@ module Fortran
 
   end
 
-  class Rename_List_Pair < E
+  class Rename_List_Pair < NT
 
     def localname
       e[1].localname
@@ -3381,7 +3381,7 @@ module Fortran
 
   end
 
-  class Result_Name < E
+  class Result_Name < NT
 
     def name
       e[0]
@@ -3389,7 +3389,7 @@ module Fortran
 
   end
 
-  class Result_Option < E
+  class Result_Option < NT
 
     def name
       e[2].name
@@ -3432,7 +3432,7 @@ module Fortran
 
   end
 
-  class Saved_Entity_1 < E
+  class Saved_Entity_1 < NT
 
     def name
       e[0].name
@@ -3440,7 +3440,7 @@ module Fortran
 
   end
 
-  class Saved_Entity_2 < E
+  class Saved_Entity_2 < NT
 
     def name
       e[1].name
@@ -3460,7 +3460,7 @@ module Fortran
 
   end
 
-  class Saved_Entity_List_Pair < E
+  class Saved_Entity_List_Pair < NT
 
     def name
       e[1].name
@@ -3468,7 +3468,7 @@ module Fortran
 
   end
 
-  class Section_Subscript_List < E
+  class Section_Subscript_List < NT
 
     def subscript_list
       e[1].elements.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
@@ -3518,7 +3518,7 @@ module Fortran
   class Stop_Stmt < StmtJ
   end
 
-  class Subroutine_Name < E
+  class Subroutine_Name < NT
 
     def name
       e[0]
@@ -3556,7 +3556,7 @@ module Fortran
 
   end
 
-  class Subscript < E
+  class Subscript < NT
 
     def subscript
       e[0]
@@ -3564,7 +3564,7 @@ module Fortran
 
   end
 
-  class Subscript_Triplet < E
+  class Subscript_Triplet < NT
 
     def lower
       (e[0].is_a?(Subscript))?(e[0]):(nil)
@@ -3580,7 +3580,7 @@ module Fortran
 
   end
 
-  class Subscript_Triplet_Stride_Option < E
+  class Subscript_Triplet_Stride_Option < NT
 
     def stride
       e[1]
@@ -3627,10 +3627,10 @@ module Fortran
 
   end
 
-  class Type_Name < E
+  class Type_Name < NT
   end
 
-  class Type_Spec < E
+  class Type_Spec < NT
 
     def derived?
       "#{e[0]}"=="type"
@@ -3660,7 +3660,7 @@ module Fortran
 
   end
 
-  class Use_Name < E
+  class Use_Name < NT
 
     def name
       e[0]
@@ -3716,7 +3716,7 @@ module Fortran
 
   end
 
-  class Variable_Name < E
+  class Variable_Name < NT
 
     def name
       e[0]
@@ -3724,7 +3724,7 @@ module Fortran
 
   end
 
-  class Vector_Subscript < E
+  class Vector_Subscript < NT
 
     def subscript
       e[0]

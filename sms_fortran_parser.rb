@@ -70,7 +70,7 @@ module Fortran
                     s8 << r10
                   end
                   if s8.last
-                    r8 = instantiate_node(E,input, i8...index, s8)
+                    r8 = instantiate_node(NT,input, i8...index, s8)
                     r8.extend(DeclarationConstruct0)
                   else
                     @index = i8
@@ -268,7 +268,7 @@ module Fortran
       s1 << r3
     end
     if s1.last
-      r1 = instantiate_node(E,input, i1...index, s1)
+      r1 = instantiate_node(NT,input, i1...index, s1)
       r1.extend(ExternalSubprogram0)
     else
       @index = i1
@@ -292,7 +292,7 @@ module Fortran
         s5 << r7
       end
       if s5.last
-        r5 = instantiate_node(E,input, i5...index, s5)
+        r5 = instantiate_node(NT,input, i5...index, s5)
         r5.extend(ExternalSubprogram1)
       else
         @index = i5
@@ -335,7 +335,7 @@ module Fortran
       @index = i0
       r0 = nil
     else
-      r0 = instantiate_node(E,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
     end
 
     node_cache[:implicit_part][start_index] = r0
@@ -1502,7 +1502,7 @@ module Fortran
               s5 << r7
             end
             if s5.last
-              r5 = instantiate_node(E,input, i5...index, s5)
+              r5 = instantiate_node(NT,input, i5...index, s5)
               r5.extend(SmsExecutable0)
             else
               @index = i5
@@ -1530,7 +1530,7 @@ module Fortran
                   s10 << r12
                 end
                 if s10.last
-                  r10 = instantiate_node(E,input, i10...index, s10)
+                  r10 = instantiate_node(NT,input, i10...index, s10)
                   r10.extend(SmsExecutable1)
                 else
                   @index = i10
@@ -1558,7 +1558,7 @@ module Fortran
                       s15 << r17
                     end
                     if s15.last
-                      r15 = instantiate_node(E,input, i15...index, s15)
+                      r15 = instantiate_node(NT,input, i15...index, s15)
                       r15.extend(SmsExecutable2)
                     else
                       @index = i15
@@ -1594,7 +1594,7 @@ module Fortran
                               s22 << r24
                             end
                             if s22.last
-                              r22 = instantiate_node(E,input, i22...index, s22)
+                              r22 = instantiate_node(NT,input, i22...index, s22)
                               r22.extend(SmsExecutable3)
                             else
                               @index = i22
