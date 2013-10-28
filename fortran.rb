@@ -603,22 +603,6 @@ module Fortran
       s[:level]+=1
     end
 
-    def insert_statement(code,rule,node,offset)
-      tree=raw(code,rule,@srcfile,{:env=>env})
-      tree.parent=node.parent
-      block=node.parent.e
-      block.insert(block.index(node)+offset,tree)
-      tree
-    end
-
-    def insert_statement_after(code,rule,predecessor)
-      insert_statement(code,rule,predecessor,1)
-    end
-
-    def insert_statement_before(code,rule,successor)
-      insert_statement(code,rule,successor,0)
-    end
-
     def inside?(*class_or_classes)
       (ancestor(*class_or_classes))?(true):(false)
     end
