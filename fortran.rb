@@ -94,11 +94,11 @@ module Fortran
       p="_default"
     end
     if access_stmt_option.is_a?(Access_Stmt_Option)
-      access_stmt_option.names.each { |x| varsetprop(x,"access",p) }
+      access_stmt_option.names.each { |x| varsetattr(x,"access",p) }
     else
       @access=p
       env.each do |n,h|
-        varsetprop(n,"access",p) if vargetprop(n,"access")=="_default"
+        varsetattr(n,"access",p) if vargetattr(n,"access")=="_default"
       end
     end
     true
@@ -112,7 +112,7 @@ module Fortran
       # Record that this var has been marked allocatable, which means that it
       # must be an array with deferred bounds.
       env[:allocatable].push(var)
-      varsetprop(var,"sort","_array")
+      varsetattr(var,"sort","_array")
       # Correct for the case where this array has already been seen and its
       # bounds incorrectly marked as assumed.
       env[var].keys.each { |k| env[var][k]="_deferred" if k=~/[lu]b\d+/ }
@@ -120,7 +120,7 @@ module Fortran
     # In case this array has not previously been seen, record its array specs.
     a.items.each do |x|
       if x.array_spec
-        env[x.name].merge!(array_props(x.array_spec,{},@distribute))
+        env[x.name].merge!(array_attrs(x.array_spec,{},@distribute))
       end
     end
     true
@@ -182,10 +182,10 @@ module Fortran
         redef(var)
         array_spec=x.spec.e[0]
         env[var]||={}
-        env[var].merge!(array_props(array_spec,{},@distribute))
+        env[var].merge!(array_attrs(array_spec,{},@distribute))
       end
     end
-    array_names_and_specs.names.each { |x| varsetprop(x,"sort","_array") }
+    array_names_and_specs.names.each { |x| varsetattr(x,"sort","_array") }
     true
   end
 
@@ -295,7 +295,7 @@ module Fortran
 
   def sp_is_array?(node)
     return false unless node.respond_to?(:name)
-    vargetprop(node.name,"sort")=="_array"
+    vargetattr(node.name,"sort")=="_array"
   end
 
   def sp_label(label)
@@ -367,7 +367,7 @@ module Fortran
   def sp_parameter_stmt(named_constant_def_list)
     named_constant_def_list.names.each do |x|
       redef(x)
-      varsetprop(x,"parameter","_true")
+      varsetattr(x,"parameter","_true")
     end
     true
   end
@@ -413,7 +413,7 @@ module Fortran
         fail "ERROR: Unexpected node type"
       end
       var=x.name
-      varsetprop(var,"sort","_array") if x.is_a?(Array_Name_And_Spec)
+      varsetattr(var,"sort","_array") if x.is_a?(Array_Name_And_Spec)
       redef(var)
     end
     true
@@ -421,28 +421,28 @@ module Fortran
 
   def sp_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
     entity_decl_list.names.each { |x| redef(x) unless (varenv=env["#{x}"]) and varenv["function"] }
-    varprops=entity_decl_list.varprops(@distribute)
+    varattrs=entity_decl_list.varattrs(@distribute)
     if x=attrchk(attr_spec_option,:dimension?)
       array_spec=x.e[0]
-      varprops.each do |v,p|
+      varattrs.each do |v,p|
         p["sort"]="_array"
-        array_props(array_spec,p,@distribute)
+        array_attrs(array_spec,p,@distribute)
       end
     end
     if attrchk(attr_spec_option,:allocatable?)
-      varprops.each { |v,p| p["allocatable"]="_true" }
+      varattrs.each { |v,p| p["allocatable"]="_true" }
     end
     if attrchk(attr_spec_option,:parameter?)
-      varprops.each { |v,p| p["parameter"]="_true" }
+      varattrs.each { |v,p| p["parameter"]="_true" }
     end
     if attrchk(attr_spec_option,:private?)
-      varprops.each { |v,p| p["access"]="private" }
+      varattrs.each { |v,p| p["access"]="private" }
     elsif attrchk(attr_spec_option,:public?)
-      varprops.each { |v,p| p["access"]="public" }
+      varattrs.each { |v,p| p["access"]="public" }
     else
-      varprops.each { |v,p| p["access"]=@access }
+      varattrs.each { |v,p| p["access"]=@access }
     end
-    varprops.each do |v,p|
+    varattrs.each do |v,p|
       name="#{v}"
       varenv=(env[name]||={})
       ["access","sort"].each { |x| p.delete(x) if varenv.include?(x) }
@@ -480,11 +480,11 @@ module Fortran
     end
     modenv(m).each do |x|
       varname=x[0]
-      varprop=x[1]
+      varattr=x[1]
       localname=use_localname(m,varname)
       if uses?(m,:all) or uses?(m,localname)
-        varprop["access"]=(e=env[varname] and a=e["access"])?(a):(@access)
-        env[localname]=varprop
+        varattr["access"]=(e=env[varname] and a=e["access"])?(a):(@access)
+        env[localname]=varattr
       end
     end
     true
@@ -503,12 +503,12 @@ module Fortran
     e[:uses][modulename].map { |x| x[1] }
   end
 
-  def vargetprop(n,k)
+  def vargetattr(n,k)
     return nil unless env["#{n}"]
     env["#{n}"]["#{k}"]||nil
   end
 
-  def varsetprop(n,k,v)
+  def varsetattr(n,k,v)
     env["#{n}"]||={}
     env["#{n}"]["#{k}"]=v
   end
@@ -2070,13 +2070,13 @@ module Fortran
       e[0].name
     end
 
-    def props(distribute)
-      _props={}
+    def attrs(distribute)
+      _attrs={}
       if e[1].is_a?(Entity_Decl_Array_Spec)
-        array_props(e[1].e[1].e[0],_props,distribute)
+        array_attrs(e[1].e[1].e[0],_attrs,distribute)
       end
-      _props["sort"]=((array?)?("_array"):("_scalar"))
-      {name=>_props}
+      _attrs["sort"]=((array?)?("_array"):("_scalar"))
+      {name=>_attrs}
     end
 
   end
@@ -2106,8 +2106,8 @@ module Fortran
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
     end
 
-    def varprops(distribute)
-      e[0].props(distribute).merge(e[1].props(distribute))
+    def varattrs(distribute)
+      e[0].attrs(distribute).merge(e[1].attrs(distribute))
     end
 
   end
@@ -2122,16 +2122,16 @@ module Fortran
       e[1].name
     end
 
-    def props(distribute)
-      e[1].props(distribute)
+    def attrs(distribute)
+      e[1].attrs(distribute)
     end
 
   end
 
   class Entity_Decl_List_Pairs < NT
 
-    def props(distribute)
-      e.reduce({}) { |m,x| m.merge(x.props(distribute)) }
+    def attrs(distribute)
+      e.reduce({}) { |m,x| m.merge(x.attrs(distribute)) }
     end
 
   end

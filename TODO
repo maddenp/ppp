@@ -97,8 +97,6 @@
 
 - Factor more sms text out into T sms_* methods (esp library calls).
 
-- varprop -> varenv?
-
 - Many rules are mapped to T nodes (for convenience, as their normalized
   text_value is fine for output) but should be NT nodes, with appropriate to_s
   methods defined.

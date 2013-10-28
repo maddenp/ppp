@@ -365,7 +365,7 @@ class Translator
         s0=s                                                         # for cases in which files added by 'include'
         s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and conf.fixed # statements or '!sms$insert include' statements
         s=prepsrc_free(s) if defined?(prepsrc_free)                  # also contain such a statement; this follows the path
-        s=assemble(s,[srcfile],conf.incdirs)                         # until all souce has been appropriately inserted
+        s=assemble(s,[srcfile],conf.incdirs)                         # until all souce has been inserted
       end
     end
     if conf.debug

@@ -1,19 +1,19 @@
 module Common
 
-  def array_props(array_spec,_props,distribute)
+  def array_attrs(array_spec,_attrs,distribute)
     dims=0
     array_spec.abstract_boundslist.each_index do |i|
       arrdim=i+1
-      _props["lb#{arrdim}"]=array_spec.abstract_boundslist[i].alb
-      _props["ub#{arrdim}"]=array_spec.abstract_boundslist[i].aub
+      _attrs["lb#{arrdim}"]=array_spec.abstract_boundslist[i].alb
+      _attrs["ub#{arrdim}"]=array_spec.abstract_boundslist[i].aub
       if distribute and (decompdim=distribute["dim"].index(arrdim))
-        _props["decomp"]=distribute["decomp"]
-        _props["dim#{arrdim}"]=decompdim+1
+        _attrs["decomp"]=distribute["decomp"]
+        _attrs["dim#{arrdim}"]=decompdim+1
       end
       dims+=1
     end
-    _props["dims"]||=dims
-    _props
+    _attrs["dims"]||=dims
+    _attrs
   end
 
   def attrchk(node,attr)
