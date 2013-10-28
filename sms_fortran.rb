@@ -1513,7 +1513,11 @@ module Fortran
   class SMS_Rank < SMS
 
     def var
-      e[2]
+      e[3]
+    end
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]}")
     end
 
     def translate

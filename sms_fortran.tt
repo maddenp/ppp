@@ -189,7 +189,7 @@ grammar Fortran
   end
 
   rule sms_rank
-    sms_sentinel sms_t_rank scalar_int_variable t_newline <SMS_Rank>
+    sms_sentinel sms_t_rank t_paren_l scalar_int_variable t_paren_r t_newline <SMS_Rank>
   end
 
   rule sms_reduce

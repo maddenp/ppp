@@ -2797,12 +2797,20 @@ module Fortran
       elements[1]
     end
 
-    def scalar_int_variable
+    def t_paren_l
       elements[2]
     end
 
-    def t_newline
+    def scalar_int_variable
       elements[3]
+    end
+
+    def t_paren_r
+      elements[4]
+    end
+
+    def t_newline
+      elements[5]
     end
   end
 
@@ -2824,11 +2832,19 @@ module Fortran
       r2 = _nt_sms_t_rank
       s0 << r2
       if r2
-        r3 = _nt_scalar_int_variable
+        r3 = _nt_t_paren_l
         s0 << r3
         if r3
-          r4 = _nt_t_newline
+          r4 = _nt_scalar_int_variable
           s0 << r4
+          if r4
+            r5 = _nt_t_paren_r
+            s0 << r5
+            if r5
+              r6 = _nt_t_newline
+              s0 << r6
+            end
+          end
         end
       end
     end
