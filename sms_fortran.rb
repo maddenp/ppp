@@ -707,7 +707,7 @@ module Fortran
           label_old,label_new=spec.send(:relabel)
           pppvar=spec.send(:pppvar)
           @spec_var_false.push("#{pppvar}=.false.")
-          @spec_var_bcast.push(sms_bcast(pppvar,"sms__type_logical","(/1/)",1))
+          @spec_var_bcast.push(sms_bcast(pppvar,sms_type(pppvar),"(/1/)",1))
           @spec_var_bcast.push(sms_chkstat)
           @spec_var_true.push("#{label_new} #{pppvar}=.true.")
           @spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
