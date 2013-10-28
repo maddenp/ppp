@@ -163,7 +163,7 @@ module Fortran
       declare("integer",sms_rankvar)
       code=""
       code+="if (#{statusvar}.ne.0) then\n"
-      code+="call nnt_me(#{sms_rankvar})\n"
+      code+="call sms__rank(#{sms_rankvar})\n"
       code+="write (*,'(a,i0)') \"#{msg} on MPI rank \",#{sms_rankvar}\n"
       code+="#{sms_stop(retcode)}\n"
       code+="endif"
