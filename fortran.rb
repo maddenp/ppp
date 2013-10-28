@@ -526,10 +526,7 @@ module Fortran
     end
 
     def post_children
-      if e
-        e.each { |x| x.post_common }
-        e.compact!
-      end
+      e.each { |x| x.post_common if x } if e
       self
     end
 
