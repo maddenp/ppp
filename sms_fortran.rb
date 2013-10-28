@@ -1523,7 +1523,7 @@ module Fortran
     def translate
       # Check the sort and type of the indicated variable, if it exists in the
       # environment. If not, carry on and hope for the best.
-      if (varenv=varenv_get(var))
+      if (varenv=varenv_get(var,self,false))
         unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
           fail "ERROR: rank query's argument must be an integer scalar"
         end
