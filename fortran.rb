@@ -1600,11 +1600,13 @@ module Fortran
   end
 
   class Block_Data_Stmt < T
+
     def to_s
       s=stmt(space)
       indent
       s
     end
+
   end
 
   class Block_Do_Construct < NT
@@ -1622,12 +1624,14 @@ module Fortran
   end
 
   class Case_Stmt < T
+
     def to_s
       unindent
       s=stmt(space)
       indent
       s
     end
+
   end
 
   class Case_Value_Range_List < T
@@ -1851,11 +1855,13 @@ module Fortran
   end
 
   class Derived_Type_Stmt < T
+
     def to_s
       s=stmt("#{e[1]}#{sb(e[2])} #{e[3]}")
       indent
       s
     end
+
   end
 
   class Dimension_Stmt < T

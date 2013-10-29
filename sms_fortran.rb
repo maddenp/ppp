@@ -1049,10 +1049,6 @@ module Fortran
 
   class SMS_Comm_Rank < SMS
 
-    def var
-      e[3]
-    end
-
     def to_s
       sms("#{e[2]}#{e[3]}#{e[4]}")
     end
@@ -1069,13 +1065,13 @@ module Fortran
       replace_statement(code)
     end
 
-  end
-
-  class SMS_Comm_Size < SMS
-
     def var
       e[3]
     end
+
+  end
+
+  class SMS_Comm_Size < SMS
 
     def to_s
       sms("#{e[2]}#{e[3]}#{e[4]}")
@@ -1091,6 +1087,10 @@ module Fortran
       end
       code="call sms__comm_size(#{var})"
       replace_statement(code)
+    end
+
+    def var
+      e[3]
     end
 
   end
@@ -1875,12 +1875,12 @@ module Fortran
 
   class SMS_Serial_Varlist < SMS
 
-    def vars
-      list_to_s.split(",")
-    end
-
     def to_s
       list_to_s
+    end
+
+    def vars
+      list_to_s.split(",")
     end
 
   end
@@ -1923,7 +1923,11 @@ module Fortran
   end
 
   class SMS_To_Local < SMS_Region
-    def to_s() "#{e[0]}#{e[1]}#{e[2]}" end
+
+    def to_s
+      "#{e[0]}#{e[1]}#{e[2]}"
+    end
+
   end
 
   class SMS_To_Local_Begin < SMS
