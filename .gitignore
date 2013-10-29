@@ -1,8 +1,1 @@
-*.env
-*.mod
-*.o
-*.sms
-.nfs*
-/p.f90
-a.out
 pppc
