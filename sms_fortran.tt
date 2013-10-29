@@ -48,6 +48,14 @@ grammar Fortran
     sms_sentinel sms_t_barrier t_newline <SMS_Barrier>
   end
 
+  rule sms_comm_rank
+    sms_sentinel sms_t_comm_rank t_paren_l scalar_int_variable t_paren_r t_newline <SMS_Comm_Rank>
+  end
+
+  rule sms_comm_size
+    sms_sentinel sms_t_comm_size t_paren_l scalar_int_variable t_paren_r t_newline <SMS_Comm_Size>
+  end
+
   rule sms_compare_var
     sms_sentinel sms_t_compare_var t_paren_l variable t_comma sms_string t_paren_r t_newline <SMS_Compare_Var>
   end
@@ -113,13 +121,14 @@ grammar Fortran
 
   rule sms_executable
     sms_barrier /
+    sms_comm_rank /
+    sms_comm_size /
     sms_compare_var /
     sms_create_decomp /
     sms_exchange /
     sms_halo_comp &{ |e| sp_env_pullup(e[0]) } <NT> /
     sms_ignore /
     sms_parallel &{ |e| sp_env_pullup(e[0]) } <NT> /
-    sms_rank /
     sms_reduce /
     sms_serial &{ |e| sp_env_pullup(e[0]) } <NT> /
     sms_set_communicator /
@@ -186,10 +195,6 @@ grammar Fortran
     sms_parallel_var_list t_comma t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_101> /
     sms_parallel_var_list t_comma sms_parallel_var_list <SMS_Parallel_Var_Lists_110> /
     sms_parallel_var_list "" <SMS_Parallel_Var_Lists_100>
-  end
-
-  rule sms_rank
-    sms_sentinel sms_t_rank t_paren_l scalar_int_variable t_paren_r t_newline <SMS_Rank>
   end
 
   rule sms_reduce
@@ -279,6 +284,14 @@ grammar Fortran
     "begin" <T>
   end
 
+  rule sms_t_comm_rank
+    "comm_rank" <T>
+  end
+
+  rule sms_t_comm_size
+    "comm_size" <T>
+  end
+
   rule sms_t_compare_var
     "compare_var" <T>
   end
@@ -341,10 +354,6 @@ grammar Fortran
 
   rule sms_t_parallel
     "parallel" <T>
-  end
-
-  rule sms_t_rank
-    "rank" <T>
   end
 
   rule sms_t_reduce

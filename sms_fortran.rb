@@ -163,7 +163,7 @@ module Fortran
       declare("integer",sms_rankvar)
       code=""
       code+="if (#{statusvar}.ne.0) then\n"
-      code+="call sms__rankget(#{sms_rankvar})\n"
+      code+="call sms__comm_rank(#{sms_rankvar})\n"
       code+="write (*,'(a,i0)') \"#{msg} on MPI rank \",#{sms_rankvar}\n"
       code+="#{sms_stop(retcode)}\n"
       code+="endif"
@@ -1049,6 +1049,54 @@ module Fortran
 
   end
 
+  class SMS_Comm_Rank < SMS
+
+    def var
+      e[3]
+    end
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]}")
+    end
+
+    def translate
+      # Check the sort and type of the indicated variable, if it exists in the
+      # environment. If not, carry on and hope for the best.
+      if (varenv=varenv_get(var,self,false))
+        unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
+          fail "ERROR: comm rank query's argument must be an integer scalar"
+        end
+      end
+      code="call sms__comm_rank(#{var})"
+      replace_statement(code)
+    end
+
+  end
+
+  class SMS_Comm_Size < SMS
+
+    def var
+      e[3]
+    end
+
+    def to_s
+      sms("#{e[2]}#{e[3]}#{e[4]}")
+    end
+
+    def translate
+      # Check the sort and type of the indicated variable, if it exists in the
+      # environment. If not, carry on and hope for the best.
+      if (varenv=varenv_get(var,self,false))
+        unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
+          fail "ERROR: comm size query's argument must be an integer scalar"
+        end
+      end
+      code="call sms__comm_size(#{var})"
+      replace_statement(code)
+    end
+
+  end
+
   class SMS_Compare_Var < SMS
 
     def to_s
@@ -1506,30 +1554,6 @@ module Fortran
 
     def vars
       [e[0].vars,e[2].vars,e[4].vars]
-    end
-
-  end
-
-  class SMS_Rank < SMS
-
-    def var
-      e[3]
-    end
-
-    def to_s
-      sms("#{e[2]}#{e[3]}#{e[4]}")
-    end
-
-    def translate
-      # Check the sort and type of the indicated variable, if it exists in the
-      # environment. If not, carry on and hope for the best.
-      if (varenv=varenv_get(var,self,false))
-        unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
-          fail "ERROR: rank query's argument must be an integer scalar"
-        end
-      end
-      code="call sms__rankget(#{var})"
-      replace_statement(code)
     end
 
   end
