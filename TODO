@@ -1,6 +1,6 @@
 ### ENVIRONMENT
 
-- Change 'function' key (with true value) to 'subprogram' with 'function' and
+* Change 'function' key (with true value) to 'subprogram' with 'function' and
   'subroutine' values, and start recording module subroutines in env.
 
 - Derived types provided by modules should appear in envfiles.
@@ -29,7 +29,7 @@
 
 ### OPTIMIZATION
 
-- Memoize to_s? Some of these are called many times for hash keys and so. Should
+* Memoize to_s? Some of these are called many times for hash keys and so. Should
   be no need to compute string version more than once, right?
 
 - read_stmt, write_stmt et al are not function calls, so we *do* know which of
@@ -43,8 +43,6 @@
   write_envfile for each module encountered.
 
 ### PARSING
-
-- Use replace_element in Nonlabel_Do_Stmt in place of raw() calls?
 
 - Deduce types of implicit variables.
 
@@ -79,11 +77,11 @@
 
 ### REFACTORING
 
-- Many rules are mapped to T nodes (for convenience, as their normalized
+* Many rules are mapped to T nodes (for convenience, as their normalized
   text_value is fine for output) but should be NT nodes, with appropriate to_s
   methods defined.
 
-- In fortran.rb/sms_fortran.rb, standardize when methods on nodes return strings
+* In fortran.rb/sms_fortran.rb, standardize when methods on nodes return strings
   or SyntaxNode subclasses. That is, should we convert to strings as early as
   possible, or delay until a string is absolutely required? Probably the latter.
 
@@ -103,7 +101,7 @@
 
 ### TRANSLATION
 
-- Does sms_gather() really need all 7 dims (see e.g. gather rollout in
+* Does sms_gather() really need all 7 dims (see e.g. gather rollout in
   Write_Stmt or SMS_Serial.
 
 - SMS_Create_Decomp translate is only valid for one decomposed dimension. Extend

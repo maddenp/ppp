@@ -922,12 +922,10 @@ module Fortran
             halo_lo=halo_offsets(dd).lo
             halo_up=halo_offsets(dd).up
             if loop_control.is_a?(Loop_Control_1)
-              lo=raw("#{dh}__s#{dd}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)",:scalar_numeric_expr,@srcfile,{:env=>env,:nl=>false})
-              lo.parent=loop_control
-              up=raw(",#{dh}__e#{dd}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)",:loop_control_pair,@srcfile,{:env=>env,:nl=>false})
-              up.parent=loop_control
-              loop_control.e[3]=lo
-              loop_control.e[4]=up
+              code="#{dh}__s#{dd}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)"
+              replace_element(code,:scalar_numeric_expr)
+              code=",#{dh}__e#{dd}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)"
+              replace_element(code,:loop_control_pair)
             end
           end
         end

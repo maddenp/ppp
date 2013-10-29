@@ -654,7 +654,7 @@ module Fortran
     end
 
     def replace_element(code,rule,node=self)
-      tree=raw(code,rule,@srcfile,{"nl"=>false,:env=>node.env})
+      tree=raw(code,rule,@srcfile,{:nl=>false,:env=>node.env})
       node=node.parent while "#{node}"=="#{node.parent}"
       tree.parent=node.parent
       block=node.parent.e
