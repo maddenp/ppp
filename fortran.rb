@@ -535,18 +535,18 @@ module Fortran
       ""
     end
 
-    def xform_common(method)
-      xform_children(method)
+    def transform_common(method)
+      transform_children(method)
       send(method) if respond_to?(method)
     end
 
-    def xform_children(method)
-      e.each { |x| x.xform_common(method) if x } if e
+    def transform_children(method)
+      e.each { |x| x.transform_common(method) if x } if e
       self
     end
 
-    def xform_top(method)
-      xform_common(method)
+    def transform_top(method)
+      transform_common(method)
       self
     end
 

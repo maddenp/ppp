@@ -192,7 +192,7 @@ class Translator
       s=s.gsub(/^ *!.*$\n/,"")  # remove full-line comments
       s=s.gsub(/^[ \t]*\n/,'')  # remove blank lines
     end
-    s=chkparse(fix_pt_norm(s,np,1,@m)) unless safe and nq # string-aware xform
+    s=chkparse(fix_pt_norm(s,np,1,@m)) unless safe and nq # string-aware transform
     s=s.gsub(/& *\n *&?/,"") unless safe                  # join continuations
     s=chkparse(np.parse(s,2,@m).to_s) unless safe and nq  # mask strings
     s=s.downcase unless safe                              # lower-case text only
@@ -398,13 +398,13 @@ class Translator
         return # if in server mode and did not exit in die()
       end
       raw_tree.instance_variable_set(:@srcfile,srcfile)
-      raw_tree=raw_tree.xform_top(:post) # post-process raw tree
+      raw_tree=raw_tree.transform_top(:post) # post-process raw tree
       return [wrap(raw_tree.to_s),raw_tree,nil] unless conf.translate
       if conf.debug
         puts "\nRAW TREE\n\n"
         p raw_tree
       end
-      translated_tree=(conf.translate)?(raw_tree.xform_top(:translate)):(nil)
+      translated_tree=(conf.translate)?(raw_tree.transform_top(:translate)):(nil)
       fail "TRANSLATION FAILED" unless translated_tree
       if conf.debug
         puts "\nTRANSLATED TREE\n\n"
