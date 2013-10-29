@@ -4,6 +4,9 @@ threads=8
 
 $: << File.dirname($0)
 
+require "version"
+version_check
+
 require "fileutils"
 require "thread"
 
