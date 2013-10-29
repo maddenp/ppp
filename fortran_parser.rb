@@ -7724,7 +7724,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtJ,input, i0...index, s0)
+      r0 = instantiate_node(Continue_Stmt,input, i0...index, s0)
       r0.extend(ContinueStmt0)
     else
       @index = i0
@@ -7888,7 +7888,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtJ,input, i0...index, s0)
+      r0 = instantiate_node(Cycle_Stmt,input, i0...index, s0)
       r0.extend(CycleStmt0)
     else
       @index = i0
@@ -11823,7 +11823,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(J,input, i0...index, s0)
+      r0 = instantiate_node(End_Function_Option,input, i0...index, s0)
       r0.extend(EndFunctionOption0)
     else
       @index = i0
@@ -12443,7 +12443,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(J,input, i0...index, s0)
+      r0 = instantiate_node(End_Subroutine_Option,input, i0...index, s0)
       r0.extend(EndSubroutineOption0)
     else
       @index = i0
@@ -13464,7 +13464,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtJ,input, i0...index, s0)
+      r0 = instantiate_node(Equivalence_Stmt,input, i0...index, s0)
       r0.extend(EquivalenceStmt0)
     else
       @index = i0
@@ -13570,7 +13570,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtJ,input, i0...index, s0)
+      r0 = instantiate_node(Executable_Construct_Action_Stmt,input, i0...index, s0)
       r0.extend(ExecutableConstructActionStmt0)
     else
       @index = i0
@@ -13776,7 +13776,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtJ,input, i0...index, s0)
+      r0 = instantiate_node(Exit_Stmt,input, i0...index, s0)
       r0.extend(ExitStmt0)
     else
       @index = i0
@@ -14295,7 +14295,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtJ,input, i0...index, s0)
+      r0 = instantiate_node(External_Stmt,input, i0...index, s0)
       r0.extend(ExternalStmt0)
     else
       @index = i0
@@ -14706,7 +14706,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtJ,input, i0...index, s0)
+      r0 = instantiate_node(Format_Stmt,input, i0...index, s0)
       r0.extend(FormatStmt0)
     else
       @index = i0
@@ -18157,7 +18157,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtJ,input, i0...index, s0)
+      r0 = instantiate_node(Intrinsic_Stmt,input, i0...index, s0)
       r0.extend(IntrinsicStmt0)
     else
       @index = i0
@@ -22459,7 +22459,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtJ,input, i0...index, s0)
+      r0 = instantiate_node(Module_Procedure_Stmt,input, i0...index, s0)
       r0.extend(ModuleProcedureStmt0)
     else
       @index = i0
@@ -23629,7 +23629,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtC,input, i0...index, s0)
+      r0 = instantiate_node(Nullify_Stmt,input, i0...index, s0)
       r0.extend(NullifyStmt0)
     else
       @index = i0
@@ -24581,7 +24581,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtC,input, i0...index, s0)
+      r0 = instantiate_node(Parameter_Stmt,input, i0...index, s0)
       r0.extend(ParameterStmt0)
     else
       @index = i0
@@ -25115,7 +25115,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtJ,input, i0...index, s0)
+      r0 = instantiate_node(Pause_Stmt,input, i0...index, s0)
       r0.extend(PauseStmt0)
     else
       @index = i0
@@ -25185,7 +25185,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtC,input, i0...index, s0)
+      r0 = instantiate_node(Pointer_Assignment_Stmt,input, i0...index, s0)
       r0.extend(PointerAssignmentStmt0)
     else
       @index = i0
@@ -25989,7 +25989,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(StmtC,input, i0...index, s0)
+      r0 = instantiate_node(Private_Sequence_Stmt,input, i0...index, s0)
       r0.extend(PrivateSequenceStmt0)
     else
       @index = i0
@@ -27465,7 +27465,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(J,input, i0...index, s0)
+      r0 = instantiate_node(Return_Stmt,input, i0...index, s0)
       r0.extend(ReturnStmt0)
     else
       @index = i0

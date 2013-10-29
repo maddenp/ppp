@@ -770,7 +770,7 @@ grammar Fortran
   rule continue_stmt
     # F90:R841
 
-    label:label_stmt? t_continue t_newline <StmtJ>
+    label:label_stmt? t_continue t_newline <Continue_Stmt>
   end
 
   rule control_edit_desc
@@ -787,7 +787,7 @@ grammar Fortran
   rule cycle_stmt
     # F90:R834
 
-    label:label_stmt? t_cycle do_construct_name? t_newline <StmtJ>
+    label:label_stmt? t_cycle do_construct_name? t_newline <Cycle_Stmt>
   end
 
   rule data_edit_desc
@@ -1221,7 +1221,7 @@ grammar Fortran
   end
 
   rule end_function_option
-    t_function function_name? <J>
+    t_function function_name? <End_Function_Option>
   end
 
   rule end_function_stmt
@@ -1281,7 +1281,7 @@ grammar Fortran
   end
 
   rule end_subroutine_option
-    t_subroutine subroutine_name? <J>
+    t_subroutine subroutine_name? <End_Subroutine_Option>
   end
 
   rule end_type_stmt
@@ -1385,7 +1385,7 @@ grammar Fortran
   rule equivalence_stmt
     # F90:R545
 
-    label:label_stmt? t_equivalence equivalence_set_list t_newline <StmtJ>
+    label:label_stmt? t_equivalence equivalence_set_list t_newline <Equivalence_Stmt>
   end
 
   rule executable_construct
@@ -1400,7 +1400,7 @@ grammar Fortran
   end
 
   rule executable_construct_action_stmt
-    !execution_part_disallowed action_stmt !{ |e| sp_nonblock_do_end?(e[1]) } <StmtJ>
+    !execution_part_disallowed action_stmt !{ |e| sp_nonblock_do_end?(e[1]) } <Executable_Construct_Action_Stmt>
   end
 
   rule execution_part
@@ -1431,7 +1431,7 @@ grammar Fortran
   rule exit_stmt
     # F90:R835
 
-    label:label_stmt? t_exit do_construct_name? t_newline <StmtJ>
+    label:label_stmt? t_exit do_construct_name? t_newline <Exit_Stmt>
   end
 
   rule explicit_shape_spec
@@ -1498,14 +1498,14 @@ grammar Fortran
   rule external_stmt
     # F90:R1207
 
-    label:label_stmt? t_external external_name_list t_newline <StmtJ>
+    label:label_stmt? t_external external_name_list t_newline <External_Stmt>
   end
 
   rule external_subprogram
     # F90:R203
 
     subroutine_subprogram &{ |e| sp_env_pullup(e[0]) } <NT> /
-    function_subprogram &{ |e| sp_env_pullup(e[0]) } <NT> 
+    function_subprogram &{ |e| sp_env_pullup(e[0]) } <NT>
   end
 
   rule file_name_expr
@@ -1547,7 +1547,7 @@ grammar Fortran
   rule format_stmt
     # F90:R1001
 
-    label_format t_format format_specification t_newline <StmtJ>
+    label_format t_format format_specification t_newline <Format_Stmt>
   end
 
   rule function_name
@@ -1884,7 +1884,7 @@ grammar Fortran
     # F90:R211
 
     subroutine_subprogram &{ |e| sp_env_pullup(e[0]) } <NT> /
-    function_subprogram &{ |e| sp_env_pullup(e[0]) } <NT> 
+    function_subprogram &{ |e| sp_env_pullup(e[0]) } <NT>
   end
 
   rule internal_subprograms
@@ -1915,7 +1915,7 @@ grammar Fortran
   rule intrinsic_stmt
     # F90:R1208
 
-    label:label_stmt? t_intrinsic intrinsic_procedure_name_list t_newline <StmtJ>
+    label:label_stmt? t_intrinsic intrinsic_procedure_name_list t_newline <Intrinsic_Stmt>
   end
 
   rule io_control_spec
@@ -2332,7 +2332,7 @@ grammar Fortran
   rule module_procedure_stmt
     # F90:R1205
 
-    label:label_stmt? t_module t_procedure procedure_name_list t_newline <StmtJ>
+    label:label_stmt? t_module t_procedure procedure_name_list t_newline <Module_Procedure_Stmt>
   end
 
   rule module_procedure_stmts
@@ -2457,7 +2457,7 @@ grammar Fortran
   rule nullify_stmt
     # F90:R629
 
-    label:label_stmt? t_nullify t_paren_l pointer_object_list t_paren_r t_newline <StmtC>
+    label:label_stmt? t_nullify t_paren_l pointer_object_list t_paren_r t_newline <Nullify_Stmt>
   end
 
   rule numeric_expr
@@ -2557,7 +2557,7 @@ grammar Fortran
   rule parameter_stmt
     # F90:R538
 
-    label:label_stmt? t_parameter t_paren_l named_constant_def_list t_paren_r t_newline &{ |e| sp_parameter_stmt(e[3]) } <StmtC>
+    label:label_stmt? t_parameter t_paren_l named_constant_def_list t_paren_r t_newline &{ |e| sp_parameter_stmt(e[3]) } <Parameter_Stmt>
   end
 
   rule parent_string
@@ -2612,13 +2612,13 @@ grammar Fortran
   rule pause_stmt
     # F90:R844
 
-    label:label_stmt? t_pause stop_code? t_newline <StmtJ>
+    label:label_stmt? t_pause stop_code? t_newline <Pause_Stmt>
   end
 
   rule pointer_assignment_stmt
     # F90:R736
 
-    label:label_stmt? pointer_object t_point target t_newline <StmtC>
+    label:label_stmt? pointer_object t_point target t_newline <Pointer_Assignment_Stmt>
   end
 
   rule pointer_object
@@ -2699,7 +2699,7 @@ grammar Fortran
   rule private_sequence_stmt
     # F90:R423
 
-    label:label_stmt? ( t_private / t_sequence ) t_newline <StmtC>
+    label:label_stmt? ( t_private / t_sequence ) t_newline <Private_Sequence_Stmt>
   end
 
   rule private_sequence_stmts
@@ -2734,7 +2734,7 @@ grammar Fortran
     external_subprogram /
     module &{ |e| sp_env_pullup(e[0]) } <NT> /
     block_data &{ |e| sp_env_pullup(e[0]) } <NT> /
-    main_program &{ |e| sp_env_pullup(e[0]) } <NT> 
+    main_program &{ |e| sp_env_pullup(e[0]) } <NT>
   end
 
   rule program_units
@@ -2845,7 +2845,7 @@ grammar Fortran
   rule return_stmt
     # F90:R1224
 
-    label:label_stmt? t_return scalar_int_expr? t_newline <J>
+    label:label_stmt? t_return scalar_int_expr? t_newline <Return_Stmt>
   end
 
   rule rewind_stmt

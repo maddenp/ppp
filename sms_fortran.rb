@@ -2077,7 +2077,7 @@ module Fortran
 
   end
 
-  class Stop_Stmt < StmtJ
+  class Stop_Stmt < NT
 
     def translate
       return if sms_ignore

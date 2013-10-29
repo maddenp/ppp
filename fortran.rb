@@ -78,7 +78,7 @@ module Fortran
       end
     end
   end
-  
+
   def sp_access_stmt(access_spec,access_stmt_option)
     if access_stmt_option.is_a?(Access_Stmt_Option)
       names=access_stmt_option.names
@@ -576,6 +576,10 @@ module Fortran
       nil
     end
 
+		def cat_stmt
+			stmt(e[1..-1].map { |x| "#{x}" }.join)
+		end
+    
     def declaration_constructs
       specification_part.e[2]
     end
@@ -754,14 +758,6 @@ module Fortran
 
   end
 
-  class J < T
-
-		def to_s
-			space(true)
-		end
-
-  end
-
   class NT < T
 
 		def to_s
@@ -771,22 +767,6 @@ module Fortran
   end
 
   class Scoping_Unit < NT
-  end
-
-  class StmtC < T
-
-		def to_s
-			stmt(e[1..-1].map { |x| "#{x}" }.join)
-		end
-
-  end
-
-  class StmtJ < T
-
-		def to_s
-			stmt(space)
-		end
-
   end
 
   # Out-of-order class definitions (must be defined before subclassed)
@@ -891,7 +871,7 @@ module Fortran
     def number
       list_item(Io_Spec_Number)
     end
-      
+
     def opened
       list_item(Io_Spec_Opened)
     end
@@ -1149,10 +1129,14 @@ module Fortran
 
   end
 
-  class Access_Stmt < StmtC
+  class Access_Stmt < NT
 
     def names
       (e[2].is_a?(Access_Stmt_Option))?(e[2].names):([])
+    end
+
+    def to_s
+      cat_stmt
     end
 
   end
@@ -1241,7 +1225,7 @@ module Fortran
 
   end
 
-  class Allocate_Stmt < StmtC
+  class Allocate_Stmt < NT
 
     def items
       e[3].items
@@ -1249,6 +1233,10 @@ module Fortran
 
     def names
       e[3].names
+    end
+
+    def to_s
+      cat_stmt
     end
 
   end
@@ -1378,7 +1366,12 @@ module Fortran
 
   end
 
-  class Assign_Stmt < StmtJ
+  class Assign_Stmt < NT
+
+    def to_s
+			stmt(space)
+    end
+
   end
 
   class Assigned_Goto_Stmt < T
@@ -1389,7 +1382,12 @@ module Fortran
 
   end
 
-  class Assignment_Stmt < StmtC
+  class Assignment_Stmt < NT
+
+    def to_s
+      cat_stmt
+    end
+
   end
 
   class Assumed_Shape_Spec < T
@@ -1730,6 +1728,22 @@ module Fortran
 
   end
 
+  class Continue_Stmt < NT
+
+    def to_s
+      stmt(space)
+    end
+
+  end
+
+  class Cycle_Stmt < NT
+
+    def to_s
+      stmt(space)
+    end
+
+  end
+
   class Data_I_Do_Object_List < T
 
 		def to_s
@@ -1786,7 +1800,12 @@ module Fortran
 
   end
 
-  class Deallocate_Stmt < StmtC
+  class Deallocate_Stmt < NT
+
+    def to_s
+      cat_stmt
+    end
+
   end
 
   class Declaration_Constructs < T
@@ -1967,6 +1986,14 @@ module Fortran
 
   end
 
+  class End_Function_Option < NT
+
+    def to_s
+			space(true)
+    end
+
+  end
+
   class End_Function_Stmt < T
 
     def to_s
@@ -2026,6 +2053,14 @@ module Fortran
       unindent
       unindent
       stmt(space)
+    end
+
+  end
+
+  class End_Subroutine_Option < NT
+
+    def to_s
+			space(true)
     end
 
   end
@@ -2164,10 +2199,34 @@ module Fortran
 
   end
 
+  class Equivalence_Stmt < NT
+
+    def to_s
+      stmt(space)
+    end
+
+  end
+
+  class Executable_Construct_Action_Stmt < NT
+
+    def to_s
+      stmt(space)
+    end
+
+  end
+
   class Execution_Part < NT
   end
 
   class Execution_Part_Construct < NT
+  end
+
+  class Exit_Stmt < NT
+
+    def to_s
+      stmt(space)
+    end
+
   end
 
   class Explicit_Shape_Spec < T
@@ -2254,6 +2313,21 @@ module Fortran
 
   end
 
+  class External_Stmt < NT
+
+    def to_s
+      stmt(space)
+    end
+
+  end
+
+  class Format_Stmt < NT
+
+    def to_s
+      stmt(space)
+    end
+
+  end
   class Function_Name < NT
 
     def name
@@ -2404,7 +2478,12 @@ module Fortran
 
   end
 
-  class Goto_Stmt < StmtJ
+  class Goto_Stmt < NT
+
+    def to_s
+			stmt(space)
+    end
+
   end
 
   class If_Construct < NT
@@ -2564,6 +2643,14 @@ module Fortran
 		def to_s
 			list_to_s
 		end
+
+  end
+
+  class Intrinsic_Stmt < NT
+
+    def to_s
+      stmt(space)
+    end
 
   end
 
@@ -2849,6 +2936,14 @@ module Fortran
   class Module_Name < NT
   end
 
+  class Module_Procedure_Stmt < NT
+
+    def to_s
+      stmt(space)
+    end
+
+  end
+
   class Module_Stmt < T
 
     def name
@@ -3044,6 +3139,14 @@ module Fortran
 
   end
 
+  class Nullify_Stmt < NT
+
+    def to_s
+      cat_stmt
+    end
+
+  end
+
   class Object_Name < NT
 
     def name
@@ -3150,6 +3253,14 @@ module Fortran
   class Output_Item_List_Pair < Io_Item_List_Pair
   end
 
+  class Parameter_Stmt < NT
+
+    def to_s
+      cat_stmt
+    end
+
+  end
+
   class Parenthesized_Args < NT
   end
 
@@ -3196,6 +3307,22 @@ module Fortran
 
     def subscript_list
       (e[1].is_a?(Parenthesized_Section_Subscript_List))?(e[1].subscript_list):([])
+    end
+
+  end
+
+  class Pause_Stmt < NT
+
+    def to_s
+      stmt(space)
+    end
+
+  end
+
+  class Pointer_Assignment_Stmt < NT
+
+    def to_s
+      cat_stmt
     end
 
   end
@@ -3258,6 +3385,14 @@ module Fortran
     def to_s
 			"#{e[0]}#{e[1]}"
 		end
+
+  end
+
+  class Private_Sequence_Stmt < NT
+
+    def to_s
+      cat_stmt
+    end
 
   end
 
@@ -3392,6 +3527,14 @@ module Fortran
 
   end
 
+  class Return_Stmt < NT
+
+    def to_s
+			space(true)
+    end
+
+  end
+
   class Rewind_Stmt_1 < Io_Stmt
 
 		def to_s
@@ -3502,15 +3645,24 @@ module Fortran
 
   end
 
-  class Stmt_Function_Stmt < StmtC
+  class Stmt_Function_Stmt < NT
 
     def name
       "#{e[1]}"
 		end
 
+    def to_s
+      cat_stmt
+    end
+
   end
 
-  class Stop_Stmt < StmtJ
+  class Stop_Stmt < NT
+
+    def to_s
+			stmt(space)
+    end
+
   end
 
   class Subroutine_Name < NT
