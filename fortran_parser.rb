@@ -10867,16 +10867,6 @@ module Fortran
   end
 
   module DummyArgList0
-    def t_comma
-      elements[0]
-    end
-
-    def dummy_arg
-      elements[1]
-    end
-  end
-
-  module DummyArgList1
     def dummy_arg
       elements[0]
     end
@@ -10900,20 +10890,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_dummy_arg
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(DummyArgList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_dummy_arg_list_pair
         if r3
           s2 << r3
         else
@@ -10925,13 +10902,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Dummy_Arg_List,input, i0...index, s0)
-      r0.extend(DummyArgList1)
+      r0.extend(DummyArgList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:dummy_arg_list][start_index] = r0
+
+    r0
+  end
+
+  module DummyArgListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def dummy_arg
+      elements[1]
+    end
+  end
+
+  def _nt_dummy_arg_list_pair
+    start_index = index
+    if node_cache[:dummy_arg_list_pair].has_key?(index)
+      cached = node_cache[:dummy_arg_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_dummy_arg
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Dummy_Arg_List_Pair,input, i0...index, s0)
+      r0.extend(DummyArgListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:dummy_arg_list_pair][start_index] = r0
 
     r0
   end
@@ -16124,7 +16142,7 @@ module Fortran
       @index = i0
       r0 = nil
     else
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Implicit_Part,input, i0...index, s0)
     end
 
     node_cache[:implicit_part][start_index] = r0
@@ -33871,7 +33889,7 @@ module Fortran
     end
 
     if has_terminal?("_", false, index)
-      r0 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      r0 = instantiate_node(T,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("_")

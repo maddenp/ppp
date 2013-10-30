@@ -1125,7 +1125,11 @@ grammar Fortran
   end
 
   rule dummy_arg_list
-    dummy_arg ( t_comma dummy_arg )* <Dummy_Arg_List>
+    dummy_arg dummy_arg_list_pair* <Dummy_Arg_List>
+  end
+
+  rule dummy_arg_list_pair
+    t_comma dummy_arg <Dummy_Arg_List_Pair>
   end
 
   rule dummy_arg_list_option
@@ -1691,7 +1695,7 @@ grammar Fortran
     # and the availibility of 3rd-party syntax-checking compilers, it is not
     # enforced here.
 
-    implicit_part_stmt+ <NT>
+    implicit_part_stmt+ <Implicit_Part>
   end
 
   rule implicit_part_stmt
@@ -3809,7 +3813,7 @@ grammar Fortran
 
   rule t_underscore
     # F90:R303
-    "_"
+    "_" <T>
   end
 
   rule t_unformatted

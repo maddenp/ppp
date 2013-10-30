@@ -271,7 +271,7 @@ module Fortran
   end
 
   def sp_hollerith_set_length(digit_string)
-    @hollerith_size=Integer(digit_string.to_s)
+    @hollerith_size=Integer("#{digit_string}")
     true
   end
 
@@ -364,7 +364,7 @@ module Fortran
     # of the matching label-do-stmt. If this isn't the case, this node cannot be
     # the end of a nonblock-do-construct.
     return false unless node.respond_to?(:label)
-    return false if node.label.to_s.empty?
+    return false if "#{node.label}".empty?
     ("#{node.label}"==@dolabels.last)?(true):(false)
   end
 
@@ -526,11 +526,6 @@ module Fortran
 
   class Treetop::Runtime::SyntaxNode
 
-    def cat
-      # concatenate elements' string representations
-      (e)?(e.map { |x| "#{x}" }.join):("")
-    end
-
     def to_s
       ""
     end
@@ -576,6 +571,18 @@ module Fortran
       nil
     end
 
+    def block_left
+      s=env[:global]
+      s[:level]||=0
+      s[:level]-=1 if s[:level]>0
+    end
+
+    def block_right
+      s=env[:global]
+      s[:level]||=0
+      s[:level]+=1
+    end
+
 		def cat_stmt
 			stmt(e[1..-1].map { |x| "#{x}" }.join)
 		end
@@ -603,19 +610,21 @@ module Fortran
     def ik(e,c,a)
       # identity keep: If the [e]lement's string form equals the [c]ontrol
       # string, return the element itself; otherwise return the [a]lternate.
-      (e.to_s==c)?(e):(a)
+      ("#{e}"==c)?(e):(a)
+    end
+
+    def indent
+      " "*2*level
+    end
+
+    def indented(s)
+      (s.empty?)?(s):(indent+s)
     end
 
     def ir(e,c,a)
       # identity replace: If the [e]lement's string form equals the [c]ontrol
       # string, return the [a]lternate; otherwise return the element itself.
-      (e.to_s==c)?(a):(e)
-    end
-
-    def indent
-      s=env[:global]
-      s[:level]||=0
-      s[:level]+=1
+      ("#{e}"==c)?(a):(e)
     end
 
     def inside?(*class_or_classes)
@@ -643,14 +652,15 @@ module Fortran
       env[:global][:level]||=0
     end
 
-    def list_to_s
+    def list_str
       s="#{e[0]}"
       s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
       s
     end
 
     def raw(code,rule,srcfile,opts={})
-      Translator.new.raw(code,rule,srcfile,opts)
+      opts[:product]=:raw_tree
+      Translator.new.process(code,rule,srcfile,opts)
     end
 
     def replace_element(code,rule,node=self)
@@ -672,13 +682,13 @@ module Fortran
     def sa(e)
       # space after: If the [e]lement's string form is empty, return that; else
       # return its string form with a trailing space appended.
-      (e.to_s=="")?(""):("#{e} ")
+      ("#{e}"=="")?(""):("#{e} ")
     end
 
     def sb(e)
       # space before: If the [e]lement's string form is empty, return that; else
       # return its string form with a prepended space.
-      (e.to_s=="")?(""):(" #{e}")
+      ("#{e}"=="")?(""):(" #{e}")
     end
 
     def scoping_unit
@@ -695,13 +705,23 @@ module Fortran
     end
 
     def stmt(s)
-      (" "*2*level)+(("#{sa(e[0])}"+s.chomp).strip)+"\n"
+      "#{sa(e[0])}#{s}\n"
     end
 
-    def unindent
-      s=env[:global]
-      s[:level]||=0
-      s[:level]-=1 if s[:level]>0
+    def str0
+      text_value
+    end
+
+    def str1
+      strmemo
+    end
+
+    def strmemo
+      @strmemo_||(@strmemo_=str0)
+    end
+
+    def to_s
+      ($INDENTED)?(str1):(str0)
     end
 
     def use(modname,usenames=[])
@@ -752,17 +772,33 @@ module Fortran
       varenv
     end
 
-    def to_s
-      text_value
-    end
-
   end
 
   class NT < T
 
-		def to_s
-			cat
+		def str0
+      (e)?(e.map { |x| "#{x}" }.join):("")
 		end
+
+  end
+
+  class List < NT
+
+    def str0
+      list_str
+    end
+
+  end
+
+  class Stmt < NT
+
+    def str0
+			stmt(space)
+    end
+
+    def str1
+      indented(strmemo)
+    end
 
   end
 
@@ -773,13 +809,13 @@ module Fortran
 
   class Io_Item_List < NT
 
-		def to_s
-			list_to_s
-		end
-
     def items
       [e[0]]+e[1].e.reduce([]) { |m,x| m.push(x.item) }
     end
+
+		def str0
+			list_str
+		end
 
   end
 
@@ -791,7 +827,7 @@ module Fortran
 
   end
 
-  class Io_Spec_List < T
+  class Io_Spec_List < NT
 
     def access
       list_item(Io_Spec_Access)
@@ -904,8 +940,8 @@ module Fortran
       list_item(Io_Spec_Size)
     end
 
-    def to_s
-      list_to_s
+    def str0
+      list_str
     end
 
     def unformatted
@@ -927,7 +963,7 @@ module Fortran
 
   end
 
-  class Io_Stmt < T
+  class Io_Stmt < NT
 
     def access
       spec_list.access
@@ -1083,9 +1119,9 @@ module Fortran
 
   # Grammar-supporting subclasses
 
-  class AC_Implied_Do_Control < T
+  class AC_Implied_Do_Control < NT
 
-    def to_s
+    def str0
       s="#{e[0]}#{e[1]}#{e[2]}"
       s+="#{e[3].e[0]}#{e[3].e[1]}" if e[3].e
       s
@@ -1093,23 +1129,27 @@ module Fortran
 
   end
 
-  class AC_Value_List < T
+  class AC_Value_List < NT
 
-		def to_s
-			list_to_s
+		def str0
+			list_str
 		end
 
   end
 
-  class Access_Id_List < T
+  class Access_Id_List < NT
 
     def names
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
 		end
 
+    def str0
+      list_str
+    end
+
   end
 
-  class Access_Id_List_Pair < T
+  class Access_Id_List_Pair < NT
 
     def name
       e[1]
@@ -1129,49 +1169,49 @@ module Fortran
 
   end
 
-  class Access_Stmt < NT
+  class Access_Stmt < Stmt
 
     def names
       (e[2].is_a?(Access_Stmt_Option))?(e[2].names):([])
     end
 
-    def to_s
-      cat_stmt
+    def str0
+      stmt("#{e[1]}#{e[2]}")
     end
 
   end
 
-  class Access_Stmt_Option < T
+  class Access_Stmt_Option < NT
 
     def names
       e[1].names
     end
 
-    def to_s
+    def str0
       "#{ik(e[0],"::"," ")}#{e[1]}"
     end
 
   end
 
-  class Actual_Arg_Spec_List < T
+  class Actual_Arg_Spec_List < NT
 
-		def to_s
-			list_to_s
+		def str0
+			list_str
 		end
 
   end
 
   class Add_Operand < NT
 
-    def to_s
+    def str0
       "#{e[0]}"+((e[1].e)?("#{e[1].e[0]}#{e[1].e[1]}"):(""))
     end
 
   end
 
-  class Allocatable_Stmt < T
+  class Allocatable_Stmt < Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
 		end
 
@@ -1189,7 +1229,7 @@ module Fortran
 
   end
 
-  class Allocate_Object_List < T
+  class Allocate_Object_List < NT
 
     def items
       e[1].e.reduce([e[0].item]) { |m,x| m.push(x.e[1].item) }
@@ -1199,13 +1239,13 @@ module Fortran
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.e[1].name) }
     end
 
-    def to_s
-      list_to_s
+    def str0
+      list_str
     end
 
   end
 
-  class Allocate_Object_List_Pair < T
+  class Allocate_Object_List_Pair < NT
 
     def item
       e[1].item
@@ -1217,15 +1257,15 @@ module Fortran
 
   end
 
-  class Allocate_Shape_Spec_List < T
+  class Allocate_Shape_Spec_List < NT
 
-		def to_s
-			list_to_s
+		def str0
+			list_str
 		end
 
   end
 
-  class Allocate_Stmt < NT
+  class Allocate_Stmt < Stmt
 
     def items
       e[3].items
@@ -1235,7 +1275,7 @@ module Fortran
       e[3].names
     end
 
-    def to_s
+    def str0
       cat_stmt
     end
 
@@ -1249,7 +1289,7 @@ module Fortran
 
   end
 
-  class Allocation_List < T
+  class Allocation_List < NT
 
     def items
       e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
@@ -1259,8 +1299,8 @@ module Fortran
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.e[1].name) }
     end
 
-    def to_s
-      list_to_s
+    def str0
+      list_str
     end
 
   end
@@ -1268,9 +1308,9 @@ module Fortran
   class Alt_Return_Spec < NT
   end
 
-  class Arithmetic_If_Stmt < T
+  class Arithmetic_If_Stmt < Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}#{e[6]}#{e[7]}#{e[8]}#{e[9]}")
 		end
 
@@ -1314,7 +1354,7 @@ module Fortran
 
   end
 
-  class Array_Names_And_Deferred_Shape_Spec_Lists < T
+  class Array_Names_And_Deferred_Shape_Spec_Lists < NT
 
     def items
       e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
@@ -1324,9 +1364,13 @@ module Fortran
       e[1].e.reduce(["#{e[0].e[0]}"]) { |m,x| m.push("#{x.e[1].e[0]}") }
     end
 
+    def str0
+      list_str
+    end
+
   end
 
-  class Array_Names_And_Specs < T
+  class Array_Names_And_Specs < NT
 
     def items
       e[1].e.reduce([e[0]]) { |m,x| m.push(x) }
@@ -1336,8 +1380,8 @@ module Fortran
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
     end
 
-    def to_s
-      list_to_s
+    def str0
+      list_str
     end
 
   end
@@ -1358,7 +1402,7 @@ module Fortran
 
   end
 
-  class Array_Spec < T
+  class Array_Spec < NT
 
     def spec
       e[0]
@@ -1366,31 +1410,26 @@ module Fortran
 
   end
 
-  class Assign_Stmt < NT
-
-    def to_s
-			stmt(space)
-    end
-
+  class Assign_Stmt < Stmt
   end
 
-  class Assigned_Goto_Stmt < T
+  class Assigned_Goto_Stmt < Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]} #{e[2]}#{ik(e[3],","," ")}#{e[4]}")
 		end
 
   end
 
-  class Assignment_Stmt < NT
+  class Assignment_Stmt < Stmt
 
-    def to_s
+    def str0
       cat_stmt
     end
 
   end
 
-  class Assumed_Shape_Spec < T
+  class Assumed_Shape_Spec < NT
 
     def abstract_bounds
       OpenStruct.new({:alb=>alb,:aub=>aub})
@@ -1435,9 +1474,13 @@ module Fortran
       end
     end
 
+    def str0
+      list_str
+    end
+
   end
 
-  class Assumed_Shape_Spec_List_Pair < T
+  class Assumed_Shape_Spec_List_Pair < NT
 
     def abstract_bounds
       e[1].abstract_bounds
@@ -1471,7 +1514,7 @@ module Fortran
 
   end
 
-  class Assumed_Size_Spec_Pair < T
+  class Assumed_Size_Spec_Pair < NT
 
     def abstract_boundslist
       e[0].abstract_boundslist
@@ -1579,7 +1622,7 @@ module Fortran
 
   class Backspace_Stmt_1 < Io_Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
 		end
 
@@ -1587,7 +1630,7 @@ module Fortran
 
   class Backspace_Stmt_2 < Io_Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]} #{e[2]}")
 		end
 
@@ -1599,11 +1642,11 @@ module Fortran
   class Block_Data_Name < NT
   end
 
-  class Block_Data_Stmt < T
+  class Block_Data_Stmt < Stmt
 
-    def to_s
-      s=stmt(space)
-      indent
+    def str1
+      s=strmemo
+      block_right
       s
     end
 
@@ -1612,9 +1655,9 @@ module Fortran
   class Block_Do_Construct < NT
   end
 
-  class Call_Stmt < T
+  class Call_Stmt < Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]} #{e[2]}#{e[3]}")
 		end
 
@@ -1623,21 +1666,21 @@ module Fortran
   class Case_Construct_Name < NT
   end
 
-  class Case_Stmt < T
+  class Case_Stmt < Stmt
 
-    def to_s
-      unindent
-      s=stmt(space)
-      indent
+    def str1
+      block_left
+      s=strmemo
+      block_right
       s
     end
 
   end
 
-  class Case_Value_Range_List < T
+  class Case_Value_Range_List < NT
 
-		def to_s
-			list_to_s
+		def str0
+			list_str
 		end
 
   end
@@ -1650,15 +1693,15 @@ module Fortran
 
   class Close_Stmt < Io_Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
 		end
 
   end
 
-  class Common_Block_Name_And_Object_List < T
+  class Common_Block_Name_And_Object_List < NT
 
-		def to_s
+		def str0
 			"#{ir(e[0],""," ")}#{e[1]}#{e[2]}"
 		end
 
@@ -1672,33 +1715,33 @@ module Fortran
 
   end
 
-  class Common_Stmt < T
+  class Common_Stmt < Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
 		end
 
   end
 
-  class Component_Attr_Spec_List < T
+  class Component_Attr_Spec_List < NT
 
-		def to_s
-			list_to_s
+		def str0
+			list_str
 		end
 
   end
 
-  class Component_Decl_List < T
+  class Component_Decl_List < NT
 
-		def to_s
-			list_to_s
+		def str0
+			list_str
 		end
 
   end
 
-  class Component_Def_Stmt < T
+  class Component_Def_Stmt < Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
 		end
 
@@ -1707,9 +1750,9 @@ module Fortran
   class Component_Name < NT
   end
 
-  class Computed_Goto_Stmt < T
+  class Computed_Goto_Stmt < Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{ir(e[5],""," ")}#{e[6]}")
 		end
 
@@ -1721,42 +1764,32 @@ module Fortran
   class Connect_Spec_List_Pair < NT
   end
 
-  class Contains_Stmt < T
+  class Contains_Stmt < Stmt
 
-    def to_s
-      unindent
-      s="\n#{stmt(space)}"
-      indent
+    def str1
+      block_left
+      s="\n#{indented(strmemo)}"
+      block_right
       s
     end
 
   end
 
-  class Continue_Stmt < NT
-
-    def to_s
-      stmt(space)
-    end
-
+  class Continue_Stmt < Stmt
   end
 
-  class Cycle_Stmt < NT
-
-    def to_s
-      stmt(space)
-    end
-
+  class Cycle_Stmt < Stmt
   end
 
-  class Data_I_Do_Object_List < T
+  class Data_I_Do_Object_List < NT
 
-		def to_s
-			list_to_s
+		def str0
+			list_str
 		end
 
   end
 
-  class Data_Ref < T
+  class Data_Ref < NT
 
     def name
       rightmost.name
@@ -1774,53 +1807,53 @@ module Fortran
       part_ref.subscript_list
     end
 
-    def to_s
+    def str0
       e[1].e.reduce("#{e[0]}") { |m,x| m+"#{x.e[0]}#{x.e[1]}" }
     end
 
   end
 
-  class Data_Stmt < T
+  class Data_Stmt < Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]} #{e[2]}")
 		end
 
   end
 
-  class Data_Stmt_Object_List < T
+  class Data_Stmt_Object_List < NT
 
-		def to_s
-			list_to_s
+		def str0
+			list_str
 		end
 
   end
 
-  class Data_Stmt_Value_List < T
+  class Data_Stmt_Value_List < NT
 
-		def to_s
-			list_to_s
+		def str0
+			list_str
 		end
 
   end
 
-  class Deallocate_Stmt < NT
+  class Deallocate_Stmt < Stmt
 
-    def to_s
+    def str0
       cat_stmt
     end
 
   end
 
-  class Declaration_Constructs < T
+  class Declaration_Constructs < NT
 
-    def to_s
+    def str0
       e.reduce("") { |m,x| m+"#{x}" }
     end
 
   end
 
-  class Deferred_Shape_Spec < T
+  class Deferred_Shape_Spec < NT
 
     def abstract_bounds
       OpenStruct.new({:alb=>alb,:aub=>aub})
@@ -1846,7 +1879,7 @@ module Fortran
 
   end
 
-  class Deferred_Shape_Spec_List_Pair < T
+  class Deferred_Shape_Spec_List_Pair < NT
 
     def abstract_bounds
       e[1].abstract_bounds
@@ -1854,19 +1887,23 @@ module Fortran
 
   end
 
-  class Derived_Type_Stmt < T
+  class Derived_Type_Stmt < Stmt
 
-    def to_s
-      s=stmt("#{e[1]}#{sb(e[2])} #{e[3]}")
-      indent
+    def str1
+      s=strmemo
+      block_right
       s
+    end
+
+    def str0
+      stmt("#{e[1]}#{sb(e[2])} #{e[3]}")
     end
 
   end
 
-  class Dimension_Stmt < T
+  class Dimension_Stmt < Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
 		end
 
@@ -1878,49 +1915,57 @@ module Fortran
   class Do_Construct_Name < NT
   end
 
-  class Do_Term_Action_Stmt < T
+  class Do_Term_Action_Stmt < Stmt
 
-    def to_s
-      unindent
-      stmt(space)
+    def str1
+      block_left
+      indented(strmemo)
     end
 
   end
 
-  class Do_Term_Shared_Stmt < T
+  class Do_Term_Shared_Stmt < Stmt
 
     def label
       "#{e[1].e[0]}"
     end
 
-    def to_s
-      unindent
+    def str1
+      block_left
       n=self
       while (n=n.ancestor(Outer_Shared_Do_Construct))
-        unindent if n.label==label
+        block_left if n.label==label
       end
-      cat
+      indented(strmemo)
     end
 
   end
 
-  class Double_Colon < T
+  class Double_Colon < NT
   end
 
-  class Dummy_Arg_List < T
+  class Dummy_Arg_List < NT
+
+    def str0
+      list_str
+    end
+
+  end
+
+  class Dummy_Arg_List_Pair < NT
   end
 
   class Dummy_Arg_Name < NT
   end
 
-  class Dummy_Arg_Name_List < T
+  class Dummy_Arg_Name_List < NT
 
     def names
       e[1].e.reduce([e[0]]) { |m,x| m.push(x.name) }
     end
 
-    def to_s
-      list_to_s
+    def str0
+      list_str
     end
 
   end
@@ -1933,174 +1978,186 @@ module Fortran
 
   end
 
-  class Else_If_Stmt < T
+  class Else_If_Stmt < Stmt
 
-    def to_s
-      unindent
-      s="\n"+stmt("#{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
-      indent
+    def str1
+      block_left
+      s="\n#{indented(strmemo)}"
+      block_right
+      s
+    end
+
+    def str0
+      stmt("#{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
+    end
+
+  end
+
+  class Else_Stmt < Stmt
+
+    def str1
+      block_left
+      s=strmemo
+      block_right
       s
     end
 
   end
 
-  class Else_Stmt < T
+  class Elsewhere_Stmt < Stmt
 
-    def to_s
-      unindent
-      s="#{stmt(space)}"
-      indent
+    def str1
+      block_left
+      s=strmemo
+      block_right
       s
     end
 
   end
 
-  class Elsewhere_Stmt < T
+  class End_Block_Data_Option < NT
 
-    def to_s
-      unindent
-      s=stmt(space)
-      indent
-      s
-    end
-
-  end
-
-  class End_Block_Data_Option < T
-
-		def to_s
+		def str0
 			space(true)
 		end
 
   end
 
-  class End_Block_Data_Stmt < T
+  class End_Block_Data_Stmt < Stmt
 
-    def to_s
-      unindent
-      stmt(space)
+    def str1
+      block_left
+      indented(strmemo)
     end
 
   end
 
-  class End_Do_Stmt < T
+  class End_Do_Stmt < Stmt
 
-    def to_s
-      unindent
-      "#{stmt(space)}"
+    def str1
+      block_left
+      indented(strmemo)
     end
 
   end
 
   class End_Function_Option < NT
 
-    def to_s
+    def str0
 			space(true)
     end
 
   end
 
-  class End_Function_Stmt < T
+  class End_Function_Stmt < Stmt
 
-    def to_s
-      unindent
-      stmt(space)+"\n"
+    def str1
+      block_left
+      "#{indented(strmemo)}\n"
     end
 
   end
 
-  class End_If_Stmt < T
+  class End_If_Stmt < Stmt
 
-    def to_s
-      unindent
-      "#{stmt(space)}"
+    def str1
+      block_left
+      indented(strmemo)
     end
 
   end
 
-  class End_Interface_Stmt < T
+  class End_Interface_Stmt < Stmt
 
-    def to_s
-      unindent
-      stmt("#{e[1]} #{e[2]}#{sb(e[3])}")+"\n"
+    def str1
+      block_left
+      "#{indented(strmemo)}\n"
+    end
+
+    def str0
+      stmt("#{e[1]} #{e[2]}#{sb(e[3])}")
     end
 
   end
 
-  class End_Module_Option < T
+  class End_Module_Option < NT
 
-		def to_s
+		def str0
 			space(true)
 		end
 
   end
 
-  class End_Module_Stmt < T
+  class End_Module_Stmt < Stmt
 
-    def to_s
-      unindent
-      "#{stmt(space)}\n"
+    def str1
+      block_left
+      "#{indented(strmemo)}\n"
     end
 
   end
 
-  class End_Program_Stmt < T
+  class End_Program_Stmt < Stmt
 
-    def to_s
-      unindent
-      "\n"+stmt("#{e[1]}#{sb(e[3])}#{sb(e[4])}")
+    def str1
+      block_left
+      "\n#{indented(strmemo)}"
+    end
+
+    def str0
+      stmt("#{e[1]}#{sb(e[3])}#{sb(e[4])}")
     end
 
   end
 
-  class End_Select_Stmt < T
+  class End_Select_Stmt < Stmt
 
-    def to_s
-      unindent
-      unindent
-      stmt(space)
+    def str1
+      block_left
+      block_left
+      indented(strmemo)
     end
 
   end
 
   class End_Subroutine_Option < NT
 
-    def to_s
+    def str0
 			space(true)
     end
 
   end
 
-  class End_Subroutine_Stmt < T
+  class End_Subroutine_Stmt < Stmt
 
-    def to_s
-      unindent
-      "\n#{stmt(space)}\n"
+    def str1
+      block_left
+      "\n#{indented(strmemo)}\n"
     end
 
   end
 
-  class End_Type_Stmt < T
+  class End_Type_Stmt < Stmt
 
-    def to_s
-      unindent
-      stmt(space)
+    def str1
+      block_left
+      indented(strmemo)
     end
 
   end
 
-  class End_Where_Stmt < T
+  class End_Where_Stmt < Stmt
 
-    def to_s
-      unindent
-      stmt(space)
+    def str1
+      block_left
+      indented(strmemo)
     end
 
   end
 
   class Endfile_Stmt_1 < Io_Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
 		end
 
@@ -2108,7 +2165,7 @@ module Fortran
 
   class Endfile_Stmt_2 < Io_Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]} #{e[2]}")
 		end
 
@@ -2189,34 +2246,29 @@ module Fortran
   class Entry_Name < NT
   end
 
-  class Entry_Stmt < T
+  class Entry_Stmt < Stmt
 
-		def to_s
+		def str0
 			stmt("#{e[1]} #{e[2]}#{e[3]}#{sb(e[4])}")
 		end
 
   end
 
-  class Equivalence_Set_List < T
+  class Equivalence_Set_List < NT
 
-		def to_s
-			list_to_s
+		def str0
+			list_str
 		end
 
   end
 
-  class Equivalence_Stmt < NT
-
-    def to_s
-      stmt(space)
-    end
-
+  class Equivalence_Stmt < Stmt
   end
 
-  class Executable_Construct_Action_Stmt < NT
+  class Executable_Construct_Action_Stmt < Stmt
 
-    def to_s
-      stmt(space)
+    def str1
+      indented(strmemo)
     end
 
   end
@@ -2227,15 +2279,10 @@ module Fortran
   class Execution_Part_Construct < NT
   end
 
-  class Exit_Stmt < NT
-
-    def to_s
-      stmt(space)
-    end
-
+  class Exit_Stmt < Stmt
   end
 
-  class Explicit_Shape_Spec < T
+  class Explicit_Shape_Spec < NT
 
     def abstract_bounds
       OpenStruct.new({:alb=>alb,:aub=>aub})
@@ -2275,9 +2322,13 @@ module Fortran
       e[1].e.reduce([e[0].concrete_bounds]) { |m,x| m.push(x.concrete_bounds) }
     end
 
+    def str0
+      list_str
+    end
+
   end
 
-  class Explicit_Shape_Spec_List_Pair < T
+  class Explicit_Shape_Spec_List_Pair < NT
 
     def abstract_bounds
       e[1].abstract_bounds
@@ -2291,16 +2342,16 @@ module Fortran
 
   class Expr < NT
 
-    def to_s
+    def str0
       "#{e[0]}"+((e[1].e)?("#{e[1].e[0]}#{e[1].e[1]}"):(""))
     end
 
   end
 
-  class Expr_List < T
+  class Expr_List < NT
 
-		def to_s
-			list_to_s
+		def str0
+			list_str
 		end
 
   end
@@ -2311,29 +2362,20 @@ module Fortran
   class External_Name < NT
   end
 
-  class External_Name_List < T
+  class External_Name_List < NT
 
-		def to_s
-			list_to_s
+		def str0
+			list_str
 		end
 
   end
 
-  class External_Stmt < NT
-
-    def to_s
-      stmt(space)
-    end
-
+  class External_Stmt < Stmt
   end
 
-  class Format_Stmt < NT
-
-    def to_s
-      stmt(space)
-    end
-
+  class Format_Stmt < Stmt
   end
+
   class Function_Name < NT
 
     def name
@@ -2342,7 +2384,7 @@ module Fortran
 
   end
 
-  class Function_Prefix < T
+  class Function_Prefix < NT
 
     def any?(o)
       fail "ERROR: Expected string or class" unless o.is_a?(Symbol) or o.is_a?(Class)
@@ -2364,13 +2406,13 @@ module Fortran
       any?(:recursive)
     end
 
+		def str0
+			e.map { |x| "#{x}" }.join(" ")
+		end
+
     def type_spec
       any?(Type_Spec)
     end
-
-		def to_s
-			e.map { |x| "#{x}" }.join(" ")
-		end
 
   end
 
@@ -2382,7 +2424,7 @@ module Fortran
 
   end
 
-  class Function_Stmt < T
+  class Function_Stmt < Stmt
 
     def elemental?
       function_prefix.elemental?
@@ -2408,10 +2450,14 @@ module Fortran
       function_prefix.recursive?
     end
 
-    def to_s
-      s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")
-      indent
+    def str1
+      s="\n#{strmemo}"
+      block_right
       s
+    end
+
+    def str0
+      stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")
     end
 
     def type_spec
@@ -2464,7 +2510,7 @@ module Fortran
 
   end
 
-  class Generic_Spec < T
+  class Generic_Spec < NT
 
     def localname
       usename
@@ -2474,7 +2520,7 @@ module Fortran
       usename
     end
 
-    def to_s
+    def str0
       "#{e[0]} #{e[1]}#{e[2]}#{e[3]}"
     end
 
@@ -2484,12 +2530,7 @@ module Fortran
 
   end
 
-  class Goto_Stmt < NT
-
-    def to_s
-			stmt(space)
-    end
-
+  class Goto_Stmt < Stmt
   end
 
   class If_Construct < NT
@@ -2498,64 +2539,65 @@ module Fortran
   class If_Construct_Name < NT
   end
 
-  class If_Stmt < T
+  class If_Stmt < Stmt
 
     def action
-      "#{e[5].to_s.strip}"
+      "#{e[5]}".strip
     end
 
     def prefix
       "#{e[1]} #{e[2]}#{e[3]}#{e[4]}"
     end
 
-    def to_s
+    def str0
       stmt("#{prefix} #{action}")
     end
 
   end
 
-  class If_Then_Stmt < T
+  class If_Then_Stmt < Stmt
 
-    def to_s
-      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
-      indent
+    def str1
+      s=indented(strmemo)
+      block_right
       s
+    end
+
+    def str0
+      stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
     end
 
   end
 
-  class Implicit_None_Stmt < NT
-
-		def to_s
-			stmt(space)+"\n"
-		end
+  class Implicit_None_Stmt < Stmt
+    def str1
+      "#{indented(strmemo)}\n"
+    end
 
   end
 
-  class Implicit_Spec_List < T
+  class Implicit_Part < NT
+  end
 
-		def to_s
-			list_to_s
-		end
+  class Implicit_Spec_List < NT
+
+    def str0
+      list_str
+    end
 
   end
 
   class Implicit_Spec_List_Pair < NT
   end
 
-  class Implicit_Stmt < NT
-
-		def to_s
-			stmt(space)
-		end
-
+  class Implicit_Stmt < Stmt
   end
 
-  class Initialization < T
+  class Initialization < NT
 
-		def to_s
-			"#{e[0]}#{e[1]}"
-		end
+    def str0
+      "#{e[0]}#{e[1]}"
+    end
 
   end
 
@@ -2565,14 +2607,10 @@ module Fortran
   class Initialization_2 < Initialization
   end
 
-  class Inner_Shared_Do_Construct < T
+  class Inner_Shared_Do_Construct < NT
 
     def label
       e[0].label
-    end
-
-    def to_s
-      cat
     end
 
   end
@@ -2588,25 +2626,25 @@ module Fortran
 
   class Inquire_Stmt_1 < Io_Stmt
 
-		def to_s
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+    end
 
   end
 
   class Inquire_Stmt_2 < Io_Stmt
 
-		def to_s
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}")
+    end
 
   end
 
-  class Intent_Stmt < T
+  class Intent_Stmt < Stmt
 
-		def to_s
-			stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{ik(e[5],"::"," ")}#{e[6]}")
-		end
+    def str0
+      stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{ik(e[5],"::"," ")}#{e[6]}")
+    end
 
   end
 
@@ -2619,23 +2657,22 @@ module Fortran
   class Interface_Body_2 < Interface_Body
   end
 
-  class Interface_Stmt < T
+  class Interface_Stmt < Stmt
 
-    def to_s
-      s="\n#{stmt(space)}"
-      indent
+    def str1
+      s="\n#{strmemo}"
+      block_right
       s
     end
-
   end
 
   class Internal_File_Unit < NT
   end
 
-  class Internal_Subprograms < T
+  class Internal_Subprograms < NT
 
 
-    def to_s
+    def str0
       e.map { |x| "#{x}" }.join
     end
 
@@ -2644,20 +2681,15 @@ module Fortran
   class Intrinsic_Procedure_Name < NT
   end
 
-  class Intrinsic_Procedure_Name_List < T
+  class Intrinsic_Procedure_Name_List < NT
 
-		def to_s
-			list_to_s
-		end
+    def str0
+      list_str
+    end
 
   end
 
-  class Intrinsic_Stmt < NT
-
-    def to_s
-      stmt(space)
-    end
-
+  class Intrinsic_Stmt < Stmt
   end
 
   class Io_Control_Spec_List < Io_Spec_List
@@ -2666,7 +2698,7 @@ module Fortran
   class Io_Control_Spec_List_Pair < NT
   end
 
-  class Io_Control_Spec_Unit_Nml < T
+  class Io_Control_Spec_Unit_Nml < NT
 
     def unit
       e[0]
@@ -2678,11 +2710,11 @@ module Fortran
 
   end
 
-  class Io_Implied_Do_Object_List < T
+  class Io_Implied_Do_Object_List < NT
 
-		def to_s
-			list_to_s
-		end
+    def str0
+      list_str
+    end
 
   end
 
@@ -2805,18 +2837,18 @@ module Fortran
   class Io_Spec_Write < Io_Spec
   end
 
-  class Kind_Selector < T
+  class Kind_Selector < NT
 
     def kind
       "#{e[2]}"
-		end
+    end
 
   end
 
-  class Label < T
+  class Label < NT
 
-    def to_s
-      text_value.to_i.to_s
+    def str0
+      "#{text_value.to_i}"
     end
 
   end
@@ -2830,29 +2862,33 @@ module Fortran
   class Label_Format < Label
   end
 
-  class Label_Do_Stmt < T
+  class Label_Do_Stmt < Stmt
 
     def label
       "#{e[3]}"
     end
 
-    def to_s
-      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
-      indent
+    def str1
+      s=strmemo
+      block_right
       s
+    end
+
+    def str0
+      stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
     end
 
   end
 
-  class Label_List < T
+  class Label_List < NT
 
     def labels
       e[1].e.reduce([e[0].label]) { |m,x| m.push(x.label) }
     end
 
-		def to_s
-			list_to_s
-		end
+    def str0
+      list_str
+    end
 
   end
 
@@ -2864,48 +2900,48 @@ module Fortran
 
   end
 
-  class Label_Stmt < Label
+  class Label_Stmt < NT
   end
 
-  class Letter_Spec_List < T
+  class Letter_Spec_List < NT
 
-		def to_s
-			list_to_s
-		end
+    def str0
+      list_str
+    end
 
   end
 
   class Local_Name < NT
   end
 
-  class Loop_Control < T
+  class Loop_Control < NT
   end
 
   class Loop_Control_1 < Loop_Control
 
-		def to_s
-			"#{ir(e[0],""," ")}#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{e[5]}"
-		end
+    def str0
+      "#{ir(e[0],""," ")}#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{e[5]}"
+    end
 
   end
 
   class Loop_Control_2 < Loop_Control
 
-		def to_s
-			"#{ir(e[0],""," ")}#{e[1]} #{e[2]}#{e[3]}#{e[4]}"
-		end
+    def str0
+      "#{ir(e[0],""," ")}#{e[1]} #{e[2]}#{e[3]}#{e[4]}"
+    end
 
   end
 
-  class Loop_Control_Pair < T
+  class Loop_Control_Pair < NT
 
     def value
       e[1]
-		end
+    end
 
   end
 
-  class Lower_Bound_Pair < T
+  class Lower_Bound_Pair < NT
 
     def alb
       # abstract lower bound
@@ -2942,23 +2978,18 @@ module Fortran
   class Module_Name < NT
   end
 
-  class Module_Procedure_Stmt < NT
-
-    def to_s
-      stmt(space)
-    end
-
+  class Module_Procedure_Stmt < Stmt
   end
 
-  class Module_Stmt < T
+  class Module_Stmt < Stmt
 
     def name
       "#{e[2]}"
     end
 
-    def to_s
-      s="\n#{stmt(space)}"
-      indent
+    def str1
+      s=indented(strmemo)
+      block_right
       s
     end
 
@@ -2976,15 +3007,15 @@ module Fortran
 
   end
 
-  class Module_Subprogram_Part < T
+  class Module_Subprogram_Part < NT
 
     def subprograms
       e[1].e
     end
 
-		def to_s
-			"#{e[0]}#{e[1].e.reduce("") { |m,x| m+="#{x}" } }"
-		end
+    def str0
+      "#{e[0]}#{e[1].e.reduce("") { |m,x| m+="#{x}" } }"
+    end
 
   end
 
@@ -3002,16 +3033,24 @@ module Fortran
 
   class Mult_Operand < NT
 
-    def to_s
+    def str0
       "#{e[0]}#{e[1]}"
     end
 
   end
 
-  class Name < T
+  class Name < NT
 
     def name
-      to_s
+      "#{self}"
+    end
+
+    def str0
+      s="#{e[0]}"
+      if e[1]
+        s=e[1].e.reduce(s) { |m,x| s+="#{x}" }
+      end
+      s
     end
 
   end
@@ -3023,18 +3062,18 @@ module Fortran
 
     def name
       e[0]
-		end
+    end
 
   end
 
-  class Named_Constant_Def_List < T
+  class Named_Constant_Def_List < NT
 
     def names
       [e[0].name]+e[1].e.reduce([]) { |m,x| m.push(x.e[1].name) }
     end
 
-    def to_s
-      list_to_s
+    def str0
+      list_str
     end
 
   end
@@ -3047,14 +3086,14 @@ module Fortran
 
   end
 
-  class Namelist_Group_Object_List < T
+  class Namelist_Group_Object_List < NT
 
     def objects
       e[1].e.reduce([e[0]]) { |m,x| m.push(x.object) }
     end
 
-    def to_s
-      list_to_s
+    def str0
+      list_str
     end
 
   end
@@ -3067,7 +3106,7 @@ module Fortran
 
   end
 
-  class Namelist_Group_Set < T
+  class Namelist_Group_Set < NT
 
     def name
       e[1].name
@@ -3081,13 +3120,13 @@ module Fortran
       [name,objects]
     end
 
-    def to_s
+    def str0
       "#{e[0]}#{e[1]}#{e[2]} #{e[3]}"
     end
 
   end
 
-  class Namelist_Group_Set_Pair < T
+  class Namelist_Group_Set_Pair < NT
 
     def name
       e[1].name
@@ -3097,7 +3136,7 @@ module Fortran
       e[1]
     end
 
-    def to_s
+    def str0
       "#{ir(e[0],""," ")}#{e[1]}"
     end
 
@@ -3115,13 +3154,13 @@ module Fortran
 
   end
 
-  class Namelist_Stmt < T
+  class Namelist_Stmt < Stmt
 
     def sets
       e[3].sets.push(e[2].set)
     end
 
-    def to_s
+    def str0
       stmt("#{e[1]} #{e[2]}#{e[3]}")
     end
 
@@ -3135,19 +3174,23 @@ module Fortran
 
   end
 
-  class Nonlabel_Do_Stmt < T
+  class Nonlabel_Do_Stmt < Stmt
 
-    def to_s
-      s=stmt("#{sa(e[1])}#{e[2]}#{e[3]}")
-      indent
+    def str1
+      s=strmemo
+      block_right
       s
+    end
+
+    def str0
+      stmt("#{sa(e[1])}#{e[2]}#{e[3]}")
     end
 
   end
 
-  class Nullify_Stmt < NT
+  class Nullify_Stmt < Stmt
 
-    def to_s
+    def str0
       cat_stmt
     end
 
@@ -3177,7 +3220,7 @@ module Fortran
 
   end
 
-  class Object_Names_And_Spec_Lists < T
+  class Object_Names_And_Spec_Lists < NT
 
     def names
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
@@ -3197,7 +3240,7 @@ module Fortran
 
   end
 
-  class Only_List < T
+  class Only_List < NT
 
     def localnames
       e[1].e.reduce([e[0].localname]) { |m,x| m.push(x.localname) }
@@ -3207,9 +3250,13 @@ module Fortran
       e[1].e.reduce([e[0].usename]) { |m,x| m.push(x.usename) }
     end
 
+    def str0
+      list_str
+    end
+
   end
 
-  class Only_List_Pair < T
+  class Only_List_Pair < NT
 
     def localname
       e[1].localname
@@ -3221,27 +3268,27 @@ module Fortran
 
   end
 
-  class Only_Option < T
+  class Only_Option < NT
 
     def localname
       "#{e[0]}"
-		end
+    end
 
   end
 
   class Open_Stmt < Io_Stmt
 
-		def to_s
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+    end
 
   end
 
-  class Optional_Stmt < T
+  class Optional_Stmt < Stmt
 
-		def to_s
-			stmt("#{e[1]}#{ik(e[2],"::"," ")}#{e[3]}")
-		end
+    def str0
+      stmt("#{e[1]}#{ik(e[2],"::"," ")}#{e[3]}")
+    end
 
   end
 
@@ -3249,7 +3296,7 @@ module Fortran
 
     def label
       e[0].label
-		end
+    end
 
   end
 
@@ -3259,9 +3306,9 @@ module Fortran
   class Output_Item_List_Pair < Io_Item_List_Pair
   end
 
-  class Parameter_Stmt < NT
+  class Parameter_Stmt < Stmt
 
-    def to_s
+    def str0
       cat_stmt
     end
 
@@ -3270,7 +3317,7 @@ module Fortran
   class Parenthesized_Args < NT
   end
 
-  class Parenthesized_Deferred_Shape_Spec_List < T
+  class Parenthesized_Deferred_Shape_Spec_List < NT
 
     def abstract_boundslist
       e[1].abstract_boundslist
@@ -3282,11 +3329,11 @@ module Fortran
 
   end
 
-  class Parenthesized_Explicit_Shape_Spec_List < T
+  class Parenthesized_Explicit_Shape_Spec_List < NT
 
     def abstract_boundslist
       e[1].abstract_boundslist
-		end
+    end
 
   end
 
@@ -3317,43 +3364,38 @@ module Fortran
 
   end
 
-  class Pause_Stmt < NT
-
-    def to_s
-      stmt(space)
-    end
-
+  class Pause_Stmt < Stmt
   end
 
-  class Pointer_Assignment_Stmt < NT
+  class Pointer_Assignment_Stmt < Stmt
 
-    def to_s
+    def str0
       cat_stmt
     end
 
   end
 
-  class Pointer_Object_List < T
+  class Pointer_Object_List < NT
 
-		def to_s
-			list_to_s
-		end
-
-  end
-
-  class Pointer_Stmt < T
-
-		def to_s
-			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
-		end
+    def str0
+      list_str
+    end
 
   end
 
-  class Position_Spec_List < T
+  class Pointer_Stmt < Stmt
 
-		def to_s
-			list_to_s
-		end
+    def str0
+      stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
+    end
+
+  end
+
+  class Position_Spec_List < NT
+
+    def str0
+      list_str
+    end
 
   end
 
@@ -3372,9 +3414,9 @@ module Fortran
       (e[3].is_a?(Print_Stmt_Output_Item_List))?(e[3].items):([])
     end
 
-		def to_s
-			stmt("#{e[1]} #{e[2]}#{e[3]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}")
+    end
 
   end
 
@@ -3388,15 +3430,15 @@ module Fortran
       e[1]
     end
 
-    def to_s
-			"#{e[0]}#{e[1]}"
-		end
+    def str0
+      "#{e[0]}#{e[1]}"
+    end
 
   end
 
-  class Private_Sequence_Stmt < NT
+  class Private_Sequence_Stmt < Stmt
 
-    def to_s
+    def str0
       cat_stmt
     end
 
@@ -3405,32 +3447,32 @@ module Fortran
   class Procedure_Name < NT
   end
 
-  class Procedure_Name_List < T
+  class Procedure_Name_List < NT
 
-		def to_s
-			list_to_s
-		end
+    def str0
+      list_str
+    end
 
   end
 
   class Program_Name < NT
   end
 
-  class Program_Stmt < T
+  class Program_Stmt < Stmt
 
-    def to_s
-      s=stmt(space)
-      indent
+    def str1
+      s=indented(strmemo)
+      block_right
       s
     end
 
   end
 
-  class Program_Units < T
+  class Program_Units < NT
 
-		def to_s
-			e.reduce("") { |m,x| m+="#{x}\n" }.chomp
-		end
+    def str0
+      e.reduce("") { |m,x| m+="#{x}\n" }.chomp
+    end
 
   end
 
@@ -3443,9 +3485,9 @@ module Fortran
       (e[5].is_a?(Input_Item_List))?(e[5].items):([])
     end
 
-		def to_s
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}")
+    end
 
   end
 
@@ -3455,9 +3497,9 @@ module Fortran
       (e[3].is_a?(Read_Stmt_Input_Item_List_Option))?(e[3].items):([])
     end
 
-		def to_s
-			stmt("#{e[1]} #{e[2]}#{e[3]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}")
+    end
 
   end
 
@@ -3491,6 +3533,10 @@ module Fortran
       e[1].e.reduce([e[0].usename]) { |m,x| m.push(x.usename) }
     end
 
+    def str0
+      list_str
+    end
+
   end
 
   class Rename_List_Pair < NT
@@ -3505,7 +3551,7 @@ module Fortran
 
   end
 
-  class Rename_List_Option < T
+  class Rename_List_Option < NT
 
     def localnames
       e[1].localnames
@@ -3533,46 +3579,46 @@ module Fortran
 
   end
 
-  class Return_Stmt < NT
+  class Return_Stmt < Stmt
 
-    def to_s
-			space(true)
+    def str0
+      space(true)
     end
 
   end
 
   class Rewind_Stmt_1 < Io_Stmt
 
-		def to_s
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+    end
 
   end
 
   class Rewind_Stmt_2 < Io_Stmt
 
-		def to_s
-			stmt("#{e[1]} #{e[2]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}")
+    end
 
   end
-  class Save_Stmt < T
+  class Save_Stmt < Stmt
 
-		def to_s
-			stmt("#{e[1]}#{e[2]}")
-		end
+    def str0
+      stmt("#{e[1]}#{e[2]}")
+    end
 
   end
 
-  class Save_Stmt_Entity_List < T
+  class Save_Stmt_Entity_List < NT
 
     def names
       e[1].names
-		end
+    end
 
-		def to_s
-			"#{ir(e[0],""," ")}#{e[1]}"
-		end
+    def str0
+      "#{ir(e[0],""," ")}#{e[1]}"
+    end
 
   end
 
@@ -3592,15 +3638,15 @@ module Fortran
 
   end
 
-  class Saved_Entity_List < T
+  class Saved_Entity_List < NT
 
     def names
       e[1].e.reduce([e[0]]) { |m,x| m.push(x.name) }
     end
 
-		def to_s
-			list_to_s
-		end
+    def str0
+      list_str
+    end
 
   end
 
@@ -3618,57 +3664,56 @@ module Fortran
       e[1].elements.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
     end
 
-    def to_s
-      list_to_s
+    def str0
+      list_str
     end
 
   end
 
-  class Select_Case_Stmt < T
+  class Select_Case_Stmt < Stmt
 
-    def to_s
-      s=stmt("#{sa(e[1])}#{e[2]} #{e[3]} #{e[4]}#{e[5]}#{e[6]}")
-      indent
-      indent
+    def str1
+      s=strmemo
+      block_right
+      block_right
       s
     end
 
-  end
-
-  class Specification_Part < T
-
-		def to_s
-			"\n#{cat}\n"
-		end
+    def str0
+      stmt("#{sa(e[1])}#{e[2]} #{e[3]} #{e[4]}#{e[5]}#{e[6]}")
+    end
 
   end
 
-  class Star_Int < T
+  class Specification_Part < NT
+
+    def str1
+      "\n#{strmemo}\n"
+    end
+
+  end
+
+  class Star_Int < NT
 
     def kind
       "#{e[1]}"
-		end
+    end
 
   end
 
-  class Stmt_Function_Stmt < NT
+  class Stmt_Function_Stmt < Stmt
 
     def name
       "#{e[1]}"
-		end
+    end
 
-    def to_s
+    def str0
       cat_stmt
     end
 
   end
 
-  class Stop_Stmt < NT
-
-    def to_s
-			stmt(space)
-    end
-
+  class Stop_Stmt < Stmt
   end
 
   class Subroutine_Name < NT
@@ -3679,11 +3724,11 @@ module Fortran
 
   end
 
-  class Subroutine_Prefix < T
+  class Subroutine_Prefix < NT
 
-		def to_s
-			e.map { |x| "#{x}" }.join(" ")
-		end
+    def str0
+      e.map { |x| "#{x}" }.join(" ")
+    end
 
   end
 
@@ -3695,16 +3740,20 @@ module Fortran
 
   end
 
-  class Subroutine_Stmt < T
+  class Subroutine_Stmt < Stmt
 
     def name
       e[3].name
     end
 
-    def to_s
-      s="\n"+stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
-      indent
+    def str1
+      s="\n#{indented(strmemo)}"
+      block_right
       s
+    end
+
+    def str0
+      stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
     end
 
   end
@@ -3741,42 +3790,42 @@ module Fortran
 
   end
 
-  class Substring < T
+  class Substring < NT
 
     def name
       e[0].name
-		end
+    end
 
   end
 
-  class Target_Object_List < T
+  class Target_Object_List < NT
 
     def objects
       e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
     end
 
-    def to_s
+    def str0
       e[1].e.reduce("#{e[0]}") { |m,x| m+"#{x}" }
     end
 
   end
 
-  class Target_Object_List_Pair < T
+  class Target_Object_List_Pair < NT
   end
 
-  class Target_Stmt < T
+  class Target_Stmt < Stmt
 
-		def to_s
-			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
-		end
+    def str0
+      stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
+    end
 
   end
 
-  class Type_Declaration_Stmt < T
+  class Type_Declaration_Stmt < Stmt
 
-		def to_s
-			stmt("#{e[1]}#{ir(e[2],"",ik(e[1],","," "))}#{e[3]}")
-		end
+    def str0
+      stmt("#{e[1]}#{ir(e[2],"",ik(e[1],","," "))}#{e[3]}")
+    end
 
   end
 
@@ -3799,7 +3848,7 @@ module Fortran
 
   end
 
-  class Upper_Bound < T
+  class Upper_Bound < NT
 
     def aub
       # abstract upper bound
@@ -3821,19 +3870,19 @@ module Fortran
 
   end
 
-  class Use_Part < T
+  class Use_Part < NT
 
-		def to_s
-			"\n#{cat}\n"
-		end
+    def str1
+      "\n#{indented(strmemo)}\n"
+    end
 
   end
 
-  class Use_Stmt < T
+  class Use_Stmt < Stmt
 
     def modulename
       "#{e[2]}"
-		end
+    end
 
   end
 
@@ -3843,7 +3892,7 @@ module Fortran
       e[3].localnames
     end
 
-    def to_s
+    def str0
       stmt("#{e[1]} #{e[2]}#{e[3]}")
     end
 
@@ -3859,7 +3908,7 @@ module Fortran
       e[6].localnames
     end
 
-    def to_s
+    def str0
       stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}")
     end
 
@@ -3885,28 +3934,32 @@ module Fortran
 
   end
 
-  class Where_Construct_Stmt < T
+  class Where_Construct_Stmt < Stmt
 
-    def to_s
-      s=stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
-      indent
+    def str1
+      s=strmemo
+      block_right
       s
+    end
+
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
     end
 
   end
 
-  class Where_Stmt < T
+  class Where_Stmt < Stmt
 
-		def to_s
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[6].to_s.strip}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[6]}".strip)
+    end
 
   end
 
   class Write_Stmt < Io_Stmt
 
-		def to_s
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}")
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{sb(e[5])}")
     end
 
   end

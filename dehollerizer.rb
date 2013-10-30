@@ -87,8 +87,8 @@ class Dehollerizer
     end
   end
 
-  def process(stringmap,source,conf)
-    @conf=conf
+  def dehollerize(stringmap,source,fixed)
+    @fixed=fixed
     @i=0
     @m=stringmap
     @s=source
@@ -117,7 +117,7 @@ class Dehollerizer
 
   def remove_continuation
     skip_whitespace
-    if @conf.fixed and see "\n     a"
+    if @fixed and see "\n     a"
       @s.slice!(@i..@i+6)
     else
       while see "&"

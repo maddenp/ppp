@@ -128,11 +128,10 @@ class Translator
   def default_opts
     {
       :debug=>false,
-      :incdirs=>[],
-      :modinfo=>false,
+      :form=>:free,
+      :incdirs=>["."],
       :nl=>true,
-      :normalize=>false,
-      :translate=>true
+      :product=>:translated_source
     }
   end
 
@@ -167,19 +166,16 @@ class Translator
     die "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
     s=File.open(srcfile,"rb").read
     conf=unpack({},args)
-    puts out(s,:program_units,srcfile,conf)
+    puts process(s,:program_units,srcfile,conf)
   end
 
   def normalize(s,conf)
     safe=conf.safe # only true for internal parses
     np=XNormalizerParser.new
     np.update(Normfree)
-    unless conf.fixed
+    unless conf.form==:fixed
       @m=Stringmap.new
-      unless safe
-        d=Dehollerizer.new
-        s=d.process(@m,s,conf)  # mask holleriths
-      end
+      Dehollerizer.new.dehollerize(@m,s,conf) unless safe
     end
     nq=(not s=~/['"]/)          # no quotes?
     unless safe
@@ -206,12 +202,9 @@ class Translator
     s
   end
 
-  def out(s,root,srcfile,conf)
-    conf=ostruct_default_merge(conf)
-    translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
-    fail "TRANSLATION FAILED" if translated_source and translated_source.empty?
-    translated_source=vertspace(translated_source) unless conf.normalize
-    translated_source
+  def ostruct_default_merge(a)
+    a=a.marshal_dump if a.is_a?(OpenStruct)
+    OpenStruct.new(default_opts.merge(a))
   end
 
   def process(s,root,srcfile,conf)
@@ -288,26 +281,22 @@ class Translator
     end
 
     def fixed2free(s,conf)
-      # Normalizer from fixed form to free form
       np=XNormalizerParser.new
       np.update(Normfixed)
-      s=detabify(s)
-      s=s.gsub(/^[ \t]*\n/,'')                 # remove blank lines
-      a=s.split("\n")                          # split file into an array by line
-      a=a.map {|e| (e+(" "*72))[0..71]}        # pad each line with 72 blanks, truncate at column 72
-      s=a.join("\n")                           # join array into string
-      s=s.gsub(/^(c|C|\*)/,"!")                # replace fixed form comment indicators with "!"
-      s=s.gsub(directive,'@\1')                # hide directives
-      if s=~/\n[ \t]{5}\#/                     # gives user more information about problem
-        $stderr.puts "ERROR:'#' in column six is a cpp directive, not\na valid fixed-form continuation character\n\n"
-      end                                      # will always end in die() from cpp-check
-      s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # replace any continuation character with generic "a"
-      s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
-      @m=Stringmap.new
       d=Dehollerizer.new
-      s=d.process(@m,s,conf)                   # mask holleriths (also removes hollerith-important continuations)
-      s=chkparse(fix_pt_norm(s,np))            # string-aware transform & parse error checking
-      s=s.gsub(/\n[ \t]{5}a/,"")               # join continuation lines
+      @m=Stringmap.new
+      s=detabify(s)                            # convert leading tabs
+      s=s.gsub(/^[ \t]*\n/,'')                 # remove blank lines
+      a=s.split("\n")                          # string -> array of lines
+      a=a.map {|e| (e+(" "*72))[0..71]}        # blank-pad lines to column 72
+      s=a.join("\n")                           # array of lines -> string
+      s=s.gsub(/^(c|C|\*)/,"!")                # all comment markers -> '!'
+      s=s.gsub(directive,'@\1')                # hide directives
+      s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # all continuation markers -> 'a'
+      s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
+      d.dehollerize(@m,s,conf.form==:fixed)    # mask holleriths
+      s=chkparse(fix_pt_norm(s,np))            # string-aware transform
+      s=s.gsub(/\n[ \t]{5}a/,"")               # join continuations
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
       s
     end
@@ -352,80 +341,81 @@ class Translator
     end
 
     def vertspace(t)
-      t=t.gsub(/\n\n\n+/,"\n\n") # Collapse multiple blank lines into one
-      t[0]=t[0].sub(/^\n/,"")    # Remove blank first line
+      empty=/^$/
+      a=t.split("\n")
+      a.delete_at(0) while a[0]=~empty
+      b=[]
+      a.each_index { |i| b.push(a[i]) unless a[i]=~empty and a[i+1]=~empty }
+      t=b.join("\n")
       t
     end
 
     conf=ostruct_default_merge(conf)
+    fixed=(conf.form==:fixed)
     fp=XFortranParser.new(srcfile,conf.incdirs)
     s0=nil
-    unless conf.safe # internal parse
-      while s!=s0 and not s.nil?                                     # Fixed point treatment of prepsrc() and assemble()
-        s0=s                                                         # for cases in which files added by 'include'
-        s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and conf.fixed # statements or '!sms$insert include' statements
-        s=prepsrc_free(s) if defined?(prepsrc_free)                  # also contain such a statement; this follows the path
-        s=assemble(s,[srcfile],conf.incdirs)                         # until all souce has been inserted
+    unless conf.safe
+      while s!=s0 and not s.nil?                                # fixed point treatment of prepsrc() and assemble()
+        s0=s                                                    # for cases in which files added by 'include'
+        s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and fixed # statements or '!sms$insert include' statements
+        s=prepsrc_free(s) if defined?(prepsrc_free)             # also contain such a statement; this follows the path
+        s=assemble(s,[srcfile],conf.incdirs)                    # until all souce has been inserted
       end
     end
-    if conf.debug
-      puts "RAW #{(conf.fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}"
-    end
-    if conf.fixed
+    puts "RAW #{(fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}" if conf.debug
+    if fixed
       puts "\nFREE-FORM TRANSLATION\n\n" if conf.debug
       s=fixed2free(s,conf)
       puts "#{s}\n\n" if conf.debug
     end
-    cppcheck(s) unless conf.safe # internal parse
+    cppcheck(s) unless conf.safe
     puts "NORMALIZED FORM\n" if conf.debug
     n=normalize(s,conf)
-    puts "\n#{n}" if conf.debug or conf.normalize
-    unless conf.normalize
-      env=(conf.env)?(conf.env):(nil)
-      raw_tree=fp.parse(n,env,{:root=>root})
-      exit if conf.modinfo
-      unless raw_tree
-        re=Regexp.new("^(.+?):in `([^\']*)'$")
-        srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
-        na=n.split("\n")
-        na.each_index { |i| $stderr.puts "#{i+1} #{na[i]}" }
-        failmsg=""
-        failmsg+="#{fp.failure_reason.split("\n")[0]}\n"
-        failmsg+="Original source: #{srcfile}\n"
-        failmsg+="PARSE FAILED"
-        failmsg+="#{srcmsg}"
-        fail failmsg
-        return # if in server mode and did not exit in die()
-      end
-      raw_tree.instance_variable_set(:@srcfile,srcfile)
-      raw_tree=raw_tree.transform_top(:post) # post-process raw tree
-      return [wrap(raw_tree.to_s),raw_tree,nil] unless conf.translate
-      if conf.debug
-        puts "\nRAW TREE\n\n"
-        p raw_tree
-      end
-      translated_tree=(conf.translate)?(raw_tree.transform_top(:translate)):(nil)
+    return n if conf.product==:normalized_source
+    puts "\n#{n}" if conf.debug
+    env=(conf.env)?(conf.env):(nil)
+    raw_tree=fp.parse(n,env,{:root=>root})
+    return if conf.product==:modinfo
+    unless raw_tree
+      re=Regexp.new("^(.+?):in `([^\']*)'$")
+      srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
+      na=n.split("\n")
+      na.each_index { |i| $stderr.puts "#{i+1} #{na[i]}" }
+      failmsg=""
+      failmsg+="#{fp.failure_reason.split("\n")[0]}\n"
+      failmsg+="Original source: #{srcfile}\n"
+      failmsg+="PARSE FAILED"
+      failmsg+="#{srcmsg}"
+      fail failmsg
+      return
+    end
+    raw_tree.instance_variable_set(:@srcfile,srcfile)
+    raw_tree=raw_tree.transform_top(:post) # post-process raw tree
+    if conf.debug
+      puts "\nRAW TREE\n\n"
+      p raw_tree
+    end
+    case conf.product
+    when :raw_tree
+      return raw_tree
+    when :raw_source
+      $INDENTED=true
+      return vertspace(wrap(raw_tree.to_s))
+    when :translated_source
+      translated_tree=raw_tree.transform_top(:translate)
       fail "TRANSLATION FAILED" unless translated_tree
       if conf.debug
         puts "\nTRANSLATED TREE\n\n"
         p translated_tree
       end
-      t=wrap(translated_tree.to_s)
+      $INDENTED=true
+      t=vertspace(wrap(translated_tree.to_s))
       puts "\nTRANSLATED SOURCE\n\n" if conf.debug
+      return t
+    else
+      fail "ERROR: Unknown product '#{conf.product}'"
     end
-    [t,raw_tree,translated_tree]
-  end
 
-  def raw(s,root,srcfile,conf={})
-    # Should only be called on code generated by ppp following conventions like:
-    # no holleriths, no comments, all lower case, etc. Review normalize() to see
-    # which transformations are done on code marked "safe".
-    conf=ostruct_default_merge(conf)
-    conf.safe=true
-    conf.translate=false
-    translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
-    fail "PARSE FAILED" unless raw_tree
-    raw_tree
   end
 
   def restore_strings(s,stringmap)
@@ -462,8 +452,20 @@ class Translator
           end
           srcdir=File.dirname(File.expand_path(srcfile))
           conf.incdirs=[srcdir]
-          conf.translate=(action=="translate")
-          conf.fixed=(form=="fixed")
+          if action=="translate"
+            conf.product=:translated_source
+          elsif action=="passthrough"
+            conf.product=:raw_source
+          else
+            puts "ERROR: Unknown action '#{action}'" unless quiet
+          end
+          if form=="fixed"
+            conf.form=:fixed
+          elsif form=="free"
+            conf.form=:free
+          else
+            puts "ERROR: Unknown form '#{form}'" unless quiet
+          end
           dirlist.split(":").each do |d|
             d=File.join(srcdir,d) if Pathname.new(d).relative?
             unless File.directory?(d)
@@ -472,7 +474,7 @@ class Translator
             conf.incdirs.push(d)
           end
           puts "Translating #{srcfile}" unless quiet
-          client.puts(out(s,:program_units,srcfile,conf))
+          client.puts(process(s,:program_units,srcfile,conf))
           client.close
         rescue Errno::EPIPE
           # Handle broken pipe (i.e. other end of the socket dies)
@@ -511,21 +513,8 @@ class Translator
     exit(status) unless status==false
   end
 
-  def tree(s,root,srcfile,conf)
-    conf=ostruct_default_merge(conf)
-    translated_source,raw_tree,translated_tree=process(s,root,srcfile,conf)
-    fail "TRANSLATION FAILED" unless translated_tree
-    translated_tree
-  end
-
-  def ostruct_default_merge(a)
-    a=a.marshal_dump if a.is_a?(OpenStruct)
-    OpenStruct.new(default_opts.merge(a))
-  end
-
   def unpack(conf,args)
     conf=OpenStruct.new(conf)
-    conf.incdirs=["."]
     while opt=args.shift
       case opt
       when "-I"
@@ -536,22 +525,17 @@ class Translator
           conf.incdirs.push(d)
         end
       when "fixed"
-        conf.fixed=true
-      when "free"
-        nil # default behavior
+        conf.form=:fixed
       when "debug"
         conf.debug=true
       when "normalize"
-        conf.normalize=true
+        conf.product=:normalized_source
       when "modinfo"
-        conf.modinfo=true
+        conf.product=:modinfo
       when "passthrough"
-        conf.translate=false
+        conf.product=:raw_source
       else
         die usage
-      end
-      if conf.modinfo and conf.normalize
-        die ("ERROR: 'normalize' and 'modinfo' are mutually exclusive\n"+usage)
       end
     end
     conf

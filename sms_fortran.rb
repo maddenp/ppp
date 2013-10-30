@@ -505,7 +505,7 @@ module Fortran
       "sms__typeget(#{var})"
     end
 
-  end # class T
+  end
 
   class Allocate_Object < NT
 
@@ -646,11 +646,11 @@ module Fortran
 
   end
 
-  class If_Stmt < T
+  class If_Stmt < Stmt
 
     def translate
       code=[]
-      code.push("#{label} #{prefix} then")
+      code.push("#{sa(label)}#{prefix} then")
       code.push("#{action}")
       code.push("endif")
       replace_statement(code)
@@ -690,7 +690,7 @@ module Fortran
 
   end
 
-  class Io_Stmt < T
+  class Io_Stmt < NT
 
     def io_stmt_bcasts
       @need_decompmod=true unless @var_bcast.empty?
@@ -821,7 +821,7 @@ module Fortran
 
   end
 
-  class Label_Stmt < Label
+  class Label_Stmt < NT
 
     def errmsg(in_serial_region)
       io=(in_serial_region)?("out"):("in")
@@ -868,7 +868,7 @@ module Fortran
 
   end
 
-  class Name < T
+  class Name < NT
 
     def globalize
       code=sms_global_name(self)
@@ -903,7 +903,7 @@ module Fortran
 
   end
 
-  class Nonlabel_Do_Stmt < T
+  class Nonlabel_Do_Stmt < Stmt
 
     def translate
       unless sms_serial
@@ -923,9 +923,9 @@ module Fortran
             halo_up=halo_offsets(dd).up
             if loop_control.is_a?(Loop_Control_1)
               code="#{dh}__s#{dd}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)"
-              replace_element(code,:scalar_numeric_expr)
+              replace_element(code,:scalar_numeric_expr,loop_control.e[3])
               code=",#{dh}__e#{dd}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)"
-              replace_element(code,:loop_control_pair)
+              replace_element(code,:loop_control_pair,loop_control.e[4])
             end
           end
         end
@@ -1049,7 +1049,7 @@ module Fortran
 
   class SMS_Comm_Rank < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4]}")
     end
 
@@ -1073,7 +1073,7 @@ module Fortran
 
   class SMS_Comm_Size < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4]}")
     end
 
@@ -1097,7 +1097,7 @@ module Fortran
 
   class SMS_Compare_Var < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}")
     end
 
@@ -1141,7 +1141,7 @@ module Fortran
       e[8]
     end
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}#{e[8]}#{e[9]}")
     end
 
@@ -1249,7 +1249,7 @@ module Fortran
 
   class SMS_Declare_Decomp < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}")
     end
 
@@ -1291,7 +1291,7 @@ module Fortran
 
   class SMS_Distribute_Begin < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
@@ -1299,7 +1299,7 @@ module Fortran
 
   class SMS_Distribute_End < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}")
     end
 
@@ -1331,7 +1331,7 @@ module Fortran
 
   class SMS_Exchange < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4].e.reduce("") { |m,x| m+="#{x.e[0]}#{x.e[1]}" }}#{e[5]}")
     end
 
@@ -1384,7 +1384,7 @@ module Fortran
 
   class SMS_Halo_Comp < SMS_Region
 
-    def to_s
+    def str0
       "#{e[0]}#{e[1]}#{e[2]}"
     end
 
@@ -1392,7 +1392,7 @@ module Fortran
 
   class SMS_Halo_Comp_Begin < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4]} #{e[5]}")
     end
 
@@ -1400,7 +1400,7 @@ module Fortran
 
   class SMS_Halo_Comp_End < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}")
     end
 
@@ -1420,7 +1420,7 @@ module Fortran
 
   class SMS_Halo_Comp_Pairs < NT
 
-    def to_s
+    def str0
       dim1="#{e[0]}"
       dim2=(e[1].e)?("#{e[1].e[1]}"):(nil)
       dim3=(e[2].e)?("#{e[2].e[1]}"):(nil)
@@ -1436,7 +1436,7 @@ module Fortran
 
   class SMS_Ignore_Begin < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}")
     end
 
@@ -1444,7 +1444,7 @@ module Fortran
 
   class SMS_Ignore_End < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}")
     end
 
@@ -1452,7 +1452,7 @@ module Fortran
 
   class SMS_Parallel < SMS_Region
 
-    def to_s
+    def str0
       "#{e[0]}#{e[1]}#{e[2]}"
     end
 
@@ -1460,7 +1460,7 @@ module Fortran
 
   class SMS_Parallel_Begin < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
@@ -1468,7 +1468,7 @@ module Fortran
 
   class SMS_Parallel_End < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}")
     end
 
@@ -1476,7 +1476,7 @@ module Fortran
 
   class SMS_Parallel_Var_List_1 < NT
 
-    def to_s
+    def str0
       s="#{e[0]}#{e[1]}"
       s+=e[2].e.reduce("") { |m,x| m+="#{x.e[1]}" } if e[2].e
       s+="#{e[3]}"
@@ -1490,7 +1490,7 @@ module Fortran
 
   class SMS_Parallel_Var_List_2 < NT
 
-    def to_s
+    def str0
       "#{e[0]}"
     end
 
@@ -1500,7 +1500,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_001 < T
+  class SMS_Parallel_Var_Lists_001 < NT
 
     def vars
       [[],[],e[2].vars]
@@ -1508,7 +1508,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_010 < T
+  class SMS_Parallel_Var_Lists_010 < NT
 
     def vars
       [[],e[1].vars,[]]
@@ -1516,7 +1516,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_011 < T
+  class SMS_Parallel_Var_Lists_011 < NT
 
     def vars
       [[],e[1].vars,e[3].vars]
@@ -1524,7 +1524,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_100 < T
+  class SMS_Parallel_Var_Lists_100 < NT
 
     def vars
       [e[0].vars,[],[]]
@@ -1532,7 +1532,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_101 < T
+  class SMS_Parallel_Var_Lists_101 < NT
 
     def vars
       [e[0].vars,[],e[3].vars]
@@ -1540,7 +1540,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_110 < T
+  class SMS_Parallel_Var_Lists_110 < NT
 
     def vars
       [e[0].vars,e[2].vars,[]]
@@ -1548,7 +1548,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_111 < T
+  class SMS_Parallel_Var_Lists_111 < NT
 
     def vars
       [e[0].vars,e[2].vars,e[4].vars]
@@ -1562,7 +1562,7 @@ module Fortran
       e[5]
     end
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}")
     end
 
@@ -1596,18 +1596,18 @@ module Fortran
   class SMS_Reduce_Varlist < SMS
 
     def vars
-      list_to_s.split(",")
+      list_str.split(",")
     end
 
-    def to_s
-      list_to_s
+    def str0
+      list_str
     end
 
   end
 
   class SMS_Serial < SMS_Region
 
-    def to_s
+    def str0
       "#{e[0]}#{e[1]}#{e[2]}"
     end
 
@@ -1739,7 +1739,7 @@ module Fortran
 
   class SMS_Serial_Begin < SMS
 
-    def to_s
+    def str0
       sms("#{sa(e[2])}#{e[3]}")
     end
 
@@ -1781,7 +1781,7 @@ module Fortran
       (e[1].e&&e[1].e[1].respond_to?(:intent))?(e[1].e[1].intent):("inout")
     end
 
-    def to_s
+    def str0
       "#{e[0]}#{e[1].cat}"
     end
 
@@ -1829,7 +1829,7 @@ module Fortran
 
   class SMS_Serial_End < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}")
     end
 
@@ -1855,7 +1855,7 @@ module Fortran
       vars
     end
 
-    def to_s
+    def str0
       "#{e[0]}"+e[1].e.reduce("") { |m,x| m+"#{x.e[0]}#{x.e[1]}" }
     end
 
@@ -1875,19 +1875,19 @@ module Fortran
 
   class SMS_Serial_Varlist < SMS
 
-    def to_s
-      list_to_s
+    def str0
+      list_str
     end
 
     def vars
-      list_to_s.split(",")
+      list_str.split(",")
     end
 
   end
 
   class SMS_Set_Communicator < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4]}")
     end
 
@@ -1924,7 +1924,7 @@ module Fortran
 
   class SMS_To_Local < SMS_Region
 
-    def to_s
+    def str0
       "#{e[0]}#{e[1]}#{e[2]}"
     end
 
@@ -1932,7 +1932,7 @@ module Fortran
 
   class SMS_To_Local_Begin < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
     end
 
@@ -1940,7 +1940,7 @@ module Fortran
 
   class SMS_To_Local_End < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}")
     end
 
@@ -1966,9 +1966,9 @@ module Fortran
 
   end
 
-  class SMS_To_Local_Lists < T
+  class SMS_To_Local_Lists < NT
 
-    def to_s
+    def str0
       s="#{e[0]}"
       if p=e[1].e
         s+="#{p[0]}#{p[1]}"
@@ -1998,7 +1998,7 @@ module Fortran
 
   class SMS_Var_List < NT
 
-    def to_s
+    def str0
       v=["#{e[0]}"]
       e[1].e.reduce(v) { |m,x| m.push("#{x.e[1]}") } if e[1].e
       v.join(",")
@@ -2012,7 +2012,7 @@ module Fortran
 
   class SMS_Unstructured_Grid < SMS
 
-    def to_s
+    def str0
       sms("#{e[2]}#{e[3]}#{e[4]}")
     end
 
@@ -2079,7 +2079,7 @@ module Fortran
 
   end
 
-  class Stop_Stmt < NT
+  class Stop_Stmt < Stmt
 
     def translate
       return if sms_ignore
