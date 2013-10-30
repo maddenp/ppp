@@ -122,6 +122,9 @@
   Array_Section, SMS_Create_Decomp. In SMS_Declare_Decomp translate, roll out
   as many e{n}/s{n} arrays as needed for the decomposition.
 
+- Add original sms directives to output for non-block directives (or any other
+  that are missing from translated output).
+
 ### TREE
 
 - To make all of this more useful, build an AST from the parse tree. Then, do

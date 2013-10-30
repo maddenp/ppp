@@ -515,6 +515,7 @@ class Translator
 
   def unpack(conf,args)
     conf=OpenStruct.new(conf)
+    conf.incdirs=["."]
     while opt=args.shift
       case opt
       when "-I"

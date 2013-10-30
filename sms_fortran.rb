@@ -1782,7 +1782,9 @@ module Fortran
     end
 
     def str0
-      "#{e[0]}#{e[1].cat}"
+      s="#{e[0]}"
+      s+="#{e[1].e[0]}#{e[1].e[1]}" if e[1].e
+      s
     end
 
     def vars_ignore

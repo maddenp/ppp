@@ -584,7 +584,7 @@ module Fortran
     end
 
 		def cat_stmt
-			stmt(e[1..-1].map { |x| "#{x}" }.join)
+			stmt(e[1..-2].map { |x| "#{x}" }.join)
 		end
     
     def declaration_constructs
@@ -1877,6 +1877,10 @@ module Fortran
       e[1].e.reduce([e[0].abstract_bounds]) { |m,x| m.push(x.abstract_bounds) }
     end
 
+    def str0
+      list_str
+    end
+
   end
 
   class Deferred_Shape_Spec_List_Pair < NT
@@ -1890,7 +1894,7 @@ module Fortran
   class Derived_Type_Stmt < Stmt
 
     def str1
-      s=strmemo
+      s=indented(strmemo)
       block_right
       s
     end
@@ -1997,7 +2001,7 @@ module Fortran
 
     def str1
       block_left
-      s=strmemo
+      s=indented(strmemo)
       block_right
       s
     end
@@ -2451,7 +2455,7 @@ module Fortran
     end
 
     def str1
-      s="\n#{strmemo}"
+      s="\n#{indented(strmemo)}"
       block_right
       s
     end
@@ -2869,7 +2873,7 @@ module Fortran
     end
 
     def str1
-      s=strmemo
+      s=indented(strmemo)
       block_right
       s
     end
@@ -3177,7 +3181,7 @@ module Fortran
   class Nonlabel_Do_Stmt < Stmt
 
     def str1
-      s=strmemo
+      s=indented(strmemo)
       block_right
       s
     end
@@ -3309,7 +3313,11 @@ module Fortran
   class Parameter_Stmt < Stmt
 
     def str0
-      cat_stmt
+      "#{e[1]} #{e[2]}#{e[3]}#{e[4]}"
+    end
+
+    def str1
+      "#{indented(strmemo)}\n"
     end
 
   end
@@ -3873,7 +3881,7 @@ module Fortran
   class Use_Part < NT
 
     def str1
-      "\n#{indented(strmemo)}\n"
+      "\n#{strmemo}\n"
     end
 
   end
