@@ -613,12 +613,8 @@ module Fortran
       ("#{e}"==c)?(e):(a)
     end
 
-    def indent
-      " "*2*level
-    end
-
-    def indented(s)
-      (s.empty?)?(s):(indent+s)
+    def indent(s)
+      (s.empty?)?(s):((" "*2*level)+s)
     end
 
     def ir(e,c,a)
@@ -797,7 +793,7 @@ module Fortran
     end
 
     def str1
-      indented(strmemo)
+      indent(strmemo)
     end
 
   end
@@ -1768,7 +1764,7 @@ module Fortran
 
     def str1
       block_left
-      s="\n#{indented(strmemo)}"
+      s="\n#{indent(strmemo)}"
       block_right
       s
     end
@@ -1898,7 +1894,7 @@ module Fortran
     end
 
     def str1
-      s=indented(strmemo)
+      s=indent(strmemo)
       block_right
       s
     end
@@ -1923,7 +1919,7 @@ module Fortran
 
     def str1
       block_left
-      indented(strmemo)
+      indent(strmemo)
     end
 
   end
@@ -1940,7 +1936,7 @@ module Fortran
       while (n=n.ancestor(Outer_Shared_Do_Construct))
         block_left if n.label==label
       end
-      indented(strmemo)
+      indent(strmemo)
     end
 
   end
@@ -1990,7 +1986,7 @@ module Fortran
 
     def str1
       block_left
-      s="\n#{indented(strmemo)}"
+      s="\n#{indent(strmemo)}"
       block_right
       s
     end
@@ -2001,7 +1997,7 @@ module Fortran
 
     def str1
       block_left
-      s=indented(strmemo)
+      s=indent(strmemo)
       block_right
       s
     end
@@ -2031,7 +2027,7 @@ module Fortran
 
     def str1
       block_left
-      indented(strmemo)
+      indent(strmemo)
     end
 
   end
@@ -2040,7 +2036,7 @@ module Fortran
 
     def str1
       block_left
-      indented(strmemo)
+      indent(strmemo)
     end
 
   end
@@ -2057,7 +2053,7 @@ module Fortran
 
     def str1
       block_left
-      "#{indented(strmemo)}\n"
+      "#{indent(strmemo)}\n"
     end
 
   end
@@ -2066,7 +2062,7 @@ module Fortran
 
     def str1
       block_left
-      indented(strmemo)
+      indent(strmemo)
     end
 
   end
@@ -2079,7 +2075,7 @@ module Fortran
 
     def str1
       block_left
-      "#{indented(strmemo)}\n"
+      "#{indent(strmemo)}\n"
     end
 
   end
@@ -2096,7 +2092,7 @@ module Fortran
 
     def str1
       block_left
-      "#{indented(strmemo)}\n"
+      "#{indent(strmemo)}\n"
     end
 
   end
@@ -2109,7 +2105,7 @@ module Fortran
 
     def str1
       block_left
-      "\n#{indented(strmemo)}"
+      "\n#{indent(strmemo)}"
     end
 
   end
@@ -2119,7 +2115,7 @@ module Fortran
     def str1
       block_left
       block_left
-      indented(strmemo)
+      indent(strmemo)
     end
 
   end
@@ -2136,7 +2132,7 @@ module Fortran
 
     def str1
       block_left
-      "\n#{indented(strmemo)}\n"
+      "\n#{indent(strmemo)}\n"
     end
 
   end
@@ -2145,7 +2141,7 @@ module Fortran
 
     def str1
       block_left
-      indented(strmemo)
+      indent(strmemo)
     end
 
   end
@@ -2154,7 +2150,7 @@ module Fortran
 
     def str1
       block_left
-      indented(strmemo)
+      indent(strmemo)
     end
 
   end
@@ -2272,7 +2268,7 @@ module Fortran
   class Executable_Construct_Action_Stmt < Stmt
 
     def str1
-      indented(strmemo)
+      indent(strmemo)
     end
 
   end
@@ -2459,7 +2455,7 @@ module Fortran
     end
 
     def str1
-      s="\n#{indented(strmemo)}"
+      s="\n#{indent(strmemo)}"
       block_right
       s
     end
@@ -2562,7 +2558,7 @@ module Fortran
   class If_Then_Stmt < Stmt
 
     def str1
-      s=indented(strmemo)
+      s=indent(strmemo)
       block_right
       s
     end
@@ -2576,7 +2572,7 @@ module Fortran
   class Implicit_None_Stmt < Stmt
 
     def str1
-      "#{indented(strmemo)}\n"
+      "#{indent(strmemo)}\n"
     end
 
   end
@@ -2878,7 +2874,7 @@ module Fortran
     end
 
     def str1
-      s=indented(strmemo)
+      s=indent(strmemo)
       block_right
       s
     end
@@ -2993,7 +2989,7 @@ module Fortran
     end
 
     def str1
-      s=indented(strmemo)
+      s=indent(strmemo)
       block_right
       s
     end
@@ -3186,7 +3182,7 @@ module Fortran
     end
 
     def str1
-      s=indented(strmemo)
+      s=indent(strmemo)
       block_right
       s
     end
@@ -3318,7 +3314,7 @@ module Fortran
     end
 
     def str1
-      "#{indented(strmemo)}\n"
+      "#{indent(strmemo)}\n"
     end
 
   end
@@ -3470,7 +3466,7 @@ module Fortran
   class Program_Stmt < Stmt
 
     def str1
-      s=indented(strmemo)
+      s=indent(strmemo)
       block_right
       s
     end
@@ -3760,7 +3756,7 @@ module Fortran
     end
 
     def str1
-      s="\n#{indented(strmemo)}"
+      s="\n#{indent(strmemo)}"
       block_right
       s
     end
