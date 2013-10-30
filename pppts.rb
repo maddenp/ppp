@@ -1,4 +1,3 @@
-debug=false
 server_mode=true
 threads=8
 
@@ -6,7 +5,6 @@ $: << File.dirname($0)
 
 require "version"
 version_check
-
 require "fileutils"
 require "thread"
 
@@ -43,12 +41,15 @@ class PPPTS
   end
 
   def run_all(threads,socket,debug,args)
-    def go(q,socket,debug)
-      test(q.deq,socket,debug) until q.empty?
-    end
+    def go(q,socket,debug) test(q.deq,socket,debug) until q.empty? end
+    def num(s) s.scan(/[0-9]+/).first.to_i end
     tdir="tests"
+    tests=Dir.glob("#{tdir}/t*").sort
+    if (filter=args[0])
+      tests.delete_if { |x| num(x) < num(filter) }
+      tests.delete_if { |x| x != "#{tdir}/#{filter}" } unless filter[0]=="+"
+    end
     q=Queue.new
-    tests=(args[0])?(["#{tdir}/#{args[0]}"]):(Dir.glob("#{tdir}/t*").sort)
     tests.each { |e| q.enq(e) }
     runners=(1..threads).reduce([]) do |m,e|
       m << Thread.new { go(q,socket,debug) }
@@ -80,4 +81,5 @@ class PPPTS
 
 end
 
+ARGV.shift if (debug=(ARGV[0]=="debug"))
 PPPTS.new(debug,server_mode,threads,ARGV)
