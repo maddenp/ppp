@@ -165,28 +165,28 @@ class Translator
     srcfile=File.expand_path(srcfile)
     die "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
     s=File.open(srcfile,"rb").read
-    conf=unpack({},args)
+    conf=unpack(args)
     puts process(s,:program_units,srcfile,conf)
   end
 
   def normalize(s,conf)
-    safe=conf.safe # only true for internal parses
+    safe=conf[:safe] # only true for internal parses
     np=XNormalizerParser.new
     np.update(Normfree)
-    unless conf.form==:fixed
+    unless conf[:form]==:fixed
       @m=Stringmap.new
-      Dehollerizer.new.dehollerize(@m,s,conf) unless safe
+      Dehollerizer.new.dehollerize(@m,s,conf[:form]==:fixed) unless safe
     end
-    nq=(not s=~/['"]/)          # no quotes?
+    nq=(not s=~/['"]/)         # no quotes?
     unless safe
-      s=s.gsub(/\t/," ")        # tabs to spaces
-      s=s.gsub(/^ +/,"")        # remove leading whitespace
+      s=s.gsub(/\t/," ")       # tabs to spaces
+      s=s.gsub(/^ +/,"")       # remove leading whitespace
     end
-    s=s.gsub(directive,'@\1')   # hide directives
+    s=s.gsub(directive,'@\1')  # hide directives
     unless safe
-      s=s.gsub(/ +$/,"")        # remove trailing whitespace
-      s=s.gsub(/^ *!.*$\n/,"")  # remove full-line comments
-      s=s.gsub(/^[ \t]*\n/,'')  # remove blank lines
+      s=s.gsub(/ +$/,"")       # remove trailing whitespace
+      s=s.gsub(/^ *!.*$\n/,"") # remove full-line comments
+      s=s.gsub(/^[ \t]*\n/,'') # remove blank lines
     end
     s=chkparse(fix_pt_norm(s,np,1,@m)) unless safe and nq # string-aware transform
     s=s.gsub(/& *\n *&?/,"") unless safe                  # join continuations
@@ -195,16 +195,11 @@ class Translator
     s=s.gsub(/ +/,"")                                     # remove spaces
     s=restore_strings(s,@m) unless safe and nq            # restore strings
     s=s.sub(/^\n+/,"") unless safe                        # rm leading newlines
-    s=s+"\n" if s[-1]!="\n" and conf.nl                   # add final newline?
-    s=s.chomp unless conf.nl                              # del final newline?
+    s=s+"\n" if s[-1]!="\n" and conf[:nl]                 # add final newline?
+    s=s.chomp unless conf[:nl]                            # del final newline?
     s=s.gsub(/^@(.*)/i,'!\1')                             # show directives
     s=s.gsub(/^ *\n/,"")                                  # remove blank lines
     s
-  end
-
-  def ostruct_default_merge(a)
-    a=a.marshal_dump if a.is_a?(OpenStruct)
-    OpenStruct.new(default_opts.merge(a))
   end
 
   def process(s,root,srcfile,conf)
@@ -294,7 +289,7 @@ class Translator
       s=s.gsub(directive,'@\1')                # hide directives
       s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # all continuation markers -> 'a'
       s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
-      d.dehollerize(@m,s,conf.form==:fixed)    # mask holleriths
+      d.dehollerize(@m,s,conf[:form]==:fixed)  # mask holleriths
       s=chkparse(fix_pt_norm(s,np))            # string-aware transform
       s=s.gsub(/\n[ \t]{5}a/,"")               # join continuations
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
@@ -350,32 +345,31 @@ class Translator
       t
     end
 
-    conf=ostruct_default_merge(conf)
-    fixed=(conf.form==:fixed)
-    fp=XFortranParser.new(srcfile,conf.incdirs)
+    conf=default_opts.merge(conf)
+    fixed=(conf[:form]==:fixed)
+    fp=XFortranParser.new(srcfile,conf[:incdirs])
     s0=nil
-    unless conf.safe
+    unless conf[:safe]
       while s!=s0 and not s.nil?                                # fixed point treatment of prepsrc() and assemble()
         s0=s                                                    # for cases in which files added by 'include'
         s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and fixed # statements or '!sms$insert include' statements
         s=prepsrc_free(s) if defined?(prepsrc_free)             # also contain such a statement; this follows the path
-        s=assemble(s,[srcfile],conf.incdirs)                    # until all souce has been inserted
+        s=assemble(s,[srcfile],conf[:incdirs])                  # until all souce has been inserted
       end
     end
-    puts "RAW #{(fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}" if conf.debug
+    puts "RAW #{(fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}" if conf[:debug]
     if fixed
-      puts "\nFREE-FORM TRANSLATION\n\n" if conf.debug
+      puts "\nFREE-FORM TRANSLATION\n\n" if conf[:debug]
       s=fixed2free(s,conf)
-      puts "#{s}\n\n" if conf.debug
+      puts "#{s}\n\n" if conf[:debug]
     end
-    cppcheck(s) unless conf.safe
-    puts "NORMALIZED FORM\n" if conf.debug
+    cppcheck(s) unless conf[:safe]
+    puts "NORMALIZED FORM\n" if conf[:debug]
     n=normalize(s,conf)
-    return n if conf.product==:normalized_source
-    puts "\n#{n}" if conf.debug
-    env=(conf.env)?(conf.env):(nil)
-    raw_tree=fp.parse(n,env,{:root=>root})
-    return if conf.product==:modinfo
+    return n if conf[:product]==:normalized_source
+    puts "\n#{n}" if conf[:debug]
+    raw_tree=fp.parse(n,conf[:env],{:root=>root})
+    return if conf[:product]==:modinfo
     unless raw_tree
       re=Regexp.new("^(.+?):in `([^\']*)'$")
       srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
@@ -391,11 +385,11 @@ class Translator
     end
     raw_tree.instance_variable_set(:@srcfile,srcfile)
     raw_tree=raw_tree.transform_top(:post) # post-process raw tree
-    if conf.debug
+    if conf[:debug]
       puts "\nRAW TREE\n\n"
       p raw_tree
     end
-    case conf.product
+    case conf[:product]
     when :raw_tree
       return raw_tree
     when :raw_source
@@ -404,16 +398,16 @@ class Translator
     when :translated_source
       translated_tree=raw_tree.transform_top(:translate)
       fail "TRANSLATION FAILED" unless translated_tree
-      if conf.debug
+      if conf[:debug]
         puts "\nTRANSLATED TREE\n\n"
         p translated_tree
       end
       $INDENTED=true
       t=vertspace(wrap(translated_tree.to_s))
-      puts "\nTRANSLATED SOURCE\n\n" if conf.debug
+      puts "\nTRANSLATED SOURCE\n\n" if conf[:debug]
       return t
     else
-      fail "ERROR: Unknown product '#{conf.product}'"
+      fail "ERROR: Unknown product '#{conf[:product]}'"
     end
 
   end
@@ -439,7 +433,7 @@ class Translator
     UNIXServer.open(socket) do |server|
       while true
         begin
-          conf=OpenStruct.new
+          conf={}
           client=server.accept
           srcfile=client.gets.chomp
           action=client.gets.chomp
@@ -451,18 +445,18 @@ class Translator
             die("No such file: #{srcfile}",false,srcfile)
           end
           srcdir=File.dirname(File.expand_path(srcfile))
-          conf.incdirs=[srcdir]
+          conf[:incdirs]=[srcdir]
           if action=="translate"
-            conf.product=:translated_source
+            conf[:product]=:translated_source
           elsif action=="passthrough"
-            conf.product=:raw_source
+            conf[:product]=:raw_source
           else
             puts "ERROR: Unknown action '#{action}'" unless quiet
           end
           if form=="fixed"
-            conf.form=:fixed
+            conf[:form]=:fixed
           elsif form=="free"
-            conf.form=:free
+            conf[:form]=:free
           else
             puts "ERROR: Unknown form '#{form}'" unless quiet
           end
@@ -471,7 +465,7 @@ class Translator
             unless File.directory?(d)
               die("No such directory: #{d}",false,srcfile)
             end
-            conf.incdirs.push(d)
+            conf[:incdirs].push(d)
           end
           puts "Translating #{srcfile}" unless quiet
           client.puts(process(s,:program_units,srcfile,conf))
@@ -513,9 +507,9 @@ class Translator
     exit(status) unless status==false
   end
 
-  def unpack(conf,args)
-    conf=OpenStruct.new(conf)
-    conf.incdirs=["."]
+  def unpack(args)
+    conf={}
+    conf[:incdirs]=["."]
     while opt=args.shift
       case opt
       when "-I"
@@ -523,18 +517,18 @@ class Translator
         die usage unless dirlist
         dirlist.split(":").each do |d|
           die "No such directory: #{d}" unless File.directory?(d)
-          conf.incdirs.push(d)
+          conf[:incdirs].push(d)
         end
       when "fixed"
-        conf.form=:fixed
+        conf[:form]=:fixed
       when "debug"
-        conf.debug=true
+        conf[:debug]=true
       when "normalize"
-        conf.product=:normalized_source
+        conf[:product]=:normalized_source
       when "modinfo"
-        conf.product=:modinfo
+        conf[:product]=:modinfo
       when "passthrough"
-        conf.product=:raw_source
+        conf[:product]=:raw_source
       else
         die usage
       end
