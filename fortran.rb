@@ -583,10 +583,10 @@ module Fortran
       s[:level]+=1
     end
 
-		def cat_stmt
-			stmt(e[1..-2].map { |x| "#{x}" }.join)
-		end
-    
+    def cat_stmt
+      stmt(e[1..-2].map { |x| "#{x}" }.join)
+    end
+
     def declaration_constructs
       specification_part.e[2]
     end
@@ -772,9 +772,9 @@ module Fortran
 
   class NT < T
 
-		def str0
+    def str0
       (e)?(e.map { |x| "#{x}" }.join):("")
-		end
+    end
 
   end
 
@@ -789,7 +789,7 @@ module Fortran
   class Stmt < NT
 
     def str0
-			stmt(space)
+      stmt(space)
     end
 
     def str1
@@ -815,7 +815,7 @@ module Fortran
 
     def item
       e[1]
-		end
+    end
 
   end
 
@@ -1124,7 +1124,7 @@ module Fortran
 
     def names
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
-		end
+    end
 
   end
 
@@ -1132,7 +1132,7 @@ module Fortran
 
     def name
       e[1]
-		end
+    end
 
   end
 
@@ -1185,9 +1185,9 @@ module Fortran
 
   class Allocatable_Stmt < Stmt
 
-		def str0
-			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
-		end
+    def str0
+      stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
+    end
 
   end
 
@@ -1271,9 +1271,9 @@ module Fortran
 
   class Arithmetic_If_Stmt < Stmt
 
-		def str0
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}#{e[6]}#{e[7]}#{e[8]}#{e[9]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}#{e[6]}#{e[7]}#{e[8]}#{e[9]}")
+    end
 
   end
 
@@ -1311,7 +1311,7 @@ module Fortran
 
     def name
       e[1].name
-		end
+    end
 
   end
 
@@ -1347,7 +1347,7 @@ module Fortran
 
     def name
       data_ref.name
-		end
+    end
 
     def subscript_list
       data_ref.subscript_list
@@ -1359,7 +1359,7 @@ module Fortran
 
     def spec
       e[0]
-		end
+    end
 
   end
 
@@ -1368,9 +1368,9 @@ module Fortran
 
   class Assigned_Goto_Stmt < Stmt
 
-		def str0
-			stmt("#{e[1]} #{e[2]}#{ik(e[3],","," ")}#{e[4]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{ik(e[3],","," ")}#{e[4]}")
+    end
 
   end
 
@@ -1515,7 +1515,7 @@ module Fortran
 
     def dimension?
       e[2]
-		end
+    end
 
   end
 
@@ -1569,23 +1569,23 @@ module Fortran
 
     def parameter?
       true
-		end
+    end
 
   end
 
   class Backspace_Stmt_1 < Io_Stmt
 
-		def str0
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+    end
 
   end
 
   class Backspace_Stmt_2 < Io_Stmt
 
-		def str0
-			stmt("#{e[1]} #{e[2]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}")
+    end
 
   end
 
@@ -1610,9 +1610,9 @@ module Fortran
 
   class Call_Stmt < Stmt
 
-		def str0
-			stmt("#{e[1]} #{e[2]}#{e[3]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}")
+    end
 
   end
 
@@ -1641,17 +1641,17 @@ module Fortran
 
   class Close_Stmt < Io_Stmt
 
-		def str0
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+    end
 
   end
 
   class Common_Block_Name_And_Object_List < NT
 
-		def str0
-			"#{ir(e[0],""," ")}#{e[1]}#{e[2]}"
-		end
+    def str0
+      "#{ir(e[0],""," ")}#{e[1]}#{e[2]}"
+    end
 
   end
 
@@ -1665,9 +1665,9 @@ module Fortran
 
   class Common_Stmt < Stmt
 
-		def str0
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+    end
 
   end
 
@@ -1679,9 +1679,9 @@ module Fortran
 
   class Component_Def_Stmt < Stmt
 
-		def str0
-			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
-		end
+    def str0
+      stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
+    end
 
   end
 
@@ -1690,9 +1690,9 @@ module Fortran
 
   class Computed_Goto_Stmt < Stmt
 
-		def str0
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{ir(e[5],""," ")}#{e[6]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}#{ir(e[5],""," ")}#{e[6]}")
+    end
 
   end
 
@@ -1748,9 +1748,9 @@ module Fortran
 
   class Data_Stmt < Stmt
 
-		def str0
-			stmt("#{e[1]} #{e[2]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}")
+    end
 
   end
 
@@ -1830,9 +1830,9 @@ module Fortran
 
   class Dimension_Stmt < Stmt
 
-		def str0
-			stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
-		end
+    def str0
+      stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
+    end
 
   end
 
@@ -1935,9 +1935,9 @@ module Fortran
 
   class End_Block_Data_Option < NT
 
-		def str0
-			space(true)
-		end
+    def str0
+      space(true)
+    end
 
   end
 
@@ -1962,7 +1962,7 @@ module Fortran
   class End_Function_Option < NT
 
     def str0
-			space(true)
+      space(true)
     end
 
   end
@@ -2000,9 +2000,9 @@ module Fortran
 
   class End_Module_Option < NT
 
-		def str0
-			space(true)
-		end
+    def str0
+      space(true)
+    end
 
   end
 
@@ -2041,7 +2041,7 @@ module Fortran
   class End_Subroutine_Option < NT
 
     def str0
-			space(true)
+      space(true)
     end
 
   end
@@ -2075,17 +2075,17 @@ module Fortran
 
   class Endfile_Stmt_1 < Io_Stmt
 
-		def str0
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+    end
 
   end
 
   class Endfile_Stmt_2 < Io_Stmt
 
-		def str0
-			stmt("#{e[1]} #{e[2]}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}")
+    end
 
   end
 
@@ -2119,7 +2119,7 @@ module Fortran
     def array?
       # need to determine array/scalar spec of named function here?
       false
-		end
+    end
   end
 
   class Entity_Decl_Array_Spec < NT
@@ -2166,9 +2166,9 @@ module Fortran
 
   class Entry_Stmt < Stmt
 
-		def str0
-			stmt("#{e[1]} #{e[2]}#{e[3]}#{sb(e[4])}")
-		end
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{sb(e[4])}")
+    end
 
   end
 
@@ -2309,9 +2309,9 @@ module Fortran
       any?(:recursive)
     end
 
-		def str0
-			e.map { |x| "#{x}" }.join(" ")
-		end
+    def str0
+      e.map { |x| "#{x}" }.join(" ")
+    end
 
     def type_spec
       any?(Type_Spec)

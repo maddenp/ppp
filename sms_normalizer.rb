@@ -1,5 +1,5 @@
 module Normalizer
-
+ 
   class SMS < Treetop::Runtime::SyntaxNode
     def to_s
       s=text_value
