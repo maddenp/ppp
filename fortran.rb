@@ -803,15 +803,11 @@ module Fortran
 
   # Out-of-order class definitions (must be defined before subclassed)
 
-  class Io_Item_List < NT
+  class Io_Item_List < List
 
     def items
       [e[0]]+e[1].e.reduce([]) { |m,x| m.push(x.item) }
     end
-
-		def str0
-			list_str
-		end
 
   end
 
@@ -823,7 +819,7 @@ module Fortran
 
   end
 
-  class Io_Spec_List < NT
+  class Io_Spec_List < List
 
     def access
       list_item(Io_Spec_Access)
@@ -934,10 +930,6 @@ module Fortran
 
     def size
       list_item(Io_Spec_Size)
-    end
-
-    def str0
-      list_str
     end
 
     def unformatted
@@ -1125,23 +1117,14 @@ module Fortran
 
   end
 
-  class AC_Value_List < NT
-
-		def str0
-			list_str
-		end
-
+  class AC_Value_List < List
   end
 
-  class Access_Id_List < NT
+  class Access_Id_List < List
 
     def names
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
 		end
-
-    def str0
-      list_str
-    end
 
   end
 
@@ -1189,12 +1172,7 @@ module Fortran
 
   end
 
-  class Actual_Arg_Spec_List < NT
-
-		def str0
-			list_str
-		end
-
+  class Actual_Arg_Spec_List < List
   end
 
   class Add_Operand < NT
@@ -1225,7 +1203,7 @@ module Fortran
 
   end
 
-  class Allocate_Object_List < NT
+  class Allocate_Object_List < List
 
     def items
       e[1].e.reduce([e[0].item]) { |m,x| m.push(x.e[1].item) }
@@ -1233,10 +1211,6 @@ module Fortran
 
     def names
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.e[1].name) }
-    end
-
-    def str0
-      list_str
     end
 
   end
@@ -1253,12 +1227,7 @@ module Fortran
 
   end
 
-  class Allocate_Shape_Spec_List < NT
-
-		def str0
-			list_str
-		end
-
+  class Allocate_Shape_Spec_List < List
   end
 
   class Allocate_Stmt < Stmt
@@ -1285,7 +1254,7 @@ module Fortran
 
   end
 
-  class Allocation_List < NT
+  class Allocation_List < List
 
     def items
       e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
@@ -1293,10 +1262,6 @@ module Fortran
 
     def names
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.e[1].name) }
-    end
-
-    def str0
-      list_str
     end
 
   end
@@ -1350,7 +1315,7 @@ module Fortran
 
   end
 
-  class Array_Names_And_Deferred_Shape_Spec_Lists < NT
+  class Array_Names_And_Deferred_Shape_Spec_Lists < List
 
     def items
       e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
@@ -1360,13 +1325,9 @@ module Fortran
       e[1].e.reduce(["#{e[0].e[0]}"]) { |m,x| m.push("#{x.e[1].e[0]}") }
     end
 
-    def str0
-      list_str
-    end
-
   end
 
-  class Array_Names_And_Specs < NT
+  class Array_Names_And_Specs < List
 
     def items
       e[1].e.reduce([e[0]]) { |m,x| m.push(x) }
@@ -1374,10 +1335,6 @@ module Fortran
 
     def names
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
-    end
-
-    def str0
-      list_str
     end
 
   end
@@ -1673,12 +1630,7 @@ module Fortran
 
   end
 
-  class Case_Value_Range_List < NT
-
-		def str0
-			list_str
-		end
-
+  class Case_Value_Range_List < List
   end
 
   class Close_Spec_List < Io_Spec_List
@@ -1719,20 +1671,10 @@ module Fortran
 
   end
 
-  class Component_Attr_Spec_List < NT
-
-		def str0
-			list_str
-		end
-
+  class Component_Attr_Spec_List < List
   end
 
-  class Component_Decl_List < NT
-
-		def str0
-			list_str
-		end
-
+  class Component_Decl_List < List
   end
 
   class Component_Def_Stmt < Stmt
@@ -1777,12 +1719,7 @@ module Fortran
   class Cycle_Stmt < Stmt
   end
 
-  class Data_I_Do_Object_List < NT
-
-		def str0
-			list_str
-		end
-
+  class Data_I_Do_Object_List < List
   end
 
   class Data_Ref < NT
@@ -1817,20 +1754,10 @@ module Fortran
 
   end
 
-  class Data_Stmt_Object_List < NT
-
-		def str0
-			list_str
-		end
-
+  class Data_Stmt_Object_List < List
   end
 
-  class Data_Stmt_Value_List < NT
-
-		def str0
-			list_str
-		end
-
+  class Data_Stmt_Value_List < List
   end
 
   class Deallocate_Stmt < Stmt
@@ -1944,12 +1871,7 @@ module Fortran
   class Double_Colon < NT
   end
 
-  class Dummy_Arg_List < NT
-
-    def str0
-      list_str
-    end
-
+  class Dummy_Arg_List < List
   end
 
   class Dummy_Arg_List_Pair < NT
@@ -1958,14 +1880,10 @@ module Fortran
   class Dummy_Arg_Name < NT
   end
 
-  class Dummy_Arg_Name_List < NT
+  class Dummy_Arg_Name_List < List
 
     def names
       e[1].e.reduce([e[0]]) { |m,x| m.push(x.name) }
-    end
-
-    def str0
-      list_str
     end
 
   end
@@ -2254,12 +2172,7 @@ module Fortran
 
   end
 
-  class Equivalence_Set_List < NT
-
-		def str0
-			list_str
-		end
-
+  class Equivalence_Set_List < List
   end
 
   class Equivalence_Stmt < Stmt
@@ -2348,12 +2261,7 @@ module Fortran
 
   end
 
-  class Expr_List < NT
-
-		def str0
-			list_str
-		end
-
+  class Expr_List < List
   end
 
   class External_File_Unit < NT
@@ -2362,12 +2270,7 @@ module Fortran
   class External_Name < NT
   end
 
-  class External_Name_List < NT
-
-		def str0
-			list_str
-		end
-
+  class External_Name_List < List
   end
 
   class External_Stmt < Stmt
@@ -2580,12 +2483,7 @@ module Fortran
   class Implicit_Part < NT
   end
 
-  class Implicit_Spec_List < NT
-
-    def str0
-      list_str
-    end
-
+  class Implicit_Spec_List < List
   end
 
   class Implicit_Spec_List_Pair < NT
@@ -2682,12 +2580,7 @@ module Fortran
   class Intrinsic_Procedure_Name < NT
   end
 
-  class Intrinsic_Procedure_Name_List < NT
-
-    def str0
-      list_str
-    end
-
+  class Intrinsic_Procedure_Name_List < List
   end
 
   class Intrinsic_Stmt < Stmt
@@ -2711,12 +2604,7 @@ module Fortran
 
   end
 
-  class Io_Implied_Do_Object_List < NT
-
-    def str0
-      list_str
-    end
-
+  class Io_Implied_Do_Object_List < List
   end
 
   class Io_Spec < NT
@@ -2881,14 +2769,10 @@ module Fortran
 
   end
 
-  class Label_List < NT
+  class Label_List < List
 
     def labels
       e[1].e.reduce([e[0].label]) { |m,x| m.push(x.label) }
-    end
-
-    def str0
-      list_str
     end
 
   end
@@ -2904,12 +2788,7 @@ module Fortran
   class Label_Stmt < NT
   end
 
-  class Letter_Spec_List < NT
-
-    def str0
-      list_str
-    end
-
+  class Letter_Spec_List < List
   end
 
   class Local_Name < NT
@@ -3067,14 +2946,10 @@ module Fortran
 
   end
 
-  class Named_Constant_Def_List < NT
+  class Named_Constant_Def_List < List
 
     def names
       [e[0].name]+e[1].e.reduce([]) { |m,x| m.push(x.e[1].name) }
-    end
-
-    def str0
-      list_str
     end
 
   end
@@ -3087,14 +2962,10 @@ module Fortran
 
   end
 
-  class Namelist_Group_Object_List < NT
+  class Namelist_Group_Object_List < List
 
     def objects
       e[1].e.reduce([e[0]]) { |m,x| m.push(x.object) }
-    end
-
-    def str0
-      list_str
     end
 
   end
@@ -3241,7 +3112,7 @@ module Fortran
 
   end
 
-  class Only_List < NT
+  class Only_List < List
 
     def localnames
       e[1].e.reduce([e[0].localname]) { |m,x| m.push(x.localname) }
@@ -3249,10 +3120,6 @@ module Fortran
 
     def usenames
       e[1].e.reduce([e[0].usename]) { |m,x| m.push(x.usename) }
-    end
-
-    def str0
-      list_str
     end
 
   end
@@ -3380,12 +3247,7 @@ module Fortran
 
   end
 
-  class Pointer_Object_List < NT
-
-    def str0
-      list_str
-    end
-
+  class Pointer_Object_List < List
   end
 
   class Pointer_Stmt < Stmt
@@ -3396,12 +3258,7 @@ module Fortran
 
   end
 
-  class Position_Spec_List < NT
-
-    def str0
-      list_str
-    end
-
+  class Position_Spec_List < List
   end
 
   class Position_Spec_List_Pair < NT
@@ -3452,12 +3309,7 @@ module Fortran
   class Procedure_Name < NT
   end
 
-  class Procedure_Name_List < NT
-
-    def str0
-      list_str
-    end
-
+  class Procedure_Name_List < List
   end
 
   class Program_Name < NT
@@ -3528,7 +3380,7 @@ module Fortran
 
   end
 
-  class Rename_List < NT
+  class Rename_List < List
 
     def localnames
       e[1].e.reduce([e[0].localname]) { |m,x| m.push(x.localname) }
@@ -3536,10 +3388,6 @@ module Fortran
 
     def usenames
       e[1].e.reduce([e[0].usename]) { |m,x| m.push(x.usename) }
-    end
-
-    def str0
-      list_str
     end
 
   end
@@ -3643,14 +3491,10 @@ module Fortran
 
   end
 
-  class Saved_Entity_List < NT
+  class Saved_Entity_List < List
 
     def names
       e[1].e.reduce([e[0]]) { |m,x| m.push(x.name) }
-    end
-
-    def str0
-      list_str
     end
 
   end
@@ -3663,14 +3507,10 @@ module Fortran
 
   end
 
-  class Section_Subscript_List < NT
+  class Section_Subscript_List < List
 
     def subscript_list
       e[1].elements.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
-    end
-
-    def str0
-      list_str
     end
 
   end
