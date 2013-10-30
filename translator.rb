@@ -307,10 +307,10 @@ class Translator
       end
 
       maxcols=132 # columns
-#     maxcont=39  # continuation lines
+      maxcont=39  # continuation lines
       a=s.split("\n")
       (0..a.length-1).each do |n|
-#       cont=0
+        cont=0
         e=a[n].chomp
         unless directive?(e)
           if e.length>maxcols
@@ -321,7 +321,7 @@ class Translator
               r=[maxcols-2,e.length-1].min
               t+=e[0..r]+"&\n"
               e=" "*i+"&"+e[r+1..-1]
-#             cont+=1
+              cont+=1
             end while e.length>maxcols
             t+=e
 #           if cont>maxcont
