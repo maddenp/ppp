@@ -29,9 +29,6 @@
 
 ### OPTIMIZATION
 
-* Memoize to_s? Some of these are called many times for hash keys and so. Should
-  be no need to compute string version more than once, right?
-
 - read_stmt, write_stmt et al are not function calls, so we *do* know which of
   their arguments may be modified during a call (e.g. iostat's variable can,
   file's variable cannot) we we can limit bcast/gather/scatter of these in a
