@@ -1893,14 +1893,14 @@ module Fortran
 
   class Derived_Type_Stmt < Stmt
 
+    def str0
+      stmt("#{e[1]}#{sb(e[2])} #{e[3]}")
+    end
+
     def str1
       s=indented(strmemo)
       block_right
       s
-    end
-
-    def str0
-      stmt("#{e[1]}#{sb(e[2])} #{e[3]}")
     end
 
   end
@@ -1984,15 +1984,15 @@ module Fortran
 
   class Else_If_Stmt < Stmt
 
+    def str0
+      stmt("#{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
+    end
+
     def str1
       block_left
       s="\n#{indented(strmemo)}"
       block_right
       s
-    end
-
-    def str0
-      stmt("#{e[2]} #{e[3]}#{e[4]}#{e[5]} #{e[6]}")
     end
 
   end
@@ -2073,13 +2073,13 @@ module Fortran
 
   class End_Interface_Stmt < Stmt
 
+    def str0
+      stmt("#{e[1]} #{e[2]}#{sb(e[3])}")
+    end
+
     def str1
       block_left
       "#{indented(strmemo)}\n"
-    end
-
-    def str0
-      stmt("#{e[1]} #{e[2]}#{sb(e[3])}")
     end
 
   end
@@ -2103,13 +2103,13 @@ module Fortran
 
   class End_Program_Stmt < Stmt
 
+    def str0
+      stmt("#{e[1]}#{sb(e[3])}#{sb(e[4])}")
+    end
+
     def str1
       block_left
       "\n#{indented(strmemo)}"
-    end
-
-    def str0
-      stmt("#{e[1]}#{sb(e[3])}#{sb(e[4])}")
     end
 
   end
@@ -2454,14 +2454,14 @@ module Fortran
       function_prefix.recursive?
     end
 
+    def str0
+      stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")
+    end
+
     def str1
       s="\n#{indented(strmemo)}"
       block_right
       s
-    end
-
-    def str0
-      stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}#{e[5]}#{e[6]}#{sb(e[7])}")
     end
 
     def type_spec
@@ -2574,6 +2574,7 @@ module Fortran
   end
 
   class Implicit_None_Stmt < Stmt
+
     def str1
       "#{indented(strmemo)}\n"
     end
@@ -2872,14 +2873,14 @@ module Fortran
       "#{e[3]}"
     end
 
+    def str0
+      stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
+    end
+
     def str1
       s=indented(strmemo)
       block_right
       s
-    end
-
-    def str0
-      stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
     end
 
   end
@@ -3180,14 +3181,14 @@ module Fortran
 
   class Nonlabel_Do_Stmt < Stmt
 
+    def str0
+      stmt("#{sa(e[1])}#{e[2]}#{e[3]}")
+    end
+
     def str1
       s=indented(strmemo)
       block_right
       s
-    end
-
-    def str0
-      stmt("#{sa(e[1])}#{e[2]}#{e[3]}")
     end
 
   end
@@ -3680,15 +3681,15 @@ module Fortran
 
   class Select_Case_Stmt < Stmt
 
+    def str0
+      stmt("#{sa(e[1])}#{e[2]} #{e[3]} #{e[4]}#{e[5]}#{e[6]}")
+    end
+
     def str1
       s=strmemo
       block_right
       block_right
       s
-    end
-
-    def str0
-      stmt("#{sa(e[1])}#{e[2]} #{e[3]} #{e[4]}#{e[5]}#{e[6]}")
     end
 
   end
@@ -3754,14 +3755,14 @@ module Fortran
       e[3].name
     end
 
+    def str0
+      stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
+    end
+
     def str1
       s="\n#{indented(strmemo)}"
       block_right
       s
-    end
-
-    def str0
-      stmt("#{sa(e[1])}#{e[2]} #{e[3]}#{e[4]}")
     end
 
   end
@@ -3944,14 +3945,14 @@ module Fortran
 
   class Where_Construct_Stmt < Stmt
 
+    def str0
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
+    end
+
     def str1
       s=strmemo
       block_right
       s
-    end
-
-    def str0
-      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]}")
     end
 
   end
