@@ -93,9 +93,6 @@
 
 ### TRANSLATION
 
-* Does sms_gather() really need all 7 dims (see e.g. gather rollout in
-  Write_Stmt or SMS_Serial.
-
 - SMS_Create_Decomp translate is only valid for one decomposed dimension. Extend
   it to handle three.
 
