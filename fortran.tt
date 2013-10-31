@@ -393,8 +393,8 @@ grammar Fortran
   rule blank_interp_edit_desc
     # F90:R1015
 
-    &"bn" t_letter t_letter <NT> /
-    &"bz" t_letter t_letter <NT>
+    "bn" <T> /
+    "bz" <T>
   end
 
   rule block
@@ -821,10 +821,10 @@ grammar Fortran
   end
 
   rule data_edit_desc_1
-    &"i" t_letter <NT> /
-    &"b" t_letter <NT> /
-    &"o" t_letter <NT> /
-    &"z" t_letter <NT>
+    "i" <T> /
+    "b" <T> /
+    "o" <T> /
+    "z" <T>
   end
 
   rule data_edit_desc_1_option
@@ -832,15 +832,15 @@ grammar Fortran
   end
 
   rule data_edit_desc_2
-    &"f" t_letter <NT> /
-    &"d" t_letter <NT>
+    "f" <T> /
+    "d" <T>
   end
 
   rule data_edit_desc_3
-    &"en" t_letter t_letter <NT> /
-    &"es" t_letter t_letter <NT> /
-    &"e" t_letter <NT> /
-    &"g" t_letter <NT>
+    "en" <T> /
+    "es" <T> /
+    "e" <T> /
+    "g" <T>
   end
 
   rule data_edit_desc_3_option
@@ -1670,16 +1670,23 @@ grammar Fortran
 
   rule hex_constant
     # F90:R410
-    #
+
+    hex_constant_prefix t_apostrophe hex_digit+ t_apostrophe <Hex_Constant> /
+    hex_constant_prefix t_quotemark hex_digit+ t_quotemark <Hex_Constant>
+  end
+
+  rule hex_constant_prefix
+
     # Note: x is NON-CONFORMANT
 
-    ( &"z" t_letter / &"x" t_letter ) ( ( t_apostrophe hex_digit+ t_apostrophe ) / ( t_quotemark hex_digit+ t_quotemark ) ) <T>
+    &"z" t_letter <NT> /
+    &"x" t_letter <NT>
   end
 
   rule hex_digit
     # F90:R411
 
-    [0123456789aAbBcCdDeEfF]
+    [0123456789aAbBcCdDeEfF] <T>
   end
 
   rule hollerith
@@ -1687,7 +1694,7 @@ grammar Fortran
   end
 
   rule hollerith_string
-    &{ |e| sp_hollerith_reset_count } ( rep_char &{ |e| sp_hollerith_check_count } )+ <T>
+    &{ |e| sp_hollerith_reset_count } ( rep_char &{ |e| sp_hollerith_check_count } )+ <Hollerith_String>
   end
 
   rule if_construct
@@ -3109,9 +3116,9 @@ grammar Fortran
   rule sign_edit_desc
     # F90:R1014
 
-    &"sp" t_letter t_letter <NT> /
-    &"ss" t_letter t_letter <NT> /
-    &"s" t_letter <NT>
+    "sp" <T> /
+    "ss" <T> /
+    "s" <T>
   end
 
   rule signed_digit_string

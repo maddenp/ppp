@@ -2506,10 +2506,26 @@ module Fortran
   class Goto_Stmt < Stmt
   end
 
+  class Hex_Constant < NT
+
+    def str0
+      "#{e[0]}#{e[1]}"+e[2].e.reduce("") { |m,x| m+="#{x}" }+"#{e[3]}"
+    end
+
+  end
+
   class Hollerith < NT
 
     def str0
       "#{e[0]}#{e[2]}#{e[4]}"
+    end
+
+  end
+
+  class Hollerith_String < NT
+
+    def str0
+      e[1].e.reduce("") { |m,x| m+="#{x.e[0]}" }      
     end
 
   end
