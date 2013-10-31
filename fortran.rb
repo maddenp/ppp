@@ -2447,6 +2447,14 @@ module Fortran
   class Goto_Stmt < Stmt
   end
 
+  class Hollerith < NT
+
+    def str0
+      "#{e[0]}h#{e[3]}"
+    end
+
+  end
+
   class If_Construct < NT
   end
 

@@ -310,7 +310,7 @@ grammar Fortran
   end
 
   rule assigned_goto_stmt_label_list
-    t_comma? t_paren_l label_list t_paren_r <T>
+    t_comma? t_paren_l label_list t_paren_r <NT>
   end
 
   rule assignment_stmt
@@ -351,7 +351,7 @@ grammar Fortran
     t_allocatable "" <Attr_Spec_Allocatable> /
     t_dimension t_paren_l array_spec t_paren_r <Attr_Spec_Dimension> /
     t_external /
-    t_intent t_paren_l intent_spec t_paren_r <T> /
+    t_intent t_paren_l intent_spec t_paren_r <NT> /
     t_intrinsic /
     t_optional /
     t_pointer /
@@ -455,7 +455,7 @@ grammar Fortran
   end
 
   rule case_construct_name_pair
-    case_construct_name t_colon <T>
+    case_construct_name t_colon <NT>
   end
 
   rule case_expr
@@ -502,9 +502,9 @@ grammar Fortran
   rule case_value_range
     # F90:R814
 
-    t_colon case_value <T> /
-    case_value t_colon case_value <T> /
-    case_value t_colon <T> /
+    t_colon case_value <NT> /
+    case_value t_colon case_value <NT> /
+    case_value t_colon <NT> /
     case_value
   end
 
@@ -527,12 +527,12 @@ grammar Fortran
   rule char_length
     # F90:R508
 
-    t_paren_l type_param_value t_paren_r <T> /
+    t_paren_l type_param_value t_paren_r <NT> /
     scalar_int_literal_constant
   end
 
   rule char_length_pair
-    t_star char_length <T>
+    t_star char_length <NT>
   end
 
   rule char_literal_constant
@@ -554,8 +554,8 @@ grammar Fortran
     # F90:R506
 
     length_selector /
-    t_paren_l len_pair type_param_value t_comma kind_pair scalar_int_initialization_expr t_paren_r <T> /
-    t_paren_l type_param_value t_comma kind_pair? scalar_int_initialization_expr t_paren_r <T> /
+    t_paren_l len_pair type_param_value t_comma kind_pair scalar_int_initialization_expr t_paren_r <NT> /
+    t_paren_l type_param_value t_comma kind_pair? scalar_int_initialization_expr t_paren_r <NT> /
     t_paren_l kind_pair scalar_int_initialization_expr ( t_comma len_pair type_param_value )? t_paren_r <T>
   end
 
@@ -584,7 +584,7 @@ grammar Fortran
 
     io_spec_iostat /
     io_spec_err /
-    t_status t_equal scalar_default_char_expr <T> /
+    t_status t_equal scalar_default_char_expr <NT> /
     ( t_unit t_equal )? external_file_unit <T>
   end
 
@@ -617,13 +617,13 @@ grammar Fortran
   end
 
   rule common_block_name_triplet
-    t_slash common_block_name? t_slash <T>
+    t_slash common_block_name? t_slash <NT>
   end
 
   rule common_block_object
     # F90:R549
 
-    variable_name common_block_object_explicit_shape_spec_list? <T>
+    variable_name common_block_object_explicit_shape_spec_list? <NT>
   end
 
   rule common_block_object_explicit_shape_spec_list
@@ -651,7 +651,7 @@ grammar Fortran
   rule complex_literal_constant
     # F90:R417
 
-    t_paren_l real_part t_comma imag_part t_paren_r <T>
+    t_paren_l real_part t_comma imag_part t_paren_r <NT>
   end
 
   rule component_array_spec
@@ -701,7 +701,7 @@ grammar Fortran
     # F95:R429
 
     t_equal initialization_expr <NT> /
-    t_point null_function_ref <T>
+    t_point null_function_ref <NT>
   end
 
   rule component_name
@@ -727,16 +727,16 @@ grammar Fortran
 
     io_spec_iostat /
     io_spec_err /
-    t_file t_equal file_name_expr <T> /
-    t_status t_equal scalar_default_char_expr <T> /
-    t_access t_equal scalar_default_char_expr <T> /
-    t_form t_equal scalar_default_char_expr <T> /
-    t_recl t_equal scalar_int_expr <T> /
-    t_blank t_equal scalar_default_char_expr <T> /
-    t_position t_equal scalar_default_char_expr <T> /
-    t_action t_equal scalar_default_char_expr <T> /
-    t_delim t_equal scalar_default_char_expr <T> /
-    t_pad t_equal scalar_default_char_expr <T> /
+    t_file t_equal file_name_expr <NT> /
+    t_status t_equal scalar_default_char_expr <NT> /
+    t_access t_equal scalar_default_char_expr <NT> /
+    t_form t_equal scalar_default_char_expr <NT> /
+    t_recl t_equal scalar_int_expr <NT> /
+    t_blank t_equal scalar_default_char_expr <NT> /
+    t_position t_equal scalar_default_char_expr <NT> /
+    t_action t_equal scalar_default_char_expr <NT> /
+    t_delim t_equal scalar_default_char_expr <NT> /
+    t_pad t_equal scalar_default_char_expr <NT> /
     ( t_unit t_equal )? external_file_unit <T>
   end
 
@@ -779,9 +779,9 @@ grammar Fortran
     position_edit_desc /
     blank_interp_edit_desc /
     sign_edit_desc /
-    int_literal_constant? t_slash <T> /
+    int_literal_constant? t_slash <NT> /
     t_colon /
-    signed_int_literal_constant? "p" <T>
+    signed_int_literal_constant? "p" <NT>
   end
 
   rule cycle_stmt
@@ -793,10 +793,10 @@ grammar Fortran
   rule data_edit_desc
     # F90:R1005
     data_edit_desc_1 int_literal_constant ( t_dot int_literal_constant )? <T> /
-    data_edit_desc_2 int_literal_constant t_dot int_literal_constant <T> /
+    data_edit_desc_2 int_literal_constant t_dot int_literal_constant <NT> /
     data_edit_desc_3 int_literal_constant t_dot int_literal_constant ( "e" int_literal_constant )? <T> /
-    "l" int_literal_constant <T> /
-    "a" int_literal_constant? <T>
+    "l" int_literal_constant <NT> /
+    "a" int_literal_constant? <NT>
   end
 
   rule data_edit_desc_1
@@ -903,11 +903,11 @@ grammar Fortran
   rule data_stmt_value
     # F90:R531
 
-    data_stmt_repeat_pair? data_stmt_constant <T>
+    data_stmt_repeat_pair? data_stmt_constant <NT>
   end
 
   rule data_stmt_repeat_pair
-    data_stmt_repeat t_star <T>
+    data_stmt_repeat t_star <NT>
   end
 
   rule data_stmt_value_list
@@ -1379,7 +1379,7 @@ grammar Fortran
   rule equivalence_set
     # F90:R546
 
-    t_paren_l equivalence_object t_comma equivalence_object_list t_paren_r <T>
+    t_paren_l equivalence_object t_comma equivalence_object_list t_paren_r <NT>
   end
 
   rule equivalence_set_list
@@ -1530,10 +1530,10 @@ grammar Fortran
   rule format_item
     # F90:R1003
 
-    int_literal_constant? data_edit_desc <T> /
+    int_literal_constant? data_edit_desc <NT> /
     control_edit_desc /
     char_string_edit_desc /
-    int_literal_constant? format_specification <T>
+    int_literal_constant? format_specification <NT>
   end
 
   rule format_item_list
@@ -1638,7 +1638,7 @@ grammar Fortran
   end
 
   rule hollerith
-    digit_string "h" &{ |e| sp_hollerith_set_length(e[0]) } hollerith_string <T>
+    digit_string "h" &{ |e| sp_hollerith_set_length(e[0]) } hollerith_string <Hollerith>
   end
 
   rule hollerith_string
@@ -1661,7 +1661,7 @@ grammar Fortran
   end
 
   rule if_construct_name_label
-    if_construct_name t_colon <T>
+    if_construct_name t_colon <NT>
   end
 
   rule if_stmt
@@ -1710,8 +1710,8 @@ grammar Fortran
   rule implicit_spec
     # F90:R541
 
-    type_spec_with_kind_selector t_paren_l letter_spec_list t_paren_r <T> /
-    type_spec_without_kind_selector t_paren_l letter_spec_list t_paren_r <T>
+    type_spec_with_kind_selector t_paren_l letter_spec_list t_paren_r <NT> /
+    type_spec_without_kind_selector t_paren_l letter_spec_list t_paren_r <NT>
   end
 
   rule implicit_spec_list
@@ -1772,9 +1772,9 @@ grammar Fortran
   rule inquire_spec
     # F90:R924
 
-    external_file_unit &t_comma <T> /
-    t_unit t_equal external_file_unit <T> /
-    t_file t_equal file_name_expr <T> /
+    external_file_unit &t_comma <NT> /
+    t_unit t_equal external_file_unit <NT> /
+    t_file t_equal file_name_expr <NT> /
     io_spec_iostat /
     io_spec_err /
     io_spec_exist /
@@ -1926,18 +1926,18 @@ grammar Fortran
     # F90:R912
 
     io_unit t_comma namelist_group_name !t_equal &{ |e| sp_namelist_group_name?(e[2]) } <Io_Control_Spec_Unit_Nml> /
-    io_unit t_comma format !t_equal <T> /
-    t_advance t_equal scalar_default_char_expr <T> /
+    io_unit t_comma format !t_equal <NT> /
+    t_advance t_equal scalar_default_char_expr <NT> /
     io_spec_end /
     io_spec_eor /
     io_spec_err/
-    t_fmt t_equal format <T> /
+    t_fmt t_equal format <NT> /
     io_spec_iostat /
     io_spec_nml /
-    t_rec t_equal scalar_int_expr <T> /
+    t_rec t_equal scalar_int_expr <NT> /
     io_spec_size /
     io_spec_unit /
-    io_unit "" <T>
+    io_unit "" <NT>
   end
 
   rule io_control_spec_list
@@ -2102,11 +2102,11 @@ grammar Fortran
   end
 
   rule keyword_pair
-    keyword t_equal <T>
+    keyword t_equal <NT>
   end
 
   rule kind_pair
-    t_kind t_equal <T>
+    t_kind t_equal <NT>
   end
 
   rule kind_param
@@ -2159,15 +2159,15 @@ grammar Fortran
   end
 
   rule len_pair
-    t_len t_equal <T>
+    t_len t_equal <NT>
   end
 
   rule length_selector
     # F90:R507
 
-    t_paren_l len_pair? type_param_value t_paren_r <T> /
-    char_length_pair &( [^\:\n]* double_colon ) <T> /
-    char_length_pair t_comma? <T>
+    t_paren_l len_pair? type_param_value t_paren_r <NT> /
+    char_length_pair &( [^\:\n]* double_colon ) <NT> /
+    char_length_pair t_comma? <NT>
   end
 
   rule letter_spec
@@ -2231,7 +2231,7 @@ grammar Fortran
   end
 
   rule level_5_expr_option
-    equiv_op level_5_expr <T>
+    equiv_op level_5_expr <NT>
   end
 
   rule literal_constant
@@ -2455,7 +2455,7 @@ grammar Fortran
   end
 
   rule null_function_ref
-    t_null t_paren_l t_paren_r <T>
+    t_null t_paren_l t_paren_r <NT>
   end
 
   rule nullify_stmt
@@ -2574,7 +2574,7 @@ grammar Fortran
   end
 
   rule parenthesized_allocate_shape_spec_list
-    t_paren_l allocate_shape_spec_list t_paren_r <T>
+    t_paren_l allocate_shape_spec_list t_paren_r <NT>
   end
 
   rule parenthesized_args
@@ -2582,7 +2582,7 @@ grammar Fortran
   end
 
   rule parenthesized_component_array_spec
-    t_paren_l component_array_spec t_paren_r <T>
+    t_paren_l component_array_spec t_paren_r <NT>
   end
 
   rule parenthesized_deferred_shape_spec_list
@@ -2645,17 +2645,17 @@ grammar Fortran
   rule position_edit_desc
     # F90:R1012
 
-    "tl" int_literal_constant <T> /
-    "tr" int_literal_constant <T> /
-    "t" int_literal_constant <T> /
-    int_literal_constant "x" <T>
+    "tl" int_literal_constant <NT> /
+    "tr" int_literal_constant <NT> /
+    "t" int_literal_constant <NT> /
+    int_literal_constant "x" <NT>
   end
 
   rule position_spec
     # F90:R922
 
-    external_file_unit &t_comma <T> /
-    t_unit t_equal external_file_unit <T> /
+    external_file_unit &t_comma <NT> /
+    t_unit t_equal external_file_unit <NT> /
     io_spec_iostat /
     io_spec_err
   end
@@ -3061,26 +3061,26 @@ grammar Fortran
   rule signed_digit_string
     # F90:R401
 
-    sign? digit_string <T>
+    sign? digit_string <NT>
   end
 
   rule signed_int_literal_constant
     # F90:R403
 
-    sign? int_literal_constant <T>
+    sign? int_literal_constant <NT>
   end
 
   rule signed_real_literal_constant
     # F90:R412
 
-    sign? real_literal_constant <T>
+    sign? real_literal_constant <NT>
   end
 
   rule significand
     # F90:R414
 
-    digit_string !significand_disallowed t_dot digit_string? <T> /
-    t_dot digit_string <T>
+    digit_string !significand_disallowed t_dot digit_string? <NT> /
+    t_dot digit_string <NT>
   end
 
   rule significand_disallowed
@@ -3244,7 +3244,7 @@ grammar Fortran
   rule substring_range
     # F90:R611
 
-    scalar_int_expr? t_colon scalar_int_expr? <T>
+    scalar_int_expr? t_colon scalar_int_expr? <NT>
   end
 
   rule substring_range_triplet

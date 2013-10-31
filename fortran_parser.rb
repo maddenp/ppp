@@ -2837,7 +2837,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(AssignedGotoStmtLabelList0)
     else
       @index = i0
@@ -3298,7 +3298,7 @@ module Fortran
                 end
               end
               if s14.last
-                r14 = instantiate_node(T,input, i14...index, s14)
+                r14 = instantiate_node(NT,input, i14...index, s14)
                 r14.extend(AttrSpec3)
               else
                 @index = i14
@@ -4321,7 +4321,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(CaseConstructNamePair0)
     else
       @index = i0
@@ -4675,7 +4675,7 @@ module Fortran
       s1 << r3
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
+      r1 = instantiate_node(NT,input, i1...index, s1)
       r1.extend(CaseValueRange0)
     else
       @index = i1
@@ -4696,7 +4696,7 @@ module Fortran
         end
       end
       if s4.last
-        r4 = instantiate_node(T,input, i4...index, s4)
+        r4 = instantiate_node(NT,input, i4...index, s4)
         r4.extend(CaseValueRange1)
       else
         @index = i4
@@ -4713,7 +4713,7 @@ module Fortran
           s8 << r10
         end
         if s8.last
-          r8 = instantiate_node(T,input, i8...index, s8)
+          r8 = instantiate_node(NT,input, i8...index, s8)
           r8.extend(CaseValueRange2)
         else
           @index = i8
@@ -4882,7 +4882,7 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
+      r1 = instantiate_node(NT,input, i1...index, s1)
       r1.extend(CharLength0)
     else
       @index = i1
@@ -4934,7 +4934,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(CharLengthPair0)
     else
       @index = i0
@@ -5358,7 +5358,7 @@ module Fortran
         end
       end
       if s2.last
-        r2 = instantiate_node(T,input, i2...index, s2)
+        r2 = instantiate_node(NT,input, i2...index, s2)
         r2.extend(CharSelector0)
       else
         @index = i2
@@ -5396,7 +5396,7 @@ module Fortran
           end
         end
         if s10.last
-          r10 = instantiate_node(T,input, i10...index, s10)
+          r10 = instantiate_node(NT,input, i10...index, s10)
           r10.extend(CharSelector1)
         else
           @index = i10
@@ -5608,7 +5608,7 @@ module Fortran
           end
         end
         if s3.last
-          r3 = instantiate_node(T,input, i3...index, s3)
+          r3 = instantiate_node(NT,input, i3...index, s3)
           r3.extend(CloseSpec0)
         else
           @index = i3
@@ -5989,7 +5989,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(CommonBlockNameTriplet0)
     else
       @index = i0
@@ -6032,7 +6032,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(CommonBlockObject0)
     else
       @index = i0
@@ -6303,7 +6303,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(ComplexLiteralConstant0)
     else
       @index = i0
@@ -6868,7 +6868,7 @@ module Fortran
         s4 << r6
       end
       if s4.last
-        r4 = instantiate_node(T,input, i4...index, s4)
+        r4 = instantiate_node(NT,input, i4...index, s4)
         r4.extend(ComponentInitialization1)
       else
         @index = i4
@@ -7238,7 +7238,7 @@ module Fortran
           end
         end
         if s3.last
-          r3 = instantiate_node(T,input, i3...index, s3)
+          r3 = instantiate_node(NT,input, i3...index, s3)
           r3.extend(ConnectSpec0)
         else
           @index = i3
@@ -7259,7 +7259,7 @@ module Fortran
             end
           end
           if s7.last
-            r7 = instantiate_node(T,input, i7...index, s7)
+            r7 = instantiate_node(NT,input, i7...index, s7)
             r7.extend(ConnectSpec1)
           else
             @index = i7
@@ -7280,7 +7280,7 @@ module Fortran
               end
             end
             if s11.last
-              r11 = instantiate_node(T,input, i11...index, s11)
+              r11 = instantiate_node(NT,input, i11...index, s11)
               r11.extend(ConnectSpec2)
             else
               @index = i11
@@ -7301,7 +7301,7 @@ module Fortran
                 end
               end
               if s15.last
-                r15 = instantiate_node(T,input, i15...index, s15)
+                r15 = instantiate_node(NT,input, i15...index, s15)
                 r15.extend(ConnectSpec3)
               else
                 @index = i15
@@ -7322,7 +7322,7 @@ module Fortran
                   end
                 end
                 if s19.last
-                  r19 = instantiate_node(T,input, i19...index, s19)
+                  r19 = instantiate_node(NT,input, i19...index, s19)
                   r19.extend(ConnectSpec4)
                 else
                   @index = i19
@@ -7343,7 +7343,7 @@ module Fortran
                     end
                   end
                   if s23.last
-                    r23 = instantiate_node(T,input, i23...index, s23)
+                    r23 = instantiate_node(NT,input, i23...index, s23)
                     r23.extend(ConnectSpec5)
                   else
                     @index = i23
@@ -7364,7 +7364,7 @@ module Fortran
                       end
                     end
                     if s27.last
-                      r27 = instantiate_node(T,input, i27...index, s27)
+                      r27 = instantiate_node(NT,input, i27...index, s27)
                       r27.extend(ConnectSpec6)
                     else
                       @index = i27
@@ -7385,7 +7385,7 @@ module Fortran
                         end
                       end
                       if s31.last
-                        r31 = instantiate_node(T,input, i31...index, s31)
+                        r31 = instantiate_node(NT,input, i31...index, s31)
                         r31.extend(ConnectSpec7)
                       else
                         @index = i31
@@ -7406,7 +7406,7 @@ module Fortran
                           end
                         end
                         if s35.last
-                          r35 = instantiate_node(T,input, i35...index, s35)
+                          r35 = instantiate_node(NT,input, i35...index, s35)
                           r35.extend(ConnectSpec8)
                         else
                           @index = i35
@@ -7427,7 +7427,7 @@ module Fortran
                             end
                           end
                           if s39.last
-                            r39 = instantiate_node(T,input, i39...index, s39)
+                            r39 = instantiate_node(NT,input, i39...index, s39)
                             r39.extend(ConnectSpec9)
                           else
                             @index = i39
@@ -7782,7 +7782,7 @@ module Fortran
             s4 << r7
           end
           if s4.last
-            r4 = instantiate_node(T,input, i4...index, s4)
+            r4 = instantiate_node(NT,input, i4...index, s4)
             r4.extend(ControlEditDesc0)
           else
             @index = i4
@@ -7814,7 +7814,7 @@ module Fortran
                 s9 << r12
               end
               if s9.last
-                r9 = instantiate_node(T,input, i9...index, s9)
+                r9 = instantiate_node(NT,input, i9...index, s9)
                 r9.extend(ControlEditDesc1)
               else
                 @index = i9
@@ -8040,7 +8040,7 @@ module Fortran
         end
       end
       if s8.last
-        r8 = instantiate_node(T,input, i8...index, s8)
+        r8 = instantiate_node(NT,input, i8...index, s8)
         r8.extend(DataEditDesc2)
       else
         @index = i8
@@ -8116,7 +8116,7 @@ module Fortran
             s22 << r24
           end
           if s22.last
-            r22 = instantiate_node(T,input, i22...index, s22)
+            r22 = instantiate_node(NT,input, i22...index, s22)
             r22.extend(DataEditDesc5)
           else
             @index = i22
@@ -8144,7 +8144,7 @@ module Fortran
               s25 << r27
             end
             if s25.last
-              r25 = instantiate_node(T,input, i25...index, s25)
+              r25 = instantiate_node(NT,input, i25...index, s25)
               r25.extend(DataEditDesc6)
             else
               @index = i25
@@ -9143,7 +9143,7 @@ module Fortran
       s0 << r3
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(DataStmtValue0)
     else
       @index = i0
@@ -9184,7 +9184,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(DataStmtRepeatPair0)
     else
       @index = i0
@@ -13350,7 +13350,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(EquivalenceSet0)
     else
       @index = i0
@@ -14504,7 +14504,7 @@ module Fortran
       s1 << r4
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
+      r1 = instantiate_node(NT,input, i1...index, s1)
       r1.extend(FormatItem0)
     else
       @index = i1
@@ -14534,7 +14534,7 @@ module Fortran
             s7 << r10
           end
           if s7.last
-            r7 = instantiate_node(T,input, i7...index, s7)
+            r7 = instantiate_node(NT,input, i7...index, s7)
             r7.extend(FormatItem1)
           else
             @index = i7
@@ -15636,7 +15636,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Hollerith,input, i0...index, s0)
       r0.extend(Hollerith0)
     else
       @index = i0
@@ -15862,7 +15862,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(IfConstructNameLabel0)
     else
       @index = i0
@@ -16254,7 +16254,7 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
+      r1 = instantiate_node(NT,input, i1...index, s1)
       r1.extend(ImplicitSpec0)
     else
       @index = i1
@@ -16279,7 +16279,7 @@ module Fortran
         end
       end
       if s6.last
-        r6 = instantiate_node(T,input, i6...index, s6)
+        r6 = instantiate_node(NT,input, i6...index, s6)
         r6.extend(ImplicitSpec1)
       else
         @index = i6
@@ -16838,7 +16838,7 @@ module Fortran
       s1 << r3
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
+      r1 = instantiate_node(NT,input, i1...index, s1)
       r1.extend(InquireSpec0)
     else
       @index = i1
@@ -16859,7 +16859,7 @@ module Fortran
         end
       end
       if s5.last
-        r5 = instantiate_node(T,input, i5...index, s5)
+        r5 = instantiate_node(NT,input, i5...index, s5)
         r5.extend(InquireSpec1)
       else
         @index = i5
@@ -16880,7 +16880,7 @@ module Fortran
           end
         end
         if s9.last
-          r9 = instantiate_node(T,input, i9...index, s9)
+          r9 = instantiate_node(NT,input, i9...index, s9)
           r9.extend(InquireSpec2)
         else
           @index = i9
@@ -18344,7 +18344,7 @@ module Fortran
         end
       end
       if s9.last
-        r9 = instantiate_node(T,input, i9...index, s9)
+        r9 = instantiate_node(NT,input, i9...index, s9)
         r9.extend(IoControlSpec1)
       else
         @index = i9
@@ -18365,7 +18365,7 @@ module Fortran
           end
         end
         if s15.last
-          r15 = instantiate_node(T,input, i15...index, s15)
+          r15 = instantiate_node(NT,input, i15...index, s15)
           r15.extend(IoControlSpec2)
         else
           @index = i15
@@ -18398,7 +18398,7 @@ module Fortran
                   end
                 end
                 if s22.last
-                  r22 = instantiate_node(T,input, i22...index, s22)
+                  r22 = instantiate_node(NT,input, i22...index, s22)
                   r22.extend(IoControlSpec3)
                 else
                   @index = i22
@@ -18427,7 +18427,7 @@ module Fortran
                         end
                       end
                       if s28.last
-                        r28 = instantiate_node(T,input, i28...index, s28)
+                        r28 = instantiate_node(NT,input, i28...index, s28)
                         r28.extend(IoControlSpec4)
                       else
                         @index = i28
@@ -18458,7 +18458,7 @@ module Fortran
                               s34 << r36
                             end
                             if s34.last
-                              r34 = instantiate_node(T,input, i34...index, s34)
+                              r34 = instantiate_node(NT,input, i34...index, s34)
                               r34.extend(IoControlSpec5)
                             else
                               @index = i34
@@ -20458,7 +20458,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(KeywordPair0)
     else
       @index = i0
@@ -20499,7 +20499,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(KindPair0)
     else
       @index = i0
@@ -21053,7 +21053,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(LenPair0)
     else
       @index = i0
@@ -21132,7 +21132,7 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
+      r1 = instantiate_node(NT,input, i1...index, s1)
       r1.extend(LengthSelector0)
     else
       @index = i1
@@ -21183,7 +21183,7 @@ module Fortran
         s7 << r9
       end
       if s7.last
-        r7 = instantiate_node(T,input, i7...index, s7)
+        r7 = instantiate_node(NT,input, i7...index, s7)
         r7.extend(LengthSelector2)
       else
         @index = i7
@@ -21205,7 +21205,7 @@ module Fortran
           s14 << r16
         end
         if s14.last
-          r14 = instantiate_node(T,input, i14...index, s14)
+          r14 = instantiate_node(NT,input, i14...index, s14)
           r14.extend(LengthSelector3)
         else
           @index = i14
@@ -21695,7 +21695,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(Level5ExprOption0)
     else
       @index = i0
@@ -23569,7 +23569,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(NullFunctionRef0)
     else
       @index = i0
@@ -24688,7 +24688,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(ParenthesizedAllocateShapeSpecList0)
     else
       @index = i0
@@ -24787,7 +24787,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(ParenthesizedComponentArraySpec0)
     else
       @index = i0
@@ -25449,7 +25449,7 @@ module Fortran
       s1 << r3
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
+      r1 = instantiate_node(NT,input, i1...index, s1)
       r1.extend(PositionEditDesc0)
     else
       @index = i1
@@ -25472,7 +25472,7 @@ module Fortran
         s4 << r6
       end
       if s4.last
-        r4 = instantiate_node(T,input, i4...index, s4)
+        r4 = instantiate_node(NT,input, i4...index, s4)
         r4.extend(PositionEditDesc1)
       else
         @index = i4
@@ -25495,7 +25495,7 @@ module Fortran
           s7 << r9
         end
         if s7.last
-          r7 = instantiate_node(T,input, i7...index, s7)
+          r7 = instantiate_node(NT,input, i7...index, s7)
           r7.extend(PositionEditDesc2)
         else
           @index = i7
@@ -25518,7 +25518,7 @@ module Fortran
             s10 << r12
           end
           if s10.last
-            r10 = instantiate_node(T,input, i10...index, s10)
+            r10 = instantiate_node(NT,input, i10...index, s10)
             r10.extend(PositionEditDesc3)
           else
             @index = i10
@@ -25587,7 +25587,7 @@ module Fortran
       s1 << r3
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
+      r1 = instantiate_node(NT,input, i1...index, s1)
       r1.extend(PositionSpec0)
     else
       @index = i1
@@ -25608,7 +25608,7 @@ module Fortran
         end
       end
       if s5.last
-        r5 = instantiate_node(T,input, i5...index, s5)
+        r5 = instantiate_node(NT,input, i5...index, s5)
         r5.extend(PositionSpec1)
       else
         @index = i5
@@ -28732,7 +28732,7 @@ module Fortran
       s0 << r3
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(SignedDigitString0)
     else
       @index = i0
@@ -28774,7 +28774,7 @@ module Fortran
       s0 << r3
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(SignedIntLiteralConstant0)
     else
       @index = i0
@@ -28816,7 +28816,7 @@ module Fortran
       s0 << r3
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(SignedRealLiteralConstant0)
     else
       @index = i0
@@ -28889,7 +28889,7 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
+      r1 = instantiate_node(NT,input, i1...index, s1)
       r1.extend(Significand0)
     else
       @index = i1
@@ -28906,7 +28906,7 @@ module Fortran
         s8 << r10
       end
       if s8.last
-        r8 = instantiate_node(T,input, i8...index, s8)
+        r8 = instantiate_node(NT,input, i8...index, s8)
         r8.extend(Significand1)
       else
         @index = i8
@@ -30059,7 +30059,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(SubstringRange0)
     else
       @index = i0
