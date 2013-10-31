@@ -16,6 +16,8 @@
 
 - Implement a continuation scheme (following Fortran!) for SMS directives.
 
+- Give specific names to the many NT nodes in [sms_]fortran.tt?
+
 ### NEW FEATURES
 
 - Does where-stmt need implicit parallelization? Currently, it operates on halo
