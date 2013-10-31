@@ -2012,7 +2012,11 @@ grammar Fortran
   rule io_implied_do_control
     # F90:R918
 
-    do_variable t_equal scalar_numeric_expr t_comma scalar_numeric_expr ( t_comma scalar_numeric_expr )? <T>
+    do_variable t_equal scalar_numeric_expr t_comma scalar_numeric_expr io_implied_do_control_option? <NT>
+  end
+
+  rule io_implied_do_control_option
+    t_comma scalar_numeric_expr <NT>
   end
 
   rule io_implied_do_object
@@ -2236,11 +2240,19 @@ grammar Fortran
   rule letter_spec
     # F90:R542
 
-    t_letter ( t_minus t_letter )? <T>
+    t_letter letter_spec_option? <NT>
   end
 
   rule letter_spec_list
-    letter_spec ( t_comma letter_spec )* <Letter_Spec_List>
+    letter_spec letter_spec_list_option* <Letter_Spec_List>
+  end
+
+  rule letter_spec_list_option
+    t_comma letter_spec <NT>
+  end
+
+  rule letter_spec_option
+    t_minus t_letter <NT>
   end
 
   rule level_1_expr
@@ -2335,7 +2347,8 @@ grammar Fortran
   rule logical_literal_constant
     # F90:R421
 
-    ( t_true / t_false ) kind_option? <T>
+    t_true kind_option? <NT> /
+    t_false kind_option? <NT>
   end
 
   rule logical_op
@@ -2554,7 +2567,8 @@ grammar Fortran
   rule octal_constant
     # F90:R409
 
-    &"o" t_letter ( ( t_apostrophe t_octal+ t_apostrophe ) / ( t_quotemark t_octal+ t_quotemark ) ) <T>
+    &"o" t_letter t_apostrophe t_octal+ t_apostrophe <Octal_Constant> /
+    &"o" t_letter t_quotemark t_octal+ t_quotemark <Octal_Constant>
   end
 
   rule only
@@ -2822,8 +2836,12 @@ grammar Fortran
   rule real_literal_constant
     # F90:R413
 
-    significand ( exponent_letter exponent )? kind_option? <T> /
-    digit_string exponent_letter exponent kind_option? <T>
+    significand real_literal_constant_option? kind_option? <NT> /
+    digit_string exponent_letter exponent kind_option? <NT>
+  end
+
+  rule real_literal_constant_option
+    exponent_letter exponent <NT>
   end
 
   rule real_part

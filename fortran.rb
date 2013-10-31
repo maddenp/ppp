@@ -3201,6 +3201,14 @@ module Fortran
 
   end
 
+  class Octal_Constant < NT
+
+    def str0
+      "#{e[1]}#{e[2]}"+e[3].e.reduce("") { |m,x| m+="#{x}" }+"#{e[4]}"
+    end
+
+  end
+
   class Only < NT
 
     def localname
