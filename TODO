@@ -1,8 +1,5 @@
 ### ENVIRONMENT
 
-* Change 'function' key (with true value) to 'subprogram' with 'function' and
-  'subroutine' values, and start recording module subroutines in env.
-
 - Derived types provided by modules should appear in envfiles.
 
 ### ERROR CHECKING / REPORTING
