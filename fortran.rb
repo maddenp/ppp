@@ -1603,7 +1603,7 @@ module Fortran
   class Binary_Constant < NT
 
     def str0
-      "b"+"#{e[1]}"+e[2].e.reduce("") { |m,x| m+="#{x}" }+"#{e[3]}"
+      "#{e[1]}#{e[2]}"+e[3].e.reduce("") { |m,x| m+="#{x}" }+"#{e[4]}"
     end
 
   end
@@ -1749,6 +1749,17 @@ module Fortran
   class Data_I_Do_Object_List < List
   end
 
+  class Data_Implied_Do < NT
+  end
+
+  class Data_Implied_Do_Option < NT
+
+    def str0
+      e.reduce("") { |m,x| m+="#{x[0]}#{x[1]}" }
+    end
+
+  end
+
   class Data_Ref < NT
 
     def name
@@ -1867,6 +1878,14 @@ module Fortran
 
     def str0
       stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
+    end
+
+  end
+
+  class Directive < NT
+
+    def str0
+      "!"+e[1].reduce("") { |x| m+="#{x}" }
     end
 
   end
@@ -2311,6 +2330,22 @@ module Fortran
   class External_Stmt < Stmt
   end
 
+  class Format_Item_List < NT
+
+    def str0
+      "#{e[0]}"+e[1].e.reduce("") { |m,x| m+="#{x}" }
+    end
+
+  end
+
+  class Format_Specification < NT
+
+    def str0
+      "#{e[0]}"+e[1].e.reduce("") { |m,x| m+="#{x}" }+"#{e[2]}"
+    end
+
+  end
+
   class Format_Stmt < Stmt
   end
 
@@ -2474,7 +2509,7 @@ module Fortran
   class Hollerith < NT
 
     def str0
-      "#{e[0]}h#{e[3]}"
+      "#{e[0]}#{e[2]}#{e[4]}"
     end
 
   end
@@ -2831,6 +2866,13 @@ module Fortran
   class Label_Stmt < NT
   end
 
+  class Letter_Sequence < NT
+
+    def str0
+      e.reduce("") { |m,x| m+="#{x}" }
+    end
+
+  end
   class Letter_Spec_List < List
   end
 

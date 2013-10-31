@@ -3651,22 +3651,30 @@ module Fortran
   end
 
   module BinaryConstant0
-    def t_apostrophe1
+    def t_letter
       elements[1]
     end
 
+    def t_apostrophe1
+      elements[2]
+    end
+
     def t_apostrophe2
-      elements[3]
+      elements[4]
     end
   end
 
   module BinaryConstant1
-    def t_quotemark1
+    def t_letter
       elements[1]
     end
 
+    def t_quotemark1
+      elements[2]
+    end
+
     def t_quotemark2
-      elements[3]
+      elements[4]
     end
   end
 
@@ -3683,37 +3691,48 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
+    i2 = index
     if has_terminal?("b", false, index)
-      r2 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("b")
+      r3 = nil
+    end
+    if r3
+      @index = i2
+      r2 = instantiate_node(SyntaxNode,input, index...index)
+    else
       r2 = nil
     end
     s1 << r2
     if r2
-      r3 = _nt_t_apostrophe
-      s1 << r3
-      if r3
-        s4, i4 = [], index
-        loop do
-          r5 = _nt_t_binary
-          if r5
-            s4 << r5
-          else
-            break
+      r4 = _nt_t_letter
+      s1 << r4
+      if r4
+        r5 = _nt_t_apostrophe
+        s1 << r5
+        if r5
+          s6, i6 = [], index
+          loop do
+            r7 = _nt_t_binary
+            if r7
+              s6 << r7
+            else
+              break
+            end
           end
-        end
-        if s4.empty?
-          @index = i4
-          r4 = nil
-        else
-          r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
-        end
-        s1 << r4
-        if r4
-          r6 = _nt_t_apostrophe
+          if s6.empty?
+            @index = i6
+            r6 = nil
+          else
+            r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
+          end
           s1 << r6
+          if r6
+            r8 = _nt_t_apostrophe
+            s1 << r8
+          end
         end
       end
     end
@@ -3727,50 +3746,61 @@ module Fortran
     if r1
       r0 = r1
     else
-      i7, s7 = index, []
+      i9, s9 = index, []
+      i10 = index
       if has_terminal?("b", false, index)
-        r8 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        r11 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("b")
-        r8 = nil
+        r11 = nil
       end
-      s7 << r8
-      if r8
-        r9 = _nt_t_quotemark
-        s7 << r9
-        if r9
-          s10, i10 = [], index
-          loop do
-            r11 = _nt_t_binary
-            if r11
-              s10 << r11
-            else
-              break
+      if r11
+        @index = i10
+        r10 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r10 = nil
+      end
+      s9 << r10
+      if r10
+        r12 = _nt_t_letter
+        s9 << r12
+        if r12
+          r13 = _nt_t_quotemark
+          s9 << r13
+          if r13
+            s14, i14 = [], index
+            loop do
+              r15 = _nt_t_binary
+              if r15
+                s14 << r15
+              else
+                break
+              end
             end
-          end
-          if s10.empty?
-            @index = i10
-            r10 = nil
-          else
-            r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
-          end
-          s7 << r10
-          if r10
-            r12 = _nt_t_quotemark
-            s7 << r12
+            if s14.empty?
+              @index = i14
+              r14 = nil
+            else
+              r14 = instantiate_node(SyntaxNode,input, i14...index, s14)
+            end
+            s9 << r14
+            if r14
+              r16 = _nt_t_quotemark
+              s9 << r16
+            end
           end
         end
       end
-      if s7.last
-        r7 = instantiate_node(Binary_Constant,input, i7...index, s7)
-        r7.extend(BinaryConstant1)
+      if s9.last
+        r9 = instantiate_node(Binary_Constant,input, i9...index, s9)
+        r9.extend(BinaryConstant1)
       else
-        @index = i7
-        r7 = nil
+        @index = i9
+        r9 = nil
       end
-      if r7
-        r0 = r7
+      if r9
+        r0 = r9
       else
         @index = i0
         r0 = nil
@@ -3780,6 +3810,26 @@ module Fortran
     node_cache[:binary_constant][start_index] = r0
 
     r0
+  end
+
+  module BlankInterpEditDesc0
+    def t_letter1
+      elements[1]
+    end
+
+    def t_letter2
+      elements[2]
+    end
+  end
+
+  module BlankInterpEditDesc1
+    def t_letter1
+      elements[1]
+    end
+
+    def t_letter2
+      elements[2]
+    end
   end
 
   def _nt_blank_interp_edit_desc
@@ -3794,25 +3844,73 @@ module Fortran
     end
 
     i0 = index
+    i1, s1 = index, []
+    i2 = index
     if has_terminal?("bn", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 2))
+      r3 = instantiate_node(SyntaxNode,input, index...(index + 2))
       @index += 2
     else
       terminal_parse_failure("bn")
+      r3 = nil
+    end
+    if r3
+      @index = i2
+      r2 = instantiate_node(SyntaxNode,input, index...index)
+    else
+      r2 = nil
+    end
+    s1 << r2
+    if r2
+      r4 = _nt_t_letter
+      s1 << r4
+      if r4
+        r5 = _nt_t_letter
+        s1 << r5
+      end
+    end
+    if s1.last
+      r1 = instantiate_node(NT,input, i1...index, s1)
+      r1.extend(BlankInterpEditDesc0)
+    else
+      @index = i1
       r1 = nil
     end
     if r1
       r0 = r1
     else
+      i6, s6 = index, []
+      i7 = index
       if has_terminal?("bz", false, index)
-        r2 = instantiate_node(SyntaxNode,input, index...(index + 2))
+        r8 = instantiate_node(SyntaxNode,input, index...(index + 2))
         @index += 2
       else
         terminal_parse_failure("bz")
-        r2 = nil
+        r8 = nil
       end
-      if r2
-        r0 = r2
+      if r8
+        @index = i7
+        r7 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r7 = nil
+      end
+      s6 << r7
+      if r7
+        r9 = _nt_t_letter
+        s6 << r9
+        if r9
+          r10 = _nt_t_letter
+          s6 << r10
+        end
+      end
+      if s6.last
+        r6 = instantiate_node(NT,input, i6...index, s6)
+        r6.extend(BlankInterpEditDesc1)
+      else
+        @index = i6
+        r6 = nil
+      end
+      if r6
+        r0 = r6
       else
         @index = i0
         r0 = nil
@@ -5276,20 +5374,6 @@ module Fortran
   end
 
   module CharSelector2
-    def t_comma
-      elements[0]
-    end
-
-    def len_pair
-      elements[1]
-    end
-
-    def type_param_value
-      elements[2]
-    end
-  end
-
-  module CharSelector3
     def t_paren_l
       elements[0]
     end
@@ -5408,24 +5492,7 @@ module Fortran
               r21 = _nt_scalar_int_initialization_expr
               s18 << r21
               if r21
-                i23, s23 = index, []
-                r24 = _nt_t_comma
-                s23 << r24
-                if r24
-                  r25 = _nt_len_pair
-                  s23 << r25
-                  if r25
-                    r26 = _nt_type_param_value
-                    s23 << r26
-                  end
-                end
-                if s23.last
-                  r23 = instantiate_node(SyntaxNode,input, i23...index, s23)
-                  r23.extend(CharSelector2)
-                else
-                  @index = i23
-                  r23 = nil
-                end
+                r23 = _nt_char_selector_option
                 if r23
                   r22 = r23
                 else
@@ -5433,15 +5500,15 @@ module Fortran
                 end
                 s18 << r22
                 if r22
-                  r27 = _nt_t_paren_r
-                  s18 << r27
+                  r24 = _nt_t_paren_r
+                  s18 << r24
                 end
               end
             end
           end
           if s18.last
-            r18 = instantiate_node(T,input, i18...index, s18)
-            r18.extend(CharSelector3)
+            r18 = instantiate_node(NT,input, i18...index, s18)
+            r18.extend(CharSelector2)
           else
             @index = i18
             r18 = nil
@@ -5457,6 +5524,55 @@ module Fortran
     end
 
     node_cache[:char_selector][start_index] = r0
+
+    r0
+  end
+
+  module CharSelectorOption0
+    def t_comma
+      elements[0]
+    end
+
+    def len_pair
+      elements[1]
+    end
+
+    def type_param_value
+      elements[2]
+    end
+  end
+
+  def _nt_char_selector_option
+    start_index = index
+    if node_cache[:char_selector_option].has_key?(index)
+      cached = node_cache[:char_selector_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_len_pair
+      s0 << r2
+      if r2
+        r3 = _nt_type_param_value
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(CharSelectorOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:char_selector_option][start_index] = r0
 
     r0
   end
@@ -5554,16 +5670,6 @@ module Fortran
   end
 
   module CloseSpec1
-    def t_unit
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-  end
-
-  module CloseSpec2
     def external_file_unit
       elements[1]
     end
@@ -5611,20 +5717,7 @@ module Fortran
           r0 = r3
         else
           i7, s7 = index, []
-          i9, s9 = index, []
-          r10 = _nt_t_unit
-          s9 << r10
-          if r10
-            r11 = _nt_t_equal
-            s9 << r11
-          end
-          if s9.last
-            r9 = instantiate_node(SyntaxNode,input, i9...index, s9)
-            r9.extend(CloseSpec1)
-          else
-            @index = i9
-            r9 = nil
-          end
+          r9 = _nt_close_spec_option
           if r9
             r8 = r9
           else
@@ -5632,12 +5725,12 @@ module Fortran
           end
           s7 << r8
           if r8
-            r12 = _nt_external_file_unit
-            s7 << r12
+            r10 = _nt_external_file_unit
+            s7 << r10
           end
           if s7.last
-            r7 = instantiate_node(T,input, i7...index, s7)
-            r7.extend(CloseSpec2)
+            r7 = instantiate_node(NT,input, i7...index, s7)
+            r7.extend(CloseSpec1)
           else
             @index = i7
             r7 = nil
@@ -5653,6 +5746,47 @@ module Fortran
     end
 
     node_cache[:close_spec][start_index] = r0
+
+    r0
+  end
+
+  module CloseSpecOption0
+    def t_unit
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+  end
+
+  def _nt_close_spec_option
+    start_index = index
+    if node_cache[:close_spec_option].has_key?(index)
+      cached = node_cache[:close_spec_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_unit
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(CloseSpecOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:close_spec_option][start_index] = r0
 
     r0
   end
@@ -6492,12 +6626,6 @@ module Fortran
     end
   end
 
-  module ComponentAttrSpecListOption1
-    def double_colon
-      elements[1]
-    end
-  end
-
   def _nt_component_attr_spec_list_option
     start_index = index
     if node_cache[:component_attr_spec_list_option].has_key?(index)
@@ -6510,33 +6638,15 @@ module Fortran
     end
 
     i0, s0 = index, []
-    i2, s2 = index, []
-    r3 = _nt_t_comma
-    s2 << r3
-    if r3
-      r4 = _nt_component_attr_spec_list
-      s2 << r4
-    end
-    if s2.last
-      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
-      r2.extend(ComponentAttrSpecListOption0)
-    else
-      @index = i2
-      r2 = nil
-    end
-    if r2
-      r1 = r2
-    else
-      r1 = instantiate_node(SyntaxNode,input, index...index)
-    end
+    r1 = _nt_t_comma
     s0 << r1
     if r1
-      r5 = _nt_double_colon
-      s0 << r5
+      r2 = _nt_component_attr_spec_list
+      s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(ComponentAttrSpecListOption1)
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(ComponentAttrSpecListOption0)
     else
       @index = i0
       r0 = nil
@@ -6742,7 +6852,7 @@ module Fortran
       r3 = _nt_type_spec
       s0 << r3
       if r3
-        r5 = _nt_component_attr_spec_list_option
+        r5 = _nt_component_def_stmt_option
         if r5
           r4 = r5
         else
@@ -6768,6 +6878,48 @@ module Fortran
     end
 
     node_cache[:component_def_stmt][start_index] = r0
+
+    r0
+  end
+
+  module ComponentDefStmtOption0
+    def double_colon
+      elements[1]
+    end
+  end
+
+  def _nt_component_def_stmt_option
+    start_index = index
+    if node_cache[:component_def_stmt_option].has_key?(index)
+      cached = node_cache[:component_def_stmt_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r2 = _nt_component_attr_spec_list_option
+    if r2
+      r1 = r2
+    else
+      r1 = instantiate_node(SyntaxNode,input, index...index)
+    end
+    s0 << r1
+    if r1
+      r3 = _nt_double_colon
+      s0 << r3
+    end
+    if s0.last
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(ComponentDefStmtOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:component_def_stmt_option][start_index] = r0
 
     r0
   end
@@ -7184,16 +7336,6 @@ module Fortran
   end
 
   module ConnectSpec10
-    def t_unit
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-  end
-
-  module ConnectSpec11
     def external_file_unit
       elements[1]
     end
@@ -7430,20 +7572,7 @@ module Fortran
                             r0 = r39
                           else
                             i43, s43 = index, []
-                            i45, s45 = index, []
-                            r46 = _nt_t_unit
-                            s45 << r46
-                            if r46
-                              r47 = _nt_t_equal
-                              s45 << r47
-                            end
-                            if s45.last
-                              r45 = instantiate_node(SyntaxNode,input, i45...index, s45)
-                              r45.extend(ConnectSpec10)
-                            else
-                              @index = i45
-                              r45 = nil
-                            end
+                            r45 = _nt_connect_spec_external_file_unit_option
                             if r45
                               r44 = r45
                             else
@@ -7451,12 +7580,12 @@ module Fortran
                             end
                             s43 << r44
                             if r44
-                              r48 = _nt_external_file_unit
-                              s43 << r48
+                              r46 = _nt_external_file_unit
+                              s43 << r46
                             end
                             if s43.last
-                              r43 = instantiate_node(T,input, i43...index, s43)
-                              r43.extend(ConnectSpec11)
+                              r43 = instantiate_node(NT,input, i43...index, s43)
+                              r43.extend(ConnectSpec10)
                             else
                               @index = i43
                               r43 = nil
@@ -7481,6 +7610,47 @@ module Fortran
     end
 
     node_cache[:connect_spec][start_index] = r0
+
+    r0
+  end
+
+  module ConnectSpecExternalFileUnitOption0
+    def t_unit
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+  end
+
+  def _nt_connect_spec_external_file_unit_option
+    start_index = index
+    if node_cache[:connect_spec_external_file_unit_option].has_key?(index)
+      cached = node_cache[:connect_spec_external_file_unit_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_unit
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(ConnectSpecExternalFileUnitOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:connect_spec_external_file_unit_option][start_index] = r0
 
     r0
   end
@@ -7736,6 +7906,9 @@ module Fortran
   end
 
   module ControlEditDesc1
+    def t_letter
+      elements[2]
+    end
   end
 
   def _nt_control_edit_desc
@@ -7797,14 +7970,25 @@ module Fortran
               end
               s9 << r10
               if r10
+                i12 = index
                 if has_terminal?("p", false, index)
-                  r12 = instantiate_node(SyntaxNode,input, index...(index + 1))
+                  r13 = instantiate_node(SyntaxNode,input, index...(index + 1))
                   @index += 1
                 else
                   terminal_parse_failure("p")
+                  r13 = nil
+                end
+                if r13
+                  @index = i12
+                  r12 = instantiate_node(SyntaxNode,input, index...index)
+                else
                   r12 = nil
                 end
                 s9 << r12
+                if r12
+                  r14 = _nt_t_letter
+                  s9 << r14
+                end
               end
               if s9.last
                 r9 = instantiate_node(NT,input, i9...index, s9)
@@ -7894,16 +8078,6 @@ module Fortran
   end
 
   module DataEditDesc0
-    def t_dot
-      elements[0]
-    end
-
-    def int_literal_constant
-      elements[1]
-    end
-  end
-
-  module DataEditDesc1
     def data_edit_desc_1
       elements[0]
     end
@@ -7914,7 +8088,7 @@ module Fortran
 
   end
 
-  module DataEditDesc2
+  module DataEditDesc1
     def data_edit_desc_2
       elements[0]
     end
@@ -7932,13 +8106,7 @@ module Fortran
     end
   end
 
-  module DataEditDesc3
-    def int_literal_constant
-      elements[1]
-    end
-  end
-
-  module DataEditDesc4
+  module DataEditDesc2
     def data_edit_desc_3
       elements[0]
     end
@@ -7957,13 +8125,21 @@ module Fortran
 
   end
 
-  module DataEditDesc5
-    def int_literal_constant
+  module DataEditDesc3
+    def t_letter
       elements[1]
+    end
+
+    def int_literal_constant
+      elements[2]
     end
   end
 
-  module DataEditDesc6
+  module DataEditDesc4
+    def t_letter
+      elements[1]
+    end
+
   end
 
   def _nt_data_edit_desc
@@ -7985,20 +8161,7 @@ module Fortran
       r3 = _nt_int_literal_constant
       s1 << r3
       if r3
-        i5, s5 = index, []
-        r6 = _nt_t_dot
-        s5 << r6
-        if r6
-          r7 = _nt_int_literal_constant
-          s5 << r7
-        end
-        if s5.last
-          r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
-          r5.extend(DataEditDesc0)
-        else
-          @index = i5
-          r5 = nil
-        end
+        r5 = _nt_data_edit_desc_1_option
         if r5
           r4 = r5
         else
@@ -8008,8 +8171,8 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
-      r1.extend(DataEditDesc1)
+      r1 = instantiate_node(NT,input, i1...index, s1)
+      r1.extend(DataEditDesc0)
     else
       @index = i1
       r1 = nil
@@ -8017,134 +8180,137 @@ module Fortran
     if r1
       r0 = r1
     else
-      i8, s8 = index, []
-      r9 = _nt_data_edit_desc_2
-      s8 << r9
-      if r9
-        r10 = _nt_int_literal_constant
-        s8 << r10
-        if r10
-          r11 = _nt_t_dot
-          s8 << r11
-          if r11
-            r12 = _nt_int_literal_constant
-            s8 << r12
+      i6, s6 = index, []
+      r7 = _nt_data_edit_desc_2
+      s6 << r7
+      if r7
+        r8 = _nt_int_literal_constant
+        s6 << r8
+        if r8
+          r9 = _nt_t_dot
+          s6 << r9
+          if r9
+            r10 = _nt_int_literal_constant
+            s6 << r10
           end
         end
       end
-      if s8.last
-        r8 = instantiate_node(NT,input, i8...index, s8)
-        r8.extend(DataEditDesc2)
+      if s6.last
+        r6 = instantiate_node(NT,input, i6...index, s6)
+        r6.extend(DataEditDesc1)
       else
-        @index = i8
-        r8 = nil
+        @index = i6
+        r6 = nil
       end
-      if r8
-        r0 = r8
+      if r6
+        r0 = r6
       else
-        i13, s13 = index, []
-        r14 = _nt_data_edit_desc_3
-        s13 << r14
-        if r14
-          r15 = _nt_int_literal_constant
-          s13 << r15
-          if r15
-            r16 = _nt_t_dot
-            s13 << r16
-            if r16
-              r17 = _nt_int_literal_constant
-              s13 << r17
-              if r17
-                i19, s19 = index, []
-                if has_terminal?("e", false, index)
-                  r20 = instantiate_node(SyntaxNode,input, index...(index + 1))
-                  @index += 1
+        i11, s11 = index, []
+        r12 = _nt_data_edit_desc_3
+        s11 << r12
+        if r12
+          r13 = _nt_int_literal_constant
+          s11 << r13
+          if r13
+            r14 = _nt_t_dot
+            s11 << r14
+            if r14
+              r15 = _nt_int_literal_constant
+              s11 << r15
+              if r15
+                r17 = _nt_data_edit_desc_3_option
+                if r17
+                  r16 = r17
                 else
-                  terminal_parse_failure("e")
-                  r20 = nil
+                  r16 = instantiate_node(SyntaxNode,input, index...index)
                 end
-                s19 << r20
-                if r20
-                  r21 = _nt_int_literal_constant
-                  s19 << r21
-                end
-                if s19.last
-                  r19 = instantiate_node(SyntaxNode,input, i19...index, s19)
-                  r19.extend(DataEditDesc3)
-                else
-                  @index = i19
-                  r19 = nil
-                end
-                if r19
-                  r18 = r19
-                else
-                  r18 = instantiate_node(SyntaxNode,input, index...index)
-                end
-                s13 << r18
+                s11 << r16
               end
             end
           end
         end
-        if s13.last
-          r13 = instantiate_node(T,input, i13...index, s13)
-          r13.extend(DataEditDesc4)
+        if s11.last
+          r11 = instantiate_node(NT,input, i11...index, s11)
+          r11.extend(DataEditDesc2)
         else
-          @index = i13
-          r13 = nil
+          @index = i11
+          r11 = nil
         end
-        if r13
-          r0 = r13
+        if r11
+          r0 = r11
         else
-          i22, s22 = index, []
+          i18, s18 = index, []
+          i19 = index
           if has_terminal?("l", false, index)
-            r23 = instantiate_node(SyntaxNode,input, index...(index + 1))
+            r20 = instantiate_node(SyntaxNode,input, index...(index + 1))
             @index += 1
           else
             terminal_parse_failure("l")
-            r23 = nil
+            r20 = nil
           end
-          s22 << r23
-          if r23
-            r24 = _nt_int_literal_constant
-            s22 << r24
-          end
-          if s22.last
-            r22 = instantiate_node(NT,input, i22...index, s22)
-            r22.extend(DataEditDesc5)
+          if r20
+            @index = i19
+            r19 = instantiate_node(SyntaxNode,input, index...index)
           else
-            @index = i22
-            r22 = nil
+            r19 = nil
           end
-          if r22
-            r0 = r22
+          s18 << r19
+          if r19
+            r21 = _nt_t_letter
+            s18 << r21
+            if r21
+              r22 = _nt_int_literal_constant
+              s18 << r22
+            end
+          end
+          if s18.last
+            r18 = instantiate_node(NT,input, i18...index, s18)
+            r18.extend(DataEditDesc3)
           else
-            i25, s25 = index, []
+            @index = i18
+            r18 = nil
+          end
+          if r18
+            r0 = r18
+          else
+            i23, s23 = index, []
+            i24 = index
             if has_terminal?("a", false, index)
-              r26 = instantiate_node(SyntaxNode,input, index...(index + 1))
+              r25 = instantiate_node(SyntaxNode,input, index...(index + 1))
               @index += 1
             else
               terminal_parse_failure("a")
-              r26 = nil
-            end
-            s25 << r26
-            if r26
-              r28 = _nt_int_literal_constant
-              if r28
-                r27 = r28
-              else
-                r27 = instantiate_node(SyntaxNode,input, index...index)
-              end
-              s25 << r27
-            end
-            if s25.last
-              r25 = instantiate_node(NT,input, i25...index, s25)
-              r25.extend(DataEditDesc6)
-            else
-              @index = i25
               r25 = nil
             end
             if r25
-              r0 = r25
+              @index = i24
+              r24 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r24 = nil
+            end
+            s23 << r24
+            if r24
+              r26 = _nt_t_letter
+              s23 << r26
+              if r26
+                r28 = _nt_int_literal_constant
+                if r28
+                  r27 = r28
+                else
+                  r27 = instantiate_node(SyntaxNode,input, index...index)
+                end
+                s23 << r27
+              end
+            end
+            if s23.last
+              r23 = instantiate_node(NT,input, i23...index, s23)
+              r23.extend(DataEditDesc4)
+            else
+              @index = i23
+              r23 = nil
+            end
+            if r23
+              r0 = r23
             else
               @index = i0
               r0 = nil
@@ -8159,6 +8325,30 @@ module Fortran
     r0
   end
 
+  module DataEditDesc10
+    def t_letter
+      elements[1]
+    end
+  end
+
+  module DataEditDesc11
+    def t_letter
+      elements[1]
+    end
+  end
+
+  module DataEditDesc12
+    def t_letter
+      elements[1]
+    end
+  end
+
+  module DataEditDesc13
+    def t_letter
+      elements[1]
+    end
+  end
+
   def _nt_data_edit_desc_1
     start_index = index
     if node_cache[:data_edit_desc_1].has_key?(index)
@@ -8171,45 +8361,125 @@ module Fortran
     end
 
     i0 = index
+    i1, s1 = index, []
+    i2 = index
     if has_terminal?("i", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("i")
+      r3 = nil
+    end
+    if r3
+      @index = i2
+      r2 = instantiate_node(SyntaxNode,input, index...index)
+    else
+      r2 = nil
+    end
+    s1 << r2
+    if r2
+      r4 = _nt_t_letter
+      s1 << r4
+    end
+    if s1.last
+      r1 = instantiate_node(NT,input, i1...index, s1)
+      r1.extend(DataEditDesc10)
+    else
+      @index = i1
       r1 = nil
     end
     if r1
       r0 = r1
     else
+      i5, s5 = index, []
+      i6 = index
       if has_terminal?("b", false, index)
-        r2 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        r7 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("b")
-        r2 = nil
+        r7 = nil
       end
-      if r2
-        r0 = r2
+      if r7
+        @index = i6
+        r6 = instantiate_node(SyntaxNode,input, index...index)
       else
+        r6 = nil
+      end
+      s5 << r6
+      if r6
+        r8 = _nt_t_letter
+        s5 << r8
+      end
+      if s5.last
+        r5 = instantiate_node(NT,input, i5...index, s5)
+        r5.extend(DataEditDesc11)
+      else
+        @index = i5
+        r5 = nil
+      end
+      if r5
+        r0 = r5
+      else
+        i9, s9 = index, []
+        i10 = index
         if has_terminal?("o", false, index)
-          r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
+          r11 = instantiate_node(SyntaxNode,input, index...(index + 1))
           @index += 1
         else
           terminal_parse_failure("o")
-          r3 = nil
+          r11 = nil
         end
-        if r3
-          r0 = r3
+        if r11
+          @index = i10
+          r10 = instantiate_node(SyntaxNode,input, index...index)
         else
+          r10 = nil
+        end
+        s9 << r10
+        if r10
+          r12 = _nt_t_letter
+          s9 << r12
+        end
+        if s9.last
+          r9 = instantiate_node(NT,input, i9...index, s9)
+          r9.extend(DataEditDesc12)
+        else
+          @index = i9
+          r9 = nil
+        end
+        if r9
+          r0 = r9
+        else
+          i13, s13 = index, []
+          i14 = index
           if has_terminal?("z", false, index)
-            r4 = instantiate_node(SyntaxNode,input, index...(index + 1))
+            r15 = instantiate_node(SyntaxNode,input, index...(index + 1))
             @index += 1
           else
             terminal_parse_failure("z")
-            r4 = nil
+            r15 = nil
           end
-          if r4
-            r0 = r4
+          if r15
+            @index = i14
+            r14 = instantiate_node(SyntaxNode,input, index...index)
+          else
+            r14 = nil
+          end
+          s13 << r14
+          if r14
+            r16 = _nt_t_letter
+            s13 << r16
+          end
+          if s13.last
+            r13 = instantiate_node(NT,input, i13...index, s13)
+            r13.extend(DataEditDesc13)
+          else
+            @index = i13
+            r13 = nil
+          end
+          if r13
+            r0 = r13
           else
             @index = i0
             r0 = nil
@@ -8221,6 +8491,59 @@ module Fortran
     node_cache[:data_edit_desc_1][start_index] = r0
 
     r0
+  end
+
+  module DataEditDesc1Option0
+    def t_dot
+      elements[0]
+    end
+
+    def int_literal_constant
+      elements[1]
+    end
+  end
+
+  def _nt_data_edit_desc_1_option
+    start_index = index
+    if node_cache[:data_edit_desc_1_option].has_key?(index)
+      cached = node_cache[:data_edit_desc_1_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_dot
+    s0 << r1
+    if r1
+      r2 = _nt_int_literal_constant
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(DataEditDesc1Option0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:data_edit_desc_1_option][start_index] = r0
+
+    r0
+  end
+
+  module DataEditDesc20
+    def t_letter
+      elements[1]
+    end
+  end
+
+  module DataEditDesc21
+    def t_letter
+      elements[1]
+    end
   end
 
   def _nt_data_edit_desc_2
@@ -8235,25 +8558,65 @@ module Fortran
     end
 
     i0 = index
+    i1, s1 = index, []
+    i2 = index
     if has_terminal?("f", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("f")
+      r3 = nil
+    end
+    if r3
+      @index = i2
+      r2 = instantiate_node(SyntaxNode,input, index...index)
+    else
+      r2 = nil
+    end
+    s1 << r2
+    if r2
+      r4 = _nt_t_letter
+      s1 << r4
+    end
+    if s1.last
+      r1 = instantiate_node(NT,input, i1...index, s1)
+      r1.extend(DataEditDesc20)
+    else
+      @index = i1
       r1 = nil
     end
     if r1
       r0 = r1
     else
+      i5, s5 = index, []
+      i6 = index
       if has_terminal?("d", false, index)
-        r2 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        r7 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("d")
-        r2 = nil
+        r7 = nil
       end
-      if r2
-        r0 = r2
+      if r7
+        @index = i6
+        r6 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r6 = nil
+      end
+      s5 << r6
+      if r6
+        r8 = _nt_t_letter
+        s5 << r8
+      end
+      if s5.last
+        r5 = instantiate_node(NT,input, i5...index, s5)
+        r5.extend(DataEditDesc21)
+      else
+        @index = i5
+        r5 = nil
+      end
+      if r5
+        r0 = r5
       else
         @index = i0
         r0 = nil
@@ -8263,6 +8626,38 @@ module Fortran
     node_cache[:data_edit_desc_2][start_index] = r0
 
     r0
+  end
+
+  module DataEditDesc30
+    def t_letter1
+      elements[1]
+    end
+
+    def t_letter2
+      elements[2]
+    end
+  end
+
+  module DataEditDesc31
+    def t_letter1
+      elements[1]
+    end
+
+    def t_letter2
+      elements[2]
+    end
+  end
+
+  module DataEditDesc32
+    def t_letter
+      elements[1]
+    end
+  end
+
+  module DataEditDesc33
+    def t_letter
+      elements[1]
+    end
   end
 
   def _nt_data_edit_desc_3
@@ -8277,45 +8672,133 @@ module Fortran
     end
 
     i0 = index
+    i1, s1 = index, []
+    i2 = index
     if has_terminal?("en", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 2))
+      r3 = instantiate_node(SyntaxNode,input, index...(index + 2))
       @index += 2
     else
       terminal_parse_failure("en")
+      r3 = nil
+    end
+    if r3
+      @index = i2
+      r2 = instantiate_node(SyntaxNode,input, index...index)
+    else
+      r2 = nil
+    end
+    s1 << r2
+    if r2
+      r4 = _nt_t_letter
+      s1 << r4
+      if r4
+        r5 = _nt_t_letter
+        s1 << r5
+      end
+    end
+    if s1.last
+      r1 = instantiate_node(NT,input, i1...index, s1)
+      r1.extend(DataEditDesc30)
+    else
+      @index = i1
       r1 = nil
     end
     if r1
       r0 = r1
     else
+      i6, s6 = index, []
+      i7 = index
       if has_terminal?("es", false, index)
-        r2 = instantiate_node(SyntaxNode,input, index...(index + 2))
+        r8 = instantiate_node(SyntaxNode,input, index...(index + 2))
         @index += 2
       else
         terminal_parse_failure("es")
-        r2 = nil
+        r8 = nil
       end
-      if r2
-        r0 = r2
+      if r8
+        @index = i7
+        r7 = instantiate_node(SyntaxNode,input, index...index)
       else
+        r7 = nil
+      end
+      s6 << r7
+      if r7
+        r9 = _nt_t_letter
+        s6 << r9
+        if r9
+          r10 = _nt_t_letter
+          s6 << r10
+        end
+      end
+      if s6.last
+        r6 = instantiate_node(NT,input, i6...index, s6)
+        r6.extend(DataEditDesc31)
+      else
+        @index = i6
+        r6 = nil
+      end
+      if r6
+        r0 = r6
+      else
+        i11, s11 = index, []
+        i12 = index
         if has_terminal?("e", false, index)
-          r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
+          r13 = instantiate_node(SyntaxNode,input, index...(index + 1))
           @index += 1
         else
           terminal_parse_failure("e")
-          r3 = nil
+          r13 = nil
         end
-        if r3
-          r0 = r3
+        if r13
+          @index = i12
+          r12 = instantiate_node(SyntaxNode,input, index...index)
         else
+          r12 = nil
+        end
+        s11 << r12
+        if r12
+          r14 = _nt_t_letter
+          s11 << r14
+        end
+        if s11.last
+          r11 = instantiate_node(NT,input, i11...index, s11)
+          r11.extend(DataEditDesc32)
+        else
+          @index = i11
+          r11 = nil
+        end
+        if r11
+          r0 = r11
+        else
+          i15, s15 = index, []
+          i16 = index
           if has_terminal?("g", false, index)
-            r4 = instantiate_node(SyntaxNode,input, index...(index + 1))
+            r17 = instantiate_node(SyntaxNode,input, index...(index + 1))
             @index += 1
           else
             terminal_parse_failure("g")
-            r4 = nil
+            r17 = nil
           end
-          if r4
-            r0 = r4
+          if r17
+            @index = i16
+            r16 = instantiate_node(SyntaxNode,input, index...index)
+          else
+            r16 = nil
+          end
+          s15 << r16
+          if r16
+            r18 = _nt_t_letter
+            s15 << r18
+          end
+          if s15.last
+            r15 = instantiate_node(NT,input, i15...index, s15)
+            r15.extend(DataEditDesc33)
+          else
+            @index = i15
+            r15 = nil
+          end
+          if r15
+            r0 = r15
           else
             @index = i0
             r0 = nil
@@ -8325,6 +8808,64 @@ module Fortran
     end
 
     node_cache[:data_edit_desc_3][start_index] = r0
+
+    r0
+  end
+
+  module DataEditDesc3Option0
+    def t_letter
+      elements[1]
+    end
+
+    def int_literal_constant
+      elements[2]
+    end
+  end
+
+  def _nt_data_edit_desc_3_option
+    start_index = index
+    if node_cache[:data_edit_desc_3_option].has_key?(index)
+      cached = node_cache[:data_edit_desc_3_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    i1 = index
+    if has_terminal?("e", false, index)
+      r2 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      @index += 1
+    else
+      terminal_parse_failure("e")
+      r2 = nil
+    end
+    if r2
+      @index = i1
+      r1 = instantiate_node(SyntaxNode,input, index...index)
+    else
+      r1 = nil
+    end
+    s0 << r1
+    if r1
+      r3 = _nt_t_letter
+      s0 << r3
+      if r3
+        r4 = _nt_int_literal_constant
+        s0 << r4
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(DataEditDesc3Option0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:data_edit_desc_3_option][start_index] = r0
 
     r0
   end
@@ -8507,16 +9048,6 @@ module Fortran
   end
 
   module DataImpliedDo0
-    def t_comma
-      elements[0]
-    end
-
-    def scalar_int_expr
-      elements[1]
-    end
-  end
-
-  module DataImpliedDo1
     def t_paren_l
       elements[0]
     end
@@ -8547,6 +9078,10 @@ module Fortran
 
     def scalar_int_expr2
       elements[7]
+    end
+
+    def data_implied_do_option
+      elements[8]
     end
 
     def t_paren_r
@@ -8590,33 +9125,11 @@ module Fortran
                   r8 = _nt_scalar_int_expr
                   s0 << r8
                   if r8
-                    s9, i9 = [], index
-                    loop do
-                      i10, s10 = index, []
-                      r11 = _nt_t_comma
-                      s10 << r11
-                      if r11
-                        r12 = _nt_scalar_int_expr
-                        s10 << r12
-                      end
-                      if s10.last
-                        r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
-                        r10.extend(DataImpliedDo0)
-                      else
-                        @index = i10
-                        r10 = nil
-                      end
-                      if r10
-                        s9 << r10
-                      else
-                        break
-                      end
-                    end
-                    r9 = instantiate_node(SyntaxNode,input, i9...index, s9)
+                    r9 = _nt_data_implied_do_option
                     s0 << r9
                     if r9
-                      r13 = _nt_t_paren_r
-                      s0 << r13
+                      r10 = _nt_t_paren_r
+                      s0 << r10
                     end
                   end
                 end
@@ -8627,14 +9140,64 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(DataImpliedDo1)
+      r0 = instantiate_node(Data_Implied_Do,input, i0...index, s0)
+      r0.extend(DataImpliedDo0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:data_implied_do][start_index] = r0
+
+    r0
+  end
+
+  module DataImpliedDoOption0
+    def t_comma
+      elements[0]
+    end
+
+    def scalar_int_expr
+      elements[1]
+    end
+  end
+
+  def _nt_data_implied_do_option
+    start_index = index
+    if node_cache[:data_implied_do_option].has_key?(index)
+      cached = node_cache[:data_implied_do_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    s0, i0 = [], index
+    loop do
+      i1, s1 = index, []
+      r2 = _nt_t_comma
+      s1 << r2
+      if r2
+        r3 = _nt_scalar_int_expr
+        s1 << r3
+      end
+      if s1.last
+        r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+        r1.extend(DataImpliedDoOption0)
+      else
+        @index = i1
+        r1 = nil
+      end
+      if r1
+        s0 << r1
+      else
+        break
+      end
+    end
+    r0 = instantiate_node(Data_Implied_Do_Option,input, i0...index, s0)
+
+    node_cache[:data_implied_do_option][start_index] = r0
 
     r0
   end
@@ -9700,6 +10263,10 @@ module Fortran
       elements[1]
     end
 
+    def letter_sequence
+      elements[2]
+    end
+
     def t_dot2
       elements[3]
     end
@@ -9723,30 +10290,16 @@ module Fortran
       r2 = _nt_t_letter
       s0 << r2
       if r2
-        s3, i3 = [], index
-        loop do
-          r4 = _nt_t_letter
-          if r4
-            s3 << r4
-          else
-            break
-          end
-        end
-        if s3.empty?
-          @index = i3
-          r3 = nil
-        else
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-        end
+        r3 = _nt_letter_sequence
         s0 << r3
         if r3
-          r5 = _nt_t_dot
-          s0 << r5
+          r4 = _nt_t_dot
+          s0 << r4
         end
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(DefinedBinaryOp0)
     else
       @index = i0
@@ -9802,6 +10355,10 @@ module Fortran
       elements[2]
     end
 
+    def letter_sequence
+      elements[3]
+    end
+
     def t_dot2
       elements[4]
     end
@@ -9847,31 +10404,17 @@ module Fortran
         r6 = _nt_t_letter
         s0 << r6
         if r6
-          s7, i7 = [], index
-          loop do
-            r8 = _nt_t_letter
-            if r8
-              s7 << r8
-            else
-              break
-            end
-          end
-          if s7.empty?
-            @index = i7
-            r7 = nil
-          else
-            r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
-          end
+          r7 = _nt_letter_sequence
           s0 << r7
           if r7
-            r9 = _nt_t_dot
-            s0 << r9
+            r8 = _nt_t_dot
+            s0 << r8
           end
         end
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(DefinedUnaryOp0)
     else
       @index = i0
@@ -10012,16 +10555,6 @@ module Fortran
   end
 
   module DerivedTypeaccessSpec0
-    def t_comma
-      elements[0]
-    end
-
-    def access_spec
-      elements[1]
-    end
-  end
-
-  module DerivedTypeaccessSpec1
     def double_colon
       elements[1]
     end
@@ -10039,20 +10572,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    i2, s2 = index, []
-    r3 = _nt_t_comma
-    s2 << r3
-    if r3
-      r4 = _nt_access_spec
-      s2 << r4
-    end
-    if s2.last
-      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
-      r2.extend(DerivedTypeaccessSpec0)
-    else
-      @index = i2
-      r2 = nil
-    end
+    r2 = _nt_derived_typeaccess_spec_option
     if r2
       r1 = r2
     else
@@ -10060,18 +10580,59 @@ module Fortran
     end
     s0 << r1
     if r1
-      r5 = _nt_double_colon
-      s0 << r5
+      r3 = _nt_double_colon
+      s0 << r3
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(DerivedTypeaccessSpec1)
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(DerivedTypeaccessSpec0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:derived_typeaccess_spec][start_index] = r0
+
+    r0
+  end
+
+  module DerivedTypeaccessSpecOption0
+    def t_comma
+      elements[0]
+    end
+
+    def access_spec
+      elements[1]
+    end
+  end
+
+  def _nt_derived_typeaccess_spec_option
+    start_index = index
+    if node_cache[:derived_typeaccess_spec_option].has_key?(index)
+      cached = node_cache[:derived_typeaccess_spec_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_access_spec
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(DerivedTypeaccessSpecOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:derived_typeaccess_spec_option][start_index] = r0
 
     r0
   end
@@ -10240,7 +10801,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Directive,input, i0...index, s0)
       r0.extend(Directive0)
     else
       @index = i0
@@ -10471,7 +11032,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(DoConstructNameLabel0)
     else
       @index = i0
@@ -13225,16 +13786,6 @@ module Fortran
   end
 
   module EquivalenceObjectList0
-    def t_comma
-      elements[0]
-    end
-
-    def equivalence_object
-      elements[1]
-    end
-  end
-
-  module EquivalenceObjectList1
     def equivalence_object
       elements[0]
     end
@@ -13256,20 +13807,7 @@ module Fortran
     r1 = _nt_equivalence_object
     s0 << r1
     if r1
-      i3, s3 = index, []
-      r4 = _nt_t_comma
-      s3 << r4
-      if r4
-        r5 = _nt_equivalence_object
-        s3 << r5
-      end
-      if s3.last
-        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-        r3.extend(EquivalenceObjectList0)
-      else
-        @index = i3
-        r3 = nil
-      end
+      r3 = _nt_equivalence_object_list_option
       if r3
         r2 = r3
       else
@@ -13278,14 +13816,55 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(EquivalenceObjectList1)
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(EquivalenceObjectList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:equivalence_object_list][start_index] = r0
+
+    r0
+  end
+
+  module EquivalenceObjectListOption0
+    def t_comma
+      elements[0]
+    end
+
+    def equivalence_object
+      elements[1]
+    end
+  end
+
+  def _nt_equivalence_object_list_option
+    start_index = index
+    if node_cache[:equivalence_object_list_option].has_key?(index)
+      cached = node_cache[:equivalence_object_list_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_equivalence_object
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(EquivalenceObjectListOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:equivalence_object_list_option][start_index] = r0
 
     r0
   end
@@ -14549,16 +15128,6 @@ module Fortran
   end
 
   module FormatItemList0
-    def t_comma
-      elements[0]
-    end
-
-    def format_item
-      elements[1]
-    end
-  end
-
-  module FormatItemList1
     def format_item
       elements[0]
     end
@@ -14582,20 +15151,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_format_item
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(FormatItemList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_format_item_list_option
         if r3
           s2 << r3
         else
@@ -14606,14 +15162,55 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(FormatItemList1)
+      r0 = instantiate_node(Format_Item_List,input, i0...index, s0)
+      r0.extend(FormatItemList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:format_item_list][start_index] = r0
+
+    r0
+  end
+
+  module FormatItemListOption0
+    def t_comma
+      elements[0]
+    end
+
+    def format_item
+      elements[1]
+    end
+  end
+
+  def _nt_format_item_list_option
+    start_index = index
+    if node_cache[:format_item_list_option].has_key?(index)
+      cached = node_cache[:format_item_list_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_format_item
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(FormatItemListOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:format_item_list_option][start_index] = r0
 
     r0
   end
@@ -14660,7 +15257,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Format_Specification,input, i0...index, s0)
       r0.extend(FormatSpecification0)
     else
       @index = i0
@@ -15405,6 +16002,18 @@ module Fortran
   end
 
   module HexConstant0
+    def t_letter
+      elements[1]
+    end
+  end
+
+  module HexConstant1
+    def t_letter
+      elements[1]
+    end
+  end
+
+  module HexConstant2
     def t_apostrophe1
       elements[0]
     end
@@ -15414,7 +16023,7 @@ module Fortran
     end
   end
 
-  module HexConstant1
+  module HexConstant3
     def t_quotemark1
       elements[0]
     end
@@ -15424,7 +16033,7 @@ module Fortran
     end
   end
 
-  module HexConstant2
+  module HexConstant4
   end
 
   def _nt_hex_constant
@@ -15440,25 +16049,65 @@ module Fortran
 
     i0, s0 = index, []
     i1 = index
+    i2, s2 = index, []
+    i3 = index
     if has_terminal?("z", false, index)
-      r2 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      r4 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("z")
+      r4 = nil
+    end
+    if r4
+      @index = i3
+      r3 = instantiate_node(SyntaxNode,input, index...index)
+    else
+      r3 = nil
+    end
+    s2 << r3
+    if r3
+      r5 = _nt_t_letter
+      s2 << r5
+    end
+    if s2.last
+      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+      r2.extend(HexConstant0)
+    else
+      @index = i2
       r2 = nil
     end
     if r2
       r1 = r2
     else
+      i6, s6 = index, []
+      i7 = index
       if has_terminal?("x", false, index)
-        r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        r8 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("x")
-        r3 = nil
+        r8 = nil
       end
-      if r3
-        r1 = r3
+      if r8
+        @index = i7
+        r7 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r7 = nil
+      end
+      s6 << r7
+      if r7
+        r9 = _nt_t_letter
+        s6 << r9
+      end
+      if s6.last
+        r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
+        r6.extend(HexConstant1)
+      else
+        @index = i6
+        r6 = nil
+      end
+      if r6
+        r1 = r6
       else
         @index = i1
         r1 = nil
@@ -15466,86 +16115,86 @@ module Fortran
     end
     s0 << r1
     if r1
-      i4 = index
-      i5, s5 = index, []
-      r6 = _nt_t_apostrophe
-      s5 << r6
-      if r6
-        s7, i7 = [], index
+      i10 = index
+      i11, s11 = index, []
+      r12 = _nt_t_apostrophe
+      s11 << r12
+      if r12
+        s13, i13 = [], index
         loop do
-          r8 = _nt_hex_digit
-          if r8
-            s7 << r8
+          r14 = _nt_hex_digit
+          if r14
+            s13 << r14
           else
             break
           end
         end
-        if s7.empty?
-          @index = i7
-          r7 = nil
+        if s13.empty?
+          @index = i13
+          r13 = nil
         else
-          r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
+          r13 = instantiate_node(SyntaxNode,input, i13...index, s13)
         end
-        s5 << r7
-        if r7
-          r9 = _nt_t_apostrophe
-          s5 << r9
+        s11 << r13
+        if r13
+          r15 = _nt_t_apostrophe
+          s11 << r15
         end
       end
-      if s5.last
-        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
-        r5.extend(HexConstant0)
+      if s11.last
+        r11 = instantiate_node(SyntaxNode,input, i11...index, s11)
+        r11.extend(HexConstant2)
       else
-        @index = i5
-        r5 = nil
+        @index = i11
+        r11 = nil
       end
-      if r5
-        r4 = r5
+      if r11
+        r10 = r11
       else
-        i10, s10 = index, []
-        r11 = _nt_t_quotemark
-        s10 << r11
-        if r11
-          s12, i12 = [], index
+        i16, s16 = index, []
+        r17 = _nt_t_quotemark
+        s16 << r17
+        if r17
+          s18, i18 = [], index
           loop do
-            r13 = _nt_hex_digit
-            if r13
-              s12 << r13
+            r19 = _nt_hex_digit
+            if r19
+              s18 << r19
             else
               break
             end
           end
-          if s12.empty?
-            @index = i12
-            r12 = nil
+          if s18.empty?
+            @index = i18
+            r18 = nil
           else
-            r12 = instantiate_node(SyntaxNode,input, i12...index, s12)
+            r18 = instantiate_node(SyntaxNode,input, i18...index, s18)
           end
-          s10 << r12
-          if r12
-            r14 = _nt_t_quotemark
-            s10 << r14
+          s16 << r18
+          if r18
+            r20 = _nt_t_quotemark
+            s16 << r20
           end
         end
-        if s10.last
-          r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
-          r10.extend(HexConstant1)
+        if s16.last
+          r16 = instantiate_node(SyntaxNode,input, i16...index, s16)
+          r16.extend(HexConstant3)
+        else
+          @index = i16
+          r16 = nil
+        end
+        if r16
+          r10 = r16
         else
           @index = i10
           r10 = nil
         end
-        if r10
-          r4 = r10
-        else
-          @index = i4
-          r4 = nil
-        end
       end
-      s0 << r4
+      s0 << r10
     end
     if s0.last
       r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(HexConstant2)
+      r0.extend(HexConstant4)
     else
       @index = i0
       r0 = nil
@@ -15584,8 +16233,12 @@ module Fortran
       elements[0]
     end
 
+    def t_letter
+      elements[2]
+    end
+
     def hollerith_string
-      elements[3]
+      elements[4]
     end
   end
 
@@ -15604,27 +16257,38 @@ module Fortran
     r1 = _nt_digit_string
     s0 << r1
     if r1
+      i2 = index
       if has_terminal?("h", false, index)
-        r2 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("h")
+        r3 = nil
+      end
+      if r3
+        @index = i2
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      else
         r2 = nil
       end
       s0 << r2
       if r2
-        i3 = index
-        r4 = lambda { |e| sp_hollerith_set_length(e[0]) }.call(s0)
+        r4 = _nt_t_letter
+        s0 << r4
         if r4
-          @index = i3
-          r3 = instantiate_node(SyntaxNode,input, index...index)
-        else
-          r3 = nil
-        end
-        s0 << r3
-        if r3
-          r5 = _nt_hollerith_string
+          i5 = index
+          r6 = lambda { |e| sp_hollerith_set_length(e[0]) }.call(s0)
+          if r6
+            @index = i5
+            r5 = instantiate_node(SyntaxNode,input, index...index)
+          else
+            r5 = nil
+          end
           s0 << r5
+          if r5
+            r7 = _nt_hollerith_string
+            s0 << r7
+          end
         end
       end
     end
@@ -21279,6 +21943,38 @@ module Fortran
     r0
   end
 
+  def _nt_letter_sequence
+    start_index = index
+    if node_cache[:letter_sequence].has_key?(index)
+      cached = node_cache[:letter_sequence][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    s0, i0 = [], index
+    loop do
+      r1 = _nt_t_letter
+      if r1
+        s0 << r1
+      else
+        break
+      end
+    end
+    if s0.empty?
+      @index = i0
+      r0 = nil
+    else
+      r0 = instantiate_node(Letter_Sequence,input, i0...index, s0)
+    end
+
+    node_cache[:letter_sequence][start_index] = r0
+
+    r0
+  end
+
   module LetterSpec0
     def t_minus
       elements[0]
@@ -23904,6 +24600,10 @@ module Fortran
   end
 
   module OctalConstant2
+    def t_letter
+      elements[1]
+    end
+
   end
 
   def _nt_octal_constant
@@ -23918,91 +24618,102 @@ module Fortran
     end
 
     i0, s0 = index, []
+    i1 = index
     if has_terminal?("o", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      r2 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("o")
+      r2 = nil
+    end
+    if r2
+      @index = i1
+      r1 = instantiate_node(SyntaxNode,input, index...index)
+    else
       r1 = nil
     end
     s0 << r1
     if r1
-      i2 = index
-      i3, s3 = index, []
-      r4 = _nt_t_apostrophe
-      s3 << r4
-      if r4
-        s5, i5 = [], index
-        loop do
-          r6 = _nt_t_octal
-          if r6
-            s5 << r6
-          else
-            break
-          end
-        end
-        if s5.empty?
-          @index = i5
-          r5 = nil
-        else
-          r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
-        end
-        s3 << r5
-        if r5
-          r7 = _nt_t_apostrophe
-          s3 << r7
-        end
-      end
-      if s3.last
-        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-        r3.extend(OctalConstant0)
-      else
-        @index = i3
-        r3 = nil
-      end
+      r3 = _nt_t_letter
+      s0 << r3
       if r3
-        r2 = r3
-      else
-        i8, s8 = index, []
-        r9 = _nt_t_quotemark
-        s8 << r9
-        if r9
-          s10, i10 = [], index
+        i4 = index
+        i5, s5 = index, []
+        r6 = _nt_t_apostrophe
+        s5 << r6
+        if r6
+          s7, i7 = [], index
           loop do
-            r11 = _nt_t_octal
-            if r11
-              s10 << r11
+            r8 = _nt_t_octal
+            if r8
+              s7 << r8
             else
               break
             end
           end
-          if s10.empty?
+          if s7.empty?
+            @index = i7
+            r7 = nil
+          else
+            r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
+          end
+          s5 << r7
+          if r7
+            r9 = _nt_t_apostrophe
+            s5 << r9
+          end
+        end
+        if s5.last
+          r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+          r5.extend(OctalConstant0)
+        else
+          @index = i5
+          r5 = nil
+        end
+        if r5
+          r4 = r5
+        else
+          i10, s10 = index, []
+          r11 = _nt_t_quotemark
+          s10 << r11
+          if r11
+            s12, i12 = [], index
+            loop do
+              r13 = _nt_t_octal
+              if r13
+                s12 << r13
+              else
+                break
+              end
+            end
+            if s12.empty?
+              @index = i12
+              r12 = nil
+            else
+              r12 = instantiate_node(SyntaxNode,input, i12...index, s12)
+            end
+            s10 << r12
+            if r12
+              r14 = _nt_t_quotemark
+              s10 << r14
+            end
+          end
+          if s10.last
+            r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
+            r10.extend(OctalConstant1)
+          else
             @index = i10
             r10 = nil
-          else
-            r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
           end
-          s8 << r10
           if r10
-            r12 = _nt_t_quotemark
-            s8 << r12
+            r4 = r10
+          else
+            @index = i4
+            r4 = nil
           end
         end
-        if s8.last
-          r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
-          r8.extend(OctalConstant1)
-        else
-          @index = i8
-          r8 = nil
-        end
-        if r8
-          r2 = r8
-        else
-          @index = i2
-          r2 = nil
-        end
+        s0 << r4
       end
-      s0 << r2
     end
     if s0.last
       r0 = instantiate_node(T,input, i0...index, s0)
@@ -25430,20 +26141,40 @@ module Fortran
   end
 
   module PositionEditDesc0
-    def int_literal_constant
+    def t_letter1
       elements[1]
+    end
+
+    def t_letter2
+      elements[2]
+    end
+
+    def int_literal_constant
+      elements[3]
     end
   end
 
   module PositionEditDesc1
-    def int_literal_constant
+    def t_letter1
       elements[1]
+    end
+
+    def t_letter2
+      elements[2]
+    end
+
+    def int_literal_constant
+      elements[3]
     end
   end
 
   module PositionEditDesc2
-    def int_literal_constant
+    def t_letter
       elements[1]
+    end
+
+    def int_literal_constant
+      elements[2]
     end
   end
 
@@ -25452,6 +26183,9 @@ module Fortran
       elements[0]
     end
 
+    def t_letter
+      elements[2]
+    end
   end
 
   def _nt_position_edit_desc
@@ -25467,17 +26201,32 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
+    i2 = index
     if has_terminal?("tl", false, index)
-      r2 = instantiate_node(SyntaxNode,input, index...(index + 2))
+      r3 = instantiate_node(SyntaxNode,input, index...(index + 2))
       @index += 2
     else
       terminal_parse_failure("tl")
+      r3 = nil
+    end
+    if r3
+      @index = i2
+      r2 = instantiate_node(SyntaxNode,input, index...index)
+    else
       r2 = nil
     end
     s1 << r2
     if r2
-      r3 = _nt_int_literal_constant
-      s1 << r3
+      r4 = _nt_t_letter
+      s1 << r4
+      if r4
+        r5 = _nt_t_letter
+        s1 << r5
+        if r5
+          r6 = _nt_int_literal_constant
+          s1 << r6
+        end
+      end
     end
     if s1.last
       r1 = instantiate_node(NT,input, i1...index, s1)
@@ -25489,74 +26238,111 @@ module Fortran
     if r1
       r0 = r1
     else
-      i4, s4 = index, []
+      i7, s7 = index, []
+      i8 = index
       if has_terminal?("tr", false, index)
-        r5 = instantiate_node(SyntaxNode,input, index...(index + 2))
+        r9 = instantiate_node(SyntaxNode,input, index...(index + 2))
         @index += 2
       else
         terminal_parse_failure("tr")
-        r5 = nil
+        r9 = nil
       end
-      s4 << r5
-      if r5
-        r6 = _nt_int_literal_constant
-        s4 << r6
-      end
-      if s4.last
-        r4 = instantiate_node(NT,input, i4...index, s4)
-        r4.extend(PositionEditDesc1)
+      if r9
+        @index = i8
+        r8 = instantiate_node(SyntaxNode,input, index...index)
       else
-        @index = i4
-        r4 = nil
+        r8 = nil
       end
-      if r4
-        r0 = r4
+      s7 << r8
+      if r8
+        r10 = _nt_t_letter
+        s7 << r10
+        if r10
+          r11 = _nt_t_letter
+          s7 << r11
+          if r11
+            r12 = _nt_int_literal_constant
+            s7 << r12
+          end
+        end
+      end
+      if s7.last
+        r7 = instantiate_node(NT,input, i7...index, s7)
+        r7.extend(PositionEditDesc1)
       else
-        i7, s7 = index, []
+        @index = i7
+        r7 = nil
+      end
+      if r7
+        r0 = r7
+      else
+        i13, s13 = index, []
+        i14 = index
         if has_terminal?("t", false, index)
-          r8 = instantiate_node(SyntaxNode,input, index...(index + 1))
+          r15 = instantiate_node(SyntaxNode,input, index...(index + 1))
           @index += 1
         else
           terminal_parse_failure("t")
-          r8 = nil
+          r15 = nil
         end
-        s7 << r8
-        if r8
-          r9 = _nt_int_literal_constant
-          s7 << r9
-        end
-        if s7.last
-          r7 = instantiate_node(NT,input, i7...index, s7)
-          r7.extend(PositionEditDesc2)
+        if r15
+          @index = i14
+          r14 = instantiate_node(SyntaxNode,input, index...index)
         else
-          @index = i7
-          r7 = nil
+          r14 = nil
         end
-        if r7
-          r0 = r7
+        s13 << r14
+        if r14
+          r16 = _nt_t_letter
+          s13 << r16
+          if r16
+            r17 = _nt_int_literal_constant
+            s13 << r17
+          end
+        end
+        if s13.last
+          r13 = instantiate_node(NT,input, i13...index, s13)
+          r13.extend(PositionEditDesc2)
         else
-          i10, s10 = index, []
-          r11 = _nt_int_literal_constant
-          s10 << r11
-          if r11
+          @index = i13
+          r13 = nil
+        end
+        if r13
+          r0 = r13
+        else
+          i18, s18 = index, []
+          r19 = _nt_int_literal_constant
+          s18 << r19
+          if r19
+            i20 = index
             if has_terminal?("x", false, index)
-              r12 = instantiate_node(SyntaxNode,input, index...(index + 1))
+              r21 = instantiate_node(SyntaxNode,input, index...(index + 1))
               @index += 1
             else
               terminal_parse_failure("x")
-              r12 = nil
+              r21 = nil
             end
-            s10 << r12
+            if r21
+              @index = i20
+              r20 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r20 = nil
+            end
+            s18 << r20
+            if r20
+              r22 = _nt_t_letter
+              s18 << r22
+            end
           end
-          if s10.last
-            r10 = instantiate_node(NT,input, i10...index, s10)
-            r10.extend(PositionEditDesc3)
+          if s18.last
+            r18 = instantiate_node(NT,input, i18...index, s18)
+            r18.extend(PositionEditDesc3)
           else
-            @index = i10
-            r10 = nil
+            @index = i18
+            r18 = nil
           end
-          if r10
-            r0 = r10
+          if r18
+            r0 = r18
           else
             @index = i0
             r0 = nil
@@ -28634,6 +29420,32 @@ module Fortran
     r0
   end
 
+  module SignEditDesc0
+    def t_letter1
+      elements[1]
+    end
+
+    def t_letter2
+      elements[2]
+    end
+  end
+
+  module SignEditDesc1
+    def t_letter1
+      elements[1]
+    end
+
+    def t_letter2
+      elements[2]
+    end
+  end
+
+  module SignEditDesc2
+    def t_letter
+      elements[1]
+    end
+  end
+
   def _nt_sign_edit_desc
     start_index = index
     if node_cache[:sign_edit_desc].has_key?(index)
@@ -28646,35 +29458,103 @@ module Fortran
     end
 
     i0 = index
+    i1, s1 = index, []
+    i2 = index
     if has_terminal?("sp", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 2))
+      r3 = instantiate_node(SyntaxNode,input, index...(index + 2))
       @index += 2
     else
       terminal_parse_failure("sp")
+      r3 = nil
+    end
+    if r3
+      @index = i2
+      r2 = instantiate_node(SyntaxNode,input, index...index)
+    else
+      r2 = nil
+    end
+    s1 << r2
+    if r2
+      r4 = _nt_t_letter
+      s1 << r4
+      if r4
+        r5 = _nt_t_letter
+        s1 << r5
+      end
+    end
+    if s1.last
+      r1 = instantiate_node(NT,input, i1...index, s1)
+      r1.extend(SignEditDesc0)
+    else
+      @index = i1
       r1 = nil
     end
     if r1
       r0 = r1
     else
+      i6, s6 = index, []
+      i7 = index
       if has_terminal?("ss", false, index)
-        r2 = instantiate_node(SyntaxNode,input, index...(index + 2))
+        r8 = instantiate_node(SyntaxNode,input, index...(index + 2))
         @index += 2
       else
         terminal_parse_failure("ss")
-        r2 = nil
+        r8 = nil
       end
-      if r2
-        r0 = r2
+      if r8
+        @index = i7
+        r7 = instantiate_node(SyntaxNode,input, index...index)
       else
+        r7 = nil
+      end
+      s6 << r7
+      if r7
+        r9 = _nt_t_letter
+        s6 << r9
+        if r9
+          r10 = _nt_t_letter
+          s6 << r10
+        end
+      end
+      if s6.last
+        r6 = instantiate_node(NT,input, i6...index, s6)
+        r6.extend(SignEditDesc1)
+      else
+        @index = i6
+        r6 = nil
+      end
+      if r6
+        r0 = r6
+      else
+        i11, s11 = index, []
+        i12 = index
         if has_terminal?("s", false, index)
-          r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
+          r13 = instantiate_node(SyntaxNode,input, index...(index + 1))
           @index += 1
         else
           terminal_parse_failure("s")
-          r3 = nil
+          r13 = nil
         end
-        if r3
-          r0 = r3
+        if r13
+          @index = i12
+          r12 = instantiate_node(SyntaxNode,input, index...index)
+        else
+          r12 = nil
+        end
+        s11 << r12
+        if r12
+          r14 = _nt_t_letter
+          s11 << r14
+        end
+        if s11.last
+          r11 = instantiate_node(NT,input, i11...index, s11)
+          r11.extend(SignEditDesc2)
+        else
+          @index = i11
+          r11 = nil
+        end
+        if r11
+          r0 = r11
         else
           @index = i0
           r0 = nil
