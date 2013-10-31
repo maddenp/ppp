@@ -1600,6 +1600,14 @@ module Fortran
 
   end
 
+  class Binary_Constant < NT
+
+    def str0
+      "b"+"#{e[1]}"+e[2].e.reduce("") { |m,x| m+="#{x}" }+"#{e[3]}"
+    end
+
+  end
+
   class Block_Data < Scoping_Unit
   end
 
@@ -1642,6 +1650,14 @@ module Fortran
   end
 
   class Case_Value_Range_List < List
+  end
+
+  class Char_Literal_Constant_Quoted < NT
+
+    def str0
+      "#{e[0]}"+e[1].e.reduce("") { |m,x| m+="#{x.e[1]}" }+"#{e[2]}"
+    end
+
   end
 
   class Close_Spec_List < Io_Spec_List
@@ -1835,6 +1851,14 @@ module Fortran
       s=indent(strmemo)
       block_right
       s
+    end
+
+  end
+
+  class Digit < NT
+
+    def str0
+      e.reduce("") { |m,x| m+="#{x}" }
     end
 
   end

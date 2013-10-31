@@ -386,7 +386,8 @@ grammar Fortran
   rule binary_constant
     # F90:R408
 
-    "b" ( ( t_apostrophe t_binary+ t_apostrophe ) / ( t_quotemark t_binary+ t_quotemark ) ) <T>
+    "b" t_apostrophe t_binary+ t_apostrophe <Binary_Constant> /
+    "b" t_quotemark t_binary+ t_quotemark <Binary_Constant>
   end
 
   rule blank_interp_edit_desc
@@ -538,16 +539,20 @@ grammar Fortran
   rule char_literal_constant
     # F90:R420
 
-    ( kind_param t_underscore )? char_literal_constant_sq <T> /
-    ( kind_param t_underscore )? char_literal_constant_dq <T>
+    char_literal_constant_prefix? char_literal_constant_sq <NT> /
+    char_literal_constant_prefix? char_literal_constant_dq <NT>
   end
 
   rule char_literal_constant_dq
-    t_quotemark ( !t_quotemark rep_char )* t_quotemark <T>
+    t_quotemark ( !t_quotemark rep_char )* t_quotemark <Char_Literal_Constant_Quoted>
+  end
+
+  rule char_literal_constant_prefix
+    kind_param t_underscore <NT>
   end
 
   rule char_literal_constant_sq
-    t_apostrophe ( !t_apostrophe rep_char )* t_apostrophe <T>
+    t_apostrophe ( !t_apostrophe rep_char )* t_apostrophe <Char_Literal_Constant_Quoted>
   end
 
   rule char_selector
@@ -1014,7 +1019,7 @@ grammar Fortran
   rule digit_string
     # F90:R402
 
-    t_digit+ <T>
+    t_digit+ <Digit>
   end
 
   rule dimension_stmt
@@ -1825,8 +1830,11 @@ grammar Fortran
 
   rule int_literal_constant
     # F90:R404
+    #
+    # Note: The negative lookahead here prevents, for example, the the 1 in the
+    # text 1_"a" (a char_literal_constant) from being matched.
 
-    digit_string ( t_underscore kind_param )? <T>
+    digit_string !( t_underscore ( t_apostrophe / t_quotemark ) ) kind_option? <NT>
   end
 
   rule int_variable
@@ -2109,6 +2117,10 @@ grammar Fortran
     t_kind t_equal <NT>
   end
 
+  rule kind_option
+    t_underscore kind_param <NT>
+  end
+
   rule kind_param
     # F90:R405
 
@@ -2272,7 +2284,7 @@ grammar Fortran
   rule logical_literal_constant
     # F90:R421
 
-    ( t_true / t_false ) ( t_underscore kind_param )? <T>
+    ( t_true / t_false ) kind_option? <T>
   end
 
   rule logical_op
@@ -2759,8 +2771,8 @@ grammar Fortran
   rule real_literal_constant
     # F90:R413
 
-    significand ( exponent_letter exponent )? ( t_underscore kind_param )? <T> /
-    digit_string exponent_letter exponent ( t_underscore kind_param )? <T>
+    significand ( exponent_letter exponent )? kind_option? <T> /
+    digit_string exponent_letter exponent kind_option? <T>
   end
 
   rule real_part
@@ -2833,7 +2845,7 @@ grammar Fortran
     # F90:4.3.2.1 (processor-dependent). Also see F90:3.1.5.
 
     character /
-    [\[\]\~\`\@\#\^\|\{\}\\]
+    [\[\]\~\`\@\#\^\|\{\}\\] <T>
   end
 
   rule result_name
@@ -3099,7 +3111,7 @@ grammar Fortran
   rule special_character
     # F90:3.1.4
 
-    [\ \=\+\-\*\/\(\)\,\.\'\:\!\"\%\&\;\<\>\?\$]
+    [\ \=\+\-\*\/\(\)\,\.\'\:\!\"\%\&\;\<\>\?\$] <T>
   end
 
   rule specification_expr

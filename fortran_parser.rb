@@ -3652,25 +3652,22 @@ module Fortran
 
   module BinaryConstant0
     def t_apostrophe1
-      elements[0]
+      elements[1]
     end
 
     def t_apostrophe2
-      elements[2]
+      elements[3]
     end
   end
 
   module BinaryConstant1
     def t_quotemark1
-      elements[0]
+      elements[1]
     end
 
     def t_quotemark2
-      elements[2]
+      elements[3]
     end
-  end
-
-  module BinaryConstant2
   end
 
   def _nt_binary_constant
@@ -3684,55 +3681,64 @@ module Fortran
       return cached
     end
 
-    i0, s0 = index, []
+    i0 = index
+    i1, s1 = index, []
     if has_terminal?("b", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      r2 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("b")
-      r1 = nil
+      r2 = nil
     end
-    s0 << r1
-    if r1
-      i2 = index
-      i3, s3 = index, []
-      r4 = _nt_t_apostrophe
-      s3 << r4
-      if r4
-        s5, i5 = [], index
+    s1 << r2
+    if r2
+      r3 = _nt_t_apostrophe
+      s1 << r3
+      if r3
+        s4, i4 = [], index
         loop do
-          r6 = _nt_t_binary
-          if r6
-            s5 << r6
+          r5 = _nt_t_binary
+          if r5
+            s4 << r5
           else
             break
           end
         end
-        if s5.empty?
-          @index = i5
-          r5 = nil
+        if s4.empty?
+          @index = i4
+          r4 = nil
         else
-          r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+          r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
         end
-        s3 << r5
-        if r5
-          r7 = _nt_t_apostrophe
-          s3 << r7
+        s1 << r4
+        if r4
+          r6 = _nt_t_apostrophe
+          s1 << r6
         end
       end
-      if s3.last
-        r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-        r3.extend(BinaryConstant0)
+    end
+    if s1.last
+      r1 = instantiate_node(Binary_Constant,input, i1...index, s1)
+      r1.extend(BinaryConstant0)
+    else
+      @index = i1
+      r1 = nil
+    end
+    if r1
+      r0 = r1
+    else
+      i7, s7 = index, []
+      if has_terminal?("b", false, index)
+        r8 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        @index += 1
       else
-        @index = i3
-        r3 = nil
+        terminal_parse_failure("b")
+        r8 = nil
       end
-      if r3
-        r2 = r3
-      else
-        i8, s8 = index, []
+      s7 << r8
+      if r8
         r9 = _nt_t_quotemark
-        s8 << r9
+        s7 << r9
         if r9
           s10, i10 = [], index
           loop do
@@ -3749,34 +3755,26 @@ module Fortran
           else
             r10 = instantiate_node(SyntaxNode,input, i10...index, s10)
           end
-          s8 << r10
+          s7 << r10
           if r10
             r12 = _nt_t_quotemark
-            s8 << r12
+            s7 << r12
           end
         end
-        if s8.last
-          r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
-          r8.extend(BinaryConstant1)
-        else
-          @index = i8
-          r8 = nil
-        end
-        if r8
-          r2 = r8
-        else
-          @index = i2
-          r2 = nil
-        end
       end
-      s0 << r2
-    end
-    if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(BinaryConstant2)
-    else
-      @index = i0
-      r0 = nil
+      if s7.last
+        r7 = instantiate_node(Binary_Constant,input, i7...index, s7)
+        r7.extend(BinaryConstant1)
+      else
+        @index = i7
+        r7 = nil
+      end
+      if r7
+        r0 = r7
+      else
+        @index = i0
+        r0 = nil
+      end
     end
 
     node_cache[:binary_constant][start_index] = r0
@@ -4947,32 +4945,12 @@ module Fortran
   end
 
   module CharLiteralConstant0
-    def kind_param
-      elements[0]
-    end
-
-    def t_underscore
-      elements[1]
-    end
-  end
-
-  module CharLiteralConstant1
     def char_literal_constant_sq
       elements[1]
     end
   end
 
-  module CharLiteralConstant2
-    def kind_param
-      elements[0]
-    end
-
-    def t_underscore
-      elements[1]
-    end
-  end
-
-  module CharLiteralConstant3
+  module CharLiteralConstant1
     def char_literal_constant_dq
       elements[1]
     end
@@ -4991,20 +4969,7 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
-    i3, s3 = index, []
-    r4 = _nt_kind_param
-    s3 << r4
-    if r4
-      r5 = _nt_t_underscore
-      s3 << r5
-    end
-    if s3.last
-      r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-      r3.extend(CharLiteralConstant0)
-    else
-      @index = i3
-      r3 = nil
-    end
+    r3 = _nt_char_literal_constant_prefix
     if r3
       r2 = r3
     else
@@ -5012,12 +4977,12 @@ module Fortran
     end
     s1 << r2
     if r2
-      r6 = _nt_char_literal_constant_sq
-      s1 << r6
+      r4 = _nt_char_literal_constant_sq
+      s1 << r4
     end
     if s1.last
-      r1 = instantiate_node(T,input, i1...index, s1)
-      r1.extend(CharLiteralConstant1)
+      r1 = instantiate_node(NT,input, i1...index, s1)
+      r1.extend(CharLiteralConstant0)
     else
       @index = i1
       r1 = nil
@@ -5025,40 +4990,27 @@ module Fortran
     if r1
       r0 = r1
     else
-      i7, s7 = index, []
-      i9, s9 = index, []
-      r10 = _nt_kind_param
-      s9 << r10
-      if r10
-        r11 = _nt_t_underscore
-        s9 << r11
-      end
-      if s9.last
-        r9 = instantiate_node(SyntaxNode,input, i9...index, s9)
-        r9.extend(CharLiteralConstant2)
-      else
-        @index = i9
-        r9 = nil
-      end
-      if r9
-        r8 = r9
-      else
-        r8 = instantiate_node(SyntaxNode,input, index...index)
-      end
-      s7 << r8
-      if r8
-        r12 = _nt_char_literal_constant_dq
-        s7 << r12
-      end
-      if s7.last
-        r7 = instantiate_node(T,input, i7...index, s7)
-        r7.extend(CharLiteralConstant3)
-      else
-        @index = i7
-        r7 = nil
-      end
+      i5, s5 = index, []
+      r7 = _nt_char_literal_constant_prefix
       if r7
-        r0 = r7
+        r6 = r7
+      else
+        r6 = instantiate_node(SyntaxNode,input, index...index)
+      end
+      s5 << r6
+      if r6
+        r8 = _nt_char_literal_constant_dq
+        s5 << r8
+      end
+      if s5.last
+        r5 = instantiate_node(NT,input, i5...index, s5)
+        r5.extend(CharLiteralConstant1)
+      else
+        @index = i5
+        r5 = nil
+      end
+      if r5
+        r0 = r5
       else
         @index = i0
         r0 = nil
@@ -5138,7 +5090,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Char_Literal_Constant_Quoted,input, i0...index, s0)
       r0.extend(CharLiteralConstantDq1)
     else
       @index = i0
@@ -5146,6 +5098,47 @@ module Fortran
     end
 
     node_cache[:char_literal_constant_dq][start_index] = r0
+
+    r0
+  end
+
+  module CharLiteralConstantPrefix0
+    def kind_param
+      elements[0]
+    end
+
+    def t_underscore
+      elements[1]
+    end
+  end
+
+  def _nt_char_literal_constant_prefix
+    start_index = index
+    if node_cache[:char_literal_constant_prefix].has_key?(index)
+      cached = node_cache[:char_literal_constant_prefix][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_kind_param
+    s0 << r1
+    if r1
+      r2 = _nt_t_underscore
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(CharLiteralConstantPrefix0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:char_literal_constant_prefix][start_index] = r0
 
     r0
   end
@@ -5218,7 +5211,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Char_Literal_Constant_Quoted,input, i0...index, s0)
       r0.extend(CharLiteralConstantSq1)
     else
       @index = i0
@@ -10107,7 +10100,7 @@ module Fortran
       @index = i0
       r0 = nil
     else
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(Digit,input, i0...index, s0)
     end
 
     node_cache[:digit_string][start_index] = r0
@@ -17300,9 +17293,6 @@ module Fortran
       elements[0]
     end
 
-    def kind_param
-      elements[1]
-    end
   end
 
   module IntLiteralConstant1
@@ -17327,11 +17317,24 @@ module Fortran
     r1 = _nt_digit_string
     s0 << r1
     if r1
+      i2 = index
       i3, s3 = index, []
       r4 = _nt_t_underscore
       s3 << r4
       if r4
-        r5 = _nt_kind_param
+        i5 = index
+        r6 = _nt_t_apostrophe
+        if r6
+          r5 = r6
+        else
+          r7 = _nt_t_quotemark
+          if r7
+            r5 = r7
+          else
+            @index = i5
+            r5 = nil
+          end
+        end
         s3 << r5
       end
       if s3.last
@@ -17342,14 +17345,24 @@ module Fortran
         r3 = nil
       end
       if r3
-        r2 = r3
+        r2 = nil
       else
+        @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
       s0 << r2
+      if r2
+        r9 = _nt_kind_option
+        if r9
+          r8 = r9
+        else
+          r8 = instantiate_node(SyntaxNode,input, index...index)
+        end
+        s0 << r8
+      end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(NT,input, i0...index, s0)
       r0.extend(IntLiteralConstant1)
     else
       @index = i0
@@ -20511,6 +20524,47 @@ module Fortran
     r0
   end
 
+  module KindOption0
+    def t_underscore
+      elements[0]
+    end
+
+    def kind_param
+      elements[1]
+    end
+  end
+
+  def _nt_kind_option
+    start_index = index
+    if node_cache[:kind_option].has_key?(index)
+      cached = node_cache[:kind_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_underscore
+    s0 << r1
+    if r1
+      r2 = _nt_kind_param
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0.extend(KindOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:kind_option][start_index] = r0
+
+    r0
+  end
+
   def _nt_kind_param
     start_index = index
     if node_cache[:kind_param].has_key?(index)
@@ -21838,16 +21892,6 @@ module Fortran
   end
 
   module LogicalLiteralConstant0
-    def t_underscore
-      elements[0]
-    end
-
-    def kind_param
-      elements[1]
-    end
-  end
-
-  module LogicalLiteralConstant1
   end
 
   def _nt_logical_literal_constant
@@ -21877,20 +21921,7 @@ module Fortran
     end
     s0 << r1
     if r1
-      i5, s5 = index, []
-      r6 = _nt_t_underscore
-      s5 << r6
-      if r6
-        r7 = _nt_kind_param
-        s5 << r7
-      end
-      if s5.last
-        r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
-        r5.extend(LogicalLiteralConstant0)
-      else
-        @index = i5
-        r5 = nil
-      end
+      r5 = _nt_kind_option
       if r5
         r4 = r5
       else
@@ -21900,7 +21931,7 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(LogicalLiteralConstant1)
+      r0.extend(LogicalLiteralConstant0)
     else
       @index = i0
       r0 = nil
@@ -26635,33 +26666,13 @@ module Fortran
   end
 
   module RealLiteralConstant1
-    def t_underscore
-      elements[0]
-    end
-
-    def kind_param
-      elements[1]
-    end
-  end
-
-  module RealLiteralConstant2
     def significand
       elements[0]
     end
 
   end
 
-  module RealLiteralConstant3
-    def t_underscore
-      elements[0]
-    end
-
-    def kind_param
-      elements[1]
-    end
-  end
-
-  module RealLiteralConstant4
+  module RealLiteralConstant2
     def digit_string
       elements[0]
     end
@@ -26713,20 +26724,7 @@ module Fortran
       end
       s1 << r3
       if r3
-        i8, s8 = index, []
-        r9 = _nt_t_underscore
-        s8 << r9
-        if r9
-          r10 = _nt_kind_param
-          s8 << r10
-        end
-        if s8.last
-          r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
-          r8.extend(RealLiteralConstant1)
-        else
-          @index = i8
-          r8 = nil
-        end
+        r8 = _nt_kind_option
         if r8
           r7 = r8
         else
@@ -26737,7 +26735,7 @@ module Fortran
     end
     if s1.last
       r1 = instantiate_node(T,input, i1...index, s1)
-      r1.extend(RealLiteralConstant2)
+      r1.extend(RealLiteralConstant1)
     else
       @index = i1
       r1 = nil
@@ -26745,48 +26743,35 @@ module Fortran
     if r1
       r0 = r1
     else
-      i11, s11 = index, []
-      r12 = _nt_digit_string
-      s11 << r12
-      if r12
-        r13 = _nt_exponent_letter
-        s11 << r13
-        if r13
-          r14 = _nt_exponent
-          s11 << r14
-          if r14
-            i16, s16 = index, []
-            r17 = _nt_t_underscore
-            s16 << r17
-            if r17
-              r18 = _nt_kind_param
-              s16 << r18
-            end
-            if s16.last
-              r16 = instantiate_node(SyntaxNode,input, i16...index, s16)
-              r16.extend(RealLiteralConstant3)
+      i9, s9 = index, []
+      r10 = _nt_digit_string
+      s9 << r10
+      if r10
+        r11 = _nt_exponent_letter
+        s9 << r11
+        if r11
+          r12 = _nt_exponent
+          s9 << r12
+          if r12
+            r14 = _nt_kind_option
+            if r14
+              r13 = r14
             else
-              @index = i16
-              r16 = nil
+              r13 = instantiate_node(SyntaxNode,input, index...index)
             end
-            if r16
-              r15 = r16
-            else
-              r15 = instantiate_node(SyntaxNode,input, index...index)
-            end
-            s11 << r15
+            s9 << r13
           end
         end
       end
-      if s11.last
-        r11 = instantiate_node(T,input, i11...index, s11)
-        r11.extend(RealLiteralConstant4)
+      if s9.last
+        r9 = instantiate_node(T,input, i9...index, s9)
+        r9.extend(RealLiteralConstant2)
       else
-        @index = i11
-        r11 = nil
+        @index = i9
+        r9 = nil
       end
-      if r11
-        r0 = r11
+      if r9
+        r0 = r9
       else
         @index = i0
         r0 = nil
@@ -27313,7 +27298,7 @@ module Fortran
       r0 = r1
     else
       if has_terminal?('\G[\\[\\]\\~\\`\\@\\#\\^\\|\\{\\}\\\\]', true, index)
-        r2 = true
+        r2 = instantiate_node(T,input, index...(index + 1))
         @index += 1
       else
         r2 = nil
@@ -28967,7 +28952,7 @@ module Fortran
     end
 
     if has_terminal?('\G[\\ \\=\\+\\-\\*\\/\\(\\)\\,\\.\\\'\\:\\!\\"\\%\\&\\;\\<\\>\\?\\$]', true, index)
-      r0 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      r0 = instantiate_node(T,input, index...(index + 1))
       @index += 1
     else
       r0 = nil
