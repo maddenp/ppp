@@ -29669,7 +29669,7 @@ module Fortran
               s0 << r9
               if r9
                 i10 = index
-                r11 = lambda { |e| sp_subroutine_stmt(e[4]) }.call(s0)
+                r11 = lambda { |e| sp_subroutine_stmt(e[3],e[4]) }.call(s0)
                 if r11
                   @index = i10
                   r10 = instantiate_node(SyntaxNode,input, index...index)

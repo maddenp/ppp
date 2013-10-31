@@ -3201,7 +3201,7 @@ grammar Fortran
   rule subroutine_stmt
     # F90:R1220 + F95:1222
 
-    label:label_stmt? subroutine_prefix? t_subroutine subroutine_name dummy_arg_list_option? t_newline &{ |e| sp_subroutine_stmt(e[4]) } <Subroutine_Stmt>
+    label:label_stmt? subroutine_prefix? t_subroutine subroutine_name dummy_arg_list_option? t_newline &{ |e| sp_subroutine_stmt(e[3],e[4]) } <Subroutine_Stmt>
   end
 
   rule subroutine_subprogram

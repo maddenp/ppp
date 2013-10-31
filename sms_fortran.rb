@@ -2106,7 +2106,7 @@ module Fortran
     def translate
       return if sms_ignore or sms_serial
       io_stmt_init
-      function=(env["#{unit}"] and env["#{unit}"]["function"])
+      function=(env["#{unit}"] and env["#{unit}"]["subprogram"]=="_function")
       @onroot=false if unit.is_a?(Internal_File_Unit) or function
       if (namelist_name=nml)
         @onroot=true

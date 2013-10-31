@@ -227,7 +227,7 @@ module Fortran
 
   def sp_function_stmt(function_name,dummy_arg_name_list,result_option)
     envpush
-    (env["#{function_name}"]||={})["function"]=true
+    (env["#{function_name}"]||={})["subprogram"]="_function"
     if result_option.is_a?(Result_Option)
       env[:result]="#{result_option.name}"
     end
@@ -322,12 +322,18 @@ module Fortran
   end
 
   def sp_module(module_stmt,module_subprogram_part)
+    fn_env={}
     if module_subprogram_part.is_a?(Module_Subprogram_Part)
-      fn_env=module_subprogram_part.subprograms.reduce({}) do |m,x|
-        m.merge(x.env.select { |k,v| x=="#{x.name}" and v["function"] })
+      module_subprogram_part.subprograms.each do |x|
+        k="#{x.name}"
+        if x.env[k].has_key?("subprogram")
+          if x.env[k]["subprogram"]=="_function"
+            fn_env[k]=x.env[k]
+          end
+        end
       end
-      env.merge!(fn_env)
     end
+    env.merge!(fn_env)
     # The environment has already been modified by processing the module's
     # specification-part, part, so always write out the module file.
     write_envfile(module_stmt.name,env)
@@ -398,8 +404,9 @@ module Fortran
     true
   end
 
-  def sp_subroutine_stmt(dummy_arg_list_option)
+  def sp_subroutine_stmt(subroutine_name,dummy_arg_list_option)
     envpush
+    (env["#{subroutine_name}"]||={})["subprogram"]="_subroutine"
     if dummy_arg_list_option.e
       if dummy_arg_list_option.e[1].is_a?(Dummy_Arg_List)
         dummy_arg_list=dummy_arg_list_option.e[1]
@@ -429,7 +436,11 @@ module Fortran
   end
 
   def sp_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
-    entity_decl_list.names.each { |x| redef(x) unless (varenv=env["#{x}"]) and varenv["function"] }
+    entity_decl_list.names.each do |x|
+      unless (varenv=env["#{x}"]) and varenv["subprogram"]=="_function"
+        redef(x)
+      end
+    end
     varattrs=entity_decl_list.varattrs(@distribute)
     if x=attrchk(attr_spec_option,:dimension?)
       array_spec=x.e[0]

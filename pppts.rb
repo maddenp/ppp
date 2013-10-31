@@ -70,7 +70,7 @@ class PPPTS
   def test(t,socket,debug)
     @lock.synchronize do
       return if @failure
-      print "trying #{File.basename(t)}..." if debug
+      print "#{File.basename(t)}..." if debug
     end
     exe("make -C #{t} clean")
     x=(socket)?(" SOCKET=#{socket} "):(" ")
