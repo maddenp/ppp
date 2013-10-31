@@ -4,6 +4,24 @@ p=$(readlink $0) || p=$0
 d=$(dirname  $p)
 b=$(basename $p)
 
+for x in $@
+do
+  if [ $x = "help" ]
+  then
+    cat <<EOF
+
+usage: $b [ help ] [ debug ] [ <test> | +<n> ]
+
+       Tests run in parallel, with terse output, unless 'debug' is specified.
+       If <test> is specified, the single test (e.g. 't0100r') is run. If +<n>
+       is specified, tests numered <n> and higher (where <n> is an expression
+       containing a numeric constant, e.g. '100' or 't0100r') are run.
+
+EOF
+    exit 0
+  fi
+done
+
 test -n "$SMS__JAVA" && java="$SMS__JAVA" || java="java"
 test -n "$SMS__RUBY" &&  mri="$SMS__RUBY" ||  mri="ruby"
 jruby="$java -server -jar $d/jruby.jar"
