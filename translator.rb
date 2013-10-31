@@ -364,9 +364,9 @@ class Translator
       puts "#{s}\n\n" if conf[:debug]
     end
     cppcheck(s) unless conf[:safe]
-    puts "NORMALIZED FORM\n" if conf[:debug]
+    puts "\nNORMALIZED FORM\n" if conf[:debug]
     n=normalize(s,conf)
-    return n if conf[:product]==:normalized_source
+    return "\n#{n}" if conf[:product]==:normalized_source
     puts "\n#{n}" if conf[:debug]
     raw_tree=fp.parse(n,conf[:env],{:root=>root})
     return if conf[:product]==:modinfo
@@ -544,7 +544,7 @@ class Translator
     x.push("modinfo")
     x.push("normalize")
     x.push("passthrough")
-    "#{File.basename(@wrapper)} [ #{x.join(" | ")} ] source"
+    "#{File.basename(@wrapper,'.rb')} [ #{x.join(" | ")} ] source"
   end
 
 end
