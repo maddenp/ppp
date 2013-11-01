@@ -38,7 +38,7 @@ module Fortran
     dims[2]=halo_comp_pairs.e[1].e[1] if halo_comp_pairs.e[1].e
     dims[3]=halo_comp_pairs.e[2].e[1] if halo_comp_pairs.e[2].e
     env[:sms_halo_comp]={}
-    dims.each { |k,v| env[:sms_halo_comp][k]=OpenStruct.new({:lo=>v.lo,:up=>v.up}) }
+    dims.each { |k,v| env[:sms_halo_comp][k]=OpenStruct.new({:lo=>"#{v.lo}",:up=>"#{v.up}"}) }
     true
   end
 
@@ -415,7 +415,7 @@ module Fortran
         halo_lo=offsets.lo
         halo_up=offsets.up
       end
-      OpenStruct.new({:lo=>halo_lo,:up=>halo_up})
+      OpenStruct.new({:lo=>"#{halo_lo}",:up=>"#{halo_up}"})
     end
 
     def intrinsic?(function_name)
@@ -878,13 +878,13 @@ module Fortran
     def translate
       # Handle to_local
       if tolocal=env[:sms_to_local] and p=tolocal[name]
-        case p.key
+        case "#{p.key}"
         when "lbound"
           se="s#{p.dd}"
-          halo_offset=halo_offsets(p.dd).lo
+          halo_offset="#{halo_offsets(p.dd.to_s).lo}"
         when "ubound"
           se="e#{p.dd}"
-          halo_offset=halo_offsets(p.dd).up
+          halo_offset="#{halo_offsets(p.dd.to_s).up}"
         else
           fail "ERROR: Unrecognized to_local key: #{p.key}"
         end
@@ -1409,11 +1409,11 @@ module Fortran
   class SMS_Halo_Comp_Pair < NT
 
     def lo
-      "#{e[1]}"
+      e[1]
     end
 
     def up
-      "#{e[3]}"
+      e[3]
     end
 
   end
@@ -1483,6 +1483,7 @@ module Fortran
     end
 
     def vars
+      # Yes, strings.
       ["#{e[1]}"]+((e[2].e)?(e[2].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
     end
 
@@ -1495,6 +1496,7 @@ module Fortran
     end
 
     def vars
+      # Yes, a string.
       ["#{e[0]}"]
     end
 
@@ -1682,7 +1684,7 @@ module Fortran
           # of scalars, non-decomposed arrays and decomposed arrays is the same
           # as described above.
 
-          d=si.default
+          d="#{si.default}"
           gathers.push(name) if dh and (d=="in" or d=="inout")
           if d=="out" or d=="inout"
             ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name)
@@ -1745,7 +1747,7 @@ module Fortran
 
     def translate
       si=env[:sms_serial_info]=OpenStruct.new
-      si.default=("#{e[2]}".empty?)?("inout"):(e[2].default)
+      si.default=("#{e[2]}".empty?)?("inout"):("#{e[2].default}")
       si.names_in_region=Set.new
       si.vars_ignore=("#{e[2]}".empty?)?([]):(e[2].vars_ignore)
       si.vars_in=("#{e[2]}".empty?)?([]):(e[2].vars_in)
@@ -1778,7 +1780,7 @@ module Fortran
   class SMS_Serial_Control_Option_1 < SMS
 
     def default
-      (e[1].e&&e[1].e[1].respond_to?(:intent))?(e[1].e[1].intent):("inout")
+      (e[1].e&&e[1].e[1].respond_to?(:intent))?("#{e[1].e[1].intent}"):("inout")
     end
 
     def str0
@@ -1824,7 +1826,7 @@ module Fortran
   class SMS_Serial_Default < SMS
 
     def intent
-      "#{e[2]}"
+      e[2]
     end
 
   end
@@ -1840,7 +1842,7 @@ module Fortran
   class SMS_Serial_Intent_List < SMS
 
     def intent
-      "#{e[3]}"
+      e[3]
     end
 
     def vars
@@ -1852,8 +1854,8 @@ module Fortran
   class SMS_Serial_Intent_Lists < SMS
 
     def vars_with_intent(intent)
-      vars=(e[0].intent==intent)?(e[0].vars):([])
-      e[1].e.each { |x| vars+=x.e[1].vars if x.e[1].intent==intent }
+      vars=("#{e[0].intent}"=="#{intent}")?(e[0].vars):([])
+      e[1].e.each { |x| vars+=x.e[1].vars if "#{x.e[1].intent}"=="#{intent}" }
       vars
     end
 
@@ -1951,15 +1953,15 @@ module Fortran
   class SMS_To_Local_List < NT
 
     def dd
-      "#{e[1]}"
+      e[1]
     end
 
     def key
-      "#{e[5]}"
+      e[5]
     end
 
     def idx
-      dd.to_i
+      "#{dd}".to_i
     end
 
     def vars
@@ -1984,7 +1986,7 @@ module Fortran
     def vars
       def rec(list,v)
         list.vars.each do |x|
-          v[x]=OpenStruct.new({:dd=>list.idx,:key=>list.key})
+          v[x]=OpenStruct.new({:dd=>list.idx,:key=>"#{list.key}"})
         end
       end
       v={}
