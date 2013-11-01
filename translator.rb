@@ -206,7 +206,7 @@ class Translator
 
     def assemble(s,seen,incdirs=[])
       current=seen.last
-      a=""
+      assembled=""
       r=Regexp.new("^\s*include\s*(\'[^\']+\'|\"[^\"]+\").*",true)
       s.split("\n").each do |line|
         m=r.match(line)
@@ -241,12 +241,12 @@ class Translator
             msg+=incchain(seen,incfile)
             die msg
           end
-          a+=assemble(File.open(incfile,"rb").read,seen+[incfile],incdirs)
+          assembled+=assemble(File.open(incfile,"rb").read,seen+[incfile],incdirs)
         else
-          a+="#{line}\n"
+          assembled+="#{line}\n"
         end
       end
-      a
+      assembled
     end
 
     def cppcheck(s)
