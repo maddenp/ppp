@@ -3218,7 +3218,7 @@ module Fortran
     end
 
     def usename
-      "#{e[1]}"
+      e[1]
     end
 
   end
@@ -3652,7 +3652,7 @@ module Fortran
   class Star_Int < NT
 
     def kind
-      "#{e[1]}"
+      e[1]
     end
 
   end
@@ -3660,7 +3660,7 @@ module Fortran
   class Stmt_Function_Stmt < Stmt
 
     def name
-      "#{e[1]}"
+      e[1]
     end
 
     def str0
@@ -3813,7 +3813,7 @@ module Fortran
 
     def cub
       # concrete upper bound
-      "#{e[0]}"
+      e[0]
     end
 
   end
@@ -3837,7 +3837,7 @@ module Fortran
   class Use_Stmt < Stmt
 
     def modulename
-      "#{e[2]}"
+      e[2]
     end
 
   end
