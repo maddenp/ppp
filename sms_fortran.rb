@@ -877,7 +877,7 @@ module Fortran
 
     def translate
       # Handle to_local
-      if tolocal=env[:sms_to_local] and p=tolocal[name]
+      if tolocal=env[:sms_to_local] and p=tolocal["#{name}"]
         case "#{p.key}"
         when "lbound"
           se="s#{p.dd}"
@@ -1483,7 +1483,6 @@ module Fortran
     end
 
     def vars
-      # Yes, strings.
       ["#{e[1]}"]+((e[2].e)?(e[2].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
     end
 
@@ -1496,7 +1495,6 @@ module Fortran
     end
 
     def vars
-      # Yes, a string.
       ["#{e[0]}"]
     end
 

@@ -120,7 +120,7 @@ module Fortran
     # In case this array has not previously been seen, record its array specs.
     a.items.each do |x|
       if x.array_spec
-        env[x.name].merge!(array_attrs(x.array_spec,{},@distribute))
+        env["#{x.name}"].merge!(array_attrs(x.array_spec,{},@distribute))
       end
     end
     true
@@ -313,7 +313,7 @@ module Fortran
 
   def sp_label_list(first,rest)
     add_branch_target(first)
-    rest.e.each { |x| add_branch_target(x.label) }
+    rest.e.each { |x| add_branch_target("#{x.label}") }
   end
 
   def sp_main_program
@@ -466,8 +466,8 @@ module Fortran
       name="#{v}"
       varenv=(env[name]||={})
       ["access","sort"].each { |x| p.delete(x) if varenv.include?(x) }
-      p["type"]=type_spec.type
-      p["kind"]=type_spec.kind
+      p["type"]="#{type_spec.type}"
+      p["kind"]="#{type_spec.kind}"
       if env[:allocatable] and env[:allocatable].include?(name)
         p.keys.each { |k| p[k]="_deferred" if k=~/[lu]b\d+/ }
         p["allocatable"]="_true"
@@ -480,6 +480,8 @@ module Fortran
   def sp_use_stmt(modulename,list)
     def use_add(modulename,usenames,localnames)
       env[:uses]||={}
+      usenames.map! { |x| "#{x}" }
+      localnames.map! { |x| "#{x}" }
       names=localnames.zip(usenames)
       unless env[:uses][modulename]
         env[:uses][modulename]=names
@@ -1298,7 +1300,7 @@ module Fortran
     end
 
     def name
-      "#{e[0]}"
+      e[0]
     end
 
   end
@@ -1309,7 +1311,7 @@ module Fortran
   class Array_Name_And_Spec < NT
 
     def name
-      "#{e[0]}"
+      e[0]
     end
 
     def spec
@@ -1908,14 +1910,14 @@ module Fortran
   class Do_Term_Shared_Stmt < Stmt
 
     def label
-      "#{e[1].e[0]}"
+      e[1].e[0]
     end
 
     def str1
       block_left
       n=self
       while (n=n.ancestor(Outer_Shared_Do_Construct))
-        block_left if n.label==label
+        block_left if "#{n.label}"=="#{label}"
       end
       indent(strmemo)
     end
@@ -2270,7 +2272,7 @@ module Fortran
     end
 
     def clb
-      (e[0].respond_to?(:clb))?(e[0].clb):("1")
+      (e[0].respond_to?(:clb))?("#{e[0].clb}"):("1")
     end
 
     def cub
@@ -2498,7 +2500,7 @@ module Fortran
     end
 
     def usename
-      "#{e[2]}"
+      e[2]
     end
 
   end
@@ -2539,7 +2541,7 @@ module Fortran
   class If_Stmt < Stmt
 
     def action
-      "#{e[5]}".strip
+      e[5]
     end
 
     def prefix
@@ -2547,7 +2549,7 @@ module Fortran
     end
 
     def str0
-      stmt("#{prefix} #{action}")
+      stmt("#{prefix} #{action.strmemo}")
     end
 
   end
@@ -2823,7 +2825,7 @@ module Fortran
   class Kind_Selector < NT
 
     def kind
-      "#{e[2]}"
+      e[2]
     end
 
   end
@@ -2848,7 +2850,7 @@ module Fortran
   class Label_Do_Stmt < Stmt
 
     def label
-      "#{e[3]}"
+      e[3]
     end
 
     def str0
@@ -2931,7 +2933,7 @@ module Fortran
 
     def clb
       # concrete lower bound
-      "#{e[0]}"
+      e[0]
     end
 
   end
@@ -2965,7 +2967,7 @@ module Fortran
   class Module_Stmt < Stmt
 
     def name
-      "#{e[2]}"
+      e[2]
     end
 
     def str1
@@ -3023,7 +3025,7 @@ module Fortran
   class Name < NT
 
     def name
-      "#{self}"
+      self
     end
 
     def str0
@@ -3248,7 +3250,7 @@ module Fortran
   class Only_Option < NT
 
     def localname
-      "#{e[0]}"
+      e[0]
     end
 
   end
@@ -3480,11 +3482,11 @@ module Fortran
   class Rename < NT
 
     def localname
-      "#{e[0]}"
+      e[0]
     end
 
     def usename
-      "#{e[2]}"
+      e[2]
     end
 
   end
@@ -3793,7 +3795,7 @@ module Fortran
     end
 
     def kind
-      return (e[1].respond_to?(:kind))?(e[1].kind):("_default")
+      return (e[1].respond_to?(:kind))?("#{e[1].kind}"):("_default")
     end
 
     def type
