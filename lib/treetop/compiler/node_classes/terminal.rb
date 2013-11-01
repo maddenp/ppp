@@ -6,8 +6,12 @@ module Treetop
         string_length = eval(text_value).length
         
         builder.if__ "has_terminal?(#{text_value}, false, index)" do
-          assign_result "instantiate_node(#{node_class_name},input, index...(index + #{string_length}))"
-          extend_result_with_inline_module
+          if address == 0 || decorated? || string_length > 1
+	    assign_result "instantiate_node(#{node_class_name},input, index...(index + #{string_length}))"
+	    extend_result_with_inline_module
+          else
+            assign_lazily_instantiated_node
+	  end
           builder << "@index += #{string_length}"
         end
         builder.else_ do

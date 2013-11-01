@@ -4,8 +4,12 @@ module Treetop
       def compile(address, builder, parent_expression = nil)
         super
         builder.if__ "index < input_length" do
-          assign_result "instantiate_node(#{node_class_name},input, index...(index + 1))"
-          extend_result_with_inline_module
+          if address == 0 || decorated?
+	    assign_result "instantiate_node(#{node_class_name},input, index...(index + 1))"
+	    extend_result_with_inline_module
+          else
+            assign_lazily_instantiated_node
+          end
           builder << "@index += 1"
         end
         builder.else_ do

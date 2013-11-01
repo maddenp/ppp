@@ -13,6 +13,8 @@ module Treetop
         obtain_new_subexpression_address
         alternatives.first.compile(subexpression_address, builder)
         builder.if__ subexpression_success? do
+	  # Undo lazy instantiation:
+	  builder << "#{subexpression_result_var} = SyntaxNode.new(input, (index-1)...index) if #{subexpression_result_var} == true"
           assign_result subexpression_result_var
           extend_result_with_declared_module
           extend_result_with_inline_module
