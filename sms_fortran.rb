@@ -1363,8 +1363,8 @@ module Fortran
         cornerdepth.push("9999")
         ranks.each { |r| gllbs.push((r>dims)?(1):(fixbound(varenv,var,r,:l))) }
         ranks.each { |r| glubs.push((r>dims)?(1):(fixbound(varenv,var,r,:u))) }
-        ranks.each { |r| halol.push((r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)")) }
-        ranks.each { |r| halou.push((r>dims)?(0):("#{dh}__halosize(1,#{dh}__nestlevel)")) }
+        ranks.each { |r| halol.push((varenv["dim#{r}"])?("#{dh}__halosize(1,#{dh}__nestlevel)"):(0)) }
+        ranks.each { |r| halou.push((varenv["dim#{r}"])?("#{dh}__halosize(1,#{dh}__nestlevel)"):(0)) }
         ranks.each { |r| perms.push(decdim(varenv,r)||0) }
         types.push(sms_type(var))
       end
