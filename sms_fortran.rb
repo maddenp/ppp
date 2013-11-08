@@ -988,7 +988,9 @@ module Fortran
       end
       input_items.each do |x|
         var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-        if (varenv=varenv_get(var,self,expected=true))
+        # If some intput item isn't present in the environment, assume that it
+        # is *not* distributed and carry on.
+        if (varenv=varenv_get(var,self,expected=false))
           if (dh=varenv["decomp"])
             @onroot=true
             @var_scatter.push(var)
