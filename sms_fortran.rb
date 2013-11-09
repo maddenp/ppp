@@ -54,6 +54,7 @@ module Fortran
 
   def sp_sms_ignore_begin
     fail "ERROR: Already inside ignore region" if sms_ignore
+    fail "ERROR: Ignore region may not appear inside serial region" if sms_serial
     envpush(false)
     env[:sms_ignore]=true
     true

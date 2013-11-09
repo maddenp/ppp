@@ -102,6 +102,9 @@
 - Add original sms directives to output for non-block directives (or any other
   that are missing from translated output).
 
+- Consider which directives may nest in which others, and which may not. Factor
+  handling of these error conditions.
+
 ### TREE
 
 - To make all of this more useful, build an AST from the parse tree. Then, do
