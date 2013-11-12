@@ -218,8 +218,8 @@ module Fortran
         type=code_type(var,varenv,:array)
         gllbs=code_global_lower_bounds(varenv,var,dims)
         glubs=code_global_upper_bounds(varenv,var,dims)
-        gstop=glubs
         gstrt=gllbs
+        gstop=glubs
         perms=code_perms(varenv)
         decomp=code_decomp(dh,:array)
         args=[]
@@ -270,8 +270,8 @@ module Fortran
         type=code_type(var,varenv,:array)
         gllbs=code_global_lower_bounds(varenv,var,dims)
         glubs=code_global_upper_bounds(varenv,var,dims)
-        gstop=glubs
         gstrt=gllbs
+        gstop=glubs
         halol="(/"+ranks.map { |r| (dd=decdim(varenv,r))?("#{dh}__halosize(#{dd},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
         halou="(/"+ranks.map { |r| (dd=decdim(varenv,r))?("#{dh}__halosize(#{dd},#{dh}__nestlevel)"):("0") }.join(",")+"/)"
         perms=code_perms(varenv)
@@ -1344,12 +1344,14 @@ module Fortran
       declare("integer",tag,{:attrs=>"save"})
       v=[e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
       nvars=v.size
-      vars=v.reduce([]) { |m,x| m.push("#{x}") }.join(",")
+      vars=v.reduce([]) { |m,x| m.push("#{x.name}") }.join(",")
       names=v.reduce([]) { |m,x| m.push("'#{x}'") }.join(",")
       cornerdepth=[]
       dectypes=[]
       gllbs=[]
       glubs=[]
+      gstrt=[]
+      gstop=[]
       halol=[]
       halou=[]
       perms=[]
@@ -1359,11 +1361,27 @@ module Fortran
         var=v[i].name
         varenv=varenv_get(var)
         dims=varenv["dims"]
+        fail "ERROR: scalar '#{var}' may not be exchanged" unless dims
         dh=varenv["decomp"]
         dectypes.push("#{dh}(#{dh}__nestlevel)")
         cornerdepth.push("9999")
         ranks.each { |r| gllbs.push((r>dims)?(1):(fixbound(varenv,var,r,:l))) }
         ranks.each { |r| glubs.push((r>dims)?(1):(fixbound(varenv,var,r,:u))) }
+        unless (subscript_list=v[i].subscript_list).empty?
+          unless subscript_list.size==dims.to_i
+            fail "ERROR: '#{v[i]}' subscript list must be rank #{dims}"
+          end
+        end
+        ranks.each do |r|
+          if r>dims
+            gstrt.push(1)
+            gstop.push(1)
+          else
+            x=subscript_list[r-1]
+            gstrt.push((x and lower=x.lower)?(lower):(fixbound(varenv,var,r,:l)))
+            gstop.push((x and upper=x.upper)?(upper):(fixbound(varenv,var,r,:u)))
+          end
+        end
         ranks.each { |r| halol.push((varenv["dim#{r}"])?("#{dh}__halosize(1,#{dh}__nestlevel)"):(0)) }
         ranks.each { |r| halou.push((varenv["dim#{r}"])?("#{dh}__halosize(1,#{dh}__nestlevel)"):(0)) }
         ranks.each { |r| perms.push(decdim(varenv,r)||0) }
@@ -1373,12 +1391,14 @@ module Fortran
       dectypes="(/#{dectypes.join(",")}/)"
       gllbs="reshape((/#{gllbs.join(",")}/),(/#{nvars},#{maxrank}/))"
       glubs="reshape((/#{glubs.join(",")}/),(/#{nvars},#{maxrank}/))"
+      gstrt="reshape((/#{gstrt.join(",")}/),(/#{nvars},#{maxrank}/))"
+      gstop="reshape((/#{gstop.join(",")}/),(/#{nvars},#{maxrank}/))"
       halol="reshape((/#{halol.join(",")}/),(/#{nvars},#{maxrank}/))"
       halou="reshape((/#{halou.join(",")}/),(/#{nvars},#{maxrank}/))"
       perms="reshape((/#{perms.join(",")}/),(/#{nvars},#{maxrank}/))"
       types="(/#{types.join(",")}/)"
       code=[]
-      code.push("call sms__exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gllbs},#{glubs},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},#{sms_statusvar},#{vars},#{names})")
+      code.push("call sms__exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gstrt},#{gstop},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},#{sms_statusvar},#{vars},#{names})")
       code.push(sms_chkstat)
       replace_statement(code)
     end
