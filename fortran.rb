@@ -3716,8 +3716,16 @@ module Fortran
 
   class Subscript < NT
 
+    def lower
+      subscript
+    end
+
     def subscript
       e[0]
+    end
+
+    def upper
+      subscript
     end
 
   end
