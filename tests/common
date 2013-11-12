@@ -33,7 +33,7 @@ endif
 ifeq ($(TEST),t.f)
 FIXEDFREE=fixed
 else
-FIXEDFREE=free
+FIXEDFREE=
 endif
 
 ifndef ENV
