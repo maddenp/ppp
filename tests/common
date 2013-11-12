@@ -15,7 +15,7 @@ OPTSOBJ=$(strip $(FFLAGS) $(INCFLAG))
 OUT_NEW=out.new
 OUT_OLD=out.old
 PPP=../../ppp
-PPPARGS=$(strip $(strip $(FIXEDFREE) $(PASSTHROUGH) $(INCFLAG)) $(TEST))
+PPPARGS=$(strip $(strip $(FORM_PPP) $(PASSTHROUGH) $(INCFLAG)) $(TEST))
 PPPC=../../pppc
 STEM=$(basename $(TEST))
 TARGETS=clean comp $(EXE_NEW) $(EXE_OLD) $(OUT_NEW) $(OUT_OLD) translation
@@ -31,9 +31,11 @@ INCFLAG=-I $(INCDIRS)
 endif
 
 ifeq ($(TEST),t.f)
-FIXEDFREE=fixed
+FORM_PPP=fixed
+FORM_PPPC=fixed
 else
-FIXEDFREE=
+FORM_PPP=
+FORM_PPPC=free
 endif
 
 ifndef ENV
@@ -88,7 +90,7 @@ endif
 
 $(TRANSLATION): $(TEST)
 ifdef SOCKET
-	$(PPPC) $(SOCKET) $(CURDIR)/$(TEST) $(PASSTHROUGH) $(FIXEDFREE) $(INCDIRS) > $(TRANSLATION)
+	$(PPPC) $(SOCKET) $(CURDIR)/$(TEST) $(PASSTHROUGH) $(FORM_PPPC) $(INCDIRS) > $(TRANSLATION)
 else
 	$(PPP) $(PPPARGS) > $(TRANSLATION)
 endif
