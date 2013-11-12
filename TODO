@@ -108,6 +108,11 @@
 - Do other uses of global start/stop (gstrt/gstop) need the same treatment as
   in SMS_Exchange's translate()? If so, can it be factored and reused?
 
+- Where should env (aka .sms) files be written? When running in standalone mode,
+  they're written in the current directory, which is probably correct in a make-
+  driven build system. But not necessarily. And in when server mode, they're
+  written to the server's directory, which is almost certainly wrong.
+
 ### TREE
 
 - To make all of this more useful, build an AST from the parse tree. Then, do
