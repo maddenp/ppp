@@ -515,18 +515,9 @@ module Fortran
         allocate_object=e[1]
         if allocate_object.is_a?(Data_Ref)
           data_ref=allocate_object
+          return if data_ref.derived_type? # see TODO re: AoS & SoA
           part_ref=data_ref.rightmost
           var=part_ref.name
-# Not sure what to do here yet. Normally we could use the following two lines
-# instead of the two after that, but if we're looking at e.g.
-#   allocate(a%b(nip))
-# then 'b' is not going to be found in the environment. We'd need to find 'a' in
-# the environment and then... Can we have a decomposed array inside a derived
-# type? A decomposed array *of* dervived type, yes -- but the components?
-
-#         varenv=varenv_get(var)
-#         if varenv["decomp"]
-
           varenv=varenv_get(var,self,false)
           if varenv and (dh=varenv["decomp"])
             use(sms_decompmod)
@@ -544,7 +535,7 @@ module Fortran
             replace_element(code,:allocate_object)
           end
         else
-          fail "ERROR: Did not expect to parse a variable_name here -- thought it was broken!"
+          fail "ERROR: Encountered unexpected variable name"
         end
       else
         # Do not translate inside a deallocate_stmt

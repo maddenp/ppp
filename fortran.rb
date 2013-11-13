@@ -1764,6 +1764,10 @@ module Fortran
 
   class Data_Ref < NT
 
+    def derived_type?
+      not e[1].e.empty?
+    end
+
     def name
       rightmost.name
     end
@@ -1782,6 +1786,14 @@ module Fortran
 
     def str0
       e[1].e.reduce("#{e[0]}") { |m,x| m+"#{x.e[0]}#{x.e[1]}" }
+    end
+
+  end
+
+  class Data_Ref_Option < NT
+
+    def part_ref
+      e[1]
     end
 
   end

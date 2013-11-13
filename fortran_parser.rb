@@ -8859,16 +8859,6 @@ module Fortran
   end
 
   module DataRef0
-    def t_percent
-      elements[0]
-    end
-
-    def part_ref
-      elements[1]
-    end
-  end
-
-  module DataRef1
     def part_ref
       elements[0]
     end
@@ -8892,20 +8882,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_percent
-        s3 << r4
-        if r4
-          r5 = _nt_part_ref
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(DataRef0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_data_ref_option
         if r3
           s2 << r3
         else
@@ -8917,13 +8894,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Data_Ref,input, i0...index, s0)
-      r0.extend(DataRef1)
+      r0.extend(DataRef0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:data_ref][start_index] = r0
+
+    r0
+  end
+
+  module DataRefOption0
+    def t_percent
+      elements[0]
+    end
+
+    def part_ref
+      elements[1]
+    end
+  end
+
+  def _nt_data_ref_option
+    start_index = index
+    if node_cache[:data_ref_option].has_key?(index)
+      cached = node_cache[:data_ref_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_percent
+    s0 << r1
+    if r1
+      r2 = _nt_part_ref
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Data_Ref_Option,input, i0...index, s0)
+      r0.extend(DataRefOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:data_ref_option][start_index] = r0
 
     r0
   end

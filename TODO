@@ -26,6 +26,10 @@
 - implicit-do constructs may require parallel treatment. See e.g. outFMTed.F90
   in FIM, where a serial region is currently required.
 
+- Provide support for distributed Structure of Arrays (SoA).
+
+- Provide support for distributed Array of Structures (AoS).
+
 ### OPTIMIZATION
 
 - read_stmt, write_stmt et al are not function calls, so we *do* know which of

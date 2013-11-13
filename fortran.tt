@@ -878,7 +878,11 @@ grammar Fortran
   rule data_ref
     # F90:R612
 
-    part_ref ( t_percent part_ref )* <Data_Ref>
+    part_ref data_ref_option* <Data_Ref>
+  end
+
+  rule data_ref_option
+    t_percent part_ref <Data_Ref_Option>
   end
 
   rule data_stmt
