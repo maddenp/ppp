@@ -83,9 +83,6 @@
   buffering scheme, which avoids limits on exchange vars and minimized the size
   of each call into the SMS library.
 
-- In sms_fortran.rb, 'names_in_region' should be 'vars_in_region' and should
-  be just that -- not function or subroutine names, not parameter names, etc.
-
 - declare() is naive. What about declaring an array with the same type as an
   already-declared scalar? Need more flexibility...
 
