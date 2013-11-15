@@ -886,8 +886,8 @@ module Fortran
       # Handle serial
       if sms_serial and not inside?(SMS_Serial_Begin)
         if (varenv=env["#{self}"])
-          unless varenv["parameter"]
-            env[:sms_serial_info].names_in_region.add("#{self}")
+          unless varenv["subprogram"] or varenv["parameter"]
+            env[:sms_serial_info].vars_in_region.add("#{self}")
           end
         end
       end
@@ -1654,7 +1654,7 @@ module Fortran
       # we do not yet know whether the names are variables (they might e.g. be
       # function or subroutine names.
 
-      si.names_in_region.sort.each do |name|
+      si.vars_in_region.sort.each do |name|
 
         # Skip names with no entries in the environemnt, i.e. that are not
         # variables. Also skip names with no type information, on the (probably
@@ -1786,7 +1786,7 @@ module Fortran
     def translate
       si=env[:sms_serial_info]=OpenStruct.new
       si.default=("#{e[2]}".empty?)?("inout"):("#{e[2].default}")
-      si.names_in_region=Set.new
+      si.vars_in_region=Set.new
       si.vars_ignore=("#{e[2]}".empty?)?([]):(e[2].vars_ignore)
       si.vars_in=("#{e[2]}".empty?)?([]):(e[2].vars_in)
       si.vars_out=("#{e[2]}".empty?)?([]):(e[2].vars_out)
