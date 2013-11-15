@@ -1337,7 +1337,7 @@ module Fortran
       v=[e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
       nvars=v.size
       vars=v.reduce([]) { |m,x| m.push("#{x.name}") }.join(",")
-      names=v.reduce([]) { |m,x| m.push("'#{x}'") }.join(",")
+      names=v.reduce([]) { |m,x| m.push("'#{x.name}'") }.join(",")
       cornerdepth=[]
       dectypes=[]
       gllbs=[]
