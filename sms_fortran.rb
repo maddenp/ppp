@@ -1641,6 +1641,11 @@ module Fortran
       gathers=[]
       scatters=[]
 
+      # Globally-sized variables must be allocated/deallocated for distributed
+      # arrays appearing within serial regions. Here's a set to track them.
+
+      globals=Set.new
+      
       # Get the serial info recorded when the serial_begin statement was parsed.
 
       si=env[:sms_serial_info]
@@ -1660,47 +1665,69 @@ module Fortran
         dh=varenv["decomp"]
         sort=varenv["sort"]
 
+        # Handle 'ingore' variables. A decomposed variable must be globalized
+        # even if it is not gathered/scattered.
+
+        si.vars_ignore.each { |x| globals.add(x) if dh }
+
         # Conservatively assume that the default intent will apply to this
         # variable.
 
         default=true
+
+        # Handle 'in' variables.
+
         if si.vars_in.include?(name)
 
-          # Explicit 'in' intent was specified for this variable: Ensure that
-          # conflicting 'ignore' intent was not specified; schedule the variable
-          # for a gather *if* it is decomposed; and note that the default intent
-          # does not apply.
+          # Ensure that conflicting 'ignore' intent was not specified.
 
           if si.vars_ignore.include?(name)
             fail "ERROR: '#{name}' cannot be both 'ignore' and 'out' in serial region"
           end
-          gathers.push(name) if dh
+
+          # Gather the variable if it is decomposed, and note that the default
+          # intent no longer applies.
+
+          if dh
+            gathers.push(name)
+            globals.add(name)
+          end
           default=false
         end
+
+        # Handle 'out' variables.
+
         if si.vars_out.include?(name)
 
-          # Explicit 'out' intent was specified for this variable. Ensure that
-          # conflicting 'ignore' intent was not specified; schedule scalars and
-          # non-decomposed arrays for broadcast, and decomposed arrays for a
-          # scatter; and note that the default intent does not apply.
+          # Ensure that conflicting 'ignore' intent was not specified.
 
           if si.vars_ignore.include?(name)
             fail "ERROR: '#{name}' cannot be both 'ignore' and 'in' in serial region"
           end
+
+          # Broadcast non-decomposed and scatter decomposed arrays, and note
+          # that the default intent no longer applies.
+
           ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name)
+          globals.add(name) if dh
           default=false
         end
+
+        # Handle variables that fall under 'default' treatment.
+
         if default and not si.vars_ignore.include?(name)
 
           # If no explicit intent was specified, the default applies. Treatment
           # of scalars, non-decomposed arrays and decomposed arrays is the same
-          # as described above.
+          # as described above. Also, all decomposed arrays appearing in the
+          # serial region must be globalized.
 
           d="#{si.default}"
           gathers.push(name) if dh and (d=="in" or d=="inout")
           if d=="out" or d=="inout"
             ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name)
           end
+          globals.add(name) if dh
         end
       end
 
@@ -1712,11 +1739,10 @@ module Fortran
         node.globalize if node.is_a?(Name) and to_globalize.include?("#{node}")
       end
 
-      globalize(oldblock,gathers+scatters)
+      globalize(oldblock,globals)
 
       # Declaration of globally-sized variables
 
-      globals=Set.new(gathers+scatters)
       globals.sort.each do |var|
         varenv=varenv_get(var)
         dims=(":"*varenv["dims"]).split("")
