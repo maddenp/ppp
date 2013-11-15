@@ -74,7 +74,7 @@ class Translator
 
     def parse(input,env,options={})
       env||={}
-      env[:global]||={}
+      env[:global]||={:srcfile=>@srcfile}
       @envstack.push(env)
       input=Xinput.new(input,@srcfile,@envstack)
       super(input,options)
