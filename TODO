@@ -24,11 +24,13 @@
 
 ### NEW FEATURES
 
+- Need to handle broadcast/scatter of variables contained in io-implied-do input
+  or output item lists, e.g. read (88) (a(i),i=1,n). Here, a must be either
+  broadcast or scattered. (Related? See e.g. outFMTed.F90 in FIM, where a serial
+  region is currently required.)
+
 - Does where-stmt need implicit parallelization? Currently, it operates on halo
   memory as well.
-
-- implicit-do constructs may require parallel treatment. See e.g. outFMTed.F90
-  in FIM, where a serial region is currently required.
 
 - Provide support for distributed Structure of Arrays (SoA).
 
@@ -94,6 +96,9 @@
 
 ### TRANSLATION
 
+- Add original sms directives to output for non-block directives (or any other
+  that are missing from translated output).
+
 - SMS_Create_Decomp translate is only valid for one decomposed dimension. Extend
   it to handle three.
 
@@ -104,19 +109,11 @@
   Array_Section, SMS_Create_Decomp. In SMS_Declare_Decomp translate, roll out
   as many e{n}/s{n} arrays as needed for the decomposition.
 
-- Add original sms directives to output for non-block directives (or any other
-  that are missing from translated output).
-
 - Consider which directives may nest in which others, and which may not. Factor
   handling of these error conditions.
 
 - Do other uses of global start/stop (gstrt/gstop) need the same treatment as
   in SMS_Exchange's translate()? If so, can it be factored and reused?
-
-- Where should env (aka .sms) files be written? When running in standalone mode,
-  they're written in the current directory, which is probably correct in a make-
-  driven build system. But not necessarily. And in when server mode, they're
-  written to the server's directory, which is almost certainly wrong.
 
 ### TREE
 
