@@ -918,6 +918,7 @@ module Fortran
               replace_element(code,:scalar_numeric_expr,loop_control.e[3])
               code=",#{dh}__e#{dd}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)"
               replace_element(code,:loop_control_pair,loop_control.e[4])
+              use(sms_decompmod)
             end
           end
         end
