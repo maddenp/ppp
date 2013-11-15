@@ -2,6 +2,10 @@
 
 - Derived types provided by modules should appear in envfiles.
 
+- May need option to specify destination directory for envfiles. Currently,
+  they are written to the directory in which the input source file is
+  located.
+
 ### ERROR CHECKING / REPORTING
 
 - Error needed when compare_var variable is not distributed or no mod info.
