@@ -1,4 +1,5 @@
 $acc
+dir$
 $omp
 acc$
 sms$

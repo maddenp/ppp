@@ -967,7 +967,8 @@ grammar Fortran
     parameter_stmt /
     format_stmt /
     entry_stmt /
-    stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <NT>
+    stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <NT> /
+    directive
   end
 
   rule declaration_constructs

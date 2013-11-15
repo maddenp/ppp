@@ -9654,8 +9654,13 @@ module Fortran
                   if r8
                     r0 = r8
                   else
-                    @index = i0
-                    r0 = nil
+                    r12 = _nt_directive
+                    if r12
+                      r0 = r12
+                    else
+                      @index = i0
+                      r0 = nil
+                    end
                   end
                 end
               end
