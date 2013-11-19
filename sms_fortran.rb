@@ -521,14 +521,14 @@ module Fortran
           varenv=varenv_get(var,self,false)
           if varenv and (dh=varenv["decomp"])
             use(sms_decompmod)
-            subscript_list=part_ref.subscript_list
+            sl=part_ref.subscript_list
             newdims=[]
-            subscript_list.each_index do |i|
+            sl.each_index do |i|
               arrdim=i+1
               if (dd=decdim(varenv,arrdim))
                 newdims.push(code_local_bound(dh,dd,:l)+":"+code_local_bound(dh,dd,:u))
               else
-                newdims.push("#{subscript_list[i]}")
+                newdims.push("#{sl[i]}")
               end
             end
             code="#{var}(#{newdims.join(",")})"
@@ -567,8 +567,9 @@ module Fortran
         fail "ERROR: '#{var}' not found in environment" unless (varenv=env[var])
         return unless varenv["decomp"]
         bounds=[]
+        sl=subscript_list
         (1..varenv["dims"]).each do |dim|
-          if (s=subscript_list[dim-1])
+          if sl and (s=sl[dim-1])
             if s.is_a?(Subscript)
               bounds[dim-1]="#{s.subscript}"
             elsif s.is_a?(Subscript_Triplet)
@@ -1359,8 +1360,9 @@ module Fortran
         cornerdepth.push("9999")
         ranks.each { |r| gllbs.push((r>dims)?(1):(fixbound(varenv,var,r,:l))) }
         ranks.each { |r| glubs.push((r>dims)?(1):(fixbound(varenv,var,r,:u))) }
-        unless (subscript_list=v[i].subscript_list).empty?
-          unless subscript_list.size==dims.to_i
+        sl=v[i].subscript_list
+        unless sl.empty?
+          unless sl.size==dims.to_i
             fail "ERROR: '#{v[i]}' subscript list must be rank #{dims}"
           end
         end
@@ -1369,7 +1371,7 @@ module Fortran
             gstrt.push(1)
             gstop.push(1)
           else
-            x=subscript_list[r-1]
+            x=sl[r-1]
             gstrt.push((x and lower=x.lower)?(lower):(fixbound(varenv,var,r,:l)))
             gstop.push((x and upper=x.upper)?(upper):(fixbound(varenv,var,r,:u)))
           end

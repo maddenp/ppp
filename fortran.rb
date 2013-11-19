@@ -3338,8 +3338,16 @@ module Fortran
 
   class Parenthesized_Section_Subscript_List < NT
 
+    def section_subscript_list
+      e[1]
+    end
+
     def subscript_list
-      e[1].subscript_list
+      if section_subscript_list.is_a?(Section_Subscript_List)
+        section_subscript_list.subscript_list
+      else
+        [section_subscript_list]
+      end
     end
 
   end
@@ -3353,12 +3361,16 @@ module Fortran
       part_name.name
     end
 
+    def parenthesized_section_subscript_list
+      (e[1].is_a?(Parenthesized_Section_Subscript_List))?(e[1]):(nil)
+    end
+
     def part_name
       e[0]
     end
 
     def subscript_list
-      (e[1].is_a?(Parenthesized_Section_Subscript_List))?(e[1].subscript_list):([])
+      (pssl=parenthesized_section_subscript_list)?(pssl.subscript_list):([])
     end
 
   end
@@ -3640,6 +3652,9 @@ module Fortran
       e[1].elements.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
     end
 
+  end
+
+  class Section_Subscript_List_Option < NT
   end
 
   class Select_Case_Stmt < Stmt

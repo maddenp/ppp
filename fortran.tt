@@ -3113,7 +3113,11 @@ grammar Fortran
   end
 
   rule section_subscript_list
-    section_subscript ( t_comma section_subscript )* <Section_Subscript_List>
+    section_subscript section_subscript_list_option* <Section_Subscript_List>
+  end
+
+  rule section_subscript_list_option
+    t_comma section_subscript <Section_Subscript_List_Option>
   end
 
   rule select_case_stmt

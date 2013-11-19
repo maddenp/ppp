@@ -28953,16 +28953,6 @@ module Fortran
   end
 
   module SectionSubscriptList0
-    def t_comma
-      elements[0]
-    end
-
-    def section_subscript
-      elements[1]
-    end
-  end
-
-  module SectionSubscriptList1
     def section_subscript
       elements[0]
     end
@@ -28986,20 +28976,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_section_subscript
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(SectionSubscriptList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_section_subscript_list_option
         if r3
           s2 << r3
         else
@@ -29011,13 +28988,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Section_Subscript_List,input, i0...index, s0)
-      r0.extend(SectionSubscriptList1)
+      r0.extend(SectionSubscriptList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:section_subscript_list][start_index] = r0
+
+    r0
+  end
+
+  module SectionSubscriptListOption0
+    def t_comma
+      elements[0]
+    end
+
+    def section_subscript
+      elements[1]
+    end
+  end
+
+  def _nt_section_subscript_list_option
+    start_index = index
+    if node_cache[:section_subscript_list_option].has_key?(index)
+      cached = node_cache[:section_subscript_list_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_section_subscript
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Section_Subscript_List_Option,input, i0...index, s0)
+      r0.extend(SectionSubscriptListOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:section_subscript_list_option][start_index] = r0
 
     r0
   end
