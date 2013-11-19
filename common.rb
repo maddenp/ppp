@@ -36,6 +36,10 @@ module Common
     env[:sms_ignore]
   end
 
+  def sms_parallel
+    env[:sms_parallel]
+  end
+
   def sms_serial
     env[:sms_serial]
   end

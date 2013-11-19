@@ -30,7 +30,7 @@ module Fortran
   end
 
   def sp_sms_halo_comp_begin(halo_comp_pairs)
-    fail "ERROR: Halo computation invalid outside parallel region" unless env[:sms_parallel]
+    fail "ERROR: Halo computation invalid outside parallel region" unless sms_parallel
     fail "ERROR: Already inside halo-computation region" if env[:sms_halo_comp]
     envpush(false)
     dims={}
@@ -71,14 +71,14 @@ module Fortran
   end
 
   def sp_sms_parallel_begin(sms_decomp_name,sms_parallel_var_lists)
-    fail "ERROR: Already inside parallel region" if env[:sms_parallel]
+    fail "ERROR: Already inside parallel region" if sms_parallel
     envpush(false)
     env[:sms_parallel]=OpenStruct.new({:decomp=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
     true
   end
 
   def sp_sms_parallel_end
-    fail "ERROR: Not inside parallel region" unless env[:sms_parallel]
+    fail "ERROR: Not inside parallel region" unless sms_parallel
     true
   end
 
@@ -899,17 +899,17 @@ module Fortran
 
     def translate
       unless sms_serial
-        if parallel=env[:sms_parallel]
+        if (p=sms_parallel)
           loop_control=e[3]
           loop_var="#{loop_control.e[1]}"
           dd=nil
           [0,1,2].each do |i|
-            if parallel.vars[i].include?(loop_var)
+            if p.vars[i].include?(loop_var)
               dd=i+1
               break
             end
           end
-          dh=parallel.decomp
+          dh=p.decomp
           if dd
             halo_lo=halo_offsets(dd).lo
             halo_up=halo_offsets(dd).up
