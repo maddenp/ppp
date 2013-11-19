@@ -1366,6 +1366,10 @@ module Fortran
       data_ref.subscript_list
     end
 
+    def substring_range
+      e[2]
+    end
+
   end
 
   class Array_Spec < NT
