@@ -570,21 +570,21 @@ module Fortran
         (1..varenv["dims"]).each do |dim|
           if (s=subscript_list[dim-1])
             if s.is_a?(Subscript)
-              bounds[dim]="#{s.subscript}"
+              bounds[dim-1]="#{s.subscript}"
             elsif s.is_a?(Subscript_Triplet)
               b=getbound(var,dim,:l,s.lower)+":"+getbound(var,dim,:u,s.upper)
               b+=":#{s.stride}" if s.stride and "#{s.stride}"!="1"
-              bounds[dim]=b
+              bounds[dim-1]=b
             elsif s.is_a?(Vector_Subscript)
-              fail "How did we get here? Please report!"
+              fail "Internal error in Array_Section#translate: Please report to developers."
             else
-              bounds[dim]="#{s}"
+              bounds[dim-1]="#{s}"
             end
           else
-            bounds[dim]=getbound(var,dim,:l)+":"+getbound(var,dim,:u)
+            bounds[dim-1]=getbound(var,dim,:l)+":"+getbound(var,dim,:u)
           end
         end
-        boundslist=(1..varenv["dims"]).map{ |dim| bounds[dim] }.join(",")
+        boundslist=(1..varenv["dims"]).map{ |dim| bounds[dim-1] }.join(",")
         code="#{var}(#{boundslist})"
         replace_element(code,:array_section)
       end
