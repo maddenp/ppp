@@ -94,6 +94,10 @@
 
 - Factor more sms text out into T sms_* methods (esp library calls).
 
+- More helper functions for e.g. sms_halo_comp() for env[:sms_halo_comp].
+
+- Outside sp_* methods, use varenv_get instead of env[].
+
 ### TRANSLATION
 
 - Add original sms directives to output for non-block directives (or any other
