@@ -868,6 +868,11 @@ module Fortran
       replace_element(code,:name)
     end
 
+    def name
+      return @name if defined?(@name)
+      @name="#{self}"
+    end
+
     def translate
       # Handle to_local
       if tolocal=env[:sms_to_local] and p=tolocal["#{name}"]
@@ -885,10 +890,13 @@ module Fortran
         replace_element(code,:expr)
       end
       # Handle serial
-      if sms_serial and not inside?(SMS_Serial_Begin)
-        if (varenv=env["#{self}"])
+      if sms_serial
+        # We should handle derived types eventually, but ignore structure
+        # components for now.
+        unless inside?(SMS_Serial_Begin,Subroutine_Name) or intrinsic?(name)# or component?
+          varenv=varenv_get(name,self,expected=false)||{}
           unless varenv["subprogram"] or varenv["parameter"]
-            env[:sms_serial_info].vars_in_region.add("#{self}")
+            env[:sms_serial_info].vars_in_region.add(name)
           end
         end
       end
@@ -1628,6 +1636,10 @@ module Fortran
       "#{e[0]}#{e[1]}#{e[2]}"
     end
 
+    def missing(x)
+      fail "ERROR: Serial-region '#{x}' variable '#{name}' not found in environment"
+    end
+
     def translate
 
       serial_begin=e[0]
@@ -1653,20 +1665,13 @@ module Fortran
 
       si=env[:sms_serial_info]
 
-      # Iterate over the set of names that occurred in the region. Note that
-      # we do not yet know whether the names are variables (they might e.g. be
-      # function or subroutine names.
+      # Iterate over the set of names that occurred in the region.
 
       si.vars_in_region.sort.each do |name|
 
-        # Skip names with no entries in the environemnt, i.e. that are not
-        # variables. Also skip names with no type information, on the (probably
-        # naive) assumption that they are function or subroutine names that are
-        # in the environment due to access specification.
-
-        next unless (varenv=varenv_get(name,self,false)) and varenv["type"]
-        dh=varenv["decomp"]
-        sort=varenv["sort"]
+        varenv=varenv_get(name,self,expected=false)
+        dh=(varenv)?(varenv["decomp"]):(nil)
+        sort=(varenv)?(varenv["sort"]):(nil)
 
         # Handle 'ingore' variables. A decomposed variable must be globalized
         # even if it is not gathered/scattered.
@@ -1681,6 +1686,8 @@ module Fortran
         # Handle 'in' variables.
 
         if si.vars_in.include?(name)
+
+          missing("in") unless varenv
 
           # Ensure that conflicting 'ignore' intent was not specified.
 
@@ -1701,6 +1708,8 @@ module Fortran
         # Handle 'out' variables.
 
         if si.vars_out.include?(name)
+
+          missing("out") unless varenv
 
           # Ensure that conflicting 'ignore' intent was not specified.
 
@@ -1726,6 +1735,7 @@ module Fortran
           # serial region must be globalized.
 
           d="#{si.default}"
+          missing(d) unless varenv or d=="ignore"
           gathers.push(name) if dh and (d=="in" or d=="inout")
           if d=="out" or d=="inout"
             ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name)
