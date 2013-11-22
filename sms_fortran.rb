@@ -1636,7 +1636,7 @@ module Fortran
       "#{e[0]}#{e[1]}#{e[2]}"
     end
 
-    def missing(x)
+    def missing(name,x)
       fail "ERROR: Serial-region '#{x}' variable '#{name}' not found in environment"
     end
 
@@ -1676,7 +1676,7 @@ module Fortran
         # Handle 'ingore' variables. A decomposed variable must be globalized
         # even if it is not gathered/scattered.
 
-        si.vars_ignore.each { |x| globals.add(x) if dh }
+        globals.add(name) if dh and si.vars_ignore.include?(name)
 
         # Conservatively assume that the default intent will apply to this
         # variable.
@@ -1687,7 +1687,7 @@ module Fortran
 
         if si.vars_in.include?(name)
 
-          missing("in") unless varenv
+          missing(name,"in") unless varenv
 
           # Ensure that conflicting 'ignore' intent was not specified.
 
@@ -1709,7 +1709,7 @@ module Fortran
 
         if si.vars_out.include?(name)
 
-          missing("out") unless varenv
+          missing(name,"out") unless varenv
 
           # Ensure that conflicting 'ignore' intent was not specified.
 
@@ -1735,7 +1735,7 @@ module Fortran
           # serial region must be globalized.
 
           d="#{si.default}"
-          missing(d) unless varenv or d=="ignore"
+          missing(name,d) unless varenv or d=="ignore"
           gathers.push(name) if dh and (d=="in" or d=="inout")
           if d=="out" or d=="inout"
             ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name)
