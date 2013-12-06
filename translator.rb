@@ -43,6 +43,9 @@ class Translator
 
   end
 
+  class TranslatorException < Exception
+  end
+
   # X*Parser scheme due to Clifford Heath (http://goo.gl/62pJ6)
 
   class XFortranParser < FortranParser
@@ -166,7 +169,11 @@ class Translator
     die "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
     s=File.open(srcfile,"rb").read
     conf=unpack(args)
-    puts process(s,:program_units,srcfile,conf)
+    begin
+      puts process(s,:program_units,srcfile,conf)
+    rescue TranslatorException
+      # suppress exception info display
+    end
   end
 
   def normalize(s,conf)
@@ -372,16 +379,17 @@ class Translator
     return if conf[:product]==:modinfo
     unless raw_tree
       re=Regexp.new("^(.+?):in `([^\']*)'$")
-      srcmsg=(re.match(caller[0])[2]=="raw")?(": See #{caller[1]}"):("")
       na=n.split("\n")
       na.each_index { |i| $stderr.puts "#{i+1} #{na[i]}" }
-      failmsg=""
-      failmsg+="#{fp.failure_reason.split("\n")[0]}\n"
-      failmsg+="Original source: #{srcfile}\n"
-      failmsg+="PARSE FAILED"
-      failmsg+="#{srcmsg}"
-      fail failmsg
-      return
+      indent=na.size.to_s.size
+      $stderr.puts "#{'^'*indent} See line #{fp.failure_line}"
+      if re.match(caller[0])[2]=="raw"
+        $stderr.puts "#{' '*indent} Internally-generated code, see #{caller[1]}"
+      else
+        $stderr.puts "#{' '*indent} Source: #{srcfile}"
+      end
+      $stderr.puts "PARSE FAILED"
+      fail TranslatorException
     end
     raw_tree.instance_variable_set(:@srcfile,srcfile)
     raw_tree=raw_tree.transform_top(:post) # post-process raw tree
@@ -477,12 +485,15 @@ class Translator
           return
         rescue SystemExit=>ex
           monitor.join
+        rescue TranslatorException=>ex
+          client.puts("\x00") # C null
+          client.close
         rescue Exception=>ex
           s="Caught exception '#{ex.class}':\n"
           s+="#{ex.message}\n"
           s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }
-          die s
           server_stop(socket,1)
+          die s
         end
       end
     end

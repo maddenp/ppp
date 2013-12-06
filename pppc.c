@@ -96,15 +96,12 @@ int main (int argc,char **argv)
   bytesout=0;
   while (read(sock,&c,1)>0)
   {
+    if (c=='\0') break;
     ++bytesout;
     printf("%c",c);
   }
 
-  if (bytesout==0)
-  {
-    printf("no reply received from server");
-    exit(1);
-  }
+  if (bytesout==0) exit(1);
 
   close(sock);
   return 0;
