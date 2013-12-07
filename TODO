@@ -119,6 +119,14 @@
 - Do other uses of global start/stop (gstrt/gstop) need the same treatment as
   in SMS_Exchange's translate()? If so, can it be factored and reused?
 
+- How to handle pointer assignment statements in serial regions? Nullify
+  statements? Assign statements?
+
+- Are namelist reads inside serial regions handled properly?
+
+- Can we identify the statements/constructs that could possibly change a
+  variable's value in a serial region and only gather/scatter/broadcast those?
+
 ### TREE
 
 - To make all of this more useful, build an AST from the parse tree. Then, do
