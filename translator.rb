@@ -166,14 +166,18 @@ class Translator
 
   def go(wrapper,args)
     @wrapper=wrapper
-    die usage unless dstfile=args.pop
+    die usage unless dstfile=args.pop # a directory when modinfo requested
     die usage unless srcfile=args.pop
     srcfile=File.expand_path(srcfile)
     die "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
     s=File.open(srcfile,"rb").read
     conf=unpack(args)
+    if conf[:product]==:modinfo and not File.directory?(dstfile)
+      die "'modinfo' requires output directory, not #{dstfile}"
+    end
     begin
-      File.open(dstfile,'w').write(process(s,:program_units,srcfile,dstfile,conf))
+      translation=process(s,:program_units,srcfile,dstfile,conf)
+      File.open(dstfile,'w').write(translation) unless conf[:product]==:modinfo
     rescue TranslatorException
       # suppress exception info display
     end
@@ -559,7 +563,7 @@ class Translator
     x.push("modinfo")
     x.push("normalize")
     x.push("passthrough")
-    "#{File.basename(@wrapper,'.rb')} [ #{x.join(" | ")} ] infile outfile"
+    "#{File.basename(@wrapper,'.rb')} [ #{x.join(" | ")} ] infile <outfile|moddir>"
   end
 
 end
