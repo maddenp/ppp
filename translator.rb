@@ -52,11 +52,12 @@ class Translator
 
     class Xinput
 
-      attr_accessor :envstack,:srcfile
+      attr_accessor :dstfile,:envstack,:srcfile
 
-      def initialize(input,srcfile,envstack)
+      def initialize(input,srcfile,dstfile,envstack)
         @input=input
         @srcfile=srcfile
+        @dstfile=dstfile
         @envstack=envstack
       end
 
@@ -66,20 +67,21 @@ class Translator
 
     end
 
-    def initialize(srcfile,incdirs)
+    def initialize(srcfile,dstfile,incdirs)
       super()
       @access="_default"
       @dolabels=[]
       @envstack=[]
       @incdirs=incdirs
       @srcfile=srcfile
+      @dstfile=dstfile
     end
 
     def parse(input,env,options={})
       env||={}
-      env[:global]||={:srcfile=>@srcfile}
+      env[:global]||={:srcfile=>@srcfile,:dstfile=>@dstfile}
       @envstack.push(env)
-      input=Xinput.new(input,@srcfile,@envstack)
+      input=Xinput.new(input,@srcfile,@dstfile,@envstack)
       super(input,options)
     end
 
@@ -164,13 +166,14 @@ class Translator
 
   def go(wrapper,args)
     @wrapper=wrapper
+    die usage unless dstfile=args.pop
     die usage unless srcfile=args.pop
     srcfile=File.expand_path(srcfile)
     die "Cannot read file: #{srcfile}" unless File.readable?(srcfile)
     s=File.open(srcfile,"rb").read
     conf=unpack(args)
     begin
-      puts process(s,:program_units,srcfile,conf)
+      File.open(dstfile,'w').write(process(s,:program_units,srcfile,dstfile,conf))
     rescue TranslatorException
       # suppress exception info display
     end
@@ -209,7 +212,7 @@ class Translator
     s
   end
 
-  def process(s,root,srcfile,conf)
+  def process(s,root,srcfile,dstfile,conf)
 
     def assemble(s,seen,incdirs=[])
       current=seen.last
@@ -354,7 +357,7 @@ class Translator
 
     conf=default_opts.merge(conf)
     fixed=(conf[:form]==:fixed)
-    fp=XFortranParser.new(srcfile,conf[:incdirs])
+    fp=XFortranParser.new(srcfile,dstfile,conf[:incdirs])
     s0=nil
     unless conf[:safe]
       while s!=s0 and not s.nil?                                # fixed point treatment of prepsrc() and assemble()
@@ -476,7 +479,7 @@ class Translator
             conf[:incdirs].push(d)
           end
           puts "Translating #{srcfile}" unless quiet
-          client.puts(process(s,:program_units,srcfile,conf))
+          client.puts(process(s,:program_units,srcfile,dstfile,conf))
           client.close
         rescue Errno::EPIPE
           # Handle broken pipe (i.e. other end of the socket dies)
@@ -555,7 +558,7 @@ class Translator
     x.push("modinfo")
     x.push("normalize")
     x.push("passthrough")
-    "#{File.basename(@wrapper,'.rb')} [ #{x.join(" | ")} ] source"
+    "#{File.basename(@wrapper,'.rb')} [ #{x.join(" | ")} ] infile outfile"
   end
 
 end

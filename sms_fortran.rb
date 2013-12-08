@@ -340,7 +340,7 @@ module Fortran
         code+="(#{dims.join(',')})" if dims
         init=props[:init]
         code+="=#{init}" if init
-        t=raw(code,:type_declaration_stmt,input.srcfile,{:env=>env})
+        t=raw(code,:type_declaration_stmt,input.srcfile,input.dstfile,{:env=>env})
         newenv=t.input.envstack.last
         newenv[var]["pppvar"]=true
         dc=declaration_constructs

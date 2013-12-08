@@ -1,4 +1,4 @@
-server_mode=true
+server_mode=false
 threads=8
 
 $: << File.dirname($0)
@@ -35,7 +35,8 @@ class PPPTS
     @lock.synchronize do
       return if @failure
       puts "\nFAIL"+((cmd)?(": #{cmd}\n"):(""))
-      puts msg.lines.reduce("") { |m,e| m+="      #{e}" } if msg
+      print (msg.is_a?(Array))?(msg.lines.reduce("") { |m,e| m+="      #{e}" }):(msg) if msg
+      puts
       @failure=true
     end
   end
@@ -49,6 +50,7 @@ class PPPTS
       tests.delete_if { |x| num(x) < num(filter) }
       tests.delete_if { |x| x != "#{tdir}/#{filter}" } unless filter[0]=="+"
     end
+    die "No matching test(s) found" if tests.empty?
     q=Queue.new
     tests.each { |e| q.enq(e) }
     runners=(1..threads).reduce([]) do |m,e|

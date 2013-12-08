@@ -66,7 +66,7 @@ module Common
     modinfo.delete_if { |k,v| k.is_a?(Symbol) }
     # Do not export info on private objects
     modinfo.delete_if { |k,v| v["access"]=="private" }
-    f=envfile("#{modulename}",File.dirname(env[:global][:srcfile]))
+    f=envfile("#{modulename}",File.dirname(env[:global][:dstfile]))
     File.delete(f) if File.exist?(f)
     unless modinfo.empty?
       File.open(f,"w") { |f| f.write(YAML.dump(modinfo)) }
