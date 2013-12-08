@@ -23,30 +23,31 @@ void term(int sock)
 
 void usage(char *exe)
 {
-  printf("Usage: %s <socket> <infile> passthrough|translate fixed|free [dir[:dir:...]]\n",exe);
+  printf("Usage: %s <socket> <infile> <outfile> passthrough|translate fixed|free [dir[:dir:...]]\n",exe);
   exit(1);
 }
 
 int main (int argc,char **argv)
 {
-  char *action,c,*exe,*form,*incdirs,*lensrcstr,*socket_file,*source_file,*src;
+  char *action,c,*dst_file,*exe,*form,*incdirs,*lensrcstr,*socket_file,*src_file,*src;
   int bytesout,fd,digits,lensrc,sock,status;
   struct sockaddr_un server;
   struct stat fileinfo;
 
   exe=argv[0];
 
-  if ((argc<5)||(argc>6)) usage(exe);
+  if ((argc<6)||(argc>7)) usage(exe);
 
   socket_file=argv[1];
-  source_file=argv[2];
-  action=argv[3];
-  form=argv[4];
-  incdirs=argv[5];
+  src_file=argv[2];
+  dst_file=argv[3];
+  action=argv[4];
+  form=argv[5];
+  incdirs=argv[6];
 
   if ((strcmp("fixed",form)!=0)&&(strcmp("free",form)!=0)) usage(exe);
 
-  if ((fd=open(source_file,O_RDONLY))<0) fail("opening infile");
+  if ((fd=open(src_file,O_RDONLY))<0) fail("opening infile");
   if (fstat(fd,&fileinfo)<0) fail("getting infile info");
 
   lensrc=fileinfo.st_size;
@@ -67,8 +68,12 @@ int main (int argc,char **argv)
     fail("connecting to server");
   }
 
-  status=write(sock,source_file,strlen(source_file));
+  status=write(sock,src_file,strlen(src_file));
   if (status<0) fail("sending infile");
+  term(sock);
+
+  status=write(sock,dst_file,strlen(dst_file));
+  if (status<0) fail("sending outfile");
   term(sock);
 
   status=write(sock,action,strlen(action));
@@ -93,15 +98,21 @@ int main (int argc,char **argv)
   status=write(sock,src,lensrc);
   if (status<0) fail("sending src");
 
+  if ((fd=open(dst_file,O_CREAT|O_TRUNC|O_WRONLY,S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))<0) fail("opening outfile");
   bytesout=0;
   while (read(sock,&c,1)>0)
   {
     if (c=='\0') break;
     ++bytesout;
-    printf("%c",c);
+    write(fd,&c,1);
   }
+  close(fd);
 
-  if (bytesout==0) exit(1);
+  if (bytesout==0)
+  {
+    if (remove(dst_file)<0) fail("removing rempty outfile");
+    exit(1);
+  }
 
   close(sock);
   return 0;

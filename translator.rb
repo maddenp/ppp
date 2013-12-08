@@ -447,6 +447,7 @@ class Translator
           conf={}
           client=server.accept
           srcfile=client.gets.chomp
+          dstfile=client.gets.chomp
           action=client.gets.chomp
           form=client.gets.chomp
           dirlist=client.gets.chomp
