@@ -1,3 +1,5 @@
+require "exceptions"
+
 module Common
 
   def array_attrs(array_spec,_attrs,distribute)
@@ -66,10 +68,21 @@ module Common
     modinfo.delete_if { |k,v| k.is_a?(Symbol) }
     # Do not export info on private objects
     modinfo.delete_if { |k,v| v["access"]=="private" }
-    f=envfile("#{modulename}",File.dirname(env[:global][:dstfile]))
-    File.delete(f) if File.exist?(f)
-    unless modinfo.empty?
-      File.open(f,"w") { |f| f.write(YAML.dump(modinfo)) }
+    d=env[:global][:dstfile]
+    d=File.dirname(d) unless File.directory?(d)
+    unless File.directory?(d)
+      $stderr.puts "Output directory '#{d}' not found"
+      raise Exceptions::TranslatorException
+    end      
+    f=envfile("#{modulename}",d)
+    begin
+      File.delete(f) if File.exist?(f)
+      unless modinfo.empty?
+        File.open(f,"w") { |f| f.write(YAML.dump(modinfo)) }
+      end
+    rescue Exception=>ex
+      $stderr.puts "Could not write module file '#{f}'"
+      raise Exceptions::TranslatorException
     end
   end
 

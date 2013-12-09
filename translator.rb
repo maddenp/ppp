@@ -16,6 +16,7 @@ require "sms_normalizer"
 require "sms_normalizer_parser"
 require "normfixed"
 require "normfree"
+require "exceptions"
 
 class Translator
 
@@ -41,9 +42,6 @@ class Translator
       k
     end
 
-  end
-
-  class TranslatorException < Exception
   end
 
   # X*Parser scheme due to Clifford Heath (http://goo.gl/62pJ6)
@@ -178,7 +176,7 @@ class Translator
     begin
       translation=process(s,:program_units,srcfile,dstfile,conf)
       File.open(dstfile,'w').write(translation) unless conf[:product]==:modinfo
-    rescue TranslatorException
+    rescue Exceptions::TranslatorException
       # suppress exception info display
     end
   end
@@ -396,7 +394,7 @@ class Translator
         $stderr.puts "#{' '*indent} Source: #{srcfile}"
       end
       $stderr.puts "PARSE FAILED"
-      fail TranslatorException
+      fail Exceptions::TranslatorException
     end
     raw_tree.instance_variable_set(:@srcfile,srcfile)
     raw_tree=raw_tree.transform_top(:post) # post-process raw tree
@@ -466,8 +464,11 @@ class Translator
             conf[:product]=:translated_source
           elsif action=="passthrough"
             conf[:product]=:raw_source
+          elsif action=="modinfo"
+            conf[:product]=:modinfo
           else
             puts "ERROR: Unknown action '#{action}'" unless quiet
+            raise Exceptions::TranslatorException
           end
           if form=="fixed"
             conf[:form]=:fixed
@@ -483,8 +484,10 @@ class Translator
             end
             conf[:incdirs].push(d)
           end
-          puts "Translating #{srcfile}" unless quiet
-          client.puts(process(s,:program_units,srcfile,dstfile,conf))
+          product=(conf[:product]==:modinfo)?("modinfo"):("translation")
+          puts "Producing #{product} for #{srcfile}" unless quiet
+          translation=process(s,:program_units,srcfile,dstfile,conf)
+          client.puts(translation)
           client.close
         rescue Errno::EPIPE
           # Handle broken pipe (i.e. other end of the socket dies)
@@ -493,15 +496,19 @@ class Translator
           return
         rescue SystemExit=>ex
           monitor.join
-        rescue TranslatorException=>ex
-          client.puts("\x00") # C null
-          client.close
+        rescue Exceptions::TranslatorException=>ex
+          begin
+            client.puts("\x00") # C null
+            client.close
+          rescue Exception=>ex
+            $stderr.puts "Error writing response to client"
+          end
         rescue Exception=>ex
-          s="Caught exception '#{ex.class}':\n"
-          s+="#{ex.message}\n"
-          s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }
+          $stderr.puts "Caught exception '#{ex.class}':"
+          $stderr.puts "#{ex.message}"
+          ex.backtrace.each { |x| $stderr.puts x }
           server_stop(socket,1)
-          die s
+          exit(1)
         end
       end
     end
@@ -557,13 +564,13 @@ class Translator
 
   def usage
     x=[]
-    x.push("-I dir[:dir:...]")
+    x.push("-I <dir>[:<dir>:...]")
     x.push("debug")
     x.push("fixed")
     x.push("modinfo")
     x.push("normalize")
     x.push("passthrough")
-    "#{File.basename(@wrapper,'.rb')} [ #{x.join(" | ")} ] infile <outfile|moddir>"
+    "#{File.basename(@wrapper,'.rb')} [ #{x.join(" | ")} ] <infile> <outfile>|<moddir>"
   end
 
 end
