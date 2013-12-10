@@ -715,6 +715,18 @@ module Fortran
 
   class Io_Stmt < NT
 
+    def add_serial_region_vars(serial_intent)
+      if (namelist_name=nml)
+        nmlenv=varenv_get(namelist_name,self,expected=true)
+        nmlenv["objects"].each do |x|
+          varenv=varenv_get(x,self,expected=true)
+          if serial_intent==:out or varenv["decomp"]
+            env[:sms_serial_info].vars_in_region.add([x,serial_intent])
+          end
+        end
+      end
+    end
+
     def io_stmt_bcasts
       @need_decompmod=true unless @var_bcast.empty?
       @code_bcast.concat(code_bcast(@var_bcast,@iostat))
@@ -974,39 +986,43 @@ module Fortran
   class Read_Stmt < Io_Stmt
 
     def translate
-      return if sms_ignore or sms_serial
-      io_stmt_init
-      @onroot=false if unit.is_a?(Internal_File_Unit)
-      if (namelist_name=nml)
-        @onroot=true
-        nmlenv=varenv_get(namelist_name,self,expected=true)
-        nmlenv["objects"].each do |x|
-          var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-          if (varenv=varenv_get(var,self,expected=false))
-            if varenv["decomp"]
-              @var_scatter.push(var)
-              replace_input_item(x,sms_global_name(var))
-            else
-              @var_bcast.push(var)
+      return if sms_ignore
+      if sms_serial
+        add_serial_region_vars(:out)
+      else
+        io_stmt_init
+        @onroot=false if unit.is_a?(Internal_File_Unit)
+        if (namelist_name=nml)
+          @onroot=true
+          nmlenv=varenv_get(namelist_name,self,expected=true)
+          nmlenv["objects"].each do |x|
+            var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
+            if (varenv=varenv_get(var,self,expected=false))
+              if varenv["decomp"]
+                @var_scatter.push(var)
+                replace_input_item(x,sms_global_name(var))
+              else
+                @var_bcast.push(var)
+              end
             end
           end
         end
-      end
-      input_items.each do |x|
-        var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-        # If some intput item isn't present in the environment, assume that it
-        # is *not* distributed and carry on.
-        if (varenv=varenv_get(var,self,expected=false))
-          if (dh=varenv["decomp"])
-            @onroot=true
-            @var_scatter.push(var)
-            replace_input_item(x,sms_global_name(var))
-          else
-            @var_bcast.push(var) if @onroot
+        input_items.each do |x|
+          var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
+          # If some intput item isn't present in the environment, assume that it
+          # is *not* distributed and carry on.
+          if (varenv=varenv_get(var,self,expected=false))
+            if (dh=varenv["decomp"])
+              @onroot=true
+              @var_scatter.push(var)
+              replace_input_item(x,sms_global_name(var))
+            else
+              @var_bcast.push(var) if @onroot
+            end
           end
         end
+        io_stmt_common
       end
-      io_stmt_common
     end
 
   end
@@ -1684,13 +1700,33 @@ module Fortran
 
       si=env[:sms_serial_info]
 
+      # Any occurrences of names with in/out treatment specified are overriden
+      # by occurrences lacking this specificity. That is, if elements ["a",:in]
+      # and "a" are both registered, the former should be ignored, so we delete
+      # it here.
+
+      si.vars_in_region.delete_if do |name|
+        name.is_a?(Array) and si.vars_in_region.include?(name.first)
+      end
+
       # Iterate over the set of names that occurred in the region.
 
-      si.vars_in_region.sort.each do |name|
+      si.vars_in_region.each do |name|
+
+        # If in/out treatment was specified when this name was registered in the
+        # serial region, extract that information now.
+
+        name,treatment=(name.is_a?(Array))?(name):([name,nil])
+
+        # Extract variable information.
 
         varenv=varenv_get(name,self,expected=false)
         dh=(varenv)?(varenv["decomp"]):(nil)
         sort=(varenv)?(varenv["sort"]):(nil)
+
+        # Ignore namelist names.
+
+        next if sort=="_namelist"
 
         # Handle 'ingore' variables. A decomposed variable must be globalized
         # even if it is not gathered/scattered.
@@ -1718,7 +1754,7 @@ module Fortran
           # intent no longer applies.
 
           if dh
-            gathers.push(name)
+            gathers.push(name) unless treatment==:out
             globals.add(name)
           end
           default=false
@@ -1739,7 +1775,7 @@ module Fortran
           # Broadcast non-decomposed and scatter decomposed arrays, and note
           # that the default intent no longer applies.
 
-          ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name)
+          ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name) unless treatment==:in
           globals.add(name) if dh
           default=false
         end
@@ -1755,9 +1791,9 @@ module Fortran
 
           d="#{si.default}"
           missing(name,d) unless varenv or d=="ignore"
-          gathers.push(name) if dh and (d=="in" or d=="inout")
+          gathers.push(name) if dh and (d=="in" or d=="inout") and not treatment==:out
           if d=="out" or d=="inout"
-            ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name)
+            ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name) unless treatment==:in
           end
           globals.add(name) if dh
         end
@@ -2176,34 +2212,38 @@ module Fortran
   class Write_Stmt < Io_Stmt
 
     def translate
-      return if sms_ignore or sms_serial
-      io_stmt_init
-      function=(env["#{unit}"] and env["#{unit}"]["subprogram"]=="_function")
-      @onroot=false if unit.is_a?(Internal_File_Unit) or function
-      if (namelist_name=nml)
-        @onroot=true
-        nmlenv=varenv_get(namelist_name,self,expected=true)
-        nmlenv["objects"].each do |x|
+      return if sms_ignore
+      if sms_serial
+        add_serial_region_vars(:in)
+      else        
+        io_stmt_init
+        function=(env["#{unit}"] and env["#{unit}"]["subprogram"]=="_function")
+        @onroot=false if unit.is_a?(Internal_File_Unit) or function
+        if (namelist_name=nml)
+          @onroot=true
+          nmlenv=varenv_get(namelist_name,self,expected=true)
+          nmlenv["objects"].each do |x|
+            var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
+            varenv=varenv_get(var,self,expected=true)
+            if varenv["decomp"]
+              @var_gather.push(var)
+              replace_input_item(x,sms_global_name(var))
+            end
+          end
+        end
+        output_items.each do |x|
           var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-          varenv=varenv_get(var,self,expected=true)
-          if varenv["decomp"]
-            @var_gather.push(var)
-            replace_input_item(x,sms_global_name(var))
+          if (varenv=varenv_get(var,self,expected=false))
+            if (dh=varenv["decomp"])
+              @onroot=true
+              global=sms_global_name(var)
+              @var_gather.push(var)
+              replace_output_item(x,global)
+            end
           end
         end
+        io_stmt_common
       end
-      output_items.each do |x|
-        var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-        if (varenv=varenv_get(var,self,expected=false))
-          if (dh=varenv["decomp"])
-            @onroot=true
-            global=sms_global_name(var)
-            @var_gather.push(var)
-            replace_output_item(x,global)
-          end
-        end
-      end
-      io_stmt_common
     end
 
   end

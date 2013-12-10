@@ -19492,7 +19492,7 @@ module Fortran
       s1 << r3
     end
     if s1.last
-      r1 = instantiate_node(IO_Implied_Do_Object_Output_Item,input, i1...index, s1)
+      r1 = instantiate_node(Io_Implied_Do_Object_Output_Item,input, i1...index, s1)
       r1.extend(IoImpliedDoObject0)
     else
       @index = i1
@@ -19517,7 +19517,7 @@ module Fortran
         s5 << r7
       end
       if s5.last
-        r5 = instantiate_node(IO_Implied_Do_Object_Input_Item,input, i5...index, s5)
+        r5 = instantiate_node(Io_Implied_Do_Object_Input_Item,input, i5...index, s5)
         r5.extend(IoImpliedDoObject1)
       else
         @index = i5

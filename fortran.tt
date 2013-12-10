@@ -2027,8 +2027,8 @@ grammar Fortran
   rule io_implied_do_object
     # F90:R917
 
-    output_item !t_equal <IO_Implied_Do_Object_Output_Item> /
-    input_item !t_equal <IO_Implied_Do_Object_Input_Item>
+    output_item !t_equal <Io_Implied_Do_Object_Output_Item> /
+    input_item !t_equal <Io_Implied_Do_Object_Input_Item>
   end
 
   rule io_implied_do_object_list

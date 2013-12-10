@@ -2863,10 +2863,10 @@ module Fortran
   class Io_Implied_Do_Control_Option < NT
   end
 
-  class IO_Implied_Do_Object_Input_Item < NT
+  class Io_Implied_Do_Object_Input_Item < NT
   end
 
-  class IO_Implied_Do_Object_Output_Item < NT
+  class Io_Implied_Do_Object_Output_Item < NT
   end
 
   class Io_Implied_Do_Object_List < List
