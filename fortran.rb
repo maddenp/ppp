@@ -1759,6 +1759,9 @@ module Fortran
   class Close_Spec_List_Pair < NT
   end
 
+  class Close_Spec_Option < NT
+  end
+
   class Close_Stmt < Io_Stmt
 
     def str0
@@ -1775,12 +1778,30 @@ module Fortran
 
   end
 
+  class Common_Block_Name_And_Object_Lists < NT
+  end
+
   class Common_Block_Name < NT
 
     def name
       e[0]
     end
 
+  end
+
+  class Common_Block_Name_Triplet < NT
+  end
+
+  class Common_Block_Object < NT
+  end
+
+  class Common_Block_Object_List < NT
+  end
+
+  class Common_Block_Object_Pair < NT
+  end
+
+  class Common_Block_Object_Pairs < NT
   end
 
   class Common_Stmt < Stmt
@@ -1791,7 +1812,19 @@ module Fortran
 
   end
 
+  class Complex_Literal_Constant < NT
+  end
+
+  class Component_Attr_Spec_1 < NT
+  end
+
   class Component_Attr_Spec_List < List
+  end
+
+  class Compoent_Attr_Spec_List_Option < NT
+  end
+
+  class Component_Decl < NT
   end
 
   class Component_Decl_List < List
@@ -1803,6 +1836,18 @@ module Fortran
       stmt("#{e[1]}#{ir(e[2],""," ")}#{e[3]}")
     end
 
+  end
+
+  class Component_Def_Stmt_Option < NT
+  end
+
+  class Component_Def_Stmts < NT
+  end
+
+  class Component_Initialization_1 < NT
+  end
+
+  class Component_Initialization_2 < NT
   end
 
   class Component_Name < NT

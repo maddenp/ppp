@@ -598,7 +598,7 @@ grammar Fortran
   end
 
   rule close_spec_option
-    t_unit t_equal <NT>
+    t_unit t_equal <Close_Spec_Option>
   end
 
   rule close_spec_list
@@ -626,17 +626,17 @@ grammar Fortran
   end
 
   rule common_block_name_and_object_lists
-    common_block_name_and_object_list* <NT>
+    common_block_name_and_object_list* <Common_Block_Name_And_Object_Lists>
   end
 
   rule common_block_name_triplet
-    t_slash common_block_name? t_slash <NT>
+    t_slash common_block_name? t_slash <Common_Block_Name_Triplet>
   end
 
   rule common_block_object
     # F90:R549
 
-    variable_name common_block_object_explicit_shape_spec_list? <NT>
+    variable_name common_block_object_explicit_shape_spec_list? <Common_Block_Object>
   end
 
   rule common_block_object_explicit_shape_spec_list
@@ -644,15 +644,15 @@ grammar Fortran
   end
 
   rule common_block_object_list
-    common_block_object common_block_object_pairs <NT>
+    common_block_object common_block_object_pairs <Common_Block_Object_List>
   end
 
   rule common_block_object_pair
-    t_comma common_block_object <NT>
+    t_comma common_block_object <Common_Block_Object_Pair>
   end
 
   rule common_block_object_pairs
-    common_block_object_pair* <NT>
+    common_block_object_pair* <Common_Block_Object_Pairs>
   end
 
   rule common_stmt
@@ -664,7 +664,7 @@ grammar Fortran
   rule complex_literal_constant
     # F90:R417
 
-    t_paren_l real_part t_comma imag_part t_paren_r <NT>
+    t_paren_l real_part t_comma imag_part t_paren_r <Complex_Literal_Constant>
   end
 
   rule component_array_spec
@@ -678,7 +678,7 @@ grammar Fortran
     # F90:R427 + F95:R426 + F03:R441
 
     t_pointer /
-    t_dimension t_paren_l component_array_spec t_paren_r <NT> /
+    t_dimension t_paren_l component_array_spec t_paren_r <Component_Attr_Spec_1> /
     t_allocatable
   end
 
@@ -687,13 +687,13 @@ grammar Fortran
   end
 
   rule component_attr_spec_list_option
-    t_comma component_attr_spec_list <NT>
+    t_comma component_attr_spec_list <Compoent_Attr_Spec_List_Option>
   end
 
   rule component_decl
     # F90:R429 + F95:R428
 
-    component_name parenthesized_component_array_spec? ( t_star char_length )? component_initialization? <NT>
+    component_name parenthesized_component_array_spec? ( t_star char_length )? component_initialization? <Component_Decl>
   end
 
   rule component_decl_list
@@ -707,18 +707,18 @@ grammar Fortran
   end
 
   rule component_def_stmt_option
-    component_attr_spec_list_option? double_colon <NT>
+    component_attr_spec_list_option? double_colon <Component_Def_Stmt_Option>
   end
 
   rule component_def_stmts
-    component_def_stmt+ <NT>
+    component_def_stmt+ <Component_Def_Stmts>
   end
 
   rule component_initialization
     # F95:R429
 
-    t_equal initialization_expr <NT> /
-    t_point null_function_ref <NT>
+    t_equal initialization_expr <Component_Initialization_1> /
+    t_point null_function_ref <Component_Initialization_2>
   end
 
   rule component_name
