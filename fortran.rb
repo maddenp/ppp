@@ -2004,6 +2004,9 @@ module Fortran
   class Do_Construct_Name < NT
   end
 
+  class Do_Stmt < Stmt
+  end
+
   class Do_Term_Action_Stmt < Stmt
 
     def str1
@@ -2968,10 +2971,18 @@ module Fortran
   class Label_Format < Label
   end
 
-  class Label_Do_Stmt < Stmt
+  class Label_Do_Stmt < Do_Stmt
+
+    def do_variable
+      (loop_control)?(loop_control.do_variable):(nil)
+    end
 
     def label
       e[3]
+    end
+
+    def loop_control
+      (e[4].is_a?(Loop_Control))?(e[4]):(nil)
     end
 
     def str0
@@ -3023,6 +3034,10 @@ module Fortran
 
   class Loop_Control_1 < Loop_Control
 
+    def do_variable
+      e[1]
+    end
+
     def str0
       "#{ir(e[0],""," ")}#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{e[5]}"
     end
@@ -3030,6 +3045,10 @@ module Fortran
   end
 
   class Loop_Control_2 < Loop_Control
+
+    def do_variable
+      nil
+    end
 
     def str0
       "#{ir(e[0],""," ")}#{e[1]} #{e[2]}#{e[3]}#{e[4]}"
@@ -3270,7 +3289,15 @@ module Fortran
 
   end
 
-  class Nonlabel_Do_Stmt < Stmt
+  class Nonlabel_Do_Stmt < Do_Stmt
+
+    def do_variable
+      (loop_control)?(loop_control.do_variable):(nil)
+    end
+
+    def loop_control
+      (e[3].is_a?(Loop_Control))?(e[3]):(nil)
+    end
 
     def str0
       stmt("#{sa(e[1])}#{e[2]}#{e[3]}")

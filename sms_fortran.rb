@@ -614,6 +614,36 @@ module Fortran
 
   end
 
+  class Do_Stmt < Stmt
+
+    def translate
+      unless sms_serial
+        if (p=sms_parallel)
+          dd=nil
+          [0,1,2].each do |i|
+            if p.vars[i].include?("#{do_variable}")
+              dd=i+1
+              break
+            end
+          end
+          dh=p.decomp
+          if dd
+            halo_lo=halo_offsets(dd).lo
+            halo_up=halo_offsets(dd).up
+            if loop_control.is_a?(Loop_Control_1)
+              code="#{dh}__s#{dd}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)"
+              replace_element(code,:scalar_numeric_expr,loop_control.e[3])
+              code=",#{dh}__e#{dd}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)"
+              replace_element(code,:loop_control_pair,loop_control.e[4])
+              use(sms_decompmod)
+            end
+          end
+        end
+      end
+    end
+
+  end
+
   class Entity_Decl_1 < Entity_Decl
 
     def translate
@@ -814,6 +844,9 @@ module Fortran
 
   end
 
+  class Label_Do_Stmt < Do_Stmt
+  end
+
   class Label_Stmt < NT
 
     def errmsg(in_serial_region)
@@ -904,36 +937,7 @@ module Fortran
 
   end
 
-  class Nonlabel_Do_Stmt < Stmt
-
-    def translate
-      unless sms_serial
-        if (p=sms_parallel)
-          loop_control=e[3]
-          loop_var="#{loop_control.e[1]}"
-          dd=nil
-          [0,1,2].each do |i|
-            if p.vars[i].include?(loop_var)
-              dd=i+1
-              break
-            end
-          end
-          dh=p.decomp
-          if dd
-            halo_lo=halo_offsets(dd).lo
-            halo_up=halo_offsets(dd).up
-            if loop_control.is_a?(Loop_Control_1)
-              code="#{dh}__s#{dd}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)"
-              replace_element(code,:scalar_numeric_expr,loop_control.e[3])
-              code=",#{dh}__e#{dd}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)"
-              replace_element(code,:loop_control_pair,loop_control.e[4])
-              use(sms_decompmod)
-            end
-          end
-        end
-      end
-    end
-
+  class Nonlabel_Do_Stmt < Do_Stmt
   end
 
   class Open_Stmt < Io_Stmt
