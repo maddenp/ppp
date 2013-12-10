@@ -1290,6 +1290,9 @@ module Fortran
   class SMS_Decomp_Name < SMS
   end
 
+  class SMS_Directive < T
+  end
+
   class SMS_Distribute < SMS_Region
   end
 
@@ -1405,6 +1408,18 @@ module Fortran
       replace_statement(code)
     end
 
+  end
+
+  class SMS_Executable_SMS_Halo_Comp < NT
+  end
+
+  class SMS_Executable_SMS_Parallel < NT
+  end
+
+  class SMS_Executable_SMS_Serial < NT
+  end
+
+  class SMS_Executable_SMS_To_Local < NT
   end
 
   class SMS_Halo_Comp < SMS_Region

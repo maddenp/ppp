@@ -70,7 +70,7 @@ module Fortran
                     s8 << r10
                   end
                   if s8.last
-                    r8 = instantiate_node(NT,input, i8...index, s8)
+                    r8 = instantiate_node(Declaration_Construct_Stmt_Function_Stmt,input, i8...index, s8)
                     r8.extend(DeclarationConstruct0)
                   else
                     @index = i8
@@ -160,7 +160,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
+      r0 = instantiate_node(SMS_Directive,input, i0...index, s0)
       r0.extend(Directive0)
     else
       @index = i0
@@ -223,38 +223,6 @@ module Fortran
     end
 
     node_cache[:executable_construct][start_index] = r0
-
-    r0
-  end
-
-  def _nt_implicit_part
-    start_index = index
-    if node_cache[:implicit_part].has_key?(index)
-      cached = node_cache[:implicit_part][index]
-      if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    s0, i0 = [], index
-    loop do
-      r1 = _nt_implicit_part_stmt
-      if r1
-        s0 << r1
-      else
-        break
-      end
-    end
-    if s0.empty?
-      @index = i0
-      r0 = nil
-    else
-      r0 = instantiate_node(NT,input, i0...index, s0)
-    end
-
-    node_cache[:implicit_part][start_index] = r0
 
     r0
   end
@@ -1572,7 +1540,7 @@ module Fortran
                   s7 << r9
                 end
                 if s7.last
-                  r7 = instantiate_node(NT,input, i7...index, s7)
+                  r7 = instantiate_node(SMS_Executable_SMS_Halo_Comp,input, i7...index, s7)
                   r7.extend(SmsExecutable0)
                 else
                   @index = i7
@@ -1600,7 +1568,7 @@ module Fortran
                       s12 << r14
                     end
                     if s12.last
-                      r12 = instantiate_node(NT,input, i12...index, s12)
+                      r12 = instantiate_node(SMS_Executable_SMS_Parallel,input, i12...index, s12)
                       r12.extend(SmsExecutable1)
                     else
                       @index = i12
@@ -1628,7 +1596,7 @@ module Fortran
                           s17 << r19
                         end
                         if s17.last
-                          r17 = instantiate_node(NT,input, i17...index, s17)
+                          r17 = instantiate_node(SMS_Executable_SMS_Serial,input, i17...index, s17)
                           r17.extend(SmsExecutable2)
                         else
                           @index = i17
@@ -1664,7 +1632,7 @@ module Fortran
                                   s24 << r26
                                 end
                                 if s24.last
-                                  r24 = instantiate_node(NT,input, i24...index, s24)
+                                  r24 = instantiate_node(SMS_Executable_SMS_To_Local,input, i24...index, s24)
                                   r24.extend(SmsExecutable3)
                                 else
                                   @index = i24

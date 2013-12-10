@@ -9,7 +9,7 @@ grammar Fortran
   rule ac_implied_do
     # F90:R433
 
-    t_paren_l ac_value_list t_comma ac_implied_do_control t_paren_r <NT>
+    t_paren_l ac_value_list t_comma ac_implied_do_control t_paren_r <AC_Implied_Do>
   end
 
   rule ac_implied_do_control
@@ -22,7 +22,7 @@ grammar Fortran
     # F90:R432
 
     ac_implied_do /
-    expr !t_equal <NT>
+    expr !t_equal <AC_Value_Expr>
   end
 
   rule ac_value_list
@@ -100,7 +100,7 @@ grammar Fortran
   rule action_term_do_construct
     # F90:R827
 
-    label_do_stmt !{ |e| sp_dolabel_repeat? } do_body do_term_action_stmt <NT>
+    label_do_stmt !{ |e| sp_dolabel_repeat? } do_body do_term_action_stmt <Action_Term_Do_Construct>
   end
 
   rule actual_arg
@@ -116,7 +116,7 @@ grammar Fortran
   rule actual_arg_spec
     # F90:R1211
 
-    keyword_option actual_arg <NT>
+    keyword_option actual_arg <Actual_Arg_Spec>
   end
 
   rule actual_arg_spec_list
@@ -175,7 +175,7 @@ grammar Fortran
   rule allocate_shape_spec
     # F90:R626
 
-    ( allocate_lower_bound t_colon )? allocate_upper_bound <NT>
+    ( allocate_lower_bound t_colon )? allocate_upper_bound <Allocate_Shape_Spec>
   end
 
   rule allocate_shape_spec_list
@@ -185,7 +185,7 @@ grammar Fortran
   end
 
   rule allocate_stat_construct
-    t_comma t_stat t_equal stat_variable <NT>
+    t_comma t_stat t_equal stat_variable <Allocate_Stat_Construct>
   end
 
   rule allocate_stmt
@@ -233,7 +233,7 @@ grammar Fortran
   rule array_constructor
     # F90:R431
 
-    t_paren_l t_slash ac_value_list t_slash t_paren_r <NT>
+    t_paren_l t_slash ac_value_list t_slash t_paren_r <Array_Constructor>
   end
 
   rule array_element
@@ -310,7 +310,7 @@ grammar Fortran
   end
 
   rule assigned_goto_stmt_label_list
-    t_comma? t_paren_l label_list t_paren_r <NT>
+    t_comma? t_paren_l label_list t_paren_r <Assigned_Goto_Stmt_Label_List>
   end
 
   rule assignment_stmt
@@ -351,7 +351,7 @@ grammar Fortran
     t_allocatable "" <Attr_Spec_Allocatable> /
     t_dimension t_paren_l array_spec t_paren_r <Attr_Spec_Dimension> /
     t_external /
-    t_intent t_paren_l intent_spec t_paren_r <NT> /
+    t_intent t_paren_l intent_spec t_paren_r <Attr_Spec_Intent> /
     t_intrinsic /
     t_optional /
     t_pointer /
@@ -428,7 +428,7 @@ grammar Fortran
     # a repeat, as that would require more than one end-do-stmt with the same
     # label, which is not permitted.
 
-    do_stmt !{ |e| sp_dolabel_repeat? } do_block end_do <NT>
+    do_stmt !{ |e| sp_dolabel_repeat? } do_block end_do <Block_Do_Construct_Main>
   end
 
   rule boz_literal_constant
@@ -448,7 +448,7 @@ grammar Fortran
   rule case_construct
     # F90:R808
 
-    select_case_stmt case_stmt_construct_block end_select_stmt <NT>
+    select_case_stmt case_stmt_construct_block end_select_stmt <Case_Construct>
   end
 
   rule case_construct_name
@@ -456,7 +456,7 @@ grammar Fortran
   end
 
   rule case_construct_name_pair
-    case_construct_name t_colon <NT>
+    case_construct_name t_colon <Case_Construct_Name_Pair>
   end
 
   rule case_expr
@@ -475,7 +475,7 @@ grammar Fortran
   end
 
   rule case_selector_range
-    t_paren_l case_value_range_list t_paren_r <NT>
+    t_paren_l case_value_range_list t_paren_r <Case_Selector_Range>
   end
 
   rule case_stmt
@@ -485,11 +485,11 @@ grammar Fortran
   end
 
   rule case_stmt_construct
-    case_stmt block <NT>
+    case_stmt block <Case_Stmt_Construct>
   end
 
   rule case_stmt_construct_block
-    case_stmt_construct* <NT>
+    case_stmt_construct* <Case_Stmt_Construct_Block>
   end
 
   rule case_value
@@ -503,9 +503,9 @@ grammar Fortran
   rule case_value_range
     # F90:R814
 
-    t_colon case_value <NT> /
-    case_value t_colon case_value <NT> /
-    case_value t_colon <NT> /
+    t_colon case_value <Case_Value_Range_1> /
+    case_value t_colon case_value <Case_Value_Range_2> /
+    case_value t_colon <Case_Value_Range_3> /
     case_value
   end
 
@@ -528,19 +528,19 @@ grammar Fortran
   rule char_length
     # F90:R508
 
-    t_paren_l type_param_value t_paren_r <NT> /
+    t_paren_l type_param_value t_paren_r <Char_Length_1> /
     scalar_int_literal_constant
   end
 
   rule char_length_pair
-    t_star char_length <NT>
+    t_star char_length <Char_Length_Pair>
   end
 
   rule char_literal_constant
     # F90:R420
 
-    char_literal_constant_prefix? char_literal_constant_sq <NT> /
-    char_literal_constant_prefix? char_literal_constant_dq <NT>
+    char_literal_constant_prefix? char_literal_constant_sq <Char_Literal_Constant_Sq> /
+    char_literal_constant_prefix? char_literal_constant_dq <Char_Literal_Constant_Dq>
   end
 
   rule char_literal_constant_dq
@@ -548,7 +548,7 @@ grammar Fortran
   end
 
   rule char_literal_constant_prefix
-    kind_param t_underscore <NT>
+    kind_param t_underscore <Char_Literal_Constant_Prefix>
   end
 
   rule char_literal_constant_sq
@@ -559,13 +559,13 @@ grammar Fortran
     # F90:R506
 
     length_selector /
-    t_paren_l len_pair type_param_value t_comma kind_pair scalar_int_initialization_expr t_paren_r <NT> /
-    t_paren_l type_param_value t_comma kind_pair? scalar_int_initialization_expr t_paren_r <NT> /
-    t_paren_l kind_pair scalar_int_initialization_expr char_selector_option? t_paren_r <NT>
+    t_paren_l len_pair type_param_value t_comma kind_pair scalar_int_initialization_expr t_paren_r <Char_Selector_1> /
+    t_paren_l type_param_value t_comma kind_pair? scalar_int_initialization_expr t_paren_r <Char_Selector_2> /
+    t_paren_l kind_pair scalar_int_initialization_expr char_selector_option? t_paren_r <Char_Selector_3>
   end
 
   rule char_selector_option
-    t_comma len_pair type_param_value <NT>
+    t_comma len_pair type_param_value <Char_Selector_Option>
   end
 
   rule char_string_edit_desc
@@ -593,8 +593,8 @@ grammar Fortran
 
     io_spec_iostat /
     io_spec_err /
-    t_status t_equal scalar_default_char_expr <NT> /
-    close_spec_option? external_file_unit <NT>
+    t_status t_equal scalar_default_char_expr <Close_Spec_1> /
+    close_spec_option? external_file_unit <Close_Spec_2>
   end
 
   rule close_spec_option
@@ -967,7 +967,7 @@ grammar Fortran
     parameter_stmt /
     format_stmt /
     entry_stmt /
-    stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <NT> /
+    stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <Declaration_Construct_Stmt_Function_Stmt> /
     directive
   end
 
@@ -2011,24 +2011,24 @@ grammar Fortran
   rule io_implied_do
     # F90:R916
 
-    t_paren_l io_implied_do_object_list t_comma io_implied_do_control t_paren_r <NT>
+    t_paren_l io_implied_do_object_list t_comma io_implied_do_control t_paren_r <Io_Implied_Do>
   end
 
   rule io_implied_do_control
     # F90:R918
 
-    do_variable t_equal scalar_numeric_expr t_comma scalar_numeric_expr io_implied_do_control_option? <NT>
+    do_variable t_equal scalar_numeric_expr t_comma scalar_numeric_expr io_implied_do_control_option? <Io_Implied_Do_Control>
   end
 
   rule io_implied_do_control_option
-    t_comma scalar_numeric_expr <NT>
+    t_comma scalar_numeric_expr <Io_Implied_Do_Control_Option>
   end
 
   rule io_implied_do_object
     # F90:R917
 
-    output_item !t_equal <NT> /
-    input_item !t_equal <NT>
+    output_item !t_equal <IO_Implied_Do_Object_Output_Item> /
+    input_item !t_equal <IO_Implied_Do_Object_Input_Item>
   end
 
   rule io_implied_do_object_list

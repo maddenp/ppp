@@ -1120,6 +1120,9 @@ module Fortran
 
   # Grammar-supporting subclasses
 
+  class AC_Implied_Do < NT
+  end
+
   class AC_Implied_Do_Control < NT
 
     def str0
@@ -1128,6 +1131,9 @@ module Fortran
       s
     end
 
+  end
+
+  class AC_Value_Expr < NT
   end
 
   class AC_Value_List < List
@@ -1185,6 +1191,12 @@ module Fortran
 
   end
 
+  class Action_Term_Do_Construct < NT
+  end
+
+  class Actual_Arg_Spec < NT
+  end
+
   class Actual_Arg_Spec_List < List
   end
 
@@ -1240,7 +1252,13 @@ module Fortran
 
   end
 
+  class Allocate_Shape_Spec < NT
+  end
+
   class Allocate_Shape_Spec_List < List
+  end
+
+  class Allocate_Stat_Construct < NT
   end
 
   class Allocate_Stmt < Stmt
@@ -1288,6 +1306,9 @@ module Fortran
       stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[5]}#{e[6]}#{e[7]}#{e[8]}#{e[9]}")
     end
 
+  end
+
+  class Array_Constructor < NT
   end
 
   class Array_Name < NT
@@ -1389,6 +1410,9 @@ module Fortran
       stmt("#{e[1]} #{e[2]}#{ik(e[3],","," ")}#{e[4]}")
     end
 
+  end
+
+  class Assigned_Goto_Stmt_Label_List < NT
   end
 
   class Assignment_Stmt < Stmt
@@ -1536,6 +1560,9 @@ module Fortran
 
   end
 
+  class Attr_Spec_Intent < NT
+  end
+
   class Attr_Spec_List < Attr_Spec_Base
   end
 
@@ -1633,6 +1660,9 @@ module Fortran
   class Block_Do_Construct < NT
   end
 
+  class Block_Do_Construct_Main < NT
+  end
+
   class Call_Stmt < Stmt
 
     def str0
@@ -1641,7 +1671,16 @@ module Fortran
 
   end
 
+  class Case_Construct < NT
+  end
+
   class Case_Construct_Name < NT
+  end
+
+  class Case_Construct_Name_Pair < NT
+  end
+
+  class Case_Selector_Range < NT
   end
 
   class Case_Stmt < Stmt
@@ -1655,7 +1694,34 @@ module Fortran
 
   end
 
+  class Case_Stmt_Construct < NT
+  end
+
+  class Case_Stmt_Construct_Block < NT
+  end
+
+  class Case_Value_Range_1 < NT
+  end
+
+  class Case_Value_Range_2 < NT
+  end
+
+  class Case_Value_Range_3 < NT
+  end
+
   class Case_Value_Range_List < List
+  end
+
+  class Char_Length_1 < NT
+  end
+
+  class Char_Length_Pair < NT
+  end
+
+  class Char_Literal_Constant_Dq < NT
+  end
+
+  class Char_Literal_Constant_Prefix < NT
   end
 
   class Char_Literal_Constant_Quoted < NT
@@ -1664,6 +1730,27 @@ module Fortran
       "#{e[0]}"+e[1].e.reduce("") { |m,x| m+="#{x.e[1]}" }+"#{e[2]}"
     end
 
+  end
+
+  class Char_Literal_Constant_Sq < NT
+  end
+
+  class Char_Selector_1 < NT
+  end
+
+  class Char_Selector_2 < NT
+  end
+
+  class Char_Selector_3 < NT
+  end
+
+  class Char_Selector_Option < NT
+  end
+
+  class Close_Spec_1 < NT
+  end
+
+  class Close_Spec_2 < NT
   end
 
   class Close_Spec_List < Io_Spec_List
@@ -1822,6 +1909,9 @@ module Fortran
       cat_stmt
     end
 
+  end
+
+  class Declaration_Construct_Stmt_Function_Stmt < NT
   end
 
   class Declaration_Constructs < NT
@@ -2714,6 +2804,21 @@ module Fortran
       e[2]
     end
 
+  end
+
+  class Io_Implied_Do < NT
+  end
+
+  class Io_Implied_Do_Control < NT
+  end
+
+  class Io_Implied_Do_Control_Option < NT
+  end
+
+  class IO_Implied_Do_Object_Input_Item < NT
+  end
+
+  class IO_Implied_Do_Object_Output_Item < NT
   end
 
   class Io_Implied_Do_Object_List < List
