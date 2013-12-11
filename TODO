@@ -14,8 +14,6 @@
 
 ### GRAMMAR
 
-- Give specific names to the many NT nodes in [sms_]fortran.tt. IN PROGRESS.
-
 - Implement a continuation scheme (following Fortran!) for SMS directives.
 
 ### NEW FEATURES
