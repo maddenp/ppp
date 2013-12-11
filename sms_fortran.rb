@@ -470,6 +470,10 @@ module Fortran
       "sms__decomp"
     end
 
+    def sms_dummyvar
+      "sms__dummy"
+    end
+
     def sms_global_name(name)
       p="sms__global_"
       n="#{name}"
@@ -1363,69 +1367,134 @@ module Fortran
     end
 
     def translate
-      use(sms_decompmod)
-      tag=sms_commtag
-      declare("integer",tag,{:attrs=>"save"})
-      v=[e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
-      nvars=v.size
-      vars=v.reduce([]) { |m,x| m.push("#{x.name}") }.join(",")
-      names=v.reduce([]) { |m,x| m.push("'#{x.name}'") }.join(",")
-      cornerdepth=[]
-      dectypes=[]
-      gllbs=[]
-      glubs=[]
-      gstrt=[]
-      gstop=[]
-      halol=[]
-      halou=[]
-      perms=[]
-      types=[]
-      varenv=nil
-      (0..nvars-1).each do |i|
-        var=v[i].name
-        varenv=varenv_get(var)
-        dims=varenv["dims"]
-        fail "ERROR: scalar '#{var}' may not be exchanged" unless dims
-        dh=varenv["decomp"]
-        dectypes.push("#{dh}(#{dh}__nestlevel)")
-        cornerdepth.push("9999")
-        ranks.each { |r| gllbs.push((r>dims)?(1):(fixbound(varenv,var,r,:l))) }
-        ranks.each { |r| glubs.push((r>dims)?(1):(fixbound(varenv,var,r,:u))) }
-        sl=v[i].subscript_list
-        unless sl.empty?
-          unless sl.size==dims.to_i
-            fail "ERROR: '#{v[i]}' subscript list must be rank #{dims}"
+      structured=false # should be deduced!
+      if structured
+        # This is the code that worked for FIM and NIM prior to Jacques'
+        # exchange optimizations for the unstructured case. Keeping it intact
+        # here in case it's closer to what's needed for the structured case,
+        # though I have no idea at the moment what that would looks like. In
+        # any case, there's likely to be a lot of overlap that can be factored
+        # out and placed above the 'if structured' conditional.
+        use(sms_decompmod)
+        tag=sms_commtag
+        declare("integer",tag,{:attrs=>"save"})
+        v=[e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
+        nvars=v.size
+        vars=v.reduce([]) { |m,x| m.push("#{x.name}") }.join(",")
+        names=v.reduce([]) { |m,x| m.push("'#{x.name}'") }.join(",")
+        cornerdepth=[]
+        dectypes=[]
+        gllbs=[]
+        glubs=[]
+        gstrt=[]
+        gstop=[]
+        halol=[]
+        halou=[]
+        perms=[]
+        types=[]
+        varenv=nil
+        (0..nvars-1).each do |i|
+          var=v[i].name
+          varenv=varenv_get(var)
+          dims=varenv["dims"]
+          fail "ERROR: scalar '#{var}' may not be exchanged" unless dims
+          dh=varenv["decomp"]
+          dectypes.push("#{dh}(#{dh}__nestlevel)")
+          cornerdepth.push("9999")
+          ranks.each { |r| gllbs.push((r>dims)?(1):(fixbound(varenv,var,r,:l))) }
+          ranks.each { |r| glubs.push((r>dims)?(1):(fixbound(varenv,var,r,:u))) }
+          sl=v[i].subscript_list
+          unless sl.empty?
+            unless sl.size==dims.to_i
+              fail "ERROR: '#{v[i]}' subscript list must be rank #{dims}"
+            end
           end
-        end
-        ranks.each do |r|
-          if r>dims
-            gstrt.push(1)
-            gstop.push(1)
-          else
-            x=sl[r-1]
-            gstrt.push((x and lower=x.lower)?(lower):(fixbound(varenv,var,r,:l)))
-            gstop.push((x and upper=x.upper)?(upper):(fixbound(varenv,var,r,:u)))
+          ranks.each do |r|
+            if r>dims
+              gstrt.push(1)
+              gstop.push(1)
+            else
+              x=sl[r-1]
+              gstrt.push((x and lower=x.lower)?(lower):(fixbound(varenv,var,r,:l)))
+              gstop.push((x and upper=x.upper)?(upper):(fixbound(varenv,var,r,:u)))
+            end
           end
+          ranks.each { |r| halol.push((varenv["dim#{r}"])?("#{dh}__halosize(1,#{dh}__nestlevel)"):(0)) }
+          ranks.each { |r| halou.push((varenv["dim#{r}"])?("#{dh}__halosize(1,#{dh}__nestlevel)"):(0)) }
+          ranks.each { |r| perms.push(decdim(varenv,r)||0) }
+          types.push(sms_type(var))
         end
-        ranks.each { |r| halol.push((varenv["dim#{r}"])?("#{dh}__halosize(1,#{dh}__nestlevel)"):(0)) }
-        ranks.each { |r| halou.push((varenv["dim#{r}"])?("#{dh}__halosize(1,#{dh}__nestlevel)"):(0)) }
-        ranks.each { |r| perms.push(decdim(varenv,r)||0) }
-        types.push(sms_type(var))
+        cornerdepth="(/#{cornerdepth.join(",")}/)"
+        dectypes="(/#{dectypes.join(",")}/)"
+        gllbs="reshape((/#{gllbs.join(",")}/),(/#{nvars},#{maxrank}/))"
+        glubs="reshape((/#{glubs.join(",")}/),(/#{nvars},#{maxrank}/))"
+        gstrt="reshape((/#{gstrt.join(",")}/),(/#{nvars},#{maxrank}/))"
+        gstop="reshape((/#{gstop.join(",")}/),(/#{nvars},#{maxrank}/))"
+        halol="reshape((/#{halol.join(",")}/),(/#{nvars},#{maxrank}/))"
+        halou="reshape((/#{halou.join(",")}/),(/#{nvars},#{maxrank}/))"
+        perms="reshape((/#{perms.join(",")}/),(/#{nvars},#{maxrank}/))"
+        types="(/#{types.join(",")}/)"
+        code=[]
+        code.push("call sms__exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gstrt},#{gstop},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},#{sms_statusvar},#{vars},#{names})")
+        code.push(sms_chkstat)
+        replace_statement(code)
+      else # unstructured
+        use(sms_decompmod)
+        tag=sms_commtag
+        declare("integer",tag,{:attrs=>"save"})
+        declare("integer",sms_dummyvar,{:init=>"1"})
+        v=[e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
+        nvars=v.size
+        dectypes=[]
+        gllbs=[]
+        glubs=[]
+        gstrt=[]
+        gstop=[]
+        perms=[]
+        types=[]
+        varenv=nil
+        (0..nvars-1).each do |i|
+          var=v[i].name
+          varenv=varenv_get(var)
+          dims=varenv["dims"]
+          fail "ERROR: scalar '#{var}' may not be exchanged" unless dims
+          dh=varenv["decomp"]
+          dectypes.push("#{dh}(#{dh}__nestlevel)")
+          ranks.each { |r| gllbs.push((r>dims)?(1):(fixbound(varenv,var,r,:l))) }
+          ranks.each { |r| glubs.push((r>dims)?(1):(fixbound(varenv,var,r,:u))) }
+          sl=v[i].subscript_list
+          unless sl.empty?
+            unless sl.size==dims.to_i
+              fail "ERROR: '#{v[i]}' subscript list must be rank #{dims}"
+            end
+          end
+          ranks.each do |r|
+            if r>dims
+              gstrt.push(1)
+              gstop.push(1)
+            else
+              x=sl[r-1]
+              gstrt.push((x and lower=x.lower)?(lower):(fixbound(varenv,var,r,:l)))
+              gstop.push((x and upper=x.upper)?(upper):(fixbound(varenv,var,r,:u)))
+            end
+          end
+          ranks.each { |r| perms.push(decdim(varenv,r)||0) }
+          types.push(sms_type(var))
+        end
+        dectypes="(/#{dectypes.join(",")}/)"
+        gllbs="reshape((/#{gllbs.join(",")}/),(/#{nvars},#{maxrank}/))"
+        glubs="reshape((/#{glubs.join(",")}/),(/#{nvars},#{maxrank}/))"
+        gstrt="reshape((/#{gstrt.join(",")}/),(/#{nvars},#{maxrank}/))"
+        gstop="reshape((/#{gstop.join(",")}/),(/#{nvars},#{maxrank}/))"
+        perms="reshape((/#{perms.join(",")}/),(/#{nvars},#{maxrank}/))"
+        types="(/"+types.join(",")+"/)"
+        names="(/"+v.reduce([]) { |m,x| m.push("'#{x.name}'") }.join(",")+"/)"
+        vars=(1..25).reduce([]) { |m,x| m.push((x>nvars)?(sms_dummyvar):("#{v[x-1].name}")) }.join(",")
+        code=[]
+        code.push("call sms__exchange(#{nvars},#{tag},#{gllbs},#{glubs},#{gstrt},#{gstop},#{perms},#{dectypes},#{types},#{names},#{sms_statusvar},#{vars})")
+        code.push(sms_chkstat)
+        replace_statement(code)
       end
-      cornerdepth="(/#{cornerdepth.join(",")}/)"
-      dectypes="(/#{dectypes.join(",")}/)"
-      gllbs="reshape((/#{gllbs.join(",")}/),(/#{nvars},#{maxrank}/))"
-      glubs="reshape((/#{glubs.join(",")}/),(/#{nvars},#{maxrank}/))"
-      gstrt="reshape((/#{gstrt.join(",")}/),(/#{nvars},#{maxrank}/))"
-      gstop="reshape((/#{gstop.join(",")}/),(/#{nvars},#{maxrank}/))"
-      halol="reshape((/#{halol.join(",")}/),(/#{nvars},#{maxrank}/))"
-      halou="reshape((/#{halou.join(",")}/),(/#{nvars},#{maxrank}/))"
-      perms="reshape((/#{perms.join(",")}/),(/#{nvars},#{maxrank}/))"
-      types="(/#{types.join(",")}/)"
-      code=[]
-      code.push("call sms__exchange_#{nvars}(#{tag},#{gllbs},#{glubs},#{gstrt},#{gstop},#{perms},#{halol},#{halou},#{cornerdepth},#{dectypes},#{types},#{sms_statusvar},#{vars},#{names})")
-      code.push(sms_chkstat)
-      replace_statement(code)
     end
 
   end
