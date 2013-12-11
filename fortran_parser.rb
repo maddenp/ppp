@@ -13,7 +13,7 @@ module Fortran
     if node_cache[:ac_do_variable].has_key?(index)
       cached = node_cache[:ac_do_variable][index]
       if cached
-        node_cache[:ac_do_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -53,7 +53,7 @@ module Fortran
     if node_cache[:ac_implied_do].has_key?(index)
       cached = node_cache[:ac_implied_do][index]
       if cached
-        node_cache[:ac_implied_do][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -121,7 +121,7 @@ module Fortran
     if node_cache[:ac_implied_do_control].has_key?(index)
       cached = node_cache[:ac_implied_do_control][index]
       if cached
-        node_cache[:ac_implied_do_control][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -185,7 +185,7 @@ module Fortran
     if node_cache[:ac_value].has_key?(index)
       cached = node_cache[:ac_value][index]
       if cached
-        node_cache[:ac_value][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -194,7 +194,6 @@ module Fortran
     i0 = index
     r1 = _nt_ac_implied_do
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i2, s2 = index, []
@@ -219,7 +218,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -254,7 +252,7 @@ module Fortran
     if node_cache[:ac_value_list].has_key?(index)
       cached = node_cache[:ac_value_list][index]
       if cached
-        node_cache[:ac_value_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -307,7 +305,7 @@ module Fortran
     if node_cache[:access_id].has_key?(index)
       cached = node_cache[:access_id][index]
       if cached
-        node_cache[:access_id][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -316,12 +314,10 @@ module Fortran
     i0 = index
     r1 = _nt_use_name
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_generic_spec
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -346,7 +342,7 @@ module Fortran
     if node_cache[:access_id_list].has_key?(index)
       cached = node_cache[:access_id_list][index]
       if cached
-        node_cache[:access_id_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -396,7 +392,7 @@ module Fortran
     if node_cache[:access_id_list_pair].has_key?(index)
       cached = node_cache[:access_id_list_pair][index]
       if cached
-        node_cache[:access_id_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -427,7 +423,7 @@ module Fortran
     if node_cache[:access_spec].has_key?(index)
       cached = node_cache[:access_spec][index]
       if cached
-        node_cache[:access_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -436,12 +432,10 @@ module Fortran
     i0 = index
     r1 = _nt_t_public
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_private
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -474,7 +468,7 @@ module Fortran
     if node_cache[:access_stmt].has_key?(index)
       cached = node_cache[:access_stmt][index]
       if cached
-        node_cache[:access_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -540,7 +534,7 @@ module Fortran
     if node_cache[:access_stmt_option].has_key?(index)
       cached = node_cache[:access_stmt_option][index]
       if cached
-        node_cache[:access_stmt_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -576,7 +570,7 @@ module Fortran
     if node_cache[:action_stmt].has_key?(index)
       cached = node_cache[:action_stmt][index]
       if cached
-        node_cache[:action_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -585,157 +579,126 @@ module Fortran
     i0 = index
     r1 = _nt_allocate_stmt
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_assignment_stmt
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_backspace_stmt
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_call_stmt
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_close_stmt
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_computed_goto_stmt
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 r7 = _nt_continue_stmt
                 if r7
-                  r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
                   r8 = _nt_cycle_stmt
                   if r8
-                    r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
                     r0 = r8
                   else
                     r9 = _nt_deallocate_stmt
                     if r9
-                      r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
                       r0 = r9
                     else
                       r10 = _nt_endfile_stmt
                       if r10
-                        r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
                         r0 = r10
                       else
                         r11 = _nt_end_function_stmt
                         if r11
-                          r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
                           r0 = r11
                         else
                           r12 = _nt_end_program_stmt
                           if r12
-                            r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
                             r0 = r12
                           else
                             r13 = _nt_end_subroutine_stmt
                             if r13
-                              r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
                               r0 = r13
                             else
                               r14 = _nt_exit_stmt
                               if r14
-                                r14 = SyntaxNode.new(input, (index-1)...index) if r14 == true
                                 r0 = r14
                               else
                                 r15 = _nt_goto_stmt
                                 if r15
-                                  r15 = SyntaxNode.new(input, (index-1)...index) if r15 == true
                                   r0 = r15
                                 else
                                   r16 = _nt_if_stmt
                                   if r16
-                                    r16 = SyntaxNode.new(input, (index-1)...index) if r16 == true
                                     r0 = r16
                                   else
                                     r17 = _nt_inquire_stmt
                                     if r17
-                                      r17 = SyntaxNode.new(input, (index-1)...index) if r17 == true
                                       r0 = r17
                                     else
                                       r18 = _nt_nullify_stmt
                                       if r18
-                                        r18 = SyntaxNode.new(input, (index-1)...index) if r18 == true
                                         r0 = r18
                                       else
                                         r19 = _nt_open_stmt
                                         if r19
-                                          r19 = SyntaxNode.new(input, (index-1)...index) if r19 == true
                                           r0 = r19
                                         else
                                           r20 = _nt_pointer_assignment_stmt
                                           if r20
-                                            r20 = SyntaxNode.new(input, (index-1)...index) if r20 == true
                                             r0 = r20
                                           else
                                             r21 = _nt_print_stmt
                                             if r21
-                                              r21 = SyntaxNode.new(input, (index-1)...index) if r21 == true
                                               r0 = r21
                                             else
                                               r22 = _nt_read_stmt
                                               if r22
-                                                r22 = SyntaxNode.new(input, (index-1)...index) if r22 == true
                                                 r0 = r22
                                               else
                                                 r23 = _nt_return_stmt
                                                 if r23
-                                                  r23 = SyntaxNode.new(input, (index-1)...index) if r23 == true
                                                   r0 = r23
                                                 else
                                                   r24 = _nt_rewind_stmt
                                                   if r24
-                                                    r24 = SyntaxNode.new(input, (index-1)...index) if r24 == true
                                                     r0 = r24
                                                   else
                                                     r25 = _nt_stop_stmt
                                                     if r25
-                                                      r25 = SyntaxNode.new(input, (index-1)...index) if r25 == true
                                                       r0 = r25
                                                     else
                                                       r26 = _nt_where_stmt
                                                       if r26
-                                                        r26 = SyntaxNode.new(input, (index-1)...index) if r26 == true
                                                         r0 = r26
                                                       else
                                                         r27 = _nt_write_stmt
                                                         if r27
-                                                          r27 = SyntaxNode.new(input, (index-1)...index) if r27 == true
                                                           r0 = r27
                                                         else
                                                           r28 = _nt_arithmetic_if_stmt
                                                           if r28
-                                                            r28 = SyntaxNode.new(input, (index-1)...index) if r28 == true
                                                             r0 = r28
                                                           else
                                                             r29 = _nt_assign_stmt
                                                             if r29
-                                                              r29 = SyntaxNode.new(input, (index-1)...index) if r29 == true
                                                               r0 = r29
                                                             else
                                                               r30 = _nt_assigned_goto_stmt
                                                               if r30
-                                                                r30 = SyntaxNode.new(input, (index-1)...index) if r30 == true
                                                                 r0 = r30
                                                               else
                                                                 r31 = _nt_pause_stmt
                                                                 if r31
-                                                                  r31 = SyntaxNode.new(input, (index-1)...index) if r31 == true
                                                                   r0 = r31
                                                                 else
                                                                   @index = i0
@@ -796,7 +759,7 @@ module Fortran
     if node_cache[:action_term_do_construct].has_key?(index)
       cached = node_cache[:action_term_do_construct][index]
       if cached
-        node_cache[:action_term_do_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -842,7 +805,7 @@ module Fortran
     if node_cache[:actual_arg].has_key?(index)
       cached = node_cache[:actual_arg][index]
       if cached
-        node_cache[:actual_arg][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -851,27 +814,22 @@ module Fortran
     i0 = index
     r1 = _nt_hollerith
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_expr
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_variable
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_procedure_name
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_alt_return_spec
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               @index = i0
@@ -902,7 +860,7 @@ module Fortran
     if node_cache[:actual_arg_spec].has_key?(index)
       cached = node_cache[:actual_arg_spec][index]
       if cached
-        node_cache[:actual_arg_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -950,7 +908,7 @@ module Fortran
     if node_cache[:actual_arg_spec_list].has_key?(index)
       cached = node_cache[:actual_arg_spec_list][index]
       if cached
-        node_cache[:actual_arg_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1003,7 +961,7 @@ module Fortran
     if node_cache[:add_op].has_key?(index)
       cached = node_cache[:add_op][index]
       if cached
-        node_cache[:add_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1012,12 +970,10 @@ module Fortran
     i0 = index
     r1 = _nt_t_plus
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_minus
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -1052,7 +1008,7 @@ module Fortran
     if node_cache[:add_operand].has_key?(index)
       cached = node_cache[:add_operand][index]
       if cached
-        node_cache[:add_operand][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1101,7 +1057,7 @@ module Fortran
     if node_cache[:and_op].has_key?(index)
       cached = node_cache[:and_op][index]
       if cached
-        node_cache[:and_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1144,7 +1100,7 @@ module Fortran
     if node_cache[:allocatable_stmt].has_key?(index)
       cached = node_cache[:allocatable_stmt][index]
       if cached
-        node_cache[:allocatable_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1208,7 +1164,7 @@ module Fortran
     if node_cache[:allocate_lower_bound].has_key?(index)
       cached = node_cache[:allocate_lower_bound][index]
       if cached
-        node_cache[:allocate_lower_bound][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1258,7 +1214,7 @@ module Fortran
     if node_cache[:allocate_object].has_key?(index)
       cached = node_cache[:allocate_object][index]
       if cached
-        node_cache[:allocate_object][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1300,7 +1256,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i7, s7 = index, []
@@ -1338,7 +1293,6 @@ module Fortran
         r7 = nil
       end
       if r7
-        r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
         r0 = r7
       else
         @index = i0
@@ -1363,7 +1317,7 @@ module Fortran
     if node_cache[:allocate_object_list].has_key?(index)
       cached = node_cache[:allocate_object_list][index]
       if cached
-        node_cache[:allocate_object_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1413,7 +1367,7 @@ module Fortran
     if node_cache[:allocate_object_list_pair].has_key?(index)
       cached = node_cache[:allocate_object_list_pair][index]
       if cached
-        node_cache[:allocate_object_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1460,7 +1414,7 @@ module Fortran
     if node_cache[:allocate_shape_spec].has_key?(index)
       cached = node_cache[:allocate_shape_spec][index]
       if cached
-        node_cache[:allocate_shape_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1526,7 +1480,7 @@ module Fortran
     if node_cache[:allocate_shape_spec_list].has_key?(index)
       cached = node_cache[:allocate_shape_spec_list][index]
       if cached
-        node_cache[:allocate_shape_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1597,7 +1551,7 @@ module Fortran
     if node_cache[:allocate_stat_construct].has_key?(index)
       cached = node_cache[:allocate_stat_construct][index]
       if cached
-        node_cache[:allocate_stat_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1662,7 +1616,7 @@ module Fortran
     if node_cache[:allocate_stmt].has_key?(index)
       cached = node_cache[:allocate_stmt][index]
       if cached
-        node_cache[:allocate_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1723,7 +1677,7 @@ module Fortran
     if node_cache[:allocate_upper_bound].has_key?(index)
       cached = node_cache[:allocate_upper_bound][index]
       if cached
-        node_cache[:allocate_upper_bound][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1748,7 +1702,7 @@ module Fortran
     if node_cache[:allocation].has_key?(index)
       cached = node_cache[:allocation][index]
       if cached
-        node_cache[:allocation][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1801,7 +1755,7 @@ module Fortran
     if node_cache[:allocation_list].has_key?(index)
       cached = node_cache[:allocation_list][index]
       if cached
-        node_cache[:allocation_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1854,7 +1808,7 @@ module Fortran
     if node_cache[:alphanumeric_character].has_key?(index)
       cached = node_cache[:alphanumeric_character][index]
       if cached
-        node_cache[:alphanumeric_character][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1863,17 +1817,14 @@ module Fortran
     i0 = index
     r1 = _nt_t_letter
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_digit
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_t_underscore
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -1903,7 +1854,7 @@ module Fortran
     if node_cache[:alt_return_spec].has_key?(index)
       cached = node_cache[:alt_return_spec][index]
       if cached
-        node_cache[:alt_return_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1992,7 +1943,7 @@ module Fortran
     if node_cache[:arithmetic_if_stmt].has_key?(index)
       cached = node_cache[:arithmetic_if_stmt][index]
       if cached
-        node_cache[:arithmetic_if_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2097,7 +2048,7 @@ module Fortran
     if node_cache[:array_constructor].has_key?(index)
       cached = node_cache[:array_constructor][index]
       if cached
-        node_cache[:array_constructor][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2140,7 +2091,7 @@ module Fortran
     if node_cache[:array_element].has_key?(index)
       cached = node_cache[:array_element][index]
       if cached
-        node_cache[:array_element][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2165,7 +2116,7 @@ module Fortran
     if node_cache[:array_name].has_key?(index)
       cached = node_cache[:array_name][index]
       if cached
-        node_cache[:array_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2176,7 +2127,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -2209,7 +2160,7 @@ module Fortran
     if node_cache[:array_name_and_deferred_shape_spec_list].has_key?(index)
       cached = node_cache[:array_name_and_deferred_shape_spec_list][index]
       if cached
-        node_cache[:array_name_and_deferred_shape_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2255,7 +2206,7 @@ module Fortran
     if node_cache[:array_name_and_deferred_shape_spec_list_pair].has_key?(index)
       cached = node_cache[:array_name_and_deferred_shape_spec_list_pair][index]
       if cached
-        node_cache[:array_name_and_deferred_shape_spec_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2304,7 +2255,7 @@ module Fortran
     if node_cache[:array_name_and_spec].has_key?(index)
       cached = node_cache[:array_name_and_spec][index]
       if cached
-        node_cache[:array_name_and_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2353,7 +2304,7 @@ module Fortran
     if node_cache[:array_name_and_spec_pair].has_key?(index)
       cached = node_cache[:array_name_and_spec_pair][index]
       if cached
-        node_cache[:array_name_and_spec_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2391,7 +2342,7 @@ module Fortran
     if node_cache[:array_names_and_deferred_shape_spec_lists].has_key?(index)
       cached = node_cache[:array_names_and_deferred_shape_spec_lists][index]
       if cached
-        node_cache[:array_names_and_deferred_shape_spec_lists][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2438,7 +2389,7 @@ module Fortran
     if node_cache[:array_names_and_specs].has_key?(index)
       cached = node_cache[:array_names_and_specs][index]
       if cached
-        node_cache[:array_names_and_specs][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2485,7 +2436,7 @@ module Fortran
     if node_cache[:array_section].has_key?(index)
       cached = node_cache[:array_section][index]
       if cached
-        node_cache[:array_section][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2553,7 +2504,7 @@ module Fortran
     if node_cache[:array_spec].has_key?(index)
       cached = node_cache[:array_spec][index]
       if cached
-        node_cache[:array_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2565,7 +2516,7 @@ module Fortran
     s1 << r2
     if r2
       if has_terminal?("", false, index)
-        r3 = true
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -2581,7 +2532,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i4, s4 = index, []
@@ -2589,7 +2539,7 @@ module Fortran
       s4 << r5
       if r5
         if has_terminal?("", false, index)
-          r6 = true
+          r6 = instantiate_node(SyntaxNode,input, index...(index + 0))
           @index += 0
         else
           terminal_parse_failure("")
@@ -2605,7 +2555,6 @@ module Fortran
         r4 = nil
       end
       if r4
-        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r0 = r4
       else
         i7, s7 = index, []
@@ -2613,7 +2562,7 @@ module Fortran
         s7 << r8
         if r8
           if has_terminal?("", false, index)
-            r9 = true
+            r9 = instantiate_node(SyntaxNode,input, index...(index + 0))
             @index += 0
           else
             terminal_parse_failure("")
@@ -2629,7 +2578,6 @@ module Fortran
           r7 = nil
         end
         if r7
-          r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
           r0 = r7
         else
           @index = i0
@@ -2648,7 +2596,7 @@ module Fortran
     if node_cache[:array_variable_name].has_key?(index)
       cached = node_cache[:array_variable_name][index]
       if cached
-        node_cache[:array_variable_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2693,7 +2641,7 @@ module Fortran
     if node_cache[:assign_stmt].has_key?(index)
       cached = node_cache[:assign_stmt][index]
       if cached
-        node_cache[:assign_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2775,7 +2723,7 @@ module Fortran
     if node_cache[:assigned_goto_stmt].has_key?(index)
       cached = node_cache[:assigned_goto_stmt][index]
       if cached
-        node_cache[:assigned_goto_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2862,7 +2810,7 @@ module Fortran
     if node_cache[:assigned_goto_stmt_label_list].has_key?(index)
       cached = node_cache[:assigned_goto_stmt_label_list][index]
       if cached
-        node_cache[:assigned_goto_stmt_label_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2928,7 +2876,7 @@ module Fortran
     if node_cache[:assignment_stmt].has_key?(index)
       cached = node_cache[:assignment_stmt][index]
       if cached
-        node_cache[:assignment_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2982,7 +2930,7 @@ module Fortran
     if node_cache[:assumed_shape_spec].has_key?(index)
       cached = node_cache[:assumed_shape_spec][index]
       if cached
-        node_cache[:assumed_shape_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3025,7 +2973,7 @@ module Fortran
     if node_cache[:assumed_shape_spec_list].has_key?(index)
       cached = node_cache[:assumed_shape_spec_list][index]
       if cached
-        node_cache[:assumed_shape_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3075,7 +3023,7 @@ module Fortran
     if node_cache[:assumed_shape_spec_list_pair].has_key?(index)
       cached = node_cache[:assumed_shape_spec_list_pair][index]
       if cached
-        node_cache[:assumed_shape_spec_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3112,7 +3060,7 @@ module Fortran
     if node_cache[:assumed_size_spec].has_key?(index)
       cached = node_cache[:assumed_size_spec][index]
       if cached
-        node_cache[:assumed_size_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3167,7 +3115,7 @@ module Fortran
     if node_cache[:assumed_size_spec_pair].has_key?(index)
       cached = node_cache[:assumed_size_spec_pair][index]
       if cached
-        node_cache[:assumed_size_spec_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3248,7 +3196,7 @@ module Fortran
     if node_cache[:attr_spec].has_key?(index)
       cached = node_cache[:attr_spec][index]
       if cached
-        node_cache[:attr_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3260,7 +3208,7 @@ module Fortran
     s1 << r2
     if r2
       if has_terminal?("", false, index)
-        r3 = true
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -3276,12 +3224,10 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r4 = _nt_access_spec
       if r4
-        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r0 = r4
       else
         i5, s5 = index, []
@@ -3289,7 +3235,7 @@ module Fortran
         s5 << r6
         if r6
           if has_terminal?("", false, index)
-            r7 = true
+            r7 = instantiate_node(SyntaxNode,input, index...(index + 0))
             @index += 0
           else
             terminal_parse_failure("")
@@ -3305,7 +3251,6 @@ module Fortran
           r5 = nil
         end
         if r5
-          r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
           r0 = r5
         else
           i8, s8 = index, []
@@ -3331,12 +3276,10 @@ module Fortran
             r8 = nil
           end
           if r8
-            r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
             r0 = r8
           else
             r13 = _nt_t_external
             if r13
-              r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
               r0 = r13
             else
               i14, s14 = index, []
@@ -3362,32 +3305,26 @@ module Fortran
                 r14 = nil
               end
               if r14
-                r14 = SyntaxNode.new(input, (index-1)...index) if r14 == true
                 r0 = r14
               else
                 r19 = _nt_t_intrinsic
                 if r19
-                  r19 = SyntaxNode.new(input, (index-1)...index) if r19 == true
                   r0 = r19
                 else
                   r20 = _nt_t_optional
                   if r20
-                    r20 = SyntaxNode.new(input, (index-1)...index) if r20 == true
                     r0 = r20
                   else
                     r21 = _nt_t_pointer
                     if r21
-                      r21 = SyntaxNode.new(input, (index-1)...index) if r21 == true
                       r0 = r21
                     else
                       r22 = _nt_t_save
                       if r22
-                        r22 = SyntaxNode.new(input, (index-1)...index) if r22 == true
                         r0 = r22
                       else
                         r23 = _nt_t_target
                         if r23
-                          r23 = SyntaxNode.new(input, (index-1)...index) if r23 == true
                           r0 = r23
                         else
                           @index = i0
@@ -3424,7 +3361,7 @@ module Fortran
     if node_cache[:attr_spec_list].has_key?(index)
       cached = node_cache[:attr_spec_list][index]
       if cached
-        node_cache[:attr_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3465,7 +3402,7 @@ module Fortran
     if node_cache[:attr_spec_list_pair].has_key?(index)
       cached = node_cache[:attr_spec_list_pair][index]
       if cached
-        node_cache[:attr_spec_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3496,7 +3433,7 @@ module Fortran
     if node_cache[:attr_spec_list_pairs].has_key?(index)
       cached = node_cache[:attr_spec_list_pairs][index]
       if cached
-        node_cache[:attr_spec_list_pairs][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3537,7 +3474,7 @@ module Fortran
     if node_cache[:attr_spec_option].has_key?(index)
       cached = node_cache[:attr_spec_option][index]
       if cached
-        node_cache[:attr_spec_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3563,12 +3500,10 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r5 = _nt_double_colon
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -3630,7 +3565,7 @@ module Fortran
     if node_cache[:backspace_stmt].has_key?(index)
       cached = node_cache[:backspace_stmt][index]
       if cached
-        node_cache[:backspace_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3673,7 +3608,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i9, s9 = index, []
@@ -3704,7 +3638,6 @@ module Fortran
         r9 = nil
       end
       if r9
-        r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
         r0 = r9
       else
         @index = i0
@@ -3750,7 +3683,7 @@ module Fortran
     if node_cache[:binary_constant].has_key?(index)
       cached = node_cache[:binary_constant][index]
       if cached
-        node_cache[:binary_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3760,7 +3693,7 @@ module Fortran
     i1, s1 = index, []
     i2 = index
     if has_terminal?("b", false, index)
-      r3 = true
+      r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("b")
@@ -3811,13 +3744,12 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i9, s9 = index, []
       i10 = index
       if has_terminal?("b", false, index)
-        r11 = true
+        r11 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("b")
@@ -3868,7 +3800,6 @@ module Fortran
         r9 = nil
       end
       if r9
-        r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
         r0 = r9
       else
         @index = i0
@@ -3886,7 +3817,7 @@ module Fortran
     if node_cache[:blank_interp_edit_desc].has_key?(index)
       cached = node_cache[:blank_interp_edit_desc][index]
       if cached
-        node_cache[:blank_interp_edit_desc][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3901,7 +3832,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       if has_terminal?("bz", false, index)
@@ -3912,7 +3842,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -3930,7 +3859,7 @@ module Fortran
     if node_cache[:block].has_key?(index)
       cached = node_cache[:block][index]
       if cached
-        node_cache[:block][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3959,7 +3888,7 @@ module Fortran
     if node_cache[:block_data].has_key?(index)
       cached = node_cache[:block_data][index]
       if cached
-        node_cache[:block_data][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4017,7 +3946,7 @@ module Fortran
     if node_cache[:block_data_name].has_key?(index)
       cached = node_cache[:block_data_name][index]
       if cached
-        node_cache[:block_data_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4028,7 +3957,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -4073,7 +4002,7 @@ module Fortran
     if node_cache[:block_data_stmt].has_key?(index)
       cached = node_cache[:block_data_stmt][index]
       if cached
-        node_cache[:block_data_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4151,7 +4080,7 @@ module Fortran
     if node_cache[:block_do_construct].has_key?(index)
       cached = node_cache[:block_do_construct][index]
       if cached
-        node_cache[:block_do_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4197,7 +4126,7 @@ module Fortran
     if node_cache[:boz_literal_constant].has_key?(index)
       cached = node_cache[:boz_literal_constant][index]
       if cached
-        node_cache[:boz_literal_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4206,17 +4135,14 @@ module Fortran
     i0 = index
     r1 = _nt_binary_constant
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_octal_constant
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_hex_constant
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -4253,7 +4179,7 @@ module Fortran
     if node_cache[:call_stmt].has_key?(index)
       cached = node_cache[:call_stmt][index]
       if cached
-        node_cache[:call_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4320,7 +4246,7 @@ module Fortran
     if node_cache[:case_construct].has_key?(index)
       cached = node_cache[:case_construct][index]
       if cached
-        node_cache[:case_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4362,7 +4288,7 @@ module Fortran
     if node_cache[:case_construct_name].has_key?(index)
       cached = node_cache[:case_construct_name][index]
       if cached
-        node_cache[:case_construct_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4373,7 +4299,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -4409,7 +4335,7 @@ module Fortran
     if node_cache[:case_construct_name_pair].has_key?(index)
       cached = node_cache[:case_construct_name_pair][index]
       if cached
-        node_cache[:case_construct_name_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4440,7 +4366,7 @@ module Fortran
     if node_cache[:case_expr].has_key?(index)
       cached = node_cache[:case_expr][index]
       if cached
-        node_cache[:case_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4449,17 +4375,14 @@ module Fortran
     i0 = index
     r1 = _nt_scalar_int_expr
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_scalar_char_expr
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_scalar_logical_expr
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -4478,7 +4401,7 @@ module Fortran
     if node_cache[:case_selector].has_key?(index)
       cached = node_cache[:case_selector][index]
       if cached
-        node_cache[:case_selector][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4487,12 +4410,10 @@ module Fortran
     i0 = index
     r1 = _nt_case_selector_range
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_default
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -4524,7 +4445,7 @@ module Fortran
     if node_cache[:case_selector_range].has_key?(index)
       cached = node_cache[:case_selector_range][index]
       if cached
-        node_cache[:case_selector_range][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4577,7 +4498,7 @@ module Fortran
     if node_cache[:case_stmt].has_key?(index)
       cached = node_cache[:case_stmt][index]
       if cached
-        node_cache[:case_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4640,7 +4561,7 @@ module Fortran
     if node_cache[:case_stmt_construct].has_key?(index)
       cached = node_cache[:case_stmt_construct][index]
       if cached
-        node_cache[:case_stmt_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4671,7 +4592,7 @@ module Fortran
     if node_cache[:case_stmt_construct_block].has_key?(index)
       cached = node_cache[:case_stmt_construct_block][index]
       if cached
-        node_cache[:case_stmt_construct_block][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4698,7 +4619,7 @@ module Fortran
     if node_cache[:case_value].has_key?(index)
       cached = node_cache[:case_value][index]
       if cached
-        node_cache[:case_value][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4707,17 +4628,14 @@ module Fortran
     i0 = index
     r1 = _nt_scalar_int_initialization_expr
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_scalar_char_initialization_expr
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_scalar_logical_initialization_expr
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -4770,7 +4688,7 @@ module Fortran
     if node_cache[:case_value_range].has_key?(index)
       cached = node_cache[:case_value_range][index]
       if cached
-        node_cache[:case_value_range][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4792,7 +4710,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i4, s4 = index, []
@@ -4814,7 +4731,6 @@ module Fortran
         r4 = nil
       end
       if r4
-        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r0 = r4
       else
         i8, s8 = index, []
@@ -4832,12 +4748,10 @@ module Fortran
           r8 = nil
         end
         if r8
-          r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
           r0 = r8
         else
           r11 = _nt_case_value
           if r11
-            r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
             r0 = r11
           else
             @index = i0
@@ -4874,7 +4788,7 @@ module Fortran
     if node_cache[:case_value_range_list].has_key?(index)
       cached = node_cache[:case_value_range_list][index]
       if cached
-        node_cache[:case_value_range_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4927,7 +4841,7 @@ module Fortran
     if node_cache[:char_expr].has_key?(index)
       cached = node_cache[:char_expr][index]
       if cached
-        node_cache[:char_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4945,7 +4859,7 @@ module Fortran
     if node_cache[:char_initialization_expr].has_key?(index)
       cached = node_cache[:char_initialization_expr][index]
       if cached
-        node_cache[:char_initialization_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4977,7 +4891,7 @@ module Fortran
     if node_cache[:char_length].has_key?(index)
       cached = node_cache[:char_length][index]
       if cached
-        node_cache[:char_length][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5003,12 +4917,10 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r5 = _nt_scalar_int_literal_constant
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -5036,7 +4948,7 @@ module Fortran
     if node_cache[:char_length_pair].has_key?(index)
       cached = node_cache[:char_length_pair][index]
       if cached
-        node_cache[:char_length_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5079,7 +4991,7 @@ module Fortran
     if node_cache[:char_literal_constant].has_key?(index)
       cached = node_cache[:char_literal_constant][index]
       if cached
-        node_cache[:char_literal_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5106,7 +5018,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -5129,7 +5040,6 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -5163,7 +5073,7 @@ module Fortran
     if node_cache[:char_literal_constant_dq].has_key?(index)
       cached = node_cache[:char_literal_constant_dq][index]
       if cached
-        node_cache[:char_literal_constant_dq][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5237,7 +5147,7 @@ module Fortran
     if node_cache[:char_literal_constant_prefix].has_key?(index)
       cached = node_cache[:char_literal_constant_prefix][index]
       if cached
-        node_cache[:char_literal_constant_prefix][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5284,7 +5194,7 @@ module Fortran
     if node_cache[:char_literal_constant_sq].has_key?(index)
       cached = node_cache[:char_literal_constant_sq][index]
       if cached
-        node_cache[:char_literal_constant_sq][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5418,7 +5328,7 @@ module Fortran
     if node_cache[:char_selector].has_key?(index)
       cached = node_cache[:char_selector][index]
       if cached
-        node_cache[:char_selector][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5427,7 +5337,6 @@ module Fortran
     i0 = index
     r1 = _nt_length_selector
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i2, s2 = index, []
@@ -5465,7 +5374,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         i10, s10 = index, []
@@ -5504,7 +5412,6 @@ module Fortran
           r10 = nil
         end
         if r10
-          r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
           r0 = r10
         else
           i18, s18 = index, []
@@ -5539,7 +5446,6 @@ module Fortran
             r18 = nil
           end
           if r18
-            r18 = SyntaxNode.new(input, (index-1)...index) if r18 == true
             r0 = r18
           else
             @index = i0
@@ -5573,7 +5479,7 @@ module Fortran
     if node_cache[:char_selector_option].has_key?(index)
       cached = node_cache[:char_selector_option][index]
       if cached
-        node_cache[:char_selector_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5608,7 +5514,7 @@ module Fortran
     if node_cache[:char_string_edit_desc].has_key?(index)
       cached = node_cache[:char_string_edit_desc][index]
       if cached
-        node_cache[:char_string_edit_desc][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5617,12 +5523,10 @@ module Fortran
     i0 = index
     r1 = _nt_hollerith
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_char_literal_constant
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -5640,7 +5544,7 @@ module Fortran
     if node_cache[:char_variable].has_key?(index)
       cached = node_cache[:char_variable][index]
       if cached
-        node_cache[:char_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5658,7 +5562,7 @@ module Fortran
     if node_cache[:character].has_key?(index)
       cached = node_cache[:character][index]
       if cached
-        node_cache[:character][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5667,12 +5571,10 @@ module Fortran
     i0 = index
     r1 = _nt_alphanumeric_character
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_special_character
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -5710,7 +5612,7 @@ module Fortran
     if node_cache[:close_spec].has_key?(index)
       cached = node_cache[:close_spec][index]
       if cached
-        node_cache[:close_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5719,12 +5621,10 @@ module Fortran
     i0 = index
     r1 = _nt_io_spec_iostat
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_io_spec_err
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         i3, s3 = index, []
@@ -5746,7 +5646,6 @@ module Fortran
           r3 = nil
         end
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           i7, s7 = index, []
@@ -5769,7 +5668,6 @@ module Fortran
             r7 = nil
           end
           if r7
-            r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
             r0 = r7
           else
             @index = i0
@@ -5799,7 +5697,7 @@ module Fortran
     if node_cache[:close_spec_option].has_key?(index)
       cached = node_cache[:close_spec_option][index]
       if cached
-        node_cache[:close_spec_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5837,7 +5735,7 @@ module Fortran
     if node_cache[:close_spec_list].has_key?(index)
       cached = node_cache[:close_spec_list][index]
       if cached
-        node_cache[:close_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5887,7 +5785,7 @@ module Fortran
     if node_cache[:close_spec_list_pair].has_key?(index)
       cached = node_cache[:close_spec_list_pair][index]
       if cached
-        node_cache[:close_spec_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5944,7 +5842,7 @@ module Fortran
     if node_cache[:close_stmt].has_key?(index)
       cached = node_cache[:close_stmt][index]
       if cached
-        node_cache[:close_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6003,7 +5901,7 @@ module Fortran
     if node_cache[:common_block_name].has_key?(index)
       cached = node_cache[:common_block_name][index]
       if cached
-        node_cache[:common_block_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6014,7 +5912,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -6050,7 +5948,7 @@ module Fortran
     if node_cache[:common_block_name_and_object_list].has_key?(index)
       cached = node_cache[:common_block_name_and_object_list][index]
       if cached
-        node_cache[:common_block_name_and_object_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6090,7 +5988,7 @@ module Fortran
     if node_cache[:common_block_name_and_object_lists].has_key?(index)
       cached = node_cache[:common_block_name_and_object_lists][index]
       if cached
-        node_cache[:common_block_name_and_object_lists][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6127,7 +6025,7 @@ module Fortran
     if node_cache[:common_block_name_triplet].has_key?(index)
       cached = node_cache[:common_block_name_triplet][index]
       if cached
-        node_cache[:common_block_name_triplet][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6174,7 +6072,7 @@ module Fortran
     if node_cache[:common_block_object].has_key?(index)
       cached = node_cache[:common_block_object][index]
       if cached
-        node_cache[:common_block_object][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6210,7 +6108,7 @@ module Fortran
     if node_cache[:common_block_object_explicit_shape_spec_list].has_key?(index)
       cached = node_cache[:common_block_object_explicit_shape_spec_list][index]
       if cached
-        node_cache[:common_block_object_explicit_shape_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6238,7 +6136,7 @@ module Fortran
     if node_cache[:common_block_object_list].has_key?(index)
       cached = node_cache[:common_block_object_list][index]
       if cached
-        node_cache[:common_block_object_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6279,7 +6177,7 @@ module Fortran
     if node_cache[:common_block_object_pair].has_key?(index)
       cached = node_cache[:common_block_object_pair][index]
       if cached
-        node_cache[:common_block_object_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6310,7 +6208,7 @@ module Fortran
     if node_cache[:common_block_object_pairs].has_key?(index)
       cached = node_cache[:common_block_object_pairs][index]
       if cached
-        node_cache[:common_block_object_pairs][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6359,7 +6257,7 @@ module Fortran
     if node_cache[:common_stmt].has_key?(index)
       cached = node_cache[:common_stmt][index]
       if cached
-        node_cache[:common_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6438,7 +6336,7 @@ module Fortran
     if node_cache[:complex_literal_constant].has_key?(index)
       cached = node_cache[:complex_literal_constant][index]
       if cached
-        node_cache[:complex_literal_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6481,7 +6379,7 @@ module Fortran
     if node_cache[:component_array_spec].has_key?(index)
       cached = node_cache[:component_array_spec][index]
       if cached
-        node_cache[:component_array_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6490,12 +6388,10 @@ module Fortran
     i0 = index
     r1 = _nt_explicit_shape_spec_list
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_deferred_shape_spec_list
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -6531,7 +6427,7 @@ module Fortran
     if node_cache[:component_attr_spec].has_key?(index)
       cached = node_cache[:component_attr_spec][index]
       if cached
-        node_cache[:component_attr_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6540,7 +6436,6 @@ module Fortran
     i0 = index
     r1 = _nt_t_pointer
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i2, s2 = index, []
@@ -6566,12 +6461,10 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r7 = _nt_t_allocatable
         if r7
-          r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
           r0 = r7
         else
           @index = i0
@@ -6607,7 +6500,7 @@ module Fortran
     if node_cache[:component_attr_spec_list].has_key?(index)
       cached = node_cache[:component_attr_spec_list][index]
       if cached
-        node_cache[:component_attr_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6670,7 +6563,7 @@ module Fortran
     if node_cache[:component_attr_spec_list_option].has_key?(index)
       cached = node_cache[:component_attr_spec_list_option][index]
       if cached
-        node_cache[:component_attr_spec_list_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6718,7 +6611,7 @@ module Fortran
     if node_cache[:component_decl].has_key?(index)
       cached = node_cache[:component_decl][index]
       if cached
-        node_cache[:component_decl][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6802,7 +6695,7 @@ module Fortran
     if node_cache[:component_decl_list].has_key?(index)
       cached = node_cache[:component_decl_list][index]
       if cached
-        node_cache[:component_decl_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6873,7 +6766,7 @@ module Fortran
     if node_cache[:component_def_stmt].has_key?(index)
       cached = node_cache[:component_def_stmt][index]
       if cached
-        node_cache[:component_def_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6932,7 +6825,7 @@ module Fortran
     if node_cache[:component_def_stmt_option].has_key?(index)
       cached = node_cache[:component_def_stmt_option][index]
       if cached
-        node_cache[:component_def_stmt_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -6968,7 +6861,7 @@ module Fortran
     if node_cache[:component_def_stmts].has_key?(index)
       cached = node_cache[:component_def_stmts][index]
       if cached
-        node_cache[:component_def_stmts][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7020,7 +6913,7 @@ module Fortran
     if node_cache[:component_initialization].has_key?(index)
       cached = node_cache[:component_initialization][index]
       if cached
-        node_cache[:component_initialization][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7042,7 +6935,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i4, s4 = index, []
@@ -7060,7 +6952,6 @@ module Fortran
         r4 = nil
       end
       if r4
-        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r0 = r4
       else
         @index = i0
@@ -7085,7 +6976,7 @@ module Fortran
     if node_cache[:component_name].has_key?(index)
       cached = node_cache[:component_name][index]
       if cached
-        node_cache[:component_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7096,7 +6987,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -7152,7 +7043,7 @@ module Fortran
     if node_cache[:computed_goto_stmt].has_key?(index)
       cached = node_cache[:computed_goto_stmt][index]
       if cached
-        node_cache[:computed_goto_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7217,7 +7108,7 @@ module Fortran
     if node_cache[:concat_op].has_key?(index)
       cached = node_cache[:concat_op][index]
       if cached
-        node_cache[:concat_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7387,7 +7278,7 @@ module Fortran
     if node_cache[:connect_spec].has_key?(index)
       cached = node_cache[:connect_spec][index]
       if cached
-        node_cache[:connect_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7396,12 +7287,10 @@ module Fortran
     i0 = index
     r1 = _nt_io_spec_iostat
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_io_spec_err
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         i3, s3 = index, []
@@ -7416,14 +7305,13 @@ module Fortran
           end
         end
         if s3.last
-          r3 = instantiate_node(NT,input, i3...index, s3)
+          r3 = instantiate_node(Connect_Spec_File_Name,input, i3...index, s3)
           r3.extend(ConnectSpec0)
         else
           @index = i3
           r3 = nil
         end
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           i7, s7 = index, []
@@ -7438,14 +7326,13 @@ module Fortran
             end
           end
           if s7.last
-            r7 = instantiate_node(NT,input, i7...index, s7)
+            r7 = instantiate_node(Connect_Spec_Status,input, i7...index, s7)
             r7.extend(ConnectSpec1)
           else
             @index = i7
             r7 = nil
           end
           if r7
-            r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
             r0 = r7
           else
             i11, s11 = index, []
@@ -7460,14 +7347,13 @@ module Fortran
               end
             end
             if s11.last
-              r11 = instantiate_node(NT,input, i11...index, s11)
+              r11 = instantiate_node(Connect_Spec_Access,input, i11...index, s11)
               r11.extend(ConnectSpec2)
             else
               @index = i11
               r11 = nil
             end
             if r11
-              r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
               r0 = r11
             else
               i15, s15 = index, []
@@ -7482,14 +7368,13 @@ module Fortran
                 end
               end
               if s15.last
-                r15 = instantiate_node(NT,input, i15...index, s15)
+                r15 = instantiate_node(Connect_Spec_Form,input, i15...index, s15)
                 r15.extend(ConnectSpec3)
               else
                 @index = i15
                 r15 = nil
               end
               if r15
-                r15 = SyntaxNode.new(input, (index-1)...index) if r15 == true
                 r0 = r15
               else
                 i19, s19 = index, []
@@ -7504,14 +7389,13 @@ module Fortran
                   end
                 end
                 if s19.last
-                  r19 = instantiate_node(NT,input, i19...index, s19)
+                  r19 = instantiate_node(Connect_Spec_Recl,input, i19...index, s19)
                   r19.extend(ConnectSpec4)
                 else
                   @index = i19
                   r19 = nil
                 end
                 if r19
-                  r19 = SyntaxNode.new(input, (index-1)...index) if r19 == true
                   r0 = r19
                 else
                   i23, s23 = index, []
@@ -7526,14 +7410,13 @@ module Fortran
                     end
                   end
                   if s23.last
-                    r23 = instantiate_node(NT,input, i23...index, s23)
+                    r23 = instantiate_node(Connect_Spec_Blank,input, i23...index, s23)
                     r23.extend(ConnectSpec5)
                   else
                     @index = i23
                     r23 = nil
                   end
                   if r23
-                    r23 = SyntaxNode.new(input, (index-1)...index) if r23 == true
                     r0 = r23
                   else
                     i27, s27 = index, []
@@ -7548,14 +7431,13 @@ module Fortran
                       end
                     end
                     if s27.last
-                      r27 = instantiate_node(NT,input, i27...index, s27)
+                      r27 = instantiate_node(Connect_Spec_Position,input, i27...index, s27)
                       r27.extend(ConnectSpec6)
                     else
                       @index = i27
                       r27 = nil
                     end
                     if r27
-                      r27 = SyntaxNode.new(input, (index-1)...index) if r27 == true
                       r0 = r27
                     else
                       i31, s31 = index, []
@@ -7570,14 +7452,13 @@ module Fortran
                         end
                       end
                       if s31.last
-                        r31 = instantiate_node(NT,input, i31...index, s31)
+                        r31 = instantiate_node(Connect_Spec_Action,input, i31...index, s31)
                         r31.extend(ConnectSpec7)
                       else
                         @index = i31
                         r31 = nil
                       end
                       if r31
-                        r31 = SyntaxNode.new(input, (index-1)...index) if r31 == true
                         r0 = r31
                       else
                         i35, s35 = index, []
@@ -7592,14 +7473,13 @@ module Fortran
                           end
                         end
                         if s35.last
-                          r35 = instantiate_node(NT,input, i35...index, s35)
+                          r35 = instantiate_node(Connect_Spec_Delim,input, i35...index, s35)
                           r35.extend(ConnectSpec8)
                         else
                           @index = i35
                           r35 = nil
                         end
                         if r35
-                          r35 = SyntaxNode.new(input, (index-1)...index) if r35 == true
                           r0 = r35
                         else
                           i39, s39 = index, []
@@ -7614,14 +7494,13 @@ module Fortran
                             end
                           end
                           if s39.last
-                            r39 = instantiate_node(NT,input, i39...index, s39)
+                            r39 = instantiate_node(Connect_Spec_Pad,input, i39...index, s39)
                             r39.extend(ConnectSpec9)
                           else
                             @index = i39
                             r39 = nil
                           end
                           if r39
-                            r39 = SyntaxNode.new(input, (index-1)...index) if r39 == true
                             r0 = r39
                           else
                             i43, s43 = index, []
@@ -7637,14 +7516,13 @@ module Fortran
                               s43 << r46
                             end
                             if s43.last
-                              r43 = instantiate_node(NT,input, i43...index, s43)
+                              r43 = instantiate_node(Connect_Spec_External_File_Unit,input, i43...index, s43)
                               r43.extend(ConnectSpec10)
                             else
                               @index = i43
                               r43 = nil
                             end
                             if r43
-                              r43 = SyntaxNode.new(input, (index-1)...index) if r43 == true
                               r0 = r43
                             else
                               @index = i0
@@ -7683,7 +7561,7 @@ module Fortran
     if node_cache[:connect_spec_external_file_unit_option].has_key?(index)
       cached = node_cache[:connect_spec_external_file_unit_option][index]
       if cached
-        node_cache[:connect_spec_external_file_unit_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7697,7 +7575,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Connect_Spec_External_File_Unit_Option,input, i0...index, s0)
       r0.extend(ConnectSpecExternalFileUnitOption0)
     else
       @index = i0
@@ -7721,7 +7599,7 @@ module Fortran
     if node_cache[:connect_spec_list].has_key?(index)
       cached = node_cache[:connect_spec_list][index]
       if cached
-        node_cache[:connect_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7771,7 +7649,7 @@ module Fortran
     if node_cache[:connect_spec_list_pair].has_key?(index)
       cached = node_cache[:connect_spec_list_pair][index]
       if cached
-        node_cache[:connect_spec_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7802,7 +7680,7 @@ module Fortran
     if node_cache[:constant].has_key?(index)
       cached = node_cache[:constant][index]
       if cached
-        node_cache[:constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7811,12 +7689,10 @@ module Fortran
     i0 = index
     r1 = _nt_literal_constant
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_named_constant
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -7834,7 +7710,7 @@ module Fortran
     if node_cache[:constant_subobject].has_key?(index)
       cached = node_cache[:constant_subobject][index]
       if cached
-        node_cache[:constant_subobject][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7866,7 +7742,7 @@ module Fortran
     if node_cache[:contains_stmt].has_key?(index)
       cached = node_cache[:contains_stmt][index]
       if cached
-        node_cache[:contains_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7920,7 +7796,7 @@ module Fortran
     if node_cache[:continue_stmt].has_key?(index)
       cached = node_cache[:continue_stmt][index]
       if cached
-        node_cache[:continue_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7972,7 +7848,7 @@ module Fortran
     if node_cache[:control_edit_desc].has_key?(index)
       cached = node_cache[:control_edit_desc][index]
       if cached
-        node_cache[:control_edit_desc][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -7981,17 +7857,14 @@ module Fortran
     i0 = index
     r1 = _nt_position_edit_desc
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_blank_interp_edit_desc
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_sign_edit_desc
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           i4, s4 = index, []
@@ -8007,19 +7880,17 @@ module Fortran
             s4 << r7
           end
           if s4.last
-            r4 = instantiate_node(NT,input, i4...index, s4)
+            r4 = instantiate_node(Control_Edit_Desc_Slash,input, i4...index, s4)
             r4.extend(ControlEditDesc0)
           else
             @index = i4
             r4 = nil
           end
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r8 = _nt_t_colon
             if r8
-              r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
               r0 = r8
             else
               i9, s9 = index, []
@@ -8033,7 +7904,7 @@ module Fortran
               if r10
                 i12 = index
                 if has_terminal?("p", false, index)
-                  r13 = true
+                  r13 = instantiate_node(SyntaxNode,input, index...(index + 1))
                   @index += 1
                 else
                   terminal_parse_failure("p")
@@ -8052,14 +7923,13 @@ module Fortran
                 end
               end
               if s9.last
-                r9 = instantiate_node(NT,input, i9...index, s9)
+                r9 = instantiate_node(Control_Edit_Desc_P,input, i9...index, s9)
                 r9.extend(ControlEditDesc1)
               else
                 @index = i9
                 r9 = nil
               end
               if r9
-                r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
                 r0 = r9
               else
                 @index = i0
@@ -8095,7 +7965,7 @@ module Fortran
     if node_cache[:cycle_stmt].has_key?(index)
       cached = node_cache[:cycle_stmt][index]
       if cached
-        node_cache[:cycle_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -8209,7 +8079,7 @@ module Fortran
     if node_cache[:data_edit_desc].has_key?(index)
       cached = node_cache[:data_edit_desc][index]
       if cached
-        node_cache[:data_edit_desc][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -8233,14 +8103,13 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(NT,input, i1...index, s1)
+      r1 = instantiate_node(Data_Edit_Desc_1,input, i1...index, s1)
       r1.extend(DataEditDesc0)
     else
       @index = i1
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i6, s6 = index, []
@@ -8259,14 +8128,13 @@ module Fortran
         end
       end
       if s6.last
-        r6 = instantiate_node(NT,input, i6...index, s6)
+        r6 = instantiate_node(Data_Edit_Desc_2,input, i6...index, s6)
         r6.extend(DataEditDesc1)
       else
         @index = i6
         r6 = nil
       end
       if r6
-        r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
         r0 = r6
       else
         i11, s11 = index, []
@@ -8294,20 +8162,19 @@ module Fortran
           end
         end
         if s11.last
-          r11 = instantiate_node(NT,input, i11...index, s11)
+          r11 = instantiate_node(Data_Edit_Desc_3,input, i11...index, s11)
           r11.extend(DataEditDesc2)
         else
           @index = i11
           r11 = nil
         end
         if r11
-          r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
           r0 = r11
         else
           i18, s18 = index, []
           i19 = index
           if has_terminal?("l", false, index)
-            r20 = true
+            r20 = instantiate_node(SyntaxNode,input, index...(index + 1))
             @index += 1
           else
             terminal_parse_failure("l")
@@ -8329,20 +8196,19 @@ module Fortran
             end
           end
           if s18.last
-            r18 = instantiate_node(NT,input, i18...index, s18)
+            r18 = instantiate_node(Data_Edit_Desc_L,input, i18...index, s18)
             r18.extend(DataEditDesc3)
           else
             @index = i18
             r18 = nil
           end
           if r18
-            r18 = SyntaxNode.new(input, (index-1)...index) if r18 == true
             r0 = r18
           else
             i23, s23 = index, []
             i24 = index
             if has_terminal?("a", false, index)
-              r25 = true
+              r25 = instantiate_node(SyntaxNode,input, index...(index + 1))
               @index += 1
             else
               terminal_parse_failure("a")
@@ -8369,14 +8235,13 @@ module Fortran
               end
             end
             if s23.last
-              r23 = instantiate_node(NT,input, i23...index, s23)
+              r23 = instantiate_node(Data_Edit_Desc_A,input, i23...index, s23)
               r23.extend(DataEditDesc4)
             else
               @index = i23
               r23 = nil
             end
             if r23
-              r23 = SyntaxNode.new(input, (index-1)...index) if r23 == true
               r0 = r23
             else
               @index = i0
@@ -8397,7 +8262,7 @@ module Fortran
     if node_cache[:data_edit_desc_1].has_key?(index)
       cached = node_cache[:data_edit_desc_1][index]
       if cached
-        node_cache[:data_edit_desc_1][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -8412,7 +8277,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       if has_terminal?("b", false, index)
@@ -8423,7 +8287,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         if has_terminal?("o", false, index)
@@ -8434,7 +8297,6 @@ module Fortran
           r3 = nil
         end
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           if has_terminal?("z", false, index)
@@ -8445,7 +8307,6 @@ module Fortran
             r4 = nil
           end
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             @index = i0
@@ -8475,7 +8336,7 @@ module Fortran
     if node_cache[:data_edit_desc_1_option].has_key?(index)
       cached = node_cache[:data_edit_desc_1_option][index]
       if cached
-        node_cache[:data_edit_desc_1_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -8489,7 +8350,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Data_Edit_Desc_1_Option,input, i0...index, s0)
       r0.extend(DataEditDesc1Option0)
     else
       @index = i0
@@ -8506,7 +8367,7 @@ module Fortran
     if node_cache[:data_edit_desc_2].has_key?(index)
       cached = node_cache[:data_edit_desc_2][index]
       if cached
-        node_cache[:data_edit_desc_2][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -8521,7 +8382,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       if has_terminal?("d", false, index)
@@ -8532,7 +8392,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -8550,7 +8409,7 @@ module Fortran
     if node_cache[:data_edit_desc_3].has_key?(index)
       cached = node_cache[:data_edit_desc_3][index]
       if cached
-        node_cache[:data_edit_desc_3][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -8565,7 +8424,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       if has_terminal?("es", false, index)
@@ -8576,7 +8434,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         if has_terminal?("e", false, index)
@@ -8587,7 +8444,6 @@ module Fortran
           r3 = nil
         end
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           if has_terminal?("g", false, index)
@@ -8598,7 +8454,6 @@ module Fortran
             r4 = nil
           end
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             @index = i0
@@ -8628,7 +8483,7 @@ module Fortran
     if node_cache[:data_edit_desc_3_option].has_key?(index)
       cached = node_cache[:data_edit_desc_3_option][index]
       if cached
-        node_cache[:data_edit_desc_3_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -8637,7 +8492,7 @@ module Fortran
     i0, s0 = index, []
     i1 = index
     if has_terminal?("e", false, index)
-      r2 = true
+      r2 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("e")
@@ -8659,7 +8514,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Data_Edit_Desc_3_Option,input, i0...index, s0)
       r0.extend(DataEditDesc3Option0)
     else
       @index = i0
@@ -8690,7 +8545,7 @@ module Fortran
     if node_cache[:data_i_do_object].has_key?(index)
       cached = node_cache[:data_i_do_object][index]
       if cached
-        node_cache[:data_i_do_object][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -8712,14 +8567,13 @@ module Fortran
       s1 << r3
     end
     if s1.last
-      r1 = instantiate_node(NT,input, i1...index, s1)
+      r1 = instantiate_node(Data_I_Do_Object_1,input, i1...index, s1)
       r1.extend(DataIDoObject0)
     else
       @index = i1
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -8737,19 +8591,17 @@ module Fortran
         s5 << r7
       end
       if s5.last
-        r5 = instantiate_node(NT,input, i5...index, s5)
+        r5 = instantiate_node(Data_I_Do_Object_2,input, i5...index, s5)
         r5.extend(DataIDoObject1)
       else
         @index = i5
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         r9 = _nt_data_implied_do
         if r9
-          r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
           r0 = r9
         else
           @index = i0
@@ -8785,7 +8637,7 @@ module Fortran
     if node_cache[:data_i_do_object_list].has_key?(index)
       cached = node_cache[:data_i_do_object_list][index]
       if cached
-        node_cache[:data_i_do_object_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -8838,7 +8690,7 @@ module Fortran
     if node_cache[:data_i_do_variable].has_key?(index)
       cached = node_cache[:data_i_do_variable][index]
       if cached
-        node_cache[:data_i_do_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -8898,7 +8750,7 @@ module Fortran
     if node_cache[:data_implied_do].has_key?(index)
       cached = node_cache[:data_implied_do][index]
       if cached
-        node_cache[:data_implied_do][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -8971,7 +8823,7 @@ module Fortran
     if node_cache[:data_implied_do_option].has_key?(index)
       cached = node_cache[:data_implied_do_option][index]
       if cached
-        node_cache[:data_implied_do_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9018,7 +8870,7 @@ module Fortran
     if node_cache[:data_ref].has_key?(index)
       cached = node_cache[:data_ref][index]
       if cached
-        node_cache[:data_ref][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9068,7 +8920,7 @@ module Fortran
     if node_cache[:data_ref_option].has_key?(index)
       cached = node_cache[:data_ref_option][index]
       if cached
-        node_cache[:data_ref_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9117,7 +8969,7 @@ module Fortran
     if node_cache[:data_stmt].has_key?(index)
       cached = node_cache[:data_stmt][index]
       if cached
-        node_cache[:data_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9161,7 +9013,7 @@ module Fortran
     if node_cache[:data_stmt_constant].has_key?(index)
       cached = node_cache[:data_stmt_constant][index]
       if cached
-        node_cache[:data_stmt_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9170,32 +9022,26 @@ module Fortran
     i0 = index
     r1 = _nt_hollerith
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_signed_real_literal_constant
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_signed_int_literal_constant
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_boz_literal_constant
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_structure_constructor
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_scalar_constant
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 @index = i0
@@ -9217,7 +9063,7 @@ module Fortran
     if node_cache[:data_stmt_object].has_key?(index)
       cached = node_cache[:data_stmt_object][index]
       if cached
-        node_cache[:data_stmt_object][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9226,12 +9072,10 @@ module Fortran
     i0 = index
     r1 = _nt_variable
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_data_implied_do
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -9266,7 +9110,7 @@ module Fortran
     if node_cache[:data_stmt_object_list].has_key?(index)
       cached = node_cache[:data_stmt_object_list][index]
       if cached
-        node_cache[:data_stmt_object_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9319,7 +9163,7 @@ module Fortran
     if node_cache[:data_stmt_repeat].has_key?(index)
       cached = node_cache[:data_stmt_repeat][index]
       if cached
-        node_cache[:data_stmt_repeat][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9328,6 +9172,47 @@ module Fortran
     r0 = _nt_scalar_int_constant
 
     node_cache[:data_stmt_repeat][start_index] = r0
+
+    r0
+  end
+
+  module DataStmtRepeatPair0
+    def data_stmt_repeat
+      elements[0]
+    end
+
+    def t_star
+      elements[1]
+    end
+  end
+
+  def _nt_data_stmt_repeat_pair
+    start_index = index
+    if node_cache[:data_stmt_repeat_pair].has_key?(index)
+      cached = node_cache[:data_stmt_repeat_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_data_stmt_repeat
+    s0 << r1
+    if r1
+      r2 = _nt_t_star
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Data_Stmt_Repeat_Pair,input, i0...index, s0)
+      r0.extend(DataStmtRepeatPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:data_stmt_repeat_pair][start_index] = r0
 
     r0
   end
@@ -9355,7 +9240,7 @@ module Fortran
     if node_cache[:data_stmt_set].has_key?(index)
       cached = node_cache[:data_stmt_set][index]
       if cached
-        node_cache[:data_stmt_set][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9377,7 +9262,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Data_Stmt_Set,input, i0...index, s0)
       r0.extend(DataStmtSet0)
     else
       @index = i0
@@ -9404,7 +9289,7 @@ module Fortran
     if node_cache[:data_stmt_set_list].has_key?(index)
       cached = node_cache[:data_stmt_set_list][index]
       if cached
-        node_cache[:data_stmt_set_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9418,7 +9303,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Data_Stmt_Set_List,input, i0...index, s0)
       r0.extend(DataStmtSetList0)
     else
       @index = i0
@@ -9441,7 +9326,7 @@ module Fortran
     if node_cache[:data_stmt_set_list_pair].has_key?(index)
       cached = node_cache[:data_stmt_set_list_pair][index]
       if cached
-        node_cache[:data_stmt_set_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9460,7 +9345,7 @@ module Fortran
       s0 << r3
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Data_Stmt_Set_List_Pair,input, i0...index, s0)
       r0.extend(DataStmtSetListPair0)
     else
       @index = i0
@@ -9477,7 +9362,7 @@ module Fortran
     if node_cache[:data_stmt_set_list_pairs].has_key?(index)
       cached = node_cache[:data_stmt_set_list_pairs][index]
       if cached
-        node_cache[:data_stmt_set_list_pairs][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9492,7 +9377,7 @@ module Fortran
         break
       end
     end
-    r0 = instantiate_node(NT,input, i0...index, s0)
+    r0 = instantiate_node(Data_Stmt_Set_List_Pairs,input, i0...index, s0)
 
     node_cache[:data_stmt_set_list_pairs][start_index] = r0
 
@@ -9510,7 +9395,7 @@ module Fortran
     if node_cache[:data_stmt_value].has_key?(index)
       cached = node_cache[:data_stmt_value][index]
       if cached
-        node_cache[:data_stmt_value][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9529,7 +9414,7 @@ module Fortran
       s0 << r3
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Data_Stmt_Value,input, i0...index, s0)
       r0.extend(DataStmtValue0)
     else
       @index = i0
@@ -9537,47 +9422,6 @@ module Fortran
     end
 
     node_cache[:data_stmt_value][start_index] = r0
-
-    r0
-  end
-
-  module DataStmtRepeatPair0
-    def data_stmt_repeat
-      elements[0]
-    end
-
-    def t_star
-      elements[1]
-    end
-  end
-
-  def _nt_data_stmt_repeat_pair
-    start_index = index
-    if node_cache[:data_stmt_repeat_pair].has_key?(index)
-      cached = node_cache[:data_stmt_repeat_pair][index]
-      if cached
-        node_cache[:data_stmt_repeat_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    i0, s0 = index, []
-    r1 = _nt_data_stmt_repeat
-    s0 << r1
-    if r1
-      r2 = _nt_t_star
-      s0 << r2
-    end
-    if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
-      r0.extend(DataStmtRepeatPair0)
-    else
-      @index = i0
-      r0 = nil
-    end
-
-    node_cache[:data_stmt_repeat_pair][start_index] = r0
 
     r0
   end
@@ -9604,7 +9448,7 @@ module Fortran
     if node_cache[:data_stmt_value_list].has_key?(index)
       cached = node_cache[:data_stmt_value_list][index]
       if cached
-        node_cache[:data_stmt_value_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9683,7 +9527,7 @@ module Fortran
     if node_cache[:deallocate_stmt].has_key?(index)
       cached = node_cache[:deallocate_stmt][index]
       if cached
-        node_cache[:deallocate_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9751,7 +9595,7 @@ module Fortran
     if node_cache[:declaration_construct].has_key?(index)
       cached = node_cache[:declaration_construct][index]
       if cached
-        node_cache[:declaration_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9760,37 +9604,30 @@ module Fortran
     i0 = index
     r1 = _nt_derived_type_def
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_interface_block
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_type_declaration_stmt
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_specification_stmt
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_parameter_stmt
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_format_stmt
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 r7 = _nt_entry_stmt
                 if r7
-                  r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
                   i8, s8 = index, []
@@ -9815,12 +9652,10 @@ module Fortran
                     r8 = nil
                   end
                   if r8
-                    r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
                     r0 = r8
                   else
                     r12 = _nt_directive
                     if r12
-                      r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
                       r0 = r12
                     else
                       @index = i0
@@ -9845,7 +9680,7 @@ module Fortran
     if node_cache[:declaration_constructs].has_key?(index)
       cached = node_cache[:declaration_constructs][index]
       if cached
-        node_cache[:declaration_constructs][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9879,7 +9714,7 @@ module Fortran
     if node_cache[:default_char_variable].has_key?(index)
       cached = node_cache[:default_char_variable][index]
       if cached
-        node_cache[:default_char_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9900,7 +9735,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Default_Char_Variable,input, i0...index, s0)
       r0.extend(DefaultCharVariable0)
     else
       @index = i0
@@ -9917,7 +9752,7 @@ module Fortran
     if node_cache[:default_char_expr].has_key?(index)
       cached = node_cache[:default_char_expr][index]
       if cached
-        node_cache[:default_char_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9935,7 +9770,7 @@ module Fortran
     if node_cache[:default_int_variable].has_key?(index)
       cached = node_cache[:default_int_variable][index]
       if cached
-        node_cache[:default_int_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9953,7 +9788,7 @@ module Fortran
     if node_cache[:default_logical_variable].has_key?(index)
       cached = node_cache[:default_logical_variable][index]
       if cached
-        node_cache[:default_logical_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9978,7 +9813,7 @@ module Fortran
     if node_cache[:deferred_shape_spec].has_key?(index)
       cached = node_cache[:deferred_shape_spec][index]
       if cached
-        node_cache[:deferred_shape_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -9989,7 +9824,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -10022,7 +9857,7 @@ module Fortran
     if node_cache[:deferred_shape_spec_list].has_key?(index)
       cached = node_cache[:deferred_shape_spec_list][index]
       if cached
-        node_cache[:deferred_shape_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10072,7 +9907,7 @@ module Fortran
     if node_cache[:deferred_shape_spec_list_pair].has_key?(index)
       cached = node_cache[:deferred_shape_spec_list_pair][index]
       if cached
-        node_cache[:deferred_shape_spec_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10121,7 +9956,7 @@ module Fortran
     if node_cache[:defined_binary_op].has_key?(index)
       cached = node_cache[:defined_binary_op][index]
       if cached
-        node_cache[:defined_binary_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10143,7 +9978,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Defined_Binary_Op,input, i0...index, s0)
       r0.extend(DefinedBinaryOp0)
     else
       @index = i0
@@ -10160,7 +9995,7 @@ module Fortran
     if node_cache[:defined_operator].has_key?(index)
       cached = node_cache[:defined_operator][index]
       if cached
-        node_cache[:defined_operator][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10169,17 +10004,14 @@ module Fortran
     i0 = index
     r1 = _nt_defined_unary_op
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_defined_binary_op
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_extended_intrinsic_op
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -10216,7 +10048,7 @@ module Fortran
     if node_cache[:defined_unary_op].has_key?(index)
       cached = node_cache[:defined_unary_op][index]
       if cached
-        node_cache[:defined_unary_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10227,12 +10059,10 @@ module Fortran
     i2 = index
     r3 = _nt_intrinsic_operator
     if r3
-      r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
       r2 = r3
     else
       r4 = _nt_logical_literal_constant
       if r4
-        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r2 = r4
       else
         @index = i2
@@ -10263,7 +10093,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Defined_Unary_Op,input, i0...index, s0)
       r0.extend(DefinedUnaryOp0)
     else
       @index = i0
@@ -10298,7 +10128,7 @@ module Fortran
     if node_cache[:derived_type_def].has_key?(index)
       cached = node_cache[:derived_type_def][index]
       if cached
-        node_cache[:derived_type_def][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10320,7 +10150,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Derived_Type_Def,input, i0...index, s0)
       r0.extend(DerivedTypeDef0)
     else
       @index = i0
@@ -10355,7 +10185,7 @@ module Fortran
     if node_cache[:derived_type_stmt].has_key?(index)
       cached = node_cache[:derived_type_stmt][index]
       if cached
-        node_cache[:derived_type_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10414,7 +10244,7 @@ module Fortran
     if node_cache[:derived_typeaccess_spec].has_key?(index)
       cached = node_cache[:derived_typeaccess_spec][index]
       if cached
-        node_cache[:derived_typeaccess_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10433,7 +10263,7 @@ module Fortran
       s0 << r3
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Derived_Typeaccess_Spec,input, i0...index, s0)
       r0.extend(DerivedTypeaccessSpec0)
     else
       @index = i0
@@ -10460,7 +10290,7 @@ module Fortran
     if node_cache[:derived_typeaccess_spec_option].has_key?(index)
       cached = node_cache[:derived_typeaccess_spec_option][index]
       if cached
-        node_cache[:derived_typeaccess_spec_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10474,7 +10304,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Derived_Typeaccess_Spec_Option,input, i0...index, s0)
       r0.extend(DerivedTypeaccessSpecOption0)
     else
       @index = i0
@@ -10491,7 +10321,7 @@ module Fortran
     if node_cache[:digit_string].has_key?(index)
       cached = node_cache[:digit_string][index]
       if cached
-        node_cache[:digit_string][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10542,7 +10372,7 @@ module Fortran
     if node_cache[:dimension_stmt].has_key?(index)
       cached = node_cache[:dimension_stmt][index]
       if cached
-        node_cache[:dimension_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10612,7 +10442,7 @@ module Fortran
     if node_cache[:directive].has_key?(index)
       cached = node_cache[:directive][index]
       if cached
-        node_cache[:directive][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10620,7 +10450,7 @@ module Fortran
 
     i0, s0 = index, []
     if has_terminal?("!", false, index)
-      r1 = true
+      r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("!")
@@ -10667,7 +10497,7 @@ module Fortran
     if node_cache[:do_block].has_key?(index)
       cached = node_cache[:do_block][index]
       if cached
-        node_cache[:do_block][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10692,7 +10522,7 @@ module Fortran
     if node_cache[:do_body].has_key?(index)
       cached = node_cache[:do_body][index]
       if cached
-        node_cache[:do_body][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10703,7 +10533,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -10743,7 +10573,7 @@ module Fortran
     if node_cache[:do_construct].has_key?(index)
       cached = node_cache[:do_construct][index]
       if cached
-        node_cache[:do_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10772,7 +10602,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -10797,7 +10626,6 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -10822,7 +10650,7 @@ module Fortran
     if node_cache[:do_construct_name].has_key?(index)
       cached = node_cache[:do_construct_name][index]
       if cached
-        node_cache[:do_construct_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10833,7 +10661,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -10869,7 +10697,7 @@ module Fortran
     if node_cache[:do_construct_name_label].has_key?(index)
       cached = node_cache[:do_construct_name_label][index]
       if cached
-        node_cache[:do_construct_name_label][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10883,7 +10711,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Do_Construct_Name_Label,input, i0...index, s0)
       r0.extend(DoConstructNameLabel0)
     else
       @index = i0
@@ -10900,7 +10728,7 @@ module Fortran
     if node_cache[:do_stmt].has_key?(index)
       cached = node_cache[:do_stmt][index]
       if cached
-        node_cache[:do_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10909,12 +10737,10 @@ module Fortran
     i0 = index
     r1 = _nt_label_do_stmt
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_nonlabel_do_stmt
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -10939,7 +10765,7 @@ module Fortran
     if node_cache[:do_term_action_stmt].has_key?(index)
       cached = node_cache[:do_term_action_stmt][index]
       if cached
-        node_cache[:do_term_action_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10988,7 +10814,7 @@ module Fortran
     if node_cache[:do_term_action_stmt_disallowed].has_key?(index)
       cached = node_cache[:do_term_action_stmt_disallowed][index]
       if cached
-        node_cache[:do_term_action_stmt_disallowed][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -10997,57 +10823,46 @@ module Fortran
     i0 = index
     r1 = _nt_arithmetic_if_stmt
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_assigned_goto_stmt
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_continue_stmt
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_cycle_stmt
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_end_function_stmt
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_end_program_stmt
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 r7 = _nt_end_subroutine_stmt
                 if r7
-                  r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
                   r8 = _nt_exit_stmt
                   if r8
-                    r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
                     r0 = r8
                   else
                     r9 = _nt_goto_stmt
                     if r9
-                      r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
                       r0 = r9
                     else
                       r10 = _nt_return_stmt
                       if r10
-                        r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
                         r0 = r10
                       else
                         r11 = _nt_stop_stmt
                         if r11
-                          r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
                           r0 = r11
                         else
                           @index = i0
@@ -11081,7 +10896,7 @@ module Fortran
     if node_cache[:do_term_shared_stmt].has_key?(index)
       cached = node_cache[:do_term_shared_stmt][index]
       if cached
-        node_cache[:do_term_shared_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11130,7 +10945,7 @@ module Fortran
     if node_cache[:do_term_shared_stmt_disallowed].has_key?(index)
       cached = node_cache[:do_term_shared_stmt_disallowed][index]
       if cached
-        node_cache[:do_term_shared_stmt_disallowed][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11139,52 +10954,42 @@ module Fortran
     i0 = index
     r1 = _nt_arithmetic_if_stmt
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_assigned_goto_stmt
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_cycle_stmt
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_end_function_stmt
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_end_program_stmt
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_end_subroutine_stmt
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 r7 = _nt_exit_stmt
                 if r7
-                  r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
                   r8 = _nt_goto_stmt
                   if r8
-                    r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
                     r0 = r8
                   else
                     r9 = _nt_return_stmt
                     if r9
-                      r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
                       r0 = r9
                     else
                       r10 = _nt_stop_stmt
                       if r10
-                        r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
                         r0 = r10
                       else
                         @index = i0
@@ -11210,7 +11015,7 @@ module Fortran
     if node_cache[:do_variable].has_key?(index)
       cached = node_cache[:do_variable][index]
       if cached
-        node_cache[:do_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11238,7 +11043,7 @@ module Fortran
     if node_cache[:double_colon].has_key?(index)
       cached = node_cache[:double_colon][index]
       if cached
-        node_cache[:double_colon][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11269,7 +11074,7 @@ module Fortran
     if node_cache[:dummy_arg].has_key?(index)
       cached = node_cache[:dummy_arg][index]
       if cached
-        node_cache[:dummy_arg][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11278,12 +11083,10 @@ module Fortran
     i0 = index
     r1 = _nt_dummy_arg_name
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_star
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -11308,7 +11111,7 @@ module Fortran
     if node_cache[:dummy_arg_list].has_key?(index)
       cached = node_cache[:dummy_arg_list][index]
       if cached
-        node_cache[:dummy_arg_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11358,7 +11161,7 @@ module Fortran
     if node_cache[:dummy_arg_list_pair].has_key?(index)
       cached = node_cache[:dummy_arg_list_pair][index]
       if cached
-        node_cache[:dummy_arg_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11399,7 +11202,7 @@ module Fortran
     if node_cache[:dummy_arg_list_option].has_key?(index)
       cached = node_cache[:dummy_arg_list_option][index]
       if cached
-        node_cache[:dummy_arg_list_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11422,7 +11225,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(NT,input, i0...index, s0)
+      r0 = instantiate_node(Dummy_Arg_List_Option,input, i0...index, s0)
       r0.extend(DummyArgListOption0)
     else
       @index = i0
@@ -11446,7 +11249,7 @@ module Fortran
     if node_cache[:dummy_arg_name].has_key?(index)
       cached = node_cache[:dummy_arg_name][index]
       if cached
-        node_cache[:dummy_arg_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11457,7 +11260,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -11490,7 +11293,7 @@ module Fortran
     if node_cache[:dummy_arg_name_list].has_key?(index)
       cached = node_cache[:dummy_arg_name_list][index]
       if cached
-        node_cache[:dummy_arg_name_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11540,7 +11343,7 @@ module Fortran
     if node_cache[:dummy_arg_name_list_pair].has_key?(index)
       cached = node_cache[:dummy_arg_name_list_pair][index]
       if cached
-        node_cache[:dummy_arg_name_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11581,7 +11384,7 @@ module Fortran
     if node_cache[:else_construct].has_key?(index)
       cached = node_cache[:else_construct][index]
       if cached
-        node_cache[:else_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11612,7 +11415,7 @@ module Fortran
     if node_cache[:else_if_construct].has_key?(index)
       cached = node_cache[:else_if_construct][index]
       if cached
-        node_cache[:else_if_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11654,7 +11457,7 @@ module Fortran
     if node_cache[:else_if_construct_element].has_key?(index)
       cached = node_cache[:else_if_construct_element][index]
       if cached
-        node_cache[:else_if_construct_element][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11726,7 +11529,7 @@ module Fortran
     if node_cache[:else_if_stmt].has_key?(index)
       cached = node_cache[:else_if_stmt][index]
       if cached
-        node_cache[:else_if_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11840,7 +11643,7 @@ module Fortran
     if node_cache[:else_stmt].has_key?(index)
       cached = node_cache[:else_stmt][index]
       if cached
-        node_cache[:else_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11899,7 +11702,7 @@ module Fortran
     if node_cache[:elsewhere_construct].has_key?(index)
       cached = node_cache[:elsewhere_construct][index]
       if cached
-        node_cache[:elsewhere_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11944,7 +11747,7 @@ module Fortran
     if node_cache[:elsewhere_stmt].has_key?(index)
       cached = node_cache[:elsewhere_stmt][index]
       if cached
-        node_cache[:elsewhere_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -11995,7 +11798,7 @@ module Fortran
     if node_cache[:end_block_data_option].has_key?(index)
       cached = node_cache[:end_block_data_option][index]
       if cached
-        node_cache[:end_block_data_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12049,7 +11852,7 @@ module Fortran
     if node_cache[:end_block_data_stmt].has_key?(index)
       cached = node_cache[:end_block_data_stmt][index]
       if cached
-        node_cache[:end_block_data_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12098,7 +11901,7 @@ module Fortran
     if node_cache[:end_do].has_key?(index)
       cached = node_cache[:end_do][index]
       if cached
-        node_cache[:end_do][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12107,12 +11910,10 @@ module Fortran
     i0 = index
     r1 = _nt_end_do_stmt
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_end_do_continue_stmt
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -12144,7 +11945,7 @@ module Fortran
     if node_cache[:end_do_continue_stmt].has_key?(index)
       cached = node_cache[:end_do_continue_stmt][index]
       if cached
-        node_cache[:end_do_continue_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12198,7 +11999,7 @@ module Fortran
     if node_cache[:end_do_stmt].has_key?(index)
       cached = node_cache[:end_do_stmt][index]
       if cached
-        node_cache[:end_do_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12254,7 +12055,7 @@ module Fortran
     if node_cache[:end_function_option].has_key?(index)
       cached = node_cache[:end_function_option][index]
       if cached
-        node_cache[:end_function_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12304,7 +12105,7 @@ module Fortran
     if node_cache[:end_function_stmt].has_key?(index)
       cached = node_cache[:end_function_stmt][index]
       if cached
-        node_cache[:end_function_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12367,7 +12168,7 @@ module Fortran
     if node_cache[:end_if_stmt].has_key?(index)
       cached = node_cache[:end_if_stmt][index]
       if cached
-        node_cache[:end_if_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12434,7 +12235,7 @@ module Fortran
     if node_cache[:end_interface_stmt].has_key?(index)
       cached = node_cache[:end_interface_stmt][index]
       if cached
-        node_cache[:end_interface_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12494,7 +12295,7 @@ module Fortran
     if node_cache[:end_module_option].has_key?(index)
       cached = node_cache[:end_module_option][index]
       if cached
-        node_cache[:end_module_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12544,7 +12345,7 @@ module Fortran
     if node_cache[:end_module_stmt].has_key?(index)
       cached = node_cache[:end_module_stmt][index]
       if cached
-        node_cache[:end_module_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12604,7 +12405,7 @@ module Fortran
     if node_cache[:end_program_stmt].has_key?(index)
       cached = node_cache[:end_program_stmt][index]
       if cached
-        node_cache[:end_program_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12678,7 +12479,7 @@ module Fortran
     if node_cache[:end_program_stmt_disallowed].has_key?(index)
       cached = node_cache[:end_program_stmt_disallowed][index]
       if cached
-        node_cache[:end_program_stmt_disallowed][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12687,37 +12488,30 @@ module Fortran
     i0 = index
     r1 = _nt_t_block
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_function
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_t_interface
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_t_module
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_t_select
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_t_subroutine
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 r7 = _nt_t_type
                 if r7
-                  r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
                   @index = i0
@@ -12758,7 +12552,7 @@ module Fortran
     if node_cache[:end_select_stmt].has_key?(index)
       cached = node_cache[:end_select_stmt][index]
       if cached
-        node_cache[:end_select_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12825,7 +12619,7 @@ module Fortran
     if node_cache[:end_subroutine_stmt].has_key?(index)
       cached = node_cache[:end_subroutine_stmt][index]
       if cached
-        node_cache[:end_subroutine_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12881,7 +12675,7 @@ module Fortran
     if node_cache[:end_subroutine_option].has_key?(index)
       cached = node_cache[:end_subroutine_option][index]
       if cached
-        node_cache[:end_subroutine_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -12935,7 +12729,7 @@ module Fortran
     if node_cache[:end_type_stmt].has_key?(index)
       cached = node_cache[:end_type_stmt][index]
       if cached
-        node_cache[:end_type_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13002,7 +12796,7 @@ module Fortran
     if node_cache[:end_where_stmt].has_key?(index)
       cached = node_cache[:end_where_stmt][index]
       if cached
-        node_cache[:end_where_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13086,7 +12880,7 @@ module Fortran
     if node_cache[:endfile_stmt].has_key?(index)
       cached = node_cache[:endfile_stmt][index]
       if cached
-        node_cache[:endfile_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13129,7 +12923,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i9, s9 = index, []
@@ -13160,7 +12953,6 @@ module Fortran
         r9 = nil
       end
       if r9
-        r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
         r0 = r9
       else
         @index = i0
@@ -13192,7 +12984,7 @@ module Fortran
     if node_cache[:entity_decl].has_key?(index)
       cached = node_cache[:entity_decl][index]
       if cached
-        node_cache[:entity_decl][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13237,7 +13029,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i9, s9 = index, []
@@ -13260,7 +13051,6 @@ module Fortran
         r9 = nil
       end
       if r9
-        r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
         r0 = r9
       else
         @index = i0
@@ -13292,7 +13082,7 @@ module Fortran
     if node_cache[:entity_decl_array_spec].has_key?(index)
       cached = node_cache[:entity_decl_array_spec][index]
       if cached
-        node_cache[:entity_decl_array_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13337,7 +13127,7 @@ module Fortran
     if node_cache[:entity_decl_list].has_key?(index)
       cached = node_cache[:entity_decl_list][index]
       if cached
-        node_cache[:entity_decl_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13378,7 +13168,7 @@ module Fortran
     if node_cache[:entity_decl_list_pair].has_key?(index)
       cached = node_cache[:entity_decl_list_pair][index]
       if cached
-        node_cache[:entity_decl_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13409,7 +13199,7 @@ module Fortran
     if node_cache[:entity_decl_list_pairs].has_key?(index)
       cached = node_cache[:entity_decl_list_pairs][index]
       if cached
-        node_cache[:entity_decl_list_pairs][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13443,7 +13233,7 @@ module Fortran
     if node_cache[:entry_name].has_key?(index)
       cached = node_cache[:entry_name][index]
       if cached
-        node_cache[:entry_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13454,7 +13244,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -13498,7 +13288,7 @@ module Fortran
     if node_cache[:entry_stmt].has_key?(index)
       cached = node_cache[:entry_stmt][index]
       if cached
-        node_cache[:entry_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13560,7 +13350,7 @@ module Fortran
     if node_cache[:equiv_op].has_key?(index)
       cached = node_cache[:equiv_op][index]
       if cached
-        node_cache[:equiv_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13575,7 +13365,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       if has_terminal?(".neqv.", false, index)
@@ -13586,7 +13375,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -13610,7 +13398,7 @@ module Fortran
     if node_cache[:equiv_operand].has_key?(index)
       cached = node_cache[:equiv_operand][index]
       if cached
-        node_cache[:equiv_operand][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13646,7 +13434,7 @@ module Fortran
     if node_cache[:equivalence_object].has_key?(index)
       cached = node_cache[:equivalence_object][index]
       if cached
-        node_cache[:equivalence_object][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13655,17 +13443,14 @@ module Fortran
     i0 = index
     r1 = _nt_substring
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_array_element
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_variable_name
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -13691,7 +13476,7 @@ module Fortran
     if node_cache[:equivalence_object_list].has_key?(index)
       cached = node_cache[:equivalence_object_list][index]
       if cached
-        node_cache[:equivalence_object_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13737,7 +13522,7 @@ module Fortran
     if node_cache[:equivalence_object_list_option].has_key?(index)
       cached = node_cache[:equivalence_object_list_option][index]
       if cached
-        node_cache[:equivalence_object_list_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13790,7 +13575,7 @@ module Fortran
     if node_cache[:equivalence_set].has_key?(index)
       cached = node_cache[:equivalence_set][index]
       if cached
-        node_cache[:equivalence_set][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13850,7 +13635,7 @@ module Fortran
     if node_cache[:equivalence_set_list].has_key?(index)
       cached = node_cache[:equivalence_set_list][index]
       if cached
-        node_cache[:equivalence_set_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13921,7 +13706,7 @@ module Fortran
     if node_cache[:equivalence_stmt].has_key?(index)
       cached = node_cache[:equivalence_stmt][index]
       if cached
-        node_cache[:equivalence_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13965,7 +13750,7 @@ module Fortran
     if node_cache[:executable_construct].has_key?(index)
       cached = node_cache[:executable_construct][index]
       if cached
-        node_cache[:executable_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -13974,32 +13759,26 @@ module Fortran
     i0 = index
     r1 = _nt_executable_construct_action_stmt
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_case_construct
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_do_construct
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_if_construct
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_where_construct
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_directive
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 @index = i0
@@ -14028,7 +13807,7 @@ module Fortran
     if node_cache[:executable_construct_action_stmt].has_key?(index)
       cached = node_cache[:executable_construct_action_stmt][index]
       if cached
-        node_cache[:executable_construct_action_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14087,7 +13866,7 @@ module Fortran
     if node_cache[:execution_part].has_key?(index)
       cached = node_cache[:execution_part][index]
       if cached
-        node_cache[:execution_part][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14118,7 +13897,7 @@ module Fortran
     if node_cache[:execution_part_disallowed].has_key?(index)
       cached = node_cache[:execution_part_disallowed][index]
       if cached
-        node_cache[:execution_part_disallowed][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14127,17 +13906,14 @@ module Fortran
     i0 = index
     r1 = _nt_end_function_stmt
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_end_program_stmt
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_end_subroutine_stmt
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -14156,7 +13932,7 @@ module Fortran
     if node_cache[:execution_part_construct].has_key?(index)
       cached = node_cache[:execution_part_construct][index]
       if cached
-        node_cache[:execution_part_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14183,7 +13959,7 @@ module Fortran
     if node_cache[:execution_part_construct_item].has_key?(index)
       cached = node_cache[:execution_part_construct_item][index]
       if cached
-        node_cache[:execution_part_construct_item][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14192,22 +13968,18 @@ module Fortran
     i0 = index
     r1 = _nt_executable_construct
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_format_stmt
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_data_stmt
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_entry_stmt
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             @index = i0
@@ -14241,7 +14013,7 @@ module Fortran
     if node_cache[:exit_stmt].has_key?(index)
       cached = node_cache[:exit_stmt][index]
       if cached
-        node_cache[:exit_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14296,7 +14068,7 @@ module Fortran
     if node_cache[:explicit_shape_spec].has_key?(index)
       cached = node_cache[:explicit_shape_spec][index]
       if cached
-        node_cache[:explicit_shape_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14339,7 +14111,7 @@ module Fortran
     if node_cache[:explicit_shape_spec_list].has_key?(index)
       cached = node_cache[:explicit_shape_spec_list][index]
       if cached
-        node_cache[:explicit_shape_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14389,7 +14161,7 @@ module Fortran
     if node_cache[:explicit_shape_spec_list_pair].has_key?(index)
       cached = node_cache[:explicit_shape_spec_list_pair][index]
       if cached
-        node_cache[:explicit_shape_spec_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14420,7 +14192,7 @@ module Fortran
     if node_cache[:exponent].has_key?(index)
       cached = node_cache[:exponent][index]
       if cached
-        node_cache[:exponent][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14438,7 +14210,7 @@ module Fortran
     if node_cache[:exponent_letter].has_key?(index)
       cached = node_cache[:exponent_letter][index]
       if cached
-        node_cache[:exponent_letter][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14478,7 +14250,7 @@ module Fortran
     if node_cache[:expr].has_key?(index)
       cached = node_cache[:expr][index]
       if cached
-        node_cache[:expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14544,7 +14316,7 @@ module Fortran
     if node_cache[:expr_list].has_key?(index)
       cached = node_cache[:expr_list][index]
       if cached
-        node_cache[:expr_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14597,7 +14369,7 @@ module Fortran
     if node_cache[:extended_intrinsic_op].has_key?(index)
       cached = node_cache[:extended_intrinsic_op][index]
       if cached
-        node_cache[:extended_intrinsic_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14615,7 +14387,7 @@ module Fortran
     if node_cache[:external_file_unit].has_key?(index)
       cached = node_cache[:external_file_unit][index]
       if cached
-        node_cache[:external_file_unit][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14640,7 +14412,7 @@ module Fortran
     if node_cache[:external_name].has_key?(index)
       cached = node_cache[:external_name][index]
       if cached
-        node_cache[:external_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14651,7 +14423,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -14694,7 +14466,7 @@ module Fortran
     if node_cache[:external_name_list].has_key?(index)
       cached = node_cache[:external_name_list][index]
       if cached
-        node_cache[:external_name_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14765,7 +14537,7 @@ module Fortran
     if node_cache[:external_stmt].has_key?(index)
       cached = node_cache[:external_stmt][index]
       if cached
-        node_cache[:external_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14823,7 +14595,7 @@ module Fortran
     if node_cache[:external_subprogram].has_key?(index)
       cached = node_cache[:external_subprogram][index]
       if cached
-        node_cache[:external_subprogram][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14852,7 +14624,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -14877,7 +14648,6 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -14895,7 +14665,7 @@ module Fortran
     if node_cache[:file_name_expr].has_key?(index)
       cached = node_cache[:file_name_expr][index]
       if cached
-        node_cache[:file_name_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14913,7 +14683,7 @@ module Fortran
     if node_cache[:format].has_key?(index)
       cached = node_cache[:format][index]
       if cached
-        node_cache[:format][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14922,22 +14692,18 @@ module Fortran
     i0 = index
     r1 = _nt_default_char_expr
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_label_format
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_t_star
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_scalar_default_int_variable
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             @index = i0
@@ -14969,7 +14735,7 @@ module Fortran
     if node_cache[:format_item].has_key?(index)
       cached = node_cache[:format_item][index]
       if cached
-        node_cache[:format_item][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -14996,17 +14762,14 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r5 = _nt_control_edit_desc
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         r6 = _nt_char_string_edit_desc
         if r6
-          r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
           r0 = r6
         else
           i7, s7 = index, []
@@ -15029,7 +14792,6 @@ module Fortran
             r7 = nil
           end
           if r7
-            r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
             r0 = r7
           else
             @index = i0
@@ -15056,7 +14818,7 @@ module Fortran
     if node_cache[:format_item_list].has_key?(index)
       cached = node_cache[:format_item_list][index]
       if cached
-        node_cache[:format_item_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15106,7 +14868,7 @@ module Fortran
     if node_cache[:format_item_list_option].has_key?(index)
       cached = node_cache[:format_item_list_option][index]
       if cached
-        node_cache[:format_item_list_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15147,7 +14909,7 @@ module Fortran
     if node_cache[:format_specification].has_key?(index)
       cached = node_cache[:format_specification][index]
       if cached
-        node_cache[:format_specification][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15209,7 +14971,7 @@ module Fortran
     if node_cache[:format_stmt].has_key?(index)
       cached = node_cache[:format_stmt][index]
       if cached
-        node_cache[:format_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15255,7 +15017,7 @@ module Fortran
     if node_cache[:function_name].has_key?(index)
       cached = node_cache[:function_name][index]
       if cached
-        node_cache[:function_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15266,7 +15028,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -15292,7 +15054,7 @@ module Fortran
     if node_cache[:function_prefix].has_key?(index)
       cached = node_cache[:function_prefix][index]
       if cached
-        node_cache[:function_prefix][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15324,7 +15086,7 @@ module Fortran
     if node_cache[:function_prefix_option].has_key?(index)
       cached = node_cache[:function_prefix_option][index]
       if cached
-        node_cache[:function_prefix_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15333,22 +15095,18 @@ module Fortran
     i0 = index
     r1 = _nt_type_spec
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_elemental
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_t_pure
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_t_recursive
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             @index = i0
@@ -15383,7 +15141,7 @@ module Fortran
     if node_cache[:function_reference].has_key?(index)
       cached = node_cache[:function_reference][index]
       if cached
-        node_cache[:function_reference][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15465,7 +15223,7 @@ module Fortran
     if node_cache[:function_stmt].has_key?(index)
       cached = node_cache[:function_stmt][index]
       if cached
-        node_cache[:function_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15566,7 +15324,7 @@ module Fortran
     if node_cache[:function_subprogram].has_key?(index)
       cached = node_cache[:function_subprogram][index]
       if cached
-        node_cache[:function_subprogram][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15642,7 +15400,7 @@ module Fortran
     if node_cache[:generic_name].has_key?(index)
       cached = node_cache[:generic_name][index]
       if cached
-        node_cache[:generic_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15653,7 +15411,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -15679,7 +15437,7 @@ module Fortran
     if node_cache[:generic_spec].has_key?(index)
       cached = node_cache[:generic_spec][index]
       if cached
-        node_cache[:generic_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15688,12 +15446,10 @@ module Fortran
     i0 = index
     r1 = _nt_generic_spec_option
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_generic_name
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -15729,7 +15485,7 @@ module Fortran
     if node_cache[:generic_spec_option_1].has_key?(index)
       cached = node_cache[:generic_spec_option_1][index]
       if cached
-        node_cache[:generic_spec_option_1][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15786,7 +15542,7 @@ module Fortran
     if node_cache[:generic_spec_option_2].has_key?(index)
       cached = node_cache[:generic_spec_option_2][index]
       if cached
-        node_cache[:generic_spec_option_2][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15825,7 +15581,7 @@ module Fortran
     if node_cache[:generic_spec_option].has_key?(index)
       cached = node_cache[:generic_spec_option][index]
       if cached
-        node_cache[:generic_spec_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15834,12 +15590,10 @@ module Fortran
     i0 = index
     r1 = _nt_generic_spec_option_1
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_generic_spec_option_2
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -15876,7 +15630,7 @@ module Fortran
     if node_cache[:goto_stmt].has_key?(index)
       cached = node_cache[:goto_stmt][index]
       if cached
-        node_cache[:goto_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -15959,7 +15713,7 @@ module Fortran
     if node_cache[:hex_constant].has_key?(index)
       cached = node_cache[:hex_constant][index]
       if cached
-        node_cache[:hex_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16003,7 +15757,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i7, s7 = index, []
@@ -16043,7 +15796,6 @@ module Fortran
         r7 = nil
       end
       if r7
-        r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
         r0 = r7
       else
         @index = i0
@@ -16073,7 +15825,7 @@ module Fortran
     if node_cache[:hex_constant_prefix].has_key?(index)
       cached = node_cache[:hex_constant_prefix][index]
       if cached
-        node_cache[:hex_constant_prefix][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16083,7 +15835,7 @@ module Fortran
     i1, s1 = index, []
     i2 = index
     if has_terminal?("z", false, index)
-      r3 = true
+      r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("z")
@@ -16108,13 +15860,12 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
       i6 = index
       if has_terminal?("x", false, index)
-        r7 = true
+        r7 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("x")
@@ -16139,7 +15890,6 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -16157,7 +15907,7 @@ module Fortran
     if node_cache[:hex_digit].has_key?(index)
       cached = node_cache[:hex_digit][index]
       if cached
-        node_cache[:hex_digit][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16194,7 +15944,7 @@ module Fortran
     if node_cache[:hollerith].has_key?(index)
       cached = node_cache[:hollerith][index]
       if cached
-        node_cache[:hollerith][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16206,7 +15956,7 @@ module Fortran
     if r1
       i2 = index
       if has_terminal?("h", false, index)
-        r3 = true
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("h")
@@ -16267,7 +16017,7 @@ module Fortran
     if node_cache[:hollerith_string].has_key?(index)
       cached = node_cache[:hollerith_string][index]
       if cached
-        node_cache[:hollerith_string][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16349,7 +16099,7 @@ module Fortran
     if node_cache[:if_construct].has_key?(index)
       cached = node_cache[:if_construct][index]
       if cached
-        node_cache[:if_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16405,7 +16155,7 @@ module Fortran
     if node_cache[:if_construct_name].has_key?(index)
       cached = node_cache[:if_construct_name][index]
       if cached
-        node_cache[:if_construct_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16416,7 +16166,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -16452,7 +16202,7 @@ module Fortran
     if node_cache[:if_construct_name_label].has_key?(index)
       cached = node_cache[:if_construct_name_label][index]
       if cached
-        node_cache[:if_construct_name_label][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16509,7 +16259,7 @@ module Fortran
     if node_cache[:if_stmt].has_key?(index)
       cached = node_cache[:if_stmt][index]
       if cached
-        node_cache[:if_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16571,7 +16321,7 @@ module Fortran
     if node_cache[:if_then_construct].has_key?(index)
       cached = node_cache[:if_then_construct][index]
       if cached
-        node_cache[:if_then_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16632,7 +16382,7 @@ module Fortran
     if node_cache[:if_then_stmt].has_key?(index)
       cached = node_cache[:if_then_stmt][index]
       if cached
-        node_cache[:if_then_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16697,7 +16447,7 @@ module Fortran
     if node_cache[:imag_part].has_key?(index)
       cached = node_cache[:imag_part][index]
       if cached
-        node_cache[:imag_part][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16706,12 +16456,10 @@ module Fortran
     i0 = index
     r1 = _nt_signed_real_literal_constant
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_signed_int_literal_constant
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -16729,7 +16477,7 @@ module Fortran
     if node_cache[:implicit_part].has_key?(index)
       cached = node_cache[:implicit_part][index]
       if cached
-        node_cache[:implicit_part][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16761,7 +16509,7 @@ module Fortran
     if node_cache[:implicit_part_stmt].has_key?(index)
       cached = node_cache[:implicit_part_stmt][index]
       if cached
-        node_cache[:implicit_part_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16770,22 +16518,18 @@ module Fortran
     i0 = index
     r1 = _nt_implicit_stmt
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_format_stmt
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_parameter_stmt
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_entry_stmt
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             @index = i0
@@ -16841,7 +16585,7 @@ module Fortran
     if node_cache[:implicit_spec].has_key?(index)
       cached = node_cache[:implicit_spec][index]
       if cached
-        node_cache[:implicit_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16871,7 +16615,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i6, s6 = index, []
@@ -16897,7 +16640,6 @@ module Fortran
         r6 = nil
       end
       if r6
-        r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
         r0 = r6
       else
         @index = i0
@@ -16922,7 +16664,7 @@ module Fortran
     if node_cache[:implicit_spec_list].has_key?(index)
       cached = node_cache[:implicit_spec_list][index]
       if cached
-        node_cache[:implicit_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -16972,7 +16714,7 @@ module Fortran
     if node_cache[:implicit_spec_list_pair].has_key?(index)
       cached = node_cache[:implicit_spec_list_pair][index]
       if cached
-        node_cache[:implicit_spec_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17039,7 +16781,7 @@ module Fortran
     if node_cache[:implicit_stmt].has_key?(index)
       cached = node_cache[:implicit_stmt][index]
       if cached
-        node_cache[:implicit_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17074,7 +16816,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i7, s7 = index, []
@@ -17105,7 +16846,6 @@ module Fortran
         r7 = nil
       end
       if r7
-        r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
         r0 = r7
       else
         @index = i0
@@ -17143,7 +16883,7 @@ module Fortran
     if node_cache[:initialization].has_key?(index)
       cached = node_cache[:initialization][index]
       if cached
-        node_cache[:initialization][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17165,7 +16905,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i4, s4 = index, []
@@ -17183,7 +16922,6 @@ module Fortran
         r4 = nil
       end
       if r4
-        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r0 = r4
       else
         @index = i0
@@ -17201,7 +16939,7 @@ module Fortran
     if node_cache[:initialization_expr].has_key?(index)
       cached = node_cache[:initialization_expr][index]
       if cached
-        node_cache[:initialization_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17233,7 +16971,7 @@ module Fortran
     if node_cache[:inner_shared_do_construct].has_key?(index)
       cached = node_cache[:inner_shared_do_construct][index]
       if cached
-        node_cache[:inner_shared_do_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17279,7 +17017,7 @@ module Fortran
     if node_cache[:input_item].has_key?(index)
       cached = node_cache[:input_item][index]
       if cached
-        node_cache[:input_item][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17288,12 +17026,10 @@ module Fortran
     i0 = index
     r1 = _nt_io_implied_do
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_variable
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -17318,7 +17054,7 @@ module Fortran
     if node_cache[:input_item_list].has_key?(index)
       cached = node_cache[:input_item_list][index]
       if cached
-        node_cache[:input_item_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17368,7 +17104,7 @@ module Fortran
     if node_cache[:input_item_list_pair].has_key?(index)
       cached = node_cache[:input_item_list_pair][index]
       if cached
-        node_cache[:input_item_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17434,7 +17170,7 @@ module Fortran
     if node_cache[:inquire_spec].has_key?(index)
       cached = node_cache[:inquire_spec][index]
       if cached
-        node_cache[:inquire_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17463,7 +17199,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -17485,7 +17220,6 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         i9, s9 = index, []
@@ -17507,122 +17241,98 @@ module Fortran
           r9 = nil
         end
         if r9
-          r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
           r0 = r9
         else
           r13 = _nt_io_spec_iostat
           if r13
-            r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
             r0 = r13
           else
             r14 = _nt_io_spec_err
             if r14
-              r14 = SyntaxNode.new(input, (index-1)...index) if r14 == true
               r0 = r14
             else
               r15 = _nt_io_spec_exist
               if r15
-                r15 = SyntaxNode.new(input, (index-1)...index) if r15 == true
                 r0 = r15
               else
                 r16 = _nt_io_spec_opened
                 if r16
-                  r16 = SyntaxNode.new(input, (index-1)...index) if r16 == true
                   r0 = r16
                 else
                   r17 = _nt_io_spec_number
                   if r17
-                    r17 = SyntaxNode.new(input, (index-1)...index) if r17 == true
                     r0 = r17
                   else
                     r18 = _nt_io_spec_named
                     if r18
-                      r18 = SyntaxNode.new(input, (index-1)...index) if r18 == true
                       r0 = r18
                     else
                       r19 = _nt_io_spec_name
                       if r19
-                        r19 = SyntaxNode.new(input, (index-1)...index) if r19 == true
                         r0 = r19
                       else
                         r20 = _nt_io_spec_access
                         if r20
-                          r20 = SyntaxNode.new(input, (index-1)...index) if r20 == true
                           r0 = r20
                         else
                           r21 = _nt_io_spec_sequential
                           if r21
-                            r21 = SyntaxNode.new(input, (index-1)...index) if r21 == true
                             r0 = r21
                           else
                             r22 = _nt_io_spec_direct
                             if r22
-                              r22 = SyntaxNode.new(input, (index-1)...index) if r22 == true
                               r0 = r22
                             else
                               r23 = _nt_io_spec_form
                               if r23
-                                r23 = SyntaxNode.new(input, (index-1)...index) if r23 == true
                                 r0 = r23
                               else
                                 r24 = _nt_io_spec_formatted
                                 if r24
-                                  r24 = SyntaxNode.new(input, (index-1)...index) if r24 == true
                                   r0 = r24
                                 else
                                   r25 = _nt_io_spec_unformatted
                                   if r25
-                                    r25 = SyntaxNode.new(input, (index-1)...index) if r25 == true
                                     r0 = r25
                                   else
                                     r26 = _nt_io_spec_recl
                                     if r26
-                                      r26 = SyntaxNode.new(input, (index-1)...index) if r26 == true
                                       r0 = r26
                                     else
                                       r27 = _nt_io_spec_nextrec
                                       if r27
-                                        r27 = SyntaxNode.new(input, (index-1)...index) if r27 == true
                                         r0 = r27
                                       else
                                         r28 = _nt_io_spec_blank
                                         if r28
-                                          r28 = SyntaxNode.new(input, (index-1)...index) if r28 == true
                                           r0 = r28
                                         else
                                           r29 = _nt_io_spec_position
                                           if r29
-                                            r29 = SyntaxNode.new(input, (index-1)...index) if r29 == true
                                             r0 = r29
                                           else
                                             r30 = _nt_io_spec_action
                                             if r30
-                                              r30 = SyntaxNode.new(input, (index-1)...index) if r30 == true
                                               r0 = r30
                                             else
                                               r31 = _nt_io_spec_read
                                               if r31
-                                                r31 = SyntaxNode.new(input, (index-1)...index) if r31 == true
                                                 r0 = r31
                                               else
                                                 r32 = _nt_io_spec_write
                                                 if r32
-                                                  r32 = SyntaxNode.new(input, (index-1)...index) if r32 == true
                                                   r0 = r32
                                                 else
                                                   r33 = _nt_io_spec_readwrite
                                                   if r33
-                                                    r33 = SyntaxNode.new(input, (index-1)...index) if r33 == true
                                                     r0 = r33
                                                   else
                                                     r34 = _nt_io_spec_delim
                                                     if r34
-                                                      r34 = SyntaxNode.new(input, (index-1)...index) if r34 == true
                                                       r0 = r34
                                                     else
                                                       r35 = _nt_io_spec_pad
                                                       if r35
-                                                        r35 = SyntaxNode.new(input, (index-1)...index) if r35 == true
                                                         r0 = r35
                                                       else
                                                         @index = i0
@@ -17681,7 +17391,7 @@ module Fortran
     if node_cache[:inquire_spec_list].has_key?(index)
       cached = node_cache[:inquire_spec_list][index]
       if cached
-        node_cache[:inquire_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17798,7 +17508,7 @@ module Fortran
     if node_cache[:inquire_stmt].has_key?(index)
       cached = node_cache[:inquire_stmt][index]
       if cached
-        node_cache[:inquire_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17841,7 +17551,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i9, s9 = index, []
@@ -17892,7 +17601,6 @@ module Fortran
         r9 = nil
       end
       if r9
-        r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
         r0 = r9
       else
         @index = i0
@@ -17910,7 +17618,7 @@ module Fortran
     if node_cache[:int_expr].has_key?(index)
       cached = node_cache[:int_expr][index]
       if cached
-        node_cache[:int_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17928,7 +17636,7 @@ module Fortran
     if node_cache[:int_initialization_expr].has_key?(index)
       cached = node_cache[:int_initialization_expr][index]
       if cached
-        node_cache[:int_initialization_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17960,7 +17668,7 @@ module Fortran
     if node_cache[:int_literal_constant].has_key?(index)
       cached = node_cache[:int_literal_constant][index]
       if cached
-        node_cache[:int_literal_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -17978,12 +17686,10 @@ module Fortran
         i5 = index
         r6 = _nt_t_apostrophe
         if r6
-          r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
           r5 = r6
         else
           r7 = _nt_t_quotemark
           if r7
-            r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
             r5 = r7
           else
             @index = i5
@@ -18034,7 +17740,7 @@ module Fortran
     if node_cache[:int_variable].has_key?(index)
       cached = node_cache[:int_variable][index]
       if cached
-        node_cache[:int_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18052,7 +17758,7 @@ module Fortran
     if node_cache[:intent_spec].has_key?(index)
       cached = node_cache[:intent_spec][index]
       if cached
-        node_cache[:intent_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18061,17 +17767,14 @@ module Fortran
     i0 = index
     r1 = _nt_t_in
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_out
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_t_inout
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -18121,7 +17824,7 @@ module Fortran
     if node_cache[:intent_stmt].has_key?(index)
       cached = node_cache[:intent_stmt][index]
       if cached
-        node_cache[:intent_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18215,7 +17918,7 @@ module Fortran
     if node_cache[:interface_block].has_key?(index)
       cached = node_cache[:interface_block][index]
       if cached
-        node_cache[:interface_block][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18254,7 +17957,7 @@ module Fortran
     if node_cache[:interface_bodies].has_key?(index)
       cached = node_cache[:interface_bodies][index]
       if cached
-        node_cache[:interface_bodies][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18303,7 +18006,7 @@ module Fortran
     if node_cache[:interface_body].has_key?(index)
       cached = node_cache[:interface_body][index]
       if cached
-        node_cache[:interface_body][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18345,7 +18048,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i8, s8 = index, []
@@ -18383,7 +18085,6 @@ module Fortran
         r8 = nil
       end
       if r8
-        r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
         r0 = r8
       else
         @index = i0
@@ -18415,7 +18116,7 @@ module Fortran
     if node_cache[:interface_stmt].has_key?(index)
       cached = node_cache[:interface_stmt][index]
       if cached
-        node_cache[:interface_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18464,7 +18165,7 @@ module Fortran
     if node_cache[:internal_file_unit].has_key?(index)
       cached = node_cache[:internal_file_unit][index]
       if cached
-        node_cache[:internal_file_unit][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18492,7 +18193,7 @@ module Fortran
     if node_cache[:internal_subprogram_part].has_key?(index)
       cached = node_cache[:internal_subprogram_part][index]
       if cached
-        node_cache[:internal_subprogram_part][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18537,7 +18238,7 @@ module Fortran
     if node_cache[:internal_subprogram].has_key?(index)
       cached = node_cache[:internal_subprogram][index]
       if cached
-        node_cache[:internal_subprogram][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18566,7 +18267,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -18591,7 +18291,6 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -18609,7 +18308,7 @@ module Fortran
     if node_cache[:internal_subprograms].has_key?(index)
       cached = node_cache[:internal_subprograms][index]
       if cached
-        node_cache[:internal_subprograms][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18641,7 +18340,7 @@ module Fortran
     if node_cache[:intrinsic_operator].has_key?(index)
       cached = node_cache[:intrinsic_operator][index]
       if cached
-        node_cache[:intrinsic_operator][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18650,32 +18349,26 @@ module Fortran
     i0 = index
     r1 = _nt_power_op
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_mult_op
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_add_op
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_concat_op
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_rel_op
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_logical_op
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 @index = i0
@@ -18704,7 +18397,7 @@ module Fortran
     if node_cache[:intrinsic_procedure_name].has_key?(index)
       cached = node_cache[:intrinsic_procedure_name][index]
       if cached
-        node_cache[:intrinsic_procedure_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18715,7 +18408,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -18758,7 +18451,7 @@ module Fortran
     if node_cache[:intrinsic_procedure_name_list].has_key?(index)
       cached = node_cache[:intrinsic_procedure_name_list][index]
       if cached
-        node_cache[:intrinsic_procedure_name_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18829,7 +18522,7 @@ module Fortran
     if node_cache[:intrinsic_stmt].has_key?(index)
       cached = node_cache[:intrinsic_stmt][index]
       if cached
-        node_cache[:intrinsic_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -18952,7 +18645,7 @@ module Fortran
     if node_cache[:io_control_spec].has_key?(index)
       cached = node_cache[:io_control_spec][index]
       if cached
-        node_cache[:io_control_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19000,7 +18693,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i9, s9 = index, []
@@ -19033,7 +18725,6 @@ module Fortran
         r9 = nil
       end
       if r9
-        r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
         r0 = r9
       else
         i15, s15 = index, []
@@ -19055,22 +18746,18 @@ module Fortran
           r15 = nil
         end
         if r15
-          r15 = SyntaxNode.new(input, (index-1)...index) if r15 == true
           r0 = r15
         else
           r19 = _nt_io_spec_end
           if r19
-            r19 = SyntaxNode.new(input, (index-1)...index) if r19 == true
             r0 = r19
           else
             r20 = _nt_io_spec_eor
             if r20
-              r20 = SyntaxNode.new(input, (index-1)...index) if r20 == true
               r0 = r20
             else
               r21 = _nt_io_spec_err
               if r21
-                r21 = SyntaxNode.new(input, (index-1)...index) if r21 == true
                 r0 = r21
               else
                 i22, s22 = index, []
@@ -19092,17 +18779,14 @@ module Fortran
                   r22 = nil
                 end
                 if r22
-                  r22 = SyntaxNode.new(input, (index-1)...index) if r22 == true
                   r0 = r22
                 else
                   r26 = _nt_io_spec_iostat
                   if r26
-                    r26 = SyntaxNode.new(input, (index-1)...index) if r26 == true
                     r0 = r26
                   else
                     r27 = _nt_io_spec_nml
                     if r27
-                      r27 = SyntaxNode.new(input, (index-1)...index) if r27 == true
                       r0 = r27
                     else
                       i28, s28 = index, []
@@ -19124,17 +18808,14 @@ module Fortran
                         r28 = nil
                       end
                       if r28
-                        r28 = SyntaxNode.new(input, (index-1)...index) if r28 == true
                         r0 = r28
                       else
                         r32 = _nt_io_spec_size
                         if r32
-                          r32 = SyntaxNode.new(input, (index-1)...index) if r32 == true
                           r0 = r32
                         else
                           r33 = _nt_io_spec_unit
                           if r33
-                            r33 = SyntaxNode.new(input, (index-1)...index) if r33 == true
                             r0 = r33
                           else
                             i34, s34 = index, []
@@ -19142,7 +18823,7 @@ module Fortran
                             s34 << r35
                             if r35
                               if has_terminal?("", false, index)
-                                r36 = true
+                                r36 = instantiate_node(SyntaxNode,input, index...(index + 0))
                                 @index += 0
                               else
                                 terminal_parse_failure("")
@@ -19158,7 +18839,6 @@ module Fortran
                               r34 = nil
                             end
                             if r34
-                              r34 = SyntaxNode.new(input, (index-1)...index) if r34 == true
                               r0 = r34
                             else
                               @index = i0
@@ -19194,7 +18874,7 @@ module Fortran
     if node_cache[:io_control_spec_list].has_key?(index)
       cached = node_cache[:io_control_spec_list][index]
       if cached
-        node_cache[:io_control_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19244,7 +18924,7 @@ module Fortran
     if node_cache[:io_control_spec_list_pair].has_key?(index)
       cached = node_cache[:io_control_spec_list_pair][index]
       if cached
-        node_cache[:io_control_spec_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19297,7 +18977,7 @@ module Fortran
     if node_cache[:io_implied_do].has_key?(index)
       cached = node_cache[:io_implied_do][index]
       if cached
-        node_cache[:io_implied_do][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19363,7 +19043,7 @@ module Fortran
     if node_cache[:io_implied_do_control].has_key?(index)
       cached = node_cache[:io_implied_do_control][index]
       if cached
-        node_cache[:io_implied_do_control][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19425,7 +19105,7 @@ module Fortran
     if node_cache[:io_implied_do_control_option].has_key?(index)
       cached = node_cache[:io_implied_do_control_option][index]
       if cached
-        node_cache[:io_implied_do_control_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19470,7 +19150,7 @@ module Fortran
     if node_cache[:io_implied_do_object].has_key?(index)
       cached = node_cache[:io_implied_do_object][index]
       if cached
-        node_cache[:io_implied_do_object][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19499,7 +19179,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -19524,7 +19203,6 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -19559,7 +19237,7 @@ module Fortran
     if node_cache[:io_implied_do_object_list].has_key?(index)
       cached = node_cache[:io_implied_do_object_list][index]
       if cached
-        node_cache[:io_implied_do_object_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19626,7 +19304,7 @@ module Fortran
     if node_cache[:io_spec_access].has_key?(index)
       cached = node_cache[:io_spec_access][index]
       if cached
-        node_cache[:io_spec_access][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19675,7 +19353,7 @@ module Fortran
     if node_cache[:io_spec_action].has_key?(index)
       cached = node_cache[:io_spec_action][index]
       if cached
-        node_cache[:io_spec_action][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19724,7 +19402,7 @@ module Fortran
     if node_cache[:io_spec_blank].has_key?(index)
       cached = node_cache[:io_spec_blank][index]
       if cached
-        node_cache[:io_spec_blank][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19773,7 +19451,7 @@ module Fortran
     if node_cache[:io_spec_delim].has_key?(index)
       cached = node_cache[:io_spec_delim][index]
       if cached
-        node_cache[:io_spec_delim][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19822,7 +19500,7 @@ module Fortran
     if node_cache[:io_spec_direct].has_key?(index)
       cached = node_cache[:io_spec_direct][index]
       if cached
-        node_cache[:io_spec_direct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19872,7 +19550,7 @@ module Fortran
     if node_cache[:io_spec_end].has_key?(index)
       cached = node_cache[:io_spec_end][index]
       if cached
-        node_cache[:io_spec_end][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19933,7 +19611,7 @@ module Fortran
     if node_cache[:io_spec_eor].has_key?(index)
       cached = node_cache[:io_spec_eor][index]
       if cached
-        node_cache[:io_spec_eor][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -19994,7 +19672,7 @@ module Fortran
     if node_cache[:io_spec_err].has_key?(index)
       cached = node_cache[:io_spec_err][index]
       if cached
-        node_cache[:io_spec_err][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20054,7 +19732,7 @@ module Fortran
     if node_cache[:io_spec_exist].has_key?(index)
       cached = node_cache[:io_spec_exist][index]
       if cached
-        node_cache[:io_spec_exist][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20103,7 +19781,7 @@ module Fortran
     if node_cache[:io_spec_form].has_key?(index)
       cached = node_cache[:io_spec_form][index]
       if cached
-        node_cache[:io_spec_form][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20152,7 +19830,7 @@ module Fortran
     if node_cache[:io_spec_formatted].has_key?(index)
       cached = node_cache[:io_spec_formatted][index]
       if cached
-        node_cache[:io_spec_formatted][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20201,7 +19879,7 @@ module Fortran
     if node_cache[:io_spec_iostat].has_key?(index)
       cached = node_cache[:io_spec_iostat][index]
       if cached
-        node_cache[:io_spec_iostat][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20250,7 +19928,7 @@ module Fortran
     if node_cache[:io_spec_name].has_key?(index)
       cached = node_cache[:io_spec_name][index]
       if cached
-        node_cache[:io_spec_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20299,7 +19977,7 @@ module Fortran
     if node_cache[:io_spec_named].has_key?(index)
       cached = node_cache[:io_spec_named][index]
       if cached
-        node_cache[:io_spec_named][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20348,7 +20026,7 @@ module Fortran
     if node_cache[:io_spec_nextrec].has_key?(index)
       cached = node_cache[:io_spec_nextrec][index]
       if cached
-        node_cache[:io_spec_nextrec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20397,7 +20075,7 @@ module Fortran
     if node_cache[:io_spec_nml].has_key?(index)
       cached = node_cache[:io_spec_nml][index]
       if cached
-        node_cache[:io_spec_nml][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20446,7 +20124,7 @@ module Fortran
     if node_cache[:io_spec_number].has_key?(index)
       cached = node_cache[:io_spec_number][index]
       if cached
-        node_cache[:io_spec_number][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20495,7 +20173,7 @@ module Fortran
     if node_cache[:io_spec_opened].has_key?(index)
       cached = node_cache[:io_spec_opened][index]
       if cached
-        node_cache[:io_spec_opened][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20544,7 +20222,7 @@ module Fortran
     if node_cache[:io_spec_pad].has_key?(index)
       cached = node_cache[:io_spec_pad][index]
       if cached
-        node_cache[:io_spec_pad][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20593,7 +20271,7 @@ module Fortran
     if node_cache[:io_spec_position].has_key?(index)
       cached = node_cache[:io_spec_position][index]
       if cached
-        node_cache[:io_spec_position][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20642,7 +20320,7 @@ module Fortran
     if node_cache[:io_spec_read].has_key?(index)
       cached = node_cache[:io_spec_read][index]
       if cached
-        node_cache[:io_spec_read][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20691,7 +20369,7 @@ module Fortran
     if node_cache[:io_spec_readwrite].has_key?(index)
       cached = node_cache[:io_spec_readwrite][index]
       if cached
-        node_cache[:io_spec_readwrite][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20740,7 +20418,7 @@ module Fortran
     if node_cache[:io_spec_recl].has_key?(index)
       cached = node_cache[:io_spec_recl][index]
       if cached
-        node_cache[:io_spec_recl][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20789,7 +20467,7 @@ module Fortran
     if node_cache[:io_spec_sequential].has_key?(index)
       cached = node_cache[:io_spec_sequential][index]
       if cached
-        node_cache[:io_spec_sequential][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20838,7 +20516,7 @@ module Fortran
     if node_cache[:io_spec_size].has_key?(index)
       cached = node_cache[:io_spec_size][index]
       if cached
-        node_cache[:io_spec_size][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20887,7 +20565,7 @@ module Fortran
     if node_cache[:io_spec_unformatted].has_key?(index)
       cached = node_cache[:io_spec_unformatted][index]
       if cached
-        node_cache[:io_spec_unformatted][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20936,7 +20614,7 @@ module Fortran
     if node_cache[:io_spec_unit].has_key?(index)
       cached = node_cache[:io_spec_unit][index]
       if cached
-        node_cache[:io_spec_unit][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -20985,7 +20663,7 @@ module Fortran
     if node_cache[:io_spec_write].has_key?(index)
       cached = node_cache[:io_spec_write][index]
       if cached
-        node_cache[:io_spec_write][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21034,7 +20712,7 @@ module Fortran
     if node_cache[:io_unit].has_key?(index)
       cached = node_cache[:io_unit][index]
       if cached
-        node_cache[:io_unit][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21043,7 +20721,6 @@ module Fortran
     i0 = index
     r1 = _nt_t_star
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i2, s2 = index, []
@@ -21051,7 +20728,7 @@ module Fortran
       s2 << r3
       if r3
         if has_terminal?("", false, index)
-          r4 = true
+          r4 = instantiate_node(SyntaxNode,input, index...(index + 0))
           @index += 0
         else
           terminal_parse_failure("")
@@ -21067,7 +20744,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         i5, s5 = index, []
@@ -21075,7 +20751,7 @@ module Fortran
         s5 << r6
         if r6
           if has_terminal?("", false, index)
-            r7 = true
+            r7 = instantiate_node(SyntaxNode,input, index...(index + 0))
             @index += 0
           else
             terminal_parse_failure("")
@@ -21091,7 +20767,6 @@ module Fortran
           r5 = nil
         end
         if r5
-          r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
           r0 = r5
         else
           @index = i0
@@ -21110,7 +20785,7 @@ module Fortran
     if node_cache[:keyword].has_key?(index)
       cached = node_cache[:keyword][index]
       if cached
-        node_cache[:keyword][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21128,7 +20803,7 @@ module Fortran
     if node_cache[:keyword_option].has_key?(index)
       cached = node_cache[:keyword_option][index]
       if cached
-        node_cache[:keyword_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21161,7 +20836,7 @@ module Fortran
     if node_cache[:keyword_pair].has_key?(index)
       cached = node_cache[:keyword_pair][index]
       if cached
-        node_cache[:keyword_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21202,7 +20877,7 @@ module Fortran
     if node_cache[:kind_pair].has_key?(index)
       cached = node_cache[:kind_pair][index]
       if cached
-        node_cache[:kind_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21243,7 +20918,7 @@ module Fortran
     if node_cache[:kind_option].has_key?(index)
       cached = node_cache[:kind_option][index]
       if cached
-        node_cache[:kind_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21274,7 +20949,7 @@ module Fortran
     if node_cache[:kind_param].has_key?(index)
       cached = node_cache[:kind_param][index]
       if cached
-        node_cache[:kind_param][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21283,12 +20958,10 @@ module Fortran
     i0 = index
     r1 = _nt_digit_string
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_scalar_int_constant_name
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -21320,7 +20993,7 @@ module Fortran
     if node_cache[:kind_selector].has_key?(index)
       cached = node_cache[:kind_selector][index]
       if cached
-        node_cache[:kind_selector][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21367,7 +21040,7 @@ module Fortran
     if node_cache[:label].has_key?(index)
       cached = node_cache[:label][index]
       if cached
-        node_cache[:label][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21429,7 +21102,7 @@ module Fortran
     if node_cache[:label_assign].has_key?(index)
       cached = node_cache[:label_assign][index]
       if cached
-        node_cache[:label_assign][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21440,7 +21113,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -21473,7 +21146,7 @@ module Fortran
     if node_cache[:label_branch].has_key?(index)
       cached = node_cache[:label_branch][index]
       if cached
-        node_cache[:label_branch][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21484,7 +21157,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -21529,7 +21202,7 @@ module Fortran
     if node_cache[:label_do_stmt].has_key?(index)
       cached = node_cache[:label_do_stmt][index]
       if cached
-        node_cache[:label_do_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21609,7 +21282,7 @@ module Fortran
     if node_cache[:label_format].has_key?(index)
       cached = node_cache[:label_format][index]
       if cached
-        node_cache[:label_format][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21620,7 +21293,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -21653,7 +21326,7 @@ module Fortran
     if node_cache[:label_list].has_key?(index)
       cached = node_cache[:label_list][index]
       if cached
-        node_cache[:label_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21714,7 +21387,7 @@ module Fortran
     if node_cache[:label_list_pair].has_key?(index)
       cached = node_cache[:label_list_pair][index]
       if cached
-        node_cache[:label_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21752,7 +21425,7 @@ module Fortran
     if node_cache[:label_stmt].has_key?(index)
       cached = node_cache[:label_stmt][index]
       if cached
-        node_cache[:label_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21763,7 +21436,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -21799,7 +21472,7 @@ module Fortran
     if node_cache[:len_pair].has_key?(index)
       cached = node_cache[:len_pair][index]
       if cached
-        node_cache[:len_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21864,7 +21537,7 @@ module Fortran
     if node_cache[:length_selector].has_key?(index)
       cached = node_cache[:length_selector][index]
       if cached
-        node_cache[:length_selector][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -21899,7 +21572,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i7, s7 = index, []
@@ -21951,7 +21623,6 @@ module Fortran
         r7 = nil
       end
       if r7
-        r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
         r0 = r7
       else
         i14, s14 = index, []
@@ -21974,7 +21645,6 @@ module Fortran
           r14 = nil
         end
         if r14
-          r14 = SyntaxNode.new(input, (index-1)...index) if r14 == true
           r0 = r14
         else
           @index = i0
@@ -21993,7 +21663,7 @@ module Fortran
     if node_cache[:letter_sequence].has_key?(index)
       cached = node_cache[:letter_sequence][index]
       if cached
-        node_cache[:letter_sequence][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22032,7 +21702,7 @@ module Fortran
     if node_cache[:letter_spec].has_key?(index)
       cached = node_cache[:letter_spec][index]
       if cached
-        node_cache[:letter_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22075,7 +21745,7 @@ module Fortran
     if node_cache[:letter_spec_list].has_key?(index)
       cached = node_cache[:letter_spec_list][index]
       if cached
-        node_cache[:letter_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22125,7 +21795,7 @@ module Fortran
     if node_cache[:letter_spec_list_option].has_key?(index)
       cached = node_cache[:letter_spec_list_option][index]
       if cached
-        node_cache[:letter_spec_list_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22166,7 +21836,7 @@ module Fortran
     if node_cache[:letter_spec_option].has_key?(index)
       cached = node_cache[:letter_spec_option][index]
       if cached
-        node_cache[:letter_spec_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22203,7 +21873,7 @@ module Fortran
     if node_cache[:level_1_expr].has_key?(index)
       cached = node_cache[:level_1_expr][index]
       if cached
-        node_cache[:level_1_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22246,7 +21916,7 @@ module Fortran
     if node_cache[:level_2_expr].has_key?(index)
       cached = node_cache[:level_2_expr][index]
       if cached
-        node_cache[:level_2_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22298,7 +21968,7 @@ module Fortran
     if node_cache[:level_3_expr].has_key?(index)
       cached = node_cache[:level_3_expr][index]
       if cached
-        node_cache[:level_3_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22344,7 +22014,7 @@ module Fortran
     if node_cache[:level_3_expr_option].has_key?(index)
       cached = node_cache[:level_3_expr_option][index]
       if cached
-        node_cache[:level_3_expr_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22382,7 +22052,7 @@ module Fortran
     if node_cache[:level_4_expr].has_key?(index)
       cached = node_cache[:level_4_expr][index]
       if cached
-        node_cache[:level_4_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22428,7 +22098,7 @@ module Fortran
     if node_cache[:level_4_expr_option].has_key?(index)
       cached = node_cache[:level_4_expr_option][index]
       if cached
-        node_cache[:level_4_expr_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22466,7 +22136,7 @@ module Fortran
     if node_cache[:level_5_expr].has_key?(index)
       cached = node_cache[:level_5_expr][index]
       if cached
-        node_cache[:level_5_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22512,7 +22182,7 @@ module Fortran
     if node_cache[:level_5_expr_option].has_key?(index)
       cached = node_cache[:level_5_expr_option][index]
       if cached
-        node_cache[:level_5_expr_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22543,7 +22213,7 @@ module Fortran
     if node_cache[:literal_constant].has_key?(index)
       cached = node_cache[:literal_constant][index]
       if cached
-        node_cache[:literal_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22552,32 +22222,26 @@ module Fortran
     i0 = index
     r1 = _nt_complex_literal_constant
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_signed_real_literal_constant
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_signed_int_literal_constant
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_logical_literal_constant
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_char_literal_constant
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_boz_literal_constant
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 @index = i0
@@ -22606,7 +22270,7 @@ module Fortran
     if node_cache[:local_name].has_key?(index)
       cached = node_cache[:local_name][index]
       if cached
-        node_cache[:local_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22617,7 +22281,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -22643,7 +22307,7 @@ module Fortran
     if node_cache[:logical_expr].has_key?(index)
       cached = node_cache[:logical_expr][index]
       if cached
-        node_cache[:logical_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22661,7 +22325,7 @@ module Fortran
     if node_cache[:logical_initialization_expr].has_key?(index)
       cached = node_cache[:logical_initialization_expr][index]
       if cached
-        node_cache[:logical_initialization_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22693,7 +22357,7 @@ module Fortran
     if node_cache[:logical_literal_constant].has_key?(index)
       cached = node_cache[:logical_literal_constant][index]
       if cached
-        node_cache[:logical_literal_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22720,7 +22384,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -22743,7 +22406,6 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -22761,7 +22423,7 @@ module Fortran
     if node_cache[:logical_op].has_key?(index)
       cached = node_cache[:logical_op][index]
       if cached
-        node_cache[:logical_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22770,22 +22432,18 @@ module Fortran
     i0 = index
     r1 = _nt_not_op
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_and_op
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_or_op
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_equiv_op
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             @index = i0
@@ -22805,7 +22463,7 @@ module Fortran
     if node_cache[:logical_variable].has_key?(index)
       cached = node_cache[:logical_variable][index]
       if cached
-        node_cache[:logical_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22860,7 +22518,7 @@ module Fortran
     if node_cache[:loop_control].has_key?(index)
       cached = node_cache[:loop_control][index]
       if cached
-        node_cache[:loop_control][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -22908,7 +22566,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i10, s10 = index, []
@@ -22943,7 +22600,6 @@ module Fortran
         r10 = nil
       end
       if r10
-        r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
         r0 = r10
       else
         @index = i0
@@ -22971,7 +22627,7 @@ module Fortran
     if node_cache[:loop_control_pair].has_key?(index)
       cached = node_cache[:loop_control_pair][index]
       if cached
-        node_cache[:loop_control_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23002,7 +22658,7 @@ module Fortran
     if node_cache[:lower_bound].has_key?(index)
       cached = node_cache[:lower_bound][index]
       if cached
-        node_cache[:lower_bound][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23030,7 +22686,7 @@ module Fortran
     if node_cache[:lower_bound_pair].has_key?(index)
       cached = node_cache[:lower_bound_pair][index]
       if cached
-        node_cache[:lower_bound_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23068,7 +22724,7 @@ module Fortran
     if node_cache[:main_program].has_key?(index)
       cached = node_cache[:main_program][index]
       if cached
-        node_cache[:main_program][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23142,7 +22798,7 @@ module Fortran
     if node_cache[:mask_expr].has_key?(index)
       cached = node_cache[:mask_expr][index]
       if cached
-        node_cache[:mask_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23171,7 +22827,7 @@ module Fortran
     if node_cache[:module].has_key?(index)
       cached = node_cache[:module][index]
       if cached
-        node_cache[:module][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23238,7 +22894,7 @@ module Fortran
     if node_cache[:module_name].has_key?(index)
       cached = node_cache[:module_name][index]
       if cached
-        node_cache[:module_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23249,7 +22905,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -23297,7 +22953,7 @@ module Fortran
     if node_cache[:module_procedure_stmt].has_key?(index)
       cached = node_cache[:module_procedure_stmt][index]
       if cached
-        node_cache[:module_procedure_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23345,7 +23001,7 @@ module Fortran
     if node_cache[:module_procedure_stmts].has_key?(index)
       cached = node_cache[:module_procedure_stmts][index]
       if cached
-        node_cache[:module_procedure_stmts][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23391,7 +23047,7 @@ module Fortran
     if node_cache[:module_stmt].has_key?(index)
       cached = node_cache[:module_stmt][index]
       if cached
-        node_cache[:module_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23460,7 +23116,7 @@ module Fortran
     if node_cache[:module_subprogram].has_key?(index)
       cached = node_cache[:module_subprogram][index]
       if cached
-        node_cache[:module_subprogram][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23489,7 +23145,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -23514,7 +23169,6 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -23539,7 +23193,7 @@ module Fortran
     if node_cache[:module_subprogram_part].has_key?(index)
       cached = node_cache[:module_subprogram_part][index]
       if cached
-        node_cache[:module_subprogram_part][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23584,7 +23238,7 @@ module Fortran
     if node_cache[:mult_op].has_key?(index)
       cached = node_cache[:mult_op][index]
       if cached
-        node_cache[:mult_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23593,12 +23247,10 @@ module Fortran
     i0 = index
     r1 = _nt_t_star
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_slash
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -23623,7 +23275,7 @@ module Fortran
     if node_cache[:mult_operand].has_key?(index)
       cached = node_cache[:mult_operand][index]
       if cached
-        node_cache[:mult_operand][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23666,7 +23318,7 @@ module Fortran
     if node_cache[:name].has_key?(index)
       cached = node_cache[:name][index]
       if cached
-        node_cache[:name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23713,7 +23365,7 @@ module Fortran
     if node_cache[:named_constant].has_key?(index)
       cached = node_cache[:named_constant][index]
       if cached
-        node_cache[:named_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23724,7 +23376,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -23764,7 +23416,7 @@ module Fortran
     if node_cache[:named_constant_def].has_key?(index)
       cached = node_cache[:named_constant_def][index]
       if cached
-        node_cache[:named_constant_def][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23816,7 +23468,7 @@ module Fortran
     if node_cache[:named_constant_def_list].has_key?(index)
       cached = node_cache[:named_constant_def_list][index]
       if cached
-        node_cache[:named_constant_def_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23876,7 +23528,7 @@ module Fortran
     if node_cache[:namelist_group_name].has_key?(index)
       cached = node_cache[:namelist_group_name][index]
       if cached
-        node_cache[:namelist_group_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23887,7 +23539,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -23913,7 +23565,7 @@ module Fortran
     if node_cache[:namelist_group_object].has_key?(index)
       cached = node_cache[:namelist_group_object][index]
       if cached
-        node_cache[:namelist_group_object][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23938,7 +23590,7 @@ module Fortran
     if node_cache[:namelist_group_object_list].has_key?(index)
       cached = node_cache[:namelist_group_object_list][index]
       if cached
-        node_cache[:namelist_group_object_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -23988,7 +23640,7 @@ module Fortran
     if node_cache[:namelist_group_object_list_pair].has_key?(index)
       cached = node_cache[:namelist_group_object_list_pair][index]
       if cached
-        node_cache[:namelist_group_object_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24037,7 +23689,7 @@ module Fortran
     if node_cache[:namelist_group_set].has_key?(index)
       cached = node_cache[:namelist_group_set][index]
       if cached
-        node_cache[:namelist_group_set][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24082,7 +23734,7 @@ module Fortran
     if node_cache[:namelist_group_set_pair].has_key?(index)
       cached = node_cache[:namelist_group_set_pair][index]
       if cached
-        node_cache[:namelist_group_set_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24118,7 +23770,7 @@ module Fortran
     if node_cache[:namelist_group_sets].has_key?(index)
       cached = node_cache[:namelist_group_sets][index]
       if cached
-        node_cache[:namelist_group_sets][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24168,7 +23820,7 @@ module Fortran
     if node_cache[:namelist_stmt].has_key?(index)
       cached = node_cache[:namelist_stmt][index]
       if cached
-        node_cache[:namelist_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24234,7 +23886,7 @@ module Fortran
     if node_cache[:nonblock_do_construct].has_key?(index)
       cached = node_cache[:nonblock_do_construct][index]
       if cached
-        node_cache[:nonblock_do_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24263,12 +23915,10 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r5 = _nt_action_term_do_construct
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -24301,7 +23951,7 @@ module Fortran
     if node_cache[:nonlabel_do_stmt].has_key?(index)
       cached = node_cache[:nonlabel_do_stmt][index]
       if cached
-        node_cache[:nonlabel_do_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24370,7 +24020,7 @@ module Fortran
     if node_cache[:not_op].has_key?(index)
       cached = node_cache[:not_op][index]
       if cached
-        node_cache[:not_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24408,7 +24058,7 @@ module Fortran
     if node_cache[:null_function_ref].has_key?(index)
       cached = node_cache[:null_function_ref][index]
       if cached
-        node_cache[:null_function_ref][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24469,7 +24119,7 @@ module Fortran
     if node_cache[:nullify_stmt].has_key?(index)
       cached = node_cache[:nullify_stmt][index]
       if cached
-        node_cache[:nullify_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24521,7 +24171,7 @@ module Fortran
     if node_cache[:numeric_expr].has_key?(index)
       cached = node_cache[:numeric_expr][index]
       if cached
-        node_cache[:numeric_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24546,7 +24196,7 @@ module Fortran
     if node_cache[:object_name].has_key?(index)
       cached = node_cache[:object_name][index]
       if cached
-        node_cache[:object_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24557,7 +24207,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -24590,7 +24240,7 @@ module Fortran
     if node_cache[:object_name_and_spec_list].has_key?(index)
       cached = node_cache[:object_name_and_spec_list][index]
       if cached
-        node_cache[:object_name_and_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24636,7 +24286,7 @@ module Fortran
     if node_cache[:object_name_and_spec_list_pair].has_key?(index)
       cached = node_cache[:object_name_and_spec_list_pair][index]
       if cached
-        node_cache[:object_name_and_spec_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24674,7 +24324,7 @@ module Fortran
     if node_cache[:object_names_and_spec_lists].has_key?(index)
       cached = node_cache[:object_names_and_spec_lists][index]
       if cached
-        node_cache[:object_names_and_spec_lists][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24742,7 +24392,7 @@ module Fortran
     if node_cache[:octal_constant].has_key?(index)
       cached = node_cache[:octal_constant][index]
       if cached
-        node_cache[:octal_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24752,7 +24402,7 @@ module Fortran
     i1, s1 = index, []
     i2 = index
     if has_terminal?("o", false, index)
-      r3 = true
+      r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("o")
@@ -24803,13 +24453,12 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i9, s9 = index, []
       i10 = index
       if has_terminal?("o", false, index)
-        r11 = true
+        r11 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("o")
@@ -24860,7 +24509,6 @@ module Fortran
         r9 = nil
       end
       if r9
-        r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
         r0 = r9
       else
         @index = i0
@@ -24884,7 +24532,7 @@ module Fortran
     if node_cache[:only].has_key?(index)
       cached = node_cache[:only][index]
       if cached
-        node_cache[:only][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24911,12 +24559,10 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r5 = _nt_access_id
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -24941,7 +24587,7 @@ module Fortran
     if node_cache[:only_list].has_key?(index)
       cached = node_cache[:only_list][index]
       if cached
-        node_cache[:only_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24991,7 +24637,7 @@ module Fortran
     if node_cache[:only_list_pair].has_key?(index)
       cached = node_cache[:only_list_pair][index]
       if cached
-        node_cache[:only_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25032,7 +24678,7 @@ module Fortran
     if node_cache[:only_option].has_key?(index)
       cached = node_cache[:only_option][index]
       if cached
-        node_cache[:only_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25089,7 +24735,7 @@ module Fortran
     if node_cache[:open_stmt].has_key?(index)
       cached = node_cache[:open_stmt][index]
       if cached
-        node_cache[:open_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25160,7 +24806,7 @@ module Fortran
     if node_cache[:optional_stmt].has_key?(index)
       cached = node_cache[:optional_stmt][index]
       if cached
-        node_cache[:optional_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25224,7 +24870,7 @@ module Fortran
     if node_cache[:or_op].has_key?(index)
       cached = node_cache[:or_op][index]
       if cached
-        node_cache[:or_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25262,7 +24908,7 @@ module Fortran
     if node_cache[:outer_shared_do_construct].has_key?(index)
       cached = node_cache[:outer_shared_do_construct][index]
       if cached
-        node_cache[:outer_shared_do_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25297,7 +24943,7 @@ module Fortran
     if node_cache[:output_item].has_key?(index)
       cached = node_cache[:output_item][index]
       if cached
-        node_cache[:output_item][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25306,12 +24952,10 @@ module Fortran
     i0 = index
     r1 = _nt_io_implied_do
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_expr
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -25336,7 +24980,7 @@ module Fortran
     if node_cache[:output_item_list].has_key?(index)
       cached = node_cache[:output_item_list][index]
       if cached
-        node_cache[:output_item_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25386,7 +25030,7 @@ module Fortran
     if node_cache[:output_item_list_pair].has_key?(index)
       cached = node_cache[:output_item_list_pair][index]
       if cached
-        node_cache[:output_item_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25444,7 +25088,7 @@ module Fortran
     if node_cache[:parameter_stmt].has_key?(index)
       cached = node_cache[:parameter_stmt][index]
       if cached
-        node_cache[:parameter_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25507,7 +25151,7 @@ module Fortran
     if node_cache[:parent_string].has_key?(index)
       cached = node_cache[:parent_string][index]
       if cached
-        node_cache[:parent_string][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25516,22 +25160,18 @@ module Fortran
     i0 = index
     r1 = _nt_array_element
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_scalar_structure_component
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_scalar_variable_name
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_scalar_constant
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             @index = i0
@@ -25565,7 +25205,7 @@ module Fortran
     if node_cache[:parenthesized_allocate_shape_spec_list].has_key?(index)
       cached = node_cache[:parenthesized_allocate_shape_spec_list][index]
       if cached
-        node_cache[:parenthesized_allocate_shape_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25610,7 +25250,7 @@ module Fortran
     if node_cache[:parenthesized_args].has_key?(index)
       cached = node_cache[:parenthesized_args][index]
       if cached
-        node_cache[:parenthesized_args][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25664,7 +25304,7 @@ module Fortran
     if node_cache[:parenthesized_component_array_spec].has_key?(index)
       cached = node_cache[:parenthesized_component_array_spec][index]
       if cached
-        node_cache[:parenthesized_component_array_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25713,7 +25353,7 @@ module Fortran
     if node_cache[:parenthesized_deferred_shape_spec_list].has_key?(index)
       cached = node_cache[:parenthesized_deferred_shape_spec_list][index]
       if cached
-        node_cache[:parenthesized_deferred_shape_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25762,7 +25402,7 @@ module Fortran
     if node_cache[:parenthesized_explicit_shape_spec_list].has_key?(index)
       cached = node_cache[:parenthesized_explicit_shape_spec_list][index]
       if cached
-        node_cache[:parenthesized_explicit_shape_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25811,7 +25451,7 @@ module Fortran
     if node_cache[:parenthesized_expr].has_key?(index)
       cached = node_cache[:parenthesized_expr][index]
       if cached
-        node_cache[:parenthesized_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25860,7 +25500,7 @@ module Fortran
     if node_cache[:parenthesized_section_subscript_list].has_key?(index)
       cached = node_cache[:parenthesized_section_subscript_list][index]
       if cached
-        node_cache[:parenthesized_section_subscript_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25902,7 +25542,7 @@ module Fortran
     if node_cache[:part_name].has_key?(index)
       cached = node_cache[:part_name][index]
       if cached
-        node_cache[:part_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25913,7 +25553,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -25946,7 +25586,7 @@ module Fortran
     if node_cache[:part_ref].has_key?(index)
       cached = node_cache[:part_ref][index]
       if cached
-        node_cache[:part_ref][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -25996,7 +25636,7 @@ module Fortran
     if node_cache[:pause_stmt].has_key?(index)
       cached = node_cache[:pause_stmt][index]
       if cached
-        node_cache[:pause_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26067,7 +25707,7 @@ module Fortran
     if node_cache[:pointer_assignment_stmt].has_key?(index)
       cached = node_cache[:pointer_assignment_stmt][index]
       if cached
-        node_cache[:pointer_assignment_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26115,7 +25755,7 @@ module Fortran
     if node_cache[:pointer_object].has_key?(index)
       cached = node_cache[:pointer_object][index]
       if cached
-        node_cache[:pointer_object][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26124,12 +25764,10 @@ module Fortran
     i0 = index
     r1 = _nt_structure_component
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_variable_name
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -26164,7 +25802,7 @@ module Fortran
     if node_cache[:pointer_object_list].has_key?(index)
       cached = node_cache[:pointer_object_list][index]
       if cached
-        node_cache[:pointer_object_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26236,7 +25874,7 @@ module Fortran
     if node_cache[:pointer_stmt].has_key?(index)
       cached = node_cache[:pointer_stmt][index]
       if cached
-        node_cache[:pointer_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26348,7 +25986,7 @@ module Fortran
     if node_cache[:position_edit_desc].has_key?(index)
       cached = node_cache[:position_edit_desc][index]
       if cached
-        node_cache[:position_edit_desc][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26391,7 +26029,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i7, s7 = index, []
@@ -26430,13 +26067,12 @@ module Fortran
         r7 = nil
       end
       if r7
-        r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
         r0 = r7
       else
         i13, s13 = index, []
         i14 = index
         if has_terminal?("t", false, index)
-          r15 = true
+          r15 = instantiate_node(SyntaxNode,input, index...(index + 1))
           @index += 1
         else
           terminal_parse_failure("t")
@@ -26465,7 +26101,6 @@ module Fortran
           r13 = nil
         end
         if r13
-          r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
           r0 = r13
         else
           i18, s18 = index, []
@@ -26474,7 +26109,7 @@ module Fortran
           if r19
             i20 = index
             if has_terminal?("x", false, index)
-              r21 = true
+              r21 = instantiate_node(SyntaxNode,input, index...(index + 1))
               @index += 1
             else
               terminal_parse_failure("x")
@@ -26500,7 +26135,6 @@ module Fortran
             r18 = nil
           end
           if r18
-            r18 = SyntaxNode.new(input, (index-1)...index) if r18 == true
             r0 = r18
           else
             @index = i0
@@ -26541,7 +26175,7 @@ module Fortran
     if node_cache[:position_spec].has_key?(index)
       cached = node_cache[:position_spec][index]
       if cached
-        node_cache[:position_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26570,7 +26204,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -26592,17 +26225,14 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         r9 = _nt_io_spec_iostat
         if r9
-          r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
           r0 = r9
         else
           r10 = _nt_io_spec_err
           if r10
-            r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
             r0 = r10
           else
             @index = i0
@@ -26629,7 +26259,7 @@ module Fortran
     if node_cache[:position_spec_list].has_key?(index)
       cached = node_cache[:position_spec_list][index]
       if cached
-        node_cache[:position_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26679,7 +26309,7 @@ module Fortran
     if node_cache[:position_spec_list_pair].has_key?(index)
       cached = node_cache[:position_spec_list_pair][index]
       if cached
-        node_cache[:position_spec_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26710,7 +26340,7 @@ module Fortran
     if node_cache[:power_op].has_key?(index)
       cached = node_cache[:power_op][index]
       if cached
-        node_cache[:power_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26744,7 +26374,7 @@ module Fortran
     if node_cache[:power_op_option].has_key?(index)
       cached = node_cache[:power_op_option][index]
       if cached
-        node_cache[:power_op_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26775,7 +26405,7 @@ module Fortran
     if node_cache[:primary].has_key?(index)
       cached = node_cache[:primary][index]
       if cached
-        node_cache[:primary][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26784,37 +26414,30 @@ module Fortran
     i0 = index
     r1 = _nt_function_reference
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_variable
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_constant
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_constant_subobject
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_array_constructor
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_structure_constructor
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 r7 = _nt_parenthesized_expr
                 if r7
-                  r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
                   @index = i0
@@ -26855,7 +26478,7 @@ module Fortran
     if node_cache[:print_stmt].has_key?(index)
       cached = node_cache[:print_stmt][index]
       if cached
-        node_cache[:print_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26918,7 +26541,7 @@ module Fortran
     if node_cache[:print_stmt_output_item_list].has_key?(index)
       cached = node_cache[:print_stmt_output_item_list][index]
       if cached
-        node_cache[:print_stmt_output_item_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26959,7 +26582,7 @@ module Fortran
     if node_cache[:private_sequence_stmt].has_key?(index)
       cached = node_cache[:private_sequence_stmt][index]
       if cached
-        node_cache[:private_sequence_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -26977,12 +26600,10 @@ module Fortran
       i3 = index
       r4 = _nt_t_private
       if r4
-        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r3 = r4
       else
         r5 = _nt_t_sequence
         if r5
-          r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
           r3 = r5
         else
           @index = i3
@@ -27013,7 +26634,7 @@ module Fortran
     if node_cache[:private_sequence_stmts].has_key?(index)
       cached = node_cache[:private_sequence_stmts][index]
       if cached
-        node_cache[:private_sequence_stmts][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27047,7 +26668,7 @@ module Fortran
     if node_cache[:procedure_name].has_key?(index)
       cached = node_cache[:procedure_name][index]
       if cached
-        node_cache[:procedure_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27058,7 +26679,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -27101,7 +26722,7 @@ module Fortran
     if node_cache[:procedure_name_list].has_key?(index)
       cached = node_cache[:procedure_name_list][index]
       if cached
-        node_cache[:procedure_name_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27161,7 +26782,7 @@ module Fortran
     if node_cache[:program_name].has_key?(index)
       cached = node_cache[:program_name][index]
       if cached
-        node_cache[:program_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27172,7 +26793,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -27217,7 +26838,7 @@ module Fortran
     if node_cache[:program_stmt].has_key?(index)
       cached = node_cache[:program_stmt][index]
       if cached
-        node_cache[:program_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27293,7 +26914,7 @@ module Fortran
     if node_cache[:program_unit].has_key?(index)
       cached = node_cache[:program_unit][index]
       if cached
-        node_cache[:program_unit][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27302,7 +26923,6 @@ module Fortran
     i0 = index
     r1 = _nt_external_subprogram
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i2, s2 = index, []
@@ -27327,7 +26947,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         i6, s6 = index, []
@@ -27352,7 +26971,6 @@ module Fortran
           r6 = nil
         end
         if r6
-          r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
           r0 = r6
         else
           i10, s10 = index, []
@@ -27377,7 +26995,6 @@ module Fortran
             r10 = nil
           end
           if r10
-            r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
             r0 = r10
           else
             @index = i0
@@ -27397,7 +27014,7 @@ module Fortran
     if node_cache[:program_units].has_key?(index)
       cached = node_cache[:program_units][index]
       if cached
-        node_cache[:program_units][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27473,7 +27090,7 @@ module Fortran
     if node_cache[:read_stmt].has_key?(index)
       cached = node_cache[:read_stmt][index]
       if cached
-        node_cache[:read_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27525,7 +27142,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i11, s11 = index, []
@@ -27565,7 +27181,6 @@ module Fortran
         r11 = nil
       end
       if r11
-        r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
         r0 = r11
       else
         @index = i0
@@ -27593,7 +27208,7 @@ module Fortran
     if node_cache[:read_stmt_input_item_list_option].has_key?(index)
       cached = node_cache[:read_stmt_input_item_list_option][index]
       if cached
-        node_cache[:read_stmt_input_item_list_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27646,7 +27261,7 @@ module Fortran
     if node_cache[:real_literal_constant].has_key?(index)
       cached = node_cache[:real_literal_constant][index]
       if cached
-        node_cache[:real_literal_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27682,7 +27297,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i7, s7 = index, []
@@ -27713,7 +27327,6 @@ module Fortran
         r7 = nil
       end
       if r7
-        r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
         r0 = r7
       else
         @index = i0
@@ -27741,7 +27354,7 @@ module Fortran
     if node_cache[:real_literal_constant_option].has_key?(index)
       cached = node_cache[:real_literal_constant_option][index]
       if cached
-        node_cache[:real_literal_constant_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27772,7 +27385,7 @@ module Fortran
     if node_cache[:real_part].has_key?(index)
       cached = node_cache[:real_part][index]
       if cached
-        node_cache[:real_part][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27781,12 +27394,10 @@ module Fortran
     i0 = index
     r1 = _nt_signed_real_literal_constant
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_signed_int_literal_constant
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -27804,7 +27415,7 @@ module Fortran
     if node_cache[:rel_op_eq].has_key?(index)
       cached = node_cache[:rel_op_eq][index]
       if cached
-        node_cache[:rel_op_eq][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27819,7 +27430,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       if has_terminal?("==", false, index)
@@ -27830,7 +27440,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -27848,7 +27457,7 @@ module Fortran
     if node_cache[:rel_op_ge].has_key?(index)
       cached = node_cache[:rel_op_ge][index]
       if cached
-        node_cache[:rel_op_ge][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27863,7 +27472,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       if has_terminal?(">=", false, index)
@@ -27874,7 +27482,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -27892,7 +27499,7 @@ module Fortran
     if node_cache[:rel_op_gt].has_key?(index)
       cached = node_cache[:rel_op_gt][index]
       if cached
-        node_cache[:rel_op_gt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27907,12 +27514,10 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_gt
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -27930,7 +27535,7 @@ module Fortran
     if node_cache[:rel_op_le].has_key?(index)
       cached = node_cache[:rel_op_le][index]
       if cached
-        node_cache[:rel_op_le][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27945,7 +27550,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       if has_terminal?("<=", false, index)
@@ -27956,7 +27560,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -27974,7 +27577,7 @@ module Fortran
     if node_cache[:rel_op_lt].has_key?(index)
       cached = node_cache[:rel_op_lt][index]
       if cached
-        node_cache[:rel_op_lt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -27989,12 +27592,10 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_lt
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -28012,7 +27613,7 @@ module Fortran
     if node_cache[:rel_op_ne].has_key?(index)
       cached = node_cache[:rel_op_ne][index]
       if cached
-        node_cache[:rel_op_ne][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28027,7 +27628,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       if has_terminal?("/=", false, index)
@@ -28038,7 +27638,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -28056,7 +27655,7 @@ module Fortran
     if node_cache[:rel_op].has_key?(index)
       cached = node_cache[:rel_op][index]
       if cached
-        node_cache[:rel_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28065,32 +27664,26 @@ module Fortran
     i0 = index
     r1 = _nt_rel_op_eq
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_rel_op_ne
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_rel_op_le
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_rel_op_lt
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_rel_op_ge
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_rel_op_gt
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 @index = i0
@@ -28126,7 +27719,7 @@ module Fortran
     if node_cache[:rename].has_key?(index)
       cached = node_cache[:rename][index]
       if cached
-        node_cache[:rename][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28168,7 +27761,7 @@ module Fortran
     if node_cache[:rename_list].has_key?(index)
       cached = node_cache[:rename_list][index]
       if cached
-        node_cache[:rename_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28218,7 +27811,7 @@ module Fortran
     if node_cache[:rename_list_pair].has_key?(index)
       cached = node_cache[:rename_list_pair][index]
       if cached
-        node_cache[:rename_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28259,7 +27852,7 @@ module Fortran
     if node_cache[:rename_list_option].has_key?(index)
       cached = node_cache[:rename_list_option][index]
       if cached
-        node_cache[:rename_list_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28290,7 +27883,7 @@ module Fortran
     if node_cache[:rep_char].has_key?(index)
       cached = node_cache[:rep_char][index]
       if cached
-        node_cache[:rep_char][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28299,7 +27892,6 @@ module Fortran
     i0 = index
     r1 = _nt_character
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       if has_terminal?('\G[\\[\\]\\~\\`\\@\\#\\^\\|\\{\\}\\\\]', true, index)
@@ -28309,7 +27901,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -28334,7 +27925,7 @@ module Fortran
     if node_cache[:result_name].has_key?(index)
       cached = node_cache[:result_name][index]
       if cached
-        node_cache[:result_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28345,7 +27936,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -28389,7 +27980,7 @@ module Fortran
     if node_cache[:result_option].has_key?(index)
       cached = node_cache[:result_option][index]
       if cached
-        node_cache[:result_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28442,7 +28033,7 @@ module Fortran
     if node_cache[:return_stmt].has_key?(index)
       cached = node_cache[:return_stmt][index]
       if cached
-        node_cache[:return_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28535,7 +28126,7 @@ module Fortran
     if node_cache[:rewind_stmt].has_key?(index)
       cached = node_cache[:rewind_stmt][index]
       if cached
-        node_cache[:rewind_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28578,7 +28169,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i9, s9 = index, []
@@ -28609,7 +28199,6 @@ module Fortran
         r9 = nil
       end
       if r9
-        r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
         r0 = r9
       else
         @index = i0
@@ -28642,7 +28231,7 @@ module Fortran
     if node_cache[:save_stmt].has_key?(index)
       cached = node_cache[:save_stmt][index]
       if cached
-        node_cache[:save_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28708,7 +28297,7 @@ module Fortran
     if node_cache[:save_stmt_entity_list].has_key?(index)
       cached = node_cache[:save_stmt_entity_list][index]
       if cached
-        node_cache[:save_stmt_entity_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28765,7 +28354,7 @@ module Fortran
     if node_cache[:saved_entity].has_key?(index)
       cached = node_cache[:saved_entity][index]
       if cached
-        node_cache[:saved_entity][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28777,7 +28366,7 @@ module Fortran
     s1 << r2
     if r2
       if has_terminal?("", false, index)
-        r3 = true
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -28793,7 +28382,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i4, s4 = index, []
@@ -28815,7 +28403,6 @@ module Fortran
         r4 = nil
       end
       if r4
-        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r0 = r4
       else
         @index = i0
@@ -28840,7 +28427,7 @@ module Fortran
     if node_cache[:saved_entity_list].has_key?(index)
       cached = node_cache[:saved_entity_list][index]
       if cached
-        node_cache[:saved_entity_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28890,7 +28477,7 @@ module Fortran
     if node_cache[:saved_entity_list_pair].has_key?(index)
       cached = node_cache[:saved_entity_list_pair][index]
       if cached
-        node_cache[:saved_entity_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28921,7 +28508,7 @@ module Fortran
     if node_cache[:scalar_char_constant].has_key?(index)
       cached = node_cache[:scalar_char_constant][index]
       if cached
-        node_cache[:scalar_char_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28930,12 +28517,10 @@ module Fortran
     i0 = index
     r1 = _nt_char_literal_constant
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_named_constant
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -28953,7 +28538,7 @@ module Fortran
     if node_cache[:scalar_char_expr].has_key?(index)
       cached = node_cache[:scalar_char_expr][index]
       if cached
-        node_cache[:scalar_char_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28971,7 +28556,7 @@ module Fortran
     if node_cache[:scalar_char_initialization_expr].has_key?(index)
       cached = node_cache[:scalar_char_initialization_expr][index]
       if cached
-        node_cache[:scalar_char_initialization_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28989,7 +28574,7 @@ module Fortran
     if node_cache[:scalar_constant].has_key?(index)
       cached = node_cache[:scalar_constant][index]
       if cached
-        node_cache[:scalar_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -28998,12 +28583,10 @@ module Fortran
     i0 = index
     r1 = _nt_literal_constant
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_named_constant
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -29021,7 +28604,7 @@ module Fortran
     if node_cache[:scalar_default_char_expr].has_key?(index)
       cached = node_cache[:scalar_default_char_expr][index]
       if cached
-        node_cache[:scalar_default_char_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29039,7 +28622,7 @@ module Fortran
     if node_cache[:scalar_default_char_variable].has_key?(index)
       cached = node_cache[:scalar_default_char_variable][index]
       if cached
-        node_cache[:scalar_default_char_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29057,7 +28640,7 @@ module Fortran
     if node_cache[:scalar_default_int_variable].has_key?(index)
       cached = node_cache[:scalar_default_int_variable][index]
       if cached
-        node_cache[:scalar_default_int_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29075,7 +28658,7 @@ module Fortran
     if node_cache[:scalar_default_logical_variable].has_key?(index)
       cached = node_cache[:scalar_default_logical_variable][index]
       if cached
-        node_cache[:scalar_default_logical_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29093,7 +28676,7 @@ module Fortran
     if node_cache[:scalar_expr].has_key?(index)
       cached = node_cache[:scalar_expr][index]
       if cached
-        node_cache[:scalar_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29111,7 +28694,7 @@ module Fortran
     if node_cache[:scalar_int_constant].has_key?(index)
       cached = node_cache[:scalar_int_constant][index]
       if cached
-        node_cache[:scalar_int_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29120,12 +28703,10 @@ module Fortran
     i0 = index
     r1 = _nt_scalar_int_literal_constant
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_scalar_int_constant_name
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -29143,7 +28724,7 @@ module Fortran
     if node_cache[:scalar_int_constant_name].has_key?(index)
       cached = node_cache[:scalar_int_constant_name][index]
       if cached
-        node_cache[:scalar_int_constant_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29161,7 +28742,7 @@ module Fortran
     if node_cache[:scalar_int_expr].has_key?(index)
       cached = node_cache[:scalar_int_expr][index]
       if cached
-        node_cache[:scalar_int_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29179,7 +28760,7 @@ module Fortran
     if node_cache[:scalar_int_initialization_expr].has_key?(index)
       cached = node_cache[:scalar_int_initialization_expr][index]
       if cached
-        node_cache[:scalar_int_initialization_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29197,7 +28778,7 @@ module Fortran
     if node_cache[:scalar_int_literal_constant].has_key?(index)
       cached = node_cache[:scalar_int_literal_constant][index]
       if cached
-        node_cache[:scalar_int_literal_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29215,7 +28796,7 @@ module Fortran
     if node_cache[:scalar_int_variable].has_key?(index)
       cached = node_cache[:scalar_int_variable][index]
       if cached
-        node_cache[:scalar_int_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29233,7 +28814,7 @@ module Fortran
     if node_cache[:scalar_logical_expr].has_key?(index)
       cached = node_cache[:scalar_logical_expr][index]
       if cached
-        node_cache[:scalar_logical_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29251,7 +28832,7 @@ module Fortran
     if node_cache[:scalar_logical_initialization_expr].has_key?(index)
       cached = node_cache[:scalar_logical_initialization_expr][index]
       if cached
-        node_cache[:scalar_logical_initialization_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29269,7 +28850,7 @@ module Fortran
     if node_cache[:scalar_numeric_expr].has_key?(index)
       cached = node_cache[:scalar_numeric_expr][index]
       if cached
-        node_cache[:scalar_numeric_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29287,7 +28868,7 @@ module Fortran
     if node_cache[:scalar_structure_component].has_key?(index)
       cached = node_cache[:scalar_structure_component][index]
       if cached
-        node_cache[:scalar_structure_component][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29305,7 +28886,7 @@ module Fortran
     if node_cache[:scalar_variable].has_key?(index)
       cached = node_cache[:scalar_variable][index]
       if cached
-        node_cache[:scalar_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29323,7 +28904,7 @@ module Fortran
     if node_cache[:scalar_variable_name].has_key?(index)
       cached = node_cache[:scalar_variable_name][index]
       if cached
-        node_cache[:scalar_variable_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29341,7 +28922,7 @@ module Fortran
     if node_cache[:section_subscript].has_key?(index)
       cached = node_cache[:section_subscript][index]
       if cached
-        node_cache[:section_subscript][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29350,17 +28931,14 @@ module Fortran
     i0 = index
     r1 = _nt_subscript_triplet
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_subscript
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_vector_subscript
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -29386,7 +28964,7 @@ module Fortran
     if node_cache[:section_subscript_list].has_key?(index)
       cached = node_cache[:section_subscript_list][index]
       if cached
-        node_cache[:section_subscript_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29436,7 +29014,7 @@ module Fortran
     if node_cache[:section_subscript_list_option].has_key?(index)
       cached = node_cache[:section_subscript_list_option][index]
       if cached
-        node_cache[:section_subscript_list_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29497,7 +29075,7 @@ module Fortran
     if node_cache[:select_case_stmt].has_key?(index)
       cached = node_cache[:select_case_stmt][index]
       if cached
-        node_cache[:select_case_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29576,7 +29154,7 @@ module Fortran
     if node_cache[:shared_term_do_construct].has_key?(index)
       cached = node_cache[:shared_term_do_construct][index]
       if cached
-        node_cache[:shared_term_do_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29605,7 +29183,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -29630,7 +29207,6 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         @index = i0
@@ -29648,7 +29224,7 @@ module Fortran
     if node_cache[:sign].has_key?(index)
       cached = node_cache[:sign][index]
       if cached
-        node_cache[:sign][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29657,12 +29233,10 @@ module Fortran
     i0 = index
     r1 = _nt_t_plus
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_minus
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -29680,7 +29254,7 @@ module Fortran
     if node_cache[:sign_edit_desc].has_key?(index)
       cached = node_cache[:sign_edit_desc][index]
       if cached
-        node_cache[:sign_edit_desc][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29695,7 +29269,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       if has_terminal?("ss", false, index)
@@ -29706,7 +29279,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         if has_terminal?("s", false, index)
@@ -29717,7 +29289,6 @@ module Fortran
           r3 = nil
         end
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -29742,7 +29313,7 @@ module Fortran
     if node_cache[:signed_digit_string].has_key?(index)
       cached = node_cache[:signed_digit_string][index]
       if cached
-        node_cache[:signed_digit_string][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29784,7 +29355,7 @@ module Fortran
     if node_cache[:signed_int_literal_constant].has_key?(index)
       cached = node_cache[:signed_int_literal_constant][index]
       if cached
-        node_cache[:signed_int_literal_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29826,7 +29397,7 @@ module Fortran
     if node_cache[:signed_real_literal_constant].has_key?(index)
       cached = node_cache[:signed_real_literal_constant][index]
       if cached
-        node_cache[:signed_real_literal_constant][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29883,7 +29454,7 @@ module Fortran
     if node_cache[:significand].has_key?(index)
       cached = node_cache[:significand][index]
       if cached
-        node_cache[:significand][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29925,7 +29496,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i8, s8 = index, []
@@ -29943,7 +29513,6 @@ module Fortran
         r8 = nil
       end
       if r8
-        r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
         r0 = r8
       else
         @index = i0
@@ -29961,7 +29530,7 @@ module Fortran
     if node_cache[:significand_disallowed].has_key?(index)
       cached = node_cache[:significand_disallowed][index]
       if cached
-        node_cache[:significand_disallowed][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29970,12 +29539,10 @@ module Fortran
     i0 = index
     r1 = _nt_rel_op
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_logical_op
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -29993,7 +29560,7 @@ module Fortran
     if node_cache[:special_character].has_key?(index)
       cached = node_cache[:special_character][index]
       if cached
-        node_cache[:special_character][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30016,7 +29583,7 @@ module Fortran
     if node_cache[:specification_expr].has_key?(index)
       cached = node_cache[:specification_expr][index]
       if cached
-        node_cache[:specification_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30044,7 +29611,7 @@ module Fortran
     if node_cache[:specification_part].has_key?(index)
       cached = node_cache[:specification_part][index]
       if cached
-        node_cache[:specification_part][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30084,7 +29651,7 @@ module Fortran
     if node_cache[:specification_stmt].has_key?(index)
       cached = node_cache[:specification_stmt][index]
       if cached
-        node_cache[:specification_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30093,72 +29660,58 @@ module Fortran
     i0 = index
     r1 = _nt_access_stmt
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_allocatable_stmt
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_common_stmt
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_data_stmt
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_dimension_stmt
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_equivalence_stmt
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 r7 = _nt_external_stmt
                 if r7
-                  r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
                   r8 = _nt_intent_stmt
                   if r8
-                    r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
                     r0 = r8
                   else
                     r9 = _nt_intrinsic_stmt
                     if r9
-                      r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
                       r0 = r9
                     else
                       r10 = _nt_namelist_stmt
                       if r10
-                        r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
                         r0 = r10
                       else
                         r11 = _nt_optional_stmt
                         if r11
-                          r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
                           r0 = r11
                         else
                           r12 = _nt_pointer_stmt
                           if r12
-                            r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
                             r0 = r12
                           else
                             r13 = _nt_save_stmt
                             if r13
-                              r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
                               r0 = r13
                             else
                               r14 = _nt_target_stmt
                               if r14
-                                r14 = SyntaxNode.new(input, (index-1)...index) if r14 == true
                                 r0 = r14
                               else
                                 @index = i0
@@ -30198,7 +29751,7 @@ module Fortran
     if node_cache[:star_int].has_key?(index)
       cached = node_cache[:star_int][index]
       if cached
-        node_cache[:star_int][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30229,7 +29782,7 @@ module Fortran
     if node_cache[:stat_variable].has_key?(index)
       cached = node_cache[:stat_variable][index]
       if cached
-        node_cache[:stat_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30277,7 +29830,7 @@ module Fortran
     if node_cache[:stmt_function_stmt].has_key?(index)
       cached = node_cache[:stmt_function_stmt][index]
       if cached
-        node_cache[:stmt_function_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30342,7 +29895,7 @@ module Fortran
     if node_cache[:stop_code].has_key?(index)
       cached = node_cache[:stop_code][index]
       if cached
-        node_cache[:stop_code][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30351,7 +29904,6 @@ module Fortran
     i0 = index
     r1 = _nt_scalar_char_constant
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       s2, i2 = [], index
@@ -30373,7 +29925,6 @@ module Fortran
         r2 = instantiate_node(T,input, i2...index, s2)
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -30405,7 +29956,7 @@ module Fortran
     if node_cache[:stop_stmt].has_key?(index)
       cached = node_cache[:stop_stmt][index]
       if cached
-        node_cache[:stop_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30454,7 +30005,7 @@ module Fortran
     if node_cache[:stride].has_key?(index)
       cached = node_cache[:stride][index]
       if cached
-        node_cache[:stride][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30472,7 +30023,7 @@ module Fortran
     if node_cache[:structure_component].has_key?(index)
       cached = node_cache[:structure_component][index]
       if cached
-        node_cache[:structure_component][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30508,7 +30059,7 @@ module Fortran
     if node_cache[:structure_constructor].has_key?(index)
       cached = node_cache[:structure_constructor][index]
       if cached
-        node_cache[:structure_constructor][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30554,7 +30105,7 @@ module Fortran
     if node_cache[:subroutine_name].has_key?(index)
       cached = node_cache[:subroutine_name][index]
       if cached
-        node_cache[:subroutine_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30565,7 +30116,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -30591,7 +30142,7 @@ module Fortran
     if node_cache[:subroutine_prefix].has_key?(index)
       cached = node_cache[:subroutine_prefix][index]
       if cached
-        node_cache[:subroutine_prefix][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30623,7 +30174,7 @@ module Fortran
     if node_cache[:subroutine_prefix_option].has_key?(index)
       cached = node_cache[:subroutine_prefix_option][index]
       if cached
-        node_cache[:subroutine_prefix_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30632,17 +30183,14 @@ module Fortran
     i0 = index
     r1 = _nt_t_elemental
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_pure
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_t_recursive
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -30680,7 +30228,7 @@ module Fortran
     if node_cache[:subroutine_stmt].has_key?(index)
       cached = node_cache[:subroutine_stmt][index]
       if cached
-        node_cache[:subroutine_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30764,7 +30312,7 @@ module Fortran
     if node_cache[:subroutine_subprogram].has_key?(index)
       cached = node_cache[:subroutine_subprogram][index]
       if cached
-        node_cache[:subroutine_subprogram][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30840,7 +30388,7 @@ module Fortran
     if node_cache[:subscript].has_key?(index)
       cached = node_cache[:subscript][index]
       if cached
-        node_cache[:subscript][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30851,7 +30399,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -30884,7 +30432,7 @@ module Fortran
     if node_cache[:subscript_triplet].has_key?(index)
       cached = node_cache[:subscript_triplet][index]
       if cached
-        node_cache[:subscript_triplet][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30948,7 +30496,7 @@ module Fortran
     if node_cache[:subscript_triplet_stride_option].has_key?(index)
       cached = node_cache[:subscript_triplet_stride_option][index]
       if cached
-        node_cache[:subscript_triplet_stride_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30979,7 +30527,7 @@ module Fortran
     if node_cache[:subobject].has_key?(index)
       cached = node_cache[:subobject][index]
       if cached
-        node_cache[:subobject][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -30988,22 +30536,18 @@ module Fortran
     i0 = index
     r1 = _nt_array_section
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_array_element
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_structure_component
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_substring
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             @index = i0
@@ -31041,7 +30585,7 @@ module Fortran
     if node_cache[:substring].has_key?(index)
       cached = node_cache[:substring][index]
       if cached
-        node_cache[:substring][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31087,7 +30631,7 @@ module Fortran
     if node_cache[:substring_range].has_key?(index)
       cached = node_cache[:substring_range][index]
       if cached
-        node_cache[:substring_range][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31146,7 +30690,7 @@ module Fortran
     if node_cache[:substring_range_triplet].has_key?(index)
       cached = node_cache[:substring_range_triplet][index]
       if cached
-        node_cache[:substring_range_triplet][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31181,7 +30725,7 @@ module Fortran
     if node_cache[:t_access].has_key?(index)
       cached = node_cache[:t_access][index]
       if cached
-        node_cache[:t_access][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31205,7 +30749,7 @@ module Fortran
     if node_cache[:t_action].has_key?(index)
       cached = node_cache[:t_action][index]
       if cached
-        node_cache[:t_action][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31229,7 +30773,7 @@ module Fortran
     if node_cache[:t_advance].has_key?(index)
       cached = node_cache[:t_advance][index]
       if cached
-        node_cache[:t_advance][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31253,7 +30797,7 @@ module Fortran
     if node_cache[:t_allocatable].has_key?(index)
       cached = node_cache[:t_allocatable][index]
       if cached
-        node_cache[:t_allocatable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31277,7 +30821,7 @@ module Fortran
     if node_cache[:t_allocate].has_key?(index)
       cached = node_cache[:t_allocate][index]
       if cached
-        node_cache[:t_allocate][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31301,7 +30845,7 @@ module Fortran
     if node_cache[:t_apostrophe].has_key?(index)
       cached = node_cache[:t_apostrophe][index]
       if cached
-        node_cache[:t_apostrophe][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31328,7 +30872,7 @@ module Fortran
     if node_cache[:t_assign].has_key?(index)
       cached = node_cache[:t_assign][index]
       if cached
-        node_cache[:t_assign][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31378,7 +30922,7 @@ module Fortran
     if node_cache[:t_assignment].has_key?(index)
       cached = node_cache[:t_assignment][index]
       if cached
-        node_cache[:t_assignment][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31402,7 +30946,7 @@ module Fortran
     if node_cache[:t_backspace].has_key?(index)
       cached = node_cache[:t_backspace][index]
       if cached
-        node_cache[:t_backspace][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31426,7 +30970,7 @@ module Fortran
     if node_cache[:t_binary].has_key?(index)
       cached = node_cache[:t_binary][index]
       if cached
-        node_cache[:t_binary][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31449,7 +30993,7 @@ module Fortran
     if node_cache[:t_blank].has_key?(index)
       cached = node_cache[:t_blank][index]
       if cached
-        node_cache[:t_blank][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31473,7 +31017,7 @@ module Fortran
     if node_cache[:t_block].has_key?(index)
       cached = node_cache[:t_block][index]
       if cached
-        node_cache[:t_block][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31497,7 +31041,7 @@ module Fortran
     if node_cache[:t_call].has_key?(index)
       cached = node_cache[:t_call][index]
       if cached
-        node_cache[:t_call][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31521,7 +31065,7 @@ module Fortran
     if node_cache[:t_case].has_key?(index)
       cached = node_cache[:t_case][index]
       if cached
-        node_cache[:t_case][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31545,7 +31089,7 @@ module Fortran
     if node_cache[:t_character].has_key?(index)
       cached = node_cache[:t_character][index]
       if cached
-        node_cache[:t_character][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31569,7 +31113,7 @@ module Fortran
     if node_cache[:t_close].has_key?(index)
       cached = node_cache[:t_close][index]
       if cached
-        node_cache[:t_close][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31593,7 +31137,7 @@ module Fortran
     if node_cache[:t_colon].has_key?(index)
       cached = node_cache[:t_colon][index]
       if cached
-        node_cache[:t_colon][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31617,7 +31161,7 @@ module Fortran
     if node_cache[:t_comma].has_key?(index)
       cached = node_cache[:t_comma][index]
       if cached
-        node_cache[:t_comma][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31641,7 +31185,7 @@ module Fortran
     if node_cache[:t_common].has_key?(index)
       cached = node_cache[:t_common][index]
       if cached
-        node_cache[:t_common][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31665,7 +31209,7 @@ module Fortran
     if node_cache[:t_contains].has_key?(index)
       cached = node_cache[:t_contains][index]
       if cached
-        node_cache[:t_contains][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31689,7 +31233,7 @@ module Fortran
     if node_cache[:t_complex].has_key?(index)
       cached = node_cache[:t_complex][index]
       if cached
-        node_cache[:t_complex][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31713,7 +31257,7 @@ module Fortran
     if node_cache[:t_continue].has_key?(index)
       cached = node_cache[:t_continue][index]
       if cached
-        node_cache[:t_continue][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31737,7 +31281,7 @@ module Fortran
     if node_cache[:t_cycle].has_key?(index)
       cached = node_cache[:t_cycle][index]
       if cached
-        node_cache[:t_cycle][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31761,7 +31305,7 @@ module Fortran
     if node_cache[:t_data].has_key?(index)
       cached = node_cache[:t_data][index]
       if cached
-        node_cache[:t_data][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31785,7 +31329,7 @@ module Fortran
     if node_cache[:t_deallocate].has_key?(index)
       cached = node_cache[:t_deallocate][index]
       if cached
-        node_cache[:t_deallocate][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31809,7 +31353,7 @@ module Fortran
     if node_cache[:t_default].has_key?(index)
       cached = node_cache[:t_default][index]
       if cached
-        node_cache[:t_default][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31833,7 +31377,7 @@ module Fortran
     if node_cache[:t_delim].has_key?(index)
       cached = node_cache[:t_delim][index]
       if cached
-        node_cache[:t_delim][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31857,7 +31401,7 @@ module Fortran
     if node_cache[:t_digit].has_key?(index)
       cached = node_cache[:t_digit][index]
       if cached
-        node_cache[:t_digit][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31880,7 +31424,7 @@ module Fortran
     if node_cache[:t_dimension].has_key?(index)
       cached = node_cache[:t_dimension][index]
       if cached
-        node_cache[:t_dimension][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31904,7 +31448,7 @@ module Fortran
     if node_cache[:t_direct].has_key?(index)
       cached = node_cache[:t_direct][index]
       if cached
-        node_cache[:t_direct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31928,7 +31472,7 @@ module Fortran
     if node_cache[:t_do].has_key?(index)
       cached = node_cache[:t_do][index]
       if cached
-        node_cache[:t_do][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31952,7 +31496,7 @@ module Fortran
     if node_cache[:t_dot].has_key?(index)
       cached = node_cache[:t_dot][index]
       if cached
-        node_cache[:t_dot][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -31976,7 +31520,7 @@ module Fortran
     if node_cache[:t_doubleprecision].has_key?(index)
       cached = node_cache[:t_doubleprecision][index]
       if cached
-        node_cache[:t_doubleprecision][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32000,7 +31544,7 @@ module Fortran
     if node_cache[:t_elemental].has_key?(index)
       cached = node_cache[:t_elemental][index]
       if cached
-        node_cache[:t_elemental][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32024,7 +31568,7 @@ module Fortran
     if node_cache[:t_else].has_key?(index)
       cached = node_cache[:t_else][index]
       if cached
-        node_cache[:t_else][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32048,7 +31592,7 @@ module Fortran
     if node_cache[:t_elseif].has_key?(index)
       cached = node_cache[:t_elseif][index]
       if cached
-        node_cache[:t_elseif][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32072,7 +31616,7 @@ module Fortran
     if node_cache[:t_elsewhere].has_key?(index)
       cached = node_cache[:t_elsewhere][index]
       if cached
-        node_cache[:t_elsewhere][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32099,7 +31643,7 @@ module Fortran
     if node_cache[:t_end].has_key?(index)
       cached = node_cache[:t_end][index]
       if cached
-        node_cache[:t_end][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32149,7 +31693,7 @@ module Fortran
     if node_cache[:t_end_disallowed].has_key?(index)
       cached = node_cache[:t_end_disallowed][index]
       if cached
-        node_cache[:t_end_disallowed][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32164,7 +31708,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       if has_terminal?("do", false, index)
@@ -32175,7 +31718,6 @@ module Fortran
         r2 = nil
       end
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         if has_terminal?("if", false, index)
@@ -32186,7 +31728,6 @@ module Fortran
           r3 = nil
         end
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           if has_terminal?("where", false, index)
@@ -32197,7 +31738,6 @@ module Fortran
             r4 = nil
           end
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             i5, s5 = index, []
@@ -32224,7 +31764,6 @@ module Fortran
               r5 = nil
             end
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               @index = i0
@@ -32245,7 +31784,7 @@ module Fortran
     if node_cache[:t_enddo].has_key?(index)
       cached = node_cache[:t_enddo][index]
       if cached
-        node_cache[:t_enddo][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32269,7 +31808,7 @@ module Fortran
     if node_cache[:t_endfile].has_key?(index)
       cached = node_cache[:t_endfile][index]
       if cached
-        node_cache[:t_endfile][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32293,7 +31832,7 @@ module Fortran
     if node_cache[:t_endif].has_key?(index)
       cached = node_cache[:t_endif][index]
       if cached
-        node_cache[:t_endif][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32317,7 +31856,7 @@ module Fortran
     if node_cache[:t_endwhere].has_key?(index)
       cached = node_cache[:t_endwhere][index]
       if cached
-        node_cache[:t_endwhere][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32341,7 +31880,7 @@ module Fortran
     if node_cache[:t_entry].has_key?(index)
       cached = node_cache[:t_entry][index]
       if cached
-        node_cache[:t_entry][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32365,7 +31904,7 @@ module Fortran
     if node_cache[:t_eor].has_key?(index)
       cached = node_cache[:t_eor][index]
       if cached
-        node_cache[:t_eor][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32389,7 +31928,7 @@ module Fortran
     if node_cache[:t_equal].has_key?(index)
       cached = node_cache[:t_equal][index]
       if cached
-        node_cache[:t_equal][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32413,7 +31952,7 @@ module Fortran
     if node_cache[:t_equivalence].has_key?(index)
       cached = node_cache[:t_equivalence][index]
       if cached
-        node_cache[:t_equivalence][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32437,7 +31976,7 @@ module Fortran
     if node_cache[:t_err].has_key?(index)
       cached = node_cache[:t_err][index]
       if cached
-        node_cache[:t_err][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32461,7 +32000,7 @@ module Fortran
     if node_cache[:t_exist].has_key?(index)
       cached = node_cache[:t_exist][index]
       if cached
-        node_cache[:t_exist][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32485,7 +32024,7 @@ module Fortran
     if node_cache[:t_exit].has_key?(index)
       cached = node_cache[:t_exit][index]
       if cached
-        node_cache[:t_exit][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32509,7 +32048,7 @@ module Fortran
     if node_cache[:t_external].has_key?(index)
       cached = node_cache[:t_external][index]
       if cached
-        node_cache[:t_external][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32533,7 +32072,7 @@ module Fortran
     if node_cache[:t_false].has_key?(index)
       cached = node_cache[:t_false][index]
       if cached
-        node_cache[:t_false][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32557,7 +32096,7 @@ module Fortran
     if node_cache[:t_file].has_key?(index)
       cached = node_cache[:t_file][index]
       if cached
-        node_cache[:t_file][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32581,7 +32120,7 @@ module Fortran
     if node_cache[:t_fmt].has_key?(index)
       cached = node_cache[:t_fmt][index]
       if cached
-        node_cache[:t_fmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32608,7 +32147,7 @@ module Fortran
     if node_cache[:t_form].has_key?(index)
       cached = node_cache[:t_form][index]
       if cached
-        node_cache[:t_form][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32661,7 +32200,7 @@ module Fortran
     if node_cache[:t_format].has_key?(index)
       cached = node_cache[:t_format][index]
       if cached
-        node_cache[:t_format][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32711,7 +32250,7 @@ module Fortran
     if node_cache[:t_formatted].has_key?(index)
       cached = node_cache[:t_formatted][index]
       if cached
-        node_cache[:t_formatted][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32735,7 +32274,7 @@ module Fortran
     if node_cache[:t_function].has_key?(index)
       cached = node_cache[:t_function][index]
       if cached
-        node_cache[:t_function][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32759,7 +32298,7 @@ module Fortran
     if node_cache[:t_goto].has_key?(index)
       cached = node_cache[:t_goto][index]
       if cached
-        node_cache[:t_goto][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32783,7 +32322,7 @@ module Fortran
     if node_cache[:t_gt].has_key?(index)
       cached = node_cache[:t_gt][index]
       if cached
-        node_cache[:t_gt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32807,7 +32346,7 @@ module Fortran
     if node_cache[:t_if].has_key?(index)
       cached = node_cache[:t_if][index]
       if cached
-        node_cache[:t_if][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32831,7 +32370,7 @@ module Fortran
     if node_cache[:t_implicit].has_key?(index)
       cached = node_cache[:t_implicit][index]
       if cached
-        node_cache[:t_implicit][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32858,7 +32397,7 @@ module Fortran
     if node_cache[:t_in].has_key?(index)
       cached = node_cache[:t_in][index]
       if cached
-        node_cache[:t_in][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32884,7 +32423,6 @@ module Fortran
         r4 = nil
       end
       if r4
-        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r3 = r4
       else
         if has_terminal?("quire", false, index)
@@ -32895,7 +32433,6 @@ module Fortran
           r5 = nil
         end
         if r5
-          r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
           r3 = r5
         else
           if has_terminal?("teger", false, index)
@@ -32906,7 +32443,6 @@ module Fortran
             r6 = nil
           end
           if r6
-            r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
             r3 = r6
           else
             if has_terminal?("tent", false, index)
@@ -32917,7 +32453,6 @@ module Fortran
               r7 = nil
             end
             if r7
-              r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
               r3 = r7
             else
               if has_terminal?("trinsic", false, index)
@@ -32928,7 +32463,6 @@ module Fortran
                 r8 = nil
               end
               if r8
-                r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
                 r3 = r8
               else
                 @index = i3
@@ -32964,7 +32498,7 @@ module Fortran
     if node_cache[:t_inout].has_key?(index)
       cached = node_cache[:t_inout][index]
       if cached
-        node_cache[:t_inout][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -32988,7 +32522,7 @@ module Fortran
     if node_cache[:t_inquire].has_key?(index)
       cached = node_cache[:t_inquire][index]
       if cached
-        node_cache[:t_inquire][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33012,7 +32546,7 @@ module Fortran
     if node_cache[:t_integer].has_key?(index)
       cached = node_cache[:t_integer][index]
       if cached
-        node_cache[:t_integer][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33036,7 +32570,7 @@ module Fortran
     if node_cache[:t_intent].has_key?(index)
       cached = node_cache[:t_intent][index]
       if cached
-        node_cache[:t_intent][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33060,7 +32594,7 @@ module Fortran
     if node_cache[:t_interface].has_key?(index)
       cached = node_cache[:t_interface][index]
       if cached
-        node_cache[:t_interface][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33084,7 +32618,7 @@ module Fortran
     if node_cache[:t_intrinsic].has_key?(index)
       cached = node_cache[:t_intrinsic][index]
       if cached
-        node_cache[:t_intrinsic][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33111,7 +32645,7 @@ module Fortran
     if node_cache[:t_io_control_spec_end].has_key?(index)
       cached = node_cache[:t_io_control_spec_end][index]
       if cached
-        node_cache[:t_io_control_spec_end][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33155,7 +32689,7 @@ module Fortran
     if node_cache[:t_iolength].has_key?(index)
       cached = node_cache[:t_iolength][index]
       if cached
-        node_cache[:t_iolength][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33179,7 +32713,7 @@ module Fortran
     if node_cache[:t_iostat].has_key?(index)
       cached = node_cache[:t_iostat][index]
       if cached
-        node_cache[:t_iostat][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33203,7 +32737,7 @@ module Fortran
     if node_cache[:t_kind].has_key?(index)
       cached = node_cache[:t_kind][index]
       if cached
-        node_cache[:t_kind][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33227,7 +32761,7 @@ module Fortran
     if node_cache[:t_len].has_key?(index)
       cached = node_cache[:t_len][index]
       if cached
-        node_cache[:t_len][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33251,7 +32785,7 @@ module Fortran
     if node_cache[:t_letter].has_key?(index)
       cached = node_cache[:t_letter][index]
       if cached
-        node_cache[:t_letter][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33274,7 +32808,7 @@ module Fortran
     if node_cache[:t_logical].has_key?(index)
       cached = node_cache[:t_logical][index]
       if cached
-        node_cache[:t_logical][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33298,7 +32832,7 @@ module Fortran
     if node_cache[:t_lt].has_key?(index)
       cached = node_cache[:t_lt][index]
       if cached
-        node_cache[:t_lt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33322,7 +32856,7 @@ module Fortran
     if node_cache[:t_minus].has_key?(index)
       cached = node_cache[:t_minus][index]
       if cached
-        node_cache[:t_minus][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33346,7 +32880,7 @@ module Fortran
     if node_cache[:t_module].has_key?(index)
       cached = node_cache[:t_module][index]
       if cached
-        node_cache[:t_module][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33373,7 +32907,7 @@ module Fortran
     if node_cache[:t_name].has_key?(index)
       cached = node_cache[:t_name][index]
       if cached
-        node_cache[:t_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33392,14 +32926,13 @@ module Fortran
       i2 = index
       i3 = index
       if has_terminal?("d", false, index)
-        r4 = true
+        r4 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("d")
         r4 = nil
       end
       if r4
-        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r3 = r4
       else
         if has_terminal?("list", false, index)
@@ -33410,7 +32943,6 @@ module Fortran
           r5 = nil
         end
         if r5
-          r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
           r3 = r5
         else
           @index = i3
@@ -33443,7 +32975,7 @@ module Fortran
     if node_cache[:t_named].has_key?(index)
       cached = node_cache[:t_named][index]
       if cached
-        node_cache[:t_named][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33467,7 +32999,7 @@ module Fortran
     if node_cache[:t_namelist].has_key?(index)
       cached = node_cache[:t_namelist][index]
       if cached
-        node_cache[:t_namelist][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33491,7 +33023,7 @@ module Fortran
     if node_cache[:t_newline].has_key?(index)
       cached = node_cache[:t_newline][index]
       if cached
-        node_cache[:t_newline][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33515,7 +33047,7 @@ module Fortran
     if node_cache[:t_nextrec].has_key?(index)
       cached = node_cache[:t_nextrec][index]
       if cached
-        node_cache[:t_nextrec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33539,7 +33071,7 @@ module Fortran
     if node_cache[:t_nml].has_key?(index)
       cached = node_cache[:t_nml][index]
       if cached
-        node_cache[:t_nml][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33563,7 +33095,7 @@ module Fortran
     if node_cache[:t_none].has_key?(index)
       cached = node_cache[:t_none][index]
       if cached
-        node_cache[:t_none][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33587,7 +33119,7 @@ module Fortran
     if node_cache[:t_null].has_key?(index)
       cached = node_cache[:t_null][index]
       if cached
-        node_cache[:t_null][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33611,7 +33143,7 @@ module Fortran
     if node_cache[:t_nullify].has_key?(index)
       cached = node_cache[:t_nullify][index]
       if cached
-        node_cache[:t_nullify][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33635,7 +33167,7 @@ module Fortran
     if node_cache[:t_number].has_key?(index)
       cached = node_cache[:t_number][index]
       if cached
-        node_cache[:t_number][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33659,7 +33191,7 @@ module Fortran
     if node_cache[:t_octal].has_key?(index)
       cached = node_cache[:t_octal][index]
       if cached
-        node_cache[:t_octal][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33682,7 +33214,7 @@ module Fortran
     if node_cache[:t_only].has_key?(index)
       cached = node_cache[:t_only][index]
       if cached
-        node_cache[:t_only][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33709,7 +33241,7 @@ module Fortran
     if node_cache[:t_open].has_key?(index)
       cached = node_cache[:t_open][index]
       if cached
-        node_cache[:t_open][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33759,7 +33291,7 @@ module Fortran
     if node_cache[:t_opened].has_key?(index)
       cached = node_cache[:t_opened][index]
       if cached
-        node_cache[:t_opened][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33783,7 +33315,7 @@ module Fortran
     if node_cache[:t_operator].has_key?(index)
       cached = node_cache[:t_operator][index]
       if cached
-        node_cache[:t_operator][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33807,7 +33339,7 @@ module Fortran
     if node_cache[:t_optional].has_key?(index)
       cached = node_cache[:t_optional][index]
       if cached
-        node_cache[:t_optional][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33831,7 +33363,7 @@ module Fortran
     if node_cache[:t_out].has_key?(index)
       cached = node_cache[:t_out][index]
       if cached
-        node_cache[:t_out][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33855,7 +33387,7 @@ module Fortran
     if node_cache[:t_pad].has_key?(index)
       cached = node_cache[:t_pad][index]
       if cached
-        node_cache[:t_pad][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33879,7 +33411,7 @@ module Fortran
     if node_cache[:t_parameter].has_key?(index)
       cached = node_cache[:t_parameter][index]
       if cached
-        node_cache[:t_parameter][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33903,7 +33435,7 @@ module Fortran
     if node_cache[:t_paren_l].has_key?(index)
       cached = node_cache[:t_paren_l][index]
       if cached
-        node_cache[:t_paren_l][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33927,7 +33459,7 @@ module Fortran
     if node_cache[:t_paren_r].has_key?(index)
       cached = node_cache[:t_paren_r][index]
       if cached
-        node_cache[:t_paren_r][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33951,7 +33483,7 @@ module Fortran
     if node_cache[:t_pause].has_key?(index)
       cached = node_cache[:t_pause][index]
       if cached
-        node_cache[:t_pause][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33975,7 +33507,7 @@ module Fortran
     if node_cache[:t_percent].has_key?(index)
       cached = node_cache[:t_percent][index]
       if cached
-        node_cache[:t_percent][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -33999,7 +33531,7 @@ module Fortran
     if node_cache[:t_plus].has_key?(index)
       cached = node_cache[:t_plus][index]
       if cached
-        node_cache[:t_plus][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34023,7 +33555,7 @@ module Fortran
     if node_cache[:t_point].has_key?(index)
       cached = node_cache[:t_point][index]
       if cached
-        node_cache[:t_point][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34047,7 +33579,7 @@ module Fortran
     if node_cache[:t_pointer].has_key?(index)
       cached = node_cache[:t_pointer][index]
       if cached
-        node_cache[:t_pointer][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34071,7 +33603,7 @@ module Fortran
     if node_cache[:t_position].has_key?(index)
       cached = node_cache[:t_position][index]
       if cached
-        node_cache[:t_position][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34095,7 +33627,7 @@ module Fortran
     if node_cache[:t_print].has_key?(index)
       cached = node_cache[:t_print][index]
       if cached
-        node_cache[:t_print][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34119,7 +33651,7 @@ module Fortran
     if node_cache[:t_private].has_key?(index)
       cached = node_cache[:t_private][index]
       if cached
-        node_cache[:t_private][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34143,7 +33675,7 @@ module Fortran
     if node_cache[:t_procedure].has_key?(index)
       cached = node_cache[:t_procedure][index]
       if cached
-        node_cache[:t_procedure][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34167,7 +33699,7 @@ module Fortran
     if node_cache[:t_program].has_key?(index)
       cached = node_cache[:t_program][index]
       if cached
-        node_cache[:t_program][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34191,7 +33723,7 @@ module Fortran
     if node_cache[:t_public].has_key?(index)
       cached = node_cache[:t_public][index]
       if cached
-        node_cache[:t_public][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34215,7 +33747,7 @@ module Fortran
     if node_cache[:t_pure].has_key?(index)
       cached = node_cache[:t_pure][index]
       if cached
-        node_cache[:t_pure][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34239,7 +33771,7 @@ module Fortran
     if node_cache[:t_quotemark].has_key?(index)
       cached = node_cache[:t_quotemark][index]
       if cached
-        node_cache[:t_quotemark][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34266,7 +33798,7 @@ module Fortran
     if node_cache[:t_read].has_key?(index)
       cached = node_cache[:t_read][index]
       if cached
-        node_cache[:t_read][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34316,7 +33848,7 @@ module Fortran
     if node_cache[:t_readwrite].has_key?(index)
       cached = node_cache[:t_readwrite][index]
       if cached
-        node_cache[:t_readwrite][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34340,7 +33872,7 @@ module Fortran
     if node_cache[:t_real].has_key?(index)
       cached = node_cache[:t_real][index]
       if cached
-        node_cache[:t_real][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34367,7 +33899,7 @@ module Fortran
     if node_cache[:t_rec].has_key?(index)
       cached = node_cache[:t_rec][index]
       if cached
-        node_cache[:t_rec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34385,7 +33917,7 @@ module Fortran
     if r1
       i2 = index
       if has_terminal?("l", false, index)
-        r3 = true
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("l")
@@ -34417,7 +33949,7 @@ module Fortran
     if node_cache[:t_recl].has_key?(index)
       cached = node_cache[:t_recl][index]
       if cached
-        node_cache[:t_recl][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34441,7 +33973,7 @@ module Fortran
     if node_cache[:t_recursive].has_key?(index)
       cached = node_cache[:t_recursive][index]
       if cached
-        node_cache[:t_recursive][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34465,7 +33997,7 @@ module Fortran
     if node_cache[:t_result].has_key?(index)
       cached = node_cache[:t_result][index]
       if cached
-        node_cache[:t_result][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34489,7 +34021,7 @@ module Fortran
     if node_cache[:t_return].has_key?(index)
       cached = node_cache[:t_return][index]
       if cached
-        node_cache[:t_return][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34513,7 +34045,7 @@ module Fortran
     if node_cache[:t_rewind].has_key?(index)
       cached = node_cache[:t_rewind][index]
       if cached
-        node_cache[:t_rewind][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34537,7 +34069,7 @@ module Fortran
     if node_cache[:t_save].has_key?(index)
       cached = node_cache[:t_save][index]
       if cached
-        node_cache[:t_save][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34561,7 +34093,7 @@ module Fortran
     if node_cache[:t_select].has_key?(index)
       cached = node_cache[:t_select][index]
       if cached
-        node_cache[:t_select][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34585,7 +34117,7 @@ module Fortran
     if node_cache[:t_sequence].has_key?(index)
       cached = node_cache[:t_sequence][index]
       if cached
-        node_cache[:t_sequence][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34609,7 +34141,7 @@ module Fortran
     if node_cache[:t_sequential].has_key?(index)
       cached = node_cache[:t_sequential][index]
       if cached
-        node_cache[:t_sequential][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34633,7 +34165,7 @@ module Fortran
     if node_cache[:t_size].has_key?(index)
       cached = node_cache[:t_size][index]
       if cached
-        node_cache[:t_size][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34657,7 +34189,7 @@ module Fortran
     if node_cache[:t_slash].has_key?(index)
       cached = node_cache[:t_slash][index]
       if cached
-        node_cache[:t_slash][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34681,7 +34213,7 @@ module Fortran
     if node_cache[:t_star].has_key?(index)
       cached = node_cache[:t_star][index]
       if cached
-        node_cache[:t_star][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34708,7 +34240,7 @@ module Fortran
     if node_cache[:t_stat].has_key?(index)
       cached = node_cache[:t_stat][index]
       if cached
-        node_cache[:t_stat][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34758,7 +34290,7 @@ module Fortran
     if node_cache[:t_status].has_key?(index)
       cached = node_cache[:t_status][index]
       if cached
-        node_cache[:t_status][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34782,7 +34314,7 @@ module Fortran
     if node_cache[:t_stop].has_key?(index)
       cached = node_cache[:t_stop][index]
       if cached
-        node_cache[:t_stop][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34806,7 +34338,7 @@ module Fortran
     if node_cache[:t_subroutine].has_key?(index)
       cached = node_cache[:t_subroutine][index]
       if cached
-        node_cache[:t_subroutine][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34830,7 +34362,7 @@ module Fortran
     if node_cache[:t_target].has_key?(index)
       cached = node_cache[:t_target][index]
       if cached
-        node_cache[:t_target][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34854,7 +34386,7 @@ module Fortran
     if node_cache[:t_then].has_key?(index)
       cached = node_cache[:t_then][index]
       if cached
-        node_cache[:t_then][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34878,7 +34410,7 @@ module Fortran
     if node_cache[:t_to].has_key?(index)
       cached = node_cache[:t_to][index]
       if cached
-        node_cache[:t_to][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34902,7 +34434,7 @@ module Fortran
     if node_cache[:t_true].has_key?(index)
       cached = node_cache[:t_true][index]
       if cached
-        node_cache[:t_true][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34926,7 +34458,7 @@ module Fortran
     if node_cache[:t_type].has_key?(index)
       cached = node_cache[:t_type][index]
       if cached
-        node_cache[:t_type][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34950,7 +34482,7 @@ module Fortran
     if node_cache[:t_underscore].has_key?(index)
       cached = node_cache[:t_underscore][index]
       if cached
-        node_cache[:t_underscore][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34974,7 +34506,7 @@ module Fortran
     if node_cache[:t_unformatted].has_key?(index)
       cached = node_cache[:t_unformatted][index]
       if cached
-        node_cache[:t_unformatted][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -34998,7 +34530,7 @@ module Fortran
     if node_cache[:t_unit].has_key?(index)
       cached = node_cache[:t_unit][index]
       if cached
-        node_cache[:t_unit][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35022,7 +34554,7 @@ module Fortran
     if node_cache[:t_use].has_key?(index)
       cached = node_cache[:t_use][index]
       if cached
-        node_cache[:t_use][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35046,7 +34578,7 @@ module Fortran
     if node_cache[:t_where].has_key?(index)
       cached = node_cache[:t_where][index]
       if cached
-        node_cache[:t_where][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35070,7 +34602,7 @@ module Fortran
     if node_cache[:t_while].has_key?(index)
       cached = node_cache[:t_while][index]
       if cached
-        node_cache[:t_while][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35094,7 +34626,7 @@ module Fortran
     if node_cache[:t_write].has_key?(index)
       cached = node_cache[:t_write][index]
       if cached
-        node_cache[:t_write][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35118,7 +34650,7 @@ module Fortran
     if node_cache[:target].has_key?(index)
       cached = node_cache[:target][index]
       if cached
-        node_cache[:target][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35127,12 +34659,10 @@ module Fortran
     i0 = index
     r1 = _nt_variable
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_expr
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -35150,7 +34680,7 @@ module Fortran
     if node_cache[:target_object].has_key?(index)
       cached = node_cache[:target_object][index]
       if cached
-        node_cache[:target_object][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35159,12 +34689,10 @@ module Fortran
     i0 = index
     r1 = _nt_array_name_and_spec
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_variable_name
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -35189,7 +34717,7 @@ module Fortran
     if node_cache[:target_object_list].has_key?(index)
       cached = node_cache[:target_object_list][index]
       if cached
-        node_cache[:target_object_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35239,7 +34767,7 @@ module Fortran
     if node_cache[:target_object_list_pair].has_key?(index)
       cached = node_cache[:target_object_list_pair][index]
       if cached
-        node_cache[:target_object_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35289,7 +34817,7 @@ module Fortran
     if node_cache[:target_stmt].has_key?(index)
       cached = node_cache[:target_stmt][index]
       if cached
-        node_cache[:target_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35372,7 +34900,7 @@ module Fortran
     if node_cache[:type_declaration_stmt].has_key?(index)
       cached = node_cache[:type_declaration_stmt][index]
       if cached
-        node_cache[:type_declaration_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35443,7 +34971,7 @@ module Fortran
     if node_cache[:type_name].has_key?(index)
       cached = node_cache[:type_name][index]
       if cached
-        node_cache[:type_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35454,7 +34982,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -35480,7 +35008,7 @@ module Fortran
     if node_cache[:type_param_value].has_key?(index)
       cached = node_cache[:type_param_value][index]
       if cached
-        node_cache[:type_param_value][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35489,12 +35017,10 @@ module Fortran
     i0 = index
     r1 = _nt_specification_expr
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_t_star
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -35512,7 +35038,7 @@ module Fortran
     if node_cache[:type_spec].has_key?(index)
       cached = node_cache[:type_spec][index]
       if cached
-        node_cache[:type_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35521,12 +35047,10 @@ module Fortran
     i0 = index
     r1 = _nt_type_spec_with_kind_selector
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_type_spec_without_kind_selector
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -35584,7 +35108,7 @@ module Fortran
     if node_cache[:type_spec_with_kind_selector].has_key?(index)
       cached = node_cache[:type_spec_with_kind_selector][index]
       if cached
-        node_cache[:type_spec_with_kind_selector][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35606,7 +35130,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i4, s4 = index, []
@@ -35624,7 +35147,6 @@ module Fortran
         r4 = nil
       end
       if r4
-        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r0 = r4
       else
         i7, s7 = index, []
@@ -35642,7 +35164,6 @@ module Fortran
           r7 = nil
         end
         if r7
-          r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
           r0 = r7
         else
           i10, s10 = index, []
@@ -35660,7 +35181,6 @@ module Fortran
             r10 = nil
           end
           if r10
-            r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
             r0 = r10
           else
             @index = i0
@@ -35780,7 +35300,7 @@ module Fortran
     if node_cache[:type_spec_without_kind_selector].has_key?(index)
       cached = node_cache[:type_spec_without_kind_selector][index]
       if cached
-        node_cache[:type_spec_without_kind_selector][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -35802,7 +35322,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i4, s4 = index, []
@@ -35810,7 +35329,7 @@ module Fortran
       s4 << r5
       if r5
         if has_terminal?("", false, index)
-          r6 = true
+          r6 = instantiate_node(SyntaxNode,input, index...(index + 0))
           @index += 0
         else
           terminal_parse_failure("")
@@ -35826,7 +35345,6 @@ module Fortran
         r4 = nil
       end
       if r4
-        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r0 = r4
       else
         i7, s7 = index, []
@@ -35844,7 +35362,6 @@ module Fortran
           r7 = nil
         end
         if r7
-          r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
           r0 = r7
         else
           i10, s10 = index, []
@@ -35852,7 +35369,7 @@ module Fortran
           s10 << r11
           if r11
             if has_terminal?("", false, index)
-              r12 = true
+              r12 = instantiate_node(SyntaxNode,input, index...(index + 0))
               @index += 0
             else
               terminal_parse_failure("")
@@ -35868,7 +35385,6 @@ module Fortran
             r10 = nil
           end
           if r10
-            r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
             r0 = r10
           else
             i13, s13 = index, []
@@ -35876,7 +35392,7 @@ module Fortran
             s13 << r14
             if r14
               if has_terminal?("", false, index)
-                r15 = true
+                r15 = instantiate_node(SyntaxNode,input, index...(index + 0))
                 @index += 0
               else
                 terminal_parse_failure("")
@@ -35892,7 +35408,6 @@ module Fortran
               r13 = nil
             end
             if r13
-              r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
               r0 = r13
             else
               i16, s16 = index, []
@@ -35910,7 +35425,6 @@ module Fortran
                 r16 = nil
               end
               if r16
-                r16 = SyntaxNode.new(input, (index-1)...index) if r16 == true
                 r0 = r16
               else
                 i19, s19 = index, []
@@ -35918,7 +35432,7 @@ module Fortran
                 s19 << r20
                 if r20
                   if has_terminal?("", false, index)
-                    r21 = true
+                    r21 = instantiate_node(SyntaxNode,input, index...(index + 0))
                     @index += 0
                   else
                     terminal_parse_failure("")
@@ -35934,7 +35448,6 @@ module Fortran
                   r19 = nil
                 end
                 if r19
-                  r19 = SyntaxNode.new(input, (index-1)...index) if r19 == true
                   r0 = r19
                 else
                   i22, s22 = index, []
@@ -35957,7 +35470,6 @@ module Fortran
                     r22 = nil
                   end
                   if r22
-                    r22 = SyntaxNode.new(input, (index-1)...index) if r22 == true
                     r0 = r22
                   else
                     i26, s26 = index, []
@@ -35975,7 +35487,6 @@ module Fortran
                       r26 = nil
                     end
                     if r26
-                      r26 = SyntaxNode.new(input, (index-1)...index) if r26 == true
                       r0 = r26
                     else
                       i29, s29 = index, []
@@ -35983,7 +35494,7 @@ module Fortran
                       s29 << r30
                       if r30
                         if has_terminal?("", false, index)
-                          r31 = true
+                          r31 = instantiate_node(SyntaxNode,input, index...(index + 0))
                           @index += 0
                         else
                           terminal_parse_failure("")
@@ -35999,7 +35510,6 @@ module Fortran
                         r29 = nil
                       end
                       if r29
-                        r29 = SyntaxNode.new(input, (index-1)...index) if r29 == true
                         r0 = r29
                       else
                         i32, s32 = index, []
@@ -36025,7 +35535,6 @@ module Fortran
                           r32 = nil
                         end
                         if r32
-                          r32 = SyntaxNode.new(input, (index-1)...index) if r32 == true
                           r0 = r32
                         else
                           @index = i0
@@ -36059,7 +35568,7 @@ module Fortran
     if node_cache[:upper_bound].has_key?(index)
       cached = node_cache[:upper_bound][index]
       if cached
-        node_cache[:upper_bound][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -36070,7 +35579,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -36103,7 +35612,7 @@ module Fortran
     if node_cache[:use_name].has_key?(index)
       cached = node_cache[:use_name][index]
       if cached
-        node_cache[:use_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -36114,7 +35623,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -36140,7 +35649,7 @@ module Fortran
     if node_cache[:use_part].has_key?(index)
       cached = node_cache[:use_part][index]
       if cached
-        node_cache[:use_part][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -36217,7 +35726,7 @@ module Fortran
     if node_cache[:use_stmt].has_key?(index)
       cached = node_cache[:use_stmt][index]
       if cached
-        node_cache[:use_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -36272,7 +35781,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i11, s11 = index, []
@@ -36335,7 +35843,6 @@ module Fortran
         r11 = nil
       end
       if r11
-        r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
         r0 = r11
       else
         @index = i0
@@ -36353,7 +35860,7 @@ module Fortran
     if node_cache[:variable].has_key?(index)
       cached = node_cache[:variable][index]
       if cached
-        node_cache[:variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -36362,17 +35869,14 @@ module Fortran
     i0 = index
     r1 = _nt_subobject
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_array_variable_name
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_scalar_variable_name
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -36398,7 +35902,7 @@ module Fortran
     if node_cache[:variable_name].has_key?(index)
       cached = node_cache[:variable_name][index]
       if cached
-        node_cache[:variable_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -36409,7 +35913,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -36442,7 +35946,7 @@ module Fortran
     if node_cache[:vector_subscript].has_key?(index)
       cached = node_cache[:vector_subscript][index]
       if cached
-        node_cache[:vector_subscript][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -36453,7 +35957,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -36479,7 +35983,7 @@ module Fortran
     if node_cache[:where_assignment_stmt_block].has_key?(index)
       cached = node_cache[:where_assignment_stmt_block][index]
       if cached
-        node_cache[:where_assignment_stmt_block][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -36520,7 +36024,7 @@ module Fortran
     if node_cache[:where_construct].has_key?(index)
       cached = node_cache[:where_construct][index]
       if cached
-        node_cache[:where_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -36590,7 +36094,7 @@ module Fortran
     if node_cache[:where_construct_stmt].has_key?(index)
       cached = node_cache[:where_construct_stmt][index]
       if cached
-        node_cache[:where_construct_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -36668,7 +36172,7 @@ module Fortran
     if node_cache[:where_stmt].has_key?(index)
       cached = node_cache[:where_stmt][index]
       if cached
-        node_cache[:where_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -36757,7 +36261,7 @@ module Fortran
     if node_cache[:write_stmt].has_key?(index)
       cached = node_cache[:write_stmt][index]
       if cached
-        node_cache[:write_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached

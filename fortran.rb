@@ -1861,11 +1861,47 @@ module Fortran
 
   end
 
+	class Connect_Spec_Access < NT
+	end
+
+	class Connect_Spec_Action < NT
+	end
+
+	class Connect_Spec_Blank < NT
+	end
+
+	class Connect_Spec_Delim < NT
+	end
+
+	class Connect_Spec_External_File_Unit < NT
+	end
+
+  class Connect_Spec_External_File_Unit_Option < NT
+  end
+
+	class Connect_Spec_File_Name < NT
+	end
+
+	class Connect_Spec_Form < NT
+	end
+
   class Connect_Spec_List < Io_Spec_List
   end
 
   class Connect_Spec_List_Pair < NT
   end
+
+	class Connect_Spec_Pad < NT
+	end
+
+	class Connect_Spec_Position < NT
+	end
+
+	class Connect_Spec_Recl < NT
+	end
+
+	class Connect_Spec_Status < NT
+	end
 
   class Contains_Stmt < Stmt
 
@@ -1881,7 +1917,40 @@ module Fortran
   class Continue_Stmt < Stmt
   end
 
+  class Control_Edit_Desc_P < NT
+  end
+
+  class Control_Edit_Desc_Slash < NT
+  end
+
   class Cycle_Stmt < Stmt
+  end
+
+	class Data_Edit_Desc_1 < NT
+	end
+
+  class Data_Edit_Desc_1_Option < NT
+  end
+
+  class Data_Edit_Desc_2 < NT
+	end
+
+	class Data_Edit_Desc_3 < NT
+	end
+
+  class Data_Edit_Desc_3_Option < NT
+  end
+
+	class Data_Edit_Desc_L < NT
+	end
+
+	class Data_Edit_Desc_A < NT
+	end
+
+  class Data_I_Do_Object_1 < NT
+  end
+
+  class Data_I_Do_Object_2 < NT
   end
 
   class Data_I_Do_Object_List < List
@@ -1945,6 +2014,24 @@ module Fortran
   class Data_Stmt_Object_List < List
   end
 
+  class Data_Stmt_Repeat_Pair < NT
+  end
+
+  class Data_Stmt_Set < NT
+  end
+
+  class Data_Stmt_Set_List < NT
+  end
+
+  class Data_Stmt_Set_List_Pair < NT
+  end
+
+  class Data_Stmt_Set_List_Pairs < NT
+  end
+
+  class Data_Stmt_Value < NT
+  end
+
   class Data_Stmt_Value_List < List
   end
 
@@ -1965,6 +2052,9 @@ module Fortran
       e.reduce("") { |m,x| m+"#{x}" }
     end
 
+  end
+
+  class Default_Char_Variable < NT
   end
 
   class Deferred_Shape_Spec < NT
@@ -2005,6 +2095,15 @@ module Fortran
 
   end
 
+  class Defined_Binary_Op < NT
+  end
+
+  class Defined_Unary_Op < NT
+  end
+
+  class Derived_Type_Def < NT
+  end
+
   class Derived_Type_Stmt < Stmt
 
     def str0
@@ -2017,6 +2116,12 @@ module Fortran
       s
     end
 
+  end
+
+  class Derived_Typeaccess_Spec < NT
+  end
+
+  class Derived_Typeaccess_Spec_Option < NT
   end
 
   class Digit < NT
@@ -2047,6 +2152,9 @@ module Fortran
   end
 
   class Do_Construct_Name < NT
+  end
+
+  class Do_Construct_Name_Label < NT
   end
 
   class Do_Stmt < Stmt
@@ -2082,6 +2190,9 @@ module Fortran
   end
 
   class Dummy_Arg_List < List
+  end
+
+  class Dummy_Arg_List_Option < NT
   end
 
   class Dummy_Arg_List_Pair < NT
