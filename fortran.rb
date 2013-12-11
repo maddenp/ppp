@@ -2217,6 +2217,15 @@ module Fortran
 
   end
 
+  class Else_Construct < NT
+  end
+
+  class Else_If_Construct < NT
+  end
+
+  class Else_If_Construct_Element < NT
+  end
+
   class Else_If_Stmt < Stmt
 
     def str0
@@ -2241,6 +2250,9 @@ module Fortran
       s
     end
 
+  end
+
+  class Elsewhere_Construct < NT
   end
 
   class Elsewhere_Stmt < Stmt
@@ -2493,6 +2505,18 @@ module Fortran
 
   end
 
+  class Equiv_Operand < NT
+  end
+
+  class Equivalence_Object_List < NT
+  end
+
+  class Equivalence_Object_List_Option < NT
+  end
+
+  class Equivalence_Set < NT
+  end
+
   class Equivalence_Set_List < List
   end
 
@@ -2597,12 +2621,27 @@ module Fortran
   class External_Stmt < Stmt
   end
 
+  class External_Subprogram_Function < NT
+  end
+
+  class External_Subprogram_Subroutine < NT
+  end
+
+  class Format_Item_Data_Edit_Desc < NT
+  end
+
+  class Format_Item_Format_Specification < NT
+  end
+
   class Format_Item_List < NT
 
     def str0
       "#{e[0]}"+e[1].e.reduce("") { |m,x| m+="#{x}" }
     end
 
+  end
+
+  class Format_Item_List_Option < NT
   end
 
   class Format_Specification < NT
@@ -2781,6 +2820,12 @@ module Fortran
 
   end
 
+  class Hex_Constant_Prefix_X < NT
+  end
+
+  class Hex_Constant_Prefix_Z < NT
+  end
+
   class Hollerith < NT
 
     def str0
@@ -2803,6 +2848,9 @@ module Fortran
   class If_Construct_Name < NT
   end
 
+  class If_Construct_Name_Label < NT
+  end
+
   class If_Stmt < Stmt
 
     def action
@@ -2817,6 +2865,9 @@ module Fortran
       stmt("#{prefix} #{action.strmemo}")
     end
 
+  end
+
+  class If_Then_Construct < NT
   end
 
   class If_Then_Stmt < Stmt
@@ -2842,6 +2893,12 @@ module Fortran
   end
 
   class Implicit_Part < NT
+  end
+
+  class Implicit_Spec_1 < NT
+  end
+
+  class Implicit_Spec_2 < NT
   end
 
   class Implicit_Spec_List < List
@@ -2881,6 +2938,15 @@ module Fortran
   class Input_Item_List_Pair < Io_Item_List_Pair
   end
 
+  class Inquire_Spec_External_File_Unit < NT
+  end
+
+  class Inquire_Spec_File < NT
+  end
+
+  class Inquire_Spec_Unit < NT
+  end
+
   class Inquire_Spec_List < Io_Spec_List
   end
 
@@ -2900,12 +2966,21 @@ module Fortran
 
   end
 
+  class Int_Literal_Constant < NT
+  end
+
   class Intent_Stmt < Stmt
 
     def str0
       stmt("#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{ik(e[5],"::"," ")}#{e[6]}")
     end
 
+  end
+
+  class Interface_Block < NT
+  end
+
+  class Interface_Bodies < NT
   end
 
   class Interface_Body < NT
@@ -2929,6 +3004,15 @@ module Fortran
   class Internal_File_Unit < NT
   end
 
+  class Internal_Subprogram_Function < NT
+  end
+
+  class Internal_Subprogram_Part < NT
+  end
+
+  class Internal_Subprogram_Subroutine < NT
+  end
+
   class Internal_Subprograms < NT
 
 
@@ -2947,10 +3031,25 @@ module Fortran
   class Intrinsic_Stmt < Stmt
   end
 
+  class Io_Control_Spec_Advance < NT
+  end
+
+  class Io_Control_Spec_Fmt < NT
+  end
+
   class Io_Control_Spec_List < Io_Spec_List
   end
 
   class Io_Control_Spec_List_Pair < NT
+  end
+
+  class Io_Control_Spec_Rec < NT
+  end
+
+  class Io_Control_Spec_Unit < NT
+  end
+
+  class Io_Control_Spec_Unit_Format < NT
   end
 
   class Io_Control_Spec_Unit_Nml < NT
@@ -3102,6 +3201,15 @@ module Fortran
   class Io_Spec_Write < Io_Spec
   end
 
+  class Keyword_Pair < NT
+  end
+
+  class Kind_Pair < NT
+  end
+
+  class Kind_Option < NT
+  end
+
   class Kind_Selector < NT
 
     def kind
@@ -3172,6 +3280,18 @@ module Fortran
   class Label_Stmt < NT
   end
 
+  class Len_Pair < NT
+  end
+
+  class Length_Selector_1 < NT
+  end
+
+  class Length_Selector_2 < NT
+  end
+
+  class Length_Selector_3 < NT
+  end
+
   class Letter_Sequence < NT
 
     def str0
@@ -3179,10 +3299,50 @@ module Fortran
     end
 
   end
+
+  class Letter_Spec < NT
+  end
+
   class Letter_Spec_List < List
   end
 
+  class Letter_Spec_List_Option < NT
+  end
+
+  class Letter_Spec_Option < NT
+  end
+
+  class Level_1_Expr < NT
+  end
+
+  class Level_2_Expr < NT
+  end
+
+  class Level_3_Expr < NT
+  end
+
+  class Level_3_Expr_Option < NT
+  end
+
+  class Level_4_Expr < NT
+  end
+
+  class Level_4_Expr_Option < NT
+  end
+
+  class Level_5_Expr < NT
+  end
+
+  class Level_5_Expr_Option < NT
+  end
+
   class Local_Name < NT
+  end
+
+  class Logical_Literal_Constant_False < NT
+  end
+
+  class Logical_Literal_Constant_True < NT
   end
 
   class Loop_Control < NT
@@ -3258,6 +3418,9 @@ module Fortran
   end
 
   class Module_Procedure_Stmt < Stmt
+  end
+
+  class Module_Procedure_Stmts < NT
   end
 
   class Module_Stmt < Stmt
@@ -3445,6 +3608,9 @@ module Fortran
 
   end
 
+  class Nonblock_Do_Construct_Osdc < NT
+  end
+
   class Nonlabel_Do_Stmt < Do_Stmt
 
     def do_variable
@@ -3465,6 +3631,9 @@ module Fortran
       s
     end
 
+  end
+
+  class Null_Function_Ref < NT
   end
 
   class Nullify_Stmt < Stmt
@@ -3601,7 +3770,13 @@ module Fortran
 
   end
 
+  class Parenthesized_Allocate_Shape_Spec_List < NT
+  end
+
   class Parenthesized_Args < NT
+  end
+
+  class Parenthesized_Component_Array_Spec < NT
   end
 
   class Parenthesized_Deferred_Shape_Spec_List < NT
@@ -3622,6 +3797,9 @@ module Fortran
       e[1].abstract_boundslist
     end
 
+  end
+
+  class Parenthesized_Expr < NT
   end
 
   class Parenthesized_Section_Subscript_List < NT
@@ -3685,6 +3863,24 @@ module Fortran
 
   end
 
+	class Position_Edit_Desc_T < NT
+	end
+
+	class Position_Edit_Desc_Tl < NT
+	end
+
+	class Position_Edit_Desc_Tr < NT
+	end
+
+	class Position_Edit_Desc_X < NT
+	end
+
+  class Position_Spec_1 < NT
+  end
+
+  class Position_Spec_2 < NT
+  end
+
   class Position_Spec_List < List
   end
 
@@ -3733,6 +3929,9 @@ module Fortran
 
   end
 
+  class Private_Sequence_Stmts < NT
+  end
+
   class Procedure_Name < NT
   end
 
@@ -3751,6 +3950,15 @@ module Fortran
     end
 
   end
+
+	class Program_Unit_Block_Data < NT
+	end
+
+	class Program_Unit_Main_Program < NT
+	end
+
+	class Program_Unit_Module < NT
+	end
 
   class Program_Units < NT
 
@@ -3793,6 +4001,15 @@ module Fortran
       e[1].items
     end
 
+  end
+
+  class Real_Literal_Constant_1 < NT
+  end
+
+  class Real_Literal_Constant_2 < NT
+  end
+
+  class Real_Literal_Constant_Option < NT
   end
 
   class Rename < NT
@@ -3960,6 +4177,27 @@ module Fortran
 
   end
 
+  class Shared_Term_Do_Construct_Inner < NT
+  end
+
+  class Shared_Term_Do_Construct_Outer < NT
+  end
+
+  class Signed_Digit_String < NT
+  end
+
+  class Signed_Int_Literal_Constant < NT
+  end
+
+  class Signed_Real_Literal_Constant < NT
+  end
+
+  class Significand_1 < NT
+  end
+
+  class Significand_2 < NT
+  end
+
   class Specification_Part < NT
 
     def str1
@@ -3989,6 +4227,9 @@ module Fortran
   end
 
   class Stop_Stmt < Stmt
+  end
+
+  class Structure_Constructor < NT
   end
 
   class Subroutine_Name < NT
@@ -4079,6 +4320,12 @@ module Fortran
       e[0].name
     end
 
+  end
+
+  class Substring_Range < NT
+  end
+
+  class Substring_Range_Triplet < NT
   end
 
   class Target_Object_List < NT
@@ -4215,6 +4462,12 @@ module Fortran
       e[0]
     end
 
+  end
+
+  class Where_Assignement_Stmt_Block < NT
+  end
+
+  class Where_Construct < NT
   end
 
   class Where_Construct_Stmt < Stmt
