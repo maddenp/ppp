@@ -2,10 +2,6 @@
 
 - Derived types provided by modules should appear in envfiles.
 
-- May need option to specify destination directory for envfiles. Currently,
-  they are written to the directory in which the input source file is
-  located.
-
 ### ERROR CHECKING / REPORTING
 
 - Error needed when compare_var variable is not distributed or no mod info.
@@ -14,13 +10,13 @@
   occur in the region. Or should we force bcast/gather/scatter of these?
 
 - sms$serial should complain about mismatches, e.g. explicitly specifying a
-  variable as both 'in' and 'ignore'.
+  variable as both 'in' and 'ignore'. Is this already in place?
 
 ### GRAMMAR
 
-- Implement a continuation scheme (following Fortran!) for SMS directives.
+- Give specific names to the many NT nodes in [sms_]fortran.tt. IN PROGRESS.
 
-- Give specific names to the many NT nodes in [sms_]fortran.tt.
+- Implement a continuation scheme (following Fortran!) for SMS directives.
 
 ### NEW FEATURES
 
@@ -47,6 +43,9 @@
   This creates a lot of IO if many programmtic delcarations are performed. It
   would be better to do this once -- maybe as a post-translation walk that calls
   write_envfile for each module encountered.
+
+- Be sure to avoid re-reading files like 'sentinels' and 'intrinsics in internal
+  parses.
 
 ### PARSING
 
@@ -100,11 +99,11 @@
 
 ### TRANSLATION
 
+- Now that the output filename is mandatory, is should be used in place of
+  '(translation) marker' messages in e.g. sms_chkstat calls.
+
 - Add original sms directives to output for non-block directives (or any other
   that are missing from translated output).
-
-- SMS_Create_Decomp translate is only valid for one decomposed dimension. Extend
-  it to handle three.
 
 - In SMS_Serial translate, what should halo[l|u] be when dh is nil?
 
@@ -120,12 +119,30 @@
   in SMS_Exchange's translate()? If so, can it be factored and reused?
 
 - How to handle pointer assignment statements in serial regions? Nullify
-  statements? Assign statements?
+  statements? Assign statements? Consider the following:
 
-- Are namelist reads inside serial regions handled properly?
+  ORIGINAL                              TRANSLATION
+  ------------------------------------- ----------------------------------------
+                                        logical::sms__ptrassign_1
+                                        logical::sms__ptrassign_2
+                                        ...
+                                        sms__ptrassign_1=.false.
+                                        sms__ptrassign_2=.false.
+  !sms$serial begin                     !sms$serial begin
+  if (cond1) then                       if (cond1) then
+    p=>t                                  p=>t ; sms__ptrassign_1=.true.
+    if (cond2) then                       if (cond2) then
+      p=>u                                  p=>u ; sms__ptrassign_2=.true.
+    endif                                 endif
+  endif                                 endif
+                                        sms__bcast(sms__ptrassign_1)
+                                        sms__bcast(sms__ptrassign_2)
+                                        if (sms__ptrassign_1) p=>t
+                                        if (sms__ptrassign_2) p=>u
 
-- Can we identify the statements/constructs that could possibly change a
-  variable's value in a serial region and only gather/scatter/broadcast those?
+- Be more selective about serial vars_in_region membership. Weed out uses that
+  cannot possible change values. See, maybe, 'serial_intent' mechanism used in
+  re: namelist reads in serial regions for a solution.
 
 ### TREE
 
