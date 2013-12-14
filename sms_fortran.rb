@@ -917,9 +917,17 @@ module Fortran
       replace_element(code,:name)
     end
 
+    def length
+      "#{self}".length
+    end
+
     def name
       return @name if defined?(@name)
       @name="#{self}"
+    end
+
+    def size
+      length
     end
 
     def translate
@@ -1488,7 +1496,8 @@ module Fortran
         gstop="reshape((/#{gstop.join(",")}/),(/#{nvars},#{maxrank}/))"
         perms="reshape((/#{perms.join(",")}/),(/#{nvars},#{maxrank}/))"
         types="(/"+types.join(",")+"/)"
-        names="(/"+v.reduce([]) { |m,x| m.push("'#{x.name}'") }.join(",")+"/)"
+        maxnamelen=v.reduce(0) { |m,x| m=(x.name.length>m)?(x.name.length):(m) }
+        names="(/"+v.reduce([]) { |m,x| m.push("'#{x.name}#{' '*(maxnamelen-x.name.length)}'//char(0)") }.join(",")+"/)"
         vars=(1..25).reduce([]) { |m,x| m.push((x>nvars)?(sms_dummyvar):("#{v[x-1].name}")) }.join(",")
         code=[]
         code.push("call sms__exchange(#{nvars},#{tag},#{gllbs},#{glubs},#{gstrt},#{gstop},#{perms},#{dectypes},#{types},#{names},#{sms_statusvar},#{vars})")
