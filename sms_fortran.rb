@@ -471,12 +471,6 @@ module Fortran
       "sms__decomp"
     end
 
-    def sms_dummyvar
-      name="sms__dummy"
-      declare("integer",name,{:dims=>[1],:init=>"(/0/)"})
-      name
-    end
-
     def sms_global_name(name)
       p="sms__global_"
       n="#{name}"
@@ -1388,7 +1382,6 @@ module Fortran
       nvars=v.size
       maxnamelen=v.reduce(0) { |m,x| m=(x.name.length>m)?(x.name.length):(m) }
       tag=sms_commtag
-      dummy=sms_dummyvar
       code=[]
 
       pre="sms__exchange_"
@@ -1401,6 +1394,8 @@ module Fortran
       dcmps="#{pre}dcmps"
       names="#{pre}names"
 
+      (nvars+1..25).each { |x| declare("integer","sms__x#{x}",{:dims=>%W[1],:init=>"0"}) }
+
       declare("integer",gllbs,{:dims=>%W[#{maxrank} #{sms_maxvars}]})
       declare("integer",glubs,{:dims=>%W[#{maxrank} #{sms_maxvars}]})
       declare("integer",strts,{:dims=>%W[#{maxrank} #{sms_maxvars}]})
@@ -1409,13 +1404,16 @@ module Fortran
       declare("integer",dcmps,{:dims=>%W[           #{sms_maxvars}]})
       declare("integer",types,{:dims=>%W[           #{sms_maxvars}]})
 
-      declare("character(len=#{maxnamelen})",names,{:dims=>%W[#{nvars}]})
+      declare("character(len=32)",names,{:dims=>%W[#{sms_maxvars}]})
 
-      code.push("#{gllbs}=1")
-      code.push("#{glubs}=1")
-      code.push("#{strts}=1")
-      code.push("#{stops}=1")
-      code.push("#{perms}=0")
+      code.push("#{gllbs}= 1")
+      code.push("#{glubs}= 1")
+      code.push("#{strts}= 1")
+      code.push("#{stops}= 1")
+      code.push("#{perms}= 0")
+      code.push("#{types}=-1")
+      code.push("#{dcmps}=-1")
+      code.push("#{names}=char(0)")
 
       (0..nvars-1).each do |i|
         arrdim=i+1
@@ -1440,13 +1438,13 @@ module Fortran
           code.push("#{strts}(#{r},#{arrdim})=#{lower}")
           code.push("#{stops}(#{r},#{arrdim})=#{upper}")
           code.push("#{perms}(#{r},#{arrdim})=1") if decdim(varenv,r)
-          code.push("#{dcmps}(#{arrdim})=#{dh}(#{dh}__nestlevel)")
-          code.push("#{types}(#{arrdim})=#{sms_type(var)}")
-          code.push("#{names}(#{arrdim})='#{var}'//char(0)")
         end
+        code.push("#{dcmps}(#{arrdim})=#{dh}(#{dh}__nestlevel)")
+        code.push("#{types}(#{arrdim})=#{sms_type(var)}")
+        code.push("#{names}(#{arrdim})='#{var}'//char(0)")
       end
 
-      vars=(1..sms_maxvars).reduce([]) { |m,x| m.push((x>nvars)?(dummy):("#{v[x-1].name}")) }.join(",")
+      vars=(1..sms_maxvars).reduce([]) { |m,x| m.push((x>nvars)?("sms__x#{x}"):("#{v[x-1].name}")) }.join(",")
       code.push("call sms__exchange(#{nvars},#{tag},#{gllbs},#{glubs},#{strts},#{stops},#{perms},#{dcmps},#{types},#{names},#{sms_statusvar},#{vars})")
       code.push(sms_chkstat)
       replace_statement(code)
