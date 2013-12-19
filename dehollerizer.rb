@@ -39,6 +39,7 @@ class Dehollerizer
   end
 
   def fwd
+    raise "Indexing past end of string" if @i>@s.length
     @i+=1
   end
 
