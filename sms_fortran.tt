@@ -116,6 +116,7 @@ grammar Fortran
     sms_create_decomp /
     sms_exchange /
     sms_halo_comp &{ |e| sp_env_pullup(e[0]) } <SMS_Executable_SMS_Halo_Comp> /
+    sms_get_communicator /
     sms_ignore /
     sms_parallel &{ |e| sp_env_pullup(e[0]) } <SMS_Executable_SMS_Parallel> /
     sms_reduce /
@@ -125,6 +126,10 @@ grammar Fortran
     sms_stop /
     sms_to_local &{ |e| sp_env_pullup(e[0]) } <SMS_Executable_SMS_To_Local> /
     sms_unstructured_grid
+  end
+
+  rule sms_get_communicator
+    sms_sentinel sms_t_get_communicator t_paren_l scalar_int_variable t_paren_r t_newline <SMS_Get_Communicator>
   end
 
   rule sms_halo_comp
@@ -307,6 +312,10 @@ grammar Fortran
 
   rule sms_t_exchange
     "exchange" <T>
+  end
+
+  rule sms_t_get_communicator
+    "get_communicator" <T>
   end
 
   rule sms_t_halo_comp

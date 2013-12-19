@@ -175,7 +175,10 @@ class Translator
     end
     begin
       translation=process(s,:program_units,srcfile,dstfile,conf)
-      File.open(dstfile,'w').write(translation) unless conf[:product]==:modinfo
+      unless conf[:product]==:modinfo
+        translation+="\n" unless translation[-1]=="\n"
+        File.open(dstfile,'w').write(translation)
+      end
     rescue Exceptions::TranslatorException
       # suppress exception info display
     end

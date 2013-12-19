@@ -1465,6 +1465,30 @@ module Fortran
   class SMS_Executable_SMS_To_Local < NT
   end
 
+  class SMS_Get_Communicator < SMS
+
+    def str0
+      sms("#{e[2]}#{e[3]}#{e[4]}")
+    end
+
+    def translate
+      # Check the sort and type of the indicated variable, if it exists in the
+      # environment. If not, carry on and hope for the best.
+      if (varenv=varenv_get(var,self,false))
+        unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
+          fail "ERROR: comm size query's argument must be an integer scalar"
+        end
+      end
+      code="call sms__get_communicator(#{var})"
+      replace_statement(code)
+    end
+
+    def var
+      e[3]
+    end
+
+  end
+
   class SMS_Halo_Comp < SMS_Region
 
     def str0

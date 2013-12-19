@@ -3963,7 +3963,7 @@ module Fortran
   class Program_Units < NT
 
     def str0
-      e.reduce("") { |m,x| m+="#{x}\n" }.chomp
+      e.reduce("") { |m,x| m+="#{x}\n" }
     end
 
   end
