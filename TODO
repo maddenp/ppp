@@ -28,24 +28,12 @@
 - Does where-stmt need implicit parallelization? Currently, it operates on halo
   memory as well.
 
-- Provide support for distributed Structure of Arrays (SoA).
-
-- Provide support for distributed Array of Structures (AoS).
-
 ### OPTIMIZATION
-
-- read_stmt, write_stmt et al are not function calls, so we *do* know which of
-  their arguments may be modified during a call (e.g. iostat's variable can,
-  file's variable cannot) we can limit bcast/gather/scatter of these in a
-  serial region.
 
 - write_envfile is called by declare() whenever something is added to a module.
   This creates a lot of IO if many programmtic delcarations are performed. It
   would be better to do this once -- maybe as a post-translation walk that calls
   write_envfile for each module encountered.
-
-- Be sure to avoid re-reading files like 'sentinels' and 'intrinsics in internal
-  parses.
 
 ### PARSING
 
@@ -72,13 +60,13 @@
 
 - IIRC, parsing of allocate_object is broken, in that the variable_name option
   (2nd choice) will never be chosen because structure_component always matches.
-  Need some more sophisticated logic...
+  Need more sophisticated logic...
 
 - In fortran.tt, rule array_spec makes a claim about a bad parse. The comment
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
 
-- Deduce types of implicit variables.
+- Deduce types of implicit variables. We cannot require 'implicit none'.
 
 ### REFACTORING
 
@@ -88,11 +76,7 @@
   reasonable to keep in ppp, but the max vars bit (may occur, with a different
   name, in other directives) should be a reference into the library code.
 
-- Re-enable continuation lines check, deal with looooong exchange in dyn_init.
-  Are the array literals as compact as possible (e.g. do we need all 7 dims, all
-  25 (?) MAX_PPP_VARS)? Better yet, make exchange use a begin/queue-multiple/end
-  buffering scheme, which avoids limits on exchange vars and minimized the size
-  of each call into the SMS library.
+- Re-enable continuation lines check, now that exchanges used declared arrays.
 
 - declare() is naive. What about declaring an array with the same type as an
   already-declared scalar? Need more flexibility...
@@ -101,9 +85,11 @@
 
 - More helper functions for e.g. sms_halo_comp() for env[:sms_halo_comp].
 
-- Outside sp_* methods, use varenv_get instead of env[].
-
 ### TRANSLATION
+
+- What about 'print *,a(88)' when 'a' is distributed?
+
+- Move tedius sms__exchange* data-structure inits and sets into sms library.
 
 - Now that the output filename is mandatory, is should be used in place of
   '(translation) marker' messages in e.g. sms_chkstat calls.
@@ -113,10 +99,10 @@
 
 - In SMS_Serial translate, what should halo[l|u] be when dh is nil?
 
-- Hardcoded '1's referring to decomposition elements should be looked up from
-  env. See translate() for SMS_Declare_Decomp, SMS_Unstructured_Grid,
-  Array_Section, SMS_Create_Decomp. In SMS_Declare_Decomp translate, roll out
-  as many e{n}/s{n} arrays as needed for the decomposition.
+- Hardcoded '1's referring to s1, e1, etc. should be looked up from env. See
+  translate() for SMS_Declare_Decomp, SMS_Unstructured_Grid, Array_Section,
+  SMS_Create_Decomp. In SMS_Declare_Decomp translate, roll out as many e{n}/s{n}
+  arrays as needed for the decomposition.
 
 - Consider which directives may nest in which others, and which may not. Factor
   handling of these error conditions.
@@ -134,21 +120,44 @@
                                         ...
                                         sms__ptrassign_1=.false.
                                         sms__ptrassign_2=.false.
-  !sms$serial begin                     !sms$serial begin
-  if (cond1) then                       if (cond1) then
-    p=>t                                  p=>t ; sms__ptrassign_1=.true.
-    if (cond2) then                       if (cond2) then
-      p=>u                                  p=>u ; sms__ptrassign_2=.true.
-    endif                                 endif
-  endif                                 endif
+                                        if (sms__i_am_root()) then
+  !sms$serial begin                       !sms$serial begin
+  if (cond1) then                         if (cond1) then
+    p=>t                                    p=>t ; sms__ptrassign_1=.true.
+    if (cond2) then                         if (cond2) then
+      p=>u                                    p=>u ; sms__ptrassign_2=.true.
+    endif                                   endif
+  endif                                   endif
+                                        endif
+  !sms$serial end                       !sms$serial end
                                         sms__bcast(sms__ptrassign_1)
                                         sms__bcast(sms__ptrassign_2)
                                         if (sms__ptrassign_1) p=>t
                                         if (sms__ptrassign_2) p=>u
 
+  Not all the way there, maybe. What if a do-loop alternately assigns p to t1
+  and t2, so that the final association of p will depend on the upper loop bound
+  being either even or odd? Then both sms__ptrassign_*s will be true. Subsequent
+  pointer assignments should set the alternatives to .false.. e.g.
+
+  do i=1,n
+    if (mod(1,2).eq.0) then
+      p=>t1
+    else
+      p=>t2
+    endif
+  enddo
+
+  If sms__ptrassign_1 relates to p=>t1 and sms__ptrassign_2 relates to p=>t2,
+  the former should be false and the latter true when n is false, and vice versa
+  when n is odd.
+
 - Be more selective about serial vars_in_region membership. Weed out uses that
   cannot possible change values. See, maybe, 'serial_intent' mechanism used in
-  re: namelist reads in serial regions for a solution.
+  re: namelist reads in serial regions for a solution. For example, read_stmt,
+  write_stmt et al are not function calls, so we *do* know which of their
+  arguments may be modified during a call (e.g. iostat's variable can, file's
+  variable cannot) we can limit bcast/gather/scatter of these.
 
 ### TREE
 
