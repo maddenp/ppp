@@ -42,8 +42,15 @@ class PPPTS
   end
 
   def run_all(threads,socket,debug,args)
-    def go(q,socket,debug) test(q.deq,socket,debug) until q.empty? end
-    def num(s) s.scan(/[0-9]+/).first.to_i end
+
+    def num(s)
+      s.scan(/[0-9]+/).first.to_i
+    end
+
+    def worker(q,socket,debug)
+      test(q.deq,socket,debug) until q.empty?
+    end
+
     tdir="tests"
     tests=Dir.glob("#{tdir}/t*").sort
     if (filter=args[0])
@@ -54,7 +61,7 @@ class PPPTS
     q=Queue.new
     tests.each { |e| q.enq(e) }
     runners=(1..threads).reduce([]) do |m,e|
-      m << Thread.new { go(q,socket,debug) }
+      m << Thread.new { worker(q,socket,debug) }
     end
     runners.each { |e| e.join }
     tests.size
