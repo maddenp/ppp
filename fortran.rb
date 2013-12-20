@@ -479,6 +479,7 @@ module Fortran
   end
 
   def sp_use_stmt(modulename,list)
+
     def use_add(modulename,usenames,localnames)
       env[:uses]||={}
       usenames.map! { |x| "#{x}" }
@@ -494,6 +495,7 @@ module Fortran
         end
       end
     end
+
     m="#{modulename}"
     if list.respond_to?(:usenames)
       use_add(m,list.usenames,list.localnames)
