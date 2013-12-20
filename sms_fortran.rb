@@ -508,6 +508,37 @@ module Fortran
 
   end
 
+  # Out-of-order class definitions (must be defined before subclassed)
+
+  class SMS < NT
+  end
+
+  class SMS_Getter < SMS
+
+    def str0
+      sms("#{e[2]}#{e[3]}#{e[4]}")
+    end
+
+    def translate_with_options(description,function)
+      # Check the sort and type of the indicated variable, if it exists in the
+      # environment. If not, carry on and hope for the best.
+      if (varenv=varenv_get(var,self,false))
+        unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
+          fail "ERROR: #{description} query's argument must be an integer scalar"
+        end
+      end
+      code="call #{function}(#{var})"
+      replace_statement(code)
+    end
+
+    def var
+      e[3]
+    end
+
+  end
+
+  # Grammar-supporting subclasses
+
   class Allocate_Object < NT
 
     def translate
@@ -1061,9 +1092,6 @@ module Fortran
 
   end
 
-  class SMS < NT
-  end
-
   class SMS_Region < SMS
   end
 
@@ -1079,50 +1107,18 @@ module Fortran
 
   end
 
-  class SMS_Comm_Rank < SMS
-
-    def str0
-      sms("#{e[2]}#{e[3]}#{e[4]}")
-    end
+  class SMS_Comm_Rank < SMS_Getter
 
     def translate
-      # Check the sort and type of the indicated variable, if it exists in the
-      # environment. If not, carry on and hope for the best.
-      if (varenv=varenv_get(var,self,false))
-        unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
-          fail "ERROR: comm rank query's argument must be an integer scalar"
-        end
-      end
-      code="call sms__comm_rank(#{var})"
-      replace_statement(code)
-    end
-
-    def var
-      e[3]
+      translate_with_options("comm rank","sms__comm_rank")
     end
 
   end
 
-  class SMS_Comm_Size < SMS
-
-    def str0
-      sms("#{e[2]}#{e[3]}#{e[4]}")
-    end
+  class SMS_Comm_Size < SMS_Getter
 
     def translate
-      # Check the sort and type of the indicated variable, if it exists in the
-      # environment. If not, carry on and hope for the best.
-      if (varenv=varenv_get(var,self,false))
-        unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
-          fail "ERROR: comm size query's argument must be an integer scalar"
-        end
-      end
-      code="call sms__comm_size(#{var})"
-      replace_statement(code)
-    end
-
-    def var
-      e[3]
+      translate_with_options("comm size","sms__comm_size")
     end
 
   end
@@ -1460,26 +1456,10 @@ module Fortran
   class SMS_Executable_SMS_To_Local < NT
   end
 
-  class SMS_Get_Communicator < SMS
-
-    def str0
-      sms("#{e[2]}#{e[3]}#{e[4]}")
-    end
+  class SMS_Get_Communicator < SMS_Getter
 
     def translate
-      # Check the sort and type of the indicated variable, if it exists in the
-      # environment. If not, carry on and hope for the best.
-      if (varenv=varenv_get(var,self,false))
-        unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
-          fail "ERROR: comm size query's argument must be an integer scalar"
-        end
-      end
-      code="call sms__get_communicator(#{var})"
-      replace_statement(code)
-    end
-
-    def var
-      e[3]
+      translate_with_options("communicator","sms__get_communicator")
     end
 
   end
