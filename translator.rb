@@ -181,7 +181,7 @@ class Translator
         File.open(dstfile,'w').write(translation)
       end
     rescue Exceptions::TranslatorException
-      # suppress exception info display
+      exit 1
     end
   end
 
