@@ -17,10 +17,12 @@ require "sms_normalizer_parser"
 require "normfixed"
 require "normfree"
 require "exceptions"
+require "sentinels"
 
 class Translator
 
   include Fortran
+  include Sentinels
 
   class Stringmap
 
@@ -140,9 +142,8 @@ class Translator
 
   def directive
     return @@directive if defined?(@@directive)
-    f=File.join(File.dirname(File.expand_path($0)),"sentinels")
-    d=File.open(f,"rb").read.gsub(/\$/,'\$').split("\n").join("|")
-    @@directive=Regexp.new("^\s*!((#{d}).*)",true)
+    s=sentinels.map { |x| x.gsub(/\$/,'\$') }.join("|")
+    @@directive=Regexp.new("^\s*!((#{s}).*)",true)
   end
 
   def die(msg,quit=true,srcfile=nil)

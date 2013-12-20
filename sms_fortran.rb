@@ -419,11 +419,6 @@ module Fortran
     end
 
     def intrinsic?(function_name)
-      s=env[:global]
-      unless (intrinsics=s[:intrinsics])
-        f=File.join(File.dirname(File.expand_path($0)),"intrinsics")
-        intrinsics=(s[:intrinsics]=Set.new(File.open(f).read.split))
-      end
       intrinsics.include?("#{function_name}")
     end
 

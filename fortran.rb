@@ -5,6 +5,7 @@ require "yaml"
 
 require "treetop/runtime"
 require "common"
+require "intrinsics"
 
 module Fortran
 
@@ -567,6 +568,7 @@ module Fortran
   class T < Treetop::Runtime::SyntaxNode
 
     include Common
+    include Intrinsics
 
     attr_accessor :envref,:srcfile
 
