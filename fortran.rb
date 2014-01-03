@@ -1978,7 +1978,7 @@ module Fortran
     end
 
     def name
-      rightmost.name
+      (derived_type?)?("#{self}"):(rightmost.name)
     end
 
     def part_ref
@@ -1986,7 +1986,7 @@ module Fortran
     end
 
     def rightmost
-      (e[1].e.empty?)?(e[0]):(e[1].e[-1].e[1])
+      (derived_type?)?(e[1].e[-1].e[1]):(e[0])
     end
 
     def subscript_list
