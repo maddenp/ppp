@@ -4278,7 +4278,15 @@ module Fortran
 
   end
 
-  class Subscript < NT
+  class Subscript_Common < NT
+
+    def const_int?(x)
+      "#{x}".sub(/_.*/,'').sub(/^[+-]/,'').gsub(/[0-9]/,'').empty?
+    end
+
+  end
+
+  class Subscript < Subscript_Common
 
     def lower
       subscript
@@ -4290,6 +4298,10 @@ module Fortran
 
     def upper
       subscript
+    end
+
+    def variable?
+      not const_int?(subscript)
     end
 
   end
@@ -4308,12 +4320,20 @@ module Fortran
       (e[2].is_a?(Subscript))?(e[2]):(nil)
     end
 
+    def variable?
+      (lower and lower.variable? ) or ( upper and upper.variable? ) or ( stride!=1 and stride.variable? )
+    end
+
   end
 
-  class Subscript_Triplet_Stride_Option < NT
+  class Subscript_Triplet_Stride_Option < Subscript_Common
 
     def stride
       e[1]
+    end
+
+    def variable?
+      not const_int?(stride)
     end
 
   end

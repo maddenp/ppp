@@ -3255,7 +3255,7 @@ grammar Fortran
   rule stride
     # F90:R620
 
-    scalar_int_expr
+    scalar_int_expr "" <Subscript>
   end
 
   rule structure_component

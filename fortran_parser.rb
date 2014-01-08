@@ -30000,6 +30000,13 @@ module Fortran
     r0
   end
 
+  module Stride0
+    def scalar_int_expr
+      elements[0]
+    end
+
+  end
+
   def _nt_stride
     start_index = index
     if node_cache[:stride].has_key?(index)
@@ -30011,7 +30018,26 @@ module Fortran
       return cached
     end
 
-    r0 = _nt_scalar_int_expr
+    i0, s0 = index, []
+    r1 = _nt_scalar_int_expr
+    s0 << r1
+    if r1
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
+      else
+        terminal_parse_failure("")
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Subscript,input, i0...index, s0)
+      r0.extend(Stride0)
+    else
+      @index = i0
+      r0 = nil
+    end
 
     node_cache[:stride][start_index] = r0
 
