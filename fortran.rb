@@ -1691,7 +1691,7 @@ module Fortran
 
     def str1
       block_left
-      s=strmemo
+      s=indent(strmemo)
       block_right
       s
     end
@@ -4173,7 +4173,7 @@ module Fortran
     end
 
     def str1
-      s=strmemo
+      s=indent(strmemo)
       block_right
       block_right
       s
