@@ -1369,11 +1369,9 @@ module Fortran
     def translate
 
       use(sms_decompmod)
-      v=[e[3]]+e[4].e.reduce([]) { |m,x| m.push(x.e[1]) }
+      v=e[4].e.reduce([e[3]]) { |m,x| m.push(x.e[1]) }
       nvars=v.size
       maxnamelen=v.reduce(0) { |m,x| m=(x.name.length>m)?(x.name.length):(m) }
-      cache=".true."
-      tag="sms__exchange_tag_dummy"
       code=[]
 
       code.push("#{self}")
@@ -1418,22 +1416,6 @@ module Fortran
           fail "ERROR: Derived type instance '#{this}' may not be exchanged"
         end
 
-        # If an array slice is to be exchanged, and if the slice is based on
-        # anything other than a constant, we cannot be sure that pre-computed
-        # exchange information will be valid next time this exchange is invoked,
-        # in which case we must signal the sms library not to cache the computed
-        # information. NOTE: When derived types are supported, the 'part_ref'
-        # method call in this block may be inappropriate is it will return e.g.
-        # the 'z' element in 'x%y%z', and something more nuanced may be needed.
-
-        if this.is_a?(Array_Section)
-          if (pssl=this.data_ref.part_ref.parenthesized_section_subscript_list)
-            pssl.subscript_list.each do |subscript|
-              cache=".false." if subscript.variable?
-            end
-          end
-        end
-
         arrdim=i+1
         var=this.name
         varenv=varenv_get(var)
@@ -1462,9 +1444,9 @@ module Fortran
         code.push("#{names}(#{arrdim})='#{var}'//char(0)")
       end
 
-      tag=sms_commtag if cache==".true."
+      tag=sms_commtag
       vars=(1..sms_maxvars).reduce([]) { |m,x| m.push((x>nvars)?("sms__x#{x}"):("#{v[x-1].name}")) }.join(",")
-      code.push("call sms__exchange(#{nvars},#{tag},#{cache},#{gllbs},#{glubs},#{strts},#{stops},#{perms},#{dcmps},#{types},#{names},#{sms_statusvar},#{vars})")
+      code.push("call sms__exchange(#{nvars},#{tag},#{gllbs},#{glubs},#{strts},#{stops},#{perms},#{dcmps},#{types},#{names},#{sms_statusvar},#{vars})")
       code.push(sms_chkstat)
       replace_statement(code)
 
