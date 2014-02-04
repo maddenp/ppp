@@ -87,7 +87,13 @@
 
 ### TRANSLATION
 
-- What about 'print *,a(88)' when 'a' is distributed?
+- 'print *,a(88)' ('a' distributed) now handled more-or-less correctly. The
+  array section node places a singleton cannonical() method on the expr node
+  of the print statement's output item list, which Print_Stmt#translate uses
+  with preference, so that 'a' is looked up in the environment, not 'a(88)',
+  found to be distributed, and serialized as needed. This behavior, at least,
+  needs to be extended to other io statements. This behavior is suppressed
+  inside parallel regions, for better or for worse.
 
 - Move tedius sms__exchange* data-structure inits and sets into sms library.
 
