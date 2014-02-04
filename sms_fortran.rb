@@ -589,12 +589,12 @@ module Fortran
         "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
       end
 
+      var="#{name}"
       if inside?(Assignment_Stmt)
         return if sms_ignore or sms_serial
         if (f=ancestor(Function_Reference))
           return unless intrinsic?(f.name)
         end
-        var="#{name}"
         fail "ERROR: '#{var}' not found in environment" unless (varenv=env[var])
         return unless varenv["decomp"]
         bounds=[]
@@ -619,6 +619,13 @@ module Fortran
         boundslist=(1..varenv["dims"]).map{ |dim| bounds[dim-1] }.join(",")
         code="#{var}(#{boundslist})"
         replace_element(code,:array_section)
+      elsif (a=ancestor(Io_Stmt))
+        a.output_items.each do |x|
+          if ancestor?(x)
+            x.define_singleton_method(:canonical) { "#{var}" }
+            break
+          end
+        end
       end
     end
 
@@ -1006,14 +1013,33 @@ module Fortran
     def translate
       return if sms_ignore or sms_serial
       io_stmt_init
-      output_items.each do |x|
-        var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-        if (varenv=varenv_get(var,self,expected=false))
-          if (dh=varenv["decomp"])
-            @onroot=true
-            global=sms_global_name(var)
-            @var_gather.push(var)
-            replace_output_item(x,global)
+
+      # Inside a parallel region, we assume that distributed arrays are indexed
+      # correctly, i.e. using the loop variable, and so do not gather a global
+      # version. This may not be sufficient, but more analysis would need to be
+      # done to improve on this assumption.
+
+      unless sms_parallel
+        output_items.each do |x|
+
+          # If the output item has a name() method, use that; otherwise punt and
+          # try to use the full lexical object as the name. If some node in the
+          # subtree has reported a canonical name (e.g. Array_Section 'a(88)'
+          # may report 'a' as the canonical name), use it to find envrionment
+          # information for the underlying variable. If a global version of the
+          # variable is used, append any extra information (e.g. '(88)') to the
+          # final, globalized output item to preserve the original meaning.
+
+          name=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
+          var=(x.respond_to?(:canonical))?("#{x.canonical}"):(name)
+          extra=name.sub(/^#{Regexp.escape(var)}/,'')
+          if (varenv=varenv_get(var,self,expected=false))
+            if (dh=varenv["decomp"])
+              @onroot=true
+              global=sms_global_name(var)+extra
+              @var_gather.push(var)
+              replace_output_item(x,global)
+            end
           end
         end
       end
