@@ -588,6 +588,12 @@ module Fortran
       nil
     end
 
+    def ancestor?(node)
+      n=self
+      return true if n==node while (n=n.parent)
+      false
+    end
+
     def block_left
       s=env[:global]
       s[:level]||=0
