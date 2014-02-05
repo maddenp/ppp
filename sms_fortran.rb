@@ -619,12 +619,16 @@ module Fortran
         boundslist=(1..varenv["dims"]).map{ |dim| bounds[dim-1] }.join(",")
         code="#{var}(#{boundslist})"
         replace_element(code,:array_section)
-      elsif (a=ancestor(Io_Stmt))
-        a.output_items.each do |x|
-          if ancestor?(x)
-            x.define_singleton_method(:canonical) { "#{var}" }
-            break
+      elsif (node=ancestor(Io_Stmt))
+        node.output_items.each do |output_item|
+          if ancestor?(output_item)
+            output_item.define_singleton_method(:canonical) { "#{var}" }
           end
+        end
+        if (varenv=varenv_get(var,self,expected=false)) and varenv["decomp"]
+          globals=node.instance_variable_get(:@globals)
+          globals||=node.instance_variable_set(:@globals,SortedSet.new)
+          globals.add(var)
         end
       end
     end
@@ -821,7 +825,7 @@ module Fortran
         io_stmt_var_set_logic
       end
       declare("logical",sms_rootcheck) if @onroot
-      @code_alloc,@code_dealloc=code_alloc_dealloc_globals(Set.new(@var_gather+@var_scatter))
+      @code_alloc,@code_dealloc=code_alloc_dealloc_globals(SortedSet.new(@var_gather+@var_scatter))
       io_stmt_gathers
       io_stmt_scatters
       io_stmt_bcasts
@@ -845,9 +849,9 @@ module Fortran
       @spec_var_goto=[]
       @spec_var_true=[]
       @success_label=nil
-      @var_bcast=[]
-      @var_gather=[]
-      @var_scatter=[]
+      @var_bcast=SortedSet.new
+      @var_gather=SortedSet.new
+      @var_scatter=SortedSet.new
     end
 
     def io_stmt_scatters
@@ -1020,6 +1024,13 @@ module Fortran
       # done to improve on this assumption.
 
       unless sms_parallel
+
+        if (globals=instance_variable_get(:@globals))
+          globals.each do |global|
+            var="#{global}"
+          end
+        end
+
         output_items.each do |x|
 
           # If the output item has a name() method, use that; otherwise punt and
@@ -1037,7 +1048,7 @@ module Fortran
             if (dh=varenv["decomp"])
               @onroot=true
               global=sms_global_name(var)+extra
-              @var_gather.push(var)
+              @var_gather.add(var)
               replace_output_item(x,global)
             end
           end
@@ -1064,10 +1075,10 @@ module Fortran
             var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
             if (varenv=varenv_get(var,self,expected=false))
               if varenv["decomp"]
-                @var_scatter.push(var)
+                @var_scatter.add(var)
                 replace_input_item(x,sms_global_name(var))
               else
-                @var_bcast.push(var)
+                @var_bcast.add(var)
               end
             end
           end
@@ -1079,10 +1090,10 @@ module Fortran
           if (varenv=varenv_get(var,self,expected=false))
             if (dh=varenv["decomp"])
               @onroot=true
-              @var_scatter.push(var)
+              @var_scatter.add(var)
               replace_input_item(x,sms_global_name(var))
             else
-              @var_bcast.push(var) if @onroot
+              @var_bcast.add(var) if @onroot
             end
           end
         end
@@ -1752,7 +1763,7 @@ module Fortran
       # Globally-sized variables must be allocated/deallocated for distributed
       # arrays appearing within serial regions. Here's a set to track them.
 
-      globals=Set.new
+      globals=SortedSet.new
       
       # Get the serial info recorded when the serial_begin statement was parsed.
 
@@ -1912,7 +1923,7 @@ module Fortran
     def translate
       si=env[:sms_serial_info]=OpenStruct.new
       si.default=("#{e[2]}".empty?)?("inout"):("#{e[2].default}")
-      si.vars_in_region=Set.new
+      si.vars_in_region=SortedSet.new
       si.vars_ignore=("#{e[2]}".empty?)?([]):(e[2].vars_ignore)
       si.vars_in=("#{e[2]}".empty?)?([]):(e[2].vars_in)
       si.vars_out=("#{e[2]}".empty?)?([]):(e[2].vars_out)
@@ -2284,7 +2295,7 @@ module Fortran
             var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
             varenv=varenv_get(var,self,expected=true)
             if varenv["decomp"]
-              @var_gather.push(var)
+              @var_gather.add(var)
               replace_input_item(x,sms_global_name(var))
             end
           end
@@ -2295,7 +2306,7 @@ module Fortran
             if (dh=varenv["decomp"])
               @onroot=true
               global=sms_global_name(var)
-              @var_gather.push(var)
+              @var_gather.add(var)
               replace_output_item(x,global)
             end
           end

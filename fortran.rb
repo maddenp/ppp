@@ -133,7 +133,7 @@ module Fortran
 
   def sp_assign_stmt(label,scalar_int_variable)
     assign_map=(env[:assign_map]||={})
-    var_array=(assign_map["#{label}"]||=Set.new)
+    var_array=(assign_map["#{label}"]||=SortedSet.new)
     var_array.add("#{scalar_int_variable}")
     true
   end
@@ -308,7 +308,7 @@ module Fortran
 
   def sp_label(label)
     n=label.e.reduce("") { |m,x| m+"#{x}" }.to_i
-    (env[:global][:labels]||=Set.new).add(n)
+    (env[:global][:labels]||=SortedSet.new).add(n)
     true
   end
 
@@ -651,7 +651,7 @@ module Fortran
     end
 
     def label_create
-      labels=(env[:global][:labels]||=Set.new)
+      labels=(env[:global][:labels]||=SortedSet.new)
       99999.downto(1).each do |n|
         unless labels.include?(n)
           labels.add(n)
