@@ -692,9 +692,9 @@ module Fortran
 
     def replace_statement(code)
       code=code.join("\n") if code.is_a?(Array)
-      tree=raw(code,:block,@srcfile,@dstfile,{:env=>self.env})
-      tree.parent=self.parent
-      block=self.parent.e
+      tree=raw(code,:block,@srcfile,@dstfile,{:env=>env})
+      tree.parent=parent
+      block=parent.e
       block[block.index(self)]=tree
     end
 
