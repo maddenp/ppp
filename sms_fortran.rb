@@ -620,9 +620,9 @@ module Fortran
         code="#{var}(#{boundslist})"
         replace_element(code,:array_section)
       elsif (node=ancestor(Io_Stmt))
-        node.output_items.each do |output_item|
-          if ancestor?(output_item)
-            output_item.define_singleton_method(:canonical) { "#{var}" }
+        node.output_items.each do |item|
+          if ancestor?(item)
+            item.define_singleton_method(:canonical) { "#{var}" }
           end
         end
         if (varenv=varenv_get(var,self,expected=false)) and varenv["decomp"]
@@ -1025,32 +1025,26 @@ module Fortran
 
       unless sms_parallel
 
-        if (globals=instance_variable_get(:@globals))
-          globals.each do |global|
-            var="#{global}"
-          end
-        end
+        globals=instance_variable_get(:@globals)||SortedSet.new
+        @onroot=true unless globals.empty?
+        globals.each { |global| @var_gather.add("#{global}") }
 
-        output_items.each do |x|
+        output_items.each do |item|
 
           # If the output item has a name() method, use that; otherwise punt and
           # try to use the full lexical object as the name. If some node in the
           # subtree has reported a canonical name (e.g. Array_Section 'a(88)'
-          # may report 'a' as the canonical name), use it to find envrionment
+          # would report 'a' as the canonical name), use it to find envrionment
           # information for the underlying variable. If a global version of the
           # variable is used, append any extra information (e.g. '(88)') to the
           # final, globalized output item to preserve the original meaning.
 
-          name=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-          var=(x.respond_to?(:canonical))?("#{x.canonical}"):(name)
-          extra=name.sub(/^#{Regexp.escape(var)}/,'')
-          if (varenv=varenv_get(var,self,expected=false))
-            if (dh=varenv["decomp"])
-              @onroot=true
-              global=sms_global_name(var)+extra
-              @var_gather.add(var)
-              replace_output_item(x,global)
-            end
+          name=(item.respond_to?(:name))?("#{item.name}"):("#{item}")
+          var=(item.respond_to?(:canonical))?("#{item.canonical}"):(name)
+          if globals.include?(var)
+            extra=name.sub(/^#{Regexp.escape(var)}/,'')
+            global=sms_global_name(var)+extra
+            replace_output_item(item,global)
           end
         end
       end
