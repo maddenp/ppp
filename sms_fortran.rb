@@ -422,6 +422,30 @@ module Fortran
       intrinsics.include?("#{function_name}")
     end
 
+    def known(var)
+      varenv_get(var,self,expected=false)
+    end
+
+    def known_array(var)
+      (varenv=known(var)) and varenv["sort"]=="_array"
+    end
+
+    def known_distributed(var)
+      (varenv=known(var)) and varenv["decomp"]
+    end
+
+    def known_pppvar(var)
+      (varenv=known(var)) and varenv["pppvar"]
+    end
+
+    def known_scalar(var)
+      (varenv=known(var)) and varenv["sort"]=="_scalar"
+    end
+
+    def known_uservar(var)
+      (varenv=known(var)) and not varenv["pppvar"]
+    end
+
     def marker
       s=env[:global]
       s[:marker]||=0
@@ -589,9 +613,9 @@ module Fortran
         "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
       end
 
+      return if sms_ignore or sms_serial
       var="#{name}"
       if inside?(Assignment_Stmt)
-        return if sms_ignore or sms_serial
         if (f=ancestor(Function_Reference))
           return unless intrinsic?(f.name)
         end
@@ -619,16 +643,16 @@ module Fortran
         boundslist=(1..varenv["dims"]).map{ |dim| bounds[dim-1] }.join(",")
         code="#{var}(#{boundslist})"
         replace_element(code,:array_section)
-      elsif (node=ancestor(Io_Stmt))
-        node.output_items.each do |item|
-          if ancestor?(item)
-            item.define_singleton_method(:canonical) { "#{var}" }
+      elsif (iostmt=ancestor(Io_Stmt))
+        if known_distributed(var)
+          subscript="#{self}".sub(/^#{Regexp.escape(var)}/,'')
+          if not sms_parallel or subscript.empty? # i.e. not a slice or element
+            iostmt.register(iostmt,:globals,var)
+            code=sms_global_name(var)+subscript
+            replace_element(code,:expr)
           end
-        end
-        if (varenv=varenv_get(var,self,expected=false)) and varenv["decomp"]
-          globals=node.instance_variable_get(:@globals)
-          globals||=node.instance_variable_set(:@globals,SortedSet.new)
-          globals.add(var)
+        else
+          iostmt.register(iostmt,:locals,var)
         end
       end
     end
@@ -819,7 +843,20 @@ module Fortran
       replace_statement(code)
     end
 
-    def io_stmt_common
+    def io_stmt_common(treatment=nil)
+      if treatment
+        unless [:in,:out].include?(treatment)
+          fail "internal error: treatment '#{treatment}' neither :in nor :out"
+        end
+        globals=instance_variable_get(:@globals)||SortedSet.new
+        @onroot=true unless globals.empty?
+        globals.each do |global|
+          ((treatment==:in)?(@var_gather):(@var_scatter)).add("#{global}")
+        end
+        if treatment==:out and (locals=instance_variable_get(:@locals))
+          locals.each { |local| @var_bcast.add(local) if @onroot }
+        end
+      end
       unless is_a?(Print_Stmt)
         io_stmt_branch_to_logic
         io_stmt_var_set_logic
@@ -894,6 +931,12 @@ module Fortran
           @iostat=var if x==:iostat
         end
       end
+    end
+
+    def register(node,key,value)
+      x=node.instance_variable_get("@#{key}")
+      x||=node.instance_variable_set("@#{key}",SortedSet.new)
+      x.add(value)
     end
 
   end
@@ -1017,38 +1060,7 @@ module Fortran
     def translate
       return if sms_ignore or sms_serial
       io_stmt_init
-
-      # Inside a parallel region, we assume that distributed arrays are indexed
-      # correctly, i.e. using the loop variable, and so do not gather a global
-      # version. This may not be sufficient, but more analysis would need to be
-      # done to improve on this assumption.
-
-      unless sms_parallel
-
-        globals=instance_variable_get(:@globals)||SortedSet.new
-        @onroot=true unless globals.empty?
-        globals.each { |global| @var_gather.add("#{global}") }
-
-        output_items.each do |item|
-
-          # If the output item has a name() method, use that; otherwise punt and
-          # try to use the full lexical object as the name. If some node in the
-          # subtree has reported a canonical name (e.g. Array_Section 'a(88)'
-          # would report 'a' as the canonical name), use it to find envrionment
-          # information for the underlying variable. If a global version of the
-          # variable is used, append any extra information (e.g. '(88)') to the
-          # final, globalized output item to preserve the original meaning.
-
-          name=(item.respond_to?(:name))?("#{item.name}"):("#{item}")
-          var=(item.respond_to?(:canonical))?("#{item.canonical}"):(name)
-          if globals.include?(var)
-            extra=name.sub(/^#{Regexp.escape(var)}/,'')
-            global=sms_global_name(var)+extra
-            replace_output_item(item,global)
-          end
-        end
-      end
-      io_stmt_common
+      io_stmt_common(:in)
     end
 
   end
@@ -1078,20 +1090,12 @@ module Fortran
           end
         end
         input_items.each do |x|
-          var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-          # If some intput item isn't present in the environment, assume that it
-          # is *not* distributed and carry on.
-          if (varenv=varenv_get(var,self,expected=false))
-            if (dh=varenv["decomp"])
-              @onroot=true
-              @var_scatter.add(var)
-              replace_input_item(x,sms_global_name(var))
-            else
-              @var_bcast.add(var) if @onroot
-            end
+          var="#{x}"
+          if known_scalar(var) and known_uservar(var)
+            @var_bcast.add(var) if @onroot
           end
         end
-        io_stmt_common
+        io_stmt_common(:out)
       end
     end
 
@@ -2296,16 +2300,14 @@ module Fortran
         end
         output_items.each do |x|
           var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-          if (varenv=varenv_get(var,self,expected=false))
-            if (dh=varenv["decomp"])
-              @onroot=true
-              global=sms_global_name(var)
-              @var_gather.add(var)
-              replace_output_item(x,global)
-            end
+          if known_distributed(var)
+            @onroot=true
+            global=sms_global_name(var)
+            @var_gather.add(var)
+            replace_output_item(x,global)
           end
         end
-        io_stmt_common
+        io_stmt_common(:in)
       end
     end
 
