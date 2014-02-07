@@ -20,11 +20,6 @@
 
 ### NEW FEATURES
 
-- Need to handle broadcast/scatter of variables contained in io-implied-do input
-  or output item lists, e.g. read (88) (a(i),i=1,n). Here, a must be either
-  broadcast or scattered. (Related? See e.g. outFMTed.F90 in FIM, where a serial
-  region is currently required.)
-
 - Does where-stmt need implicit parallelization? Currently, it operates on halo
   memory as well.
 
@@ -77,6 +72,7 @@
   name, in other directives) should be a reference into the library code.
 
 - Re-enable continuation lines check, now that exchanges used declared arrays.
+  Actually, maybe wait until register/exchange scheme is in place.
 
 - declare() is naive. What about declaring an array with the same type as an
   already-declared scalar? Need more flexibility...
@@ -87,21 +83,14 @@
 
 ### TRANSLATION
 
-- 'print *,a(88)' ('a' distributed) now handled more-or-less correctly. The
-  array section node places a singleton cannonical() method on the expr node
-  of the print statement's output item list, which Print_Stmt#translate uses
-  with preference, so that 'a' is looked up in the environment, not 'a(88)',
-  found to be distributed, and serialized as needed. This behavior, at least,
-  needs to be extended to other io statements. This behavior is suppressed
-  inside parallel regions, for better or for worse.
-
-- Move tedius sms__exchange* data-structure inits and sets into sms library.
-
 - Now that the output filename is mandatory, is should be used in place of
   '(translation) marker' messages in e.g. sms_chkstat calls.
 
 - Add original sms directives to output for non-block directives (or any other
   that are missing from translated output).
+
+- Move tedius sms__exchange* data-structure inits and sets into sms library.
+  Better yet, implement register/exchange scheme.
 
 - In SMS_Serial translate, what should halo[l|u] be when dh is nil?
 
@@ -112,9 +101,6 @@
 
 - Consider which directives may nest in which others, and which may not. Factor
   handling of these error conditions.
-
-- Do other uses of global start/stop (gstrt/gstop) need the same treatment as
-  in SMS_Exchange's translate()? If so, can it be factored and reused?
 
 - How to handle pointer assignment statements in serial regions? Nullify
   statements? Assign statements? Consider the following:
@@ -159,7 +145,7 @@
   when n is odd.
 
 - Be more selective about serial vars_in_region membership. Weed out uses that
-  cannot possible change values. See, maybe, 'serial_intent' mechanism used in
+  cannot possibly change values. See, maybe, 'serial_intent' mechanism used in
   re: namelist reads in serial regions for a solution. For example, read_stmt,
   write_stmt et al are not function calls, so we *do* know which of their
   arguments may be modified during a call (e.g. iostat's variable can, file's
