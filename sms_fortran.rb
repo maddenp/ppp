@@ -2298,15 +2298,6 @@ module Fortran
             end
           end
         end
-        output_items.each do |x|
-          var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
-          if known_distributed(var)
-            @onroot=true
-            global=sms_global_name(var)
-            @var_gather.add(var)
-            replace_output_item(x,global)
-          end
-        end
         io_stmt_common(:in)
       end
     end
