@@ -91,6 +91,12 @@
 
 - More helper functions for e.g. sms_halo_comp() for env[:sms_halo_comp].
 
+- It might be better to get rid of of 'sort' key in .sms file, rename 'dims' to
+  'rank', and have rank 0 => scalar, rank > 0 => array. But the value of the
+  'sort' key can also be '_namelist', so that has to be dealt with somehow.
+  Maybe rank => _namelist would work. In general, think about how the names
+  'dimension' and 'rank' are used, and what would be best.
+
 ### TRANSLATION
 
 - Now that the output filename is mandatory, is should be used in place of
