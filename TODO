@@ -4,9 +4,6 @@
 
 ### ERROR CHECKING / REPORTING
 
-- Error in SMS_Exchange#translate when > 25 variables specified. Better yet,
-  implement register/exchange scheme.
-
 - Error needed when compare_var variable is not distributed or no mod info.
 
 - sms$serial should complain about in/out/inout intent of variables that never
@@ -17,13 +14,13 @@
 
 ### GRAMMAR
 
-- Implement a continuation scheme (following Fortran!) for SMS directives. This
+* Implement a continuation scheme (following Fortran!) for SMS directives. This
   probably goes in class Translator in sms_fortran.rb, to be executed alongside
   sms$[insert|remove] during early lexical transformations.
 
 ### NEW FEATURES
 
-- Does where-stmt need implicit parallelization? Currently, it operates on halo
+* Does where-stmt need implicit parallelization? Currently, it operates on halo
   memory as well.
 
 ### NORMALIZATION
@@ -41,6 +38,8 @@
   write_envfile for each module encountered.
 
 ### PARSING
+
+- Deduce types of implicit variables. We cannot require 'implicit none'.
 
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
   label, but also labels further down in the stack? That would also be an error,
@@ -71,9 +70,15 @@
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
 
-- Deduce types of implicit variables. We cannot require 'implicit none'.
-
 ### REFACTORING
+
+* Re-enable continuation lines check, now that exchanges used declared arrays.
+
+* Factor more sms text out into T sms_* methods (esp library calls).
+
+* More helper functions for e.g. sms_halo_comp() for env[:sms_halo_comp].
+
+- Implement register/exchange scheme.
 
 - In e.g. SMS_Exchange, rename maxrank -> ppp_max_rank and sms_maxvars -> 
   ppp_max_exchange_vars, first renaming the ppp_* vars in the SMS library to
@@ -81,15 +86,8 @@
   reasonable to keep in ppp, but the max vars bit (may occur, with a different
   name, in other directives) should be a reference into the library code.
 
-- Re-enable continuation lines check, now that exchanges used declared arrays.
-  Actually, maybe wait until register/exchange scheme is in place.
-
 - declare() is naive. What about declaring an array with the same type as an
   already-declared scalar? Need more flexibility...
-
-- Factor more sms text out into T sms_* methods (esp library calls).
-
-- More helper functions for e.g. sms_halo_comp() for env[:sms_halo_comp].
 
 - It might be better to get rid of of 'sort' key in .sms file, rename 'dims' to
   'rank', and have rank 0 => scalar, rank > 0 => array. But the value of the
@@ -99,14 +97,11 @@
 
 ### TRANSLATION
 
-- Now that the output filename is mandatory, is should be used in place of
+* Now that the output filename is mandatory, is should be used in place of
   '(translation) marker' messages in e.g. sms_chkstat calls.
 
-- Add original sms directives to output for non-block directives (or any other
+* Add original sms directives to output for non-block directives (or any other
   that are missing from translated output).
-
-- Move tedius sms__exchange* data-structure inits and sets into sms library.
-  Better yet, implement register/exchange scheme.
 
 - In SMS_Serial translate, what should halo[l|u] be when dh is nil?
 
