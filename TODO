@@ -4,12 +4,12 @@
 
 ### ERROR CHECKING / REPORTING
 
-- Error needed when compare_var variable is not distributed or no mod info.
+* Error needed when compare_var variable is not distributed or no mod info.
 
-- sms$serial should complain about in/out/inout intent of variables that never
+* sms$serial should complain about in/out/inout intent of variables that never
   occur in the region. Or should we force bcast/gather/scatter of these?
 
-- sms$serial should complain about mismatches, e.g. explicitly specifying a
+* sms$serial should complain about mismatches, e.g. explicitly specifying a
   variable as both 'in' and 'ignore'. Is this already in place?
 
 ### GRAMMAR
@@ -161,6 +161,8 @@
   write_stmt et al are not function calls, so we *do* know which of their
   arguments may be modified during a call (e.g. iostat's variable can, file's
   variable cannot) we can limit bcast/gather/scatter of these.
+
+- Deal with structured grids.
 
 ### TREE
 
