@@ -1034,7 +1034,7 @@ module Fortran
         unless inside?(SMS_Serial_Begin,Subroutine_Name) or intrinsic?(name)# or component?
           varenv=varenv_get(name,self,expected=false)||{}
           unless varenv["subprogram"] or varenv["parameter"]
-            env[:sms_serial_info].vars_in_region.add(name)
+            env[:sms_serial_info].vars_in_region.add([name,nil])
           end
         end
       end
@@ -1773,7 +1773,7 @@ module Fortran
       # it here.
 
       si.vars_in_region.delete_if do |name|
-        name.is_a?(Array) and si.vars_in_region.include?(name.first)
+        name.last and si.vars_in_region.include?(name.first)
       end
 
       # Iterate over the set of names that occurred in the region.
@@ -1783,7 +1783,7 @@ module Fortran
         # If in/out treatment was specified when this name was registered in the
         # serial region, extract that information now.
 
-        name,treatment=(name.is_a?(Array))?(name):([name,nil])
+        name,treatment=name
 
         # Extract variable information.
 
