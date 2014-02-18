@@ -191,7 +191,7 @@ module Fortran
   def sp_dimension_stmt(array_names_and_specs)
     array_names_and_specs.e.each do |x|
       if x.is_a?(Array_Name_And_Spec)
-        var=x.name
+        var="#{x.name}"
         redef(var)
         array_spec=x.spec.e[0]
         env[var]||={}
@@ -441,7 +441,7 @@ module Fortran
       unless x.is_a?(Array_Name_And_Spec) or x.is_a?(Variable_Name)
         fail "ERROR: Unexpected node type"
       end
-      var=x.name
+      var="#{x.name}"
       varsetattr(var,"sort","_array") if x.is_a?(Array_Name_And_Spec)
       redef(var)
     end
