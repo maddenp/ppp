@@ -71,6 +71,18 @@ module Fortran
   end
 
   def redef(var)
+
+    # When entering a child scope (e.g. the scope of a subroutine contained in a
+    # module), the child's environment is initially a copy of its parent's. If a
+    # variable is redefined in the child, the old definition must be completely
+    # forgotten. It is not enough to simply, say, update its type from integer
+    # to real; all other attributes (target, pointer, dimension, intent, etc.)
+    # from the parent scope must also be discarded. But this must happen only
+    # once per scope: Except for one-time deletion from the child's environment,
+    # variable attributes must accumulate as they are gleaned from potentially
+    # multiple statements (target, pointer, dimension, intent, etc.) encountered
+    # in the declaration section.
+
     var="#{var}" unless var.is_a?(String)
     if defined?(@redefs)
       unless @redefs[var]
