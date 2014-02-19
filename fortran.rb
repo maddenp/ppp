@@ -584,12 +584,12 @@ module Fortran
     include Common
     include Intrinsics
 
-    attr_accessor :envref,:srcfile
+    attr_accessor :envref,:meta
 
     def initialize(*args)
       super(*args)
       @envref=input.envstack.last
-      @srcfile=nil
+      @meta={}
     end
 
     def ancestor(*classes)
@@ -695,7 +695,7 @@ module Fortran
     end
 
     def replace_element(code,rule,node=self)
-      tree=raw(code,rule,@srcfile,@dstfile,{:nl=>false,:env=>node.env})
+      tree=raw(code,rule,input.srcfile,@dstfile,{:nl=>false,:env=>node.env})
       node=node.parent while "#{node}"=="#{node.parent}"
       tree.parent=node.parent
       block=node.parent.e
@@ -704,7 +704,7 @@ module Fortran
 
     def replace_statement(code)
       code=code.join("\n") if code.is_a?(Array)
-      tree=raw(code,:block,@srcfile,@dstfile,{:env=>env})
+      tree=raw(code,:block,input.srcfile,@dstfile,{:env=>env})
       tree.parent=parent
       block=parent.e
       block[block.index(self)]=tree
@@ -778,7 +778,7 @@ module Fortran
           new_uses={modname=>new_usenames}
           old_uses=up.env[:uses]
           up.env[:uses]=(old_uses)?(old_uses.merge(new_uses)):(new_uses)
-          t=raw(code,:use_stmt,@srcfile,@dstfile,{:env=>env})
+          t=raw(code,:use_stmt,input.srcfile,@dstfile,{:env=>env})
           t.parent=up
           up.e.push(t)
         end
@@ -803,7 +803,7 @@ module Fortran
       varenv
     end
 
-  end
+  end # class T
 
   class NT < T
 

@@ -530,7 +530,7 @@ module Fortran
       "sms__typeget(#{var})"
     end
 
-  end
+  end # class T
 
   # Out-of-order class definitions (must be defined before subclassed)
 
@@ -647,12 +647,12 @@ module Fortran
         if known_distributed(var)
           subscript="#{self}".sub(/^#{Regexp.escape(var)}/,'')
           if not sms_parallel or subscript.empty? # i.e. not a slice or element
-            iostmt.register(iostmt,:globals,var)
+            iostmt.register_io_var(iostmt,:globals,var)
             code=sms_global_name(var)+subscript
             replace_element(code,:expr)
           end
         else
-          iostmt.register(iostmt,:locals,var)
+          iostmt.register_io_var(iostmt,:locals,var)
         end
       end
     end
@@ -848,12 +848,12 @@ module Fortran
         unless [:in,:out].include?(treatment)
           fail "internal error: treatment '#{treatment}' neither :in nor :out"
         end
-        globals=instance_variable_get(:@globals)||SortedSet.new
+        globals=meta[:globals]||SortedSet.new
         @onroot=true unless globals.empty?
         globals.each do |global|
           ((treatment==:in)?(@var_gather):(@var_scatter)).add("#{global}")
         end
-        if treatment==:out and (locals=instance_variable_get(:@locals))
+        if treatment==:out and (locals=meta[:locals])
           locals.each { |local| @var_bcast.add(local) if @onroot }
         end
       end
@@ -933,10 +933,8 @@ module Fortran
       end
     end
 
-    def register(node,key,value)
-      x=node.instance_variable_get("@#{key}")
-      x||=node.instance_variable_set("@#{key}",SortedSet.new)
-      x.add(value)
+    def register_io_var(node,key,value)
+      (node.meta[key]||=SortedSet.new).add(value)
     end
 
   end
