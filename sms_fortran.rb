@@ -418,8 +418,8 @@ module Fortran
       OpenStruct.new({:lo=>"#{halo_lo}",:up=>"#{halo_up}"})
     end
 
-    def intrinsic?(function_name)
-      intrinsics.include?("#{function_name}")
+    def intrinsic(function_name)
+      intrinsics["#{function_name}"]
     end
 
     def known(var)
@@ -616,11 +616,15 @@ module Fortran
       return if sms_ignore or sms_serial
       var="#{name}"
       if inside?(Assignment_Stmt)
-        if (f=ancestor(Function_Reference))
-          return unless intrinsic?(f.name)
+        if (fn=ancestor(Function_Reference))           # we're an actual arg
+          return if not (treatment=intrinsic(fn.name)) # fn is not intrinsic
+          return if treatment==:complete               # complete array arg ok
         end
         fail "ERROR: '#{var}' not found in environment" unless (varenv=env[var])
         return unless varenv["decomp"]
+        if defined?(treatment) and treatment==:error
+          fail "ERROR: Distributed-arrary argument '#{var}' incompatible with intrinsic procedure '#{fn.name}'"
+        end
         bounds=[]
         sl=subscript_list
         (1..varenv["dims"]).each do |dim|
@@ -1029,7 +1033,7 @@ module Fortran
       if sms_serial
         # We should handle derived types eventually, but ignore structure
         # components for now.
-        unless inside?(SMS_Serial_Begin,Subroutine_Name) or intrinsic?(name)# or component?
+        unless inside?(SMS_Serial_Begin,Subroutine_Name) or intrinsic(name)# or component?
           varenv=varenv_get(name,self,expected=false)||{}
           unless varenv["subprogram"] or varenv["parameter"]
             env[:sms_serial_info].vars_in_region.add([name,nil])
