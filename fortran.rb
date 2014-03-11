@@ -290,7 +290,7 @@ module Fortran
 
   def sp_intent_stmt(intent_spec,dummy_arg_name_list)
     dummy_arg_name_list.names.each do |x|
-      env["#{x}"]["intent"]="#{intent_spec}"
+      varsetattr(x,"intent","#{intent_spec}")
     end
     true
   end
@@ -430,7 +430,7 @@ module Fortran
         env[:args]=rest.reduce([first]) { |m,x| m.push("#{x.e[1]}") }
         env[:args].each do |arg|
           redef(arg)
-          env[arg]={"intent"=>"inout"}
+          varsetattr(arg,"intent","inout")
         end
       end
     end
