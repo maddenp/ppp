@@ -1906,7 +1906,7 @@ grammar Fortran
   rule intent_stmt
     # F90:R519
 
-    label:label_stmt? t_intent t_paren_l intent_spec t_paren_r double_colon? dummy_arg_name_list t_newline &{ |e| sp_intent_stmt(e[6]) } <Intent_Stmt>
+    label:label_stmt? t_intent t_paren_l intent_spec t_paren_r double_colon? dummy_arg_name_list t_newline &{ |e| sp_intent_stmt(e[3],e[6]) } <Intent_Stmt>
   end
 
   rule interface_block

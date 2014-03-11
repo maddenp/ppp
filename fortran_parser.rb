@@ -17866,7 +17866,7 @@ module Fortran
                   s0 << r10
                   if r10
                     i11 = index
-                    r12 = lambda { |e| sp_intent_stmt(e[6]) }.call(s0)
+                    r12 = lambda { |e| sp_intent_stmt(e[3],e[6]) }.call(s0)
                     if r12
                       @index = i11
                       r11 = instantiate_node(SyntaxNode,input, index...index)

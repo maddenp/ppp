@@ -288,8 +288,10 @@ module Fortran
     true
   end
 
-  def sp_intent_stmt(dummy_arg_name_list)
-    dummy_arg_name_list.names.each { |x| redef(x) }
+  def sp_intent_stmt(intent_spec,dummy_arg_name_list)
+    dummy_arg_name_list.names.each do |x|
+      env["#{x}"]["intent"]="#{intent_spec}"
+    end
     true
   end
 
@@ -426,6 +428,10 @@ module Fortran
         first="#{dummy_arg_list.e[0]}"
         rest=dummy_arg_list.e[1].e
         env[:args]=rest.reduce([first]) { |m,x| m.push("#{x.e[1]}") }
+        env[:args].each do |arg|
+          redef(arg)
+          env[arg]={"intent"=>"inout"}
+        end
       end
     end
     true
@@ -455,7 +461,7 @@ module Fortran
       end
     end
     varattrs=entity_decl_list.varattrs(@distribute)
-    if x=attrchk(attr_spec_option,:dimension?)
+    if (x=attrchk(attr_spec_option,:dimension?))
       array_spec=x.e[0]
       varattrs.each do |v,p|
         p["sort"]="_array"
@@ -464,6 +470,9 @@ module Fortran
     end
     if attrchk(attr_spec_option,:allocatable?)
       varattrs.each { |v,p| p["allocatable"]="_true" }
+    end
+    if (x=attrchk(attr_spec_option,:intent?))
+      varattrs.each { |v,p| p["intent"]="#{x}" }
     end
     if attrchk(attr_spec_option,:parameter?)
       varattrs.each { |v,p| p["parameter"]="_true" }
@@ -1560,6 +1569,10 @@ module Fortran
       attrany(:dimension?)
     end
 
+    def intent?
+      attrany(:intent?)
+    end
+
     def parameter?
       attrany(:parameter?)
     end
@@ -1583,6 +1596,11 @@ module Fortran
   end
 
   class Attr_Spec_Intent < NT
+
+    def intent?
+      e[2]
+    end
+
   end
 
   class Attr_Spec_List < Attr_Spec_Base
@@ -1599,6 +1617,10 @@ module Fortran
 
     def dimension?
       (e[0])?(attrany(:dimension?,e[0].e)):(false)
+    end
+
+    def intent?
+      (e[0])?(attrany(:intent?,e[0].e)):(false)
     end
 
     def parameter?
@@ -1623,6 +1645,10 @@ module Fortran
 
     def dimension?
       e[1].dimension?
+    end
+
+    def intent?
+      e[1].intent?
     end
 
     def parameter?
