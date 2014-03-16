@@ -3242,8 +3242,8 @@ grammar Fortran
   rule stop_code
     # F90:R843
 
-    scalar_char_constant /
-    t_digit 1..5 <T>
+    scalar_char_constant "" <Stop_Code_Character> /
+    t_digit 1..5 <Stop_Code_Numeric>
   end
 
   rule stop_stmt

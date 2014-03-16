@@ -2263,14 +2263,27 @@ module Fortran
     def translate
       return if sms_ignore
       l=label_delete unless (l=label).empty?
+      retcode=0
+      msg=nil
+      if (s=stop_code)
+        if s.numeric?
+          retcode="#{s}"
+        else
+          msg="#{s}"
+        end
+      end
       code=[]
       if sms_serial
-        code.push(sms_stop(1))
+        code.push(sms_stop(retcode))
       else
         use(sms_decompmod)
         declare("logical",sms_rootcheck)
         code.push("#{sa(l)} if (#{sms_rootcheck}()) then")
-        code.push(sms_stop(1))
+        if msg
+          code.push("write (*,'(a)') #{msg}")
+          code.push("call flush(6)")
+        end
+        code.push(sms_stop(retcode))
         code.push("endif")
       end
       replace_statement(code)

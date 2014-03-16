@@ -4274,7 +4274,40 @@ module Fortran
 
   end
 
+  class Stop_Code < NT
+  end
+
+  class Stop_Code_Character < Stop_Code
+
+    def character?
+      true
+    end
+
+    def numeric?
+      false
+    end
+
+  end
+
+  class Stop_Code_Numeric < Stop_Code
+
+    def character?
+      false
+    end
+
+    def numeric?
+      true
+    end
+
+  end
+
   class Stop_Stmt < Stmt
+
+    def stop_code
+      x=e[2]
+      (x.is_a?(Stop_Code))?(x):(nil)
+    end
+
   end
 
   class Structure_Constructor < NT
