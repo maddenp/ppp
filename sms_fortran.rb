@@ -166,7 +166,7 @@ module Fortran
       code+="if (#{statusvar}.ne.0) then\n"
       code+="call sms__comm_rank(#{sms_rankvar})\n"
       code+="write (*,'(a,i0)') \"#{msg} on MPI rank \",#{sms_rankvar}\n"
-      code+="#{sms_stop(retcode)}\n"
+      code+="#{sms_abort(retcode)}\n"
       code+="endif"
     end
 
@@ -466,6 +466,12 @@ module Fortran
       "#{e[0]}#{e[1]} #{s}\n"
     end
 
+    def sms_abort(retcode,msg=nil)
+      use(sms_decompmod)
+      msg="[ #{marker} ]"+((msg)?(" #{msg}"):(""))
+      "call sms__abort(#{retcode},'#{msg}')"
+    end
+
     def sms_bcast(var,type,sizes,dims)
       "call sms__bcast(#{var},#{type},#{sizes},#{dims},#{sms_statusvar})"
     end
@@ -520,10 +526,9 @@ module Fortran
       "sms__status"
     end
 
-    def sms_stop(retcode)
+    def sms_stop(msg=nil)
       use(sms_decompmod)
-      retvar=(retcode==0)?("sms__exit"):("sms__abort")
-      "call sms__stop('#{marker}',#{retcode},#{retvar})"
+      "call sms__stop('#{msg}')"
     end
 
     def sms_type(var)
@@ -2095,7 +2100,7 @@ module Fortran
   class SMS_Stop < SMS
 
     def translate
-      code=sms_stop(0)
+      code=sms_stop
       replace_statement(code)
     end
 
@@ -2263,29 +2268,11 @@ module Fortran
     def translate
       return if sms_ignore
       l=label_delete unless (l=label).empty?
-      retcode=0
-      msg=nil
-      if (s=stop_code)
-        if s.numeric?
-          retcode="#{s}"
-        else
-          msg="#{s}"
-        end
-      end
+      retcode=(stop_code and stop_code.numeric?)?("#{stop_code}"):("0")
+      msg=(stop_code and stop_code.character?)?("#{stop_code}"):(nil)
+      msg=msg.sub(/^['"]/,'').sub(/['"]$/,'') if msg
       code=[]
-      if sms_serial
-        code.push(sms_stop(retcode))
-      else
-        use(sms_decompmod)
-        declare("logical",sms_rootcheck)
-        code.push("#{sa(l)} if (#{sms_rootcheck}()) then")
-        if msg
-          code.push("write (*,'(a)') #{msg}")
-          code.push("call flush(6)")
-        end
-        code.push(sms_stop(retcode))
-        code.push("endif")
-      end
+      code.push(sms_abort(retcode,msg))
       replace_statement(code)
     end
 
