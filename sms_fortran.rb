@@ -450,8 +450,8 @@ module Fortran
       s=env[:global]
       s[:marker]||=0
       m=(s[:marker]+=1)
-      f=File.basename(input.srcfile)
-      "#{f} (translation) marker #{m}"
+      f=File.basename(env[:global][:dstfile])
+      "#{f} marker #{m}"
     end
 
     def maxrank

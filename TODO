@@ -97,9 +97,6 @@
 
 ### TRANSLATION
 
-* Now that the output filename is mandatory, is should be used in place of
-  '(translation) marker' messages in e.g. sms_chkstat calls.
-
 * Add original sms directives to output for non-block directives (or any other
   that are missing from translated output).
 
