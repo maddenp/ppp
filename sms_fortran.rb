@@ -526,9 +526,9 @@ module Fortran
       "sms__status"
     end
 
-    def sms_stop(msg=nil)
+    def sms_stop
       use(sms_decompmod)
-      "call sms__stop('#{msg}')"
+      "call sms__stop"
     end
 
     def sms_type(var)
