@@ -468,7 +468,7 @@ module Fortran
 
     def sms_abort(retcode,msg=nil)
       use(sms_decompmod)
-      msg="[ #{marker} ]"+((msg)?(" #{msg}"):(""))
+      msg="#{marker}"+((msg)?(" [ #{msg} ]"):(""))
       "call sms__abort(#{retcode},'#{msg}')"
     end
 
