@@ -18,7 +18,7 @@ grammar Fortran
     # Note: Any "comment" not stripped out during normalization is a directive.
     # These are non-SMS directives.
 
-    !sms_sentinel "!" character+ t_newline <SMS_Directive>
+    !sms_sentinel "!" character+ t_newline <Directive>
   end
 
   rule executable_construct

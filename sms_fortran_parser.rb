@@ -160,7 +160,7 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(SMS_Directive,input, i0...index, s0)
+      r0 = instantiate_node(Directive,input, i0...index, s0)
       r0.extend(Directive0)
     else
       @index = i0

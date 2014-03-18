@@ -3,9 +3,9 @@ module Sentinels
   def sentinels
     %W[
         $acc
+        dec$
         dir$
         $omp
-        acc$
         sms$
       ]
   end

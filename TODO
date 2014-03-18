@@ -70,6 +70,9 @@
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.
 
+- Intel compiler directives (http://goo.gl/c8q2eu) need independent grammar
+  rules, with scoping to decl, exe, other sections.
+
 ### REFACTORING
 
 * Re-enable continuation lines check, now that exchanges used declared arrays.

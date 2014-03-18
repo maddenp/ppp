@@ -1356,9 +1356,6 @@ module Fortran
   class SMS_Decomp_Name < SMS
   end
 
-  class SMS_Directive < T
-  end
-
   class SMS_Distribute < SMS_Region
   end
 

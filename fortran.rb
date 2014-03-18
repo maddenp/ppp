@@ -2188,12 +2188,7 @@ module Fortran
 
   end
 
-  class Directive < NT
-
-    def str0
-      "!"+e[1].reduce("") { |x| m+="#{x}" }
-    end
-
+  class Directive < T
   end
 
   class Do_Body < NT
