@@ -2260,6 +2260,16 @@ module Fortran
 
   end
 
+  class SMS_Zerotimers < SMS
+
+    def translate
+      code=[]
+      code.push("call sms__zerotimers")
+      replace_statement(code)
+    end
+
+  end
+
   class Stop_Stmt < Stmt
 
     def translate

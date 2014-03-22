@@ -125,7 +125,8 @@ grammar Fortran
     sms_start /
     sms_stop /
     sms_to_local &{ |e| sp_env_pullup(e[0]) } <SMS_Executable_SMS_To_Local> /
-    sms_unstructured_grid
+    sms_unstructured_grid /
+    sms_zerotimers
   end
 
   rule sms_get_communicator
@@ -398,6 +399,10 @@ grammar Fortran
     "unstructured_grid" <T>
   end
 
+  rule sms_t_zerotimers
+    "zerotimers" <T>
+  end
+
   rule sms_to_local
     sms_to_local_begin block sms_to_local_end &{ |e| sp_sms_to_local } <SMS_To_Local>
   end
@@ -438,6 +443,10 @@ grammar Fortran
 
   rule sms_var_list
     variable_name ( t_comma variable_name )* <SMS_Var_List>
+  end
+
+  rule sms_zerotimers
+    sms_sentinel sms_t_zerotimers t_newline <SMS_Zerotimers>
   end
 
 end

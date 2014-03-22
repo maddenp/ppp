@@ -1649,8 +1649,13 @@ module Fortran
                                     if r29
                                       r0 = r29
                                     else
-                                      @index = i0
-                                      r0 = nil
+                                      r30 = _nt_sms_zerotimers
+                                      if r30
+                                        r0 = r30
+                                      else
+                                        @index = i0
+                                        r0 = nil
+                                      end
                                     end
                                   end
                                 end
@@ -4851,6 +4856,30 @@ module Fortran
     r0
   end
 
+  def _nt_sms_t_zerotimers
+    start_index = index
+    if node_cache[:sms_t_zerotimers].has_key?(index)
+      cached = node_cache[:sms_t_zerotimers][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("zerotimers", false, index)
+      r0 = instantiate_node(T,input, index...(index + 10))
+      @index += 10
+    else
+      terminal_parse_failure("zerotimers")
+      r0 = nil
+    end
+
+    node_cache[:sms_t_zerotimers][start_index] = r0
+
+    r0
+  end
+
   module SmsToLocal0
     def sms_to_local_begin
       elements[0]
@@ -5686,6 +5715,55 @@ module Fortran
     end
 
     node_cache[:sms_var_list][start_index] = r0
+
+    r0
+  end
+
+  module SmsZerotimers0
+    def sms_sentinel
+      elements[0]
+    end
+
+    def sms_t_zerotimers
+      elements[1]
+    end
+
+    def t_newline
+      elements[2]
+    end
+  end
+
+  def _nt_sms_zerotimers
+    start_index = index
+    if node_cache[:sms_zerotimers].has_key?(index)
+      cached = node_cache[:sms_zerotimers][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_sentinel
+    s0 << r1
+    if r1
+      r2 = _nt_sms_t_zerotimers
+      s0 << r2
+      if r2
+        r3 = _nt_t_newline
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Zerotimers,input, i0...index, s0)
+      r0.extend(SmsZerotimers0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_zerotimers][start_index] = r0
 
     r0
   end
