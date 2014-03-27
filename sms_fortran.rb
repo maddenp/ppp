@@ -618,7 +618,7 @@ module Fortran
         "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
       end
 
-      return if sms_ignore or sms_serial
+      return if sms_ignore or sms_parallel or sms_serial
       var="#{name}"
       if inside?(Assignment_Stmt)
         if (fn=ancestor(Function_Reference))           # we're an actual arg
@@ -655,11 +655,9 @@ module Fortran
       elsif (iostmt=ancestor(Io_Stmt))
         if known_distributed(var)
           subscript="#{self}".sub(/^#{Regexp.escape(var)}/,'')
-          if not sms_parallel or subscript.empty? # i.e. not a slice or element
-            iostmt.register_io_var(iostmt,:globals,var)
-            code=sms_global_name(var)+subscript
-            replace_element(code,:expr)
-          end
+          iostmt.register_io_var(iostmt,:globals,var)
+          code=sms_global_name(var)+subscript
+          replace_element(code,:expr)
         else
           iostmt.register_io_var(iostmt,:locals,var)
         end
@@ -859,6 +857,7 @@ module Fortran
         end
         globals=meta[:globals]||SortedSet.new
         @onroot=true unless globals.empty?
+        @onroot=false if sms_parallel
         globals.each do |global|
           ((treatment==:in)?(@var_gather):(@var_scatter)).add("#{global}")
         end
