@@ -847,6 +847,9 @@ module Fortran
 
   # Out-of-order class definitions (must be defined before subclassed)
 
+  class Do_Construct < NT
+  end
+
   class Io_Item_List < List
 
     def items
@@ -1705,7 +1708,7 @@ module Fortran
 
   end
 
-  class Block_Do_Construct < NT
+  class Block_Do_Construct < Do_Construct
   end
 
   class Block_Do_Construct_Main < NT
@@ -3643,7 +3646,7 @@ module Fortran
 
   end
 
-  class Nonblock_Do_Construct < NT
+  class Nonblock_Do_Construct < Do_Construct
 
     def label
       e[0].label

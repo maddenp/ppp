@@ -514,6 +514,14 @@ module Fortran
       25
     end
 
+    def sms_parallel_loop
+      if (dc=ancestor(Do_Construct))
+        dc.metadata[:parallel]
+      else
+        false
+      end
+    end
+
     def sms_rankvar
       "sms__rank"
     end
@@ -618,7 +626,7 @@ module Fortran
         "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
       end
 
-      return if sms_ignore or sms_parallel or sms_serial
+      return if sms_ignore or sms_parallel_loop or sms_serial
       var="#{name}"
       if inside?(Assignment_Stmt)
         if (fn=ancestor(Function_Reference))           # we're an actual arg
@@ -687,6 +695,14 @@ module Fortran
 
   end
 
+  class Do_Construct < NT
+
+    def register_as_parallel
+      metadata[:parallel]=true
+    end
+
+  end
+
   class Do_Stmt < Stmt
 
     def translate
@@ -695,12 +711,13 @@ module Fortran
           dd=nil
           [0,1,2].each do |i|
             if p.vars[i].include?("#{do_variable}")
+              ancestor(Do_Construct).register_as_parallel
               dd=i+1
               break
             end
           end
-          dh=p.decomp
           if dd
+            dh=p.decomp
             halo_lo=halo_offsets(dd).lo
             halo_up=halo_offsets(dd).up
             if loop_control.is_a?(Loop_Control_1)
@@ -857,7 +874,7 @@ module Fortran
         end
         globals=metadata[:globals]||SortedSet.new
         @onroot=true unless globals.empty?
-        @onroot=false if sms_parallel
+        @onroot=false if sms_parallel_loop
         globals.each do |global|
           ((treatment==:in)?(@var_gather):(@var_scatter)).add("#{global}")
         end
@@ -1747,7 +1764,7 @@ module Fortran
 
     def translate
 
-      fail "ERROR: Serial regions may not appear inside parallel regions" if sms_parallel
+      fail "ERROR: Serial regions may not appear inside parallel loops" if sms_parallel_loop
 
       serial_begin=e[0]
       oldblock=e[1]
