@@ -593,12 +593,12 @@ module Fortran
     include Common
     include Intrinsics
 
-    attr_accessor :envref,:meta
+    attr_accessor :envref,:metadata
 
     def initialize(*args)
       super(*args)
       @envref=input.envstack.last
-      @meta={}
+      @metadata={}
     end
 
     def ancestor(*classes)

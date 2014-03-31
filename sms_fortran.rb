@@ -655,11 +655,11 @@ module Fortran
       elsif (iostmt=ancestor(Io_Stmt))
         if known_distributed(var)
           subscript="#{self}".sub(/^#{Regexp.escape(var)}/,'')
-          iostmt.register_io_var(iostmt,:globals,var)
+          iostmt.register_io_var(:globals,var)
           code=sms_global_name(var)+subscript
           replace_element(code,:expr)
         else
-          iostmt.register_io_var(iostmt,:locals,var)
+          iostmt.register_io_var(:locals,var)
         end
       end
     end
@@ -855,13 +855,13 @@ module Fortran
         unless [:in,:out].include?(treatment)
           fail "internal error: treatment '#{treatment}' neither :in nor :out"
         end
-        globals=meta[:globals]||SortedSet.new
+        globals=metadata[:globals]||SortedSet.new
         @onroot=true unless globals.empty?
         @onroot=false if sms_parallel
         globals.each do |global|
           ((treatment==:in)?(@var_gather):(@var_scatter)).add("#{global}")
         end
-        if treatment==:out and (locals=meta[:locals])
+        if treatment==:out and (locals=metadata[:locals])
           locals.each { |local| @var_bcast.add(local) if @onroot }
         end
       end
@@ -941,8 +941,8 @@ module Fortran
       end
     end
 
-    def register_io_var(node,key,value)
-      (node.meta[key]||=SortedSet.new).add(value)
+    def register_io_var(key,value)
+      (metadata[key]||=SortedSet.new).add(value)
     end
 
   end
