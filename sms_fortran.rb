@@ -1747,6 +1747,8 @@ module Fortran
 
     def translate
 
+      fail "ERROR: Serial regions may not appear inside parallel regions" if sms_parallel
+
       serial_begin=e[0]
       oldblock=e[1]
       serial_end=e[2]
