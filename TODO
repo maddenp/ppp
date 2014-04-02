@@ -4,6 +4,8 @@
 
 ### ERROR CHECKING / REPORTING
 
+* Forbid 'entry' statement in sms$serial region.
+
 * Error needed when compare_var variable is not distributed or no mod info.
 
 * sms$serial should complain about in/out/inout intent of variables that never
@@ -102,6 +104,10 @@
 
 * Add original sms directives to output for non-block directives (or any other
   that are missing from translated output).
+
+- Perform sms$parallel translation implicitly.
+
+- sms$halo_comp -> one-line directive bound to parallel do loop.
 
 - In SMS_Serial translate, what should halo[l|u] be when dh is nil?
 
