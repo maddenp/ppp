@@ -105,6 +105,12 @@
 * Add original sms directives to output for non-block directives (or any other
   that are missing from translated output).
 
+- Upon serial-region entry, set a flag in sms library indicating the same. Then,
+  prior to executing any MPI collective, verify that flag is not set, which
+  would otherwise lead to a hang. Just before serial-region exit, clear flag.
+  It's crucial here that it is not possible to bypass the set/clear calls via
+  e.g. branching via goto or entry or ... Are there other ways?
+
 - Perform sms$parallel translation implicitly.
 
 - sms$halo_comp -> one-line directive bound to parallel do loop.
