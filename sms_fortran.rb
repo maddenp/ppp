@@ -759,6 +759,14 @@ module Fortran
 
   end
 
+  class Entry_Stmt < Stmt
+
+    def translate
+      fail "ERROR: 'entry' statement may not appear inside serial region" if sms_serial
+    end
+
+  end
+
   class If_Stmt < Stmt
 
     def translate
@@ -870,7 +878,7 @@ module Fortran
     def io_stmt_common(treatment=nil)
       if treatment
         unless [:in,:out].include?(treatment)
-          fail "internal error: treatment '#{treatment}' neither :in nor :out"
+          fail "INTERNAL ERROR: treatment '#{treatment}' neither :in nor :out"
         end
         globals=metadata[:globals]||SortedSet.new
         @onroot=true unless globals.empty?
