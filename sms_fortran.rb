@@ -1156,6 +1156,7 @@ module Fortran
   class SMS_Barrier < SMS
 
     def translate
+      fail "ERROR: Barrier directive may not appear inside serial region" if sms_serial
       use(sms_decompmod)
       code=[]
       code.push("call sms__barrier(#{sms_statusvar})")
@@ -1188,6 +1189,7 @@ module Fortran
     end
 
     def translate
+      fail "ERROR: Compare_Var directive may not appear inside serial region" if sms_serial
       use(sms_decompmod)
       declare("logical","sms__debugging_on")
       var="#{e[3].name}"
@@ -1232,6 +1234,7 @@ module Fortran
     end
 
     def translate
+      fail "ERROR: Create_Decomp directive may not appear inside serial region" if sms_serial
       max=3
       d="#{decomp}"
       n="#{decomp}__nestlevel"
@@ -1340,6 +1343,7 @@ module Fortran
     end
 
     def translate
+      fail "ERROR: Declare_Decomp directive may not appear inside serial region" if sms_serial
       use("sms__module")
       dh="#{e[3]}"
       declare("integer","#{dh}__maxnests",{:attrs=>"parameter",:init=>"1"})
@@ -1422,6 +1426,8 @@ module Fortran
     end
 
     def translate
+
+      fail "ERROR: Exchange directive may not appear inside serial region" if sms_serial
 
       use(sms_decompmod)
       v=e[4].e.reduce([e[3]]) { |m,x| m.push(x.e[1]) }
@@ -1535,6 +1541,10 @@ module Fortran
       "#{e[0]}#{e[1]}#{e[2]}"
     end
 
+    def translate
+      fail "ERROR: Halo_Comp directive may not appear inside serial region" if sms_serial
+    end
+    
   end
 
   class SMS_Halo_Comp_Begin < SMS
@@ -1579,6 +1589,11 @@ module Fortran
   end
 
   class SMS_Ignore < SMS_Region
+
+    def translate
+      fail "ERROR: Ignore directive may not appear inside serial region" if sms_serial
+    end
+    
   end
 
   class SMS_Ignore_Begin < SMS
@@ -1601,6 +1616,10 @@ module Fortran
 
     def str0
       "#{e[0]}#{e[1]}#{e[2]}"
+    end
+
+    def translate
+      fail "ERROR: Parallel directive may not appear inside serial region" if sms_serial
     end
 
   end
@@ -1714,6 +1733,7 @@ module Fortran
     end
 
     def translate
+      fail "ERROR: Reduce directive may not appear inside serial region" if sms_serial
       nvars=vars.size
       fail "ERROR: reduce supports reduction of #{sms_maxvars} variables max" if nvars>sms_maxvars
       use(sms_decompmod)
@@ -1764,6 +1784,7 @@ module Fortran
 
     def translate
 
+      fail "ERROR: Serial directive may not appear inside serial region" if inside?(SMS_Serial)
       fail "ERROR: Serial regions may not appear inside parallel loops" if sms_parallel_loop
 
       serial_begin=e[0]
@@ -2097,6 +2118,7 @@ module Fortran
     end
 
     def translate
+      fail "ERROR: Set_Communicator directive may not appear inside serial region" if sms_serial
       use(sms_decompmod)
       code=[]
       code.push("call sms__set_communicator(#{e[3]},#{sms_statusvar})")
@@ -2109,6 +2131,7 @@ module Fortran
   class SMS_Start < SMS
 
     def translate
+      fail "ERROR: Start directive may not appear inside serial region" if sms_serial
       use(sms_decompmod)
       code=[]
       code.push("call sms__start(#{sms_statusvar})")
@@ -2121,6 +2144,7 @@ module Fortran
   class SMS_Stop < SMS
 
     def translate
+      fail "ERROR: Stop directive may not appear inside serial region" if sms_serial
       code=sms_stop
       replace_statement(code)
     end
@@ -2131,6 +2155,10 @@ module Fortran
 
     def str0
       "#{e[0]}#{e[1]}#{e[2]}"
+    end
+
+    def translate
+      fail "ERROR: To_Local directive may not appear inside serial region" if sms_serial
     end
 
   end
@@ -2222,6 +2250,7 @@ module Fortran
     end
 
     def translate
+      fail "ERROR: Unstructured_Grid directive may not appear inside serial region" if sms_serial
       var="#{e[3]}"
       fail "ERROR: No module info found for variable '#{var}'" unless (varenv=varenv_get(var))
       fail "ERROR: No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
@@ -2287,6 +2316,7 @@ module Fortran
   class SMS_Zerotimers < SMS
 
     def translate
+      fail "ERROR: Zerotimers directive may not appear inside serial region" if sms_serial
       code=[]
       code.push("call sms__zerotimers")
       replace_statement(code)
