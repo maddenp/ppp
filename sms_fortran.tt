@@ -126,6 +126,7 @@ grammar Fortran
     sms_stop /
     sms_to_local &{ |e| sp_env_pullup(e[0]) } <SMS_Executable_SMS_To_Local> /
     sms_unstructured_grid /
+    sms_unstructured_print_timers /
     sms_zerotimers
   end
 
@@ -399,6 +400,10 @@ grammar Fortran
     "unstructured_grid" <T>
   end
 
+  rule sms_t_unstructured_print_timers
+    "unstructured_print_timers" <T>
+  end
+
   rule sms_t_zerotimers
     "zerotimers" <T>
   end
@@ -430,6 +435,10 @@ grammar Fortran
 
   rule sms_unstructured_grid
     sms_sentinel sms_t_unstructured_grid t_paren_l variable_name t_paren_r t_newline <SMS_Unstructured_Grid>
+  end
+
+  rule sms_unstructured_print_timers
+    sms_sentinel sms_t_unstructured_print_timers t_newline <SMS_Unstructured_Print_Timers>
   end
 
   rule sms_varlist3d

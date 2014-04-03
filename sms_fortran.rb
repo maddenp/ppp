@@ -564,7 +564,9 @@ module Fortran
           fail "ERROR: #{description} query's argument must be an integer scalar"
         end
       end
-      code="call #{function}(#{var})"
+      code=[]
+      code.push("#{self}")
+      code.push("call #{function}(#{var})")
       replace_statement(code)
     end
 
@@ -1167,6 +1169,7 @@ module Fortran
       fail "ERROR: sms$barrier may not appear inside sms$serial region" if sms_serial
       use(sms_decompmod)
       code=[]
+      code.push("#{self}")
       code.push("call sms__barrier(#{sms_statusvar})")
       code.push(sms_chkstat)
       replace_statement(code)
@@ -1210,6 +1213,7 @@ module Fortran
       perms=code_perms(varenv)
       dh=code_decomp(varenv["decomp"],:scalar)
       code=[]
+      code.push("#{self}")
       code.push("if (sms__debugging_on()) then")
       code.push("call sms__compare_var(#{dh},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},#{sms_statusvar})")
       code.push(sms_chkstat)
@@ -1250,6 +1254,7 @@ module Fortran
       declare("integer","sms__periodicusedlower",{:dims=>%W[sms__max_decomposed_dims]})
       declare("integer","sms__periodicusedupper",{:dims=>%W[sms__max_decomposed_dims]})
       code=[]
+      code.push("#{self}")
       code.push("#{n}=1")
       code.push("#{d}__nregions=1")
       max.times do |i|
@@ -1757,6 +1762,7 @@ module Fortran
       sizes="(/#{sizes.join(",")}/)"
       types="(/#{types.join(",")}/)"
       code=[]
+      code.push("#{self}")
       code.push("call sms__reduce_#{nvars}(#{sizes},#{types},sms__op_#{op},#{sms_statusvar},#{vars.join(',')})")
       code.push(sms_chkstat)
       replace_statement(code)
@@ -2129,6 +2135,7 @@ module Fortran
       fail "ERROR: sms$set_communicator may not appear inside sms$serial region" if sms_serial
       use(sms_decompmod)
       code=[]
+      code.push("#{self}")
       code.push("call sms__set_communicator(#{e[3]},#{sms_statusvar})")
       code.push(sms_chkstat)
       replace_statement(code)
@@ -2142,6 +2149,7 @@ module Fortran
       fail "ERROR: sms$start may not appear inside sms$serial region" if sms_serial
       use(sms_decompmod)
       code=[]
+      code.push("#{self}")
       code.push("call sms__start(#{sms_statusvar})")
       code.push(sms_chkstat)
       replace_statement(code)
@@ -2153,7 +2161,9 @@ module Fortran
 
     def translate
       fail "ERROR: sms$stop may not appear inside sms$serial region" if sms_serial
-      code=sms_stop
+      code=[]
+      code.push("#{self}")
+      code.push(sms_stop)
       replace_statement(code)
     end
 
@@ -2264,11 +2274,23 @@ module Fortran
       fail "ERROR: No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
       use(sms_decompmod)
       code=[]
+      code.push("#{self}")
       code.push("call sms__unstructuredgrid(#{dh},size(#{var},1),#{var})")
       code.push("call sms__get_collapsed_halo_size(#{dh}(#{dh}__nestlevel),1,1,#{dh}__localhalosize,#{sms_statusvar})")
       code.push(sms_chkstat)
       code.push("#{dh}__s1(1,1,#{dh}__nestlevel)=#{dh}__s1(1,0,#{dh}__nestlevel)")
       code.push("#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),1,#{dh}__nestlevel)=#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),0,#{dh}__nestlevel)+#{dh}__localhalosize")
+      replace_statement(code)
+    end
+
+  end
+
+  class SMS_Unstructured_Print_Timers < SMS
+
+    def translate
+      code=[]
+      code.push("#{self}")
+      code.push("call sms__unstructured_print_timers")
       replace_statement(code)
     end
 
@@ -2326,6 +2348,7 @@ module Fortran
     def translate
       fail "ERROR: sms$zerotimers may not appear inside sms$serial region" if sms_serial
       code=[]
+      code.push("#{self}")
       code.push("call sms__zerotimers")
       replace_statement(code)
     end

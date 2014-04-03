@@ -100,9 +100,6 @@
 
 ### TRANSLATION
 
-* Add original sms directives to output for non-block directives (or any other
-  that are missing from translated output).
-
 - Upon serial-region entry, set a flag in sms library indicating the same. Then,
   prior to executing any MPI collective, verify that flag is not set, which
   would otherwise lead to a hang. Just before serial-region exit, clear flag.
