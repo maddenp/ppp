@@ -4,8 +4,6 @@
 
 ### ERROR CHECKING / REPORTING
 
-* Forbid 'entry' statement in sms$serial region.
-
 * Error needed when compare_var variable is not distributed or no mod info.
 
 * sms$serial should complain about in/out/inout intent of variables that never
