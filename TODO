@@ -67,8 +67,6 @@
 
 ### REFACTORING
 
-* Re-enable continuation lines check, now that exchanges used declared arrays.
-
 * Factor more sms text out into T sms_* methods (esp library calls).
 
 * More helper functions for e.g. sms_halo_comp() for env[:sms_halo_comp].

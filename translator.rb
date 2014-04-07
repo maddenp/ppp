@@ -340,9 +340,9 @@ class Translator
               cont+=1
             end while e.length>maxcols
             t+=e
-#           if cont>maxcont
-#             die "ERROR: More than #{maxcont} continuation lines:\n\n#{t}"
-#           end
+            if cont>maxcont
+              die "ERROR: More than #{maxcont} continuation lines:\n\n#{t}"
+            end
             a[n]=t
           end
         end
