@@ -1801,8 +1801,12 @@ module Fortran
       "#{e[0]}#{e[1]}#{e[2]}"
     end
 
-    def missing(name,x)
+    def not_in_env(name,x)
       fail "ERROR: sms$serial-region '#{x}' variable '#{name}' not found in environment"
+    end
+
+    def not_in_region(name,x)
+      fail "ERROR: variable '#{name}' not found in sms$serial region '#{x}'"
     end
 
     def translate
@@ -1825,7 +1829,8 @@ module Fortran
       scatters=[]
 
       # Globally-sized variables must be allocated/deallocated for distributed
-      # arrays appearing within serial regions. Here's a set to track them.
+      # arrays appearing within serial regions. Here's a set, initially empty,
+      # to track them.
 
       globals=SortedSet.new
       
@@ -1833,14 +1838,43 @@ module Fortran
 
       si=env[:sms_serial_info]
 
-      # Any occurrences of names with in/out treatment specified are overriden
-      # by occurrences lacking this specificity. That is, if elements ["a",:in]
-      # and "a" are both registered, the former should be ignored, so we delete
-      # it here.
+      # The vars_in_region set contains names occurring in the serial-region
+      # body (rather than in the sms$serial directive itself) and, optionally,
+      # an inferred :in or :out treatment. A specific variable name may exist
+      # more than once in the set, with different (or no) treatment specified.
+      # An instance of a name with 'in' or 'out' treatment is overriden by an
+      # instance lacking this specificity. That is: If ["a",:in] and ["a"] both
+      # exist, the former is a weaker requirement than the latter (which implies
+      # 'inout' treatment) and so should be removed, which we do here.
 
       si.vars_in_region.delete_if do |name|
         name.last and si.vars_in_region.include?(name.first)
       end
+
+      # Reject variables specified in the sms$ignore directive that are not
+      # actually present in the serial region.
+
+      def presence_check(directive_set,region_set,treatment)
+        directive_set.each do |directive_var|
+          found=false
+          region_set.each do |region_var|
+            if "#{region_var.first}"=="#{directive_var}"
+              found=true
+              break
+            end
+          end
+          unless found
+            fail "ERROR: sms$serial '#{treatment}' variable "+
+              "'#{directive_var}' not present in serial region"
+          end
+        end
+      end
+
+      vars_inout=Set.new(si.vars_in).intersection(Set.new(si.vars_out))
+      presence_check(vars_inout,si.vars_in_region,"inout")
+      presence_check(si.vars_ignore,si.vars_in_region,"ignore")
+      presence_check(si.vars_in,si.vars_in_region,"in")
+      presence_check(si.vars_out,si.vars_in_region,"out")
 
       # Iterate over the set of names that occurred in the region.
 
@@ -1875,7 +1909,7 @@ module Fortran
 
         if si.vars_in.include?(name)
 
-          missing(name,"in") unless varenv
+          not_in_env(name,"in") unless varenv
 
           # Ensure that conflicting 'ignore' intent was not specified.
 
@@ -1897,7 +1931,7 @@ module Fortran
 
         if si.vars_out.include?(name)
 
-          missing(name,"out") unless varenv
+          not_in_env(name,"out") unless varenv
 
           # Ensure that conflicting 'ignore' intent was not specified.
 
@@ -1923,7 +1957,7 @@ module Fortran
           # serial region must be globalized.
 
           d="#{si.default}"
-          missing(name,d) unless varenv or d=="ignore"
+          not_in_env(name,d) unless varenv or d=="ignore"
           gathers.push(name) if dh and (d=="in" or d=="inout") and not treatment==:out
           if d=="out" or d=="inout"
             ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name) unless treatment==:in

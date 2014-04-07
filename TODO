@@ -4,9 +4,6 @@
 
 ### ERROR CHECKING / REPORTING
 
-* sms$serial should complain about in/out/inout intent of variables that never
-  occur in the region. Or should we force bcast/gather/scatter of these?
-
 * sms$serial should complain about mismatches, e.g. explicitly specifying a
   variable as both 'in' and 'ignore'. Is this already in place?
 
