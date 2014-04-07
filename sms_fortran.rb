@@ -243,11 +243,19 @@ module Fortran
     end
 
     def code_global_lower_bounds(varenv,var,dims)
-      "(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+      if dims
+        "(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:l)) }.join(",")+"/)"
+      else
+        "(/"+ranks.map { |r| 1 }.join(",")+"/)"
+      end
     end
 
     def code_global_upper_bounds(varenv,var,dims)
-      "(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+      if dims
+        "(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
+        else
+        "(/"+ranks.map { |r| 1 }.join(",")+"/)"
+      end
     end
 
     def code_local_bound(dh,dd,lu)
@@ -1212,6 +1220,7 @@ module Fortran
       glubs=code_global_upper_bounds(varenv,var,dims)
       perms=code_perms(varenv)
       dh=code_decomp(varenv["decomp"],:scalar)
+      dims||="1"
       code=[]
       code.push("#{self}")
       code.push("if (sms__debugging_on()) then")
