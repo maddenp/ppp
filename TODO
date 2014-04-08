@@ -24,6 +24,23 @@
 
 ### PARSING
 
+* rule variable is broken: See parse tree for program 'i=1\nend'. 'i' is parsed
+  as data_ref. It seems that some mechanism to differentiate between user-
+  defined and intrinsic types is needed. Also, probably user-defined type
+  information  needs to be in the environment, written to .sms mod files, etc.
+
+* Structure constructor recognition is broken, is parsed as function reference.
+  See t0151. May also be related to need to track, store, load user-defined type
+  info.
+
+* IIRC, parsing of allocate_object is broken, in that the variable_name option
+  (2nd choice) will never be chosen because structure_component always matches.
+  Need more sophisticated logic...
+
+* In fortran.tt, rule array_spec makes a claim about a bad parse. The comment
+  should include a case to demonstrate this, so that the comment can be removed
+  if/when the parse problem is corrected.
+
 - Deduce types of implicit variables. We cannot require 'implicit none'.
 
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
@@ -37,23 +54,6 @@
 
 - write-stmt seems to parse wrong, 'write' recognized as Data_Ref. This could be
   a problem re: implicit translation of write io statements.
-
-- rule variable is broken: See parse tree for program 'i=1\nend'. 'i' is parsed
-  as data_ref. It seems that some mechanism to differentiate between user-
-  defined and intrinsic types is needed. Also, probably user-defined type
-  information  needs to be in the environment, written to .sms mod files, etc.
-
-- Structure constructor recognition is broken, is parsed as function reference.
-  See t0151. May also be related to need to track, store, load user-defined type
-  info.
-
-- IIRC, parsing of allocate_object is broken, in that the variable_name option
-  (2nd choice) will never be chosen because structure_component always matches.
-  Need more sophisticated logic...
-
-- In fortran.tt, rule array_spec makes a claim about a bad parse. The comment
-  should include a case to demonstrate this, so that the comment can be removed
-  if/when the parse problem is corrected.
 
 - Intel compiler directives (http://goo.gl/c8q2eu) need independent grammar
   rules, with scoping to decl, exe, other sections.
