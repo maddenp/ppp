@@ -4586,7 +4586,7 @@ module Fortran
   class Where_Stmt < Stmt
 
     def str0
-      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} #{e[6]}".strip)
+      stmt("#{e[1]} #{e[2]}#{e[3]}#{e[4]} "+e[6].to_s.strip)
     end
 
   end

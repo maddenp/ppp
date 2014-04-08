@@ -638,7 +638,7 @@ module Fortran
 
       return if sms_ignore or sms_parallel_loop or sms_serial
       var="#{name}"
-      if inside?(Assignment_Stmt)
+      if inside?(Assignment_Stmt,Where_Construct,Where_Stmt)
         if (fn=ancestor(Function_Reference))           # we're an actual arg
           return if not (treatment=intrinsic(fn.name)) # fn is not intrinsic
           return if treatment==:complete               # complete array arg ok

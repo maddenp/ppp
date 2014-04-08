@@ -8,9 +8,6 @@
 
 ### NEW FEATURES
 
-* Does where-stmt need implicit parallelization? Currently, it operates on halo
-  memory as well.
-
 ### NORMALIZATION
 
 - Replace ad-hoc normalizer with (maybe) Ragel-based transformer. Should handle
