@@ -31,19 +31,19 @@ module Fortran
 
   def sp_sms_halo_comp_begin(halo_comp_pairs)
     fail "ERROR: sms$halo_comp invalid outside sms$parallel region" unless sms_parallel
-    fail "ERROR: Already inside sms$halo_comp region" if env[:sms_halo_comp]
+    fail "ERROR: Already inside sms$halo_comp region" if sms_halo_comp
     envpush(false)
     dims={}
     dims[1]=halo_comp_pairs.e[0]
     dims[2]=halo_comp_pairs.e[1].e[1] if halo_comp_pairs.e[1].e
     dims[3]=halo_comp_pairs.e[2].e[1] if halo_comp_pairs.e[2].e
     env[:sms_halo_comp]={}
-    dims.each { |k,v| env[:sms_halo_comp][k]=OpenStruct.new({:lo=>"#{v.lo}",:up=>"#{v.up}"}) }
+    dims.each { |k,v| sms_halo_comp[k]=OpenStruct.new({:lo=>"#{v.lo}",:up=>"#{v.up}"}) }
     true
   end
 
   def sp_sms_halo_comp_end
-    fail "ERROR: Not inside sms$halo_comp region" unless env[:sms_halo_comp]
+    fail "ERROR: Not inside sms$halo_comp region" unless sms_halo_comp
     true
   end
 
@@ -105,7 +105,7 @@ module Fortran
   end
 
   def sp_sms_to_local_begin(sms_decomp_name,sms_to_local_lists)
-    fail "ERROR: Already inside sms$to_local region" if env[:sms_to_local]
+    fail "ERROR: Already inside sms$to_local region" if sms_to_local
     envpush(false)
     env[:sms_to_local]=sms_to_local_lists.vars.each do |var,props|
       props.dh="#{sms_decomp_name}"
@@ -114,7 +114,7 @@ module Fortran
   end
 
   def sp_sms_to_local_end
-    fail "ERROR: Not inside sms$to_local region" unless env[:sms_to_local]
+    fail "ERROR: Not inside sms$to_local region" unless sms_to_local
     true
   end
 
@@ -418,7 +418,7 @@ module Fortran
     def halo_offsets(dd)
       halo_lo=0
       halo_up=0
-      if halocomp=env[:sms_halo_comp]
+      if halocomp=sms_halo_comp
         offsets=halocomp[dd]
         halo_lo=offsets.lo
         halo_up=offsets.up
@@ -829,7 +829,7 @@ module Fortran
         nmlenv["objects"].each do |x|
           varenv=varenv_get(x,self,expected=true)
           if serial_intent==:out or varenv["decomp"]
-            env[:sms_serial_info].vars_in_region.add([x,serial_intent])
+            sms_serial_info.vars_in_region.add([x,serial_intent])
           end
         end
       end
@@ -1054,7 +1054,7 @@ module Fortran
 
     def translate
       # Handle to_local
-      if tolocal=env[:sms_to_local] and p=tolocal["#{name}"]
+      if tolocal=sms_to_local and p=tolocal["#{name}"]
         case "#{p.key}"
         when "lbound"
           se="s#{p.dd}"
@@ -1075,7 +1075,7 @@ module Fortran
         unless inside?(SMS_Serial_Begin,Subroutine_Name) or intrinsic(name)# or component?
           varenv=varenv_get(name,self,expected=false)||{}
           unless varenv["subprogram"] or varenv["parameter"]
-            env[:sms_serial_info].vars_in_region.add([name,nil])
+            sms_serial_info.vars_in_region.add([name,nil])
           end
         end
       end
@@ -1836,7 +1836,7 @@ module Fortran
       
       # Get the serial info recorded when the serial_begin statement was parsed.
 
-      si=env[:sms_serial_info]
+      si=sms_serial_info
 
       # The vars_in_region set contains names occurring in the serial-region
       # body (rather than in the sms$serial directive itself) and, optionally,
@@ -2025,13 +2025,13 @@ module Fortran
     end
 
     def translate
-      si=env[:sms_serial_info]=OpenStruct.new
+      si=sms_serial_info=OpenStruct.new
       si.default=("#{e[2]}".empty?)?("inout"):("#{e[2].default}")
       si.vars_in_region=SortedSet.new
       si.vars_ignore=("#{e[2]}".empty?)?([]):(e[2].vars_ignore)
       si.vars_in=("#{e[2]}".empty?)?([]):(e[2].vars_in)
       si.vars_out=("#{e[2]}".empty?)?([]):(e[2].vars_out)
-      parent.env[:sms_serial_info]=env[:sms_serial_info]
+      parent.env[:sms_serial_info]=sms_serial_info
     end
 
   end

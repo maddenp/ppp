@@ -34,6 +34,10 @@ module Common
     File.join(File.expand_path(d),"#{m}#{envext}")
   end
 
+  def sms_halo_comp
+    env[:sms_halo_comp]
+  end
+
   def sms_ignore
     env[:sms_ignore]
   end
@@ -44,6 +48,14 @@ module Common
 
   def sms_serial
     env[:sms_serial]
+  end
+
+  def sms_serial_info
+    env[:sms_serial_info]
+  end
+
+  def sms_to_local
+    env[:sms_to_local]
   end
 
   def use_localnames(modulename)

@@ -67,10 +67,6 @@
 
 ### REFACTORING
 
-* Factor more sms text out into T sms_* methods (esp library calls).
-
-* More helper functions for e.g. sms_halo_comp() for env[:sms_halo_comp].
-
 - Implement register/exchange scheme.
 
 - In e.g. SMS_Exchange, rename maxrank -> ppp_max_rank and sms_maxvars -> 
