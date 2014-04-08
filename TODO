@@ -6,10 +6,6 @@
 
 ### GRAMMAR
 
-* Implement a continuation scheme (following Fortran!) for SMS directives. This
-  probably goes in class Translator in sms_fortran.rb, to be executed alongside
-  sms$[insert|remove] during early lexical transformations.
-
 ### NEW FEATURES
 
 * Does where-stmt need implicit parallelization? Currently, it operates on halo

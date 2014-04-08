@@ -2446,14 +2446,16 @@ end # module Fortran
 class Translator
 
   def prepsrc_free(s)
-    s=s.gsub(/^\s*!sms\$insert\s*/i,"")                            # process inserts
-    s=s.gsub(/^\s*!sms\$remove\s+begin.*?!sms\$remove\s+end/im,"") # process removes
+    s=s.gsub(/^\s*(!sms\$.*)&\s*\n\s*!sms\$&(.*)/im,'\1\2')             # continuations
+    s=s.gsub(/^\s*!sms\$insert\s*/i,"")                                 # inserts
+    s=s.gsub(/^\s*!sms\$remove\s+begin.*?!sms\$remove\s+end/im,"")      # removes
     s
   end
 
   def prepsrc_fixed(s)
-    s=s.gsub(/^[c\*]sms\$insert\s*/i,"")
-    s=s.gsub(/^[c\*]sms\$remove\s+begin.*?[c\*]sms\$remove\s+end/im, "")
+    s=s.gsub(/^([c\*]sms\$.*)&\s*\n[c\*]sms\$&(.*)/im,'\1\2')           # continuations
+    s=s.gsub(/^[c\*]sms\$insert\s*/i,"")                                # inserts
+    s=s.gsub(/^[c\*]sms\$remove\s+begin.*?[c\*]sms\$remove\s+end/im,"") # removes
     s
   end
 
