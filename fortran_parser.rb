@@ -1188,7 +1188,7 @@ module Fortran
   end
 
   module AllocateObject1
-    def structure_component
+    def variable_name
       elements[1]
     end
   end
@@ -1204,7 +1204,7 @@ module Fortran
   end
 
   module AllocateObject3
-    def variable_name
+    def structure_component
       elements[1]
     end
   end
@@ -1245,7 +1245,7 @@ module Fortran
     end
     s1 << r2
     if r2
-      r6 = _nt_structure_component
+      r6 = _nt_variable_name
       s1 << r6
     end
     if s1.last
@@ -1282,7 +1282,7 @@ module Fortran
       end
       s7 << r8
       if r8
-        r12 = _nt_variable_name
+        r12 = _nt_structure_component
         s7 << r12
       end
       if s7.last
@@ -1394,16 +1394,6 @@ module Fortran
   end
 
   module AllocateShapeSpec0
-    def allocate_lower_bound
-      elements[0]
-    end
-
-    def t_colon
-      elements[1]
-    end
-  end
-
-  module AllocateShapeSpec1
     def allocate_upper_bound
       elements[1]
     end
@@ -1421,20 +1411,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    i2, s2 = index, []
-    r3 = _nt_allocate_lower_bound
-    s2 << r3
-    if r3
-      r4 = _nt_t_colon
-      s2 << r4
-    end
-    if s2.last
-      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
-      r2.extend(AllocateShapeSpec0)
-    else
-      @index = i2
-      r2 = nil
-    end
+    r2 = _nt_allocate_shape_spec_option
     if r2
       r1 = r2
     else
@@ -1442,18 +1419,59 @@ module Fortran
     end
     s0 << r1
     if r1
-      r5 = _nt_allocate_upper_bound
-      s0 << r5
+      r3 = _nt_allocate_upper_bound
+      s0 << r3
     end
     if s0.last
       r0 = instantiate_node(Allocate_Shape_Spec,input, i0...index, s0)
-      r0.extend(AllocateShapeSpec1)
+      r0.extend(AllocateShapeSpec0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:allocate_shape_spec][start_index] = r0
+
+    r0
+  end
+
+  module AllocateShapeSpecOption0
+    def allocate_lower_bound
+      elements[0]
+    end
+
+    def t_colon
+      elements[1]
+    end
+  end
+
+  def _nt_allocate_shape_spec_option
+    start_index = index
+    if node_cache[:allocate_shape_spec_option].has_key?(index)
+      cached = node_cache[:allocate_shape_spec_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_allocate_lower_bound
+    s0 << r1
+    if r1
+      r2 = _nt_t_colon
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Allocate_Shape_Spec_Option,input, i0...index, s0)
+      r0.extend(AllocateShapeSpecOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:allocate_shape_spec_option][start_index] = r0
 
     r0
   end
@@ -30124,6 +30142,13 @@ module Fortran
     r0
   end
 
+  module StructureComponent0
+    def data_ref
+      elements[0]
+    end
+
+  end
+
   def _nt_structure_component
     start_index = index
     if node_cache[:structure_component].has_key?(index)
@@ -30135,7 +30160,26 @@ module Fortran
       return cached
     end
 
-    r0 = _nt_data_ref
+    i0, s0 = index, []
+    r1 = _nt_data_ref
+    s0 << r1
+    if r1
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
+      else
+        terminal_parse_failure("")
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Structure_Component,input, i0...index, s0)
+      r0.extend(StructureComponent0)
+    else
+      @index = i0
+      r0 = nil
+    end
 
     node_cache[:structure_component][start_index] = r0
 
@@ -36120,12 +36164,19 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      if has_terminal?("", false, index)
-        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
-        @index += 0
+      i2 = index
+      if has_terminal?("%", false, index)
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        @index += 1
       else
-        terminal_parse_failure("")
+        terminal_parse_failure("%")
+        r3 = nil
+      end
+      if r3
         r2 = nil
+      else
+        @index = i2
+        r2 = instantiate_node(SyntaxNode,input, index...index)
       end
       s0 << r2
     end

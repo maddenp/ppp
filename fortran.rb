@@ -706,6 +706,12 @@ module Fortran
       env[:global][:level]||=0
     end
 
+    def list_idx(node)
+      return 0 if e[0].object_id==node.object_id
+      e.size.times { |n| return n+1 if e[n].e[1].object_id==node.object_id }
+      nil
+    end
+
     def list_str
       s="#{e[0]}"
       s=e[1].e.reduce(s) { |m,x| m+"#{x.e[0]}#{x.e[1]}" } if e[1].e
@@ -837,6 +843,10 @@ module Fortran
   end
 
   class List < NT
+
+    def idx(node)
+      list_idx(node)
+    end
 
     def str0
       list_str
@@ -1283,7 +1293,14 @@ module Fortran
     end
 
     def name
-      e[1].name
+      if e[1].is_a?(Variable_Name) or e[1].is_a?(Structure_Component)
+        return e[1].name
+      end
+      fail "ERROR: Unexpected allocate object class '#{e[1].class}'"
+    end
+
+    def subscript_list
+      item.subscript_list
     end
 
   end
@@ -1313,9 +1330,34 @@ module Fortran
   end
 
   class Allocate_Shape_Spec < NT
+
+    def allocate_lower_bound
+      (e[0].is_a?(Allocate_Shape_Spec_Option))?(e[0].allocate_lower_bound):("1")
+    end
+
+    def allocate_upper_bound
+      e[1]
+    end
+
+    def dim
+      (idx=ancestor(Allocate_Shape_Spec_List).idx(self))?(idx+1):(nil)
+    end
+
+    def name
+      ancestor(Allocation).name
+    end
+
   end
 
   class Allocate_Shape_Spec_List < List
+  end
+
+  class Allocate_Shape_Spec_Option < NT
+
+    def allocate_lower_bound
+      e[0]
+    end
+
   end
 
   class Allocate_Stat_Construct < NT
@@ -1339,8 +1381,16 @@ module Fortran
 
   class Allocation < NT
 
+    def item
+      e[0]
+    end
+
     def name
-      e[0].name
+      item.name
+    end
+
+    def subscript_list
+      item.subscript_list
     end
 
   end
@@ -4377,6 +4427,14 @@ module Fortran
     def stop_code
       x=e[2]
       (x.is_a?(Stop_Code))?(x):(nil)
+    end
+
+  end
+
+  class Structure_Component < NT
+
+    def name
+      e[0].name
     end
 
   end

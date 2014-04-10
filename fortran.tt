@@ -160,8 +160,8 @@ grammar Fortran
   rule allocate_object
     # F90:R625
 
-    !( t_stat t_equal ) structure_component <Allocate_Object> /
-    !( t_stat t_equal ) variable_name <Allocate_Object>
+    !( t_stat t_equal ) variable_name <Allocate_Object> /
+    !( t_stat t_equal ) structure_component <Allocate_Object>
   end
 
   rule allocate_object_list
@@ -175,7 +175,11 @@ grammar Fortran
   rule allocate_shape_spec
     # F90:R626
 
-    ( allocate_lower_bound t_colon )? allocate_upper_bound <Allocate_Shape_Spec>
+    allocate_shape_spec_option? allocate_upper_bound <Allocate_Shape_Spec>
+  end
+
+  rule allocate_shape_spec_option
+    allocate_lower_bound t_colon <Allocate_Shape_Spec_Option>
   end
 
   rule allocate_shape_spec_list
@@ -3261,7 +3265,7 @@ grammar Fortran
   rule structure_component
     # F90:R614
 
-    data_ref
+    data_ref "" <Structure_Component>
   end
 
   rule structure_constructor
@@ -4037,7 +4041,7 @@ grammar Fortran
   rule variable_name
     # Multiple uses (not explicitly defined)
 
-    name "" <Variable_Name>
+    name !"%" <Variable_Name>
   end
 
   rule vector_subscript

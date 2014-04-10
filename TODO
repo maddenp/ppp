@@ -24,10 +24,6 @@
 
 ### PARSING
 
-* IIRC, parsing of allocate_object is broken, in that the variable_name option
-  (2nd choice) will never be chosen because structure_component always matches.
-  Need more sophisticated logic...
-
 * In fortran.tt, rule array_spec makes a claim about a bad parse. The comment
   should include a case to demonstrate this, so that the comment can be removed
   if/when the parse problem is corrected.

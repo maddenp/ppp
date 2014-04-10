@@ -652,37 +652,18 @@ module Fortran
 
   # Grammar-supporting subclasses
 
-  class Allocate_Object < NT
+  class Allocate_Shape_Spec < NT
 
     def translate
-      if inside?(Allocate_Stmt)
-        allocate_object=e[1]
-        if allocate_object.is_a?(Data_Ref)
-          data_ref=allocate_object
-          return if data_ref.derived_type? # see TODO re: AoS & SoA
-          part_ref=data_ref.rightmost
-          var=part_ref.name
-          varenv=varenv_get(var,self,false)
-          if varenv and (dh=varenv["decomp"])
-            use(sms_decompmod)
-            sl=part_ref.subscript_list
-            newdims=[]
-            sl.each_index do |i|
-              arrdim=i+1
-              if (dd=decdim(varenv,arrdim))
-                newdims.push(code_local_bound(dh,dd,:l)+":"+code_local_bound(dh,dd,:u))
-              else
-                newdims.push("#{sl[i]}")
-              end
-            end
-            code="#{var}(#{newdims.join(",")})"
-            replace_element(code,:allocate_object)
-          end
-        else
-          fail "ERROR: Encountered unexpected variable name '#{var}'"
+      var="#{name}"
+      varenv=varenv_get(var,self,false)
+      if varenv and (dh=varenv["decomp"])
+        use(sms_decompmod)
+        arrdim=dim
+        if (dd=decdim(varenv,arrdim))
+          code=code_local_bound(dh,dd,:l)+":"+code_local_bound(dh,dd,:u)
+          replace_element(code,:allocate_shape_spec)
         end
-      else
-        # Do not translate inside a deallocate_stmt
       end
     end
 
