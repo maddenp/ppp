@@ -24,10 +24,6 @@
 
 ### PARSING
 
-* Structure constructor recognition is broken, is parsed as function reference.
-  See t0151. May also be related to need to track, store, load user-defined type
-  info.
-
 * IIRC, parsing of allocate_object is broken, in that the variable_name option
   (2nd choice) will never be chosen because structure_component always matches.
   Need more sophisticated logic...

@@ -184,6 +184,13 @@ module Fortran
     end
   end
 
+  def sp_derived_type_def(derived_type_stmt)
+    type_name="#{derived_type_stmt.name}"
+    env[type_name]||={}
+    env[type_name]["sort"]="type"
+    true
+  end
+
   def sp_dimension_stmt(array_names_and_specs)
     array_names_and_specs.e.each do |x|
       if x.is_a?(Array_Name_And_Spec)
@@ -316,6 +323,13 @@ module Fortran
     vargetattr(node.name,"sort")=="_array"
   end
 
+  def sp_is_function_name?(node)
+    return true if vargetattr("#{node}","subprogram")=="_function"
+    return false if sp_is_array?(node)
+    return false if vargetattr("#{node}","sort")=="type"
+    true # just a guess at this point
+  end
+
   def sp_label(label)
     n=label.e.reduce("") { |m,x| m+"#{x}" }.to_i
     (env[:global][:labels]||=SortedSet.new).add(n)
@@ -413,6 +427,10 @@ module Fortran
       save_stmt_entity_list.names.each { |x| redef x }
     end
     true
+  end
+
+  def sp_structure_constructor(node)
+    vargetattr("#{node}","sort")=="type"
   end
 
   def sp_subroutine_stmt(subroutine_name,dummy_arg_list_option)
@@ -2200,6 +2218,10 @@ module Fortran
   end
 
   class Derived_Type_Stmt < Stmt
+
+    def name
+      e[3]
+    end
 
     def str0
       stmt("#{e[1]}#{sb(e[2])} #{e[3]}")

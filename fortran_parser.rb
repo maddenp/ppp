@@ -10148,6 +10148,7 @@ module Fortran
     def end_type_stmt
       elements[3]
     end
+
   end
 
   def _nt_derived_type_def
@@ -10173,6 +10174,17 @@ module Fortran
         if r3
           r4 = _nt_end_type_stmt
           s0 << r4
+          if r4
+            i5 = index
+            r6 = lambda { |e| sp_derived_type_def(e[0]) }.call(s0)
+            if r6
+              @index = i5
+              r5 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r5 = nil
+            end
+            s0 << r5
+          end
         end
       end
     end
@@ -15054,11 +15066,12 @@ module Fortran
     r1 = _nt_name
     s0 << r1
     if r1
-      if has_terminal?("", false, index)
-        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
-        @index += 0
+      i2 = index
+      r3 = lambda { |e| sp_is_function_name?(e[0]) }.call(s0)
+      if r3
+        @index = i2
+        r2 = instantiate_node(SyntaxNode,input, index...index)
       else
-        terminal_parse_failure("")
         r2 = nil
       end
       s0 << r2
@@ -15160,7 +15173,6 @@ module Fortran
     def t_paren_r
       elements[3]
     end
-
   end
 
   def _nt_function_reference
@@ -15191,17 +15203,6 @@ module Fortran
         if r3
           r5 = _nt_t_paren_r
           s0 << r5
-          if r5
-            i6 = index
-            r7 = lambda { |e| sp_is_array?(e[0]) }.call(s0)
-            if r7
-              r6 = nil
-            else
-              @index = i6
-              r6 = instantiate_node(SyntaxNode,input, index...index)
-            end
-            s0 << r6
-          end
         end
       end
     end
@@ -26443,23 +26444,23 @@ module Fortran
     if r1
       r0 = r1
     else
-      r2 = _nt_variable
+      r2 = _nt_structure_constructor
       if r2
         r0 = r2
       else
-        r3 = _nt_constant
+        r3 = _nt_variable
         if r3
           r0 = r3
         else
-          r4 = _nt_constant_subobject
+          r4 = _nt_constant
           if r4
             r0 = r4
           else
-            r5 = _nt_array_constructor
+            r5 = _nt_constant_subobject
             if r5
               r0 = r5
             else
-              r6 = _nt_structure_constructor
+              r6 = _nt_array_constructor
               if r6
                 r0 = r6
               else
@@ -30157,6 +30158,7 @@ module Fortran
     def t_paren_r
       elements[3]
     end
+
   end
 
   def _nt_structure_constructor
@@ -30182,6 +30184,17 @@ module Fortran
         if r3
           r4 = _nt_t_paren_r
           s0 << r4
+          if r4
+            i5 = index
+            r6 = lambda { |e| sp_structure_constructor(e[0]) }.call(s0)
+            if r6
+              @index = i5
+              r5 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              r5 = nil
+            end
+            s0 << r5
+          end
         end
       end
     end

@@ -1036,7 +1036,7 @@ grammar Fortran
   rule derived_type_def
     # F90:R422
 
-    derived_type_stmt private_sequence_stmts component_def_stmts end_type_stmt <Derived_Type_Def>
+    derived_type_stmt private_sequence_stmts component_def_stmts end_type_stmt &{ |e| sp_derived_type_def(e[0]) } <Derived_Type_Def>
   end
 
   rule derived_type_stmt
@@ -1607,7 +1607,7 @@ grammar Fortran
   rule function_name
     # Multiple uses (not explicitly defined)
 
-    name "" <Function_Name>
+    name &{ |e| sp_is_function_name?(e[0]) } <Function_Name>
   end
 
   rule function_prefix
@@ -1626,7 +1626,7 @@ grammar Fortran
   rule function_reference
     # F90:R1209
 
-    function_name t_paren_l actual_arg_spec_list? t_paren_r !{ |e| sp_is_array?(e[0]) } <Function_Reference>
+    function_name t_paren_l actual_arg_spec_list? t_paren_r <Function_Reference>
   end
 
   rule function_stmt
@@ -2764,11 +2764,11 @@ grammar Fortran
     # F90:R701
 
     function_reference /
+    structure_constructor /
     variable /
     constant /
     constant_subobject /
     array_constructor /
-    structure_constructor /
     parenthesized_expr
   end
 
@@ -3267,7 +3267,7 @@ grammar Fortran
   rule structure_constructor
     # F90:R430
 
-    type_name t_paren_l expr_list t_paren_r <Structure_Constructor>
+    type_name t_paren_l expr_list t_paren_r &{ |e| sp_structure_constructor(e[0]) } <Structure_Constructor>
   end
 
   rule subroutine_name
