@@ -118,6 +118,72 @@ module Fortran
     true
   end
 
+  # Modules
+
+  module Array_Translation
+
+    def translate
+
+      def getbound(var,dim,lu,cb=nil)
+        varenv=env[var]
+        return "#{cb}" unless (dd=decdim(varenv,dim))
+        dh=varenv["decomp"]
+        nl="#{dh}__nestlevel"
+        a1="#{dh}__#{(lu==:l)?('s'):('e')}1"
+        a2="#{dh}__#{(lu==:l)?('low'):('upper')}bounds(#{dd},#{nl})"
+        "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
+      end
+
+      return if sms_ignore or sms_parallel_loop or sms_serial
+      var="#{name}"
+      if inside?(Assignment_Stmt,Where_Construct,Where_Stmt)
+        if (fn=ancestor(Function_Reference))           # we're an actual arg
+          return if not (treatment=intrinsic(fn.name)) # fn is not intrinsic
+          return if treatment==:complete               # complete array arg ok
+        end
+        fail "ERROR: '#{var}' not found in environment" unless (varenv=env[var])
+        return unless varenv["decomp"]
+        if defined?(treatment) and treatment==:error
+          fail "ERROR: Distributed-arrary argument '#{var}' incompatible with intrinsic procedure '#{fn.name}'"
+        end
+        bounds=[]
+        sl=subscript_list
+        (1..varenv["dims"]).each do |dim|
+          if sl and (s=sl[dim-1])
+            if s.is_a?(Subscript)
+              bounds[dim-1]="#{s.subscript}"
+            elsif s.is_a?(Subscript_Triplet)
+              b=getbound(var,dim,:l,s.lower)+":"+getbound(var,dim,:u,s.upper)
+              b+=":#{s.stride}" if s.stride and "#{s.stride}"!="1"
+              bounds[dim-1]=b
+            elsif s.is_a?(Vector_Subscript)
+              fail "INTERNAL ERROR: in Array_Translation#translate: Please report to developers."
+            else
+              bounds[dim-1]="#{s}"
+            end
+          else
+            bounds[dim-1]=getbound(var,dim,:l)+":"+getbound(var,dim,:u)
+          end
+        end
+        boundslist=(1..varenv["dims"]).map{ |dim| bounds[dim-1] }.join(",")
+        code="#{var}(#{boundslist})"
+        replace_element(code,:variable)
+      elsif (iostmt=ancestor(Io_Stmt))
+        if known_distributed(var)
+          subscript="#{self}".sub(/^#{Regexp.escape(var)}/,'')
+          iostmt.register_io_var(:globals,var)
+          code=sms_global_name(var)+subscript
+          replace_element(code,:expr)
+        else
+          iostmt.register_io_var(:locals,var)
+        end
+      end
+    end
+
+  end
+
+  # Generic classes
+
   class T < Treetop::Runtime::SyntaxNode
 
     def code_alloc_dealloc_globals(globals)
@@ -622,68 +688,6 @@ module Fortran
 
   end
 
-  class Array_Section < NT
-
-    def translate
-
-      def getbound(var,dim,lu,cb=nil)
-        varenv=env[var]
-        return "#{cb}" unless (dd=decdim(varenv,dim))
-        dh=varenv["decomp"]
-        nl="#{dh}__nestlevel"
-        a1="#{dh}__#{(lu==:l)?('s'):('e')}1"
-        a2="#{dh}__#{(lu==:l)?('low'):('upper')}bounds(#{dd},#{nl})"
-        "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
-      end
-
-      return if sms_ignore or sms_parallel_loop or sms_serial
-      var="#{name}"
-      if inside?(Assignment_Stmt,Where_Construct,Where_Stmt)
-        if (fn=ancestor(Function_Reference))           # we're an actual arg
-          return if not (treatment=intrinsic(fn.name)) # fn is not intrinsic
-          return if treatment==:complete               # complete array arg ok
-        end
-        fail "ERROR: '#{var}' not found in environment" unless (varenv=env[var])
-        return unless varenv["decomp"]
-        if defined?(treatment) and treatment==:error
-          fail "ERROR: Distributed-arrary argument '#{var}' incompatible with intrinsic procedure '#{fn.name}'"
-        end
-        bounds=[]
-        sl=subscript_list
-        (1..varenv["dims"]).each do |dim|
-          if sl and (s=sl[dim-1])
-            if s.is_a?(Subscript)
-              bounds[dim-1]="#{s.subscript}"
-            elsif s.is_a?(Subscript_Triplet)
-              b=getbound(var,dim,:l,s.lower)+":"+getbound(var,dim,:u,s.upper)
-              b+=":#{s.stride}" if s.stride and "#{s.stride}"!="1"
-              bounds[dim-1]=b
-            elsif s.is_a?(Vector_Subscript)
-              fail "INTERNAL ERROR: in Array_Section#translate: Please report to developers."
-            else
-              bounds[dim-1]="#{s}"
-            end
-          else
-            bounds[dim-1]=getbound(var,dim,:l)+":"+getbound(var,dim,:u)
-          end
-        end
-        boundslist=(1..varenv["dims"]).map{ |dim| bounds[dim-1] }.join(",")
-        code="#{var}(#{boundslist})"
-        replace_element(code,:array_section)
-      elsif (iostmt=ancestor(Io_Stmt))
-        if known_distributed(var)
-          subscript="#{self}".sub(/^#{Regexp.escape(var)}/,'')
-          iostmt.register_io_var(:globals,var)
-          code=sms_global_name(var)+subscript
-          replace_element(code,:expr)
-        else
-          iostmt.register_io_var(:locals,var)
-        end
-      end
-    end
-
-  end
-
   class Array_Name_And_Spec < NT
 
     def translate
@@ -693,6 +697,14 @@ module Fortran
       distribute_array_bounds(spec,varenv)
     end
 
+  end
+
+  class Array_Section < NT
+    include Array_Translation
+  end
+
+  class Array_Variable_Name < Variable_Name
+    include Array_Translation
   end
 
   class Close_Stmt < Io_Stmt
@@ -1037,10 +1049,6 @@ module Fortran
     def globalize
       code=sms_global_name(self)
       replace_element(code,:name)
-    end
-
-    def length
-      "#{self}".length
     end
 
     def name
@@ -1495,7 +1503,7 @@ module Fortran
 
         # Derived types are not currently supported.
 
-        if this.data_ref.derived_type?
+        if this.derived_type?
           fail "ERROR: Derived type instance '#{this}' may not be exchanged"
         end
 

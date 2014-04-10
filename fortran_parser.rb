@@ -2591,6 +2591,13 @@ module Fortran
     r0
   end
 
+  module ArrayVariableName0
+    def variable_name
+      elements[0]
+    end
+
+  end
+
   def _nt_array_variable_name
     start_index = index
     if node_cache[:array_variable_name].has_key?(index)
@@ -2602,7 +2609,27 @@ module Fortran
       return cached
     end
 
-    r0 = _nt_variable_name
+    i0, s0 = index, []
+    r1 = _nt_variable_name
+    s0 << r1
+    if r1
+      i2 = index
+      r3 = lambda { |e| sp_is_array?(e[0]) }.call(s0)
+      if r3
+        @index = i2
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Array_Variable_Name,input, i0...index, s0)
+      r0.extend(ArrayVariableName0)
+    else
+      @index = i0
+      r0 = nil
+    end
 
     node_cache[:array_variable_name][start_index] = r0
 
@@ -28899,6 +28926,13 @@ module Fortran
     r0
   end
 
+  module ScalarVariableName0
+    def variable_name
+      elements[0]
+    end
+
+  end
+
   def _nt_scalar_variable_name
     start_index = index
     if node_cache[:scalar_variable_name].has_key?(index)
@@ -28910,7 +28944,26 @@ module Fortran
       return cached
     end
 
-    r0 = _nt_variable_name
+    i0, s0 = index, []
+    r1 = _nt_variable_name
+    s0 << r1
+    if r1
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
+      else
+        terminal_parse_failure("")
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Scalar_Variable_Name,input, i0...index, s0)
+      r0.extend(ScalarVariableName0)
+    else
+      @index = i0
+      r0 = nil
+    end
 
     node_cache[:scalar_variable_name][start_index] = r0
 
@@ -35907,6 +35960,27 @@ module Fortran
     r0
   end
 
+  module Variable0
+    def array_variable_name
+      elements[0]
+    end
+
+  end
+
+  module Variable1
+    def scalar_variable_name
+      elements[0]
+    end
+
+  end
+
+  module Variable2
+    def subobject
+      elements[0]
+    end
+
+  end
+
   def _nt_variable
     start_index = index
     if node_cache[:variable].has_key?(index)
@@ -35919,17 +35993,86 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_subobject
+    i1, s1 = index, []
+    r2 = _nt_array_variable_name
+    s1 << r2
+    if r2
+      i3 = index
+      if has_terminal?('\G[\\(\\%]', true, index)
+        r4 = true
+        @index += 1
+      else
+        r4 = nil
+      end
+      if r4
+        r3 = nil
+      else
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
+      end
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(Variable,input, i1...index, s1)
+      r1.extend(Variable0)
+    else
+      @index = i1
+      r1 = nil
+    end
     if r1
       r0 = r1
     else
-      r2 = _nt_array_variable_name
-      if r2
-        r0 = r2
+      i5, s5 = index, []
+      r6 = _nt_scalar_variable_name
+      s5 << r6
+      if r6
+        i7 = index
+        if has_terminal?('\G[\\(\\%]', true, index)
+          r8 = true
+          @index += 1
+        else
+          r8 = nil
+        end
+        if r8
+          r7 = nil
+        else
+          @index = i7
+          r7 = instantiate_node(SyntaxNode,input, index...index)
+        end
+        s5 << r7
+      end
+      if s5.last
+        r5 = instantiate_node(Variable,input, i5...index, s5)
+        r5.extend(Variable1)
       else
-        r3 = _nt_scalar_variable_name
-        if r3
-          r0 = r3
+        @index = i5
+        r5 = nil
+      end
+      if r5
+        r0 = r5
+      else
+        i9, s9 = index, []
+        r10 = _nt_subobject
+        s9 << r10
+        if r10
+          if has_terminal?("", false, index)
+            r11 = instantiate_node(SyntaxNode,input, index...(index + 0))
+            @index += 0
+          else
+            terminal_parse_failure("")
+            r11 = nil
+          end
+          s9 << r11
+        end
+        if s9.last
+          r9 = instantiate_node(Variable,input, i9...index, s9)
+          r9.extend(Variable2)
+        else
+          @index = i9
+          r9 = nil
+        end
+        if r9
+          r0 = r9
         else
           @index = i0
           r0 = nil

@@ -294,7 +294,7 @@ grammar Fortran
   rule array_variable_name
     # Section 6 (not explicitly defined)
 
-    variable_name
+    variable_name &{ |e| sp_is_array?(e[0]) } <Array_Variable_Name>
   end
 
   rule assign_stmt
@@ -3096,7 +3096,7 @@ grammar Fortran
   rule scalar_variable_name
     # Section 6 (not explicitly defined)
 
-    variable_name
+    variable_name "" <Scalar_Variable_Name>
   end
 
   rule section_subscript
@@ -4029,9 +4029,9 @@ grammar Fortran
   rule variable
     # F90:R601
 
-    subobject /
-    array_variable_name /
-    scalar_variable_name
+    array_variable_name ![\(\%] <Variable> /
+    scalar_variable_name ![\(\%] <Variable> /
+    subobject "" <Variable>
   end
 
   rule variable_name

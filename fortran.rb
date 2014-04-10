@@ -173,14 +173,10 @@ module Fortran
   end
 
   def sp_default_char_variable?(var)
-    if var.is_a?(Name)
-      # fine as-is
-    elsif var.is_a?(Data_Ref)
-      var=var.rightmost.name
-    else
-      fail "ERROR: Unexpected node type"
+    unless var.is_a?(Variable)
+      fail "ERROR: Unexpected node type '#{var.class}' for variable '#{var}'"
     end
-    varenv=env["#{var}"]
+    varenv=env["#{var.name}"]
     if varenv and varenv["type"]=="character" and varenv["kind"]=="_default"
       true
     else
@@ -586,7 +582,7 @@ module Fortran
 
   end
 
-  # Generic subclasses
+  # Generic classes
 
   class T < Treetop::Runtime::SyntaxNode
 
@@ -1152,6 +1148,18 @@ module Fortran
 
   end
 
+  class Variable_Name < NT
+
+    def length
+      name.length
+    end
+
+    def name
+      e[0]
+    end
+
+  end
+
   # Grammar-supporting subclasses
 
   class AC_Implied_Do < NT
@@ -1413,6 +1421,14 @@ module Fortran
       e[0]
     end
 
+    def derived_type?
+      data_ref.derived_type?
+    end
+
+    def length
+      data_ref.length
+    end
+
     def name
       data_ref.name
     end
@@ -1430,6 +1446,30 @@ module Fortran
   class Array_Spec < NT
 
     def spec
+      e[0]
+    end
+
+  end
+
+  class Array_Variable_Name < Variable_Name
+
+    def length
+      name.length
+    end
+
+    def name
+      variable_name.name
+    end
+
+    def subscript_list
+      nil
+    end
+
+    def substring_range
+      nil
+    end
+
+    def variable_name
       e[0]
     end
 
@@ -2024,8 +2064,12 @@ module Fortran
       not e[1].e.empty?
     end
 
+    def length
+      name.length
+    end
+
     def name
-      (derived_type?)?("#{self}"):(rightmost.name)
+      rightmost.name
     end
 
     def part_ref
@@ -3529,6 +3573,10 @@ module Fortran
 
   class Name < NT
 
+    def length
+      "#{self}".length
+    end
+
     def name
       self
     end
@@ -4197,6 +4245,9 @@ module Fortran
 
   end
 
+  class Scalar_Variable_Name < Variable_Name
+  end
+
   class Section_Subscript_List < List
 
     def subscript_list
@@ -4547,10 +4598,34 @@ module Fortran
 
   end
 
-  class Variable_Name < NT
+  class Variable < NT
+
+    def array_section
+      (e[0].is_a?(Array_Section))?(e[0]):(nil)
+    end
+
+    def data_ref
+      (x=array_section)?(x.data_ref):(nil)
+    end
+
+    def derived_type?
+      (x=array_section)?(x.derived_type?):(false)
+    end
+
+    def length
+      name.length
+    end
 
     def name
-      e[0]
+      e[0].name
+    end
+
+    def subscript_list
+      (x=array_section)?(x.subscript_list):([])
+    end
+
+    def substring_range
+      (x=array_section)?(x.e[2]):(nil)
     end
 
   end
