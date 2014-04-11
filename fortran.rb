@@ -708,7 +708,9 @@ module Fortran
 
     def list_idx(node)
       return 0 if e[0].object_id==node.object_id
-      e.size.times { |n| return n+1 if e[n].e[1].object_id==node.object_id }
+      e[1].e.size.times do |n|
+        return n+1 if e[1].e[n].e[1].object_id==node.object_id
+      end
       nil
     end
 
