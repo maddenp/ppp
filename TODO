@@ -37,9 +37,6 @@
   status of the element as a scalar or an array, respectively. This information
   is not available here, now.
 
-* write-stmt seems to parse wrong, 'write' recognized as Data_Ref. This could be
-  a problem re: implicit translation of write io statements.
-
 - Deduce types of implicit variables. We cannot require 'implicit none'.
 
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
