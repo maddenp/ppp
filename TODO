@@ -24,9 +24,16 @@
 
 ### PARSING
 
-* In fortran.tt, rule array_spec makes a claim about a bad parse. The comment
-  should include a case to demonstrate this, so that the comment can be removed
-  if/when the parse problem is corrected.
+* In fortran.tt, rule array_spec: A deferred_shape_spec_list will be incorrectly
+  recognized as an assumed_shape_spec_list, as it's (apparently) impossible to
+  differentiate all cases with only information encountered so far. This is
+  corrected in tree post-processing.
+
+* In fortran.tt, rule section_subscript: The vector_subscript choice will
+  probably never be selected without parsing improvements. Choices 'subscript'
+  and 'vector_subscript' should be distinguished, per R617 and R621, by the
+  status of the element as a scalar or an array, respectively. This information
+  is not available here, now.
 
 - Deduce types of implicit variables. We cannot require 'implicit none'.
 

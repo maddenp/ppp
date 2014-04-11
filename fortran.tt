@@ -284,11 +284,6 @@ grammar Fortran
 
   rule array_spec
     # F90:R512
-    #
-    # Note: A deferred_shape_spec_list will be (incorrectly) recognized as an
-    # assumed_shape_spec_list, as it's (apparently) impossible to differentiate
-    # all cases with only information encountered so far. This is corrected in
-    # tree post-processing.
 
     assumed_size_spec "" <Array_Spec> /
     explicit_shape_spec_list "" <Array_Spec> /
@@ -3105,11 +3100,6 @@ grammar Fortran
 
   rule section_subscript
     # F90:R618
-    #
-    # Note: The vector_subscript choice will probably never be selected without
-    # parsing improvements. Choices 'subscript' and 'vector_subscript' should be
-    # distinguished, per R617 and R621, by the status of the element as a scalar
-    # or an array, respectively. This information is not available here, now.
 
     subscript_triplet /
     subscript /
