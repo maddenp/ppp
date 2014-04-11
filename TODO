@@ -1,6 +1,8 @@
 ### ENVIRONMENT
 
-- Derived types provided by modules should appear in envfiles.
+- Derived types provided by modules should appear in envfiles. Update: A start
+  has been made here, in that derived-type names are now registered in the
+  environment with {"sort"=>"type"}. The type's contents need to be added.
 
 ### ERROR CHECKING / REPORTING
 
@@ -35,6 +37,9 @@
   status of the element as a scalar or an array, respectively. This information
   is not available here, now.
 
+* write-stmt seems to parse wrong, 'write' recognized as Data_Ref. This could be
+  a problem re: implicit translation of write io statements.
+
 - Deduce types of implicit variables. We cannot require 'implicit none'.
 
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
@@ -45,9 +50,6 @@
   Main_Program e.g.) check *there* for expected class vs SyntaxNode and return
   nil for the latter (i.e. the optional element is not present). This factors
   the knowledge about the grammar into the appropriate class.
-
-- write-stmt seems to parse wrong, 'write' recognized as Data_Ref. This could be
-  a problem re: implicit translation of write io statements.
 
 - Intel compiler directives (http://goo.gl/c8q2eu) need independent grammar
   rules, with scoping to decl, exe, other sections.
@@ -72,12 +74,6 @@
   'dimension' and 'rank' are used, and what would be best.
 
 ### TRANSLATION
-
-- Upon serial-region entry, set a flag in sms library indicating the same. Then,
-  prior to executing any MPI collective, verify that flag is not set, which
-  would otherwise lead to a hang. Just before serial-region exit, clear flag.
-  It's crucial here that it is not possible to bypass the set/clear calls via
-  e.g. branching via goto or entry or ... Are there other ways?
 
 - Perform sms$parallel translation implicitly.
 

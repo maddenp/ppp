@@ -170,7 +170,7 @@ module Fortran
         replace_element(code,:variable)
       elsif (iostmt=ancestor(Io_Stmt))
         if known_distributed(var)
-          subscript="#{self}".sub(/^#{Regexp.escape(var)}/,'')
+          subscript="#{self}".sub(/^#{Regexp.escape(var)}/,"")
           iostmt.register_io_var(:globals,var)
           code=sms_global_name(var)+subscript
           replace_element(code,:expr)
@@ -243,13 +243,13 @@ module Fortran
         sort=varenv["sort"]
         type=varenv["type"]
         if type=="character"
-          arg2=(sort=="_scalar")?("1"):("size(#{var})")
+          arg2=(sort=="scalar")?("1"):("size(#{var})")
           code.push("if (#{iostat}.eq.0) then") if iostat
           code.push(sms_bcast_char(var,arg2))
           code.push(sms_chkstat)
           code.push("endif") if iostat
         else
-          if sort=="_scalar"
+          if sort=="scalar"
             dims="1"
             sizes="(/1/)"
           else
@@ -404,7 +404,7 @@ module Fortran
           lenopt="(len=#{props[:len]})"
         end
         kind=props[:kind]
-        kind=([nil,"_default"].include?(kind))?(""):("(kind=#{kind})")
+        kind=([nil,"default"].include?(kind))?(""):("(kind=#{kind})")
         attrs=props[:attrs]||[]
         attrs=[attrs] unless attrs.is_a?(Array)
         attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
@@ -467,9 +467,9 @@ module Fortran
 
     def fixbound(varenv,var,dim,x)
       bound=varenv["#{x}b#{dim}"]
-      fail "ERROR: Bad upper bound: #{bound}" if bound=="_default" and x==:u
-      return 1 if bound=="_default" and x==:l
-      if ["_assumed","_deferred","_explicit"].include?(bound)
+      fail "ERROR: Bad upper bound: #{bound}" if bound=="default" and x==:u
+      return 1 if bound=="default" and x==:l
+      if ["assumed","deferred","explicit"].include?(bound)
         if (dd=decdim(varenv,dim))
           dh=varenv["decomp"]
           lu=(x==:l)?("low"):("upper")
@@ -501,7 +501,7 @@ module Fortran
     end
 
     def known_array(var)
-      (varenv=known(var)) and varenv["sort"]=="_array"
+      (varenv=known(var)) and varenv["sort"]=="array"
     end
 
     def known_distributed(var)
@@ -513,7 +513,7 @@ module Fortran
     end
 
     def known_scalar(var)
-      (varenv=known(var)) and varenv["sort"]=="_scalar"
+      (varenv=known(var)) and varenv["sort"]=="scalar"
     end
 
     def known_uservar(var)
@@ -634,7 +634,7 @@ module Fortran
       # Check the sort and type of the indicated variable, if it exists in the
       # environment. If not, carry on and hope for the best.
       if (varenv=varenv_get(var,self,false))
-        unless varenv["sort"]=="_scalar" and varenv["type"]=="integer"
+        unless varenv["sort"]=="scalar" and varenv["type"]=="integer"
           fail "ERROR: #{description} query's argument must be an integer scalar"
         end
       end
@@ -743,7 +743,7 @@ module Fortran
       var="#{name}"
       varenv=varenv_get(var)
       spec=nil
-      if varenv["sort"]=="_array"
+      if varenv["sort"]=="array"
         if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
           # entity_decl_array_spec case
           spec=entity_decl_array_spec.e[1].spec
@@ -1144,10 +1144,10 @@ module Fortran
       # compile-time values.
 
       env.each do |k,v|
-        next if k.is_a?(Symbol) or not v["sort"]=="_array" or not v["decomp"]
+        next if k.is_a?(Symbol) or not v["sort"]=="array" or not v["decomp"]
         (1..v["dims"].to_i).each do |dim|
           ["lb","ub"].each do |lub|
-            if (b=v["#{lub}#{dim}"]) and b=="_explicit"
+            if (b=v["#{lub}#{dim}"]) and b=="explicit"
               fail "ERROR: Static distributed array ('#{k}') not supported"
             end
           end
@@ -1754,7 +1754,7 @@ module Fortran
         var=vars[i]
         varenv=varenv_get(var)
         fail "ERROR: sms$reduce inapplicable to distributed array '#{var}'" if varenv["decomp"]
-        sizes.push((varenv["sort"]=="_array")?("size(#{var})"):("1"))
+        sizes.push((varenv["sort"]=="array")?("size(#{var})"):("1"))
         types.push(sms_type(var))
       end
       sizes="(/#{sizes.join(",")}/)"
@@ -1882,7 +1882,7 @@ module Fortran
 
         # Ignore namelist names.
 
-        next if sort=="_namelist"
+        next if sort=="namelist"
 
         # Handle 'ingore' variables. A decomposed variable must be globalized
         # even if it is not gathered/scattered.
@@ -1931,7 +1931,7 @@ module Fortran
           # Broadcast non-decomposed and scatter decomposed arrays, and note
           # that the default intent no longer applies.
 
-          ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name) unless treatment==:in
+          ((sort=="scalar"||!dh)?(bcasts):(scatters)).push(name) unless treatment==:in
           globals.add(name) if dh
           default=false
         end
@@ -1949,7 +1949,7 @@ module Fortran
           not_in_env(name,d) unless varenv or d=="ignore"
           gathers.push(name) if dh and (d=="in" or d=="inout") and not treatment==:out
           if d=="out" or d=="inout"
-            ((sort=="_scalar"||!dh)?(bcasts):(scatters)).push(name) unless treatment==:in
+            ((sort=="scalar"||!dh)?(bcasts):(scatters)).push(name) unless treatment==:in
           end
           globals.add(name) if dh
         end
@@ -2394,7 +2394,7 @@ module Fortran
       l=label_delete unless (l=label).empty?
       retcode=(stop_code and stop_code.numeric?)?("#{stop_code}"):("0")
       msg=(stop_code and stop_code.character?)?("#{stop_code}"):(nil)
-      msg=msg.sub(/^['"]/,'').sub(/['"]$/,'') if msg
+      msg=msg.sub(/^['"]/,"").sub(/['"]$/,"") if msg
       code=[]
       code.push(sms_abort(retcode,msg))
       replace_statement(code)
@@ -2410,7 +2410,7 @@ module Fortran
         add_serial_region_vars(:in)
       else        
         io_stmt_init
-        function=(env["#{unit}"] and env["#{unit}"]["subprogram"]=="_function")
+        function=(env["#{unit}"] and env["#{unit}"]["subprogram"]=="function")
         @onroot=false if unit.is_a?(Internal_File_Unit) or function
         if (namelist_name=nml)
           @onroot=true

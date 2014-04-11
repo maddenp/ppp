@@ -104,14 +104,14 @@ module Fortran
     elsif access_spec.public?
       p="public"
     else
-      p="_default"
+      p="default"
     end
     if access_stmt_option.is_a?(Access_Stmt_Option)
       access_stmt_option.names.each { |x| varsetattr(x,"access",p) }
     else
       @access=p
       env.each do |n,h|
-        varsetattr(n,"access",p) if vargetattr(n,"access")=="_default"
+        varsetattr(n,"access",p) if vargetattr(n,"access")=="default"
       end
     end
     true
@@ -125,10 +125,10 @@ module Fortran
       # Record that this var has been marked allocatable, which means that it
       # must be an array with deferred bounds.
       env[:allocatable].push(var)
-      varsetattr(var,"sort","_array")
+      varsetattr(var,"sort","array")
       # Correct for the case where this array has already been seen and its
       # bounds incorrectly marked as assumed.
-      env[var].keys.each { |k| env[var][k]="_deferred" if k=~/[lu]b\d+/ }
+      env[var].keys.each { |k| env[var][k]="deferred" if k=~/[lu]b\d+/ }
     end
     # In case this array has not previously been seen, record its array specs.
     a.items.each do |x|
@@ -177,7 +177,7 @@ module Fortran
       fail "ERROR: Unexpected node type '#{var.class}' for variable '#{var}'"
     end
     varenv=env["#{var.name}"]
-    if varenv and varenv["type"]=="character" and varenv["kind"]=="_default"
+    if varenv and varenv["type"]=="character" and varenv["kind"]=="default"
       true
     else
       nil
@@ -201,7 +201,7 @@ module Fortran
         env[var].merge!(array_attrs(array_spec,{},@distribute))
       end
     end
-    array_names_and_specs.names.each { |x| varsetattr(x,"sort","_array") }
+    array_names_and_specs.names.each { |x| varsetattr(x,"sort","array") }
     true
   end
 
@@ -243,7 +243,7 @@ module Fortran
 
   def sp_function_stmt(function_name,dummy_arg_name_list,result_option)
     envpush
-    (env["#{function_name}"]||={})["subprogram"]="_function"
+    (env["#{function_name}"]||={})["subprogram"]="function"
     if result_option.is_a?(Result_Option)
       env[:result]="#{result_option.name}"
     end
@@ -258,7 +258,7 @@ module Fortran
   def sp_function_subprogram(function_stmt)
     var="#{function_stmt.name}"
     varenv=(env[var]||={})
-    varenv["sort"]||="_scalar"
+    varenv["sort"]||="scalar"
     access=varenv["access"]||@access
     if (type_spec=function_stmt.type_spec)
       varenv["kind"]="#{type_spec.kind}"
@@ -320,11 +320,11 @@ module Fortran
 
   def sp_is_array?(node)
     return false unless node.respond_to?(:name)
-    vargetattr(node.name,"sort")=="_array"
+    vargetattr(node.name,"sort")=="array"
   end
 
   def sp_is_function_name?(node)
-    return true if vargetattr("#{node}","subprogram")=="_function"
+    return true if vargetattr("#{node}","subprogram")=="function"
     return false if sp_is_array?(node)
     return false if vargetattr("#{node}","sort")=="type"
     true # just a guess at this point
@@ -352,7 +352,7 @@ module Fortran
       module_subprogram_part.subprograms.each do |x|
         k="#{x.name}"
         if x.env[k].has_key?("subprogram")
-          if x.env[k]["subprogram"]=="_function"
+          if x.env[k]["subprogram"]=="function"
             fn_env[k]=x.env[k]
           end
         end
@@ -363,7 +363,7 @@ module Fortran
     # specification-part, part, so always write out the module file.
     write_envfile(module_stmt.name,env)
     envpop
-    @access="_default"
+    @access="default"
     true
   end
 
@@ -374,7 +374,7 @@ module Fortran
 
   def sp_namelist_group_name?(name)
     return false unless (varenv=env["#{name}"])
-    varenv["sort"]=="_namelist"
+    varenv["sort"]=="namelist"
   end
 
   def sp_namelist_stmt(first,rest)
@@ -382,7 +382,7 @@ module Fortran
       name="#{set.name}"
       redef(name)
       env[name]||={}
-      env[name]["sort"]="_namelist"
+      env[name]["sort"]="namelist"
       env[name]["objects"]||=[]
       env[name]["access"]||=@access
       set.objects.each { |object| env[name]["objects"].push("#{object}") }
@@ -407,7 +407,7 @@ module Fortran
   def sp_parameter_stmt(named_constant_def_list)
     named_constant_def_list.names.each do |x|
       redef(x)
-      varsetattr(x,"parameter","_true")
+      varsetattr(x,"parameter",true)
     end
     true
   end
@@ -435,7 +435,7 @@ module Fortran
 
   def sp_subroutine_stmt(subroutine_name,dummy_arg_list_option)
     envpush
-    (env["#{subroutine_name}"]||={})["subprogram"]="_subroutine"
+    (env["#{subroutine_name}"]||={})["subprogram"]="subroutine"
     if dummy_arg_list_option.e
       if dummy_arg_list_option.e[1].is_a?(Dummy_Arg_List)
         dummy_arg_list=dummy_arg_list_option.e[1]
@@ -462,7 +462,7 @@ module Fortran
         fail "ERROR: Unexpected node type"
       end
       var="#{x.name}"
-      varsetattr(var,"sort","_array") if x.is_a?(Array_Name_And_Spec)
+      varsetattr(var,"sort","array") if x.is_a?(Array_Name_And_Spec)
       redef(var)
     end
     true
@@ -470,7 +470,7 @@ module Fortran
 
   def sp_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
     entity_decl_list.names.each do |x|
-      unless (varenv=env["#{x}"]) and varenv["subprogram"]=="_function"
+      unless (varenv=env["#{x}"]) and varenv["subprogram"]=="function"
         redef(x)
       end
     end
@@ -478,18 +478,18 @@ module Fortran
     if (x=attrchk(attr_spec_option,:dimension?))
       array_spec=x.e[0]
       varattrs.each do |v,p|
-        p["sort"]="_array"
+        p["sort"]="array"
         array_attrs(array_spec,p,@distribute)
       end
     end
     if attrchk(attr_spec_option,:allocatable?)
-      varattrs.each { |v,p| p["allocatable"]="_true" }
+      varattrs.each { |v,p| p["allocatable"]=true }
     end
     if (x=attrchk(attr_spec_option,:intent?))
       varattrs.each { |v,p| p["intent"]="#{x}" }
     end
     if attrchk(attr_spec_option,:parameter?)
-      varattrs.each { |v,p| p["parameter"]="_true" }
+      varattrs.each { |v,p| p["parameter"]=true }
     end
     if attrchk(attr_spec_option,:private?)
       varattrs.each { |v,p| p["access"]="private" }
@@ -505,8 +505,8 @@ module Fortran
       p["type"]="#{type_spec.type}"
       p["kind"]="#{type_spec.kind}"
       if env[:allocatable] and env[:allocatable].include?(name)
-        p.keys.each { |k| p[k]="_deferred" if k=~/[lu]b\d+/ }
-        p["allocatable"]="_true"
+        p.keys.each { |k| p[k]="deferred" if k=~/[lu]b\d+/ }
+        p["allocatable"]=true
       end
       varenv.merge!(p)
     end
@@ -1579,12 +1579,12 @@ module Fortran
 
     def alb
       # abstract lower bound
-      ("#{e[0]}".empty?)?("_assumed"):("_offset")
+      ("#{e[0]}".empty?)?("assumed"):("offset")
     end
 
     def aub
       # abstract upper bound
-      "_assumed"
+      "assumed"
     end
 
   end
@@ -1602,13 +1602,13 @@ module Fortran
         ok=(env[:args] and env[:args].include?(array_name))?(true):(false)
       elsif (entity_decl=ancestor(Array_Name_And_Spec))
         array_name="#{entity_decl.name}"
-        ok=(env[array_name]["lb1"]=="_deferred")?(false):(true)
+        ok=(env[array_name]["lb1"]=="deferred")?(false):(true)
       end
       unless ok
         code="#{self}"
         replace_element(code,:deferred_shape_spec_list)
         varenv=varenv_get(array_name)
-        varenv.keys.each { |k| varenv[k]="_deferred" if k=~/[lu]b\d+/ }
+        varenv.keys.each { |k| varenv[k]="deferred" if k=~/[lu]b\d+/ }
       end
     end
 
@@ -1642,12 +1642,12 @@ module Fortran
 
     def alb
       # abstract lower bound
-      ("#{e[1]}".empty?)?("_default"):(e[1].alb)
+      ("#{e[1]}".empty?)?("default"):(e[1].alb)
     end
 
     def aub
       # abstract upper bound
-      "_assumed"
+      "assumed"
     end
 
   end
@@ -2230,12 +2230,12 @@ module Fortran
 
     def alb
       # abstract lower bound
-      "_deferred"
+      "deferred"
     end
 
     def aub
       # abstract upper bound
-      "_deferred"
+      "deferred"
     end
 
   end
@@ -2597,7 +2597,7 @@ module Fortran
       if e[1].is_a?(Entity_Decl_Array_Spec)
         array_attrs(e[1].e[1].e[0],_attrs,distribute)
       end
-      _attrs["sort"]=((array?)?("_array"):("_scalar"))
+      _attrs["sort"]=((array?)?("array"):("scalar"))
       {name=>_attrs}
     end
 
@@ -2712,12 +2712,12 @@ module Fortran
 
     def alb
       # abstract lower bound
-      "_explicit"
+      "explicit"
     end
 
     def aub
       # abstract upperbound
-      "_explicit"
+      "explicit"
     end
 
     def concrete_bounds
@@ -4489,7 +4489,7 @@ module Fortran
   class Subscript_Common < NT
 
     def const_int?(x)
-      "#{x}".sub(/_.*/,'').sub(/^[+-]/,'').gsub(/[0-9]/,'').empty?
+      "#{x}".sub(/_.*/,"").sub(/^[+-]/,"").gsub(/[0-9]/,"").empty?
     end
 
   end
@@ -4601,7 +4601,7 @@ module Fortran
     end
 
     def kind
-      return (e[1].respond_to?(:kind))?("#{e[1].kind}"):("_default")
+      return (e[1].respond_to?(:kind))?("#{e[1].kind}"):("default")
     end
 
     def type
