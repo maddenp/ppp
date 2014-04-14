@@ -577,6 +577,20 @@ module Fortran
 
   class Treetop::Runtime::SyntaxNode
 
+    def ancestor(*classes)
+      node=parent
+      begin
+        return node if classes.any? { |x| node.is_a?(x) }
+      end while node=node.parent
+      nil
+    end
+
+    def ancestor?(node)
+      n=self
+      return true if n==node while (n=n.parent)
+      false
+    end
+
     def to_s
       ""
     end
@@ -613,20 +627,6 @@ module Fortran
       super(*args)
       @envref=input.envstack.last
       @metadata={}
-    end
-
-    def ancestor(*classes)
-      n=parent
-      begin
-        return n if classes.any? { |x| n.is_a?(x) }
-      end while n=n.parent
-      nil
-    end
-
-    def ancestor?(node)
-      n=self
-      return true if n==node while (n=n.parent)
-      false
     end
 
     def block_left

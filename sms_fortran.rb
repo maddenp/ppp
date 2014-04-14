@@ -589,11 +589,12 @@ module Fortran
     end
 
     def sms_parallel_loop
-      if (dc=ancestor(Do_Construct))
-        dc.metadata[:parallel]
-      else
-        false
+      node=self
+      while (dc=node.ancestor(Do_Construct))
+        return true if dc.metadata[:parallel]
+        node=node.parent  
       end
+      false
     end
 
     def sms_rankvar
