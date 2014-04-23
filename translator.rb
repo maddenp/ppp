@@ -400,7 +400,6 @@ class Translator
       $stderr.puts "PARSE FAILED"
       fail Exceptions::TranslatorException
     end
-    raw_tree=raw_tree.transform_top(:post) # post-process raw tree
     if conf[:debug]
       puts "\nRAW TREE\n\n"
       p raw_tree

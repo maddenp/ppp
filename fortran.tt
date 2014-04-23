@@ -284,9 +284,18 @@ grammar Fortran
 
   rule array_spec
     # F90:R512
+    #
+    # Note: Since e.g. "(:)" may indicate either an assumed-shape or a deferred-
+    # shape array, which cannot be determined until all declarations have been
+    # parsed, a generic "implicit" rule is recognized here. The implicit rule
+    # cannot match an assumed-shape spec when a lower bound is specified, so a
+    # final assumed_shape_spec_list choice is retained. Environment information
+    # for a variable associated with an implicit_shape_spec_list is reconciled
+    # later.
 
     assumed_size_spec "" <Array_Spec> /
     explicit_shape_spec_list "" <Array_Spec> /
+    implicit_shape_spec_list "" <Array_Spec> /
     assumed_shape_spec_list "" <Array_Spec>
   end
 
@@ -353,7 +362,7 @@ grammar Fortran
     t_intent t_paren_l intent_spec t_paren_r <Attr_Spec_Intent> /
     t_intrinsic /
     t_optional /
-    t_pointer /
+    t_pointer "" <Attr_Spec_Pointer> /
     t_save /
     t_target
   end
@@ -1761,6 +1770,20 @@ grammar Fortran
     format_stmt /
     parameter_stmt /
     entry_stmt
+  end
+
+  rule implicit_shape_spec
+    # Note: See also rule array_spec.
+
+    t_colon "" <Implicit_Shape_Spec>
+  end
+
+  rule implicit_shape_spec_list
+    implicit_shape_spec implicit_shape_spec_list_pair* !t_comma <Implicit_Shape_Spec_List>
+  end
+
+  rule implicit_shape_spec_list_pair
+    t_comma implicit_shape_spec <Implicit_Shape_Spec_List_Pair>
   end
 
   rule implicit_spec
@@ -3195,7 +3218,7 @@ grammar Fortran
   rule specification_part
     # F90:R204
 
-    use_part implicit_part? declaration_constructs <Specification_Part>
+    use_part implicit_part? declaration_constructs &{ |e| sp_specification_part } <Specification_Part>
   end
 
   rule specification_stmt

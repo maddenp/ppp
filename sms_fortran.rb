@@ -432,14 +432,15 @@ module Fortran
       var
     end
 
-    def distribute_array_bounds(spec,varenv)
-      return unless spec # why would spec be nil?
+    def distribute_array_bounds(spec_list,varenv)
+      return unless spec_list
       return unless dh=varenv["decomp"]
-      return unless [Assumed_Shape_Spec_List,Explicit_Shape_Spec_List].include?(spec.class)
+      ok=[Assumed_Shape_Spec_List,Explicit_Shape_Spec_List,Implicit_Shape_Spec_List]
+      return unless ok.include?(spec_list.class)
       use(sms_decompmod)
       newbounds=[]
-      if spec.is_a?(Explicit_Shape_Spec_List)
-        cb=spec.concrete_boundslist
+      if spec_list.is_a?(Explicit_Shape_Spec_List)
+        cb=spec_list.concrete_boundslist
         cb.each_index do |i|
           b=cb[i]
           arrdim=i+1
@@ -450,10 +451,10 @@ module Fortran
           end
           newbounds.push(s)
         end
-      elsif spec.is_a?(Assumed_Shape_Spec_List)
+      elsif spec_list.is_a?(Assumed_Shape_Spec_List) or spec_list.is_a?(Implicit_Shape_Spec_List)
         (1..varenv["dims"].to_i).each do |i|
           arrdim=i
-          if (dd=decdim(varenv,arrdim)) and not varenv["allocatable"]
+          if (dd=decdim(varenv,arrdim)) and not varenv["lb#{arrdim}"]=="deferred"
             s=code_local_bound(dh,dd,:l)+":"
           else
             s=":"
@@ -462,7 +463,7 @@ module Fortran
         end
       end
       code=newbounds.join(",")
-      replace_element(code,:array_spec,spec)
+      replace_element(code,:array_spec,spec_list)
     end
 
     def fixbound(varenv,var,dim,x)
@@ -674,9 +675,9 @@ module Fortran
 
     def translate
       var="#{e[0]}"
-      spec=e[2].spec
+      spec_list=e[2].spec_list
       varenv=varenv_get(var)
-      distribute_array_bounds(spec,varenv)
+      distribute_array_bounds(spec_list,varenv)
     end
 
   end
@@ -743,22 +744,22 @@ module Fortran
     def translate
       var="#{name}"
       varenv=varenv_get(var)
-      spec=nil
+      spec_list=nil
       if varenv["sort"]=="array"
         if (entity_decl_array_spec=e[1]).is_a?(Entity_Decl_Array_Spec)
           # entity_decl_array_spec case
-          spec=entity_decl_array_spec.e[1].spec
+          spec_list=entity_decl_array_spec.array_spec.spec_list
         else
           attr_spec_option=ancestor(Type_Declaration_Stmt).e[2]
           if attr_spec_option.is_a?(Attr_Spec_Option)
             if (d=attr_spec_option.dimension?)
               # dimension attribute case
-              spec=d.spec
+              spec_list=d.spec_list
             end
           end
         end
       end
-      distribute_array_bounds(spec,varenv)
+      distribute_array_bounds(spec_list,varenv)
     end
 
   end

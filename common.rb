@@ -8,9 +8,10 @@ module Common
       arrdim=i+1
       _attrs["lb#{arrdim}"]=array_spec.abstract_boundslist[i].alb
       _attrs["ub#{arrdim}"]=array_spec.abstract_boundslist[i].aub
-      if distribute and (decompdim=distribute["dim"].index(arrdim))
+      if distribute and (x=distribute["dim"].index(arrdim))
+        decdim=x+1
         _attrs["decomp"]=distribute["decomp"]
-        _attrs["dim#{arrdim}"]=decompdim+1
+        _attrs["dim#{arrdim}"]=decdim
       end
       dims+=1
     end

@@ -119,21 +119,18 @@ module Fortran
 
   def sp_allocatable_stmt(array_names_and_deferred_shape_spec_lists)
     a=array_names_and_deferred_shape_spec_lists
-    env[:allocatable]||=[]
-    a.names.each do |var|
+    # Record variable attributes.
+    a.names.each do |name|
+      var="#{name}"
       redef(var)
-      # Record that this var has been marked allocatable, which means that it
-      # must be an array with deferred bounds.
-      env[:allocatable].push(var)
+      (env[:deferred]||=Set.new).add(var)
+      varsetattr(var,"allocatable",true)
       varsetattr(var,"sort","array")
-      # Correct for the case where this array has already been seen and its
-      # bounds incorrectly marked as assumed.
-      env[var].keys.each { |k| env[var][k]="deferred" if k=~/[lu]b\d+/ }
     end
-    # In case this array has not previously been seen, record its array specs.
-    a.items.each do |x|
-      if x.array_spec
-        env["#{x.name}"].merge!(array_attrs(x.array_spec,{},@distribute))
+    # Record array specs.
+    a.items.each do |item|
+      if (x=item.array_spec)
+        env["#{item.name}"].merge!(array_attrs(x,{},@distribute))
       end
     end
     true
@@ -413,7 +410,19 @@ module Fortran
   end
 
   def sp_pointer_stmt(object_names_and_spec_lists)
-    object_names_and_spec_lists.names.each { |x| redef x }
+    # Record variable attributes.
+    object_names_and_spec_lists.names.each do |name|
+      var="#{name}"
+      redef(var)
+      (env[:deferred]||=Set.new).add(var)
+      varsetattr(var,"pointer",true)
+    end
+    # Record array specs.
+    object_names_and_spec_lists.items.each do |item|
+      if item.array_spec
+        env["#{item.name}"].merge!(array_attrs(item.array_spec,{},@distribute))
+      end
+    end
     true
   end
 
@@ -425,6 +434,16 @@ module Fortran
   def sp_save_stmt(save_stmt_entity_list)
     if save_stmt_entity_list.is_a?(Save_Stmt_Entity_List)
       save_stmt_entity_list.names.each { |x| redef x }
+    end
+    true
+  end
+
+  def sp_specification_part
+    if (deferred=env[:deferred])
+      deferred.each do |var|
+        env[var].keys.each { |x| env[var][x]="deferred" if x=~/[lu]b[1-7]/ }
+      end
+      env.delete(:deferred)
     end
     true
   end
@@ -469,9 +488,12 @@ module Fortran
   end
 
   def sp_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
-    entity_decl_list.names.each do |x|
-      unless (varenv=env["#{x}"]) and varenv["subprogram"]=="function"
-        redef(x)
+    entity_decl_list.names.each do |name|
+      var="#{name}"
+      varenv=env[var]
+      redef(var) unless varenv and varenv["subprogram"]=="function"
+      if varenv
+        varenv.keys.each { |x| env[var][x]="deferred" if x=~/[lu]b[1-7]/ }
       end
     end
     varattrs=entity_decl_list.varattrs(@distribute)
@@ -483,13 +505,24 @@ module Fortran
       end
     end
     if attrchk(attr_spec_option,:allocatable?)
-      varattrs.each { |v,p| p["allocatable"]=true }
+      varattrs.each do |v,p|
+        p.keys.each { |key| p[key]="deferred" if key=~/[lu]b[1-7]/ }
+        p["allocatable"]=true
+        (env[:deferred]||=Set.new).add("#{v}")
+      end
     end
     if (x=attrchk(attr_spec_option,:intent?))
       varattrs.each { |v,p| p["intent"]="#{x}" }
     end
     if attrchk(attr_spec_option,:parameter?)
       varattrs.each { |v,p| p["parameter"]=true }
+    end
+    if attrchk(attr_spec_option,:pointer?)
+      varattrs.each do |v,p|
+        p.keys.each { |key| p[key]="deferred" if key=~/[lu]b[1-7]/ }
+        p["pointer"]=true
+        (env[:deferred]||=Set.new).add("#{v}")
+      end
     end
     if attrchk(attr_spec_option,:private?)
       varattrs.each { |v,p| p["access"]="private" }
@@ -581,7 +614,7 @@ module Fortran
       node=parent
       begin
         return node if classes.any? { |x| node.is_a?(x) }
-      end while node=node.parent
+      end while node and node=node.parent
       nil
     end
 
@@ -1468,7 +1501,7 @@ module Fortran
     end
 
     def names
-      e[1].e.reduce(["#{e[0].e[0]}"]) { |m,x| m.push("#{x.e[1].e[0]}") }
+      e[1].e.reduce([e[0].e[0]]) { |m,x| m.push(x.e[1].e[0]) }
     end
 
   end
@@ -1515,7 +1548,7 @@ module Fortran
 
   class Array_Spec < NT
 
-    def spec
+    def spec_list
       e[0]
     end
 
@@ -1578,12 +1611,21 @@ module Fortran
     end
 
     def alb
-      # abstract lower bound
-      ("#{e[0]}".empty?)?("assumed"):("offset")
+      # Abstract Lower Bound
+      #
+      # Note that the abstract lower bound could also be "assumed", but an array
+      # node of this class is only instantiated when the lower bound, indicating
+      # an offset, is present. Without it, the array is indistinguishable from
+      # a deferred-shape array until all declarations are parsed, in which case
+      # a generic node will be instantiated, and the environment information for
+      # its parent array node corrected by later processing.
+      
+      "offset"
     end
 
     def aub
-      # abstract upper bound
+      # Abstract Upper Bound
+
       "assumed"
     end
 
@@ -1593,23 +1635,6 @@ module Fortran
 
     def abstract_boundslist
       e[1].e.reduce([e[0].abstract_bounds]) { |m,x| m.push(x.abstract_bounds) }
-    end
-
-    def post
-      ok=true
-      if (entity_decl=ancestor(Entity_Decl))
-        array_name="#{entity_decl.name}"
-        ok=(env[:args] and env[:args].include?(array_name))?(true):(false)
-      elsif (entity_decl=ancestor(Array_Name_And_Spec))
-        array_name="#{entity_decl.name}"
-        ok=(env[array_name]["lb1"]=="deferred")?(false):(true)
-      end
-      unless ok
-        code="#{self}"
-        replace_element(code,:deferred_shape_spec_list)
-        varenv=varenv_get(array_name)
-        varenv.keys.each { |k| varenv[k]="deferred" if k=~/[lu]b\d+/ }
-      end
     end
 
     def str0
@@ -1641,12 +1666,12 @@ module Fortran
     end
 
     def alb
-      # abstract lower bound
+      # Abstract Lower Bound
       ("#{e[1]}".empty?)?("default"):(e[1].alb)
     end
 
     def aub
-      # abstract upper bound
+      # Abstract Upper Bound
       "assumed"
     end
 
@@ -1688,6 +1713,10 @@ module Fortran
 
     def parameter?
       attrany(:parameter?)
+    end
+
+    def pointer?
+      attrany(:pointer?)
     end
 
     def private?
@@ -1740,6 +1769,10 @@ module Fortran
       (e[0])?(attrany(:parameter?,e[0].e)):(false)
     end
 
+    def pointer?
+      (e[0])?(attrany(:pointer?,e[0].e)):(false)
+    end
+
     def private?
       (e[0])?(attrany(:private?,e[0].e)):(false)
     end
@@ -1768,11 +1801,23 @@ module Fortran
       e[1].parameter?
     end
 
+    def pointer?
+      e[1].pointer?
+    end
+
   end
 
   class Attr_Spec_Parameter < NT
 
     def parameter?
+      true
+    end
+
+  end
+
+  class Attr_Spec_Pointer < NT
+
+    def pointer?
       true
     end
 
@@ -2229,12 +2274,12 @@ module Fortran
     end
 
     def alb
-      # abstract lower bound
+      # Abstract Lower Bound
       "deferred"
     end
 
     def aub
-      # abstract upper bound
+      # Abstract Upper Bound
       "deferred"
     end
 
@@ -2620,6 +2665,11 @@ module Fortran
   end
 
   class Entity_Decl_Array_Spec < NT
+
+    def array_spec
+      e[1]
+    end
+
   end
 
   class Entity_Decl_List < NT
@@ -3057,6 +3107,42 @@ module Fortran
   end
 
   class Implicit_Part < NT
+  end
+
+  class Implicit_Shape_Spec < NT
+
+    attr_accessor :alb,:aub
+
+    def initialize(*args)
+      super(*args)
+      @alb="assumed" # initial guess
+      @aub="assumed" # initial guess
+    end
+
+    def abstract_bounds
+      OpenStruct.new({:alb=>alb,:aub=>aub})
+    end
+
+  end
+
+  class Implicit_Shape_Spec_List < Array_Spec
+
+    def abstract_boundslist
+      e[1].e.reduce([e[0].abstract_bounds]) { |m,x| m.push(x.abstract_bounds) }
+    end
+
+    def str0
+      list_str
+    end
+
+  end
+
+  class Implicit_Shape_Spec_List_Pair < NT
+
+    def abstract_bounds
+      e[1].abstract_bounds
+    end
+
   end
 
   class Implicit_Spec_1 < NT
@@ -3822,6 +3908,10 @@ module Fortran
 
   class Object_Name_And_Spec_List < NT
 
+    def array_spec
+      (e[1].respond_to?(:array_spec))?(e[1].array_spec):(nil)
+    end
+
     def name
       e[0].name
     end
@@ -3837,6 +3927,10 @@ module Fortran
   end
 
   class Object_Names_And_Spec_Lists < NT
+
+    def items
+      e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
+    end
 
     def names
       e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
