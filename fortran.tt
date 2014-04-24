@@ -364,7 +364,7 @@ grammar Fortran
     t_optional /
     t_pointer "" <Attr_Spec_Pointer> /
     t_save /
-    t_target
+    t_target "" <Attr_Spec_Target>
   end
 
   rule attr_spec_list

@@ -476,13 +476,17 @@ module Fortran
   end
 
   def sp_target_stmt(target_object_list)
-    target_object_list.objects.each do |x|
-      unless x.is_a?(Array_Name_And_Spec) or x.is_a?(Variable_Name)
-        fail "ERROR: Unexpected node type"
-      end
-      var="#{x.name}"
-      varsetattr(var,"sort","array") if x.is_a?(Array_Name_And_Spec)
+    # Record variable attributes.
+    target_object_list.names.each do |name|
+      var="#{name}"
       redef(var)
+      varsetattr(var,"target",true)
+    end
+    # Record array specs
+    target_object_list.objects.each do |object|
+      if object.array_spec
+        env["#{object.name}"].merge!(array_attrs(object.array_spec,{},@distribute))
+      end
     end
     true
   end
@@ -530,6 +534,9 @@ module Fortran
       varattrs.each { |v,p| p["access"]="public" }
     else
       varattrs.each { |v,p| p["access"]=@access }
+    end
+    if attrchk(attr_spec_option,:target?)
+      varattrs.each { |v,p| p["target"]=true }
     end
     varattrs.each do |v,p|
       name="#{v}"
@@ -1213,6 +1220,10 @@ module Fortran
 
   class Variable_Name < NT
 
+    def array_spec
+      nil
+    end
+
     def length
       name.length
     end
@@ -1548,6 +1559,10 @@ module Fortran
 
   class Array_Spec < NT
 
+    def abstract_boundslist
+      spec_list.abstract_boundslist
+    end
+
     def spec_list
       e[0]
     end
@@ -1727,6 +1742,10 @@ module Fortran
       attrany(:public?)
     end
 
+    def target?
+      attrany(:target?)
+    end
+
   end
 
   class Attr_Spec_Dimension < NT
@@ -1781,6 +1800,10 @@ module Fortran
       (e[0])?(attrany(:public?,e[0].e)):(false)
     end
 
+    def target?
+      (e[0])?(attrany(:target?,e[0].e)):(false)
+    end
+
   end
 
   class Attr_Spec_Option < Attr_Spec_Base
@@ -1805,6 +1828,10 @@ module Fortran
       e[1].pointer?
     end
 
+    def target?
+      e[1].target?
+    end
+
   end
 
   class Attr_Spec_Parameter < NT
@@ -1818,6 +1845,14 @@ module Fortran
   class Attr_Spec_Pointer < NT
 
     def pointer?
+      true
+    end
+
+  end
+
+  class Attr_Spec_Target < NT
+
+    def target?
       true
     end
 
@@ -4655,6 +4690,10 @@ module Fortran
   end
 
   class Target_Object_List < NT
+
+    def names
+      objects.map { |x| x.name }
+    end
 
     def objects
       e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
