@@ -437,7 +437,6 @@ module Fortran
       return unless dh=varenv["decomp"]
       ok=[Assumed_Shape_Spec_List,Explicit_Shape_Spec_List,Implicit_Shape_Spec_List]
       return unless ok.include?(spec_list.class)
-      use(sms_decompmod)
       newbounds=[]
       if spec_list.is_a?(Explicit_Shape_Spec_List)
         cb=spec_list.concrete_boundslist
@@ -445,6 +444,7 @@ module Fortran
           b=cb[i]
           arrdim=i+1
           if (dd=decdim(varenv,arrdim))
+            use(sms_decompmod)
             s=code_local_bound(dh,dd,:l)+":"+code_local_bound(dh,dd,:u)
           else
             s=(b.clb=="1")?(b.cub):("#{b.clb}:#{b.cub}")
@@ -455,6 +455,7 @@ module Fortran
         (1..varenv["dims"].to_i).each do |i|
           arrdim=i
           if (dd=decdim(varenv,arrdim)) and not varenv["lb#{arrdim}"]=="deferred"
+            use(sms_decompmod)
             s=code_local_bound(dh,dd,:l)+":"
           else
             s=":"

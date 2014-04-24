@@ -32,6 +32,10 @@
   status of the element as a scalar or an array, respectively. This information
   is not available here, now.
 
+* 'target' statement probably needs handling similar to 'pointer' stmt in re:
+  updating env info for arrays if array specs are given. Might as well record
+  target status in environment, too, in case it is useful in the future.
+
 - Deduce types of implicit variables. We cannot require 'implicit none'.
 
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
