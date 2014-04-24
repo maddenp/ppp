@@ -1358,7 +1358,7 @@ module Fortran
     end
 
     def names
-      e[1].e.reduce([e[0].name]) { |m,x| m.push(x.e[1].name) }
+      items.map { |x| x.name }
     end
 
   end
@@ -1448,7 +1448,7 @@ module Fortran
     end
 
     def names
-      e[1].e.reduce([e[0].name]) { |m,x| m.push(x.e[1].name) }
+      items.map { |x| x.name }
     end
 
   end
@@ -1512,7 +1512,7 @@ module Fortran
     end
 
     def names
-      e[1].e.reduce([e[0].e[0]]) { |m,x| m.push(x.e[1].e[0]) }
+      items.map { |x| x.e[0] }
     end
 
   end
@@ -1524,7 +1524,7 @@ module Fortran
     end
 
     def names
-      e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
+      items.map { |x| x.name }
     end
 
   end
@@ -3968,7 +3968,7 @@ module Fortran
     end
 
     def names
-      e[1].e.reduce([e[0].name]) { |m,x| m.push(x.name) }
+      items.map { |x| x.name }
     end
 
   end
