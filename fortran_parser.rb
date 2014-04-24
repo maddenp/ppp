@@ -29235,13 +29235,8 @@ module Fortran
       if r2
         r0 = r2
       else
-        r3 = _nt_vector_subscript
-        if r3
-          r0 = r3
-        else
-          @index = i0
-          r0 = nil
-        end
+        @index = i0
+        r0 = nil
       end
     end
 

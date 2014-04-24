@@ -3123,10 +3123,13 @@ grammar Fortran
 
   rule section_subscript
     # F90:R618
+    #
+    # Note: Distinguishing between the subscript and vector_subscript choices
+    # would require shape analysis not currently being performed.
 
     subscript_triplet /
-    subscript /
-    vector_subscript
+    subscript #/
+#   vector_subscript
   end
 
   rule section_subscript_list

@@ -26,12 +26,6 @@
 
 ### PARSING
 
-* In fortran.tt, rule section_subscript: The vector_subscript choice will
-  probably never be selected without parsing improvements. Choices 'subscript'
-  and 'vector_subscript' should be distinguished, per R617 and R621, by the
-  status of the element as a scalar or an array, respectively. This information
-  is not available here, now.
-
 - Deduce types of implicit variables. We cannot require 'implicit none'.
 
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
