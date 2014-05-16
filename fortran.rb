@@ -617,6 +617,20 @@ module Fortran
 
   class Treetop::Runtime::SyntaxNode
 
+    alias_method :e,:elements
+    alias_method :init,:initialize
+
+    def initialize(input,interval,elements=nil)
+      init(input,interval,elements)
+      if elements
+        elements.each do |x|
+          if x.is_a?(Treetop::Runtime::SyntaxNode)
+            x.parent=self
+          end
+        end
+      end
+    end
+
     def ancestor(*classes)
       node=parent
       begin
@@ -649,8 +663,6 @@ module Fortran
       transform_common(method)
       self
     end
-
-    alias e elements
 
   end
 
