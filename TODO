@@ -61,6 +61,8 @@
 
 ### TRANSLATION
 
+- Deal with derived types. Start e.g. with treating them in serial regions.
+
 - Perform sms$parallel translation implicitly.
 
 - sms$halo_comp -> one-line directive bound to parallel do loop.
