@@ -1089,9 +1089,7 @@ module Fortran
       end
       # Handle serial
       if sms_serial
-        # We should handle derived types eventually, but ignore structure
-        # components for now.
-        unless inside?(SMS_Serial_Begin,Subroutine_Name) or intrinsic(name)# or component?
+        unless inside?(SMS_Serial_Begin,Subroutine_Name) or intrinsic(name) or derived_type? or structure_component?
           varenv=varenv_get(name,self,expected=false)||{}
           unless varenv["subprogram"] or varenv["parameter"]
             sms_serial_info.vars_in_region.add([name,nil])

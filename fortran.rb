@@ -3790,6 +3790,18 @@ module Fortran
 
   class Name < NT
 
+    def derived_type?
+      return false unless (my_data_ref=ancestor(Data_Ref))
+      my_data_ref.e[1].e[0].is_a?(Data_Ref_Option)
+    end
+
+    def structure_component?
+      return false unless (my_data_ref=ancestor(Data_Ref_Option))
+      return false unless (parent_data_ref=my_data_ref.ancestor(Data_Ref))
+      structure_head=parent_data_ref.e[0]
+      not structure_head==self
+    end
+
     def length
       "#{self}".length
     end
