@@ -2,6 +2,18 @@ require "set"
 
 module Fortran
 
+  def sp_do_construct(do_construct)
+    iterator=do_construct.do_stmt.do_variable
+    if (p=env[:sms_parallel])
+      p.vars.each do |x|
+        if x.include?("#{iterator}")
+          do_construct.metadata[:parallel]=true
+        end
+      end
+    end
+    true
+  end
+
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
 
     # Do not push an environment here. The declarations that appear inside a
@@ -590,13 +602,12 @@ module Fortran
       25
     end
 
-    def sms_parallel_loop
-      node=self
-      while (dc=node.ancestor(Do_Construct))
-        return true if dc.metadata[:parallel]
-        node=node.parent  
+    def sms_parallel_loop(node=self)
+      return node if node.is_a?(Do_Construct) and node.metadata[:parallel]
+      while (node=node.ancestor(Do_Construct))
+        return node if node.metadata[:parallel]
       end
-      false
+      nil
     end
 
     def sms_rankvar
@@ -605,6 +616,11 @@ module Fortran
 
     def sms_rootcheck
       "sms__i_am_root"
+    end
+
+    def sms_serial_region(node=self)
+      return node if node.is_a?(SMS_Serial)
+      node.ancestor(SMS_Serial)
     end
 
     def sms_statusvar
@@ -703,8 +719,12 @@ module Fortran
 
   class Do_Construct < NT
 
-    def register_as_parallel
-      metadata[:parallel]=true
+    def str0
+      "#{e[0]}"
+    end
+
+    def str1
+      strmemo
     end
 
   end
@@ -712,12 +732,11 @@ module Fortran
   class Do_Stmt < Stmt
 
     def translate
-      unless sms_serial
+      unless sms_ignore or sms_serial
         if (p=sms_parallel)
           dd=nil
           [0,1,2].each do |i|
             if p.vars[i].include?("#{do_variable}")
-              ancestor(Do_Construct).register_as_parallel
               dd=i+1
               break
             end
@@ -983,27 +1002,35 @@ module Fortran
 
   class Label_Stmt < NT
 
-    def errmsg(in_serial_region)
+    def errmsg_parallel(in_parallel_loop)
+      io=(in_parallel_loop)?("out"):("in")
+      "ERROR: Branch to statement labeled '#{self}' from #{io}side parallel loop"
+    end
+
+    def errmsg_serial(in_serial_region)
       io=(in_serial_region)?("out"):("in")
       "ERROR: Branch to statement labeled '#{self}' from #{io}side serial region"
     end
 
     def translate
-      my_serial_region=ancestor(SMS_Serial)
+      my_serial_region=sms_serial_region
+      my_parallel_loop=sms_parallel_loop
       # Handle branches via numeric labels.
-      ((env[:branch_targets]||{})["#{self}"]||[]).each do |label|
-        unless label.ancestor(SMS_Serial)==my_serial_region
-          fail errmsg(my_serial_region)
+      (env[:branch_targets]["#{self}"]||[]).each do |label|
+        unless sms_serial_region(label)==my_serial_region
+          fail errmsg_serial(my_serial_region)
+        end
+        unless sms_parallel_loop(label)==my_parallel_loop
+          fail errmsg_parallel(my_parallel_loop)
         end
       end
       # Handle branches via assigned goto statements.
-      if (agt=env[:assigned_goto_targets])
-        ((env[:assign_map]||{})["#{self}"]||[]).each do |var|
-          if (targets=agt[var])
-            targets.each do |target|
-              unless target.ancestor(SMS_Serial)==my_serial_region
-                fail errmsg(my_serial_region)
-              end
+      agt=env[:assigned_goto_targets]
+      (env[:assign_map]["#{self}"]||[]).each do |var|
+        if (targets=agt[var])
+          targets.each do |target|
+            unless sms_serial_region(target)==my_serial_region
+              fail errmsg_serial(my_serial_region)
             end
           end
         end

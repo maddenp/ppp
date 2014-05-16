@@ -26,7 +26,7 @@ grammar Fortran
 
     executable_construct_action_stmt /
     case_construct /
-    do_construct /
+    do_construct &{ |e| sp_do_construct(e[0]) } <Do_Construct> /
     if_construct /
     where_construct /
     sms_executable /

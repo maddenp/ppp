@@ -12,8 +12,7 @@ module Fortran
   include Common
 
   def add_branch_target(label)
-    branch_targets=(env[:branch_targets]||={})
-    label_array=(branch_targets["#{label}"]||=[])
+    label_array=(env[:branch_targets]["#{label}"]||=[])
     label_array.push(label)
   end
 
@@ -25,27 +24,21 @@ module Fortran
     oldenv=@envstack.pop
     @envstack.push({}) if @envstack.empty?
     env[:global]=oldenv[:global]
-    unless scope_change
-      env_scope_items.each { |k| env[k]=oldenv[k] }
-    end
+    env_scope_keeps.each { |k| env[k]=oldenv[k] } unless scope_change
     oldenv
   end
 
   def envpush(scope_change=true)
     keep={}
     keep[:global]=env.delete(:global)
-    env_scope_items.each do |k|
-      if (v=env.delete(k))
-        keep[k]=v unless scope_change
-      end
-    end
+    env_scope_keeps.each { |k| keep[k]=(scope_change)?({}):(env.delete(k)) }
     @envstack.push(deepcopy(env))
     keep.each { |k,v| env[k]=v }
     @redefs={}
     nil
   end
 
-  def env_scope_items
+  def env_scope_keeps
     [
       :assign_map,
       :assigned_goto_targets,
@@ -141,15 +134,13 @@ module Fortran
   end
 
   def sp_assign_stmt(label,scalar_int_variable)
-    assign_map=(env[:assign_map]||={})
-    var_array=(assign_map["#{label}"]||=SortedSet.new)
+    var_array=(env[:assign_map]["#{label}"]||=SortedSet.new)
     var_array.add("#{scalar_int_variable}")
     true
   end
 
   def sp_assigned_goto_stmt(scalar_int_variable)
-    assigned_goto_targets=(env[:assigned_goto_targets]||={})
-    var_array=(assigned_goto_targets["#{scalar_int_variable}"]||=[])
+    var_array=(env[:assigned_goto_targets]["#{scalar_int_variable}"]||=[])
     var_array.push(scalar_int_variable)
     true
   end
@@ -1320,6 +1311,11 @@ module Fortran
   end
 
   class Action_Term_Do_Construct < NT
+
+    def do_stmt
+      e[0]
+    end
+
   end
 
   class Actual_Arg_Spec < NT
@@ -1911,9 +1907,19 @@ module Fortran
   end
 
   class Block_Do_Construct < Do_Construct
+
+    def do_stmt
+      e[0].do_stmt
+    end
+
   end
 
   class Block_Do_Construct_Main < NT
+
+    def do_stmt
+      e[0]
+    end
+
   end
 
   class Call_Stmt < Stmt
@@ -3223,6 +3229,10 @@ module Fortran
 
   class Inner_Shared_Do_Construct < NT
 
+    def do_stmt
+      e[0]
+    end
+
     def label
       e[0].label
     end
@@ -3903,6 +3913,10 @@ module Fortran
 
   class Nonblock_Do_Construct < Do_Construct
 
+    def do_stmt
+      e[0].do_stmt
+    end
+
     def label
       e[0].label
     end
@@ -3910,6 +3924,11 @@ module Fortran
   end
 
   class Nonblock_Do_Construct_Osdc < NT
+
+    def do_stmt
+      e[0].do_stmt
+    end
+
   end
 
   class Nonlabel_Do_Stmt < Do_Stmt
@@ -4054,6 +4073,10 @@ module Fortran
   end
 
   class Outer_Shared_Do_Construct < NT
+
+    def do_stmt
+      e[0]
+    end
 
     def label
       e[0].label
@@ -4490,9 +4513,19 @@ module Fortran
   end
 
   class Shared_Term_Do_Construct_Inner < NT
+
+    def do_stmt
+      e[0].do_stmt
+    end
+
   end
 
   class Shared_Term_Do_Construct_Outer < NT
+
+    def do_stmt
+      e[0].do_stmt
+    end
+
   end
 
   class Signed_Digit_String < NT

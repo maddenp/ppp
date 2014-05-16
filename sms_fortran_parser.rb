@@ -172,6 +172,13 @@ module Fortran
     r0
   end
 
+  module ExecutableConstruct0
+    def do_construct
+      elements[0]
+    end
+
+  end
+
   def _nt_executable_construct
     start_index = index
     if node_cache[:executable_construct].has_key?(index)
@@ -192,25 +199,45 @@ module Fortran
       if r2
         r0 = r2
       else
-        r3 = _nt_do_construct
+        i3, s3 = index, []
+        r4 = _nt_do_construct
+        s3 << r4
+        if r4
+          i5 = index
+          r6 = lambda { |e| sp_do_construct(e[0]) }.call(s3)
+          if r6
+            @index = i5
+            r5 = instantiate_node(SyntaxNode,input, index...index)
+          else
+            r5 = nil
+          end
+          s3 << r5
+        end
+        if s3.last
+          r3 = instantiate_node(Do_Construct,input, i3...index, s3)
+          r3.extend(ExecutableConstruct0)
+        else
+          @index = i3
+          r3 = nil
+        end
         if r3
           r0 = r3
         else
-          r4 = _nt_if_construct
-          if r4
-            r0 = r4
+          r7 = _nt_if_construct
+          if r7
+            r0 = r7
           else
-            r5 = _nt_where_construct
-            if r5
-              r0 = r5
+            r8 = _nt_where_construct
+            if r8
+              r0 = r8
             else
-              r6 = _nt_sms_executable
-              if r6
-                r0 = r6
+              r9 = _nt_sms_executable
+              if r9
+                r0 = r9
               else
-                r7 = _nt_directive
-                if r7
-                  r0 = r7
+                r10 = _nt_directive
+                if r10
+                  r0 = r10
                 else
                   @index = i0
                   r0 = nil
