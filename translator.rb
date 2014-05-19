@@ -65,6 +65,10 @@ class Translator
         @input.send(method,*args)
       end
 
+      def to_s
+        @input.to_s
+      end
+
     end
 
     def initialize(srcfile,dstfile,incdirs)

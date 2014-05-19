@@ -4501,7 +4501,7 @@ module Fortran
   class Section_Subscript_List < List
 
     def subscript_list
-      e[1].elements.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
+      e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }
     end
 
   end
