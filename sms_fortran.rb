@@ -707,6 +707,16 @@ module Fortran
     include Array_Translation
   end
 
+  class Call_Stmt < Stmt
+
+    def translate
+      if (pl=sms_parallel_loop)
+        pl.metadata[:calls_out]=true
+      end
+    end
+
+  end
+
   class Close_Stmt < Io_Stmt
 
     def translate
@@ -720,10 +730,11 @@ module Fortran
   class Do_Construct < NT
 
     def translate
-      if metadata[:parallel]
+      if metadata[:parallel] and metadata[:calls_out]
+        node=raw("sms__in_parallel=.true.",:assignment_stmt,input.srcfile,@dstfile)
+        body.e.insert(0,node)
         code=[]
-        code.push("sms__in_parallel=.true.")
-        code.push(body)
+        code.push(self)
         code.push("sms__in_parallel=.false.")
         replace_statement(code)
       end
@@ -790,6 +801,16 @@ module Fortran
 
     def translate
       fail "ERROR: 'entry' statement may not appear inside sms$serial region" if sms_serial
+    end
+
+  end
+
+  class Function_Reference < NT
+
+    def translate
+      if (pl=sms_parallel_loop)
+        pl.metadata[:calls_out]=true
+      end
     end
 
   end
@@ -1411,7 +1432,7 @@ module Fortran
 
   end
 
-  class SMS_Declare_Decomp_Unstructured_Option < NT
+  class SMS_Declare_Decomp_Unstructured_Option < SMS
   end
 
   class SMS_Decomp_Name < SMS
@@ -1556,16 +1577,16 @@ module Fortran
 
   end
 
-  class SMS_Executable_SMS_Halo_Comp < NT
+  class SMS_Executable_SMS_Halo_Comp < SMS
   end
 
-  class SMS_Executable_SMS_Parallel < NT
+  class SMS_Executable_SMS_Parallel < SMS
   end
 
-  class SMS_Executable_SMS_Serial < NT
+  class SMS_Executable_SMS_Serial < SMS
   end
 
-  class SMS_Executable_SMS_To_Local < NT
+  class SMS_Executable_SMS_To_Local < SMS
   end
 
   class SMS_Get_Communicator < SMS_Getter
@@ -1604,7 +1625,7 @@ module Fortran
 
   end
 
-  class SMS_Halo_Comp_Pair < NT
+  class SMS_Halo_Comp_Pair < SMS
 
     def lo
       e[1]
@@ -1616,7 +1637,7 @@ module Fortran
 
   end
 
-  class SMS_Halo_Comp_Pairs < NT
+  class SMS_Halo_Comp_Pairs < SMS
 
     def str0
       dim1="#{e[0]}"
@@ -1681,7 +1702,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_List_1 < NT
+  class SMS_Parallel_Var_List_1 < SMS
 
     def str0
       s="#{e[0]}#{e[1]}"
@@ -1695,7 +1716,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_List_2 < NT
+  class SMS_Parallel_Var_List_2 < SMS
 
     def str0
       "#{e[0]}"
@@ -1707,7 +1728,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_001 < NT
+  class SMS_Parallel_Var_Lists_001 < SMS
 
     def vars
       [[],[],e[2].vars]
@@ -1715,7 +1736,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_010 < NT
+  class SMS_Parallel_Var_Lists_010 < SMS
 
     def vars
       [[],e[1].vars,[]]
@@ -1723,7 +1744,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_011 < NT
+  class SMS_Parallel_Var_Lists_011 < SMS
 
     def vars
       [[],e[1].vars,e[3].vars]
@@ -1731,7 +1752,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_100 < NT
+  class SMS_Parallel_Var_Lists_100 < SMS
 
     def vars
       [e[0].vars,[],[]]
@@ -1739,7 +1760,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_101 < NT
+  class SMS_Parallel_Var_Lists_101 < SMS
 
     def vars
       [e[0].vars,[],e[3].vars]
@@ -1747,7 +1768,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_110 < NT
+  class SMS_Parallel_Var_Lists_110 < SMS
 
     def vars
       [e[0].vars,e[2].vars,[]]
@@ -1755,7 +1776,7 @@ module Fortran
 
   end
 
-  class SMS_Parallel_Var_Lists_111 < NT
+  class SMS_Parallel_Var_Lists_111 < SMS
 
     def vars
       [e[0].vars,e[2].vars,e[4].vars]
@@ -2259,7 +2280,7 @@ module Fortran
 
   end
 
-  class SMS_To_Local_List < NT
+  class SMS_To_Local_List < SMS
 
     def dd
       e[1]
@@ -2279,7 +2300,7 @@ module Fortran
 
   end
 
-  class SMS_To_Local_Lists < NT
+  class SMS_To_Local_Lists < SMS
 
     def str0
       s="#{e[0]}"
@@ -2309,7 +2330,7 @@ module Fortran
 
   end
 
-  class SMS_Var_List < NT
+  class SMS_Var_List < SMS
 
     def str0
       v=["#{e[0]}"]
@@ -2468,6 +2489,7 @@ class Translator
     s=s.gsub(/^\s*(!sms\$.*)&\s*\n\s*!sms\$&(.*)/im,'\1\2')             # continuations
     s=s.gsub(/^\s*!sms\$insert\s*/i,"")                                 # inserts
     s=s.gsub(/^\s*!sms\$remove\s+begin.*?!sms\$remove\s+end/im,"")      # removes
+    s=s.gsub(/^\s*!\$omp +end +parallel +do.*/i,"")                     # no omp end parallel do
     s
   end
 
@@ -2475,6 +2497,7 @@ class Translator
     s=s.gsub(/^([c\*]sms\$.*)&\s*\n[c\*]sms\$&(.*)/im,'\1\2')           # continuations
     s=s.gsub(/^[c\*]sms\$insert\s*/i,"")                                # inserts
     s=s.gsub(/^[c\*]sms\$remove\s+begin.*?[c\*]sms\$remove\s+end/im,"") # removes
+    s=s.gsub(/^[c\*]\$omp +end +parallel +do.*/i,"")                    # no omp end parallel do
     s
   end
 
