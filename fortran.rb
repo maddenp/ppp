@@ -1,4 +1,4 @@
-$: << (basedir=File.dirname($0)) << File.join(basedir,"lib")
+$: << (basedir=File.dirname($0)) << File.join(basedir,"treetop")
 
 require "ostruct"
 require "yaml"
@@ -912,6 +912,10 @@ module Fortran
 
   class Do_Construct < NT
 
+    def body
+      e[0].body
+    end
+
     def do_stmt
       e[0].do_stmt
     end
@@ -1318,6 +1322,10 @@ module Fortran
   end
 
   class Action_Term_Do_Construct < NT
+
+    def body
+      e[2]
+    end
 
     def do_stmt
       e[0]
@@ -1915,6 +1923,10 @@ module Fortran
 
   class Block_Do_Construct < Do_Construct
 
+    def body
+      e[0]
+    end
+
     def do_stmt
       e[0].do_stmt
     end
@@ -1922,6 +1934,10 @@ module Fortran
   end
 
   class Block_Do_Construct_Main < NT
+
+    def body
+      e[2]
+    end
 
     def do_stmt
       e[0]
@@ -3236,6 +3252,10 @@ module Fortran
 
   class Inner_Shared_Do_Construct < NT
 
+    def body
+      e[2]
+    end
+
     def do_stmt
       e[0]
     end
@@ -3932,6 +3952,10 @@ module Fortran
 
   class Nonblock_Do_Construct < Do_Construct
 
+    def body
+      e[0].body
+    end
+
     def do_stmt
       e[0].do_stmt
     end
@@ -4092,6 +4116,10 @@ module Fortran
   end
 
   class Outer_Shared_Do_Construct < NT
+
+    def body
+      e[1]
+    end
 
     def do_stmt
       e[0]
@@ -4533,6 +4561,10 @@ module Fortran
 
   class Shared_Term_Do_Construct_Inner < NT
 
+    def body
+      e[0].body
+    end
+
     def do_stmt
       e[0].do_stmt
     end
@@ -4540,6 +4572,10 @@ module Fortran
   end
 
   class Shared_Term_Do_Construct_Outer < NT
+
+    def body
+      e[0].body
+    end
 
     def do_stmt
       e[0].do_stmt

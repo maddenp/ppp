@@ -13,7 +13,7 @@ module Normalizer
     if node_cache[:text].has_key?(index)
       cached = node_cache[:text][index]
       if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        node_cache[:text][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24,18 +24,22 @@ module Normalizer
       i1 = index
       r2 = _nt_directive
       if r2
+        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r1 = r2
       else
         r3 = _nt_comment
         if r3
+          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r1 = r3
         else
           r4 = _nt_quoted
           if r4
+            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r1 = r4
           else
             r5 = _nt_unquoted
             if r5
+              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r1 = r5
             else
               @index = i1
@@ -65,7 +69,7 @@ module Normalizer
     if node_cache[:comment].has_key?(index)
       cached = node_cache[:comment][index]
       if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        node_cache[:comment][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -73,7 +77,7 @@ module Normalizer
 
     i0, s0 = index, []
     if has_terminal?("!", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      r1 = true
       @index += 1
     else
       terminal_parse_failure("!")
@@ -101,7 +105,7 @@ module Normalizer
         s4, i4 = [], index
         loop do
           if has_terminal?("\n", false, index)
-            r5 = instantiate_node(SyntaxNode,input, index...(index + 1))
+            r5 = true
             @index += 1
           else
             terminal_parse_failure("\n")
@@ -143,7 +147,7 @@ module Normalizer
     if node_cache[:directive].has_key?(index)
       cached = node_cache[:directive][index]
       if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        node_cache[:directive][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -151,7 +155,7 @@ module Normalizer
 
     i0, s0 = index, []
     if has_terminal?("@", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
+      r1 = true
       @index += 1
     else
       terminal_parse_failure("@")
@@ -182,7 +186,7 @@ module Normalizer
       s0 << r2
       if r2
         if has_terminal?("\n", false, index)
-          r4 = instantiate_node(SyntaxNode,input, index...(index + 1))
+          r4 = true
           @index += 1
         else
           terminal_parse_failure("\n")
@@ -215,7 +219,7 @@ module Normalizer
     if node_cache[:quoted].has_key?(index)
       cached = node_cache[:quoted][index]
       if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        node_cache[:quoted][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -267,6 +271,7 @@ module Normalizer
         r2 = nil
       end
       if r2
+        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r1 = r2
       else
         i7, s7 = index, []
@@ -312,6 +317,7 @@ module Normalizer
           r7 = nil
         end
         if r7
+          r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
           r1 = r7
         else
           @index = i1
@@ -341,7 +347,7 @@ module Normalizer
     if node_cache[:unquoted].has_key?(index)
       cached = node_cache[:unquoted][index]
       if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        node_cache[:unquoted][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached

@@ -717,6 +717,20 @@ module Fortran
 
   end
 
+  class Do_Construct < NT
+
+    def translate
+      if metadata[:parallel]
+        code=[]
+        code.push("sms__in_parallel=.true.")
+        code.push(body)
+        code.push("sms__in_parallel=.false.")
+        replace_statement(code)
+      end
+    end
+
+  end
+
   class Do_Stmt < Stmt
 
     def translate
