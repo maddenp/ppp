@@ -26,6 +26,15 @@
 
 ### PARSING
 
+- Reconsider storing references to tree nodes during parsing. Instead, consider
+  replacing 'adopt' walk with a general data-collection walk, after initial
+  parse. Some data collection during parsing will still be necessary for correct
+  parsing, but move anything related to collecting information for translation
+  to the data-collection walk. Also get rid of env[:global][:parsed].
+
+- Get rid of :safe optization, at least when new normalier is in place, maybe
+  before. It didn't help much and adds complication.
+
 - Deduce types of implicit variables. We cannot require 'implicit none'.
 
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
