@@ -12,8 +12,10 @@ module Fortran
   include Common
 
   def add_branch_target(label)
-    label_array=(env[:branch_targets]["#{label}"]||=[])
-    label_array.push(label)
+    unless env[:global][:parsed]
+      label_array=(env[:branch_targets]["#{label}"]||=[])
+      label_array.push(label)
+    end
   end
 
   def env
@@ -609,17 +611,9 @@ module Fortran
   class Treetop::Runtime::SyntaxNode
 
     alias_method :e,:elements
-    alias_method :init,:initialize
 
-    def initialize(input,interval,elements=nil)
-      init(input,interval,elements)
-      if elements
-        elements.each do |x|
-          if x.is_a?(Treetop::Runtime::SyntaxNode)
-            x.parent=self
-          end
-        end
-      end
+    def adopt
+      e.each { |x| x.parent=self if x.respond_to?(:parent=) } if e
     end
 
     def ancestor(*classes)
@@ -640,6 +634,11 @@ module Fortran
       ""
     end
 
+    def transform(method)
+      transform_common(method)
+      self
+    end
+
     def transform_common(method)
       transform_children(method)
       send(method) if respond_to?(method)
@@ -647,11 +646,6 @@ module Fortran
 
     def transform_children(method)
       e.each { |x| x.transform_common(method) if x } if e
-      self
-    end
-
-    def transform_top(method)
-      transform_common(method)
       self
     end
 
@@ -917,6 +911,19 @@ module Fortran
   # Out-of-order class definitions (must be defined before subclassed)
 
   class Do_Construct < NT
+
+    def do_stmt
+      e[0].do_stmt
+    end
+
+    def str0
+      "#{e[0]}"
+    end
+
+    def str1
+      strmemo
+    end
+
   end
 
   class Io_Item_List < List

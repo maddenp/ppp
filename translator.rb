@@ -389,6 +389,7 @@ class Translator
     return "\n#{n}" if conf[:product]==:normalized_source
     puts "\n#{n}" if conf[:debug]
     raw_tree=fp.parse(n,conf[:env],{:root=>root})
+    raw_tree.env[:global][:parsed]=true
     return if conf[:product]==:modinfo
     unless raw_tree
       re=Regexp.new("^(.+?):in `([^\']*)'$")
@@ -415,7 +416,8 @@ class Translator
       $INDENTED=true
       return vertspace(wrap(raw_tree.to_s))
     when :translated_source
-      translated_tree=raw_tree.transform_top(:translate)
+      raw_tree.transform(:adopt)
+      translated_tree=raw_tree.transform(:translate)
       fail "TRANSLATION FAILED" unless translated_tree
       if conf[:debug]
         puts "\nTRANSLATED TREE\n\n"

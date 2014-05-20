@@ -1451,7 +1451,7 @@ grammar Fortran
 
     executable_construct_action_stmt /
     case_construct /
-    do_construct /
+    do_construct "" <Do_Construct> /
     if_construct /
     where_construct /
     directive

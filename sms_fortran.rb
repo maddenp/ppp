@@ -717,18 +717,6 @@ module Fortran
 
   end
 
-  class Do_Construct < NT
-
-    def str0
-      "#{e[0]}"
-    end
-
-    def str1
-      strmemo
-    end
-
-  end
-
   class Do_Stmt < Stmt
 
     def translate
