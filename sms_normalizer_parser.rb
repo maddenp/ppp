@@ -13,7 +13,7 @@ module Normalizer
     if node_cache[:text].has_key?(index)
       cached = node_cache[:text][index]
       if cached
-        node_cache[:text][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24,27 +24,22 @@ module Normalizer
       i1 = index
       r2 = _nt_sms
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r1 = r2
       else
         r3 = _nt_directive
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r1 = r3
         else
           r4 = _nt_comment
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r1 = r4
           else
             r5 = _nt_quoted
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r1 = r5
             else
               r6 = _nt_unquoted
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r1 = r6
               else
                 @index = i1
@@ -75,7 +70,7 @@ module Normalizer
     if node_cache[:sms].has_key?(index)
       cached = node_cache[:sms][index]
       if cached
-        node_cache[:sms][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -83,7 +78,7 @@ module Normalizer
 
     i0, s0 = index, []
     if has_terminal?("@", false, index)
-      r1 = true
+      r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
       @index += 1
     else
       terminal_parse_failure("@")
@@ -116,7 +111,7 @@ module Normalizer
           s0 << r4
           if r4
             if has_terminal?("$", false, index)
-              r5 = true
+              r5 = instantiate_node(SyntaxNode,input, index...(index + 1))
               @index += 1
             else
               terminal_parse_failure("$")

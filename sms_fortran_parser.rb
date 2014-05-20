@@ -20,7 +20,7 @@ module Fortran
     if node_cache[:declaration_construct].has_key?(index)
       cached = node_cache[:declaration_construct][index]
       if cached
-        node_cache[:declaration_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -29,37 +29,30 @@ module Fortran
     i0 = index
     r1 = _nt_derived_type_def
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_interface_block
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_type_declaration_stmt
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_specification_stmt
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_parameter_stmt
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_format_stmt
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 r7 = _nt_entry_stmt
                 if r7
-                  r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
                   i8, s8 = index, []
@@ -84,12 +77,10 @@ module Fortran
                     r8 = nil
                   end
                   if r8
-                    r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
                     r0 = r8
                   else
                     r12 = _nt_sms_declarative
                     if r12
-                      r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
                       r0 = r12
                     else
                       @index = i0
@@ -120,7 +111,7 @@ module Fortran
     if node_cache[:directive].has_key?(index)
       cached = node_cache[:directive][index]
       if cached
-        node_cache[:directive][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -138,7 +129,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("!", false, index)
-        r3 = true
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("!")
@@ -193,7 +184,7 @@ module Fortran
     if node_cache[:executable_construct].has_key?(index)
       cached = node_cache[:executable_construct][index]
       if cached
-        node_cache[:executable_construct][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -202,12 +193,10 @@ module Fortran
     i0 = index
     r1 = _nt_executable_construct_action_stmt
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_case_construct
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         i3, s3 = index, []
@@ -232,27 +221,22 @@ module Fortran
           r3 = nil
         end
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r7 = _nt_if_construct
           if r7
-            r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
             r0 = r7
           else
             r8 = _nt_where_construct
             if r8
-              r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
               r0 = r8
             else
               r9 = _nt_sms_executable
               if r9
-                r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
                 r0 = r9
               else
                 r10 = _nt_directive
                 if r10
-                  r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
                   r0 = r10
                 else
                   @index = i0
@@ -289,7 +273,7 @@ module Fortran
     if node_cache[:sms_barrier].has_key?(index)
       cached = node_cache[:sms_barrier][index]
       if cached
-        node_cache[:sms_barrier][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -350,7 +334,7 @@ module Fortran
     if node_cache[:sms_comm_rank].has_key?(index)
       cached = node_cache[:sms_comm_rank][index]
       if cached
-        node_cache[:sms_comm_rank][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -423,7 +407,7 @@ module Fortran
     if node_cache[:sms_comm_size].has_key?(index)
       cached = node_cache[:sms_comm_size][index]
       if cached
-        node_cache[:sms_comm_size][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -504,7 +488,7 @@ module Fortran
     if node_cache[:sms_compare_var].has_key?(index)
       cached = node_cache[:sms_compare_var][index]
       if cached
-        node_cache[:sms_compare_var][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -605,7 +589,7 @@ module Fortran
     if node_cache[:sms_create_decomp].has_key?(index)
       cached = node_cache[:sms_create_decomp][index]
       if cached
-        node_cache[:sms_create_decomp][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -686,7 +670,7 @@ module Fortran
     if node_cache[:sms_create_decomp_global].has_key?(index)
       cached = node_cache[:sms_create_decomp_global][index]
       if cached
-        node_cache[:sms_create_decomp_global][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -735,7 +719,7 @@ module Fortran
     if node_cache[:sms_create_decomp_halo].has_key?(index)
       cached = node_cache[:sms_create_decomp_halo][index]
       if cached
-        node_cache[:sms_create_decomp_halo][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -788,7 +772,7 @@ module Fortran
     if node_cache[:sms_create_decomp_regionsize].has_key?(index)
       cached = node_cache[:sms_create_decomp_regionsize][index]
       if cached
-        node_cache[:sms_create_decomp_regionsize][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -827,7 +811,7 @@ module Fortran
     if node_cache[:sms_declarative].has_key?(index)
       cached = node_cache[:sms_declarative][index]
       if cached
-        node_cache[:sms_declarative][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -836,12 +820,10 @@ module Fortran
     i0 = index
     r1 = _nt_sms_declare_decomp
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_sms_distribute
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -893,7 +875,7 @@ module Fortran
     if node_cache[:sms_declare_decomp].has_key?(index)
       cached = node_cache[:sms_declare_decomp][index]
       if cached
-        node_cache[:sms_declare_decomp][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -967,7 +949,7 @@ module Fortran
     if node_cache[:sms_declare_decomp_unstructured_option].has_key?(index)
       cached = node_cache[:sms_declare_decomp_unstructured_option][index]
       if cached
-        node_cache[:sms_declare_decomp_unstructured_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1005,7 +987,7 @@ module Fortran
     if node_cache[:sms_decomp_name].has_key?(index)
       cached = node_cache[:sms_decomp_name][index]
       if cached
-        node_cache[:sms_decomp_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1016,7 +998,7 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("", false, index)
-        r2 = true
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
         @index += 0
       else
         terminal_parse_failure("")
@@ -1056,7 +1038,7 @@ module Fortran
     if node_cache[:sms_distribute].has_key?(index)
       cached = node_cache[:sms_distribute][index]
       if cached
-        node_cache[:sms_distribute][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1130,7 +1112,7 @@ module Fortran
     if node_cache[:sms_distribute_begin].has_key?(index)
       cached = node_cache[:sms_distribute_begin][index]
       if cached
-        node_cache[:sms_distribute_begin][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1200,7 +1182,7 @@ module Fortran
     if node_cache[:sms_distribute_dim].has_key?(index)
       cached = node_cache[:sms_distribute_dim][index]
       if cached
-        node_cache[:sms_distribute_dim][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1249,7 +1231,7 @@ module Fortran
     if node_cache[:sms_distribute_dims].has_key?(index)
       cached = node_cache[:sms_distribute_dims][index]
       if cached
-        node_cache[:sms_distribute_dims][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1275,7 +1257,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -1293,7 +1274,6 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         i8, s8 = index, []
@@ -1301,7 +1281,7 @@ module Fortran
         s8 << r9
         if r9
           if has_terminal?("", false, index)
-            r10 = true
+            r10 = instantiate_node(SyntaxNode,input, index...(index + 0))
             @index += 0
           else
             terminal_parse_failure("")
@@ -1317,7 +1297,6 @@ module Fortran
           r8 = nil
         end
         if r8
-          r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
           r0 = r8
         else
           @index = i0
@@ -1355,7 +1334,7 @@ module Fortran
     if node_cache[:sms_distribute_end].has_key?(index)
       cached = node_cache[:sms_distribute_end][index]
       if cached
-        node_cache[:sms_distribute_end][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1441,7 +1420,7 @@ module Fortran
     if node_cache[:sms_exchange].has_key?(index)
       cached = node_cache[:sms_exchange][index]
       if cached
-        node_cache[:sms_exchange][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1542,7 +1521,7 @@ module Fortran
     if node_cache[:sms_executable].has_key?(index)
       cached = node_cache[:sms_executable][index]
       if cached
-        node_cache[:sms_executable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1551,32 +1530,26 @@ module Fortran
     i0 = index
     r1 = _nt_sms_barrier
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_sms_comm_rank
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_sms_comm_size
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_sms_compare_var
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             r5 = _nt_sms_create_decomp
             if r5
-              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r0 = r5
             else
               r6 = _nt_sms_exchange
               if r6
-                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
                 i7, s7 = index, []
@@ -1601,17 +1574,14 @@ module Fortran
                   r7 = nil
                 end
                 if r7
-                  r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
                   r11 = _nt_sms_get_communicator
                   if r11
-                    r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
                     r0 = r11
                   else
                     r12 = _nt_sms_ignore
                     if r12
-                      r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
                       r0 = r12
                     else
                       i13, s13 = index, []
@@ -1636,12 +1606,10 @@ module Fortran
                         r13 = nil
                       end
                       if r13
-                        r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
                         r0 = r13
                       else
                         r17 = _nt_sms_reduce
                         if r17
-                          r17 = SyntaxNode.new(input, (index-1)...index) if r17 == true
                           r0 = r17
                         else
                           i18, s18 = index, []
@@ -1666,22 +1634,18 @@ module Fortran
                             r18 = nil
                           end
                           if r18
-                            r18 = SyntaxNode.new(input, (index-1)...index) if r18 == true
                             r0 = r18
                           else
                             r22 = _nt_sms_set_communicator
                             if r22
-                              r22 = SyntaxNode.new(input, (index-1)...index) if r22 == true
                               r0 = r22
                             else
                               r23 = _nt_sms_start
                               if r23
-                                r23 = SyntaxNode.new(input, (index-1)...index) if r23 == true
                                 r0 = r23
                               else
                                 r24 = _nt_sms_stop
                                 if r24
-                                  r24 = SyntaxNode.new(input, (index-1)...index) if r24 == true
                                   r0 = r24
                                 else
                                   i25, s25 = index, []
@@ -1706,22 +1670,18 @@ module Fortran
                                     r25 = nil
                                   end
                                   if r25
-                                    r25 = SyntaxNode.new(input, (index-1)...index) if r25 == true
                                     r0 = r25
                                   else
                                     r29 = _nt_sms_unstructured_grid
                                     if r29
-                                      r29 = SyntaxNode.new(input, (index-1)...index) if r29 == true
                                       r0 = r29
                                     else
                                       r30 = _nt_sms_unstructured_print_timers
                                       if r30
-                                        r30 = SyntaxNode.new(input, (index-1)...index) if r30 == true
                                         r0 = r30
                                       else
                                         r31 = _nt_sms_zerotimers
                                         if r31
-                                          r31 = SyntaxNode.new(input, (index-1)...index) if r31 == true
                                           r0 = r31
                                         else
                                           @index = i0
@@ -1782,7 +1742,7 @@ module Fortran
     if node_cache[:sms_get_communicator].has_key?(index)
       cached = node_cache[:sms_get_communicator][index]
       if cached
-        node_cache[:sms_get_communicator][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1844,7 +1804,7 @@ module Fortran
     if node_cache[:sms_halo_comp].has_key?(index)
       cached = node_cache[:sms_halo_comp][index]
       if cached
-        node_cache[:sms_halo_comp][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -1921,7 +1881,7 @@ module Fortran
     if node_cache[:sms_halo_comp_begin].has_key?(index)
       cached = node_cache[:sms_halo_comp_begin][index]
       if cached
-        node_cache[:sms_halo_comp_begin][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2002,7 +1962,7 @@ module Fortran
     if node_cache[:sms_halo_comp_end].has_key?(index)
       cached = node_cache[:sms_halo_comp_end][index]
       if cached
-        node_cache[:sms_halo_comp_end][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2074,7 +2034,7 @@ module Fortran
     if node_cache[:sms_halo_comp_pair].has_key?(index)
       cached = node_cache[:sms_halo_comp_pair][index]
       if cached
-        node_cache[:sms_halo_comp_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2144,7 +2104,7 @@ module Fortran
     if node_cache[:sms_halo_comp_pairs].has_key?(index)
       cached = node_cache[:sms_halo_comp_pairs][index]
       if cached
-        node_cache[:sms_halo_comp_pairs][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2230,7 +2190,7 @@ module Fortran
     if node_cache[:sms_ignore].has_key?(index)
       cached = node_cache[:sms_ignore][index]
       if cached
-        node_cache[:sms_ignore][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2295,7 +2255,7 @@ module Fortran
     if node_cache[:sms_ignore_begin].has_key?(index)
       cached = node_cache[:sms_ignore_begin][index]
       if cached
-        node_cache[:sms_ignore_begin][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2364,7 +2324,7 @@ module Fortran
     if node_cache[:sms_ignore_end].has_key?(index)
       cached = node_cache[:sms_ignore_end][index]
       if cached
-        node_cache[:sms_ignore_end][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2429,7 +2389,7 @@ module Fortran
     if node_cache[:sms_parallel].has_key?(index)
       cached = node_cache[:sms_parallel][index]
       if cached
-        node_cache[:sms_parallel][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2514,7 +2474,7 @@ module Fortran
     if node_cache[:sms_parallel_begin].has_key?(index)
       cached = node_cache[:sms_parallel_begin][index]
       if cached
-        node_cache[:sms_parallel_begin][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2603,7 +2563,7 @@ module Fortran
     if node_cache[:sms_parallel_end].has_key?(index)
       cached = node_cache[:sms_parallel_end][index]
       if cached
-        node_cache[:sms_parallel_end][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2684,7 +2644,7 @@ module Fortran
     if node_cache[:sms_parallel_var_list].has_key?(index)
       cached = node_cache[:sms_parallel_var_list][index]
       if cached
-        node_cache[:sms_parallel_var_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2736,7 +2696,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i9, s9 = index, []
@@ -2744,7 +2703,7 @@ module Fortran
       s9 << r10
       if r10
         if has_terminal?("", false, index)
-          r11 = true
+          r11 = instantiate_node(SyntaxNode,input, index...(index + 0))
           @index += 0
         else
           terminal_parse_failure("")
@@ -2760,7 +2719,6 @@ module Fortran
         r9 = nil
       end
       if r9
-        r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
         r0 = r9
       else
         @index = i0
@@ -2881,7 +2839,7 @@ module Fortran
     if node_cache[:sms_parallel_var_lists].has_key?(index)
       cached = node_cache[:sms_parallel_var_lists][index]
       if cached
-        node_cache[:sms_parallel_var_lists][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -2907,7 +2865,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i5, s5 = index, []
@@ -2933,7 +2890,6 @@ module Fortran
         r5 = nil
       end
       if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
         r0 = r5
       else
         i10, s10 = index, []
@@ -2951,7 +2907,6 @@ module Fortran
           r10 = nil
         end
         if r10
-          r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
           r0 = r10
         else
           i13, s13 = index, []
@@ -2981,7 +2936,6 @@ module Fortran
             r13 = nil
           end
           if r13
-            r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
             r0 = r13
           else
             i19, s19 = index, []
@@ -3007,7 +2961,6 @@ module Fortran
               r19 = nil
             end
             if r19
-              r19 = SyntaxNode.new(input, (index-1)...index) if r19 == true
               r0 = r19
             else
               i24, s24 = index, []
@@ -3029,7 +2982,6 @@ module Fortran
                 r24 = nil
               end
               if r24
-                r24 = SyntaxNode.new(input, (index-1)...index) if r24 == true
                 r0 = r24
               else
                 i28, s28 = index, []
@@ -3037,7 +2989,7 @@ module Fortran
                 s28 << r29
                 if r29
                   if has_terminal?("", false, index)
-                    r30 = true
+                    r30 = instantiate_node(SyntaxNode,input, index...(index + 0))
                     @index += 0
                   else
                     terminal_parse_failure("")
@@ -3053,7 +3005,6 @@ module Fortran
                   r28 = nil
                 end
                 if r28
-                  r28 = SyntaxNode.new(input, (index-1)...index) if r28 == true
                   r0 = r28
                 else
                   @index = i0
@@ -3110,7 +3061,7 @@ module Fortran
     if node_cache[:sms_reduce].has_key?(index)
       cached = node_cache[:sms_reduce][index]
       if cached
-        node_cache[:sms_reduce][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3165,7 +3116,7 @@ module Fortran
     if node_cache[:sms_reduce_op].has_key?(index)
       cached = node_cache[:sms_reduce_op][index]
       if cached
-        node_cache[:sms_reduce_op][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3174,17 +3125,14 @@ module Fortran
     i0 = index
     r1 = _nt_sms_t_max
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_sms_t_min
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_sms_t_sum
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           @index = i0
@@ -3221,7 +3169,7 @@ module Fortran
     if node_cache[:sms_reduce_varlist].has_key?(index)
       cached = node_cache[:sms_reduce_varlist][index]
       if cached
-        node_cache[:sms_reduce_varlist][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3285,7 +3233,7 @@ module Fortran
     if node_cache[:sms_sentinel].has_key?(index)
       cached = node_cache[:sms_sentinel][index]
       if cached
-        node_cache[:sms_sentinel][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3324,7 +3272,7 @@ module Fortran
     if node_cache[:sms_serial].has_key?(index)
       cached = node_cache[:sms_serial][index]
       if cached
-        node_cache[:sms_serial][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3389,7 +3337,7 @@ module Fortran
     if node_cache[:sms_serial_begin].has_key?(index)
       cached = node_cache[:sms_serial_begin][index]
       if cached
-        node_cache[:sms_serial_begin][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3462,7 +3410,7 @@ module Fortran
     if node_cache[:sms_serial_control].has_key?(index)
       cached = node_cache[:sms_serial_control][index]
       if cached
-        node_cache[:sms_serial_control][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3521,7 +3469,7 @@ module Fortran
     if node_cache[:sms_serial_control_option].has_key?(index)
       cached = node_cache[:sms_serial_control_option][index]
       if cached
-        node_cache[:sms_serial_control_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3561,7 +3509,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i7, s7 = index, []
@@ -3569,7 +3516,7 @@ module Fortran
       s7 << r8
       if r8
         if has_terminal?("", false, index)
-          r9 = true
+          r9 = instantiate_node(SyntaxNode,input, index...(index + 0))
           @index += 0
         else
           terminal_parse_failure("")
@@ -3585,7 +3532,6 @@ module Fortran
         r7 = nil
       end
       if r7
-        r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
         r0 = r7
       else
         @index = i0
@@ -3617,7 +3563,7 @@ module Fortran
     if node_cache[:sms_serial_default].has_key?(index)
       cached = node_cache[:sms_serial_default][index]
       if cached
-        node_cache[:sms_serial_default][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3671,7 +3617,7 @@ module Fortran
     if node_cache[:sms_serial_end].has_key?(index)
       cached = node_cache[:sms_serial_end][index]
       if cached
-        node_cache[:sms_serial_end][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3721,7 +3667,7 @@ module Fortran
     if node_cache[:sms_serial_intent].has_key?(index)
       cached = node_cache[:sms_serial_intent][index]
       if cached
-        node_cache[:sms_serial_intent][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3730,22 +3676,18 @@ module Fortran
     i0 = index
     r1 = _nt_sms_t_ignore
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_sms_t_inout
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         r3 = _nt_sms_t_in
         if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r0 = r3
         else
           r4 = _nt_sms_t_out
           if r4
-            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
             @index = i0
@@ -3787,7 +3729,7 @@ module Fortran
     if node_cache[:sms_serial_intent_list].has_key?(index)
       cached = node_cache[:sms_serial_intent_list][index]
       if cached
-        node_cache[:sms_serial_intent_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3847,7 +3789,7 @@ module Fortran
     if node_cache[:sms_serial_intent_lists].has_key?(index)
       cached = node_cache[:sms_serial_intent_lists][index]
       if cached
-        node_cache[:sms_serial_intent_lists][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -3918,7 +3860,7 @@ module Fortran
     if node_cache[:sms_serial_varlist].has_key?(index)
       cached = node_cache[:sms_serial_varlist][index]
       if cached
-        node_cache[:sms_serial_varlist][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4008,7 +3950,7 @@ module Fortran
     if node_cache[:sms_set_communicator].has_key?(index)
       cached = node_cache[:sms_set_communicator][index]
       if cached
-        node_cache[:sms_set_communicator][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4069,7 +4011,7 @@ module Fortran
     if node_cache[:sms_start].has_key?(index)
       cached = node_cache[:sms_start][index]
       if cached
-        node_cache[:sms_start][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4118,7 +4060,7 @@ module Fortran
     if node_cache[:sms_stop].has_key?(index)
       cached = node_cache[:sms_stop][index]
       if cached
-        node_cache[:sms_stop][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4153,7 +4095,7 @@ module Fortran
     if node_cache[:sms_string].has_key?(index)
       cached = node_cache[:sms_string][index]
       if cached
-        node_cache[:sms_string][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4162,12 +4104,10 @@ module Fortran
     i0 = index
     r1 = _nt_char_literal_constant_dq
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_char_literal_constant_sq
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -4185,7 +4125,7 @@ module Fortran
     if node_cache[:sms_t_barrier].has_key?(index)
       cached = node_cache[:sms_t_barrier][index]
       if cached
-        node_cache[:sms_t_barrier][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4209,7 +4149,7 @@ module Fortran
     if node_cache[:sms_t_begin].has_key?(index)
       cached = node_cache[:sms_t_begin][index]
       if cached
-        node_cache[:sms_t_begin][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4233,7 +4173,7 @@ module Fortran
     if node_cache[:sms_t_comm_rank].has_key?(index)
       cached = node_cache[:sms_t_comm_rank][index]
       if cached
-        node_cache[:sms_t_comm_rank][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4257,7 +4197,7 @@ module Fortran
     if node_cache[:sms_t_comm_size].has_key?(index)
       cached = node_cache[:sms_t_comm_size][index]
       if cached
-        node_cache[:sms_t_comm_size][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4281,7 +4221,7 @@ module Fortran
     if node_cache[:sms_t_compare_var].has_key?(index)
       cached = node_cache[:sms_t_compare_var][index]
       if cached
-        node_cache[:sms_t_compare_var][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4305,7 +4245,7 @@ module Fortran
     if node_cache[:sms_t_create_decomp].has_key?(index)
       cached = node_cache[:sms_t_create_decomp][index]
       if cached
-        node_cache[:sms_t_create_decomp][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4329,7 +4269,7 @@ module Fortran
     if node_cache[:sms_t_declare_decomp].has_key?(index)
       cached = node_cache[:sms_t_declare_decomp][index]
       if cached
-        node_cache[:sms_t_declare_decomp][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4353,7 +4293,7 @@ module Fortran
     if node_cache[:sms_t_default].has_key?(index)
       cached = node_cache[:sms_t_default][index]
       if cached
-        node_cache[:sms_t_default][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4377,7 +4317,7 @@ module Fortran
     if node_cache[:sms_t_distribute].has_key?(index)
       cached = node_cache[:sms_t_distribute][index]
       if cached
-        node_cache[:sms_t_distribute][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4401,7 +4341,7 @@ module Fortran
     if node_cache[:sms_t_end].has_key?(index)
       cached = node_cache[:sms_t_end][index]
       if cached
-        node_cache[:sms_t_end][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4425,7 +4365,7 @@ module Fortran
     if node_cache[:sms_t_exchange].has_key?(index)
       cached = node_cache[:sms_t_exchange][index]
       if cached
-        node_cache[:sms_t_exchange][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4449,7 +4389,7 @@ module Fortran
     if node_cache[:sms_t_get_communicator].has_key?(index)
       cached = node_cache[:sms_t_get_communicator][index]
       if cached
-        node_cache[:sms_t_get_communicator][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4473,7 +4413,7 @@ module Fortran
     if node_cache[:sms_t_halo_comp].has_key?(index)
       cached = node_cache[:sms_t_halo_comp][index]
       if cached
-        node_cache[:sms_t_halo_comp][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4497,7 +4437,7 @@ module Fortran
     if node_cache[:sms_t_ignore].has_key?(index)
       cached = node_cache[:sms_t_ignore][index]
       if cached
-        node_cache[:sms_t_ignore][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4521,7 +4461,7 @@ module Fortran
     if node_cache[:sms_t_in].has_key?(index)
       cached = node_cache[:sms_t_in][index]
       if cached
-        node_cache[:sms_t_in][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4545,7 +4485,7 @@ module Fortran
     if node_cache[:sms_t_inout].has_key?(index)
       cached = node_cache[:sms_t_inout][index]
       if cached
-        node_cache[:sms_t_inout][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4569,7 +4509,7 @@ module Fortran
     if node_cache[:sms_t_lbound].has_key?(index)
       cached = node_cache[:sms_t_lbound][index]
       if cached
-        node_cache[:sms_t_lbound][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4593,7 +4533,7 @@ module Fortran
     if node_cache[:sms_t_max].has_key?(index)
       cached = node_cache[:sms_t_max][index]
       if cached
-        node_cache[:sms_t_max][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4617,7 +4557,7 @@ module Fortran
     if node_cache[:sms_t_min].has_key?(index)
       cached = node_cache[:sms_t_min][index]
       if cached
-        node_cache[:sms_t_min][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4641,7 +4581,7 @@ module Fortran
     if node_cache[:sms_t_out].has_key?(index)
       cached = node_cache[:sms_t_out][index]
       if cached
-        node_cache[:sms_t_out][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4665,7 +4605,7 @@ module Fortran
     if node_cache[:sms_t_parallel].has_key?(index)
       cached = node_cache[:sms_t_parallel][index]
       if cached
-        node_cache[:sms_t_parallel][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4689,7 +4629,7 @@ module Fortran
     if node_cache[:sms_t_reduce].has_key?(index)
       cached = node_cache[:sms_t_reduce][index]
       if cached
-        node_cache[:sms_t_reduce][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4713,7 +4653,7 @@ module Fortran
     if node_cache[:sms_t_regionsize].has_key?(index)
       cached = node_cache[:sms_t_regionsize][index]
       if cached
-        node_cache[:sms_t_regionsize][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4737,7 +4677,7 @@ module Fortran
     if node_cache[:sms_t_serial].has_key?(index)
       cached = node_cache[:sms_t_serial][index]
       if cached
-        node_cache[:sms_t_serial][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4761,7 +4701,7 @@ module Fortran
     if node_cache[:sms_t_set_communicator].has_key?(index)
       cached = node_cache[:sms_t_set_communicator][index]
       if cached
-        node_cache[:sms_t_set_communicator][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4785,7 +4725,7 @@ module Fortran
     if node_cache[:sms_t_start].has_key?(index)
       cached = node_cache[:sms_t_start][index]
       if cached
-        node_cache[:sms_t_start][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4809,7 +4749,7 @@ module Fortran
     if node_cache[:sms_t_stop].has_key?(index)
       cached = node_cache[:sms_t_stop][index]
       if cached
-        node_cache[:sms_t_stop][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4833,7 +4773,7 @@ module Fortran
     if node_cache[:sms_t_sum].has_key?(index)
       cached = node_cache[:sms_t_sum][index]
       if cached
-        node_cache[:sms_t_sum][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4857,7 +4797,7 @@ module Fortran
     if node_cache[:sms_t_to_local].has_key?(index)
       cached = node_cache[:sms_t_to_local][index]
       if cached
-        node_cache[:sms_t_to_local][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4881,7 +4821,7 @@ module Fortran
     if node_cache[:sms_t_ubound].has_key?(index)
       cached = node_cache[:sms_t_ubound][index]
       if cached
-        node_cache[:sms_t_ubound][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4905,7 +4845,7 @@ module Fortran
     if node_cache[:sms_t_unstructured].has_key?(index)
       cached = node_cache[:sms_t_unstructured][index]
       if cached
-        node_cache[:sms_t_unstructured][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4929,7 +4869,7 @@ module Fortran
     if node_cache[:sms_t_unstructured_grid].has_key?(index)
       cached = node_cache[:sms_t_unstructured_grid][index]
       if cached
-        node_cache[:sms_t_unstructured_grid][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4953,7 +4893,7 @@ module Fortran
     if node_cache[:sms_t_unstructured_print_timers].has_key?(index)
       cached = node_cache[:sms_t_unstructured_print_timers][index]
       if cached
-        node_cache[:sms_t_unstructured_print_timers][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -4977,7 +4917,7 @@ module Fortran
     if node_cache[:sms_t_zerotimers].has_key?(index)
       cached = node_cache[:sms_t_zerotimers][index]
       if cached
-        node_cache[:sms_t_zerotimers][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5016,7 +4956,7 @@ module Fortran
     if node_cache[:sms_to_local].has_key?(index)
       cached = node_cache[:sms_to_local][index]
       if cached
-        node_cache[:sms_to_local][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5101,7 +5041,7 @@ module Fortran
     if node_cache[:sms_to_local_begin].has_key?(index)
       cached = node_cache[:sms_to_local_begin][index]
       if cached
-        node_cache[:sms_to_local_begin][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5190,7 +5130,7 @@ module Fortran
     if node_cache[:sms_to_local_end].has_key?(index)
       cached = node_cache[:sms_to_local_end][index]
       if cached
-        node_cache[:sms_to_local_end][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5240,7 +5180,7 @@ module Fortran
     if node_cache[:sms_to_local_key].has_key?(index)
       cached = node_cache[:sms_to_local_key][index]
       if cached
-        node_cache[:sms_to_local_key][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5249,12 +5189,10 @@ module Fortran
     i0 = index
     r1 = _nt_sms_t_lbound
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       r2 = _nt_sms_t_ubound
       if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r0 = r2
       else
         @index = i0
@@ -5302,7 +5240,7 @@ module Fortran
     if node_cache[:sms_to_local_list].has_key?(index)
       cached = node_cache[:sms_to_local_list][index]
       if cached
-        node_cache[:sms_to_local_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5381,7 +5319,7 @@ module Fortran
     if node_cache[:sms_to_local_lists].has_key?(index)
       cached = node_cache[:sms_to_local_lists][index]
       if cached
-        node_cache[:sms_to_local_lists][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5478,7 +5416,7 @@ module Fortran
     if node_cache[:sms_unstructured_grid].has_key?(index)
       cached = node_cache[:sms_unstructured_grid][index]
       if cached
-        node_cache[:sms_unstructured_grid][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5539,7 +5477,7 @@ module Fortran
     if node_cache[:sms_unstructured_print_timers].has_key?(index)
       cached = node_cache[:sms_unstructured_print_timers][index]
       if cached
-        node_cache[:sms_unstructured_print_timers][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5659,7 +5597,7 @@ module Fortran
     if node_cache[:sms_varlist3d].has_key?(index)
       cached = node_cache[:sms_varlist3d][index]
       if cached
-        node_cache[:sms_varlist3d][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5693,7 +5631,6 @@ module Fortran
       r1 = nil
     end
     if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
       i7, s7 = index, []
@@ -5719,7 +5656,6 @@ module Fortran
         r7 = nil
       end
       if r7
-        r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
         r0 = r7
       else
         i12, s12 = index, []
@@ -5741,7 +5677,6 @@ module Fortran
           r12 = nil
         end
         if r12
-          r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
           r0 = r12
         else
           i16, s16 = index, []
@@ -5763,7 +5698,6 @@ module Fortran
             r16 = nil
           end
           if r16
-            r16 = SyntaxNode.new(input, (index-1)...index) if r16 == true
             r0 = r16
           else
             i20, s20 = index, []
@@ -5781,7 +5715,6 @@ module Fortran
               r20 = nil
             end
             if r20
-              r20 = SyntaxNode.new(input, (index-1)...index) if r20 == true
               r0 = r20
             else
               i23, s23 = index, []
@@ -5789,7 +5722,7 @@ module Fortran
               s23 << r24
               if r24
                 if has_terminal?("", false, index)
-                  r25 = true
+                  r25 = instantiate_node(SyntaxNode,input, index...(index + 0))
                   @index += 0
                 else
                   terminal_parse_failure("")
@@ -5805,7 +5738,6 @@ module Fortran
                 r23 = nil
               end
               if r23
-                r23 = SyntaxNode.new(input, (index-1)...index) if r23 == true
                 r0 = r23
               else
                 @index = i0
@@ -5844,7 +5776,7 @@ module Fortran
     if node_cache[:sms_var_list].has_key?(index)
       cached = node_cache[:sms_var_list][index]
       if cached
-        node_cache[:sms_var_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -5911,7 +5843,7 @@ module Fortran
     if node_cache[:sms_zerotimers].has_key?(index)
       cached = node_cache[:sms_zerotimers][index]
       if cached
-        node_cache[:sms_zerotimers][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
