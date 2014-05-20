@@ -15,7 +15,11 @@
 - Replace ad-hoc normalizer with (maybe) Ragel-based transformer. Should handle
   holleriths, too. Changes made to text coordinates during processing by the
   state machine should be recorded so that coordinates related to errors during
-  parsing can be mapped to original-source coordinates.
+  parsing can be mapped to original-source coordinates. Note that prepsrc_free
+  and prepsrc_fixed changes need to be incorporated into this somehow.
+
+- Current removal of !$OMP END PARALLEL DO directive in sms_fortran.rb ignores
+  the possibility of continuation lines. Fix.
 
 ### OPTIMIZATION
 
