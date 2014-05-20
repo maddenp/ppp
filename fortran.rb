@@ -1924,7 +1924,7 @@ module Fortran
   class Block_Do_Construct < Do_Construct
 
     def body
-      e[0]
+      e[0].body
     end
 
     def do_stmt
