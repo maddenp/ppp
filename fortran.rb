@@ -1,4 +1,4 @@
-$: << (basedir=File.dirname($0)) << File.join(basedir,"treetop")
+$: << (basedir=File.dirname($0)) << File.join(basedir,"lib")
 
 require "ostruct"
 require "yaml"
