@@ -707,16 +707,6 @@ module Fortran
     include Array_Translation
   end
 
-  class Call_Stmt < Stmt
-
-    def translate
-      if (pl=sms_parallel_loop)
-        pl.metadata[:calls_out]=true
-      end
-    end
-
-  end
-
   class Close_Stmt < Io_Stmt
 
     def translate
@@ -730,7 +720,7 @@ module Fortran
   class Do_Construct < NT
 
     def translate
-      if metadata[:parallel] and metadata[:calls_out]
+      if metadata[:parallel]
         node=raw("sms__in_parallel=.true.",:assignment_stmt,input.srcfile,@dstfile)
         body.e.insert(0,node)
         code=[]
@@ -801,16 +791,6 @@ module Fortran
 
     def translate
       fail "ERROR: 'entry' statement may not appear inside sms$serial region" if sms_serial
-    end
-
-  end
-
-  class Function_Reference < NT
-
-    def translate
-      if (pl=sms_parallel_loop)
-        pl.metadata[:calls_out]=true
-      end
     end
 
   end
@@ -2489,7 +2469,6 @@ class Translator
     s=s.gsub(/^\s*(!sms\$.*)&\s*\n\s*!sms\$&(.*)/im,'\1\2')             # continuations
     s=s.gsub(/^\s*!sms\$insert\s*/i,"")                                 # inserts
     s=s.gsub(/^\s*!sms\$remove\s+begin.*?!sms\$remove\s+end/im,"")      # removes
-    s=s.gsub(/^\s*!\$omp +end +parallel +do.*/i,"")                     # no omp end parallel do
     s
   end
 
@@ -2497,7 +2476,6 @@ class Translator
     s=s.gsub(/^([c\*]sms\$.*)&\s*\n[c\*]sms\$&(.*)/im,'\1\2')           # continuations
     s=s.gsub(/^[c\*]sms\$insert\s*/i,"")                                # inserts
     s=s.gsub(/^[c\*]sms\$remove\s+begin.*?[c\*]sms\$remove\s+end/im,"") # removes
-    s=s.gsub(/^[c\*]\$omp +end +parallel +do.*/i,"")                    # no omp end parallel do
     s
   end
 
