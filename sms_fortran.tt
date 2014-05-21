@@ -51,6 +51,10 @@ grammar Fortran
   end
 
   rule omp_parallel_do_body
+    omp_parallel_do_body_allowed+ <OMP_Parallel_Do_Body>
+  end
+
+  rule omp_parallel_do_body_allowed
     do_construct &{ |e| sp_do_construct(e[0]) } <Do_Construct> /
     directive
   end
@@ -59,16 +63,20 @@ grammar Fortran
     "!$omp " <T>
   end
 
+  rule omp_space
+    " "*
+  end
+
   rule omp_t_do
-    "do" <T>
+    "do" omp_space <T>
   end
 
   rule omp_t_end
-    "end " <T>
+    "end" omp_space <T>
   end
 
   rule omp_t_parallel
-    "parallel " <T>
+    "parallel" omp_space <T>
   end
 
   rule sms_barrier

@@ -1115,15 +1115,18 @@ module Fortran
   class OMP_Parallel_Do_Begin < NT
 
     def str0
-      wrap("#{e[0]}#{e[1]}#{e[2]}#{e[3]}","!$omp ")+"\n"
+      wrap("#{e[0]}#{e[1]}#{e[2]}#{e[3]}","!$omp")+"\n"
     end
 
+  end
+
+  class OMP_Parallel_Do_Body < NT
   end
 
   class OMP_Parallel_Do_End < OMP_Directive
 
     def str0
-      wrap("#{e[0]}#{e[1]}#{e[2]}#{e[3]}","!$omp ")+"\n"
+      wrap("#{e[0]}#{e[1]}#{e[2]}#{e[3]}","!$omp")+"\n"
     end
 
   end
@@ -2503,7 +2506,7 @@ class Translator
       j=i
       while s0=~/^[c!\*]\$omp.*&\s*$/i
         j+=1
-        s0=(s0.sub(/&\s*$/,'')+a[j].sub(/^[c!\*]\$omp/i,'')).gsub(/\s+/,' ')
+        s0=(s0.sub(/&\s*$/,'')+a[j].sub(/^[c!\*]\$omp\s*/i,'')).gsub(/\s+/,' ')
       end
       if s0=~/^!\$omp (end )?parallel do.*$/i
         a[i]=s0.downcase
@@ -2532,9 +2535,9 @@ class Translator
       j=i
       while s0=~/^\s*!\$omp.*&\s*$/i
         j+=1
-        s0=(s0.sub(/&\s*$/,'')+a[j].sub(/^\s*!\$omp/i,'')).gsub(/\s+/,' ')
+        s0=(s0.sub(/&\s*$/,'')+a[j].sub(/^\s*!\$omp\s*/i,'')).gsub(/\s+/,' ')
       end
-      if s0=~/^\s*!\$omp (end )?parallel do.*$/i
+      if s0=~/^\s*!\$omp\s*(end\s*)?parallel\s*do.*$/i
         a[i]=s0.downcase
         (j-i).times { a.delete_at(i+1) }
       end
