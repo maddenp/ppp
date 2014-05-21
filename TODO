@@ -25,6 +25,8 @@
   would be better to do this once -- maybe as a post-translation walk that calls
   write_envfile for each module encountered.
 
+- Consider replacing internal mini-parses with manual node/tree construction.
+
 ### PARSING
 
 - Reconsider storing references to tree nodes during parsing. Instead, consider

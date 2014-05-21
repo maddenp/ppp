@@ -119,7 +119,24 @@ module Fortran
 
     i0, s0 = index, []
     i1 = index
-    r2 = _nt_sms_sentinel
+    i2 = index
+    r3 = _nt_sms_sentinel
+    if r3
+      r2 = r3
+    else
+      r4 = _nt_omp_parallel_do_begin
+      if r4
+        r2 = r4
+      else
+        r5 = _nt_omp_parallel_do_end
+        if r5
+          r2 = r5
+        else
+          @index = i2
+          r2 = nil
+        end
+      end
+    end
     if r2
       r1 = nil
     else
@@ -129,33 +146,33 @@ module Fortran
     s0 << r1
     if r1
       if has_terminal?("!", false, index)
-        r3 = instantiate_node(SyntaxNode,input, index...(index + 1))
+        r6 = instantiate_node(SyntaxNode,input, index...(index + 1))
         @index += 1
       else
         terminal_parse_failure("!")
-        r3 = nil
+        r6 = nil
       end
-      s0 << r3
-      if r3
-        s4, i4 = [], index
+      s0 << r6
+      if r6
+        s7, i7 = [], index
         loop do
-          r5 = _nt_character
-          if r5
-            s4 << r5
+          r8 = _nt_character
+          if r8
+            s7 << r8
           else
             break
           end
         end
-        if s4.empty?
-          @index = i4
-          r4 = nil
+        if s7.empty?
+          @index = i7
+          r7 = nil
         else
-          r4 = instantiate_node(SyntaxNode,input, i4...index, s4)
+          r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
         end
-        s0 << r4
-        if r4
-          r6 = _nt_t_newline
-          s0 << r6
+        s0 << r7
+        if r7
+          r9 = _nt_t_newline
+          s0 << r9
         end
       end
     end
@@ -426,7 +443,7 @@ module Fortran
       elements[0]
     end
 
-    def do_construct
+    def omp_parallel_do_body
       elements[1]
     end
 
@@ -447,7 +464,7 @@ module Fortran
     r1 = _nt_omp_parallel_do_begin
     s0 << r1
     if r1
-      r2 = _nt_do_construct
+      r2 = _nt_omp_parallel_do_body
       s0 << r2
       if r2
         r4 = _nt_omp_parallel_do_end
@@ -490,26 +507,38 @@ module Fortran
       return cached
     end
 
-    i0, s0 = index, []
-    r1 = _nt_do_construct
-    s0 << r1
-    if r1
-      i2 = index
-      r3 = lambda { |e| sp_do_construct(e[0]) }.call(s0)
-      if r3
-        @index = i2
-        r2 = instantiate_node(SyntaxNode,input, index...index)
+    i0 = index
+    i1, s1 = index, []
+    r2 = _nt_do_construct
+    s1 << r2
+    if r2
+      i3 = index
+      r4 = lambda { |e| sp_do_construct(e[0]) }.call(s1)
+      if r4
+        @index = i3
+        r3 = instantiate_node(SyntaxNode,input, index...index)
       else
-        r2 = nil
+        r3 = nil
       end
-      s0 << r2
+      s1 << r3
     end
-    if s0.last
-      r0 = instantiate_node(Do_Construct,input, i0...index, s0)
-      r0.extend(OmpParallelDoBody0)
+    if s1.last
+      r1 = instantiate_node(Do_Construct,input, i1...index, s1)
+      r1.extend(OmpParallelDoBody0)
     else
-      @index = i0
-      r0 = nil
+      @index = i1
+      r1 = nil
+    end
+    if r1
+      r0 = r1
+    else
+      r5 = _nt_directive
+      if r5
+        r0 = r5
+      else
+        @index = i0
+        r0 = nil
+      end
     end
 
     node_cache[:omp_parallel_do_body][start_index] = r0
@@ -552,11 +581,11 @@ module Fortran
       return cached
     end
 
-    if has_terminal?("do ", false, index)
-      r0 = instantiate_node(T,input, index...(index + 3))
-      @index += 3
+    if has_terminal?("do", false, index)
+      r0 = instantiate_node(T,input, index...(index + 2))
+      @index += 2
     else
-      terminal_parse_failure("do ")
+      terminal_parse_failure("do")
       r0 = nil
     end
 

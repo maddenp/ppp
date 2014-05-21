@@ -18,7 +18,7 @@ grammar Fortran
     # Note: Any "comment" not stripped out during normalization is a directive.
     # These are non-SMS directives.
 
-    !sms_sentinel "!" character+ t_newline <Directive>
+    !( sms_sentinel / omp_parallel_do_begin / omp_parallel_do_end ) "!" character+ t_newline <Directive>
   end
 
   rule executable_construct
@@ -47,11 +47,12 @@ grammar Fortran
   end
 
   rule omp_parallel_do
-    omp_parallel_do_begin do_construct omp_parallel_do_end? <OMP_Parallel_Do>
+    omp_parallel_do_begin omp_parallel_do_body omp_parallel_do_end? <OMP_Parallel_Do>
   end
 
   rule omp_parallel_do_body
-    do_construct  &{ |e| sp_do_construct(e[0]) } <Do_Construct>
+    do_construct &{ |e| sp_do_construct(e[0]) } <Do_Construct> /
+    directive
   end
 
   rule omp_sentinel
@@ -59,7 +60,7 @@ grammar Fortran
   end
 
   rule omp_t_do
-    "do " <T>
+    "do" <T>
   end
 
   rule omp_t_end

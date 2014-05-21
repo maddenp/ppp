@@ -721,12 +721,12 @@ module Fortran
 
     def translate
       if metadata[:parallel]
-        node=raw("sms__in_parallel=.true.",:assignment_stmt,input.srcfile,@dstfile)
-        body.e.insert(0,node)
+        target=(ompdo=ancestor(OMP_Parallel_Do))?(ompdo):(self)
         code=[]
-        code.push(self)
+        code.push("sms__in_parallel=.true.")
+        code.push(target)
         code.push("sms__in_parallel=.false.")
-        replace_statement(code)
+        target.replace_statement(code)
       end
     end
 
