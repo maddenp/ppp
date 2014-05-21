@@ -2494,13 +2494,14 @@ end # module Fortran
 
 class Translator
 
-  def prepsrc_fixed(s)
+  
+  def prepsrc_common(s,sms,omp)
 
     # Process SMS continuations, inserts and removes
 
-    s=s.gsub(/^([c!\*]sms\$.*)&\s*\n[c\*]sms\$&(.*)/im,'\1\2')
-    s=s.gsub(/^[c!\*]sms\$insert\s*/i,"")
-    s=s.gsub(/^[c!\*]sms\$remove\s+begin.*?[c\*]sms\$remove\s+end/im,"")
+    s=s.gsub(/^(#{sms}.*)&\s*\n#{sms}&(.*)/im,'\1\2')
+    s=s.gsub(/^#{sms}insert\s*/i,"")
+    s=s.gsub(/^#{sms}remove\s+begin.*?#{sms}remove\s+end/im,"")
 
     # Join OpenMP (END) PARALLEL DO directives
 
@@ -2508,11 +2509,11 @@ class Translator
     a.each_index do |i|
       s0=a[i].chomp
       j=i
-      while s0=~/^[c!\*]\$omp.*&$/i
+      while s0=~/^#{omp}.*&$/i
         j+=1
-        s0=(s0.sub(/\s*&$/i,'')+a[j].chomp.sub(/^\s*[c!\*]\$omp(&)?\s*/i,'')).gsub(/\s+/,' ')
+        s0=(s0.sub(/\s*&$/i,'')+a[j].chomp.sub(/^\s*#{omp}(&)?\s*/i,'')).gsub(/\s+/,' ')
       end
-      if s0=~/^\s*[c!\*]\$omp\s*(end\s*)?parallel\s*do.*$/i
+      if s0=~/^\s*#{omp}\s*(end\s*)?parallel\s*do.*$/i
         a[i]=s0.downcase
         (j-i).times { a.delete_at(i+1) }
       end
@@ -2523,33 +2524,12 @@ class Translator
 
   end
 
+  def prepsrc_fixed(s)
+    prepsrc_common(s,'[c!\*]sms\$','[c!\*]\$omp')
+  end
+
   def prepsrc_free(s)
-
-    # Process SMS continuations, inserts and removes
-
-    s=s.gsub(/^\s*(!sms\$.*)&\s*\n\s*!sms\$&(.*)/im,'\1\2')
-    s=s.gsub(/^\s*!sms\$insert\s*/i,"")
-    s=s.gsub(/^\s*!sms\$remove\s+begin.*?!sms\$remove\s+end/im,"")
-
-    # Join OpenMP (END) PARALLEL DO directives
-
-    a=s.split("\n")
-    a.each_index do |i|
-      s0=a[i].chomp
-      j=i
-      while s0=~/^\s*!\$omp.*&$/i
-        j+=1
-        s0=(s0.sub(/\s*&$/i,'')+a[j].chomp.sub(/^\s*!\$omp(&)?\s*/i,'')).gsub(/\s+/,' ')
-      end
-      if s0=~/^\s*!\$omp\s*(end\s*)?parallel\s*do.*$/i
-        a[i]=s0.downcase
-        (j-i).times { a.delete_at(i+1) }
-      end
-    end
-    s=a.join("\n")
-    
-    s
-
+    prepsrc_common(s,'!sms\$','!\$omp')
   end
 
 end
