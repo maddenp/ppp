@@ -12,6 +12,8 @@
 
 ### NORMALIZATION
 
+- Factor out common code in prepsrc_[fixed|free] in sms_fortran.rb.
+
 - Replace ad-hoc normalizer with (maybe) Ragel-based transformer. Should handle
   holleriths, too. Changes made to text coordinates during processing by the
   state machine should be recorded so that coordinates related to errors during

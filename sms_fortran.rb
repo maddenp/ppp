@@ -2506,13 +2506,13 @@ class Translator
 
     a=s.split("\n")
     a.each_index do |i|
-      s0=a[i]
+      s0=a[i].chomp
       j=i
-      while s0=~/^[c!\*]\$omp.*&\s*$/i
+      while s0=~/^[c!\*]\$omp.*&$/i
         j+=1
-        s0=(s0.sub(/\s*&\s*$/,'')+a[j].sub(/^[c!\*]\$omp\s*/i,'').chomp).gsub(/\s+/,' ')
+        s0=(s0.sub(/\s*&$/i,'')+a[j].chomp.sub(/^\s*[c!\*]\$omp(&)?\s*/i,'')).gsub(/\s+/,' ')
       end
-      if s0=~/^!\$omp (end )?parallel do.*$/i
+      if s0=~/^\s*[c!\*]\$omp\s*(end\s*)?parallel\s*do.*$/i
         a[i]=s0.downcase
         (j-i).times { a.delete_at(i+1) }
       end
@@ -2535,11 +2535,11 @@ class Translator
 
     a=s.split("\n")
     a.each_index do |i|
-      s0=a[i]
+      s0=a[i].chomp
       j=i
-      while s0=~/^\s*!\$omp.*&\s*$/i
+      while s0=~/^\s*!\$omp.*&$/i
         j+=1
-        s0=(s0.sub(/\s*&\s*$/,'')+a[j].sub(/^\s*!\$omp\s*/i,'').chomp).gsub(/\s+/,' ')
+        s0=(s0.sub(/\s*&$/i,'')+a[j].chomp.sub(/^\s*!\$omp(&)?\s*/i,'')).gsub(/\s+/,' ')
       end
       if s0=~/^\s*!\$omp\s*(end\s*)?parallel\s*do.*$/i
         a[i]=s0.downcase
