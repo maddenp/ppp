@@ -146,7 +146,7 @@ module Fortran
         "#{a1}("+((cb)?("#{cb}"):("#{a2}"))+",0,#{nl})"
       end
 
-      return if sms_ignore or sms_parallel_loop or sms_serial
+      return if omp_parallel_loop or sms_ignore or sms_parallel_loop or sms_serial
       var="#{name}"
       if inside?(Assignment_Stmt,Where_Construct,Where_Stmt)
         if (fn=ancestor(Function_Reference))           # we're an actual arg
@@ -546,6 +546,10 @@ module Fortran
       7
     end
 
+    def omp_parallel_loop(node=self)
+      return (opl=node.ancestor(OMP_Parallel_Do))?(opl):(nil)
+    end
+
     def ranks
       (1..maxrank)
     end
@@ -721,7 +725,7 @@ module Fortran
 
     def translate
       if metadata[:parallel]
-        target=(ompdo=ancestor(OMP_Parallel_Do))?(ompdo):(self)
+        target=(opl=omp_parallel_loop)?(opl):(self)
         code=[]
         code.push("sms__in_parallel=.true.")
         code.push(target)
@@ -910,7 +914,7 @@ module Fortran
         end
         globals=metadata[:globals]||SortedSet.new
         @onroot=true unless globals.empty?
-        @onroot=false if sms_parallel_loop
+        @onroot=false if omp_parallel_loop or sms_parallel_loop
         globals.each do |global|
           ((treatment==:in)?(@var_gather):(@var_scatter)).add("#{global}")
         end
