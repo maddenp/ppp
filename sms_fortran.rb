@@ -714,7 +714,7 @@ module Fortran
   class Close_Stmt < Io_Stmt
 
     def translate
-      return if sms_ignore or sms_serial
+      return if omp_parallel_loop or sms_ignore or sms_parallel_loop or sms_serial
       io_stmt_init
       io_stmt_common
     end
@@ -914,7 +914,6 @@ module Fortran
         end
         globals=metadata[:globals]||SortedSet.new
         @onroot=true unless globals.empty?
-        @onroot=false if omp_parallel_loop or sms_parallel_loop
         globals.each do |global|
           ((treatment==:in)?(@var_gather):(@var_scatter)).add("#{global}")
         end
@@ -1138,7 +1137,7 @@ module Fortran
   class Open_Stmt < Io_Stmt
 
     def translate
-      return if sms_ignore or sms_serial
+      return if omp_parallel_loop or sms_ignore or sms_parallel_loop or sms_serial
       io_stmt_init
       io_stmt_common
     end
@@ -1148,7 +1147,7 @@ module Fortran
   class Print_Stmt < Io_Stmt
 
     def translate
-      return if sms_ignore or sms_serial
+      return if omp_parallel_loop or sms_ignore or sms_parallel_loop or sms_serial
       io_stmt_init
       io_stmt_common(:in)
     end
@@ -1158,7 +1157,7 @@ module Fortran
   class Read_Stmt < Io_Stmt
 
     def translate
-      return if sms_ignore
+      return if omp_parallel_loop or sms_ignore or sms_parallel_loop
       if sms_serial
         add_serial_region_vars(:out)
       else
@@ -1224,6 +1223,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$barrier may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$barrier may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       use(sms_decompmod)
       code=[]
       code.push("#{self}")
@@ -1237,6 +1237,7 @@ module Fortran
   class SMS_Comm_Rank < SMS_Getter
 
     def translate
+      fail "ERROR: sms$comm_rank may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       translate_with_options("comm rank","sms__comm_rank")
     end
 
@@ -1245,6 +1246,7 @@ module Fortran
   class SMS_Comm_Size < SMS_Getter
 
     def translate
+      fail "ERROR: sms$comm_size may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       translate_with_options("comm size","sms__comm_size")
     end
 
@@ -1258,6 +1260,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$compare_var may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$compare_var may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       use(sms_decompmod)
       declare("logical","sms__debugging_on")
       var="#{e[3].name}"
@@ -1305,6 +1308,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$create_decomp may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$create_decomp may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       max=3
       d="#{decomp}"
       n="#{decomp}__nestlevel"
@@ -1415,6 +1419,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$declare_decomp may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$declare_decomp may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       use("sms__module")
       dh="#{e[3]}"
       declare("integer","#{dh}__maxnests",{:attrs=>"parameter",:init=>"1"})
@@ -1499,6 +1504,7 @@ module Fortran
     def translate
 
       fail "ERROR: sms$exchange may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$exchange may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
 
       use(sms_decompmod)
       v=e[4].e.reduce([e[3]]) { |m,x| m.push(x.e[1]) }
@@ -1614,6 +1620,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$halo_comp may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$halo_comp may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
     end
     
   end
@@ -1663,6 +1670,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$ignore may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$ignore may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
     end
     
   end
@@ -1691,6 +1699,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$parallel may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$parallel may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
     end
 
   end
@@ -1805,6 +1814,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$reduce may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$reduce may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       nvars=vars.size
       fail "ERROR: sms$reduce supports reduction of #{sms_maxvars} variables max" if nvars>sms_maxvars
       use(sms_decompmod)
@@ -1862,6 +1872,7 @@ module Fortran
 
       fail "ERROR: sms$serial may not appear inside another sms$serial region" if inside?(SMS_Serial)
       fail "ERROR: sms$erial regions may not appear inside sms$parallel loops" if sms_parallel_loop
+      fail "ERROR: sms$serial may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
 
       serial_begin=e[0]
       oldblock=e[1]
@@ -2225,6 +2236,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$set_communicator may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$set_communicator may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       use(sms_decompmod)
       code=[]
       code.push("#{self}")
@@ -2239,6 +2251,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$start may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$start may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       use(sms_decompmod)
       code=[]
       code.push("#{self}")
@@ -2253,6 +2266,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$stop may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$stop may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       code=[]
       code.push("#{self}")
       code.push(sms_stop)
@@ -2269,6 +2283,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$to_local may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$to_local may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
     end
 
   end
@@ -2361,6 +2376,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$unstructured_grid may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$unstructured_grid may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       var="#{e[3]}"
       fail "ERROR: No module info found for variable '#{var}'" unless (varenv=varenv_get(var))
       fail "ERROR: No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
@@ -2380,6 +2396,7 @@ module Fortran
   class SMS_Unstructured_Print_Timers < SMS
 
     def translate
+      fail "ERROR: sms$unstructured_print_timers may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       code=[]
       code.push("#{self}")
       code.push("call sms__unstructured_print_timers")
@@ -2439,6 +2456,7 @@ module Fortran
 
     def translate
       fail "ERROR: sms$zerotimers may not appear inside sms$serial region" if sms_serial
+      fail "ERROR: sms$zerotimers may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       code=[]
       code.push("#{self}")
       code.push("call sms__zerotimers")
@@ -2465,7 +2483,7 @@ module Fortran
   class Write_Stmt < Io_Stmt
 
     def translate
-      return if sms_ignore
+      return if omp_parallel_loop or sms_ignore or sms_parallel_loop
       if sms_serial
         add_serial_region_vars(:in)
       else        
