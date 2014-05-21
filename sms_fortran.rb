@@ -1115,7 +1115,7 @@ module Fortran
   class OMP_Parallel_Do_Begin < NT
 
     def str0
-      "#{e[0]}#{e[1]}#{e[2]}#{e[3]}\n"
+      wrap("#{e[0]}#{e[1]}#{e[2]}#{e[3]}","!$omp ")+"\n"
     end
 
   end
@@ -1123,7 +1123,7 @@ module Fortran
   class OMP_Parallel_Do_End < OMP_Directive
 
     def str0
-      "#{e[0]}#{e[1]}#{e[2]}#{e[3]}\n"
+      wrap("#{e[0]}#{e[1]}#{e[2]}#{e[3]}","!$omp ")+"\n"
     end
 
   end

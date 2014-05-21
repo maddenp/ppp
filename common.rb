@@ -1,6 +1,51 @@
 require "exceptions"
+require "sentinels"
 
 module Common
+
+  include Sentinels
+
+  def directive
+    return @@directive if defined?(@@directive)
+    s=sentinels.map { |x| x.gsub(/\$/,'\$') }.join("|")
+    @@directive=Regexp.new("^\s*!((#{s}).*)",true)
+  end
+
+  def wrap(s,alt=nil)
+
+    def directive?(s)
+      s=~directive
+    end
+
+    maxcols=132 # columns
+    maxcont=39  # continuation lines
+    a=s.split("\n")
+    (0..a.length-1).each do |n|
+      cont=0
+      e=a[n].chomp
+      unless directive?(e) and not alt
+        if e.length>maxcols
+          e=~/^( *).*$/
+          i=$1.length+2
+          t=""
+          begin
+            r=[maxcols-2,e.length-1].min
+            t+=e[0..r]+"&\n"
+            prefix=(alt)?(alt):(" "*i+"&")
+            e=prefix+e[r+1..-1]
+            cont+=1
+          end while e.length>maxcols
+          t+=e
+          if cont>maxcont
+            die "ERROR: More than #{maxcont} continuation lines:\n\n#{t}"
+          end
+          a[n]=t
+        end
+      end
+    end
+    s=a.join("\n")
+    s
+  end
 
   def array_attrs(array_spec,_attrs,distribute)
     dims=0
