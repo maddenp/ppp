@@ -34,8 +34,12 @@ grammar Fortran
     directive
   end
 
+  rule omp_clauses
+    [^&\n]* <T>
+  end
+
   rule omp_parallel_do_begin
-    omp_sentinel omp_t_parallel omp_t_do t_newline <OMP_Parallel_Do_Begin>
+    omp_sentinel omp_t_parallel omp_t_do omp_clauses t_newline <OMP_Parallel_Do_Begin>
   end
 
   rule omp_parallel_do_end
@@ -51,19 +55,19 @@ grammar Fortran
   end
 
   rule omp_sentinel
-    "!$omp" <T>
+    "!$omp " <T>
   end
 
   rule omp_t_do
-    "do" <T>
+    "do " <T>
   end
 
   rule omp_t_end
-    "end" <T>
+    "end " <T>
   end
 
   rule omp_t_parallel
-    "parallel" <T>
+    "parallel " <T>
   end
 
   rule sms_barrier

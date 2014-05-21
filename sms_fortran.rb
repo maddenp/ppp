@@ -1106,21 +1106,24 @@ module Fortran
   class Nonlabel_Do_Stmt < Do_Stmt
   end
 
-  class OMP_Parallel_Do < NT
+  class OMP_Directive < NT
+  end
+
+  class OMP_Parallel_Do < OMP_Directive
   end
 
   class OMP_Parallel_Do_Begin < NT
 
     def str0
-      "#{e[0]} #{e[1]} #{e[2]} #{e[3]}"
+      "#{e[0]}#{e[1]}#{e[2]}#{e[3]}\n"
     end
 
   end
 
-  class OMP_Parallel_Do_End < NT
+  class OMP_Parallel_Do_End < OMP_Directive
 
     def str0
-      "#{e[0]} #{e[1]} #{e[2]} #{e[3]} #{e[4]}"
+      "#{e[0]}#{e[1]}#{e[2]}#{e[3]}\n"
     end
 
   end
@@ -2484,35 +2487,6 @@ end # module Fortran
 
 class Translator
 
-  def prepsrc_free(s)
-
-    # Process SMS continuations, inserts and removes
-
-    s=s.gsub(/^\s*(!sms\$.*)&\s*\n\s*!sms\$&(.*)/im,'\1\2')
-    s=s.gsub(/^\s*!sms\$insert\s*/i,"")
-    s=s.gsub(/^\s*!sms\$remove\s+begin.*?!sms\$remove\s+end/im,"")
-
-    # Join OpenMP (END) PARALLEL DO directives
-
-    a=s.split("\n")
-    a.each_index do |i|
-      s0=a[i]
-      j=i
-      while s0=~/^\s*!\$omp.*&\s*$/i
-        j+=1
-        s0=(s0.sub(/&\s*$/,'')+a[j].sub(/^\s*!\$omp/i,'')).gsub(/\s+/,' ')
-      end
-      if s0=~/^\s*!\$omp (end )?parallel do/i
-        a[i]=s0.downcase
-        (j-i).times { a.delete_at(i+1) }
-      end
-    end
-    s=a.join("\n")
-    
-    s
-
-  end
-
   def prepsrc_fixed(s)
 
     # Process SMS continuations, inserts and removes
@@ -2531,7 +2505,36 @@ class Translator
         j+=1
         s0=(s0.sub(/&\s*$/,'')+a[j].sub(/^[c!\*]\$omp/i,'')).gsub(/\s+/,' ')
       end
-      if s0=~/^!\$omp (end )?parallel do/i
+      if s0=~/^!\$omp (end )?parallel do.*$/i
+        a[i]=s0.downcase
+        (j-i).times { a.delete_at(i+1) }
+      end
+    end
+    s=a.join("\n")
+    
+    s
+
+  end
+
+  def prepsrc_free(s)
+
+    # Process SMS continuations, inserts and removes
+
+    s=s.gsub(/^\s*(!sms\$.*)&\s*\n\s*!sms\$&(.*)/im,'\1\2')
+    s=s.gsub(/^\s*!sms\$insert\s*/i,"")
+    s=s.gsub(/^\s*!sms\$remove\s+begin.*?!sms\$remove\s+end/im,"")
+
+    # Join OpenMP (END) PARALLEL DO directives
+
+    a=s.split("\n")
+    a.each_index do |i|
+      s0=a[i]
+      j=i
+      while s0=~/^\s*!\$omp.*&\s*$/i
+        j+=1
+        s0=(s0.sub(/&\s*$/,'')+a[j].sub(/^\s*!\$omp/i,'')).gsub(/\s+/,' ')
+      end
+      if s0=~/^\s*!\$omp (end )?parallel do.*$/i
         a[i]=s0.downcase
         (j-i).times { a.delete_at(i+1) }
       end

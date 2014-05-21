@@ -259,6 +259,38 @@ module Fortran
     r0
   end
 
+  def _nt_omp_clauses
+    start_index = index
+    if node_cache[:omp_clauses].has_key?(index)
+      cached = node_cache[:omp_clauses][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    s0, i0 = [], index
+    loop do
+      if has_terminal?('\G[^&\\n]', true, index)
+        r1 = true
+        @index += 1
+      else
+        r1 = nil
+      end
+      if r1
+        s0 << r1
+      else
+        break
+      end
+    end
+    r0 = instantiate_node(T,input, i0...index, s0)
+
+    node_cache[:omp_clauses][start_index] = r0
+
+    r0
+  end
+
   module OmpParallelDoBegin0
     def omp_sentinel
       elements[0]
@@ -272,8 +304,12 @@ module Fortran
       elements[2]
     end
 
-    def t_newline
+    def omp_clauses
       elements[3]
+    end
+
+    def t_newline
+      elements[4]
     end
   end
 
@@ -298,8 +334,12 @@ module Fortran
         r3 = _nt_omp_t_do
         s0 << r3
         if r3
-          r4 = _nt_t_newline
+          r4 = _nt_omp_clauses
           s0 << r4
+          if r4
+            r5 = _nt_t_newline
+            s0 << r5
+          end
         end
       end
     end
@@ -488,11 +528,11 @@ module Fortran
       return cached
     end
 
-    if has_terminal?("!$omp", false, index)
-      r0 = instantiate_node(T,input, index...(index + 5))
-      @index += 5
+    if has_terminal?("!$omp ", false, index)
+      r0 = instantiate_node(T,input, index...(index + 6))
+      @index += 6
     else
-      terminal_parse_failure("!$omp")
+      terminal_parse_failure("!$omp ")
       r0 = nil
     end
 
@@ -512,11 +552,11 @@ module Fortran
       return cached
     end
 
-    if has_terminal?("do", false, index)
-      r0 = instantiate_node(T,input, index...(index + 2))
-      @index += 2
+    if has_terminal?("do ", false, index)
+      r0 = instantiate_node(T,input, index...(index + 3))
+      @index += 3
     else
-      terminal_parse_failure("do")
+      terminal_parse_failure("do ")
       r0 = nil
     end
 
@@ -536,11 +576,11 @@ module Fortran
       return cached
     end
 
-    if has_terminal?("end", false, index)
-      r0 = instantiate_node(T,input, index...(index + 3))
-      @index += 3
+    if has_terminal?("end ", false, index)
+      r0 = instantiate_node(T,input, index...(index + 4))
+      @index += 4
     else
-      terminal_parse_failure("end")
+      terminal_parse_failure("end ")
       r0 = nil
     end
 
@@ -560,11 +600,11 @@ module Fortran
       return cached
     end
 
-    if has_terminal?("parallel", false, index)
-      r0 = instantiate_node(T,input, index...(index + 8))
-      @index += 8
+    if has_terminal?("parallel ", false, index)
+      r0 = instantiate_node(T,input, index...(index + 9))
+      @index += 9
     else
-      terminal_parse_failure("parallel")
+      terminal_parse_failure("parallel ")
       r0 = nil
     end
 
