@@ -3611,9 +3611,6 @@ module Fortran
 
   end
 
-  class Label_Stmt < NT
-  end
-
   class Len_Pair < NT
   end
 
@@ -4624,6 +4621,9 @@ module Fortran
       cat_stmt
     end
 
+  end
+
+  class Stmt_Label < NT
   end
 
   class Stop_Code < NT

@@ -1006,45 +1006,6 @@ module Fortran
   class Label_Do_Stmt < Do_Stmt
   end
 
-  class Label_Stmt < NT
-
-    def errmsg_parallel(in_parallel_loop)
-      io=(in_parallel_loop)?("out"):("in")
-      "ERROR: Branch to statement labeled '#{self}' from #{io}side parallel loop"
-    end
-
-    def errmsg_serial(in_serial_region)
-      io=(in_serial_region)?("out"):("in")
-      "ERROR: Branch to statement labeled '#{self}' from #{io}side serial region"
-    end
-
-    def translate
-      my_serial_region=sms_serial_region
-      my_parallel_loop=sms_parallel_loop
-      # Handle branches via numeric labels.
-      (env[:branch_targets]["#{self}"]||[]).each do |label|
-        unless sms_serial_region(label)==my_serial_region
-          fail errmsg_serial(my_serial_region)
-        end
-        unless sms_parallel_loop(label)==my_parallel_loop
-          fail errmsg_parallel(my_parallel_loop)
-        end
-      end
-      # Handle branches via assigned goto statements.
-      agt=env[:assigned_goto_targets]
-      (env[:assign_map]["#{self}"]||[]).each do |var|
-        if (targets=agt[var])
-          targets.each do |target|
-            unless sms_serial_region(target)==my_serial_region
-              fail errmsg_serial(my_serial_region)
-            end
-          end
-        end
-      end
-    end
-
-  end
-
   class Main_Program < Scoping_Unit
 
     def translate
@@ -2461,6 +2422,45 @@ module Fortran
       code.push("#{self}")
       code.push("call sms__zerotimers")
       replace_statement(code)
+    end
+
+  end
+
+  class Stmt_Label < NT
+
+    def errmsg_parallel(in_parallel_loop)
+      io=(in_parallel_loop)?("out"):("in")
+      "ERROR: Branch to statement labeled '#{self}' from #{io}side parallel loop"
+    end
+
+    def errmsg_serial(in_serial_region)
+      io=(in_serial_region)?("out"):("in")
+      "ERROR: Branch to statement labeled '#{self}' from #{io}side serial region"
+    end
+
+    def translate
+      my_serial_region=sms_serial_region
+      my_parallel_loop=sms_parallel_loop
+      # Handle branches via numeric labels.
+      (env[:branch_targets]["#{self}"]||[]).each do |label|
+        unless sms_serial_region(label)==my_serial_region
+          fail errmsg_serial(my_serial_region)
+        end
+        unless sms_parallel_loop(label)==my_parallel_loop
+          fail errmsg_parallel(my_parallel_loop)
+        end
+      end
+      # Handle branches via assigned goto statements.
+      agt=env[:assigned_goto_targets]
+      (env[:assign_map]["#{self}"]||[]).each do |var|
+        if (targets=agt[var])
+          targets.each do |target|
+            unless sms_serial_region(target)==my_serial_region
+              fail errmsg_serial(my_serial_region)
+            end
+          end
+        end
+      end
     end
 
   end

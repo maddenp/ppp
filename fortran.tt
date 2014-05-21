@@ -54,7 +54,7 @@ grammar Fortran
   rule access_stmt
     # F90:R521
 
-    label:label_stmt? access_spec access_stmt_option? t_newline &{ |e| sp_access_stmt(e[1],e[2]) } <Access_Stmt>
+    label:stmt_label? access_spec access_stmt_option? t_newline &{ |e| sp_access_stmt(e[1],e[2]) } <Access_Stmt>
   end
 
   rule access_stmt_option
@@ -148,7 +148,7 @@ grammar Fortran
   rule allocatable_stmt
     # F90:R526
 
-    label:label_stmt? t_allocatable double_colon? array_names_and_deferred_shape_spec_lists t_newline &{ |e| sp_allocatable_stmt(e[3]) } <Allocatable_Stmt>
+    label:stmt_label? t_allocatable double_colon? array_names_and_deferred_shape_spec_lists t_newline &{ |e| sp_allocatable_stmt(e[3]) } <Allocatable_Stmt>
   end
 
   rule allocate_lower_bound
@@ -195,7 +195,7 @@ grammar Fortran
   rule allocate_stmt
     # F90:R622
 
-    label:label_stmt? t_allocate t_paren_l allocation_list allocate_stat_construct? t_paren_r t_newline <Allocate_Stmt>
+    label:stmt_label? t_allocate t_paren_l allocation_list allocate_stat_construct? t_paren_r t_newline <Allocate_Stmt>
   end
 
   rule allocate_upper_bound
@@ -231,7 +231,7 @@ grammar Fortran
   rule arithmetic_if_stmt
     # F90:R840
 
-    label:label_stmt? t_if t_paren_l scalar_numeric_expr t_paren_r label_branch t_comma label_branch t_comma label_branch t_newline &{ |e| sp_arithmetic_if_stmt(e[5],e[7],e[9]) } <Arithmetic_If_Stmt>
+    label:stmt_label? t_if t_paren_l scalar_numeric_expr t_paren_r label_branch t_comma label_branch t_comma label_branch t_newline &{ |e| sp_arithmetic_if_stmt(e[5],e[7],e[9]) } <Arithmetic_If_Stmt>
   end
 
   rule array_constructor
@@ -308,13 +308,13 @@ grammar Fortran
   rule assign_stmt
     # F90:R838
 
-    label:label_stmt? t_assign label_assign t_to scalar_int_variable t_newline &{ |e| sp_assign_stmt(e[2],e[4]) } <Assign_Stmt>
+    label:stmt_label? t_assign label_assign t_to scalar_int_variable t_newline &{ |e| sp_assign_stmt(e[2],e[4]) } <Assign_Stmt>
   end
 
   rule assigned_goto_stmt
     # F90:R839
 
-    label:label_stmt? t_goto scalar_int_variable t_comma? assigned_goto_stmt_label_list? t_newline &{ |e| sp_assigned_goto_stmt(e[2]) } <Assigned_Goto_Stmt>
+    label:stmt_label? t_goto scalar_int_variable t_comma? assigned_goto_stmt_label_list? t_newline &{ |e| sp_assigned_goto_stmt(e[2]) } <Assigned_Goto_Stmt>
   end
 
   rule assigned_goto_stmt_label_list
@@ -324,7 +324,7 @@ grammar Fortran
   rule assignment_stmt
     # F90:R735
 
-    label:label_stmt? variable t_equal expr t_newline <Assignment_Stmt>
+    label:stmt_label? variable t_equal expr t_newline <Assignment_Stmt>
   end
 
   rule assumed_shape_spec
@@ -387,8 +387,8 @@ grammar Fortran
   rule backspace_stmt
     # F90:R919
 
-    label:label_stmt? t_backspace t_paren_l position_spec_list t_paren_r t_newline <Backspace_Stmt_1> /
-    label:label_stmt? t_backspace external_file_unit t_newline <Backspace_Stmt_2>
+    label:stmt_label? t_backspace t_paren_l position_spec_list t_paren_r t_newline <Backspace_Stmt_1> /
+    label:stmt_label? t_backspace external_file_unit t_newline <Backspace_Stmt_2>
   end
 
   rule binary_constant
@@ -426,7 +426,7 @@ grammar Fortran
   rule block_data_stmt
     # F90:R1111
 
-    label:label_stmt? t_block t_data block_data_name? t_newline &{ |e| sp_block_data_stmt } <Block_Data_Stmt>
+    label:stmt_label? t_block t_data block_data_name? t_newline &{ |e| sp_block_data_stmt } <Block_Data_Stmt>
   end
 
   rule block_do_construct
@@ -450,7 +450,7 @@ grammar Fortran
   rule call_stmt
     # F90:R1210
 
-    label:label_stmt? t_call subroutine_name parenthesized_args? t_newline <Call_Stmt>
+    label:stmt_label? t_call subroutine_name parenthesized_args? t_newline <Call_Stmt>
   end
 
   rule case_construct
@@ -489,7 +489,7 @@ grammar Fortran
   rule case_stmt
     # F90:R810
 
-    label:label_stmt? t_case case_selector case_construct_name? t_newline <Case_Stmt>
+    label:stmt_label? t_case case_selector case_construct_name? t_newline <Case_Stmt>
   end
 
   rule case_stmt_construct
@@ -620,7 +620,7 @@ grammar Fortran
   rule close_stmt
     # F90:R907
 
-    label:label_stmt? t_close t_paren_l close_spec_list t_paren_r t_newline <Close_Stmt>
+    label:stmt_label? t_close t_paren_l close_spec_list t_paren_r t_newline <Close_Stmt>
   end
 
   rule common_block_name
@@ -666,7 +666,7 @@ grammar Fortran
   rule common_stmt
     # F90:R548
 
-    label:label_stmt? t_common common_block_name_triplet? common_block_object_list common_block_name_and_object_lists t_newline <Common_Stmt>
+    label:stmt_label? t_common common_block_name_triplet? common_block_object_list common_block_name_and_object_lists t_newline <Common_Stmt>
   end
 
   rule complex_literal_constant
@@ -711,7 +711,7 @@ grammar Fortran
   rule component_def_stmt
     # F90:R426
 
-    label:label_stmt? type_spec component_def_stmt_option? component_decl_list t_newline <Component_Def_Stmt>
+    label:stmt_label? type_spec component_def_stmt_option? component_decl_list t_newline <Component_Def_Stmt>
   end
 
   rule component_def_stmt_option
@@ -738,7 +738,7 @@ grammar Fortran
   rule computed_goto_stmt
     # F90:R837
 
-    label:label_stmt? t_goto t_paren_l label_list t_paren_r t_comma? scalar_int_expr t_newline <Computed_Goto_Stmt>
+    label:stmt_label? t_goto t_paren_l label_list t_paren_r t_comma? scalar_int_expr t_newline <Computed_Goto_Stmt>
   end
 
   rule concat_op
@@ -793,13 +793,13 @@ grammar Fortran
   rule contains_stmt
     # F90:R1225
 
-    label:label_stmt? t_contains t_newline <Contains_Stmt>
+    label:stmt_label? t_contains t_newline <Contains_Stmt>
   end
 
   rule continue_stmt
     # F90:R841
 
-    label:label_stmt? t_continue t_newline <Continue_Stmt>
+    label:stmt_label? t_continue t_newline <Continue_Stmt>
   end
 
   rule control_edit_desc
@@ -816,7 +816,7 @@ grammar Fortran
   rule cycle_stmt
     # F90:R834
 
-    label:label_stmt? t_cycle do_construct_name? t_newline <Cycle_Stmt>
+    label:stmt_label? t_cycle do_construct_name? t_newline <Cycle_Stmt>
   end
 
   rule data_edit_desc
@@ -896,7 +896,7 @@ grammar Fortran
   rule data_stmt
     # F90:R529
 
-    label:label_stmt? t_data data_stmt_set_list t_newline <Data_Stmt>
+    label:stmt_label? t_data data_stmt_set_list t_newline <Data_Stmt>
   end
 
   rule data_stmt_constant
@@ -962,7 +962,7 @@ grammar Fortran
   rule deallocate_stmt
     # F90:R631
 
-    label:label_stmt? t_deallocate t_paren_l allocate_object_list allocate_stat_construct? t_paren_r t_newline <Deallocate_Stmt>
+    label:stmt_label? t_deallocate t_paren_l allocate_object_list allocate_stat_construct? t_paren_r t_newline <Deallocate_Stmt>
   end
 
   rule declaration_construct
@@ -1050,7 +1050,7 @@ grammar Fortran
   rule derived_type_stmt
     # F90:R424
 
-    label:label_stmt? t_type derived_typeaccess_spec? type_name t_newline <Derived_Type_Stmt>
+    label:stmt_label? t_type derived_typeaccess_spec? type_name t_newline <Derived_Type_Stmt>
   end
 
   rule derived_typeaccess_spec
@@ -1070,7 +1070,7 @@ grammar Fortran
   rule dimension_stmt
     # F90:R525
 
-    label:label_stmt? t_dimension double_colon? array_names_and_specs t_newline &{ |e| sp_dimension_stmt(e[3]) } <Dimension_Stmt>
+    label:stmt_label? t_dimension double_colon? array_names_and_specs t_newline &{ |e| sp_dimension_stmt(e[3]) } <Dimension_Stmt>
   end
 
   rule directive
@@ -1228,13 +1228,13 @@ grammar Fortran
     # characters 'elseif' are irrevocably recognized using rule t_elseif, and
     # a parse failure follows, as '_label' is then unexpected.
 
-    label:label_stmt? !( t_else if_construct_name !t_paren_l ) t_elseif t_paren_l scalar_logical_expr t_paren_r t_then if_construct_name? t_newline <Else_If_Stmt>
+    label:stmt_label? !( t_else if_construct_name !t_paren_l ) t_elseif t_paren_l scalar_logical_expr t_paren_r t_then if_construct_name? t_newline <Else_If_Stmt>
   end
 
   rule else_stmt
     # F90:R805
 
-    label:label_stmt? t_else if_construct_name? t_newline <Else_Stmt>
+    label:stmt_label? t_else if_construct_name? t_newline <Else_Stmt>
   end
 
   rule elsewhere_construct
@@ -1244,7 +1244,7 @@ grammar Fortran
   rule elsewhere_stmt
     # F90:R742
 
-    label:label_stmt? t_elsewhere t_newline <Elsewhere_Stmt>
+    label:stmt_label? t_elsewhere t_newline <Elsewhere_Stmt>
   end
 
   rule end_block_data_option
@@ -1254,7 +1254,7 @@ grammar Fortran
   rule end_block_data_stmt
     # F90:R1112
 
-    label:label_stmt? t_end end_block_data_option? t_newline <End_Block_Data_Stmt>
+    label:stmt_label? t_end end_block_data_option? t_newline <End_Block_Data_Stmt>
   end
 
   rule end_do
@@ -1265,13 +1265,13 @@ grammar Fortran
   end
 
   rule end_do_continue_stmt
-    label:label_stmt? t_continue t_newline <End_Do_Stmt>
+    label:stmt_label? t_continue t_newline <End_Do_Stmt>
   end
 
   rule end_do_stmt
     # F90:R825
 
-    label:label_stmt? t_enddo do_construct_name? t_newline <End_Do_Stmt>
+    label:stmt_label? t_enddo do_construct_name? t_newline <End_Do_Stmt>
   end
 
   rule end_function_option
@@ -1281,19 +1281,19 @@ grammar Fortran
   rule end_function_stmt
     # F90:R1218
 
-    label:label_stmt? t_end end_function_option? t_newline <End_Function_Stmt>
+    label:stmt_label? t_end end_function_option? t_newline <End_Function_Stmt>
   end
 
   rule end_if_stmt
     # F90:R806
 
-    label:label_stmt? t_endif if_construct_name? t_newline <End_If_Stmt>
+    label:stmt_label? t_endif if_construct_name? t_newline <End_If_Stmt>
   end
 
   rule end_interface_stmt
     # F90:R1203 + F95:R1204
 
-    label:label_stmt? t_end t_interface generic_spec? t_newline <End_Interface_Stmt>
+    label:stmt_label? t_end t_interface generic_spec? t_newline <End_Interface_Stmt>
   end
 
   rule end_module_option
@@ -1303,13 +1303,13 @@ grammar Fortran
   rule end_module_stmt
     # F90:R1106
 
-    label:label_stmt? t_end end_module_option? t_newline <End_Module_Stmt>
+    label:stmt_label? t_end end_module_option? t_newline <End_Module_Stmt>
   end
 
   rule end_program_stmt
     # F90:R1103
 
-    label:label_stmt? t_end !end_program_stmt_disallowed t_program? program_name? t_newline? <End_Program_Stmt>
+    label:stmt_label? t_end !end_program_stmt_disallowed t_program? program_name? t_newline? <End_Program_Stmt>
   end
 
   rule end_program_stmt_disallowed
@@ -1325,13 +1325,13 @@ grammar Fortran
   rule end_select_stmt
     # F90:R811
 
-    label:label_stmt? t_end t_select case_construct_name? t_newline <End_Select_Stmt>
+    label:stmt_label? t_end t_select case_construct_name? t_newline <End_Select_Stmt>
   end
 
   rule end_subroutine_stmt
     # F90:R1222
 
-    label:label_stmt? t_end end_subroutine_option? t_newline <End_Subroutine_Stmt>
+    label:stmt_label? t_end end_subroutine_option? t_newline <End_Subroutine_Stmt>
   end
 
   rule end_subroutine_option
@@ -1341,20 +1341,20 @@ grammar Fortran
   rule end_type_stmt
     # F90:R415
 
-    label:label_stmt? t_end t_type type_name? t_newline <End_Type_Stmt>
+    label:stmt_label? t_end t_type type_name? t_newline <End_Type_Stmt>
   end
 
   rule end_where_stmt
     # F90:R743
 
-    label:label_stmt? t_endwhere t_newline <End_Where_Stmt>
+    label:stmt_label? t_endwhere t_newline <End_Where_Stmt>
   end
 
   rule endfile_stmt
     # F90:R920
 
-    label:label_stmt? t_endfile t_paren_l position_spec_list t_paren_r t_newline <Endfile_Stmt_1> /
-    label:label_stmt? t_endfile external_file_unit t_newline <Endfile_Stmt_2>
+    label:stmt_label? t_endfile t_paren_l position_spec_list t_paren_r t_newline <Endfile_Stmt_1> /
+    label:stmt_label? t_endfile external_file_unit t_newline <Endfile_Stmt_2>
   end
 
   rule entity_decl
@@ -1398,7 +1398,7 @@ grammar Fortran
   rule entry_stmt
     # F90:R1223
 
-    label:label_stmt? t_entry entry_name dummy_arg_list_option? result_option? t_newline <Entry_Stmt>
+    label:stmt_label? t_entry entry_name dummy_arg_list_option? result_option? t_newline <Entry_Stmt>
   end
 
   rule equiv_op
@@ -1443,7 +1443,7 @@ grammar Fortran
   rule equivalence_stmt
     # F90:R545
 
-    label:label_stmt? t_equivalence equivalence_set_list t_newline <Equivalence_Stmt>
+    label:stmt_label? t_equivalence equivalence_set_list t_newline <Equivalence_Stmt>
   end
 
   rule executable_construct
@@ -1489,7 +1489,7 @@ grammar Fortran
   rule exit_stmt
     # F90:R835
 
-    label:label_stmt? t_exit do_construct_name? t_newline <Exit_Stmt>
+    label:stmt_label? t_exit do_construct_name? t_newline <Exit_Stmt>
   end
 
   rule explicit_shape_spec
@@ -1556,7 +1556,7 @@ grammar Fortran
   rule external_stmt
     # F90:R1207
 
-    label:label_stmt? t_external external_name_list t_newline <External_Stmt>
+    label:stmt_label? t_external external_name_list t_newline <External_Stmt>
   end
 
   rule external_subprogram
@@ -1640,7 +1640,7 @@ grammar Fortran
   rule function_stmt
     # F90:R1216
 
-    label:label_stmt? function_prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r result_option? t_newline &{ |e| sp_function_stmt(e[3],e[5],e[7]) } <Function_Stmt>
+    label:stmt_label? function_prefix? t_function function_name t_paren_l dummy_arg_name_list? t_paren_r result_option? t_newline &{ |e| sp_function_stmt(e[3],e[5],e[7]) } <Function_Stmt>
   end
 
   rule function_subprogram
@@ -1678,7 +1678,7 @@ grammar Fortran
   rule goto_stmt
     # F90:R836
 
-    label:label_stmt? t_goto label_branch t_newline &{ |e| sp_goto_stmt(e[2]) } <Goto_Stmt>
+    label:stmt_label? t_goto label_branch t_newline &{ |e| sp_goto_stmt(e[2]) } <Goto_Stmt>
   end
 
   rule hex_constant
@@ -1732,7 +1732,7 @@ grammar Fortran
   rule if_stmt
     # F90:R807
 
-    label:label_stmt? t_if t_paren_l scalar_logical_expr t_paren_r action_stmt <If_Stmt>
+    label:stmt_label? t_if t_paren_l scalar_logical_expr t_paren_r action_stmt <If_Stmt>
   end
 
   rule if_then_construct
@@ -1742,7 +1742,7 @@ grammar Fortran
   rule if_then_stmt
     # F90:R803
 
-    label:label_stmt? if_construct_name_label? t_if t_paren_l scalar_logical_expr t_paren_r t_then t_newline <If_Then_Stmt>
+    label:stmt_label? if_construct_name_label? t_if t_paren_l scalar_logical_expr t_paren_r t_then t_newline <If_Then_Stmt>
   end
 
   rule imag_part
@@ -1804,8 +1804,8 @@ grammar Fortran
   rule implicit_stmt
     # F90:R540
 
-    label:label_stmt? t_implicit t_none t_newline <Implicit_None_Stmt> /
-    label:label_stmt? t_implicit implicit_spec_list t_newline <Implicit_Stmt>
+    label:stmt_label? t_implicit t_none t_newline <Implicit_None_Stmt> /
+    label:stmt_label? t_implicit implicit_spec_list t_newline <Implicit_Stmt>
   end
 
   rule initialization
@@ -1886,8 +1886,8 @@ grammar Fortran
   rule inquire_stmt
     # F90:R923
 
-    label:label_stmt? t_inquire t_paren_l inquire_spec_list t_paren_r t_newline <Inquire_Stmt_1> /
-    label:label_stmt? t_inquire t_paren_l t_iolength t_equal scalar_default_int_variable t_paren_r output_item_list t_newline <Inquire_Stmt_2>
+    label:stmt_label? t_inquire t_paren_l inquire_spec_list t_paren_r t_newline <Inquire_Stmt_1> /
+    label:stmt_label? t_inquire t_paren_l t_iolength t_equal scalar_default_int_variable t_paren_r output_item_list t_newline <Inquire_Stmt_2>
   end
 
   rule int_expr
@@ -1928,7 +1928,7 @@ grammar Fortran
   rule intent_stmt
     # F90:R519
 
-    label:label_stmt? t_intent t_paren_l intent_spec t_paren_r double_colon? dummy_arg_name_list t_newline &{ |e| sp_intent_stmt(e[3],e[6]) } <Intent_Stmt>
+    label:stmt_label? t_intent t_paren_l intent_spec t_paren_r double_colon? dummy_arg_name_list t_newline &{ |e| sp_intent_stmt(e[3],e[6]) } <Intent_Stmt>
   end
 
   rule interface_block
@@ -1951,7 +1951,7 @@ grammar Fortran
   rule interface_stmt
     # F90:R1202
 
-    label:label_stmt? t_interface generic_spec? t_newline <Interface_Stmt>
+    label:stmt_label? t_interface generic_spec? t_newline <Interface_Stmt>
   end
 
   rule internal_file_unit
@@ -2001,7 +2001,7 @@ grammar Fortran
   rule intrinsic_stmt
     # F90:R1208
 
-    label:label_stmt? t_intrinsic intrinsic_procedure_name_list t_newline <Intrinsic_Stmt>
+    label:stmt_label? t_intrinsic intrinsic_procedure_name_list t_newline <Intrinsic_Stmt>
   end
 
   rule io_control_spec
@@ -2229,7 +2229,7 @@ grammar Fortran
   rule label_do_stmt
     # F90:R819
 
-    label:label_stmt? do_construct_name_label? t_do label loop_control? t_newline &{ |e| sp_dolabel_push(e[3]) } <Label_Do_Stmt>
+    label:stmt_label? do_construct_name_label? t_do label loop_control? t_newline &{ |e| sp_dolabel_push(e[3]) } <Label_Do_Stmt>
   end
 
   rule label_format
@@ -2244,8 +2244,8 @@ grammar Fortran
     t_comma label_branch <Label_List_Pair>
   end
 
-  rule label_stmt
-    label "" <Label_Stmt>
+  rule stmt_label
+    label "" <Stmt_Label>
   end
 
   rule len_pair
@@ -2439,7 +2439,7 @@ grammar Fortran
   rule module_procedure_stmt
     # F90:R1205
 
-    label:label_stmt? t_module t_procedure procedure_name_list t_newline <Module_Procedure_Stmt>
+    label:stmt_label? t_module t_procedure procedure_name_list t_newline <Module_Procedure_Stmt>
   end
 
   rule module_procedure_stmts
@@ -2449,7 +2449,7 @@ grammar Fortran
   rule module_stmt
     # F90:R1105
 
-    label:label_stmt? t_module module_name t_newline &{ |e| sp_module_stmt } <Module_Stmt>
+    label:stmt_label? t_module module_name t_newline &{ |e| sp_module_stmt } <Module_Stmt>
   end
 
   rule module_subprogram
@@ -2535,7 +2535,7 @@ grammar Fortran
   rule namelist_stmt
     # F90:R543
 
-    label:label_stmt? t_namelist namelist_group_set namelist_group_sets t_newline &{ |e| sp_namelist_stmt(e[2],e[3]) } <Namelist_Stmt>
+    label:stmt_label? t_namelist namelist_group_set namelist_group_sets t_newline &{ |e| sp_namelist_stmt(e[2],e[3]) } <Namelist_Stmt>
   end
 
   rule nonblock_do_construct
@@ -2548,7 +2548,7 @@ grammar Fortran
   rule nonlabel_do_stmt
     # F90:R820
 
-    label:label_stmt? do_construct_name_label? t_do loop_control? t_newline &{ |e| sp_dolabel_push(:nolabel) } <Nonlabel_Do_Stmt>
+    label:stmt_label? do_construct_name_label? t_do loop_control? t_newline &{ |e| sp_dolabel_push(:nolabel) } <Nonlabel_Do_Stmt>
   end
 
   rule not_op
@@ -2564,7 +2564,7 @@ grammar Fortran
   rule nullify_stmt
     # F90:R629
 
-    label:label_stmt? t_nullify t_paren_l pointer_object_list t_paren_r t_newline <Nullify_Stmt>
+    label:stmt_label? t_nullify t_paren_l pointer_object_list t_paren_r t_newline <Nullify_Stmt>
   end
 
   rule numeric_expr
@@ -2620,13 +2620,13 @@ grammar Fortran
   rule open_stmt
     # F90:R904
 
-    label:label_stmt? t_open t_paren_l connect_spec_list t_paren_r t_newline <Open_Stmt>
+    label:stmt_label? t_open t_paren_l connect_spec_list t_paren_r t_newline <Open_Stmt>
   end
 
   rule optional_stmt
     # F90:R520
 
-    label:label_stmt? t_optional double_colon? dummy_arg_name_list t_newline &{ |e| sp_optional_stmt(e[3]) } <Optional_Stmt>
+    label:stmt_label? t_optional double_colon? dummy_arg_name_list t_newline &{ |e| sp_optional_stmt(e[3]) } <Optional_Stmt>
   end
 
   rule or_op
@@ -2665,7 +2665,7 @@ grammar Fortran
   rule parameter_stmt
     # F90:R538
 
-    label:label_stmt? t_parameter t_paren_l named_constant_def_list t_paren_r t_newline &{ |e| sp_parameter_stmt(e[3]) } <Parameter_Stmt>
+    label:stmt_label? t_parameter t_paren_l named_constant_def_list t_paren_r t_newline &{ |e| sp_parameter_stmt(e[3]) } <Parameter_Stmt>
   end
 
   rule parent_string
@@ -2720,13 +2720,13 @@ grammar Fortran
   rule pause_stmt
     # F90:R844
 
-    label:label_stmt? t_pause stop_code? t_newline <Pause_Stmt>
+    label:stmt_label? t_pause stop_code? t_newline <Pause_Stmt>
   end
 
   rule pointer_assignment_stmt
     # F90:R736
 
-    label:label_stmt? pointer_object t_point target t_newline <Pointer_Assignment_Stmt>
+    label:stmt_label? pointer_object t_point target t_newline <Pointer_Assignment_Stmt>
   end
 
   rule pointer_object
@@ -2743,7 +2743,7 @@ grammar Fortran
   rule pointer_stmt
     # F90:R527
 
-    label:label_stmt? t_pointer double_colon? object_names_and_spec_lists t_newline &{ |e| sp_pointer_stmt(e[3]) } <Pointer_Stmt>
+    label:stmt_label? t_pointer double_colon? object_names_and_spec_lists t_newline &{ |e| sp_pointer_stmt(e[3]) } <Pointer_Stmt>
   end
 
   rule position_edit_desc
@@ -2797,7 +2797,7 @@ grammar Fortran
   rule print_stmt
     # F90:R911
 
-    label:label_stmt? t_print format print_stmt_output_item_list? t_newline <Print_Stmt>
+    label:stmt_label? t_print format print_stmt_output_item_list? t_newline <Print_Stmt>
   end
 
   rule print_stmt_output_item_list
@@ -2807,7 +2807,7 @@ grammar Fortran
   rule private_sequence_stmt
     # F90:R423
 
-    label:label_stmt? ( t_private / t_sequence ) t_newline <Private_Sequence_Stmt>
+    label:stmt_label? ( t_private / t_sequence ) t_newline <Private_Sequence_Stmt>
   end
 
   rule private_sequence_stmts
@@ -2833,7 +2833,7 @@ grammar Fortran
   rule program_stmt
     # F90:R1102
 
-    label:label_stmt? t_program program_name t_newline &{ |e| sp_program_stmt } <Program_Stmt>
+    label:stmt_label? t_program program_name t_newline &{ |e| sp_program_stmt } <Program_Stmt>
   end
 
   rule program_unit
@@ -2852,8 +2852,8 @@ grammar Fortran
   rule read_stmt
     # F90:R909
 
-    label:label_stmt? t_read t_paren_l io_control_spec_list t_paren_r input_item_list? t_newline <Read_Stmt_1> /
-    label:label_stmt? t_read format read_stmt_input_item_list_option? t_newline <Read_Stmt_2>
+    label:stmt_label? t_read t_paren_l io_control_spec_list t_paren_r input_item_list? t_newline <Read_Stmt_1> /
+    label:stmt_label? t_read format read_stmt_input_item_list_option? t_newline <Read_Stmt_2>
   end
 
   rule read_stmt_input_item_list_option
@@ -2957,20 +2957,20 @@ grammar Fortran
   rule return_stmt
     # F90:R1224
 
-    label:label_stmt? t_return scalar_int_expr? t_newline <Return_Stmt>
+    label:stmt_label? t_return scalar_int_expr? t_newline <Return_Stmt>
   end
 
   rule rewind_stmt
     # F90:R921
 
-    label:label_stmt? t_rewind t_paren_l position_spec_list t_paren_r t_newline <Rewind_Stmt_1> /
-    label:label_stmt? t_rewind external_file_unit t_newline <Rewind_Stmt_2>
+    label:stmt_label? t_rewind t_paren_l position_spec_list t_paren_r t_newline <Rewind_Stmt_1> /
+    label:stmt_label? t_rewind external_file_unit t_newline <Rewind_Stmt_2>
   end
 
   rule save_stmt
     # F90:R523
 
-    label:label_stmt? t_save save_stmt_entity_list? t_newline &{ |e| sp_save_stmt(e[2]) } <Save_Stmt>
+    label:stmt_label? t_save save_stmt_entity_list? t_newline &{ |e| sp_save_stmt(e[2]) } <Save_Stmt>
   end
 
   rule save_stmt_entity_list
@@ -3143,7 +3143,7 @@ grammar Fortran
   rule select_case_stmt
     # F90:R809
 
-    label:label_stmt? case_construct_name_pair? t_select t_case t_paren_l case_expr t_paren_r t_newline <Select_Case_Stmt>
+    label:stmt_label? case_construct_name_pair? t_select t_case t_paren_l case_expr t_paren_r t_newline <Select_Case_Stmt>
   end
 
   rule shared_term_do_construct
@@ -3256,7 +3256,7 @@ grammar Fortran
   rule stmt_function_stmt
     # F90:R1226
 
-    label:label_stmt? function_name t_paren_l dummy_arg_name_list? t_paren_r t_equal scalar_expr t_newline <Stmt_Function_Stmt>
+    label:stmt_label? function_name t_paren_l dummy_arg_name_list? t_paren_r t_equal scalar_expr t_newline <Stmt_Function_Stmt>
   end
 
   rule stop_code
@@ -3269,7 +3269,7 @@ grammar Fortran
   rule stop_stmt
     # F90:R842
 
-    label:label_stmt? t_stop stop_code? t_newline <Stop_Stmt>
+    label:stmt_label? t_stop stop_code? t_newline <Stop_Stmt>
   end
 
   rule stride
@@ -3311,7 +3311,7 @@ grammar Fortran
   rule subroutine_stmt
     # F90:R1220 + F95:1222
 
-    label:label_stmt? subroutine_prefix? t_subroutine subroutine_name dummy_arg_list_option? t_newline &{ |e| sp_subroutine_stmt(e[3],e[4]) } <Subroutine_Stmt>
+    label:stmt_label? subroutine_prefix? t_subroutine subroutine_name dummy_arg_list_option? t_newline &{ |e| sp_subroutine_stmt(e[3],e[4]) } <Subroutine_Stmt>
   end
 
   rule subroutine_subprogram
@@ -3973,13 +3973,13 @@ grammar Fortran
   rule target_stmt
     # F90:R528
 
-    label:label_stmt? t_target double_colon? target_object_list t_newline &{ |e| sp_target_stmt(e[3]) } <Target_Stmt>
+    label:stmt_label? t_target double_colon? target_object_list t_newline &{ |e| sp_target_stmt(e[3]) } <Target_Stmt>
   end
 
   rule type_declaration_stmt
     # F90:R501
 
-    label:label_stmt? type_spec attr_spec_option? entity_decl_list t_newline &{ |e| sp_type_declaration_stmt(e[1],e[2],e[3]) } <Type_Declaration_Stmt>
+    label:stmt_label? type_spec attr_spec_option? entity_decl_list t_newline &{ |e| sp_type_declaration_stmt(e[1],e[2],e[3]) } <Type_Declaration_Stmt>
   end
 
   rule type_name
@@ -4042,8 +4042,8 @@ grammar Fortran
   rule use_stmt
     # F90:R1107
 
-    label:label_stmt? t_use module_name rename_list_option? t_newline &{ |e| sp_use_stmt(e[2],e[3]) } <Use_Stmt_1> /
-    label:label_stmt? t_use module_name t_comma t_only t_colon only_list? t_newline &{ |e| sp_use_stmt(e[2],e[6]) } <Use_Stmt_2>
+    label:stmt_label? t_use module_name rename_list_option? t_newline &{ |e| sp_use_stmt(e[2],e[3]) } <Use_Stmt_1> /
+    label:stmt_label? t_use module_name t_comma t_only t_colon only_list? t_newline &{ |e| sp_use_stmt(e[2],e[6]) } <Use_Stmt_2>
   end
 
   rule variable
@@ -4079,19 +4079,19 @@ grammar Fortran
   rule where_construct_stmt
     # F90:R740
 
-    label:label_stmt? t_where t_paren_l mask_expr t_paren_r t_newline <Where_Construct_Stmt>
+    label:stmt_label? t_where t_paren_l mask_expr t_paren_r t_newline <Where_Construct_Stmt>
   end
 
   rule where_stmt
     # F90:R738
 
-    label:label_stmt? t_where t_paren_l mask_expr t_paren_r !label assignment_stmt <Where_Stmt>
+    label:stmt_label? t_where t_paren_l mask_expr t_paren_r !label assignment_stmt <Where_Stmt>
   end
 
   rule write_stmt
     # F90:R910
 
-    label:label_stmt? t_write t_paren_l io_control_spec_list t_paren_r output_item_list? t_newline <Write_Stmt>
+    label:stmt_label? t_write t_paren_l io_control_spec_list t_paren_r output_item_list? t_newline <Write_Stmt>
   end
 
 end
