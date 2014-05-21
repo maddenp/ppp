@@ -29,8 +29,41 @@ grammar Fortran
     do_construct &{ |e| sp_do_construct(e[0]) } <Do_Construct> /
     if_construct /
     where_construct /
+    omp_parallel_do /
     sms_executable /
     directive
+  end
+
+  rule omp_parallel_do_begin
+    omp_sentinel omp_t_parallel omp_t_do t_newline <OMP_Parallel_Do_Begin>
+  end
+
+  rule omp_parallel_do_end
+    omp_sentinel omp_t_end omp_t_parallel omp_t_do t_newline <OMP_Parallel_Do_End>
+  end
+
+  rule omp_parallel_do
+    omp_parallel_do_begin do_construct omp_parallel_do_end? <OMP_Parallel_Do>
+  end
+
+  rule omp_parallel_do_body
+    do_construct  &{ |e| sp_do_construct(e[0]) } <Do_Construct>
+  end
+
+  rule omp_sentinel
+    "!$omp" <T>
+  end
+
+  rule omp_t_do
+    "do" <T>
+  end
+
+  rule omp_t_end
+    "end" <T>
+  end
+
+  rule omp_t_parallel
+    "parallel" <T>
   end
 
   rule sms_barrier

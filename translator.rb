@@ -389,7 +389,6 @@ class Translator
     return "\n#{n}" if conf[:product]==:normalized_source
     puts "\n#{n}" if conf[:debug]
     raw_tree=fp.parse(n,conf[:env],{:root=>root})
-    raw_tree.env[:global][:parsed]=true
     return if conf[:product]==:modinfo
     unless raw_tree
       re=Regexp.new("^(.+?):in `([^\']*)'$")
@@ -405,6 +404,7 @@ class Translator
       $stderr.puts "PARSE FAILED"
       fail Exceptions::TranslatorException
     end
+    raw_tree.env[:global][:parsed]=true
     if conf[:debug]
       puts "\nRAW TREE\n\n"
       p raw_tree

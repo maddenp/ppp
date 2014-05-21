@@ -26,24 +26,29 @@ module Normalizer
       if r2
         r1 = r2
       else
-        r3 = _nt_directive
+        r3 = _nt_omp
         if r3
           r1 = r3
         else
-          r4 = _nt_comment
+          r4 = _nt_directive
           if r4
             r1 = r4
           else
-            r5 = _nt_quoted
+            r5 = _nt_comment
             if r5
               r1 = r5
             else
-              r6 = _nt_unquoted
+              r6 = _nt_quoted
               if r6
                 r1 = r6
               else
-                @index = i1
-                r1 = nil
+                r7 = _nt_unquoted
+                if r7
+                  r1 = r7
+                else
+                  @index = i1
+                  r1 = nil
+                end
               end
             end
           end
@@ -58,6 +63,85 @@ module Normalizer
     r0 = instantiate_node(Text,input, i0...index, s0)
 
     node_cache[:text][start_index] = r0
+
+    r0
+  end
+
+  module Omp0
+  end
+
+  def _nt_omp
+    start_index = index
+    if node_cache[:omp].has_key?(index)
+      cached = node_cache[:omp][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    if has_terminal?("@$omp ", false, index)
+      r1 = instantiate_node(SyntaxNode,input, index...(index + 6))
+      @index += 6
+    else
+      terminal_parse_failure("@$omp ")
+      r1 = nil
+    end
+    s0 << r1
+    if r1
+      if has_terminal?("end ", false, index)
+        r3 = instantiate_node(SyntaxNode,input, index...(index + 4))
+        @index += 4
+      else
+        terminal_parse_failure("end ")
+        r3 = nil
+      end
+      if r3
+        r2 = r3
+      else
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      end
+      s0 << r2
+      if r2
+        if has_terminal?("parallel do", false, index)
+          r4 = instantiate_node(SyntaxNode,input, index...(index + 11))
+          @index += 11
+        else
+          terminal_parse_failure("parallel do")
+          r4 = nil
+        end
+        s0 << r4
+        if r4
+          s5, i5 = [], index
+          loop do
+            if has_terminal?('\G[^\\\'\\"\\n]', true, index)
+              r6 = true
+              @index += 1
+            else
+              r6 = nil
+            end
+            if r6
+              s5 << r6
+            else
+              break
+            end
+          end
+          r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
+          s0 << r5
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(OMP,input, i0...index, s0)
+      r0.extend(Omp0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:omp][start_index] = r0
 
     r0
   end

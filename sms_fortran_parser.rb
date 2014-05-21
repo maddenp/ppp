@@ -231,16 +231,21 @@ module Fortran
             if r8
               r0 = r8
             else
-              r9 = _nt_sms_executable
+              r9 = _nt_omp_parallel_do
               if r9
                 r0 = r9
               else
-                r10 = _nt_directive
+                r10 = _nt_sms_executable
                 if r10
                   r0 = r10
                 else
-                  @index = i0
-                  r0 = nil
+                  r11 = _nt_directive
+                  if r11
+                    r0 = r11
+                  else
+                    @index = i0
+                    r0 = nil
+                  end
                 end
               end
             end
@@ -250,6 +255,320 @@ module Fortran
     end
 
     node_cache[:executable_construct][start_index] = r0
+
+    r0
+  end
+
+  module OmpParallelDoBegin0
+    def omp_sentinel
+      elements[0]
+    end
+
+    def omp_t_parallel
+      elements[1]
+    end
+
+    def omp_t_do
+      elements[2]
+    end
+
+    def t_newline
+      elements[3]
+    end
+  end
+
+  def _nt_omp_parallel_do_begin
+    start_index = index
+    if node_cache[:omp_parallel_do_begin].has_key?(index)
+      cached = node_cache[:omp_parallel_do_begin][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_omp_sentinel
+    s0 << r1
+    if r1
+      r2 = _nt_omp_t_parallel
+      s0 << r2
+      if r2
+        r3 = _nt_omp_t_do
+        s0 << r3
+        if r3
+          r4 = _nt_t_newline
+          s0 << r4
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(OMP_Parallel_Do_Begin,input, i0...index, s0)
+      r0.extend(OmpParallelDoBegin0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:omp_parallel_do_begin][start_index] = r0
+
+    r0
+  end
+
+  module OmpParallelDoEnd0
+    def omp_sentinel
+      elements[0]
+    end
+
+    def omp_t_end
+      elements[1]
+    end
+
+    def omp_t_parallel
+      elements[2]
+    end
+
+    def omp_t_do
+      elements[3]
+    end
+
+    def t_newline
+      elements[4]
+    end
+  end
+
+  def _nt_omp_parallel_do_end
+    start_index = index
+    if node_cache[:omp_parallel_do_end].has_key?(index)
+      cached = node_cache[:omp_parallel_do_end][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_omp_sentinel
+    s0 << r1
+    if r1
+      r2 = _nt_omp_t_end
+      s0 << r2
+      if r2
+        r3 = _nt_omp_t_parallel
+        s0 << r3
+        if r3
+          r4 = _nt_omp_t_do
+          s0 << r4
+          if r4
+            r5 = _nt_t_newline
+            s0 << r5
+          end
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(OMP_Parallel_Do_End,input, i0...index, s0)
+      r0.extend(OmpParallelDoEnd0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:omp_parallel_do_end][start_index] = r0
+
+    r0
+  end
+
+  module OmpParallelDo0
+    def omp_parallel_do_begin
+      elements[0]
+    end
+
+    def do_construct
+      elements[1]
+    end
+
+  end
+
+  def _nt_omp_parallel_do
+    start_index = index
+    if node_cache[:omp_parallel_do].has_key?(index)
+      cached = node_cache[:omp_parallel_do][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_omp_parallel_do_begin
+    s0 << r1
+    if r1
+      r2 = _nt_do_construct
+      s0 << r2
+      if r2
+        r4 = _nt_omp_parallel_do_end
+        if r4
+          r3 = r4
+        else
+          r3 = instantiate_node(SyntaxNode,input, index...index)
+        end
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(OMP_Parallel_Do,input, i0...index, s0)
+      r0.extend(OmpParallelDo0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:omp_parallel_do][start_index] = r0
+
+    r0
+  end
+
+  module OmpParallelDoBody0
+    def do_construct
+      elements[0]
+    end
+
+  end
+
+  def _nt_omp_parallel_do_body
+    start_index = index
+    if node_cache[:omp_parallel_do_body].has_key?(index)
+      cached = node_cache[:omp_parallel_do_body][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_do_construct
+    s0 << r1
+    if r1
+      i2 = index
+      r3 = lambda { |e| sp_do_construct(e[0]) }.call(s0)
+      if r3
+        @index = i2
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      else
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Do_Construct,input, i0...index, s0)
+      r0.extend(OmpParallelDoBody0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:omp_parallel_do_body][start_index] = r0
+
+    r0
+  end
+
+  def _nt_omp_sentinel
+    start_index = index
+    if node_cache[:omp_sentinel].has_key?(index)
+      cached = node_cache[:omp_sentinel][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("!$omp", false, index)
+      r0 = instantiate_node(T,input, index...(index + 5))
+      @index += 5
+    else
+      terminal_parse_failure("!$omp")
+      r0 = nil
+    end
+
+    node_cache[:omp_sentinel][start_index] = r0
+
+    r0
+  end
+
+  def _nt_omp_t_do
+    start_index = index
+    if node_cache[:omp_t_do].has_key?(index)
+      cached = node_cache[:omp_t_do][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("do", false, index)
+      r0 = instantiate_node(T,input, index...(index + 2))
+      @index += 2
+    else
+      terminal_parse_failure("do")
+      r0 = nil
+    end
+
+    node_cache[:omp_t_do][start_index] = r0
+
+    r0
+  end
+
+  def _nt_omp_t_end
+    start_index = index
+    if node_cache[:omp_t_end].has_key?(index)
+      cached = node_cache[:omp_t_end][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("end", false, index)
+      r0 = instantiate_node(T,input, index...(index + 3))
+      @index += 3
+    else
+      terminal_parse_failure("end")
+      r0 = nil
+    end
+
+    node_cache[:omp_t_end][start_index] = r0
+
+    r0
+  end
+
+  def _nt_omp_t_parallel
+    start_index = index
+    if node_cache[:omp_t_parallel].has_key?(index)
+      cached = node_cache[:omp_t_parallel][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("parallel", false, index)
+      r0 = instantiate_node(T,input, index...(index + 8))
+      @index += 8
+    else
+      terminal_parse_failure("parallel")
+      r0 = nil
+    end
+
+    node_cache[:omp_t_parallel][start_index] = r0
 
     r0
   end

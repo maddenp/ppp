@@ -1106,6 +1106,25 @@ module Fortran
   class Nonlabel_Do_Stmt < Do_Stmt
   end
 
+  class OMP_Parallel_Do < NT
+  end
+
+  class OMP_Parallel_Do_Begin < NT
+
+    def str0
+      "#{e[0]} #{e[1]} #{e[2]} #{e[3]}"
+    end
+
+  end
+
+  class OMP_Parallel_Do_End < NT
+
+    def str0
+      "#{e[0]} #{e[1]} #{e[2]} #{e[3]} #{e[4]}"
+    end
+
+  end
+
   class Open_Stmt < Io_Stmt
 
     def translate
@@ -2466,17 +2485,61 @@ end # module Fortran
 class Translator
 
   def prepsrc_free(s)
-    s=s.gsub(/^\s*(!sms\$.*)&\s*\n\s*!sms\$&(.*)/im,'\1\2')             # continuations
-    s=s.gsub(/^\s*!sms\$insert\s*/i,"")                                 # inserts
-    s=s.gsub(/^\s*!sms\$remove\s+begin.*?!sms\$remove\s+end/im,"")      # removes
+
+    # Process SMS continuations, inserts and removes
+
+    s=s.gsub(/^\s*(!sms\$.*)&\s*\n\s*!sms\$&(.*)/im,'\1\2')
+    s=s.gsub(/^\s*!sms\$insert\s*/i,"")
+    s=s.gsub(/^\s*!sms\$remove\s+begin.*?!sms\$remove\s+end/im,"")
+
+    # Join OpenMP (END) PARALLEL DO directives
+
+    a=s.split("\n")
+    a.each_index do |i|
+      s0=a[i]
+      j=i
+      while s0=~/^\s*!\$omp.*&\s*$/i
+        j+=1
+        s0=(s0.sub(/&\s*$/,'')+a[j].sub(/^\s*!\$omp/i,'')).gsub(/\s+/,' ')
+      end
+      if s0=~/^\s*!\$omp (end )?parallel do/i
+        a[i]=s0.downcase
+        (j-i).times { a.delete_at(i+1) }
+      end
+    end
+    s=a.join("\n")
+    
     s
+
   end
 
   def prepsrc_fixed(s)
-    s=s.gsub(/^([c\*]sms\$.*)&\s*\n[c\*]sms\$&(.*)/im,'\1\2')           # continuations
-    s=s.gsub(/^[c\*]sms\$insert\s*/i,"")                                # inserts
-    s=s.gsub(/^[c\*]sms\$remove\s+begin.*?[c\*]sms\$remove\s+end/im,"") # removes
+
+    # Process SMS continuations, inserts and removes
+
+    s=s.gsub(/^([c!\*]sms\$.*)&\s*\n[c\*]sms\$&(.*)/im,'\1\2')
+    s=s.gsub(/^[c!\*]sms\$insert\s*/i,"")
+    s=s.gsub(/^[c!\*]sms\$remove\s+begin.*?[c\*]sms\$remove\s+end/im,"")
+
+    # Join OpenMP (END) PARALLEL DO directives
+
+    a=s.split("\n")
+    a.each_index do |i|
+      s0=a[i]
+      j=i
+      while s0=~/^[c!\*]\$omp.*&\s*$/i
+        j+=1
+        s0=(s0.sub(/&\s*$/,'')+a[j].sub(/^[c!\*]\$omp/i,'')).gsub(/\s+/,' ')
+      end
+      if s0=~/^!\$omp (end )?parallel do/i
+        a[i]=s0.downcase
+        (j-i).times { a.delete_at(i+1) }
+      end
+    end
+    s=a.join("\n")
+    
     s
+
   end
 
 end

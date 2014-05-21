@@ -1,7 +1,11 @@
 grammar Normalizer
 
   rule text
-    ( sms / directive / comment / quoted / unquoted )* <Text>
+    ( sms / omp / directive / comment / quoted / unquoted )* <Text>
+  end
+
+  rule omp
+    "@$omp " "end "? "parallel do" [^\'\"\n]* <OMP>
   end
 
   rule sms
