@@ -2506,7 +2506,7 @@ class Translator
       j=i
       while s0=~/^[c!\*]\$omp.*&\s*$/i
         j+=1
-        s0=(s0.sub(/&\s*$/,'')+a[j].sub(/^[c!\*]\$omp\s*/i,'')).gsub(/\s+/,' ')
+        s0=(s0.sub(/\s*&\s*$/,'')+a[j].sub(/^[c!\*]\$omp\s*/i,'').chomp).gsub(/\s+/,' ')
       end
       if s0=~/^!\$omp (end )?parallel do.*$/i
         a[i]=s0.downcase
@@ -2535,7 +2535,7 @@ class Translator
       j=i
       while s0=~/^\s*!\$omp.*&\s*$/i
         j+=1
-        s0=(s0.sub(/&\s*$/,'')+a[j].sub(/^\s*!\$omp\s*/i,'')).gsub(/\s+/,' ')
+        s0=(s0.sub(/\s*&\s*$/,'')+a[j].sub(/^\s*!\$omp\s*/i,'').chomp).gsub(/\s+/,' ')
       end
       if s0=~/^\s*!\$omp\s*(end\s*)?parallel\s*do.*$/i
         a[i]=s0.downcase
