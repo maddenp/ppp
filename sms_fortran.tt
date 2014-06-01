@@ -270,31 +270,31 @@ grammar Fortran
   end
 
   rule sms_serial_control_option
-    sms_serial_intent_lists ( t_colon sms_serial_default )? <SMS_Serial_Control_Option_1> /
+    sms_serial_treatment_lists ( t_colon sms_serial_default )? <SMS_Serial_Control_Option_1> /
     sms_serial_default "" <SMS_Serial_Control_Option_2>
   end
 
   rule sms_serial_default
-    sms_t_default t_equal sms_serial_intent <SMS_Serial_Default>
+    sms_t_default t_equal sms_serial_treatment <SMS_Serial_Default>
   end
 
   rule sms_serial_end
     sms_sentinel sms_t_serial sms_t_end t_newline &{ |e| sp_sms_serial_end } <SMS_Serial_End>
   end
 
-  rule sms_serial_intent
+  rule sms_serial_treatment
     sms_t_ignore /
     sms_t_inout /
     sms_t_in /
     sms_t_out
   end
 
-  rule sms_serial_intent_list
-    t_lt sms_serial_varlist t_comma sms_serial_intent t_gt <SMS_Serial_Intent_List>
+  rule sms_serial_treatment_list
+    t_lt sms_serial_varlist t_comma sms_serial_treatment t_gt <SMS_Serial_Treatment_List>
   end
 
-  rule sms_serial_intent_lists
-    sms_serial_intent_list ( t_comma sms_serial_intent_list )* <SMS_Serial_Intent_Lists>
+  rule sms_serial_treatment_lists
+    sms_serial_treatment_list ( t_comma sms_serial_treatment_list )* <SMS_Serial_Treatment_Lists>
   end
 
   rule sms_serial_varlist

@@ -3961,7 +3961,7 @@ module Fortran
   end
 
   module SmsSerialControlOption1
-    def sms_serial_intent_lists
+    def sms_serial_treatment_lists
       elements[0]
     end
 
@@ -3987,7 +3987,7 @@ module Fortran
 
     i0 = index
     i1, s1 = index, []
-    r2 = _nt_sms_serial_intent_lists
+    r2 = _nt_sms_serial_treatment_lists
     s1 << r2
     if r2
       i4, s4 = index, []
@@ -4063,7 +4063,7 @@ module Fortran
       elements[1]
     end
 
-    def sms_serial_intent
+    def sms_serial_treatment
       elements[2]
     end
   end
@@ -4086,7 +4086,7 @@ module Fortran
       r2 = _nt_t_equal
       s0 << r2
       if r2
-        r3 = _nt_sms_serial_intent
+        r3 = _nt_sms_serial_treatment
         s0 << r3
       end
     end
@@ -4172,10 +4172,10 @@ module Fortran
     r0
   end
 
-  def _nt_sms_serial_intent
+  def _nt_sms_serial_treatment
     start_index = index
-    if node_cache[:sms_serial_intent].has_key?(index)
-      cached = node_cache[:sms_serial_intent][index]
+    if node_cache[:sms_serial_treatment].has_key?(index)
+      cached = node_cache[:sms_serial_treatment][index]
       if cached
         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
@@ -4207,12 +4207,12 @@ module Fortran
       end
     end
 
-    node_cache[:sms_serial_intent][start_index] = r0
+    node_cache[:sms_serial_treatment][start_index] = r0
 
     r0
   end
 
-  module SmsSerialIntentList0
+  module SmsSerialTreatmentList0
     def t_lt
       elements[0]
     end
@@ -4225,7 +4225,7 @@ module Fortran
       elements[2]
     end
 
-    def sms_serial_intent
+    def sms_serial_treatment
       elements[3]
     end
 
@@ -4234,10 +4234,10 @@ module Fortran
     end
   end
 
-  def _nt_sms_serial_intent_list
+  def _nt_sms_serial_treatment_list
     start_index = index
-    if node_cache[:sms_serial_intent_list].has_key?(index)
-      cached = node_cache[:sms_serial_intent_list][index]
+    if node_cache[:sms_serial_treatment_list].has_key?(index)
+      cached = node_cache[:sms_serial_treatment_list][index]
       if cached
         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
@@ -4255,7 +4255,7 @@ module Fortran
         r3 = _nt_t_comma
         s0 << r3
         if r3
-          r4 = _nt_sms_serial_intent
+          r4 = _nt_sms_serial_treatment
           s0 << r4
           if r4
             r5 = _nt_t_gt
@@ -4265,39 +4265,39 @@ module Fortran
       end
     end
     if s0.last
-      r0 = instantiate_node(SMS_Serial_Intent_List,input, i0...index, s0)
-      r0.extend(SmsSerialIntentList0)
+      r0 = instantiate_node(SMS_Serial_Treatment_List,input, i0...index, s0)
+      r0.extend(SmsSerialTreatmentList0)
     else
       @index = i0
       r0 = nil
     end
 
-    node_cache[:sms_serial_intent_list][start_index] = r0
+    node_cache[:sms_serial_treatment_list][start_index] = r0
 
     r0
   end
 
-  module SmsSerialIntentLists0
+  module SmsSerialTreatmentLists0
     def t_comma
       elements[0]
     end
 
-    def sms_serial_intent_list
+    def sms_serial_treatment_list
       elements[1]
     end
   end
 
-  module SmsSerialIntentLists1
-    def sms_serial_intent_list
+  module SmsSerialTreatmentLists1
+    def sms_serial_treatment_list
       elements[0]
     end
 
   end
 
-  def _nt_sms_serial_intent_lists
+  def _nt_sms_serial_treatment_lists
     start_index = index
-    if node_cache[:sms_serial_intent_lists].has_key?(index)
-      cached = node_cache[:sms_serial_intent_lists][index]
+    if node_cache[:sms_serial_treatment_lists].has_key?(index)
+      cached = node_cache[:sms_serial_treatment_lists][index]
       if cached
         cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
@@ -4306,7 +4306,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    r1 = _nt_sms_serial_intent_list
+    r1 = _nt_sms_serial_treatment_list
     s0 << r1
     if r1
       s2, i2 = [], index
@@ -4315,12 +4315,12 @@ module Fortran
         r4 = _nt_t_comma
         s3 << r4
         if r4
-          r5 = _nt_sms_serial_intent_list
+          r5 = _nt_sms_serial_treatment_list
           s3 << r5
         end
         if s3.last
           r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(SmsSerialIntentLists0)
+          r3.extend(SmsSerialTreatmentLists0)
         else
           @index = i3
           r3 = nil
@@ -4335,14 +4335,14 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(SMS_Serial_Intent_Lists,input, i0...index, s0)
-      r0.extend(SmsSerialIntentLists1)
+      r0 = instantiate_node(SMS_Serial_Treatment_Lists,input, i0...index, s0)
+      r0.extend(SmsSerialTreatmentLists1)
     else
       @index = i0
       r0 = nil
     end
 
-    node_cache[:sms_serial_intent_lists][start_index] = r0
+    node_cache[:sms_serial_treatment_lists][start_index] = r0
 
     r0
   end

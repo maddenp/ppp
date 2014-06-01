@@ -149,13 +149,13 @@ module Fortran
       return if omp_parallel_loop or sms_ignore or sms_parallel_loop or sms_serial
       var="#{name}"
       if inside?(Assignment_Stmt,Where_Construct,Where_Stmt)
-        if (fn=ancestor(Function_Reference))           # we're an actual arg
-          return if not (treatment=intrinsic(fn.name)) # fn is not intrinsic
-          return if treatment==:complete               # complete array arg ok
+        if (fn=ancestor(Function_Reference))       # we're an actual arg
+          return if not (range=intrinsic(fn.name)) # fn is not intrinsic
+          return if range==:complete               # complete array arg ok
         end
         fail "ERROR: '#{var}' not found in environment" unless (varenv=env[var])
         return unless varenv["decomp"]
-        if defined?(treatment) and treatment==:error
+        if defined?(range) and range==:error
           fail "ERROR: Distributed-arrary argument '#{var}' incompatible with intrinsic procedure '#{fn.name}'"
         end
         bounds=[]
@@ -845,13 +845,13 @@ module Fortran
 
   class Io_Stmt < NT
 
-    def add_serial_region_vars(serial_intent)
+    def add_serial_region_nml_vars(serial_treatment)
       if (namelist_name=nml)
         nmlenv=varenv_get(namelist_name,self,expected=true)
         nmlenv["objects"].each do |x|
           varenv=varenv_get(x,self,expected=true)
-          if serial_intent==:out or varenv["decomp"]
-            sms_serial_info.vars_in_region.add([x,serial_intent])
+          if serial_treatment==:out or varenv["decomp"]
+            sms_serial_info.vars_in_region.add([x,serial_treatment])
           end
         end
       end
@@ -1059,7 +1059,7 @@ module Fortran
         unless inside?(SMS_Serial_Begin,Subroutine_Name) or intrinsic(name) or derived_type? or structure_component?
           varenv=varenv_get(name,self,expected=false)||{}
           unless varenv["subprogram"] or varenv["parameter"]
-            sms_serial_info.vars_in_region.add([name,nil])
+            sms_serial_info.vars_in_region.add([name,:none])
           end
         end
       end
@@ -1120,7 +1120,7 @@ module Fortran
     def translate
       return if omp_parallel_loop or sms_ignore or sms_parallel_loop
       if sms_serial
-        add_serial_region_vars(:out)
+        add_serial_region_nml_vars(:out)
       else
         io_stmt_init
         @onroot=false if unit.is_a?(Internal_File_Unit)
@@ -1817,16 +1817,12 @@ module Fortran
 
   class SMS_Serial < SMS_Region
 
+    def not_in_env(name)
+      fail "ERROR: sms$serial-region variable '#{name}' not found in environment"
+    end
+
     def str0
       "#{e[0]}#{e[1]}#{e[2]}"
-    end
-
-    def not_in_env(name,x)
-      fail "ERROR: sms$serial-region '#{x}' variable '#{name}' not found in environment"
-    end
-
-    def not_in_region(name,x)
-      fail "ERROR: variable '#{name}' not found in sms$serial region '#{x}'"
     end
 
     def translate
@@ -1837,13 +1833,14 @@ module Fortran
 
       serial_begin=e[0]
       oldblock=e[1]
+      fail "ERROR: sms$serial region contains no statements" if oldblock.e.empty?
       serial_end=e[2]
       return if oldblock.e.empty?
       use(sms_decompmod)
       declare("logical",sms_rootcheck)
 
-      # Initially, we don't know which variables will need to be gathered,
-      # scattered, or broadcast.
+      # Initially, we don't know which variables will need to be broadcast,
+      # gathered, or scattered.
 
       bcasts=[]
       gathers=[]
@@ -1859,131 +1856,76 @@ module Fortran
 
       si=sms_serial_info
 
-      # The vars_in_region set contains names occurring in the serial-region
-      # body (rather than in the sms$serial directive itself) and, optionally,
-      # an inferred :in or :out treatment. A specific variable name may exist
-      # more than once in the set, with different (or no) treatment specified.
-      # An instance of a name with 'in' or 'out' treatment is overriden by an
-      # instance lacking this specificity. That is: If ["a",:in] and ["a"] both
-      # exist, the former is a weaker requirement than the latter (which implies
-      # 'inout' treatment) and so should be removed, which we do here.
+######## FORBID BAD TREATMENT COMBINATIONS HERE
 
-      si.vars_in_region.delete_if do |name|
-        name.last and si.vars_in_region.include?(name.first)
-      end
+      # Build up a set of variables present in serial-region statements and/or
+      # mentioned in the in/inout/out clauses of the serial directive for
+      # potential communication.
 
-      # Reject variables specified in the sms$ignore directive that are not
-      # actually present in the serial region.
-
-      def presence_check(directive_set,region_set,treatment)
-        directive_set.each do |directive_var|
-          found=false
-          region_set.each do |region_var|
-            if "#{region_var.first}"=="#{directive_var}"
-              found=true
-              break
-            end
-          end
-          unless found
-            fail "ERROR: sms$serial '#{treatment}' variable "+
-              "'#{directive_var}' not present in serial region"
-          end
+      commvars=si.vars_in_region.dup
+      [:ignore,:in,:inout,:out].each do |treatment|
+        if (vars=eval("si.vars_#{treatment}"))
+          vars.each { |var| commvars.add([var,treatment]) }
         end
       end
 
-      vars_inout=Set.new(si.vars_in).intersection(Set.new(si.vars_out))
-      presence_check(vars_inout,si.vars_in_region,"inout")
-      presence_check(si.vars_ignore,si.vars_in_region,"ignore")
-      presence_check(si.vars_in,si.vars_in_region,"in")
-      presence_check(si.vars_out,si.vars_in_region,"out")
+      # Reject all but the highest-priority treatment for each variable.
 
-      # Iterate over the set of names that occurred in the region.
+      priority={:ignore=>3,:inout=>2,:in=>1,:out=>1,:none=>0}
+      commvars.group_by { |var_treatment| var_treatment[0] }.each do |k,v|
+        top=priority[v.max_by { |var,treatment| priority[treatment] }[1]]
+        commvars=commvars.reject { |var,treatment| var==k and priority[treatment]<top }
+      end
 
-      si.vars_in_region.each do |name|
+      # Apply appropriate treatment where none is defined, and ensure that
+      # variables requiring communication are known in the environment.
 
-        # If in/out treatment was specified when this name was registered in the
-        # serial region, extract that information now.
+      commvars.each do |var_treatment|
+        var,treatment=var_treatment
+        if treatment==:none
+          default=si.default
+          expected=(default==:ignore)?(false):(true)
+          varenv=varenv_get(var,self,expected)
+          dh=(varenv)?(varenv["decomp"]):(nil)
+          case default
+          when :ignore
+            new_treatment=:ignore
+          when :inout
+            new_treatment=(dh)?(:inout):(:out)
+          when :in
+            new_treatment=(dh)?(:in):(:ignore)
+          when :out
+            new_treatment=:out
+          else
+            fail "INTERNAL ERROR: Unknown treatment '#{treatment}'"
+          end
+          not_in_env(var) unless varenv or default==:ignore
+          var_treatment[1]=new_treatment
+        end
+      end
 
-        name,treatment=name
+      # Arrange for necessary communication of serial-region variables.
 
-        # Extract variable information.
-
-        varenv=varenv_get(name,self,expected=false)
+      commvars.each do |var,treatment|
+        expected=(treatment==:ignore)?(false):(true)
+        varenv=varenv_get(var,self,expected)
         dh=(varenv)?(varenv["decomp"]):(nil)
         sort=(varenv)?(varenv["sort"]):(nil)
-
-        # Ignore namelist names.
-
         next if sort=="namelist"
-
-        # Handle 'ingore' variables. A decomposed variable must be globalized
-        # even if it is not gathered/scattered.
-
-        globals.add(name) if dh and si.vars_ignore.include?(name)
-
-        # Conservatively assume that the default intent will apply to this
-        # variable.
-
-        default=true
-
-        # Handle 'in' variables.
-
-        if si.vars_in.include?(name)
-
-          not_in_env(name,"in") unless varenv
-
-          # Ensure that conflicting 'ignore' intent was not specified.
-
-          if si.vars_ignore.include?(name)
-            fail "ERROR: '#{name}' cannot be both 'ignore' and 'out' in serial region"
-          end
-
-          # Gather the variable if it is decomposed, and note that the default
-          # intent no longer applies.
-
-          if dh
-            gathers.push(name) unless treatment==:out
-            globals.add(name)
-          end
-          default=false
-        end
-
-        # Handle 'out' variables.
-
-        if si.vars_out.include?(name)
-
-          not_in_env(name,"out") unless varenv
-
-          # Ensure that conflicting 'ignore' intent was not specified.
-
-          if si.vars_ignore.include?(name)
-            fail "ERROR: '#{name}' cannot be both 'ignore' and 'in' in serial region"
-          end
-
-          # Broadcast non-decomposed and scatter decomposed arrays, and note
-          # that the default intent no longer applies.
-
-          ((sort=="scalar"||!dh)?(bcasts):(scatters)).push(name) unless treatment==:in
-          globals.add(name) if dh
-          default=false
-        end
-
-        # Handle variables that fall under 'default' treatment.
-
-        if default and not si.vars_ignore.include?(name)
-
-          # If no explicit intent was specified, the default applies. Treatment
-          # of scalars, non-decomposed arrays and decomposed arrays is the same
-          # as described above. Also, all decomposed arrays appearing in the
-          # serial region must be globalized.
-
-          d="#{si.default}"
-          not_in_env(name,d) unless varenv or d=="ignore"
-          gathers.push(name) if dh and (d=="in" or d=="inout") and not treatment==:out
-          if d=="out" or d=="inout"
-            ((sort=="scalar"||!dh)?(bcasts):(scatters)).push(name) unless treatment==:in
-          end
-          globals.add(name) if dh
+        globals.add(var) if dh
+        case treatment
+        when :ignore
+        when :in
+          fail "ERROR: 'in' variable '#{var}' is not decomposed" unless dh
+          gathers.push(var)
+        when :inout
+          fail "ERROR: 'inout' variable '#{var}' is not decomposed" unless dh
+          gathers.push(var)
+          ((sort=="scalar"||!dh)?(bcasts):(scatters)).push(var)
+        when :out
+          ((sort=="scalar"||!dh)?(bcasts):(scatters)).push(var)
+        else
+          fail "INTERNAL ERROR: Unknown treatment '#{treatment}'"
         end
       end
 
@@ -1994,10 +1936,9 @@ module Fortran
         node.e.each { |x| globalize(x,to_globalize) } if node.e
         node.globalize if node.is_a?(Name) and to_globalize.include?("#{node}")
       end
-
       globalize(oldblock,globals)
 
-      # Declaration of globally-sized variables
+      # Declare globally-sized variables
 
       globals.sort.each do |var|
         varenv=varenv_get(var)
@@ -2041,17 +1982,21 @@ module Fortran
 
   class SMS_Serial_Begin < SMS
 
+    def control
+      (c=e[2].is_a?(SMS_Serial_Control))?(e[2]):(nil)
+    end
+
     def str0
       sms("#{sa(e[2])}#{e[3]}")
     end
 
     def translate
       si=sms_serial_info=OpenStruct.new
-      si.default=("#{e[2]}".empty?)?("inout"):("#{e[2].default}")
       si.vars_in_region=SortedSet.new
-      si.vars_ignore=("#{e[2]}".empty?)?([]):(e[2].vars_ignore)
-      si.vars_in=("#{e[2]}".empty?)?([]):(e[2].vars_in)
-      si.vars_out=("#{e[2]}".empty?)?([]):(e[2].vars_out)
+      si.default     = control ? "#{control.default}".to_sym : :inout
+      si.vars_ignore = control ? control.vars_ignore         : []
+      si.vars_in     = control ? control.vars_in             : []
+      si.vars_out    = control ? control.vars_out            : []
       parent.env[:sms_serial_info]=sms_serial_info
     end
 
@@ -2059,20 +2004,24 @@ module Fortran
 
   class SMS_Serial_Control < SMS
 
+    def control
+      e[1]
+    end
+
     def default
-      e[1].default
+      control.default
     end
 
     def vars_ignore
-      e[1].vars_ignore
+      control.vars_ignore
     end
 
     def vars_in
-      e[1].vars_in
+      control.vars_in
     end
 
     def vars_out
-      e[1].vars_out
+      control.vars_out
     end
 
   end
@@ -2080,7 +2029,7 @@ module Fortran
   class SMS_Serial_Control_Option_1 < SMS
 
     def default
-      (e[1].e&&e[1].e[1].respond_to?(:intent))?("#{e[1].e[1].intent}"):("inout")
+      (e[1].e&&e[1].e[1].respond_to?(:treatment))?(e[1].e[1].treatment):(:inout)
     end
 
     def str0
@@ -2106,7 +2055,7 @@ module Fortran
   class SMS_Serial_Control_Option_2 < SMS
 
     def default
-      e[0].intent
+      e[0].treatment
     end
 
     def vars_ignore
@@ -2125,7 +2074,7 @@ module Fortran
 
   class SMS_Serial_Default < SMS
 
-    def intent
+    def treatment
       e[2]
     end
 
@@ -2139,9 +2088,9 @@ module Fortran
 
   end
 
-  class SMS_Serial_Intent_List < SMS
+  class SMS_Serial_Treatment_List < SMS
 
-    def intent
+    def treatment
       e[3]
     end
 
@@ -2151,11 +2100,11 @@ module Fortran
 
   end
 
-  class SMS_Serial_Intent_Lists < SMS
+  class SMS_Serial_Treatment_Lists < SMS
 
-    def vars_with_intent(intent)
-      vars=("#{e[0].intent}"=="#{intent}")?(e[0].vars):([])
-      e[1].e.each { |x| vars+=x.e[1].vars if "#{x.e[1].intent}"=="#{intent}" }
+    def vars_with_treatment(treatment)
+      vars=("#{e[0].treatment}"=="#{treatment}")?(e[0].vars):([])
+      e[1].e.each { |x| vars+=x.e[1].vars if "#{x.e[1].treatment}"=="#{treatment}" }
       vars
     end
 
@@ -2164,15 +2113,15 @@ module Fortran
     end
 
     def vars_ignore
-      vars_with_intent("ignore")
+      vars_with_treatment(:ignore)
     end
 
     def vars_in
-      vars_with_intent("inout")+vars_with_intent("in")
+      vars_with_treatment(:inout)+vars_with_treatment(:in)
     end
 
     def vars_out
-      vars_with_intent("inout")+vars_with_intent("out")
+      vars_with_treatment(:inout)+vars_with_treatment(:out)
     end
 
   end
@@ -2485,7 +2434,7 @@ module Fortran
     def translate
       return if omp_parallel_loop or sms_ignore or sms_parallel_loop
       if sms_serial
-        add_serial_region_vars(:in)
+        add_serial_region_nml_vars(:in)
       else        
         io_stmt_init
         function=(env["#{unit}"] and env["#{unit}"]["subprogram"]=="function")
