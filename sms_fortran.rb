@@ -1856,24 +1856,35 @@ module Fortran
 
       si=sms_serial_info
 
-######## FORBID BAD TREATMENT COMBINATIONS HERE
-
       # Build up a set of variables present in serial-region statements and/or
       # mentioned in the in/inout/out clauses of the serial directive for
-      # potential communication.
+      # potential communication. Start with in/inout/out-clause variables.
 
-      commvars=si.vars_in_region.dup
+      commvars=SortedSet.new
       [:ignore,:in,:inout,:out].each do |treatment|
         if (vars=eval("si.vars_#{treatment}"))
           vars.each { |var| commvars.add([var,treatment]) }
         end
       end
 
+      # Forbid multiple treatment.
+
+      commvars.group_by { |var,treatment| var }.each do |k,v|
+        if v.size>1
+          t=v.map { |var,treatment| "'#{treatment}'" }.join(", ")
+          fail "ERROR: Multiple treatment (#{t}) specified for sms$serial variable '#{k}'"
+        end
+      end
+
+      # Merge in variables found in serial-region statements.
+
+      commvars.merge(si.vars_in_region)
+
       # Reject all but the highest-priority treatment for each variable.
 
       priority={:ignore=>3,:inout=>2,:in=>1,:out=>1,:none=>0}
-      commvars.group_by { |var_treatment| var_treatment[0] }.each do |k,v|
-        top=priority[v.max_by { |var,treatment| priority[treatment] }[1]]
+      commvars.group_by { |var,treatment| var }.each do |k,v|
+        top=priority[v.max_by { |var,treatment| priority[treatment] }.last]
         commvars=commvars.reject { |var,treatment| var==k and priority[treatment]<top }
       end
 
@@ -1904,7 +1915,15 @@ module Fortran
         end
       end
 
-      # Arrange for necessary communication of serial-region variables.
+      # Schedule necessary communication of serial-region variables.
+
+      def schedule_in(var,gathers)
+        gathers.push(var)
+      end
+
+      def schedule_out(var,sort,dh,bcasts,scatters)
+        ((sort=="scalar"||!dh)?(bcasts):(scatters)).push(var)
+      end
 
       commvars.each do |var,treatment|
         expected=(treatment==:ignore)?(false):(true)
@@ -1917,13 +1936,13 @@ module Fortran
         when :ignore
         when :in
           fail "ERROR: 'in' variable '#{var}' is not decomposed" unless dh
-          gathers.push(var)
+          schedule_in(var,gathers)
         when :inout
           fail "ERROR: 'inout' variable '#{var}' is not decomposed" unless dh
-          gathers.push(var)
-          ((sort=="scalar"||!dh)?(bcasts):(scatters)).push(var)
+          schedule_in(var,gathers)
+          schedule_out(var,sort,dh,bcasts,scatters)
         when :out
-          ((sort=="scalar"||!dh)?(bcasts):(scatters)).push(var)
+          schedule_out(var,sort,dh,bcasts,scatters)
         else
           fail "INTERNAL ERROR: Unknown treatment '#{treatment}'"
         end
@@ -1996,6 +2015,7 @@ module Fortran
       si.default     = control ? "#{control.default}".to_sym : :inout
       si.vars_ignore = control ? control.vars_ignore         : []
       si.vars_in     = control ? control.vars_in             : []
+      si.vars_inout  = control ? control.vars_inout          : []
       si.vars_out    = control ? control.vars_out            : []
       parent.env[:sms_serial_info]=sms_serial_info
     end
@@ -2020,6 +2040,10 @@ module Fortran
       control.vars_in
     end
 
+    def vars_inout
+      control.vars_inout
+    end
+
     def vars_out
       control.vars_out
     end
@@ -2032,6 +2056,10 @@ module Fortran
       (e[1].e&&e[1].e[1].respond_to?(:treatment))?(e[1].e[1].treatment):(:inout)
     end
 
+    def sms_serial_treatment_lists
+      e[0]
+    end
+
     def str0
       s="#{e[0]}"
       s+="#{e[1].e[0]}#{e[1].e[1]}" if e[1].e
@@ -2039,15 +2067,19 @@ module Fortran
     end
 
     def vars_ignore
-      e[0].vars_ignore
+      sms_serial_treatment_lists.vars_ignore
     end
 
     def vars_in
-      e[0].vars_in
+      sms_serial_treatment_lists.vars_in
+    end
+
+    def vars_inout
+      sms_serial_treatment_lists.vars_inout
     end
 
     def vars_out
-      e[0].vars_out
+      sms_serial_treatment_lists.vars_out
     end
 
   end
@@ -2063,6 +2095,10 @@ module Fortran
     end
 
     def vars_in
+      []
+    end
+
+    def vars_inout
       []
     end
 
@@ -2117,11 +2153,15 @@ module Fortran
     end
 
     def vars_in
-      vars_with_treatment(:inout)+vars_with_treatment(:in)
+      vars_with_treatment(:in)
+    end
+
+    def vars_inout
+      vars_with_treatment(:inout)
     end
 
     def vars_out
-      vars_with_treatment(:inout)+vars_with_treatment(:out)
+      vars_with_treatment(:out)
     end
 
   end
