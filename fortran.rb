@@ -490,7 +490,7 @@ module Fortran
       varenv=env[var]
       redef(var) unless varenv and varenv["subprogram"]=="function"
       if varenv
-        varenv.keys.each { |x| env[var][x]="deferred" if x=~/[lu]b[1-7]/ }
+        varenv.keys.each { |x| varenv[x]="deferred" if x=~/[lu]b[1-7]/ }
       end
     end
     varattrs=entity_decl_list.varattrs(@distribute)
