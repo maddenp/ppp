@@ -99,14 +99,14 @@ module Fortran
     elsif access_spec.public?
       p="public"
     else
-      p="default"
+      p="_"
     end
     if access_stmt_option.is_a?(Access_Stmt_Option)
       access_stmt_option.names.each { |x| varsetattr(x,"access",p) }
     else
       @access=p
       env.each do |n,h|
-        varsetattr(n,"access",p) if vargetattr(n,"access")=="default"
+        varsetattr(n,"access",p) if vargetattr(n,"access")=="_"
       end
     end
     true
@@ -167,7 +167,7 @@ module Fortran
       fail "ERROR: Unexpected node type '#{var.class}' for variable '#{var}'"
     end
     varenv=env["#{var.name}"]
-    if varenv and varenv["type"]=="character" and varenv["kind"]=="default"
+    if varenv and varenv["type"]=="character" and varenv["kind"]=="_"
       true
     else
       nil
@@ -353,7 +353,7 @@ module Fortran
     # specification-part, part, so always write out the module file.
     write_envfile(module_stmt.name,env)
     envpop
-    @access="default"
+    @access="_"
     true
   end
 
@@ -1705,7 +1705,7 @@ module Fortran
 
     def alb
       # Abstract Lower Bound
-      ("#{e[1]}".empty?)?("default"):(e[1].alb)
+      ("#{e[1]}".empty?)?("_"):(e[1].alb)
     end
 
     def aub
@@ -4834,7 +4834,7 @@ module Fortran
     end
 
     def kind
-      return (e[1].respond_to?(:kind))?("#{e[1].kind}"):("default")
+      return (e[1].respond_to?(:kind))?("#{e[1].kind}"):("_")
     end
 
     def type

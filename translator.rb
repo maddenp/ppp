@@ -73,7 +73,7 @@ class Translator
 
     def initialize(srcfile,dstfile,incdirs)
       super()
-      @access="default"
+      @access="_"
       @dolabels=[]
       @envstack=[]
       @incdirs=incdirs

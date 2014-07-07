@@ -416,7 +416,7 @@ module Fortran
           lenopt="(len=#{props[:len]})"
         end
         kind=props[:kind]
-        kind=([nil,"default"].include?(kind))?(""):("(kind=#{kind})")
+        kind=([nil,"_"].include?(kind))?(""):("(kind=#{kind})")
         attrs=props[:attrs]||[]
         attrs=[attrs] unless attrs.is_a?(Array)
         attrs=(attrs.empty?)?(""):(",#{attrs.sort.join(",")}")
@@ -481,8 +481,8 @@ module Fortran
 
     def fixbound(varenv,var,dim,x)
       bound=varenv["#{x}b#{dim}"]
-      fail "ERROR: Bad upper bound: #{bound}" if bound=="default" and x==:u
-      return 1 if bound=="default" and x==:l
+      fail "ERROR: Bad upper bound: #{bound}" if bound=="_" and x==:u
+      return 1 if bound=="_" and x==:l
       if ["assumed","deferred","explicit"].include?(bound)
         if (dd=decdim(varenv,dim))
           dh=varenv["decomp"]
