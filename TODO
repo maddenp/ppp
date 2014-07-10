@@ -145,6 +145,8 @@
 
 - Deal with structured grids.
 
+- Think about (and deal with) distributed parameter arrays.
+
 ### TREE
 
 - To make all of this more useful, build an AST from the parse tree. Then, do

@@ -666,6 +666,11 @@ module Fortran
       @metadata={}
     end
 
+    def basetype_chk(type)
+      basetypes=["integer","real","complex","character","logical"]
+      basetypes.include?(type)
+    end
+    
     def block_left
       s=env[:global]
       s[:level]||=0
@@ -743,6 +748,12 @@ module Fortran
       env[:global][:level]||=0
     end
 
+    def list_array
+      a=[e[0]]
+      a=e[1].e.reduce(a) { |m,x| m.push(x.e[1]) } if e[1].e
+      a
+    end
+    
     def list_idx(node)
       return 0 if e[0].object_id==node.object_id
       e[1].e.size.times do |n|
@@ -883,6 +894,10 @@ module Fortran
 
   class List < NT
 
+    def array
+      list_array
+    end
+    
     def idx(node)
       list_idx(node)
     end
@@ -1269,6 +1284,9 @@ module Fortran
   class AC_Value_List < List
   end
 
+  class AC_Value_List_Pair < NT
+  end
+  
   class Access_Id_List < List
 
     def names
@@ -1339,6 +1357,9 @@ module Fortran
   class Actual_Arg_Spec_List < List
   end
 
+  class Actual_Arg_Spec_List_Pair < NT
+  end
+  
   class Add_Operand < NT
 
     def str0
@@ -1421,6 +1442,9 @@ module Fortran
   class Allocate_Shape_Spec_List < List
   end
 
+  class Allocate_Shape_Spec_List_Pair < NT
+  end
+  
   class Allocate_Shape_Spec_Option < NT
 
     def allocate_lower_bound
@@ -1476,6 +1500,9 @@ module Fortran
 
   end
 
+  class Allocation_List_Pair < NT
+  end
+  
   class Alt_Return_Spec < NT
   end
 
@@ -1994,6 +2021,9 @@ module Fortran
   class Case_Value_Range_List < List
   end
 
+  class Case_Value_Range_List_Pair < NT
+  end
+  
   class Char_Length_1 < NT
   end
 
@@ -2103,15 +2133,21 @@ module Fortran
   class Component_Attr_Spec_List < List
   end
 
-  class Compoent_Attr_Spec_List_Option < NT
+  class Component_Attr_Spec_List_Option < NT
   end
 
+  class Component_Attr_Spec_List_Pair < NT
+  end
+  
   class Component_Decl < NT
   end
 
   class Component_Decl_List < List
   end
 
+  class Component_Decl_List_Pair < NT
+  end
+  
   class Component_Def_Stmt < Stmt
 
     def str0
@@ -2238,7 +2274,13 @@ module Fortran
   class Data_I_Do_Object_List < List
   end
 
+  class Data_I_Do_Object_List_Pair < NT
+  end
+  
   class Data_Implied_Do < NT
+  end
+
+  class Data_Implied_Do_Loop < NT
   end
 
   class Data_Implied_Do_Option < NT
@@ -2300,6 +2342,9 @@ module Fortran
   class Data_Stmt_Object_List < List
   end
 
+  class Data_Stmt_Object_List_Pair < NT
+  end
+  
   class Data_Stmt_Repeat_Pair < NT
   end
 
@@ -2321,6 +2366,9 @@ module Fortran
   class Data_Stmt_Value_List < List
   end
 
+  class Data_Stmt_Value_List_Pair < NT
+  end
+  
   class Deallocate_Stmt < Stmt
 
     def str0
@@ -2469,6 +2517,9 @@ module Fortran
       indent(strmemo)
     end
 
+  end
+
+  class Do_Variable < NT
   end
 
   class Double_Colon < NT
@@ -2810,6 +2861,9 @@ module Fortran
   class Equivalence_Set_List < List
   end
 
+  class Equivalence_Set_List_Pair < NT
+  end
+  
   class Equivalence_Stmt < Stmt
   end
 
@@ -2899,6 +2953,9 @@ module Fortran
   class Expr_List < List
   end
 
+  class Expr_List_Pair < NT
+  end
+  
   class External_File_Unit < NT
   end
 
@@ -2908,6 +2965,9 @@ module Fortran
   class External_Name_List < List
   end
 
+  class External_Name_List_Pair < NT
+  end
+  
   class External_Stmt < Stmt
   end
 
@@ -3284,6 +3344,9 @@ module Fortran
   class Inquire_Spec_List < Io_Spec_List
   end
 
+  class Inquire_Spec_List_Pair < NT
+  end
+  
   class Inquire_Stmt_1 < Io_Stmt
 
     def str0
@@ -3362,6 +3425,9 @@ module Fortran
   class Intrinsic_Procedure_Name_List < List
   end
 
+  class Intrinsic_Procedure_Name_List_Pair < NT
+  end
+  
   class Intrinsic_Stmt < Stmt
   end
 
@@ -3416,6 +3482,9 @@ module Fortran
   class Io_Implied_Do_Object_List < List
   end
 
+  class Io_Implied_Do_Object_List_Pair < NT
+  end
+  
   class Io_Spec < NT
 
     def relabel_spec(spec)
@@ -3863,6 +3932,9 @@ module Fortran
 
   end
 
+  class Named_Constant_Def_List_Pair < NT
+  end
+  
   class Namelist_Group_Name < NT
 
     def name
@@ -4231,6 +4303,9 @@ module Fortran
   class Pointer_Object_List < List
   end
 
+  class Pointer_Object_List_Pair < NT
+  end
+  
   class Pointer_Stmt < Stmt
 
     def str0
@@ -4314,6 +4389,9 @@ module Fortran
   class Procedure_Name_List < List
   end
 
+  class Procedure_Name_List_Pair < NT
+  end
+  
   class Program_Name < NT
   end
 

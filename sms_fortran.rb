@@ -711,6 +711,19 @@ module Fortran
     include Array_Translation
   end
 
+  class Assign_Stmt < Stmt
+
+    def translate
+      if sms_serial
+        variable=e[4]
+        (sms_serial_info.lbl["#{variable}"]||=[]).push("#{self}")
+        counter=sms_serial_info.lbl["#{variable}"].length
+        replace_statement("#{self}; sms__label_assign_#{variable}=#{counter}")
+      end
+    end
+
+  end  
+
   class Close_Stmt < Io_Stmt
 
     def translate
@@ -850,8 +863,13 @@ module Fortran
         nmlenv=varenv_get(namelist_name,self,expected=true)
         nmlenv["objects"].each do |x|
           varenv=varenv_get(x,self,expected=true)
-          if serial_treatment==:out or varenv["decomp"]
-            sms_serial_info.vars_in_region.add([x,serial_treatment])
+          if serial_treatment==:pppout
+            sms_serial_info.lvars.add(x)
+            sms_serial_info.rvars.add(x) if varenv["decomp"]
+          elsif serial_treatment==:pppin
+            sms_serial_info.rvars.add(x)
+          else
+            fail "INTERNAL ERROR: Serial region namelist variable not recognized."
           end
         end
       end
@@ -1039,6 +1057,58 @@ module Fortran
     end
 
     def translate
+
+      def handle_serial
+        
+        def i_am_lvar
+          if inside?(Actual_Arg_Spec) # function(x,y,x) or call subroutrine(x,y,z)
+            sms_serial_info.rvars.add(name)
+            return true
+          end
+          return false if inside?(Section_Subscript_List) # array indexing
+          return true if inside?(Assignment_Stmt) and not inside?(Expr) # left side of assignment-stmt 
+          return true if inside?(Io_Spec_Iostat,Allocate_Stat_Construct,Input_Item_List,Do_Variable)
+          return true if inside?(Data_Stmt_Object_List) and not inside?(Data_Implied_Do_Loop)
+          if inside?(Inquire_Spec_List)
+            return true unless inside?(External_File_Unit,Inquire_Spec_File,Io_Spec_Err)
+          end
+          false
+        end
+
+        def fail_if_allocate(varenv)
+        
+          def fail_allocate_msg(stat,comm)
+            fail "ERROR: #{stat} of '#{name}' in serial region incompatible with '#{comm}' treatment"
+          end
+          
+          if inside?(Allocate_Object)
+            stat="Allocation" if inside?(Allocate_Stmt)
+            stat="Deallocation" if inside?(Deallocate_Stmt)
+            fail "ERROR: #{stat} of distributed array '#{name}' in a serial region is forbidden" if varenv["decomp"]
+            return if sms_serial_info.vars_ignore.include?(name)
+            fail_allocate_msg(stat,"in") if sms_serial_info.vars_in.include?(name)
+            fail_allocate_msg(stat,"out") if sms_serial_info.vars_out.include?(name)
+            fail_allocate_msg(stat,"inout") if sms_serial_info.vars_inout.include?(name)
+            unless [:ignore,:ppp].include?(sms_serial_info.default)
+              fail_allocate_msg(stat,":default=#{sms_serial_info.default}")
+            end
+          end
+        end
+
+        unless inside?(SMS_Serial_Begin,Subroutine_Name,Function_Name) or intrinsic(name) or derived_type? or structure_component?
+          varenv=varenv_get(name,self,expected=false)||{}
+          fail_if_allocate(varenv)
+          unless varenv["parameter"]
+            if i_am_lvar
+              sms_serial_info.rvars.add(name) if varenv["decomp"]
+              sms_serial_info.lvars.add(name)
+            else
+              sms_serial_info.rvars.add(name)
+            end
+          end
+        end
+      end
+      
       # Handle to_local
       if tolocal=sms_to_local and p=tolocal["#{name}"]
         case "#{p.key}"
@@ -1054,15 +1124,7 @@ module Fortran
         code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
         replace_element(code,:expr)
       end
-      # Handle serial
-      if sms_serial
-        unless inside?(SMS_Serial_Begin,Subroutine_Name) or intrinsic(name) or derived_type? or structure_component?
-          varenv=varenv_get(name,self,expected=false)||{}
-          unless varenv["subprogram"] or varenv["parameter"]
-            sms_serial_info.vars_in_region.add([name,:none])
-          end
-        end
-      end
+      handle_serial if sms_serial 
     end
 
   end
@@ -1070,6 +1132,23 @@ module Fortran
   class Nonlabel_Do_Stmt < Do_Stmt
   end
 
+  class Nullify_Stmt < Stmt
+
+    def translate
+      if sms_serial
+        vars=e[3].array
+        new_stmt=["#{self}"]
+        vars.each do |pointer|
+          (sms_serial_info.ptr["#{pointer}"]||=[]).push("nullify (#{pointer})")
+          counter=sms_serial_info.ptr["#{pointer}"].length
+          new_stmt.push("sms_ptr_assign_#{pointer}=#{counter}")
+        end
+        replace_statement(new_stmt)
+      end
+    end
+
+  end
+  
   class OMP_Directive < NT
   end
 
@@ -1105,6 +1184,19 @@ module Fortran
 
   end
 
+  class Pointer_Assignment_Stmt < Stmt
+    
+    def translate
+      if sms_serial
+        pointer=e[1]
+        (sms_serial_info.ptr["#{pointer}"]||=[]).push("#{self}")
+        counter=sms_serial_info.ptr["#{pointer}"].length
+        replace_statement("#{self}; sms__ptr_assign_#{pointer}=#{counter}")
+      end
+    end
+
+  end
+
   class Print_Stmt < Io_Stmt
 
     def translate
@@ -1120,7 +1212,7 @@ module Fortran
     def translate
       return if omp_parallel_loop or sms_ignore or sms_parallel_loop
       if sms_serial
-        add_serial_region_nml_vars(:out)
+        add_serial_region_nml_vars(:pppout)
       else
         io_stmt_init
         @onroot=false if unit.is_a?(Internal_File_Unit)
@@ -1818,7 +1910,7 @@ module Fortran
   class SMS_Serial < SMS_Region
 
     def not_in_env(name)
-      fail "ERROR: sms$serial-region variable '#{name}' not found in environment"
+      fail "ERROR: sms$serial-region variable '#{name}' not found in environment and not ignored"
     end
 
     def str0
@@ -1851,7 +1943,7 @@ module Fortran
       # to track them.
 
       globals=SortedSet.new
-      
+
       # Get the serial info recorded when the serial_begin statement was parsed.
 
       si=sms_serial_info
@@ -1859,6 +1951,8 @@ module Fortran
       # Build up a set of variables present in serial-region statements and/or
       # mentioned in the in/inout/out clauses of the serial directive for
       # potential communication. Start with in/inout/out-clause variables.
+
+      # Add variables from control specifications.
 
       commvars=SortedSet.new
       [:ignore,:in,:inout,:out].each do |treatment|
@@ -1876,44 +1970,70 @@ module Fortran
         end
       end
 
-      # Merge in variables found in serial-region statements.
+      # Merge in variables found in serial-region statements and specify their
+      # control.
 
-      commvars.merge(si.vars_in_region)
+      [[si.lvars,:pppout],[si.rvars,:pppin]].each do |vars,treatment|
+        vars.each { |var| commvars.add([var,treatment]) }
+      end
 
       # Reject all but the highest-priority treatment for each variable.
+      # At this point, variables found in serial-region statements and
+      # control specifcations will have multiple treatment but the control
+      # specification treatment will take precedence.
 
-      priority={:ignore=>3,:inout=>2,:in=>1,:out=>1,:none=>0}
+      priority={:ignore=>3,:inout=>2,:in=>1,:out=>1,:pppin=>0,:pppout=>0}
       commvars.group_by { |var,treatment| var }.each do |k,v|
         top=priority[v.max_by { |var,treatment| priority[treatment] }.last]
-        commvars=commvars.reject { |var,treatment| var==k and priority[treatment]<top }
+        commvars.reject! { |var,treatment| var==k and priority[treatment]<top }
       end
 
-      # Apply appropriate treatment where none is defined, and ensure that
+      # Apply default treatment if necessary, and ensure that
       # variables requiring communication are known in the environment.
-
+      # Also handle out of environment variables in specification and
+      # derived types that are not ignored.
+      
       commvars.each do |var_treatment|
         var,treatment=var_treatment
-        if treatment==:none
-          default=si.default
-          expected=(default==:ignore)?(false):(true)
-          varenv=varenv_get(var,self,expected)
-          dh=(varenv)?(varenv["decomp"]):(nil)
-          case default
-          when :ignore
-            new_treatment=:ignore
-          when :inout
-            new_treatment=(dh)?(:inout):(:out)
-          when :in
-            new_treatment=(dh)?(:in):(:ignore)
-          when :out
-            new_treatment=:out
-          else
-            fail "INTERNAL ERROR: Unknown treatment '#{treatment}'"
+        default=si.default
+        varenv=varenv_get(var,self,false)||{}
+        if treatment==:pppin or treatment==:pppout
+          unless default==:ignore or default==:ppp
+            not_in_env(var) if varenv.empty?
+            fail "ERROR: Derived type '#{var}' cannot be communicated in sms$serial region" unless basetype_chk(varenv["type"])              
           end
-          not_in_env(var) unless varenv or default==:ignore
-          var_treatment[1]=new_treatment
+          dh=(varenv)?(varenv["decomp"]):(nil)
+          var_treatment[1]=case default
+                           when :ignore
+                               :ignore
+                           when :inout
+                             (dh)?(:inout):(:out)
+                           when :in
+                             (dh)?(:in):(:ignore)
+                           when :out
+                             :out
+                           when :ppp
+                             case treatment
+                             when :pppout
+                               :pppout
+                             when :pppin
+                               (dh)?(:pppin):(:ignore)
+                             end
+                           else
+                             fail "ERROR: Unknown sms$serial default treatment '#{default}'"
+                           end
+        else
+          unless treatment==:ignore or varenv.empty?
+            fail "ERROR: Derived type '#{var}' cannot be communicated in sms$serial region" unless basetype_chk(varenv["type"])
+          end
         end
       end
+      
+      # Refresh the sorted set to eliminate duplicates created from applying
+      # the same default treatment to previously different :pppin and :pppout
+      # serial region variables.
+      
+      commvars=SortedSet.new(commvars)
 
       # Schedule necessary communication of serial-region variables.
 
@@ -1926,25 +2046,31 @@ module Fortran
       end
 
       commvars.each do |var,treatment|
-        expected=(treatment==:ignore)?(false):(true)
+        expected=([:ignore,:pppin,:pppout].include?(treatment))?(false):(true)
         varenv=varenv_get(var,self,expected)
         dh=(varenv)?(varenv["decomp"]):(nil)
         sort=(varenv)?(varenv["sort"]):(nil)
         next if sort=="namelist"
         globals.add(var) if dh
-        case treatment
-        when :ignore
-        when :in
-          fail "ERROR: 'in' variable '#{var}' is not decomposed" unless dh
-          schedule_in(var,gathers)
-        when :inout
-          fail "ERROR: 'inout' variable '#{var}' is not decomposed" unless dh
-          schedule_in(var,gathers)
-          schedule_out(var,sort,dh,bcasts,scatters)
-        when :out
-          schedule_out(var,sort,dh,bcasts,scatters)
-        else
-          fail "INTERNAL ERROR: Unknown treatment '#{treatment}'"
+        if varenv and basetype_chk(varenv["type"])
+          case treatment
+          when :ignore
+          when :in
+            fail "ERROR: sms$serial 'in' variable '#{var}' is not decomposed" unless dh
+            schedule_in(var,gathers)
+          when :inout
+            fail "ERROR: sms$serial 'inout' variable '#{var}' is not decomposed" unless dh
+            schedule_in(var,gathers)
+            schedule_out(var,sort,dh,bcasts,scatters)
+          when :out
+            schedule_out(var,sort,dh,bcasts,scatters)
+          when :pppin
+            schedule_in(var,gathers)
+          when :pppout
+            schedule_out(var,sort,dh,bcasts,scatters)
+          else
+            fail "INTERNAL ERROR: Unknown sms$serial treatment '#{treatment}'"
+          end
         end
       end
 
@@ -1969,6 +2095,29 @@ module Fortran
         declare(type,sms_global_name(var),props)
       end
 
+      restates=[]
+
+      # Declare and broadcast sms-created variables that handle pointers,
+      # and assign-statements. Add logic based on runtime behavior that will
+      # execute these statements correctly on all nodes.
+
+      [:lbl,:ptr].each do |type|
+        list=eval("si.#{type}").sort
+        list.each do |var,info|
+          sms_var="sms__#{type}_assign_#{var}"
+          declare("integer",sms_var)
+          bcasts.push(sms_var) unless bcasts.include?(sms_var)
+          restates.push("select case (#{sms_var})")
+          info.each_index do |idx|
+            restates.push("case (#{idx+1})")
+            restates.push(info[idx])
+          end
+          restates.push("case default")
+          restates.push(sms_abort(1,"RUNTIME ERROR: '#{var}' #{type} assign case construct has no matching statement"))
+          restates.push("end select")
+        end
+      end
+
       code=[]
 
       # Collect code for allocation and deallocation of globals.
@@ -1989,6 +2138,7 @@ module Fortran
       code.concat(code_scatter(scatters))
       code.concat(code_bcast(bcasts))
       code.concat(code_dealloc)
+      code.push(restates)
 
       # Replace serial region with new code block.
 
@@ -2011,8 +2161,11 @@ module Fortran
 
     def translate
       si=sms_serial_info=OpenStruct.new
-      si.vars_in_region=SortedSet.new
-      si.default     = control ? "#{control.default}".to_sym : :inout
+      si.lvars=Set.new
+      si.rvars=Set.new
+      si.ptr=Hash.new()
+      si.lbl=Hash.new()
+      si.default     = control ? "#{control.default}".to_sym : :ppp
       si.vars_ignore = control ? control.vars_ignore         : []
       si.vars_in     = control ? control.vars_in             : []
       si.vars_inout  = control ? control.vars_inout          : []
@@ -2053,7 +2206,7 @@ module Fortran
   class SMS_Serial_Control_Option_1 < SMS
 
     def default
-      (e[1].e&&e[1].e[1].respond_to?(:treatment))?(e[1].e[1].treatment):(:inout)
+      (e[1].e&&e[1].e[1].respond_to?(:treatment))?(e[1].e[1].treatment):(:ppp)
     end
 
     def sms_serial_treatment_lists
@@ -2474,7 +2627,7 @@ module Fortran
     def translate
       return if omp_parallel_loop or sms_ignore or sms_parallel_loop
       if sms_serial
-        add_serial_region_nml_vars(:in)
+        add_serial_region_nml_vars(:pppin)
       else        
         io_stmt_init
         function=(env["#{unit}"] and env["#{unit}"]["subprogram"]=="function")

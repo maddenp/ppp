@@ -231,16 +231,6 @@ module Fortran
   end
 
   module AcValueList0
-    def t_comma
-      elements[0]
-    end
-
-    def ac_value
-      elements[1]
-    end
-  end
-
-  module AcValueList1
     def ac_value
       elements[0]
     end
@@ -264,20 +254,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_ac_value
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(AcValueList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_ac_value_list_pair
         if r3
           s2 << r3
         else
@@ -289,13 +266,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(AC_Value_List,input, i0...index, s0)
-      r0.extend(AcValueList1)
+      r0.extend(AcValueList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:ac_value_list][start_index] = r0
+
+    r0
+  end
+
+  module AcValueListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def ac_value
+      elements[1]
+    end
+  end
+
+  def _nt_ac_value_list_pair
+    start_index = index
+    if node_cache[:ac_value_list_pair].has_key?(index)
+      cached = node_cache[:ac_value_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_ac_value
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(AC_Value_List_Pair,input, i0...index, s0)
+      r0.extend(AcValueListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:ac_value_list_pair][start_index] = r0
 
     r0
   end
@@ -887,16 +905,6 @@ module Fortran
   end
 
   module ActualArgSpecList0
-    def t_comma
-      elements[0]
-    end
-
-    def actual_arg_spec
-      elements[1]
-    end
-  end
-
-  module ActualArgSpecList1
     def actual_arg_spec
       elements[0]
     end
@@ -920,20 +928,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_actual_arg_spec
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(ActualArgSpecList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_actual_arg_spec_list_pair
         if r3
           s2 << r3
         else
@@ -945,13 +940,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Actual_Arg_Spec_List,input, i0...index, s0)
-      r0.extend(ActualArgSpecList1)
+      r0.extend(ActualArgSpecList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:actual_arg_spec_list][start_index] = r0
+
+    r0
+  end
+
+  module ActualArgSpecListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def actual_arg_spec
+      elements[1]
+    end
+  end
+
+  def _nt_actual_arg_spec_list_pair
+    start_index = index
+    if node_cache[:actual_arg_spec_list_pair].has_key?(index)
+      cached = node_cache[:actual_arg_spec_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_actual_arg_spec
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Actual_Arg_Spec_List_Pair,input, i0...index, s0)
+      r0.extend(ActualArgSpecListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:actual_arg_spec_list_pair][start_index] = r0
 
     r0
   end
@@ -1477,16 +1513,6 @@ module Fortran
   end
 
   module AllocateShapeSpecList0
-    def t_comma
-      elements[0]
-    end
-
-    def allocate_shape_spec
-      elements[1]
-    end
-  end
-
-  module AllocateShapeSpecList1
     def allocate_shape_spec
       elements[0]
     end
@@ -1510,20 +1536,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_allocate_shape_spec
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(AllocateShapeSpecList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_allocate_shape_spec_list_pair
         if r3
           s2 << r3
         else
@@ -1535,13 +1548,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Allocate_Shape_Spec_List,input, i0...index, s0)
-      r0.extend(AllocateShapeSpecList1)
+      r0.extend(AllocateShapeSpecList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:allocate_shape_spec_list][start_index] = r0
+
+    r0
+  end
+
+  module AllocateShapeSpecListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def allocate_shape_spec
+      elements[1]
+    end
+  end
+
+  def _nt_allocate_shape_spec_list_pair
+    start_index = index
+    if node_cache[:allocate_shape_spec_list_pair].has_key?(index)
+      cached = node_cache[:allocate_shape_spec_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_allocate_shape_spec
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Allocate_Shape_Spec_List_Pair,input, i0...index, s0)
+      r0.extend(AllocateShapeSpecListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:allocate_shape_spec_list_pair][start_index] = r0
 
     r0
   end
@@ -1752,16 +1806,6 @@ module Fortran
   end
 
   module AllocationList0
-    def t_comma
-      elements[0]
-    end
-
-    def allocation
-      elements[1]
-    end
-  end
-
-  module AllocationList1
     def allocation
       elements[0]
     end
@@ -1785,20 +1829,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_allocation
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(AllocationList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_allocation_list_pair
         if r3
           s2 << r3
         else
@@ -1810,13 +1841,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Allocation_List,input, i0...index, s0)
-      r0.extend(AllocationList1)
+      r0.extend(AllocationList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:allocation_list][start_index] = r0
+
+    r0
+  end
+
+  module AllocationListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def allocation
+      elements[1]
+    end
+  end
+
+  def _nt_allocation_list_pair
+    start_index = index
+    if node_cache[:allocation_list_pair].has_key?(index)
+      cached = node_cache[:allocation_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_allocation
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Allocation_List_Pair,input, i0...index, s0)
+      r0.extend(AllocationListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:allocation_list_pair][start_index] = r0
 
     r0
   end
@@ -4895,16 +4967,6 @@ module Fortran
   end
 
   module CaseValueRangeList0
-    def t_comma
-      elements[0]
-    end
-
-    def case_value_range
-      elements[1]
-    end
-  end
-
-  module CaseValueRangeList1
     def case_value_range
       elements[0]
     end
@@ -4928,20 +4990,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_case_value_range
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(CaseValueRangeList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_case_value_range_list_pair
         if r3
           s2 << r3
         else
@@ -4953,13 +5002,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Case_Value_Range_List,input, i0...index, s0)
-      r0.extend(CaseValueRangeList1)
+      r0.extend(CaseValueRangeList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:case_value_range_list][start_index] = r0
+
+    r0
+  end
+
+  module CaseValueRangeListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def case_value_range
+      elements[1]
+    end
+  end
+
+  def _nt_case_value_range_list_pair
+    start_index = index
+    if node_cache[:case_value_range_list_pair].has_key?(index)
+      cached = node_cache[:case_value_range_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_case_value_range
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Case_Value_Range_List_Pair,input, i0...index, s0)
+      r0.extend(CaseValueRangeListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:case_value_range_list_pair][start_index] = r0
 
     r0
   end
@@ -6607,16 +6697,6 @@ module Fortran
   end
 
   module ComponentAttrSpecList0
-    def t_comma
-      elements[0]
-    end
-
-    def component_attr_spec
-      elements[1]
-    end
-  end
-
-  module ComponentAttrSpecList1
     def component_attr_spec
       elements[0]
     end
@@ -6640,20 +6720,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_component_attr_spec
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(ComponentAttrSpecList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_component_attr_spec_list_pair
         if r3
           s2 << r3
         else
@@ -6665,7 +6732,7 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Component_Attr_Spec_List,input, i0...index, s0)
-      r0.extend(ComponentAttrSpecList1)
+      r0.extend(ComponentAttrSpecList0)
     else
       @index = i0
       r0 = nil
@@ -6705,7 +6772,7 @@ module Fortran
       s0 << r2
     end
     if s0.last
-      r0 = instantiate_node(Compoent_Attr_Spec_List_Option,input, i0...index, s0)
+      r0 = instantiate_node(Component_Attr_Spec_List_Option,input, i0...index, s0)
       r0.extend(ComponentAttrSpecListOption0)
     else
       @index = i0
@@ -6713,6 +6780,47 @@ module Fortran
     end
 
     node_cache[:component_attr_spec_list_option][start_index] = r0
+
+    r0
+  end
+
+  module ComponentAttrSpecListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def component_attr_spec
+      elements[1]
+    end
+  end
+
+  def _nt_component_attr_spec_list_pair
+    start_index = index
+    if node_cache[:component_attr_spec_list_pair].has_key?(index)
+      cached = node_cache[:component_attr_spec_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_component_attr_spec
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Component_Attr_Spec_List_Pair,input, i0...index, s0)
+      r0.extend(ComponentAttrSpecListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:component_attr_spec_list_pair][start_index] = r0
 
     r0
   end
@@ -6802,16 +6910,6 @@ module Fortran
   end
 
   module ComponentDeclList0
-    def t_comma
-      elements[0]
-    end
-
-    def component_decl
-      elements[1]
-    end
-  end
-
-  module ComponentDeclList1
     def component_decl
       elements[0]
     end
@@ -6835,20 +6933,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_component_decl
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(ComponentDeclList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_component_decl_list_pair
         if r3
           s2 << r3
         else
@@ -6860,13 +6945,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Component_Decl_List,input, i0...index, s0)
-      r0.extend(ComponentDeclList1)
+      r0.extend(ComponentDeclList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:component_decl_list][start_index] = r0
+
+    r0
+  end
+
+  module ComponentDeclListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def component_decl
+      elements[1]
+    end
+  end
+
+  def _nt_component_decl_list_pair
+    start_index = index
+    if node_cache[:component_decl_list_pair].has_key?(index)
+      cached = node_cache[:component_decl_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_component_decl
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Component_Decl_List_Pair,input, i0...index, s0)
+      r0.extend(ComponentDeclListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:component_decl_list_pair][start_index] = r0
 
     r0
   end
@@ -8744,16 +8870,6 @@ module Fortran
   end
 
   module DataIDoObjectList0
-    def t_comma
-      elements[0]
-    end
-
-    def data_i_do_object
-      elements[1]
-    end
-  end
-
-  module DataIDoObjectList1
     def data_i_do_object
       elements[0]
     end
@@ -8777,20 +8893,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_data_i_do_object
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(DataIDoObjectList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_data_i_do_object_list_pair
         if r3
           s2 << r3
         else
@@ -8802,13 +8905,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Data_I_Do_Object_List,input, i0...index, s0)
-      r0.extend(DataIDoObjectList1)
+      r0.extend(DataIDoObjectList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:data_i_do_object_list][start_index] = r0
+
+    r0
+  end
+
+  module DataIDoObjectListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def data_i_do_object
+      elements[1]
+    end
+  end
+
+  def _nt_data_i_do_object_list_pair
+    start_index = index
+    if node_cache[:data_i_do_object_list_pair].has_key?(index)
+      cached = node_cache[:data_i_do_object_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_data_i_do_object
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Data_I_Do_Object_List_Pair,input, i0...index, s0)
+      r0.extend(DataIDoObjectListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:data_i_do_object_list_pair][start_index] = r0
 
     r0
   end
@@ -8840,36 +8984,16 @@ module Fortran
       elements[1]
     end
 
-    def t_comma1
+    def t_comma
       elements[2]
     end
 
-    def data_i_do_variable
+    def data_implied_do_loop
       elements[3]
     end
 
-    def t_equal
-      elements[4]
-    end
-
-    def scalar_int_expr1
-      elements[5]
-    end
-
-    def t_comma2
-      elements[6]
-    end
-
-    def scalar_int_expr2
-      elements[7]
-    end
-
-    def data_implied_do_option
-      elements[8]
-    end
-
     def t_paren_r
-      elements[9]
+      elements[4]
     end
   end
 
@@ -8894,31 +9018,11 @@ module Fortran
         r3 = _nt_t_comma
         s0 << r3
         if r3
-          r4 = _nt_data_i_do_variable
+          r4 = _nt_data_implied_do_loop
           s0 << r4
           if r4
-            r5 = _nt_t_equal
+            r5 = _nt_t_paren_r
             s0 << r5
-            if r5
-              r6 = _nt_scalar_int_expr
-              s0 << r6
-              if r6
-                r7 = _nt_t_comma
-                s0 << r7
-                if r7
-                  r8 = _nt_scalar_int_expr
-                  s0 << r8
-                  if r8
-                    r9 = _nt_data_implied_do_option
-                    s0 << r9
-                    if r9
-                      r10 = _nt_t_paren_r
-                      s0 << r10
-                    end
-                  end
-                end
-              end
-            end
           end
         end
       end
@@ -8932,6 +9036,79 @@ module Fortran
     end
 
     node_cache[:data_implied_do][start_index] = r0
+
+    r0
+  end
+
+  module DataImpliedDoLoop0
+    def data_i_do_variable
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def scalar_int_expr1
+      elements[2]
+    end
+
+    def t_comma
+      elements[3]
+    end
+
+    def scalar_int_expr2
+      elements[4]
+    end
+
+    def data_implied_do_option
+      elements[5]
+    end
+  end
+
+  def _nt_data_implied_do_loop
+    start_index = index
+    if node_cache[:data_implied_do_loop].has_key?(index)
+      cached = node_cache[:data_implied_do_loop][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_data_i_do_variable
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_scalar_int_expr
+        s0 << r3
+        if r3
+          r4 = _nt_t_comma
+          s0 << r4
+          if r4
+            r5 = _nt_scalar_int_expr
+            s0 << r5
+            if r5
+              r6 = _nt_data_implied_do_option
+              s0 << r6
+            end
+          end
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(Data_Implied_Do_Loop,input, i0...index, s0)
+      r0.extend(DataImpliedDoLoop0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:data_implied_do_loop][start_index] = r0
 
     r0
   end
@@ -9217,16 +9394,6 @@ module Fortran
   end
 
   module DataStmtObjectList0
-    def t_comma
-      elements[0]
-    end
-
-    def data_stmt_object
-      elements[1]
-    end
-  end
-
-  module DataStmtObjectList1
     def data_stmt_object
       elements[0]
     end
@@ -9250,20 +9417,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_data_stmt_object
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(DataStmtObjectList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_data_stmt_object_list_pair
         if r3
           s2 << r3
         else
@@ -9275,13 +9429,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Data_Stmt_Object_List,input, i0...index, s0)
-      r0.extend(DataStmtObjectList1)
+      r0.extend(DataStmtObjectList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:data_stmt_object_list][start_index] = r0
+
+    r0
+  end
+
+  module DataStmtObjectListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def data_stmt_object
+      elements[1]
+    end
+  end
+
+  def _nt_data_stmt_object_list_pair
+    start_index = index
+    if node_cache[:data_stmt_object_list_pair].has_key?(index)
+      cached = node_cache[:data_stmt_object_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_data_stmt_object
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Data_Stmt_Object_List_Pair,input, i0...index, s0)
+      r0.extend(DataStmtObjectListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:data_stmt_object_list_pair][start_index] = r0
 
     r0
   end
@@ -9555,16 +9750,6 @@ module Fortran
   end
 
   module DataStmtValueList0
-    def t_comma
-      elements[0]
-    end
-
-    def data_stmt_value
-      elements[1]
-    end
-  end
-
-  module DataStmtValueList1
     def data_stmt_value
       elements[0]
     end
@@ -9588,20 +9773,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_data_stmt_value
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(DataStmtValueList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_data_stmt_value_list_pair
         if r3
           s2 << r3
         else
@@ -9613,13 +9785,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Data_Stmt_Value_List,input, i0...index, s0)
-      r0.extend(DataStmtValueList1)
+      r0.extend(DataStmtValueList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:data_stmt_value_list][start_index] = r0
+
+    r0
+  end
+
+  module DataStmtValueListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def data_stmt_value
+      elements[1]
+    end
+  end
+
+  def _nt_data_stmt_value_list_pair
+    start_index = index
+    if node_cache[:data_stmt_value_list_pair].has_key?(index)
+      cached = node_cache[:data_stmt_value_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_data_stmt_value
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Data_Stmt_Value_List_Pair,input, i0...index, s0)
+      r0.extend(DataStmtValueListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:data_stmt_value_list_pair][start_index] = r0
 
     r0
   end
@@ -11150,6 +11363,13 @@ module Fortran
     r0
   end
 
+  module DoVariable0
+    def scalar_variable
+      elements[0]
+    end
+
+  end
+
   def _nt_do_variable
     start_index = index
     if node_cache[:do_variable].has_key?(index)
@@ -11161,7 +11381,26 @@ module Fortran
       return cached
     end
 
-    r0 = _nt_scalar_variable
+    i0, s0 = index, []
+    r1 = _nt_scalar_variable
+    s0 << r1
+    if r1
+      if has_terminal?("", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 0))
+        @index += 0
+      else
+        terminal_parse_failure("")
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Do_Variable,input, i0...index, s0)
+      r0.extend(DoVariable0)
+    else
+      @index = i0
+      r0 = nil
+    end
 
     node_cache[:do_variable][start_index] = r0
 
@@ -13754,16 +13993,6 @@ module Fortran
   end
 
   module EquivalenceSetList0
-    def t_comma
-      elements[0]
-    end
-
-    def equivalence_set
-      elements[1]
-    end
-  end
-
-  module EquivalenceSetList1
     def equivalence_set
       elements[0]
     end
@@ -13787,20 +14016,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_equivalence_set
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(EquivalenceSetList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_equivalence_set_list_pair
         if r3
           s2 << r3
         else
@@ -13812,13 +14028,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Equivalence_Set_List,input, i0...index, s0)
-      r0.extend(EquivalenceSetList1)
+      r0.extend(EquivalenceSetList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:equivalence_set_list][start_index] = r0
+
+    r0
+  end
+
+  module EquivalenceSetListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def equivalence_set
+      elements[1]
+    end
+  end
+
+  def _nt_equivalence_set_list_pair
+    start_index = index
+    if node_cache[:equivalence_set_list_pair].has_key?(index)
+      cached = node_cache[:equivalence_set_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_equivalence_set
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Equivalence_Set_List_Pair,input, i0...index, s0)
+      r0.extend(EquivalenceSetListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:equivalence_set_list_pair][start_index] = r0
 
     r0
   end
@@ -14461,16 +14718,6 @@ module Fortran
   end
 
   module ExprList0
-    def t_comma
-      elements[0]
-    end
-
-    def expr
-      elements[1]
-    end
-  end
-
-  module ExprList1
     def expr
       elements[0]
     end
@@ -14494,20 +14741,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_expr
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(ExprList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_expr_list_pair
         if r3
           s2 << r3
         else
@@ -14519,13 +14753,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Expr_List,input, i0...index, s0)
-      r0.extend(ExprList1)
+      r0.extend(ExprList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:expr_list][start_index] = r0
+
+    r0
+  end
+
+  module ExprListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def expr
+      elements[1]
+    end
+  end
+
+  def _nt_expr_list_pair
+    start_index = index
+    if node_cache[:expr_list_pair].has_key?(index)
+      cached = node_cache[:expr_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_expr
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Expr_List_Pair,input, i0...index, s0)
+      r0.extend(ExprListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:expr_list_pair][start_index] = r0
 
     r0
   end
@@ -14611,16 +14886,6 @@ module Fortran
   end
 
   module ExternalNameList0
-    def t_comma
-      elements[0]
-    end
-
-    def external_name
-      elements[1]
-    end
-  end
-
-  module ExternalNameList1
     def external_name
       elements[0]
     end
@@ -14644,20 +14909,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_external_name
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(ExternalNameList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_external_name_list_pair
         if r3
           s2 << r3
         else
@@ -14669,13 +14921,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(External_Name_List,input, i0...index, s0)
-      r0.extend(ExternalNameList1)
+      r0.extend(ExternalNameList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:external_name_list][start_index] = r0
+
+    r0
+  end
+
+  module ExternalNameListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def external_name
+      elements[1]
+    end
+  end
+
+  def _nt_external_name_list_pair
+    start_index = index
+    if node_cache[:external_name_list_pair].has_key?(index)
+      cached = node_cache[:external_name_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_external_name
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(External_Name_List_Pair,input, i0...index, s0)
+      r0.extend(ExternalNameListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:external_name_list_pair][start_index] = r0
 
     r0
   end
@@ -17668,16 +17961,6 @@ module Fortran
   end
 
   module InquireSpecList0
-    def t_comma
-      elements[0]
-    end
-
-    def inquire_spec
-      elements[1]
-    end
-  end
-
-  module InquireSpecList1
     def inquire_spec
       elements[0]
     end
@@ -17701,20 +17984,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_inquire_spec
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(InquireSpecList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_inquire_spec_list_pair
         if r3
           s2 << r3
         else
@@ -17726,13 +17996,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Inquire_Spec_List,input, i0...index, s0)
-      r0.extend(InquireSpecList1)
+      r0.extend(InquireSpecList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:inquire_spec_list][start_index] = r0
+
+    r0
+  end
+
+  module InquireSpecListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def inquire_spec
+      elements[1]
+    end
+  end
+
+  def _nt_inquire_spec_list_pair
+    start_index = index
+    if node_cache[:inquire_spec_list_pair].has_key?(index)
+      cached = node_cache[:inquire_spec_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_inquire_spec
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Inquire_Spec_List_Pair,input, i0...index, s0)
+      r0.extend(InquireSpecListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:inquire_spec_list_pair][start_index] = r0
 
     r0
   end
@@ -18728,16 +19039,6 @@ module Fortran
   end
 
   module IntrinsicProcedureNameList0
-    def t_comma
-      elements[0]
-    end
-
-    def intrinsic_procedure_name
-      elements[1]
-    end
-  end
-
-  module IntrinsicProcedureNameList1
     def intrinsic_procedure_name
       elements[0]
     end
@@ -18761,20 +19062,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_intrinsic_procedure_name
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(IntrinsicProcedureNameList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_intrinsic_procedure_name_list_pair
         if r3
           s2 << r3
         else
@@ -18786,13 +19074,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Intrinsic_Procedure_Name_List,input, i0...index, s0)
-      r0.extend(IntrinsicProcedureNameList1)
+      r0.extend(IntrinsicProcedureNameList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:intrinsic_procedure_name_list][start_index] = r0
+
+    r0
+  end
+
+  module IntrinsicProcedureNameListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def intrinsic_procedure_name
+      elements[1]
+    end
+  end
+
+  def _nt_intrinsic_procedure_name_list_pair
+    start_index = index
+    if node_cache[:intrinsic_procedure_name_list_pair].has_key?(index)
+      cached = node_cache[:intrinsic_procedure_name_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_intrinsic_procedure_name
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Intrinsic_Procedure_Name_List_Pair,input, i0...index, s0)
+      r0.extend(IntrinsicProcedureNameListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:intrinsic_procedure_name_list_pair][start_index] = r0
 
     r0
   end
@@ -19514,16 +19843,6 @@ module Fortran
   end
 
   module IoImpliedDoObjectList0
-    def t_comma
-      elements[0]
-    end
-
-    def io_implied_do_object
-      elements[1]
-    end
-  end
-
-  module IoImpliedDoObjectList1
     def io_implied_do_object
       elements[0]
     end
@@ -19547,20 +19866,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_io_implied_do_object
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(IoImpliedDoObjectList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_io_implied_do_object_list_pair
         if r3
           s2 << r3
         else
@@ -19572,13 +19878,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Io_Implied_Do_Object_List,input, i0...index, s0)
-      r0.extend(IoImpliedDoObjectList1)
+      r0.extend(IoImpliedDoObjectList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:io_implied_do_object_list][start_index] = r0
+
+    r0
+  end
+
+  module IoImpliedDoObjectListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def io_implied_do_object
+      elements[1]
+    end
+  end
+
+  def _nt_io_implied_do_object_list_pair
+    start_index = index
+    if node_cache[:io_implied_do_object_list_pair].has_key?(index)
+      cached = node_cache[:io_implied_do_object_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_io_implied_do_object
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Io_Implied_Do_Object_List_Pair,input, i0...index, s0)
+      r0.extend(IoImpliedDoObjectListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_implied_do_object_list_pair][start_index] = r0
 
     r0
   end
@@ -23745,16 +24092,6 @@ module Fortran
   end
 
   module NamedConstantDefList0
-    def t_comma
-      elements[0]
-    end
-
-    def named_constant_def
-      elements[1]
-    end
-  end
-
-  module NamedConstantDefList1
     def named_constant_def
       elements[0]
     end
@@ -23778,20 +24115,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_named_constant_def
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(NamedConstantDefList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_named_constant_def_list_pair
         if r3
           s2 << r3
         else
@@ -23803,13 +24127,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Named_Constant_Def_List,input, i0...index, s0)
-      r0.extend(NamedConstantDefList1)
+      r0.extend(NamedConstantDefList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:named_constant_def_list][start_index] = r0
+
+    r0
+  end
+
+  module NamedConstantDefListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def named_constant_def
+      elements[1]
+    end
+  end
+
+  def _nt_named_constant_def_list_pair
+    start_index = index
+    if node_cache[:named_constant_def_list_pair].has_key?(index)
+      cached = node_cache[:named_constant_def_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_named_constant_def
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Named_Constant_Def_List_Pair,input, i0...index, s0)
+      r0.extend(NamedConstantDefListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:named_constant_def_list_pair][start_index] = r0
 
     r0
   end
@@ -26079,16 +26444,6 @@ module Fortran
   end
 
   module PointerObjectList0
-    def t_comma
-      elements[0]
-    end
-
-    def pointer_object
-      elements[1]
-    end
-  end
-
-  module PointerObjectList1
     def pointer_object
       elements[0]
     end
@@ -26112,20 +26467,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_pointer_object
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(PointerObjectList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_pointer_object_list_pair
         if r3
           s2 << r3
         else
@@ -26137,13 +26479,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Pointer_Object_List,input, i0...index, s0)
-      r0.extend(PointerObjectList1)
+      r0.extend(PointerObjectList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:pointer_object_list][start_index] = r0
+
+    r0
+  end
+
+  module PointerObjectListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def pointer_object
+      elements[1]
+    end
+  end
+
+  def _nt_pointer_object_list_pair
+    start_index = index
+    if node_cache[:pointer_object_list_pair].has_key?(index)
+      cached = node_cache[:pointer_object_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_pointer_object
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Pointer_Object_List_Pair,input, i0...index, s0)
+      r0.extend(PointerObjectListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:pointer_object_list_pair][start_index] = r0
 
     r0
   end
@@ -26999,16 +27382,6 @@ module Fortran
   end
 
   module ProcedureNameList0
-    def t_comma
-      elements[0]
-    end
-
-    def procedure_name
-      elements[1]
-    end
-  end
-
-  module ProcedureNameList1
     def procedure_name
       elements[0]
     end
@@ -27032,20 +27405,7 @@ module Fortran
     if r1
       s2, i2 = [], index
       loop do
-        i3, s3 = index, []
-        r4 = _nt_t_comma
-        s3 << r4
-        if r4
-          r5 = _nt_procedure_name
-          s3 << r5
-        end
-        if s3.last
-          r3 = instantiate_node(SyntaxNode,input, i3...index, s3)
-          r3.extend(ProcedureNameList0)
-        else
-          @index = i3
-          r3 = nil
-        end
+        r3 = _nt_procedure_name_list_pair
         if r3
           s2 << r3
         else
@@ -27057,13 +27417,54 @@ module Fortran
     end
     if s0.last
       r0 = instantiate_node(Procedure_Name_List,input, i0...index, s0)
-      r0.extend(ProcedureNameList1)
+      r0.extend(ProcedureNameList0)
     else
       @index = i0
       r0 = nil
     end
 
     node_cache[:procedure_name_list][start_index] = r0
+
+    r0
+  end
+
+  module ProcedureNameListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def procedure_name
+      elements[1]
+    end
+  end
+
+  def _nt_procedure_name_list_pair
+    start_index = index
+    if node_cache[:procedure_name_list_pair].has_key?(index)
+      cached = node_cache[:procedure_name_list_pair][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_procedure_name
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Procedure_Name_List_Pair,input, i0...index, s0)
+      r0.extend(ProcedureNameListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:procedure_name_list_pair][start_index] = r0
 
     r0
   end
