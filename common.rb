@@ -131,7 +131,7 @@ module Common
     unless File.directory?(d)
       $stderr.puts "Output directory '#{d}' not found"
       raise Exceptions::TranslatorException
-    end      
+    end
     f=envfile("#{modulename}",d)
     begin
       File.delete(f) if File.exist?(f)

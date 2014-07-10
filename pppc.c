@@ -26,7 +26,7 @@ void senderr(char *component)
   printf("Could not send %s to server\n",component);
   fail();
 }
-  
+
 void usage(char *exe)
 {
   printf("usage: %s <socket> <infile> <outfile>|<moddir> modinfo|passthrough|translate fixed|free [<dir>[:<dir>:...]]\n",exe);

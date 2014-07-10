@@ -32,7 +32,7 @@ grammar Fortran
   rule ac_value_list_pair
     t_comma ac_value <AC_Value_List_Pair>
   end
-  
+
   rule access_id
     # F90:R522
 
@@ -130,7 +130,7 @@ grammar Fortran
   rule actual_arg_spec_list_pair
     t_comma actual_arg_spec <Actual_Arg_Spec_List_Pair>
   end
-  
+
   rule add_op
     # F90:R710
 
@@ -199,7 +199,7 @@ grammar Fortran
   rule allocate_shape_spec_list_pair
     t_comma allocate_shape_spec <Allocate_Shape_Spec_List_Pair>
   end
-  
+
   rule allocate_stat_construct
     t_comma t_stat t_equal stat_variable <Allocate_Stat_Construct>
   end
@@ -540,7 +540,7 @@ grammar Fortran
   rule case_value_range_list_pair
     t_comma case_value_range <Case_Value_Range_List_Pair>
   end
-  
+
   rule char_expr
     # F90:R726
 
@@ -898,7 +898,7 @@ grammar Fortran
   rule data_i_do_object_list_pair
     t_comma data_i_do_object <Data_I_Do_Object_List_Pair>
   end
-  
+
   rule data_i_do_variable
     # F90:R537
 
@@ -960,7 +960,7 @@ grammar Fortran
   rule data_stmt_object_list_pair
     t_comma data_stmt_object <Data_Stmt_Object_List_Pair>
   end
-  
+
   rule data_stmt_repeat
     # F90:R534
 
@@ -1002,7 +1002,7 @@ grammar Fortran
   rule data_stmt_value_list_pair
     t_comma data_stmt_value <Data_Stmt_Value_List_Pair>
   end
-  
+
   rule deallocate_stmt
     # F90:R631
 
@@ -1608,7 +1608,7 @@ grammar Fortran
   rule external_name_list_pair
     t_comma external_name <External_Name_List_Pair>
   end
-  
+
   rule external_stmt
     # F90:R1207
 
@@ -1942,7 +1942,7 @@ grammar Fortran
   rule inquire_spec_list_pair
     t_comma inquire_spec <Inquire_Spec_List_Pair>
   end
-  
+
   rule inquire_stmt
     # F90:R923
 
@@ -2061,7 +2061,7 @@ grammar Fortran
   rule intrinsic_procedure_name_list_pair
     t_comma intrinsic_procedure_name <Intrinsic_Procedure_Name_List_Pair>
   end
-  
+
   rule intrinsic_stmt
     # F90:R1208
 
@@ -2571,7 +2571,7 @@ grammar Fortran
   rule named_constant_def_list_pair
     t_comma named_constant_def <Named_Constant_Def_List_Pair>
   end
-  
+
   rule namelist_group_name
     # Multiple uses (not explicitly defined)
 

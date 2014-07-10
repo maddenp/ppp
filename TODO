@@ -61,7 +61,7 @@
 
 - Implement register/exchange scheme.
 
-- In e.g. SMS_Exchange, rename maxrank -> ppp_max_rank and sms_maxvars -> 
+- In e.g. SMS_Exchange, rename maxrank -> ppp_max_rank and sms_maxvars ->
   ppp_max_exchange_vars, first renaming the ppp_* vars in the SMS library to
   adhere to sms__ naming convention. 7 as the max fortran rank would be
   reasonable to keep in ppp, but the max vars bit (may occur, with a different

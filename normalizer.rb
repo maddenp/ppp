@@ -1,5 +1,5 @@
 module Normalizer
- 
+
   def update(m1)
     to_update=["Quoted","Unquoted"]
     m0=Normalizer

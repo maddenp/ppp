@@ -670,7 +670,7 @@ module Fortran
       basetypes=["integer","real","complex","character","logical"]
       basetypes.include?(type)
     end
-    
+
     def block_left
       s=env[:global]
       s[:level]||=0
@@ -753,7 +753,7 @@ module Fortran
       a=e[1].e.reduce(a) { |m,x| m.push(x.e[1]) } if e[1].e
       a
     end
-    
+
     def list_idx(node)
       return 0 if e[0].object_id==node.object_id
       e[1].e.size.times do |n|
@@ -897,7 +897,7 @@ module Fortran
     def array
       list_array
     end
-    
+
     def idx(node)
       list_idx(node)
     end
@@ -1286,7 +1286,7 @@ module Fortran
 
   class AC_Value_List_Pair < NT
   end
-  
+
   class Access_Id_List < List
 
     def names
@@ -1359,7 +1359,7 @@ module Fortran
 
   class Actual_Arg_Spec_List_Pair < NT
   end
-  
+
   class Add_Operand < NT
 
     def str0
@@ -1444,7 +1444,7 @@ module Fortran
 
   class Allocate_Shape_Spec_List_Pair < NT
   end
-  
+
   class Allocate_Shape_Spec_Option < NT
 
     def allocate_lower_bound
@@ -1502,7 +1502,7 @@ module Fortran
 
   class Allocation_List_Pair < NT
   end
-  
+
   class Alt_Return_Spec < NT
   end
 
@@ -1684,7 +1684,7 @@ module Fortran
       # a deferred-shape array until all declarations are parsed, in which case
       # a generic node will be instantiated, and the environment information for
       # its parent array node corrected by later processing.
-      
+
       "offset"
     end
 
@@ -2023,7 +2023,7 @@ module Fortran
 
   class Case_Value_Range_List_Pair < NT
   end
-  
+
   class Char_Length_1 < NT
   end
 
@@ -2138,7 +2138,7 @@ module Fortran
 
   class Component_Attr_Spec_List_Pair < NT
   end
-  
+
   class Component_Decl < NT
   end
 
@@ -2147,7 +2147,7 @@ module Fortran
 
   class Component_Decl_List_Pair < NT
   end
-  
+
   class Component_Def_Stmt < Stmt
 
     def str0
@@ -2276,7 +2276,7 @@ module Fortran
 
   class Data_I_Do_Object_List_Pair < NT
   end
-  
+
   class Data_Implied_Do < NT
   end
 
@@ -2344,7 +2344,7 @@ module Fortran
 
   class Data_Stmt_Object_List_Pair < NT
   end
-  
+
   class Data_Stmt_Repeat_Pair < NT
   end
 
@@ -2368,7 +2368,7 @@ module Fortran
 
   class Data_Stmt_Value_List_Pair < NT
   end
-  
+
   class Deallocate_Stmt < Stmt
 
     def str0
@@ -2863,7 +2863,7 @@ module Fortran
 
   class Equivalence_Set_List_Pair < NT
   end
-  
+
   class Equivalence_Stmt < Stmt
   end
 
@@ -2955,7 +2955,7 @@ module Fortran
 
   class Expr_List_Pair < NT
   end
-  
+
   class External_File_Unit < NT
   end
 
@@ -2967,7 +2967,7 @@ module Fortran
 
   class External_Name_List_Pair < NT
   end
-  
+
   class External_Stmt < Stmt
   end
 
@@ -3187,7 +3187,7 @@ module Fortran
   class Hollerith_String < NT
 
     def str0
-      e[1].e.reduce("") { |m,x| m+="#{x.e[0]}" }      
+      e[1].e.reduce("") { |m,x| m+="#{x.e[0]}" }
     end
 
   end
@@ -3346,7 +3346,7 @@ module Fortran
 
   class Inquire_Spec_List_Pair < NT
   end
-  
+
   class Inquire_Stmt_1 < Io_Stmt
 
     def str0
@@ -3427,7 +3427,7 @@ module Fortran
 
   class Intrinsic_Procedure_Name_List_Pair < NT
   end
-  
+
   class Intrinsic_Stmt < Stmt
   end
 
@@ -3484,7 +3484,7 @@ module Fortran
 
   class Io_Implied_Do_Object_List_Pair < NT
   end
-  
+
   class Io_Spec < NT
 
     def relabel_spec(spec)
@@ -3934,7 +3934,7 @@ module Fortran
 
   class Named_Constant_Def_List_Pair < NT
   end
-  
+
   class Namelist_Group_Name < NT
 
     def name
@@ -4305,7 +4305,7 @@ module Fortran
 
   class Pointer_Object_List_Pair < NT
   end
-  
+
   class Pointer_Stmt < Stmt
 
     def str0
@@ -4391,7 +4391,7 @@ module Fortran
 
   class Procedure_Name_List_Pair < NT
   end
-  
+
   class Program_Name < NT
   end
 

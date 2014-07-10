@@ -722,7 +722,7 @@ module Fortran
       end
     end
 
-  end  
+  end
 
   class Close_Stmt < Io_Stmt
 
@@ -1059,14 +1059,14 @@ module Fortran
     def translate
 
       def handle_serial
-        
+
         def i_am_lvar
           if inside?(Actual_Arg_Spec) # function(x,y,x) or call subroutrine(x,y,z)
             sms_serial_info.rvars.add(name)
             return true
           end
           return false if inside?(Section_Subscript_List) # array indexing
-          return true if inside?(Assignment_Stmt) and not inside?(Expr) # left side of assignment-stmt 
+          return true if inside?(Assignment_Stmt) and not inside?(Expr) # left side of assignment-stmt
           return true if inside?(Io_Spec_Iostat,Allocate_Stat_Construct,Input_Item_List,Do_Variable)
           return true if inside?(Data_Stmt_Object_List) and not inside?(Data_Implied_Do_Loop)
           if inside?(Inquire_Spec_List)
@@ -1076,11 +1076,11 @@ module Fortran
         end
 
         def fail_if_allocate(varenv)
-        
+
           def fail_allocate_msg(stat,comm)
             fail "ERROR: #{stat} of '#{name}' in serial region incompatible with '#{comm}' treatment"
           end
-          
+
           if inside?(Allocate_Object)
             stat="Allocation" if inside?(Allocate_Stmt)
             stat="Deallocation" if inside?(Deallocate_Stmt)
@@ -1108,7 +1108,7 @@ module Fortran
           end
         end
       end
-      
+
       # Handle to_local
       if tolocal=sms_to_local and p=tolocal["#{name}"]
         case "#{p.key}"
@@ -1124,7 +1124,7 @@ module Fortran
         code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
         replace_element(code,:expr)
       end
-      handle_serial if sms_serial 
+      handle_serial if sms_serial
     end
 
   end
@@ -1148,7 +1148,7 @@ module Fortran
     end
 
   end
-  
+
   class OMP_Directive < NT
   end
 
@@ -1185,7 +1185,7 @@ module Fortran
   end
 
   class Pointer_Assignment_Stmt < Stmt
-    
+
     def translate
       if sms_serial
         pointer=e[1]
@@ -1675,7 +1675,7 @@ module Fortran
       fail "ERROR: sms$halo_comp may not appear inside sms$serial region" if sms_serial
       fail "ERROR: sms$halo_comp may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
     end
-    
+
   end
 
   class SMS_Halo_Comp_Begin < SMS
@@ -1725,7 +1725,7 @@ module Fortran
       fail "ERROR: sms$ignore may not appear inside sms$serial region" if sms_serial
       fail "ERROR: sms$ignore may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
     end
-    
+
   end
 
   class SMS_Ignore_Begin < SMS
@@ -1992,7 +1992,7 @@ module Fortran
       # variables requiring communication are known in the environment.
       # Also handle out of environment variables in specification and
       # derived types that are not ignored.
-      
+
       commvars.each do |var_treatment|
         var,treatment=var_treatment
         default=si.default
@@ -2000,7 +2000,7 @@ module Fortran
         if treatment==:pppin or treatment==:pppout
           unless default==:ignore or default==:ppp
             not_in_env(var) if varenv.empty?
-            fail "ERROR: Derived type '#{var}' cannot be communicated in sms$serial region" unless basetype_chk(varenv["type"])              
+            fail "ERROR: Derived type '#{var}' cannot be communicated in sms$serial region" unless basetype_chk(varenv["type"])
           end
           dh=(varenv)?(varenv["decomp"]):(nil)
           var_treatment[1]=case default
@@ -2028,11 +2028,11 @@ module Fortran
           end
         end
       end
-      
+
       # Refresh the sorted set to eliminate duplicates created from applying
       # the same default treatment to previously different :pppin and :pppout
       # serial region variables.
-      
+
       commvars=SortedSet.new(commvars)
 
       # Schedule necessary communication of serial-region variables.
@@ -2628,7 +2628,7 @@ module Fortran
       return if omp_parallel_loop or sms_ignore or sms_parallel_loop
       if sms_serial
         add_serial_region_nml_vars(:pppin)
-      else        
+      else
         io_stmt_init
         function=(env["#{unit}"] and env["#{unit}"]["subprogram"]=="function")
         @onroot=false if unit.is_a?(Internal_File_Unit) or function
@@ -2654,7 +2654,7 @@ end # module Fortran
 
 class Translator
 
-  
+
   def prepsrc_common(s,sms,omp)
 
     # Process SMS continuations, inserts and removes
@@ -2679,7 +2679,7 @@ class Translator
       end
     end
     s=a.join("\n")
-    
+
     s
 
   end

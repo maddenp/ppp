@@ -1,5 +1,5 @@
 module Normalizer
- 
+
   class OMP < Treetop::Runtime::SyntaxNode
     def to_s
       s=text_value
