@@ -331,7 +331,7 @@ module Fortran
     def code_global_upper_bounds(varenv,var,dims)
       if dims
         "(/"+ranks.map { |r| (r>dims)?(1):(fixbound(varenv,var,r,:u)) }.join(",")+"/)"
-        else
+      else
         "(/"+ranks.map { |r| 1 }.join(",")+"/)"
       end
     end
@@ -1952,7 +1952,7 @@ module Fortran
       # mentioned in the in/inout/out clauses of the serial directive for
       # potential communication. Start with in/inout/out-clause variables.
 
-      # Add variables from control specifications.
+      # Add explicit-treatment variables.
 
       commvars=SortedSet.new
       [:ignore,:in,:inout,:out].each do |treatment|
@@ -1977,10 +1977,10 @@ module Fortran
         vars.each { |var| commvars.add([var,treatment]) }
       end
 
-      # Reject all but the highest-priority treatment for each variable.
-      # At this point, variables found in serial-region statements and
-      # control specifcations will have multiple treatment but the control
-      # specification treatment will take precedence.
+      # Reject all but the highest-priority treatment for each variable. At this
+      # point, variables found both in serial-region statements and found in the
+      # serial region will have multiple treatment but those for which explicit
+      # treatment was specified will take precedence.
 
       priority={:ignore=>3,:inout=>2,:in=>1,:out=>1,:pppin=>0,:pppout=>0}
       commvars.group_by { |var,treatment| var }.each do |k,v|
@@ -1988,10 +1988,9 @@ module Fortran
         commvars.reject! { |var,treatment| var==k and priority[treatment]<top }
       end
 
-      # Apply default treatment if necessary, and ensure that
-      # variables requiring communication are known in the environment.
-      # Also handle out of environment variables in specification and
-      # derived types that are not ignored.
+      # Apply default treatment if necessary, and ensure that variables needing
+      # communication are known in the environment. Handle out-of-environment
+      # variables in specification and derived types that are not ignored.
 
       commvars.each do |var_treatment|
         var,treatment=var_treatment
@@ -2005,7 +2004,7 @@ module Fortran
           dh=(varenv)?(varenv["decomp"]):(nil)
           var_treatment[1]=case default
                            when :ignore
-                               :ignore
+                             :ignore
                            when :inout
                              (dh)?(:inout):(:out)
                            when :in
