@@ -740,9 +740,9 @@ module Fortran
       if metadata[:parallel]
         target=(opl=omp_parallel_loop)?(opl):(self)
         code=[]
-        code.push("sms__in_parallel=.true.")
+        code.push("sms__parallel_depth=sms__parallel_depth+1")
         code.push(target)
-        code.push("sms__in_parallel=.false.")
+        code.push("sms__parallel_depth=sms__parallel_depth-1")
         target.replace_statement(code)
       end
     end
@@ -2128,11 +2128,11 @@ module Fortran
       code.concat(code_alloc)
       code.concat(code_gather(gathers))
       code.push("if (#{sms_rootcheck}()) then")
-      code.push("sms__in_serial=.true.")
+      code.push("sms__serial_depth=sms__serial_depth+1")
       code.push(serial_begin)
       code.push(oldblock)
       code.push(serial_end)
-      code.push("sms__in_serial=.false.")
+      code.push("sms__serial_depth=sms__serial_depth-1")
       code.push("endif")
       code.concat(code_scatter(scatters))
       code.concat(code_bcast(bcasts))
