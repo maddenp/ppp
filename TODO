@@ -121,6 +121,10 @@
   anything to consider here in re: branching into / out of serial/parallel
   blocks?
 
+- Disqualify from eligibility for post-serial-region broadcast (a) 'intent(in)'
+  variables, and (b) variables appearing (only) as arguments to intrinsic
+  functions, which are pure.
+
 ### TREE
 
 - To make all of this more useful, build an AST from the parse tree. Then, do
