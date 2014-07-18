@@ -98,6 +98,29 @@
 
 - Think about (and deal with) distributed parameter arrays.
 
+- Currently, if an object allocated inside a serial region is also modified in a
+  (not necessarily the same) serial region, it becomes an l-value eligible for
+  post-region broadcast. (Note that allocating a distributed array in a serial
+  region is already prohibited, so this applies only to non-distributed arrays
+  and scalars.) However, this is erroneous because the object has only been
+  allocated by the root processor. So, currently, such an object must be given
+  explicit 'ignore' treatment. Automatic treatment could be improved by a check
+  that the object in question is allocated on all processors and, in the case of
+  arrays, has the same size on all processors, in which case broadcasts are
+  safe. It should be possible to implement this check via a reduce, e.g. set 'x'
+  to 0 for unallocated objects, and to the size of allocated ones (scalar size =
+  1), and reduce 'x'. If pre- and post-reduce 'x' is identical, perform the
+  broadcast. That's a sketch, and could require more thought. Similarly, pointer
+  assignments may need similar checks: The allocation status of a target should
+  be checked before replaying a pointer assignment on all tasks after a serial
+  region.
+
+- Branching into or out of serial regions or parallel loops is prohibited, but
+  is 'goto l', where 'l' is an integer variable, already detected? If not, it
+  should be. Also, when replaying label 'assign' after a serial region, is there
+  anything to consider here in re: branching into / out of serial/parallel
+  blocks?
+
 ### TREE
 
 - To make all of this more useful, build an AST from the parse tree. Then, do
