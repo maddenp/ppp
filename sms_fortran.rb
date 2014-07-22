@@ -140,6 +140,7 @@ module Fortran
         varenv=env[var]
         return "#{cb}" unless (dd=decdim(varenv,dim))
         dh=varenv["decomp"]
+        use(sms_decompmod) if dh
         nl="#{dh}__nestlevel"
         a1="#{dh}__#{(lu==:l)?('s'):('e')}1"
         a2="#{dh}__#{(lu==:l)?('low'):('upper')}bounds(#{dd},#{nl})"
