@@ -119,11 +119,21 @@
   is 'goto l', where 'l' is an integer variable, already detected? If not, it
   should be. Also, when replaying label 'assign' after a serial region, is there
   anything to consider here in re: branching into / out of serial/parallel
-  blocks?
+  blocks? A complication to explicit treatment of such variables is that they
+  have dual meaning, both as typed variables and as label aliases.
 
 - Disqualify from eligibility for post-serial-region broadcast (a) 'intent(in)'
   variables, and (b) variables appearing (only) as arguments to intrinsic
   functions, which are pure.
+
+- Intent(out) variables in serial regions in subprograms are not currently
+  gathered before region entry. Is this ok?
+
+- Consider whether this functionality is necessary: Explicit 'ignore' of serial
+  region pointers will effectively ignore them; however, 'default=ignore' and 
+  'default=in' will not stop their post serial region communication. (Right now,
+  pointer assignments will be communicated unless explicitly ignored by pointer
+  name.)
 
 ### TREE
 

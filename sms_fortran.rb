@@ -1061,9 +1061,14 @@ module Fortran
 
       def handle_serial
 
-        def i_am_lvar
+        def i_am_lvar(varenv)
+          return false if varenv["intent"]=="in"
           if inside?(Actual_Arg_Spec) # function(x,y,x) or call subroutrine(x,y,z)
             sms_serial_info.rvars.add(name)
+            if (fn_stmt=ancestor(Function_Reference))
+              fn_name=fn_stmt.e[0]
+              return false if intrinsic(fn_name)
+            end
             return true
           end
           return false if inside?(Section_Subscript_List) # array indexing
@@ -1100,11 +1105,11 @@ module Fortran
           varenv=varenv_get(name,self,expected=false)||{}
           fail_if_allocate(varenv)
           unless varenv["parameter"]
-            if i_am_lvar
+            if i_am_lvar(varenv)
               sms_serial_info.rvars.add(name) if varenv["decomp"]
               sms_serial_info.lvars.add(name)
             else
-              sms_serial_info.rvars.add(name)
+              sms_serial_info.rvars.add(name) unless varenv["intent"]=="out"
             end
           end
         end
@@ -1140,9 +1145,11 @@ module Fortran
         vars=e[3].array
         new_stmt=["#{self}"]
         vars.each do |pointer|
-          (sms_serial_info.ptr["#{pointer}"]||=[]).push("nullify (#{pointer})")
-          counter=sms_serial_info.ptr["#{pointer}"].length
-          new_stmt.push("sms_ptr_assign_#{pointer}=#{counter}")
+          unless sms_serial_info.vars_ignore.include?("#{pointer}")
+            (sms_serial_info.ptr["#{pointer}"]||=[]).push("nullify (#{pointer})")
+            counter=sms_serial_info.ptr["#{pointer}"].length
+            new_stmt.push("sms_ptr_assign_#{pointer}=#{counter}")
+          end
         end
         replace_statement(new_stmt)
       end
@@ -1190,9 +1197,11 @@ module Fortran
     def translate
       if sms_serial
         pointer=e[1]
-        (sms_serial_info.ptr["#{pointer}"]||=[]).push("#{self}")
-        counter=sms_serial_info.ptr["#{pointer}"].length
-        replace_statement("#{self}; sms__ptr_assign_#{pointer}=#{counter}")
+        unless sms_serial_info.vars_ignore.include?("#{pointer}")
+          (sms_serial_info.ptr["#{pointer}"]||=[]).push("#{self}")
+          counter=sms_serial_info.ptr["#{pointer}"].length
+          replace_statement("#{self}; sms__ptr_assign_#{pointer}=#{counter}")
+        end
       end
     end
 
