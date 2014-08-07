@@ -190,31 +190,25 @@ class Translator
   end
 
   def normalize(s,conf)
-    safe=conf[:safe] # only true for internal parses
     np=XNormalizerParser.new
     np.update(Normfree)
     unless conf[:form]==:fixed
       @m=Stringmap.new
-      Dehollerizer.new.dehollerize(@m,s,conf[:form]==:fixed) unless safe
+      Dehollerizer.new.dehollerize(@m,s,conf[:form]==:fixed)
     end
-    nq=(not s=~/['"]/)         # no quotes?
-    unless safe
-      s=s.gsub(/\t/," ")       # tabs to spaces
-      s=s.gsub(/^ +/,"")       # remove leading whitespace
-    end
+    s=s.gsub(/\t/," ")       # tabs to spaces
+    s=s.gsub(/^ +/,"")       # remove leading whitespace
     s=s.gsub(directive,'@\1')  # hide directives
-    unless safe
-      s=s.gsub(/ +$/,"")       # remove trailing whitespace
-      s=s.gsub(/^ *!.*$\n/,"") # remove full-line comments
-      s=s.gsub(/^[ \t]*\n/,'') # remove blank lines
-    end
-    s=chkparse(fix_pt_norm(s,np,1,@m)) unless safe and nq # string-aware transform
-    s=s.gsub(/& *\n *&?/,"") unless safe                  # join continuations
-    s=chkparse(np.parse(s,2,@m).to_s) unless safe and nq  # mask strings
-    s=s.downcase unless safe                              # lower-case text only
+    s=s.gsub(/ +$/,"")       # remove trailing whitespace
+    s=s.gsub(/^ *!.*$\n/,"") # remove full-line comments
+    s=s.gsub(/^[ \t]*\n/,'') # remove blank lines
+    s=chkparse(fix_pt_norm(s,np,1,@m))                    # string-aware transform
+    s=s.gsub(/& *\n *&?/,"")                              # join continuations
+    s=chkparse(np.parse(s,2,@m).to_s)                     # mask strings
+    s=s.downcase                                          # lower-case text only
     s=s.gsub(/ +/,"")                                     # remove spaces
-    s=restore_strings(s,@m) unless safe and nq            # restore strings
-    s=s.sub(/^\n+/,"") unless safe                        # rm leading newlines
+    s=restore_strings(s,@m)                               # restore strings
+    s=s.sub(/^\n+/,"")                                    # rm leading newlines
     s=s+"\n" if s[-1]!="\n" and conf[:nl]                 # add final newline?
     s=s.chomp unless conf[:nl]                            # del final newline?
     s=s.gsub(/^@(.*)/i,'!\1')                             # show directives
@@ -369,13 +363,11 @@ class Translator
     fixed=(conf[:form]==:fixed)
     fp=XFortranParser.new(srcfile,dstfile,conf[:incdirs])
     s0=nil
-    unless conf[:safe]
-      while s!=s0 and not s.nil?                                # fixed point treatment of prepsrc() and assemble()
-        s0=s                                                    # for cases in which files added by 'include'
-        s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and fixed # statements or '!sms$insert include' statements
-        s=prepsrc_free(s) if defined?(prepsrc_free)             # also contain such a statement; this follows the path
-        s=assemble(s,[srcfile],conf[:incdirs])                  # until all souce has been inserted
-      end
+    while s!=s0 and not s.nil?                                # fixed point treatment of prepsrc() and assemble()
+      s0=s                                                    # for cases in which files added by 'include'
+      s=prepsrc_fixed(s) if defined?(prepsrc_fixed) and fixed # statements or '!sms$insert include' statements
+      s=prepsrc_free(s) if defined?(prepsrc_free)             # also contain such a statement; this follows the path
+      s=assemble(s,[srcfile],conf[:incdirs])                  # until all souce has been inserted
     end
     puts "RAW #{(fixed)?("FIXED"):("FREE")}-FORM SOURCE\n\n#{s}" if conf[:debug]
     if fixed
@@ -383,7 +375,7 @@ class Translator
       s=fixed2free(s,conf)
       puts "#{s}\n\n" if conf[:debug]
     end
-    cppcheck(s) unless conf[:safe]
+    cppcheck(s)
     puts "\nNORMALIZED FORM\n" if conf[:debug]
     n=normalize(s,conf)
     return "\n#{n}" if conf[:product]==:normalized_source
