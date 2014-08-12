@@ -2127,7 +2127,8 @@ module Fortran
         end
       end
 
-      code=[]
+      code1=[]
+      code2=[]
 
       # Collect code for allocation and deallocation of globals.
 
@@ -2135,24 +2136,26 @@ module Fortran
 
       # Concatenate code.
 
-      code.concat(code_alloc)
-      code.concat(code_gather(gathers))
-      code.push("if (#{sms_rootcheck}()) then")
-      code.push("sms__serial_depth=sms__serial_depth+1")
-      code.push(serial_begin)
-      code.push(oldblock)
-      code.push(serial_end)
-      code.push("sms__serial_depth=sms__serial_depth-1")
-      code.push("endif")
-      code.concat(code_scatter(scatters))
-      code.concat(code_bcast(bcasts))
-      code.concat(code_dealloc)
-      code.push(restates)
+      code1.concat(code_alloc)
+      code1.concat(code_gather(gathers))
+#     code1.push("continue")
+      code1.push("continue")
+#     code1.push("print *,'hello'")
+      code1.concat(code_scatter(scatters))
+      code1.concat(code_bcast(bcasts))
+      code1.concat(code_dealloc)
+      code1.push(restates)
+
+      code2.push("if (#{sms_rootcheck}()) then")
+      code2.push("sms__serial_depth=sms__serial_depth+1")
+      code2.push("continue")
+      code2.push("sms__serial_depth=sms__serial_depth-1")
+      code2.push("endif")
 
       # Replace serial region with new code block.
 
       env[:sms_serial]=false
-      replace_statement(code)
+      replace_statement_serial_opt(code1,code2,e)
 
     end
 

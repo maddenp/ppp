@@ -789,6 +789,37 @@ module Fortran
       block[block.index(self)]=tree
     end
 
+    def replace_statement_serial_opt(code1,code2,oldblock)
+      code1=code1.join("\n") if code1.is_a?(Array)
+      code2=code2.join("\n") if code2.is_a?(Array)
+      tree1=raw(code1,:block,input.srcfile,@dstfile,{:env=>env})
+      tree2=raw(code2,:block,input.srcfile,@dstfile,{:env=>env})
+      (execution_part_construct=tree2.e[0].e[0].e[1]).e.delete_at(1)
+      oldblock.reverse.each { |x| execution_part_construct.e.insert(1,x) }
+
+      continues=tree1.e.reduce([]) do |m,x|
+        m.push(x) if x.e[1].is_a?(Continue_Stmt)
+        if m.size > 1
+          fail "INTERNAL ERROR: Multiple 'continue' statements in block"
+        end
+        m
+      end
+      unless (continue=continues.first)
+        fail "INTERNAL ERROR: No 'continue' statement in block"
+      end
+
+      point=continue.parent.e.index(continue)
+      continue.parent.e.delete(continue)
+      tree2.e.reverse.each do |x|
+        tree1.e.insert(point,x)
+      end
+
+      tree1.parent=parent
+      block=parent.e
+      block[block.index(self)]=tree1
+
+    end
+
     def sa(e)
       # space after: If the [e]lement's string form is empty, return that; else
       # return its string form with a trailing space appended.

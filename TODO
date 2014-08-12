@@ -23,7 +23,9 @@
 - Test/measure new case-insensitivity and regex capabilities in Treetop.
 
 - Try to simplify internal parses by replacing code blocks with single stmts,
-  e.g. a continue stmt, and just swapping in the old block after reparse.
+  e.g. a continue stmt, and just swapping in the old block after reparse. This
+  has been done for serial regions, see replace_statement_smart(). 'endif' is
+  not printing correctly, there is too much whitespace before it.
 
 - write_envfile is called by declare() whenever something is added to a module.
   This creates a lot of IO if many programmtic delcarations are performed. It
@@ -122,12 +124,8 @@
   blocks? A complication to explicit treatment of such variables is that they
   have dual meaning, both as typed variables and as label aliases.
 
-- Disqualify from eligibility for post-serial-region broadcast (a) 'intent(in)'
-  variables, and (b) variables appearing (only) as arguments to intrinsic
-  functions, which are pure.
-
 - Intent(out) variables in serial regions in subprograms are not currently
-  gathered before region entry. Is this ok?
+  gathered before region entry. Is this ok? Probably not.
 
 - Consider whether this functionality is necessary: Explicit 'ignore' of serial
   region pointers will effectively ignore them; however, 'default=ignore' and 
