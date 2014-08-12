@@ -803,10 +803,7 @@ module Fortran
         m
       end
       fail "INTERNAL ERROR: No 'continue' statement" unless (continue=cs.first)
-
-      point=continue.parent.e.index(continue)
-      continue.parent.e.delete_at(point)
-      tree2.e.reverse.each { |x| tree1.e.insert(point,x) }
+      tree1.e[continue.parent.e.index(continue)]=tree2
 
       tree1.parent=parent
       block=parent.e
