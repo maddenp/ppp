@@ -789,26 +789,24 @@ module Fortran
       block[block.index(self)]=tree
     end
 
-    def replace_statement_serial_opt(code1,code2,oldblock)
-      code1=code1.join("\n") if code1.is_a?(Array)
-      code2=code2.join("\n") if code2.is_a?(Array)
-      tree1=raw(code1,:block,input.srcfile,@dstfile,{:env=>env})
-      tree2=raw(code2,:block,input.srcfile,@dstfile,{:env=>env})
-      (execution_part_construct=tree2.e[0].e[0].e[1]).e.delete_at(1)
+    def replace_statement_serial_opt(code,oldblock)
+      tree=[]
+      code.each_index do |i|
+        code[i]=code[i].join("\n") if code[i].is_a?(Array)
+        tree[i]=raw(code[i],:block,input.srcfile,@dstfile,{:env=>env})
+      end
+      (execution_part_construct=tree[1].e[0].e[0].e[1]).e.delete_at(1)
       oldblock.reverse.each { |x| execution_part_construct.e.insert(1,x) }
-
-      cs=tree1.e.reduce([]) do |m,x|
+      cs=tree[0].e.reduce([]) do |m,x|
         m.push(x) if x.e[1].is_a?(Continue_Stmt)
         fail "INTERNAL ERROR: Multiple 'continue' statements" if m.size > 1
         m
       end
       fail "INTERNAL ERROR: No 'continue' statement" unless (continue=cs.first)
-      tree1.e[continue.parent.e.index(continue)]=tree2
-
-      tree1.parent=parent
+      tree[0].e[continue.parent.e.index(continue)]=tree[1]
+      tree[0].parent=parent
       block=parent.e
-      block[block.index(self)]=tree1
-
+      block[block.index(self)]=tree[0]
     end
 
     def sa(e)

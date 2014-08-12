@@ -2155,7 +2155,8 @@ module Fortran
       # Replace serial region with new code block.
 
       env[:sms_serial]=false
-      replace_statement_serial_opt(code1,code2,e)
+#     replace_statement_serial_opt(code1,code2,e)
+      replace_statement_serial_opt([code1,code2],e)
 
     end
 
