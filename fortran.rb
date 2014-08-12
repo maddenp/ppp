@@ -797,22 +797,16 @@ module Fortran
       (execution_part_construct=tree2.e[0].e[0].e[1]).e.delete_at(1)
       oldblock.reverse.each { |x| execution_part_construct.e.insert(1,x) }
 
-      continues=tree1.e.reduce([]) do |m,x|
+      cs=tree1.e.reduce([]) do |m,x|
         m.push(x) if x.e[1].is_a?(Continue_Stmt)
-        if m.size > 1
-          fail "INTERNAL ERROR: Multiple 'continue' statements in block"
-        end
+        fail "INTERNAL ERROR: Multiple 'continue' statements" if m.size > 1
         m
       end
-      unless (continue=continues.first)
-        fail "INTERNAL ERROR: No 'continue' statement in block"
-      end
+      fail "INTERNAL ERROR: No 'continue' statement" unless (continue=cs.first)
 
       point=continue.parent.e.index(continue)
-      continue.parent.e.delete(continue)
-      tree2.e.reverse.each do |x|
-        tree1.e.insert(point,x)
-      end
+      continue.parent.e.delete_at(point)
+      tree2.e.reverse.each { |x| tree1.e.insert(point,x) }
 
       tree1.parent=parent
       block=parent.e
