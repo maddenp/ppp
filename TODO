@@ -27,6 +27,8 @@
   would be better to do this once -- maybe as a post-translation walk that calls
   write_envfile for each module encountered.
 
+- Can serial-region parse optimization be used elsewhere? Marshal::[load/dump]?
+
 ### PARSING
 
 - Reconsider storing references to tree nodes during parsing. Instead, consider
