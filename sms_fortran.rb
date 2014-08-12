@@ -2138,9 +2138,7 @@ module Fortran
 
       code1.concat(code_alloc)
       code1.concat(code_gather(gathers))
-#     code1.push("continue")
       code1.push("continue")
-#     code1.push("print *,'hello'")
       code1.concat(code_scatter(scatters))
       code1.concat(code_bcast(bcasts))
       code1.concat(code_dealloc)
@@ -2155,7 +2153,6 @@ module Fortran
       # Replace serial region with new code block.
 
       env[:sms_serial]=false
-#     replace_statement_serial_opt(code1,code2,e)
       replace_statement_serial_opt([code1,code2],e)
 
     end
