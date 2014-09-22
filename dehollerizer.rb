@@ -58,13 +58,22 @@ class Dehollerizer
   end
 
   def mask_hollerith
+    def previous_nonblank_char
+      (@i-1).step(0,-1).each { |i| return @s[i] unless @s[i]=~/\s/ }
+      raise "No non-blank character precedes '#{@s[@i]}' at position #{@i}"
+    end
     digits=[]
+    p=previous_nonblank_char
     origin=@i
     while see /[0-9]/
       digits.push(see)
       fwd
       remove_whitespace
       remove_continuation
+    end
+    if p=~/[a-zA-Z]/
+      @i-=1
+      return
     end
     length=(digits.join).to_i
     remove_whitespace
