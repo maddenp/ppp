@@ -118,7 +118,7 @@ class Dehollerizer
 
   def remove_continuation
     skip_whitespace
-    if @fixed and see "\n     a"
+    if @fixed and see "\n     _"
       @s.slice!(@i..@i+6)
     else
       while see "&"

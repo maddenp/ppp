@@ -300,11 +300,11 @@ class Translator
       s=a.join("\n")                           # array of lines -> string
       s=s.gsub(/^(c|C|\*)/,"!")                # all comment markers -> '!'
       s=s.gsub(directive,'@\1')                # hide directives
-      s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # all continuation markers -> 'a'
+      s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     _") # all continuation markers -> '_'
       s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
       d.dehollerize(@m,s,conf[:form]==:fixed)  # mask holleriths
       s=chkparse(fixed_point_normalize(s,np))  # string-aware transform
-      s=s.gsub(/\n[ \t]{5}a/,"")               # join continuations
+      s=s.gsub(/\n[ \t]{5}_/,"")               # join continuations
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
       s
     end
