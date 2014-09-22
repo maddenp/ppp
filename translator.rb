@@ -157,8 +157,7 @@ class Translator
     exit(1) if quit
   end
 
-  def fix_pt_norm(s,parser,op=nil,stringmap=nil)
-    # fixed-point normalization
+  def fixed_point_normalize(s,parser,op=nil,stringmap=nil)
     s0=nil
     while s=parser.parse(s,op,stringmap).to_s and not s.nil?
       s=s.gsub(/^$ *\n/,'')
@@ -196,23 +195,23 @@ class Translator
       @m=Stringmap.new
       Dehollerizer.new.dehollerize(@m,s,conf[:form]==:fixed)
     end
-    s=s.gsub(/\t/," ")       # tabs to spaces
-    s=s.gsub(/^ +/,"")       # remove leading whitespace
-    s=s.gsub(directive,'@\1')  # hide directives
-    s=s.gsub(/ +$/,"")       # remove trailing whitespace
-    s=s.gsub(/^ *!.*$\n/,"") # remove full-line comments
-    s=s.gsub(/^[ \t]*\n/,'') # remove blank lines
-    s=chkparse(fix_pt_norm(s,np,1,@m))                    # string-aware transform
-    s=s.gsub(/& *\n *&?/,"")                              # join continuations
-    s=chkparse(np.parse(s,2,@m).to_s)                     # mask strings
-    s=s.downcase                                          # lower-case text only
-    s=s.gsub(/ +/,"")                                     # remove spaces
-    s=restore_strings(s,@m)                               # restore strings
-    s=s.sub(/^\n+/,"")                                    # rm leading newlines
-    s=s+"\n" if s[-1]!="\n" and conf[:nl]                 # add final newline?
-    s=s.chomp unless conf[:nl]                            # del final newline?
-    s=s.gsub(/^@(.*)/i,'!\1')                             # show directives
-    s=s.gsub(/^ *\n/,"")                                  # remove blank lines
+    s=s.gsub(/\t/," ")                           # tabs to spaces
+    s=s.gsub(/^ +/,"")                           # remove leading whitespace
+    s=s.gsub(directive,'@\1')                    # hide directives
+    s=s.gsub(/ +$/,"")                           # remove trailing whitespace
+    s=s.gsub(/^ *!.*$\n/,"")                     # remove full-line comments
+    s=s.gsub(/^[ \t]*\n/,'')                     # remove blank lines
+    s=chkparse(fixed_point_normalize(s,np,1,@m)) # string-aware transform
+    s=s.gsub(/& *\n *&?/,"")                     # join continuations
+    s=chkparse(np.parse(s,2,@m).to_s)            # mask strings
+    s=s.downcase                                 # lower-case text only
+    s=s.gsub(/ +/,"")                            # remove spaces
+    s=restore_strings(s,@m)                      # restore strings
+    s=s.sub(/^\n+/,"")                           # rm leading newlines
+    s=s+"\n" if s[-1]!="\n" and conf[:nl]        # add final newline?
+    s=s.chomp unless conf[:nl]                   # del final newline?
+    s=s.gsub(/^@(.*)/i,'!\1')                    # show directives
+    s=s.gsub(/^ *\n/,"")                         # remove blank lines
     s
   end
 
@@ -304,7 +303,7 @@ class Translator
       s=s.gsub(/\n[ \t]{5}[^ \t0]/,"\n     a") # all continuation markers -> 'a'
       s=s.gsub(/^[ \t]*!.*$\n?/,"")            # remove full-line comments
       d.dehollerize(@m,s,conf[:form]==:fixed)  # mask holleriths
-      s=chkparse(fix_pt_norm(s,np))            # string-aware transform
+      s=chkparse(fixed_point_normalize(s,np))  # string-aware transform
       s=s.gsub(/\n[ \t]{5}a/,"")               # join continuations
       s=s.gsub(/^@(,*)/i,'!\1')                # show directives
       s

@@ -1,6 +1,6 @@
 class Dehollerizer
 
-  def check_hollerith_parens
+  def check_hollerith_in_parens
     nestlevel=0
     begin
       remove_continuation
@@ -16,7 +16,7 @@ class Dehollerizer
     end while nestlevel>0
   end
 
-  def check_hollerith_slashes
+  def check_hollerith_in_slashes
     remove_continuation
     begin
       case see
@@ -192,13 +192,13 @@ class Dehollerizer
     if keyword "call"
       skip_variable
       remove_continuation
-      check_hollerith_parens if see "("
+      check_hollerith_in_parens if see "("
     end
   end
 
   def try_data
     return unless keyword "data"
-    while skip_variable and see "/" and fwd and check_hollerith_slashes
+    while skip_variable and see "/" and fwd and check_hollerith_in_slashes
       ["/",","].each do |x|
         return unless see x and fwd and remove_continuation and skip_whitespace
       end
@@ -206,7 +206,7 @@ class Dehollerizer
   end
 
   def try_format
-    check_hollerith_parens if keyword "format" and see "("
+    check_hollerith_in_parens if keyword "format" and see "("
   end
 
 end
