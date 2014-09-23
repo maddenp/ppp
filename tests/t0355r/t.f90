@@ -1,7 +1,12 @@
 program p
   implicit none
-  integer::x6h=1
-  call s(a=x6h, b=2) ! don't interpret '6h' as start of hollerith!
+  integer::x6h =1
+  integer::x_6h=1
+  integer::x16h=1
+! don't misinterpret variables as holleriths
+  call s(a=x6h,  b=2)
+  call s(a=x_6h, b=2)
+  call s(a=x16h, b=2)
 contains
   subroutine s(a,b)
     integer::a,b

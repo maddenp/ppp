@@ -71,7 +71,7 @@ class Dehollerizer
       remove_whitespace
       remove_continuation
     end
-    if p=~/[a-zA-Z]/
+    if p=~/[a-zA-Z_]/
       @i-=1
       return
     end
