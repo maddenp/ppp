@@ -1558,13 +1558,13 @@ module Fortran
 
   end
 
-  class SMS_Exchange < SMS
+  class SMS_Exchange_Common < SMS
 
     def str0
       sms("#{e[2]}#{e[3]}#{e[4].e.reduce("") { |m,x| m+="#{x.e[0]}#{x.e[1]}" }}#{e[5]}")
     end
 
-    def translate
+    def translate_common(overlap)
 
       fail "ERROR: sms$exchange may not appear inside sms$serial region" if sms_serial
       fail "ERROR: sms$exchange may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
@@ -1647,7 +1647,7 @@ module Fortran
 
       tag=sms_commtag
       vars=(1..sms_maxvars).reduce([]) { |m,x| m.push((x>nvars)?("sms__x#{x}"):("#{v[x-1].name}")) }.join(",")
-      code.push("call sms__exchange(#{nvars},#{tag},#{gllbs},#{glubs},#{strts},#{stops},#{perms},#{dcmps},#{types},#{names},#{sms_statusvar},#{vars})")
+      code.push("call sms__exchange(#{nvars},#{tag},#{gllbs},#{glubs},#{strts},#{stops},#{perms},#{dcmps},#{types},#{names},#{sms_statusvar},#{vars},#{overlap})")
       code.push(sms_chkstat)
       replace_statement(code)
 
@@ -1655,6 +1655,37 @@ module Fortran
 
   end
 
+  class SMS_Exchange < SMS_Exchange_Common
+
+    def translate
+      translate_common(".false.")
+    end
+
+  end
+
+  class SMS_Exchange_Begin < SMS_Exchange_Common
+
+    def translate
+      translate_common(".true.")
+    end
+
+  end
+
+  class SMS_Exchange_End < SMS
+
+    def str0
+      sms("")
+    end
+
+    def translate
+      code=[]
+      code.push("#{self}")
+      code.push("call sms__exchange_end")
+      replace_statement(code)
+    end
+
+  end
+  
   class SMS_Executable_SMS_Halo_Comp < SMS
   end
 

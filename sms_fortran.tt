@@ -154,12 +154,22 @@ grammar Fortran
     sms_sentinel sms_t_exchange t_paren_l variable ( t_comma variable )* t_paren_r t_newline <SMS_Exchange>
   end
 
+  rule sms_exchange_begin
+    sms_sentinel sms_t_exchange_begin t_paren_l variable ( t_comma variable )* t_paren_r t_newline <SMS_Exchange_Begin>
+  end
+
+  rule sms_exchange_end
+    sms_sentinel sms_t_exchange_end t_newline <SMS_Exchange_End>
+  end
+
   rule sms_executable
     sms_barrier /
     sms_comm_rank /
     sms_comm_size /
     sms_compare_var /
     sms_create_decomp /
+    sms_exchange_begin /
+    sms_exchange_end /
     sms_exchange /
     sms_halo_comp &{ |e| sp_env_pullup(e[0]) } <SMS_Executable_SMS_Halo_Comp> /
     sms_get_communicator /
@@ -360,6 +370,14 @@ grammar Fortran
 
   rule sms_t_exchange
     "exchange" <T>
+  end
+
+  rule sms_t_exchange_begin
+    "exchange_begin" <T>
+  end
+
+  rule sms_t_exchange_end
+    "exchange_end" <T>
   end
 
   rule sms_t_get_communicator
