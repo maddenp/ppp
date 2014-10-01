@@ -1647,7 +1647,7 @@ module Fortran
 
       tag=sms_commtag
       vars=(1..sms_maxvars).reduce([]) { |m,x| m.push((x>nvars)?("sms__x#{x}"):("#{v[x-1].name}")) }.join(",")
-      code.push("call sms__exchange(#{nvars},#{tag},#{gllbs},#{glubs},#{strts},#{stops},#{perms},#{dcmps},#{types},#{names},#{sms_statusvar},#{vars},#{overlap})")
+      code.push("call sms__exchange(#{nvars},#{tag},#{gllbs},#{glubs},#{strts},#{stops},#{perms},#{dcmps},#{types},#{names},#{sms_statusvar},#{overlap},#{vars})")
       code.push(sms_chkstat)
       replace_statement(code)
 
