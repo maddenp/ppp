@@ -1315,6 +1315,14 @@ module Fortran
 
   end
 
+  class SMS_Comment < SMS
+
+    def str0
+      ""
+    end
+
+  end
+
   class SMS_Compare_Var < SMS
 
     def str0

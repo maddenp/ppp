@@ -101,6 +101,10 @@ module Fortran
   end
 
   module Directive0
+    def t_bang
+      elements[1]
+    end
+
     def t_newline
       elements[3]
     end
@@ -145,13 +149,7 @@ module Fortran
     end
     s0 << r1
     if r1
-      if has_terminal?("!", false, index)
-        r6 = instantiate_node(SyntaxNode,input, index...(index + 1))
-        @index += 1
-      else
-        terminal_parse_failure("!")
-        r6 = nil
-      end
+      r6 = _nt_t_bang
       s0 << r6
       if r6
         s7, i7 = [], index
@@ -578,6 +576,13 @@ module Fortran
     r0
   end
 
+  module OmpSentinel0
+    def t_bang
+      elements[0]
+    end
+
+  end
+
   def _nt_omp_sentinel
     start_index = index
     if node_cache[:omp_sentinel].has_key?(index)
@@ -589,11 +594,24 @@ module Fortran
       return cached
     end
 
-    if has_terminal?("!$omp ", false, index)
-      r0 = instantiate_node(T,input, index...(index + 6))
-      @index += 6
+    i0, s0 = index, []
+    r1 = _nt_t_bang
+    s0 << r1
+    if r1
+      if has_terminal?("$omp ", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 5))
+        @index += 5
+      else
+        terminal_parse_failure("$omp ")
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(T,input, i0...index, s0)
+      r0.extend(OmpSentinel0)
     else
-      terminal_parse_failure("!$omp ")
+      @index = i0
       r0 = nil
     end
 
@@ -774,7 +792,7 @@ module Fortran
     end
 
     def t_newline
-      elements[2]
+      elements[3]
     end
   end
 
@@ -796,8 +814,17 @@ module Fortran
       r2 = _nt_sms_t_barrier
       s0 << r2
       if r2
-        r3 = _nt_t_newline
+        r4 = _nt_sms_comment
+        if r4
+          r3 = r4
+        else
+          r3 = instantiate_node(SyntaxNode,input, index...index)
+        end
         s0 << r3
+        if r3
+          r5 = _nt_t_newline
+          s0 << r5
+        end
       end
     end
     if s0.last
@@ -835,7 +862,7 @@ module Fortran
     end
 
     def t_newline
-      elements[5]
+      elements[6]
     end
   end
 
@@ -866,8 +893,17 @@ module Fortran
             r5 = _nt_t_paren_r
             s0 << r5
             if r5
-              r6 = _nt_t_newline
+              r7 = _nt_sms_comment
+              if r7
+                r6 = r7
+              else
+                r6 = instantiate_node(SyntaxNode,input, index...index)
+              end
               s0 << r6
+              if r6
+                r8 = _nt_t_newline
+                s0 << r8
+              end
             end
           end
         end
@@ -908,7 +944,7 @@ module Fortran
     end
 
     def t_newline
-      elements[5]
+      elements[6]
     end
   end
 
@@ -939,8 +975,17 @@ module Fortran
             r5 = _nt_t_paren_r
             s0 << r5
             if r5
-              r6 = _nt_t_newline
+              r7 = _nt_sms_comment
+              if r7
+                r6 = r7
+              else
+                r6 = instantiate_node(SyntaxNode,input, index...index)
+              end
               s0 << r6
+              if r6
+                r8 = _nt_t_newline
+                s0 << r8
+              end
             end
           end
         end
@@ -955,6 +1000,58 @@ module Fortran
     end
 
     node_cache[:sms_comm_size][start_index] = r0
+
+    r0
+  end
+
+  module SmsComment0
+    def t_bang
+      elements[0]
+    end
+
+  end
+
+  def _nt_sms_comment
+    start_index = index
+    if node_cache[:sms_comment].has_key?(index)
+      cached = node_cache[:sms_comment][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_bang
+    s0 << r1
+    if r1
+      s2, i2 = [], index
+      loop do
+        if has_terminal?('\G[^\\n]', true, index)
+          r3 = true
+          @index += 1
+        else
+          r3 = nil
+        end
+        if r3
+          s2 << r3
+        else
+          break
+        end
+      end
+      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Comment,input, i0...index, s0)
+      r0.extend(SmsComment0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_comment][start_index] = r0
 
     r0
   end
@@ -989,7 +1086,7 @@ module Fortran
     end
 
     def t_newline
-      elements[7]
+      elements[8]
     end
   end
 
@@ -1026,8 +1123,17 @@ module Fortran
                 r7 = _nt_t_paren_r
                 s0 << r7
                 if r7
-                  r8 = _nt_t_newline
+                  r9 = _nt_sms_comment
+                  if r9
+                    r8 = r9
+                  else
+                    r8 = instantiate_node(SyntaxNode,input, index...index)
+                  end
                   s0 << r8
+                  if r8
+                    r10 = _nt_t_newline
+                    s0 << r10
+                  end
                 end
               end
             end
@@ -1090,7 +1196,7 @@ module Fortran
     end
 
     def t_newline
-      elements[10]
+      elements[11]
     end
   end
 
@@ -1136,8 +1242,17 @@ module Fortran
                       r10 = _nt_t_paren_r
                       s0 << r10
                       if r10
-                        r11 = _nt_t_newline
+                        r12 = _nt_sms_comment
+                        if r12
+                          r11 = r12
+                        else
+                          r11 = instantiate_node(SyntaxNode,input, index...index)
+                        end
                         s0 << r11
+                        if r11
+                          r13 = _nt_t_newline
+                          s0 << r13
+                        end
                       end
                     end
                   end
@@ -1376,7 +1491,7 @@ module Fortran
     end
 
     def t_newline
-      elements[8]
+      elements[9]
     end
   end
 
@@ -1421,8 +1536,17 @@ module Fortran
                   r9 = _nt_t_paren_r
                   s0 << r9
                   if r9
-                    r10 = _nt_t_newline
+                    r11 = _nt_sms_comment
+                    if r11
+                      r10 = r11
+                    else
+                      r10 = instantiate_node(SyntaxNode,input, index...index)
+                    end
                     s0 << r10
+                    if r10
+                      r12 = _nt_t_newline
+                      s0 << r12
+                    end
                   end
                 end
               end
@@ -1612,7 +1736,7 @@ module Fortran
     end
 
     def t_newline
-      elements[8]
+      elements[9]
     end
 
   end
@@ -1653,18 +1777,27 @@ module Fortran
                   r8 = _nt_sms_t_begin
                   s0 << r8
                   if r8
-                    r9 = _nt_t_newline
+                    r10 = _nt_sms_comment
+                    if r10
+                      r9 = r10
+                    else
+                      r9 = instantiate_node(SyntaxNode,input, index...index)
+                    end
                     s0 << r9
                     if r9
-                      i10 = index
-                      r11 = lambda { |e| sp_sms_distribute_begin(e[3],e[5]) }.call(s0)
+                      r11 = _nt_t_newline
+                      s0 << r11
                       if r11
-                        @index = i10
-                        r10 = instantiate_node(SyntaxNode,input, index...index)
-                      else
-                        r10 = nil
+                        i12 = index
+                        r13 = lambda { |e| sp_sms_distribute_begin(e[3],e[5]) }.call(s0)
+                        if r13
+                          @index = i12
+                          r12 = instantiate_node(SyntaxNode,input, index...index)
+                        else
+                          r12 = nil
+                        end
+                        s0 << r12
                       end
-                      s0 << r10
                     end
                   end
                 end
@@ -1834,7 +1967,7 @@ module Fortran
     end
 
     def t_newline
-      elements[3]
+      elements[4]
     end
 
   end
@@ -1860,18 +1993,27 @@ module Fortran
         r3 = _nt_sms_t_end
         s0 << r3
         if r3
-          r4 = _nt_t_newline
+          r5 = _nt_sms_comment
+          if r5
+            r4 = r5
+          else
+            r4 = instantiate_node(SyntaxNode,input, index...index)
+          end
           s0 << r4
           if r4
-            i5 = index
-            r6 = lambda { |e| sp_sms_distribute_end }.call(s0)
+            r6 = _nt_t_newline
+            s0 << r6
             if r6
-              @index = i5
-              r5 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r5 = nil
+              i7 = index
+              r8 = lambda { |e| sp_sms_distribute_end }.call(s0)
+              if r8
+                @index = i7
+                r7 = instantiate_node(SyntaxNode,input, index...index)
+              else
+                r7 = nil
+              end
+              s0 << r7
             end
-            s0 << r5
           end
         end
       end
@@ -1921,7 +2063,7 @@ module Fortran
     end
 
     def t_newline
-      elements[6]
+      elements[7]
     end
   end
 
@@ -1977,8 +2119,17 @@ module Fortran
               r9 = _nt_t_paren_r
               s0 << r9
               if r9
-                r10 = _nt_t_newline
+                r11 = _nt_sms_comment
+                if r11
+                  r10 = r11
+                else
+                  r10 = instantiate_node(SyntaxNode,input, index...index)
+                end
                 s0 << r10
+                if r10
+                  r12 = _nt_t_newline
+                  s0 << r12
+                end
               end
             end
           end
@@ -2030,7 +2181,7 @@ module Fortran
     end
 
     def t_newline
-      elements[6]
+      elements[7]
     end
   end
 
@@ -2086,8 +2237,17 @@ module Fortran
               r9 = _nt_t_paren_r
               s0 << r9
               if r9
-                r10 = _nt_t_newline
+                r11 = _nt_sms_comment
+                if r11
+                  r10 = r11
+                else
+                  r10 = instantiate_node(SyntaxNode,input, index...index)
+                end
                 s0 << r10
+                if r10
+                  r12 = _nt_t_newline
+                  s0 << r12
+                end
               end
             end
           end
@@ -2117,7 +2277,7 @@ module Fortran
     end
 
     def t_newline
-      elements[2]
+      elements[3]
     end
   end
 
@@ -2139,8 +2299,17 @@ module Fortran
       r2 = _nt_sms_t_exchange_end
       s0 << r2
       if r2
-        r3 = _nt_t_newline
+        r4 = _nt_sms_comment
+        if r4
+          r3 = r4
+        else
+          r3 = instantiate_node(SyntaxNode,input, index...index)
+        end
         s0 << r3
+        if r3
+          r5 = _nt_t_newline
+          s0 << r5
+        end
       end
     end
     if s0.last
@@ -2411,7 +2580,7 @@ module Fortran
     end
 
     def t_newline
-      elements[5]
+      elements[6]
     end
   end
 
@@ -2442,8 +2611,17 @@ module Fortran
             r5 = _nt_t_paren_r
             s0 << r5
             if r5
-              r6 = _nt_t_newline
+              r7 = _nt_sms_comment
+              if r7
+                r6 = r7
+              else
+                r6 = instantiate_node(SyntaxNode,input, index...index)
+              end
               s0 << r6
+              if r6
+                r8 = _nt_t_newline
+                s0 << r8
+              end
             end
           end
         end
@@ -2549,7 +2727,7 @@ module Fortran
     end
 
     def t_newline
-      elements[6]
+      elements[7]
     end
 
   end
@@ -2584,18 +2762,27 @@ module Fortran
               r6 = _nt_sms_t_begin
               s0 << r6
               if r6
-                r7 = _nt_t_newline
+                r8 = _nt_sms_comment
+                if r8
+                  r7 = r8
+                else
+                  r7 = instantiate_node(SyntaxNode,input, index...index)
+                end
                 s0 << r7
                 if r7
-                  i8 = index
-                  r9 = lambda { |e| sp_sms_halo_comp_begin(e[3]) }.call(s0)
+                  r9 = _nt_t_newline
+                  s0 << r9
                   if r9
-                    @index = i8
-                    r8 = instantiate_node(SyntaxNode,input, index...index)
-                  else
-                    r8 = nil
+                    i10 = index
+                    r11 = lambda { |e| sp_sms_halo_comp_begin(e[3]) }.call(s0)
+                    if r11
+                      @index = i10
+                      r10 = instantiate_node(SyntaxNode,input, index...index)
+                    else
+                      r10 = nil
+                    end
+                    s0 << r10
                   end
-                  s0 << r8
                 end
               end
             end
@@ -2630,7 +2817,7 @@ module Fortran
     end
 
     def t_newline
-      elements[3]
+      elements[4]
     end
 
   end
@@ -2656,18 +2843,27 @@ module Fortran
         r3 = _nt_sms_t_end
         s0 << r3
         if r3
-          r4 = _nt_t_newline
+          r5 = _nt_sms_comment
+          if r5
+            r4 = r5
+          else
+            r4 = instantiate_node(SyntaxNode,input, index...index)
+          end
           s0 << r4
           if r4
-            i5 = index
-            r6 = lambda { |e| sp_sms_halo_comp_end }.call(s0)
+            r6 = _nt_t_newline
+            s0 << r6
             if r6
-              @index = i5
-              r5 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r5 = nil
+              i7 = index
+              r8 = lambda { |e| sp_sms_halo_comp_end }.call(s0)
+              if r8
+                @index = i7
+                r7 = instantiate_node(SyntaxNode,input, index...index)
+              else
+                r7 = nil
+              end
+              s0 << r7
             end
-            s0 << r5
           end
         end
       end
@@ -2923,7 +3119,7 @@ module Fortran
     end
 
     def t_newline
-      elements[3]
+      elements[4]
     end
 
   end
@@ -2949,18 +3145,27 @@ module Fortran
         r3 = _nt_sms_t_begin
         s0 << r3
         if r3
-          r4 = _nt_t_newline
+          r5 = _nt_sms_comment
+          if r5
+            r4 = r5
+          else
+            r4 = instantiate_node(SyntaxNode,input, index...index)
+          end
           s0 << r4
           if r4
-            i5 = index
-            r6 = lambda { |e| sp_sms_ignore_begin }.call(s0)
+            r6 = _nt_t_newline
+            s0 << r6
             if r6
-              @index = i5
-              r5 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r5 = nil
+              i7 = index
+              r8 = lambda { |e| sp_sms_ignore_begin }.call(s0)
+              if r8
+                @index = i7
+                r7 = instantiate_node(SyntaxNode,input, index...index)
+              else
+                r7 = nil
+              end
+              s0 << r7
             end
-            s0 << r5
           end
         end
       end
@@ -2992,7 +3197,7 @@ module Fortran
     end
 
     def t_newline
-      elements[3]
+      elements[4]
     end
 
   end
@@ -3018,18 +3223,27 @@ module Fortran
         r3 = _nt_sms_t_end
         s0 << r3
         if r3
-          r4 = _nt_t_newline
+          r5 = _nt_sms_comment
+          if r5
+            r4 = r5
+          else
+            r4 = instantiate_node(SyntaxNode,input, index...index)
+          end
           s0 << r4
           if r4
-            i5 = index
-            r6 = lambda { |e| sp_sms_ignore_end }.call(s0)
+            r6 = _nt_t_newline
+            s0 << r6
             if r6
-              @index = i5
-              r5 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r5 = nil
+              i7 = index
+              r8 = lambda { |e| sp_sms_ignore_end }.call(s0)
+              if r8
+                @index = i7
+                r7 = instantiate_node(SyntaxNode,input, index...index)
+              else
+                r7 = nil
+              end
+              s0 << r7
             end
-            s0 << r5
           end
         end
       end
@@ -3142,7 +3356,7 @@ module Fortran
     end
 
     def t_newline
-      elements[8]
+      elements[9]
     end
 
   end
@@ -3183,18 +3397,27 @@ module Fortran
                   r8 = _nt_sms_t_begin
                   s0 << r8
                   if r8
-                    r9 = _nt_t_newline
+                    r10 = _nt_sms_comment
+                    if r10
+                      r9 = r10
+                    else
+                      r9 = instantiate_node(SyntaxNode,input, index...index)
+                    end
                     s0 << r9
                     if r9
-                      i10 = index
-                      r11 = lambda { |e| sp_sms_parallel_begin(e[3],e[5]) }.call(s0)
+                      r11 = _nt_t_newline
+                      s0 << r11
                       if r11
-                        @index = i10
-                        r10 = instantiate_node(SyntaxNode,input, index...index)
-                      else
-                        r10 = nil
+                        i12 = index
+                        r13 = lambda { |e| sp_sms_parallel_begin(e[3],e[5]) }.call(s0)
+                        if r13
+                          @index = i12
+                          r12 = instantiate_node(SyntaxNode,input, index...index)
+                        else
+                          r12 = nil
+                        end
+                        s0 << r12
                       end
-                      s0 << r10
                     end
                   end
                 end
@@ -3231,7 +3454,7 @@ module Fortran
     end
 
     def t_newline
-      elements[3]
+      elements[4]
     end
 
   end
@@ -3257,18 +3480,27 @@ module Fortran
         r3 = _nt_sms_t_end
         s0 << r3
         if r3
-          r4 = _nt_t_newline
+          r5 = _nt_sms_comment
+          if r5
+            r4 = r5
+          else
+            r4 = instantiate_node(SyntaxNode,input, index...index)
+          end
           s0 << r4
           if r4
-            i5 = index
-            r6 = lambda { |e| sp_sms_parallel_end }.call(s0)
+            r6 = _nt_t_newline
+            s0 << r6
             if r6
-              @index = i5
-              r5 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r5 = nil
+              i7 = index
+              r8 = lambda { |e| sp_sms_parallel_end }.call(s0)
+              if r8
+                @index = i7
+                r7 = instantiate_node(SyntaxNode,input, index...index)
+              else
+                r7 = nil
+              end
+              s0 << r7
             end
-            s0 << r5
           end
         end
       end
@@ -3730,7 +3962,7 @@ module Fortran
     end
 
     def t_newline
-      elements[7]
+      elements[8]
     end
   end
 
@@ -3767,8 +3999,17 @@ module Fortran
                 r7 = _nt_t_paren_r
                 s0 << r7
                 if r7
-                  r8 = _nt_t_newline
+                  r9 = _nt_sms_comment
+                  if r9
+                    r8 = r9
+                  else
+                    r8 = instantiate_node(SyntaxNode,input, index...index)
+                  end
                   s0 << r8
+                  if r8
+                    r10 = _nt_t_newline
+                    s0 << r10
+                  end
                 end
               end
             end
@@ -3906,6 +4147,13 @@ module Fortran
     r0
   end
 
+  module SmsSentinel0
+    def t_bang
+      elements[0]
+    end
+
+  end
+
   def _nt_sms_sentinel
     start_index = index
     if node_cache[:sms_sentinel].has_key?(index)
@@ -3917,11 +4165,24 @@ module Fortran
       return cached
     end
 
-    if has_terminal?("!sms$", false, index)
-      r0 = instantiate_node(T,input, index...(index + 5))
-      @index += 5
+    i0, s0 = index, []
+    r1 = _nt_t_bang
+    s0 << r1
+    if r1
+      if has_terminal?("sms$", false, index)
+        r2 = instantiate_node(SyntaxNode,input, index...(index + 4))
+        @index += 4
+      else
+        terminal_parse_failure("sms$")
+        r2 = nil
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(T,input, i0...index, s0)
+      r0.extend(SmsSentinel0)
     else
-      terminal_parse_failure("!sms$")
+      @index = i0
       r0 = nil
     end
 
@@ -4005,7 +4266,7 @@ module Fortran
     end
 
     def t_newline
-      elements[4]
+      elements[5]
     end
 
   end
@@ -4039,18 +4300,27 @@ module Fortran
           r5 = _nt_sms_t_begin
           s0 << r5
           if r5
-            r6 = _nt_t_newline
+            r7 = _nt_sms_comment
+            if r7
+              r6 = r7
+            else
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            end
             s0 << r6
             if r6
-              i7 = index
-              r8 = lambda { |e| sp_sms_serial_begin }.call(s0)
+              r8 = _nt_t_newline
+              s0 << r8
               if r8
-                @index = i7
-                r7 = instantiate_node(SyntaxNode,input, index...index)
-              else
-                r7 = nil
+                i9 = index
+                r10 = lambda { |e| sp_sms_serial_begin }.call(s0)
+                if r10
+                  @index = i9
+                  r9 = instantiate_node(SyntaxNode,input, index...index)
+                else
+                  r9 = nil
+                end
+                s0 << r9
               end
-              s0 << r7
             end
           end
         end
@@ -4285,7 +4555,7 @@ module Fortran
     end
 
     def t_newline
-      elements[3]
+      elements[4]
     end
 
   end
@@ -4311,18 +4581,27 @@ module Fortran
         r3 = _nt_sms_t_end
         s0 << r3
         if r3
-          r4 = _nt_t_newline
+          r5 = _nt_sms_comment
+          if r5
+            r4 = r5
+          else
+            r4 = instantiate_node(SyntaxNode,input, index...index)
+          end
           s0 << r4
           if r4
-            i5 = index
-            r6 = lambda { |e| sp_sms_serial_end }.call(s0)
+            r6 = _nt_t_newline
+            s0 << r6
             if r6
-              @index = i5
-              r5 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r5 = nil
+              i7 = index
+              r8 = lambda { |e| sp_sms_serial_end }.call(s0)
+              if r8
+                @index = i7
+                r7 = instantiate_node(SyntaxNode,input, index...index)
+              else
+                r7 = nil
+              end
+              s0 << r7
             end
-            s0 << r5
           end
         end
       end
@@ -4619,7 +4898,7 @@ module Fortran
     end
 
     def t_newline
-      elements[5]
+      elements[6]
     end
   end
 
@@ -4650,8 +4929,17 @@ module Fortran
             r5 = _nt_t_paren_r
             s0 << r5
             if r5
-              r6 = _nt_t_newline
+              r7 = _nt_sms_comment
+              if r7
+                r6 = r7
+              else
+                r6 = instantiate_node(SyntaxNode,input, index...index)
+              end
               s0 << r6
+              if r6
+                r8 = _nt_t_newline
+                s0 << r8
+              end
             end
           end
         end
@@ -4680,7 +4968,7 @@ module Fortran
     end
 
     def t_newline
-      elements[2]
+      elements[3]
     end
   end
 
@@ -4702,8 +4990,17 @@ module Fortran
       r2 = _nt_sms_t_start
       s0 << r2
       if r2
-        r3 = _nt_t_newline
+        r4 = _nt_sms_comment
+        if r4
+          r3 = r4
+        else
+          r3 = instantiate_node(SyntaxNode,input, index...index)
+        end
         s0 << r3
+        if r3
+          r5 = _nt_t_newline
+          s0 << r5
+        end
       end
     end
     if s0.last
@@ -4729,7 +5026,7 @@ module Fortran
     end
 
     def t_newline
-      elements[2]
+      elements[3]
     end
   end
 
@@ -4751,8 +5048,17 @@ module Fortran
       r2 = _nt_sms_t_stop
       s0 << r2
       if r2
-        r3 = _nt_t_newline
+        r4 = _nt_sms_comment
+        if r4
+          r3 = r4
+        else
+          r3 = instantiate_node(SyntaxNode,input, index...index)
+        end
         s0 << r3
+        if r3
+          r5 = _nt_t_newline
+          s0 << r5
+        end
       end
     end
     if s0.last
@@ -5757,7 +6063,7 @@ module Fortran
     end
 
     def t_newline
-      elements[8]
+      elements[9]
     end
 
   end
@@ -5798,18 +6104,27 @@ module Fortran
                   r8 = _nt_sms_t_begin
                   s0 << r8
                   if r8
-                    r9 = _nt_t_newline
+                    r10 = _nt_sms_comment
+                    if r10
+                      r9 = r10
+                    else
+                      r9 = instantiate_node(SyntaxNode,input, index...index)
+                    end
                     s0 << r9
                     if r9
-                      i10 = index
-                      r11 = lambda { |e| sp_sms_to_local_begin(e[3],e[5]) }.call(s0)
+                      r11 = _nt_t_newline
+                      s0 << r11
                       if r11
-                        @index = i10
-                        r10 = instantiate_node(SyntaxNode,input, index...index)
-                      else
-                        r10 = nil
+                        i12 = index
+                        r13 = lambda { |e| sp_sms_to_local_begin(e[3],e[5]) }.call(s0)
+                        if r13
+                          @index = i12
+                          r12 = instantiate_node(SyntaxNode,input, index...index)
+                        else
+                          r12 = nil
+                        end
+                        s0 << r12
                       end
-                      s0 << r10
                     end
                   end
                 end
@@ -5846,7 +6161,7 @@ module Fortran
     end
 
     def t_newline
-      elements[3]
+      elements[4]
     end
 
   end
@@ -5872,18 +6187,27 @@ module Fortran
         r3 = _nt_sms_t_end
         s0 << r3
         if r3
-          r4 = _nt_t_newline
+          r5 = _nt_sms_comment
+          if r5
+            r4 = r5
+          else
+            r4 = instantiate_node(SyntaxNode,input, index...index)
+          end
           s0 << r4
           if r4
-            i5 = index
-            r6 = lambda { |e| sp_sms_to_local_end }.call(s0)
+            r6 = _nt_t_newline
+            s0 << r6
             if r6
-              @index = i5
-              r5 = instantiate_node(SyntaxNode,input, index...index)
-            else
-              r5 = nil
+              i7 = index
+              r8 = lambda { |e| sp_sms_to_local_end }.call(s0)
+              if r8
+                @index = i7
+                r7 = instantiate_node(SyntaxNode,input, index...index)
+              else
+                r7 = nil
+              end
+              s0 << r7
             end
-            s0 << r5
           end
         end
       end
@@ -6133,7 +6457,7 @@ module Fortran
     end
 
     def t_newline
-      elements[5]
+      elements[6]
     end
   end
 
@@ -6164,8 +6488,17 @@ module Fortran
             r5 = _nt_t_paren_r
             s0 << r5
             if r5
-              r6 = _nt_t_newline
+              r7 = _nt_sms_comment
+              if r7
+                r6 = r7
+              else
+                r6 = instantiate_node(SyntaxNode,input, index...index)
+              end
               s0 << r6
+              if r6
+                r8 = _nt_t_newline
+                s0 << r8
+              end
             end
           end
         end
@@ -6194,7 +6527,7 @@ module Fortran
     end
 
     def t_newline
-      elements[2]
+      elements[3]
     end
   end
 
@@ -6216,8 +6549,17 @@ module Fortran
       r2 = _nt_sms_t_unstructured_print_timers
       s0 << r2
       if r2
-        r3 = _nt_t_newline
+        r4 = _nt_sms_comment
+        if r4
+          r3 = r4
+        else
+          r3 = instantiate_node(SyntaxNode,input, index...index)
+        end
         s0 << r3
+        if r3
+          r5 = _nt_t_newline
+          s0 << r5
+        end
       end
     end
     if s0.last
@@ -6560,7 +6902,7 @@ module Fortran
     end
 
     def t_newline
-      elements[2]
+      elements[3]
     end
   end
 
@@ -6582,8 +6924,17 @@ module Fortran
       r2 = _nt_sms_t_zerotimers
       s0 << r2
       if r2
-        r3 = _nt_t_newline
+        r4 = _nt_sms_comment
+        if r4
+          r3 = r4
+        else
+          r3 = instantiate_node(SyntaxNode,input, index...index)
+        end
         s0 << r3
+        if r3
+          r5 = _nt_t_newline
+          s0 << r5
+        end
       end
     end
     if s0.last

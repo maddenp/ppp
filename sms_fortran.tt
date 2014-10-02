@@ -18,7 +18,7 @@ grammar Fortran
     # Note: Any "comment" not stripped out during normalization is a directive.
     # These are non-SMS directives.
 
-    !( sms_sentinel / omp_parallel_do_begin / omp_parallel_do_end ) "!" character+ t_newline <Directive>
+    !( sms_sentinel / omp_parallel_do_begin / omp_parallel_do_end ) t_bang character+ t_newline <Directive>
   end
 
   rule executable_construct
@@ -60,7 +60,7 @@ grammar Fortran
   end
 
   rule omp_sentinel
-    "!$omp " <T>
+    t_bang "$omp " <T>
   end
 
   rule omp_space
@@ -80,23 +80,27 @@ grammar Fortran
   end
 
   rule sms_barrier
-    sms_sentinel sms_t_barrier t_newline <SMS_Barrier>
+    sms_sentinel sms_t_barrier sms_comment? t_newline <SMS_Barrier>
   end
 
   rule sms_comm_rank
-    sms_sentinel sms_t_comm_rank t_paren_l scalar_int_variable t_paren_r t_newline <SMS_Comm_Rank>
+    sms_sentinel sms_t_comm_rank t_paren_l scalar_int_variable t_paren_r sms_comment? t_newline <SMS_Comm_Rank>
   end
 
   rule sms_comm_size
-    sms_sentinel sms_t_comm_size t_paren_l scalar_int_variable t_paren_r t_newline <SMS_Comm_Size>
+    sms_sentinel sms_t_comm_size t_paren_l scalar_int_variable t_paren_r sms_comment? t_newline <SMS_Comm_Size>
+  end
+
+  rule sms_comment
+    t_bang [^\n]* <SMS_Comment>
   end
 
   rule sms_compare_var
-    sms_sentinel sms_t_compare_var t_paren_l variable t_comma sms_string t_paren_r t_newline <SMS_Compare_Var>
+    sms_sentinel sms_t_compare_var t_paren_l variable t_comma sms_string t_paren_r sms_comment? t_newline <SMS_Compare_Var>
   end
 
   rule sms_create_decomp
-    sms_sentinel sms_t_create_decomp t_paren_l sms_decomp_name t_comma sms_create_decomp_global t_comma sms_create_decomp_halo sms_create_decomp_regionsize t_paren_r t_newline <SMS_Create_Decomp>
+    sms_sentinel sms_t_create_decomp t_paren_l sms_decomp_name t_comma sms_create_decomp_global t_comma sms_create_decomp_halo sms_create_decomp_regionsize t_paren_r sms_comment? t_newline <SMS_Create_Decomp>
   end
 
   rule sms_create_decomp_global
@@ -117,7 +121,7 @@ grammar Fortran
   end
 
   rule sms_declare_decomp
-    sms_sentinel sms_t_declare_decomp t_paren_l sms_decomp_name t_comma scalar_int_literal_constant sms_declare_decomp_unstructured_option? t_paren_r t_newline <SMS_Declare_Decomp>
+    sms_sentinel sms_t_declare_decomp t_paren_l sms_decomp_name t_comma scalar_int_literal_constant sms_declare_decomp_unstructured_option? t_paren_r sms_comment? t_newline <SMS_Declare_Decomp>
   end
 
   rule sms_declare_decomp_unstructured_option
@@ -133,7 +137,7 @@ grammar Fortran
    end
 
   rule sms_distribute_begin
-    sms_sentinel sms_t_distribute t_paren_l sms_decomp_name t_comma sms_distribute_dims t_paren_r sms_t_begin t_newline &{ |e| sp_sms_distribute_begin(e[3],e[5]) } <SMS_Distribute_Begin>
+    sms_sentinel sms_t_distribute t_paren_l sms_decomp_name t_comma sms_distribute_dims t_paren_r sms_t_begin sms_comment? t_newline &{ |e| sp_sms_distribute_begin(e[3],e[5]) } <SMS_Distribute_Begin>
   end
 
   rule sms_distribute_dim
@@ -147,19 +151,19 @@ grammar Fortran
   end
 
   rule sms_distribute_end
-    sms_sentinel sms_t_distribute sms_t_end t_newline &{ |e| sp_sms_distribute_end } <SMS_Distribute_End>
+    sms_sentinel sms_t_distribute sms_t_end sms_comment? t_newline &{ |e| sp_sms_distribute_end } <SMS_Distribute_End>
   end
 
   rule sms_exchange
-    sms_sentinel sms_t_exchange t_paren_l variable ( t_comma variable )* t_paren_r t_newline <SMS_Exchange>
+    sms_sentinel sms_t_exchange t_paren_l variable ( t_comma variable )* t_paren_r sms_comment? t_newline <SMS_Exchange>
   end
 
   rule sms_exchange_begin
-    sms_sentinel sms_t_exchange_begin t_paren_l variable ( t_comma variable )* t_paren_r t_newline <SMS_Exchange_Begin>
+    sms_sentinel sms_t_exchange_begin t_paren_l variable ( t_comma variable )* t_paren_r sms_comment? t_newline <SMS_Exchange_Begin>
   end
 
   rule sms_exchange_end
-    sms_sentinel sms_t_exchange_end t_newline <SMS_Exchange_End>
+    sms_sentinel sms_t_exchange_end sms_comment? t_newline <SMS_Exchange_End>
   end
 
   rule sms_executable
@@ -187,7 +191,7 @@ grammar Fortran
   end
 
   rule sms_get_communicator
-    sms_sentinel sms_t_get_communicator t_paren_l scalar_int_variable t_paren_r t_newline <SMS_Get_Communicator>
+    sms_sentinel sms_t_get_communicator t_paren_l scalar_int_variable t_paren_r sms_comment? t_newline <SMS_Get_Communicator>
   end
 
   rule sms_halo_comp
@@ -195,11 +199,11 @@ grammar Fortran
   end
 
   rule sms_halo_comp_begin
-    sms_sentinel sms_t_halo_comp t_paren_l sms_halo_comp_pairs t_paren_r sms_t_begin t_newline &{ |e| sp_sms_halo_comp_begin(e[3]) } <SMS_Halo_Comp_Begin>
+    sms_sentinel sms_t_halo_comp t_paren_l sms_halo_comp_pairs t_paren_r sms_t_begin sms_comment? t_newline &{ |e| sp_sms_halo_comp_begin(e[3]) } <SMS_Halo_Comp_Begin>
   end
 
   rule sms_halo_comp_end
-    sms_sentinel sms_t_halo_comp sms_t_end t_newline &{ |e| sp_sms_halo_comp_end } <SMS_Halo_Comp_End>
+    sms_sentinel sms_t_halo_comp sms_t_end sms_comment? t_newline &{ |e| sp_sms_halo_comp_end } <SMS_Halo_Comp_End>
   end
 
   rule sms_halo_comp_pair
@@ -215,11 +219,11 @@ grammar Fortran
   end
 
   rule sms_ignore_begin
-    sms_sentinel sms_t_ignore sms_t_begin t_newline &{ |e| sp_sms_ignore_begin } <SMS_Ignore_Begin>
+    sms_sentinel sms_t_ignore sms_t_begin sms_comment? t_newline &{ |e| sp_sms_ignore_begin } <SMS_Ignore_Begin>
   end
 
   rule sms_ignore_end
-    sms_sentinel sms_t_ignore sms_t_end t_newline &{ |e| sp_sms_ignore_end } <SMS_Ignore_End>
+    sms_sentinel sms_t_ignore sms_t_end sms_comment? t_newline &{ |e| sp_sms_ignore_end } <SMS_Ignore_End>
   end
 
   rule sms_parallel
@@ -227,11 +231,11 @@ grammar Fortran
   end
 
   rule sms_parallel_begin
-    sms_sentinel sms_t_parallel t_paren_l sms_decomp_name t_comma sms_parallel_var_lists t_paren_r sms_t_begin t_newline &{ |e| sp_sms_parallel_begin(e[3],e[5]) } <SMS_Parallel_Begin>
+    sms_sentinel sms_t_parallel t_paren_l sms_decomp_name t_comma sms_parallel_var_lists t_paren_r sms_t_begin sms_comment? t_newline &{ |e| sp_sms_parallel_begin(e[3],e[5]) } <SMS_Parallel_Begin>
   end
 
   rule sms_parallel_end
-    sms_sentinel sms_t_parallel sms_t_end t_newline &{ |e| sp_sms_parallel_end } <SMS_Parallel_End>
+    sms_sentinel sms_t_parallel sms_t_end sms_comment? t_newline &{ |e| sp_sms_parallel_end } <SMS_Parallel_End>
   end
 
   rule sms_parallel_var_list
@@ -250,7 +254,7 @@ grammar Fortran
   end
 
   rule sms_reduce
-    sms_sentinel sms_t_reduce t_paren_l sms_reduce_varlist t_comma sms_reduce_op t_paren_r t_newline <SMS_Reduce>
+    sms_sentinel sms_t_reduce t_paren_l sms_reduce_varlist t_comma sms_reduce_op t_paren_r sms_comment? t_newline <SMS_Reduce>
   end
 
   rule sms_reduce_op
@@ -264,7 +268,7 @@ grammar Fortran
   end
 
   rule sms_sentinel
-    "!sms$" <T>
+    t_bang "sms$" <T>
   end
 
   rule sms_serial
@@ -272,7 +276,7 @@ grammar Fortran
   end
 
   rule sms_serial_begin
-    sms_sentinel sms_t_serial sms_serial_control? sms_t_begin t_newline &{ |e| sp_sms_serial_begin } <SMS_Serial_Begin>
+    sms_sentinel sms_t_serial sms_serial_control? sms_t_begin sms_comment? t_newline &{ |e| sp_sms_serial_begin } <SMS_Serial_Begin>
   end
 
   rule sms_serial_control
@@ -289,7 +293,7 @@ grammar Fortran
   end
 
   rule sms_serial_end
-    sms_sentinel sms_t_serial sms_t_end t_newline &{ |e| sp_sms_serial_end } <SMS_Serial_End>
+    sms_sentinel sms_t_serial sms_t_end sms_comment? t_newline &{ |e| sp_sms_serial_end } <SMS_Serial_End>
   end
 
   rule sms_serial_treatment
@@ -312,15 +316,15 @@ grammar Fortran
   end
 
   rule sms_set_communicator
-    sms_sentinel sms_t_set_communicator t_paren_l variable_name t_paren_r t_newline <SMS_Set_Communicator>
+    sms_sentinel sms_t_set_communicator t_paren_l variable_name t_paren_r sms_comment? t_newline <SMS_Set_Communicator>
   end
 
   rule sms_start
-    sms_sentinel sms_t_start t_newline <SMS_Start>
+    sms_sentinel sms_t_start sms_comment? t_newline <SMS_Start>
   end
 
   rule sms_stop
-    sms_sentinel sms_t_stop t_newline <SMS_Stop>
+    sms_sentinel sms_t_stop sms_comment? t_newline <SMS_Stop>
   end
 
   rule sms_string
@@ -477,11 +481,11 @@ grammar Fortran
   end
 
   rule sms_to_local_begin
-    sms_sentinel sms_t_to_local t_paren_l sms_decomp_name t_colon sms_to_local_lists t_paren_r sms_t_begin t_newline &{ |e| sp_sms_to_local_begin(e[3],e[5]) } <SMS_To_Local_Begin>
+    sms_sentinel sms_t_to_local t_paren_l sms_decomp_name t_colon sms_to_local_lists t_paren_r sms_t_begin sms_comment? t_newline &{ |e| sp_sms_to_local_begin(e[3],e[5]) } <SMS_To_Local_Begin>
   end
 
   rule sms_to_local_end
-    sms_sentinel sms_t_to_local sms_t_end t_newline &{ |e| sp_sms_to_local_end } <SMS_To_Local_End>
+    sms_sentinel sms_t_to_local sms_t_end sms_comment? t_newline &{ |e| sp_sms_to_local_end } <SMS_To_Local_End>
   end
 
   rule sms_to_local_key
@@ -498,11 +502,11 @@ grammar Fortran
   end
 
   rule sms_unstructured_grid
-    sms_sentinel sms_t_unstructured_grid t_paren_l variable_name t_paren_r t_newline <SMS_Unstructured_Grid>
+    sms_sentinel sms_t_unstructured_grid t_paren_l variable_name t_paren_r sms_comment? t_newline <SMS_Unstructured_Grid>
   end
 
   rule sms_unstructured_print_timers
-    sms_sentinel sms_t_unstructured_print_timers t_newline <SMS_Unstructured_Print_Timers>
+    sms_sentinel sms_t_unstructured_print_timers sms_comment? t_newline <SMS_Unstructured_Print_Timers>
   end
 
   rule sms_varlist3d
@@ -519,7 +523,7 @@ grammar Fortran
   end
 
   rule sms_zerotimers
-    sms_sentinel sms_t_zerotimers t_newline <SMS_Zerotimers>
+    sms_sentinel sms_t_zerotimers sms_comment? t_newline <SMS_Zerotimers>
   end
 
 end

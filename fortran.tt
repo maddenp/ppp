@@ -1120,7 +1120,7 @@ grammar Fortran
   rule directive
     # Note: Any "comment" not stripped out during normalization is a directive.
 
-    "!" character+ t_newline <Directive>
+    t_bang character+ t_newline <Directive>
   end
 
   rule do_block
@@ -3475,6 +3475,10 @@ grammar Fortran
 
   rule t_backspace
     "backspace" <T>
+  end
+
+  rule t_bang
+    "!" <T>
   end
 
   rule t_binary

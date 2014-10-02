@@ -10785,6 +10785,10 @@ module Fortran
   end
 
   module Directive0
+    def t_bang
+      elements[0]
+    end
+
     def t_newline
       elements[2]
     end
@@ -10802,13 +10806,7 @@ module Fortran
     end
 
     i0, s0 = index, []
-    if has_terminal?("!", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
-      @index += 1
-    else
-      terminal_parse_failure("!")
-      r1 = nil
-    end
+    r1 = _nt_t_bang
     s0 << r1
     if r1
       s2, i2 = [], index
@@ -31783,6 +31781,30 @@ module Fortran
     end
 
     node_cache[:t_backspace][start_index] = r0
+
+    r0
+  end
+
+  def _nt_t_bang
+    start_index = index
+    if node_cache[:t_bang].has_key?(index)
+      cached = node_cache[:t_bang][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if has_terminal?("!", false, index)
+      r0 = instantiate_node(T,input, index...(index + 1))
+      @index += 1
+    else
+      terminal_parse_failure("!")
+      r0 = nil
+    end
+
+    node_cache[:t_bang][start_index] = r0
 
     r0
   end
