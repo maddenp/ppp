@@ -5026,7 +5026,7 @@ module Fortran
     end
 
     def t_newline
-      elements[3]
+      elements[4]
     end
   end
 
@@ -5048,7 +5048,7 @@ module Fortran
       r2 = _nt_sms_t_stop
       s0 << r2
       if r2
-        r4 = _nt_sms_comment
+        r4 = _nt_sms_stop_option
         if r4
           r3 = r4
         else
@@ -5056,8 +5056,17 @@ module Fortran
         end
         s0 << r3
         if r3
-          r5 = _nt_t_newline
+          r6 = _nt_sms_comment
+          if r6
+            r5 = r6
+          else
+            r5 = instantiate_node(SyntaxNode,input, index...index)
+          end
           s0 << r5
+          if r5
+            r7 = _nt_t_newline
+            s0 << r7
+          end
         end
       end
     end
@@ -5070,6 +5079,55 @@ module Fortran
     end
 
     node_cache[:sms_stop][start_index] = r0
+
+    r0
+  end
+
+  module SmsStopOption0
+    def t_paren_l
+      elements[0]
+    end
+
+    def variable_name
+      elements[1]
+    end
+
+    def t_paren_r
+      elements[2]
+    end
+  end
+
+  def _nt_sms_stop_option
+    start_index = index
+    if node_cache[:sms_stop_option].has_key?(index)
+      cached = node_cache[:sms_stop_option][index]
+      if cached
+        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_paren_l
+    s0 << r1
+    if r1
+      r2 = _nt_variable_name
+      s0 << r2
+      if r2
+        r3 = _nt_t_paren_r
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Stop_Option,input, i0...index, s0)
+      r0.extend(SmsStopOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_stop_option][start_index] = r0
 
     r0
   end

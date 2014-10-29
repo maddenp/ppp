@@ -632,9 +632,13 @@ module Fortran
       "sms__status"
     end
 
-    def sms_stop
+    def sms_stop(comm)
       use(sms_decompmod)
-      "call sms__stop"
+      if comm
+        "call sms__stop(#{comm})"
+      else
+        "call sms__stop"
+      end
     end
 
     def sms_type(var)
@@ -2416,13 +2420,25 @@ module Fortran
 
   class SMS_Stop < SMS
 
+    def comm
+      (e[2].is_a?(SMS_Stop_Option))?(e[2].comm):(nil)
+    end
+
     def translate
       fail "ERROR: sms$stop may not appear inside sms$serial region" if sms_serial
       fail "ERROR: sms$stop may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
       code=[]
       code.push("#{self}")
-      code.push(sms_stop)
+      code.push(sms_stop(comm))
       replace_statement(code)
+    end
+
+  end
+
+  class SMS_Stop_Option < SMS
+
+    def comm
+      e[1]
     end
 
   end

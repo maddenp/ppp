@@ -324,7 +324,11 @@ grammar Fortran
   end
 
   rule sms_stop
-    sms_sentinel sms_t_stop sms_comment? t_newline <SMS_Stop>
+    sms_sentinel sms_t_stop sms_stop_option? sms_comment? t_newline <SMS_Stop>
+  end
+
+  rule sms_stop_option
+    t_paren_l variable_name t_paren_r <SMS_Stop_Option>
   end
 
   rule sms_string
