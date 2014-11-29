@@ -1,8 +1,8 @@
 program t
   write (*,'(i0)') 1
-!sms$remove begin
+  !sms$remove begin
   write (*,'(i0)') 2
-!sms$remove end
+  !sms$remove end
   write (*,'(i0)') 3
 !sms$remove begin
   write (*,'(i0)') 4

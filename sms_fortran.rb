@@ -2725,8 +2725,8 @@ class Translator
     # Process SMS continuations, inserts and removes
 
     s=s.gsub(/^(#{sms}.*)&\s*\n#{sms}&(.*)/im,'\1\2')
-    s=s.gsub(/^#{sms}insert\s*/i,"")
-    s=s.gsub(/^#{sms}remove\s+begin.*?#{sms}remove\s+end/im,"")
+    s=s.gsub(/^\s*#{sms}insert\s*/i,"")
+    s=s.gsub(/^\s*#{sms}remove\s+begin.*?#{sms}remove\s+end/im,"")
 
     # Join OpenMP (END) PARALLEL DO directives
 
