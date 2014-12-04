@@ -1994,6 +1994,10 @@ module Fortran
 
   class Call_Stmt < Stmt
 
+    def name
+      e[2]
+    end
+
     def str0
       stmt("#{e[1]} #{e[2]}#{e[3]}")
     end
@@ -3820,6 +3824,10 @@ module Fortran
       (e[2].is_a?(Execution_Part))?(e[2]):(nil)
     end
 
+    def name
+      (e[0].is_a?(Program_Stmt))?(e[0].name):"ANONYMOUS"
+    end
+
   end
 
   class Module < Scoping_Unit
@@ -4413,9 +4421,18 @@ module Fortran
   end
 
   class Program_Name < NT
+
+    def name
+      e[2]
+    end
+
   end
 
   class Program_Stmt < Stmt
+
+    def name
+      e[2].name
+    end
 
     def str1
       s=indent(strmemo)
