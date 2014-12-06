@@ -1019,6 +1019,10 @@ module Fortran
       list_item(Io_Spec_Exist)
     end
 
+    def file
+      list_item(Io_Spec_File)
+    end
+
     def form
       list_item(Io_Spec_Form)
     end
@@ -1033,7 +1037,8 @@ module Fortran
 
     def list_item(spec)
       return e[0] if e[0].is_a?(spec)
-      e[1].e.each { |x| return x.e[1] if x.e[1].is_a?(spec) } if e[1]
+      return nil unless e[1]
+      e[1].e.each { |x| return x.e[1] if x.e[1].is_a?(spec) }
       nil
     end
 
@@ -1149,6 +1154,10 @@ module Fortran
 
     def exist
       spec_list.exist
+    end
+
+    def file
+      spec_list.file
     end
 
     def form
