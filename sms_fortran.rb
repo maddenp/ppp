@@ -909,19 +909,24 @@ module Fortran
     def io_stmt_codegen
       use(sms_decompmod) if @need_decompmod
       code=[]
-      if @onroot
+      io_ok_condition="#{sms_rootcheck}()"
+      if @serialize_io
+        if @code_gather.empty? and @code_scatter.empty?
+          use(sms_decompmod)
+          io_ok_condition+=".or.sms__parallel_depth.gt.0"
+        end
         my_label=(label.empty?)?(nil):(label)
         my_label=label_delete if my_label
         code.push("#{my_label} continue") if my_label
       end
       code.concat(@code_alloc)
       code.concat(@code_gather)
-      code.push("if (#{sms_rootcheck}()) then") if @onroot
+      code.push("if (#{io_ok_condition}) then") if @serialize_io
       code.concat(@spec_var_false)
       code.push("#{self}".chomp)
       code.push("goto #{@success_label}") if @success_label
       code.concat(@spec_var_true)
-      code.push("#{sa(@success_label)}endif") if @onroot
+      code.push("#{sa(@success_label)}endif") if @serialize_io
       code.concat(@spec_var_bcast)
       code.concat(@spec_var_goto)
       code.concat(@code_scatter)
@@ -936,19 +941,19 @@ module Fortran
           fail "INTERNAL ERROR: treatment '#{treatment}' neither :in nor :out"
         end
         globals=metadata[:globals]||SortedSet.new
-        @onroot=true unless globals.empty?
+        @serialize_io=true unless globals.empty?
         globals.each do |global|
           ((treatment==:in)?(@var_gather):(@var_scatter)).add("#{global}")
         end
         if treatment==:out and (locals=metadata[:locals])
-          locals.each { |local| @var_bcast.add(local) if @onroot }
+          locals.each { |local| @var_bcast.add(local) if @serialize_io }
         end
       end
       unless is_a?(Print_Stmt)
         io_stmt_branch_to_logic
         io_stmt_var_set_logic
       end
-      declare("logical",sms_rootcheck) if @onroot
+      declare("logical",sms_rootcheck) if @serialize_io
       @code_alloc,@code_dealloc=code_alloc_dealloc_globals(SortedSet.new(@var_gather+@var_scatter))
       io_stmt_gathers
       io_stmt_scatters
@@ -967,7 +972,7 @@ module Fortran
       @code_scatter=[]
       @iostat=nil
       @need_decompmod=false
-      @onroot=true
+      @serialize_io=true
       @spec_var_bcast=[]
       @spec_var_false=[]
       @spec_var_goto=[]
@@ -1229,9 +1234,9 @@ module Fortran
         add_serial_region_nml_vars(:pppout)
       else
         io_stmt_init
-        @onroot=false if unit.is_a?(Internal_File_Unit)
+        @serialize_io=false if unit.is_a?(Internal_File_Unit)
         if (namelist_name=nml)
-          @onroot=true
+          @serialize_io=true
           nmlenv=varenv_get(namelist_name,self,expected=true)
           nmlenv["objects"].each do |x|
             var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
@@ -1248,7 +1253,7 @@ module Fortran
         input_items.each do |x|
           var="#{x}"
           if known_scalar(var) and known_uservar(var)
-            @var_bcast.add(var) if @onroot
+            @var_bcast.add(var) if @serialize_io
           end
         end
         io_stmt_common(:out)
@@ -2696,9 +2701,9 @@ module Fortran
       else
         io_stmt_init
         function=(env["#{unit}"] and env["#{unit}"]["subprogram"]=="function")
-        @onroot=false if unit.is_a?(Internal_File_Unit) or function
+        @serialize_io=false if unit.is_a?(Internal_File_Unit) or function
         if (namelist_name=nml)
-          @onroot=true
+          @serialize_io=true
           nmlenv=varenv_get(namelist_name,self,expected=true)
           nmlenv["objects"].each do |x|
             var=(x.respond_to?(:name))?("#{x.name}"):("#{x}")
