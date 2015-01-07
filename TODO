@@ -12,7 +12,7 @@
 
 ### NORMALIZATION
 
-- Replace ad-hoc normalizer with (maybe) Ragel-based transformer. Should handle
++ Replace ad-hoc normalizer with (maybe) Ragel-based transformer. Should handle
   holleriths, too. Changes made to text coordinates during processing by the
   state machine should be recorded so that coordinates related to errors during
   parsing can be mapped to original-source coordinates. Note that prepsrc_free
@@ -20,9 +20,9 @@
 
 ### OPTIMIZATION
 
-- Test/measure new case-insensitivity and regex capabilities in Treetop.
++ Test/measure new case-insensitivity and regex capabilities in Treetop.
 
-- write_envfile is called by declare() whenever something is added to a module.
++ write_envfile is called by declare() whenever something is added to a module.
   This creates a lot of IO if many programmtic delcarations are performed. It
   would be better to do this once -- maybe as a post-translation walk that calls
   write_envfile for each module encountered.
@@ -37,7 +37,7 @@
   parsing, but move anything related to collecting information for translation
   to the data-collection walk. Also get rid of env[:global][:parsed].
 
-- Deduce types of implicit variables. We cannot require 'implicit none'.
++ Deduce types of implicit variables. We cannot require 'implicit none'.
 
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
   label, but also labels further down in the stack? That would also be an error,
@@ -48,8 +48,8 @@
   nil for the latter (i.e. the optional element is not present). This factors
   the knowledge about the grammar into the appropriate class.
 
-- Intel compiler directives (http://goo.gl/c8q2eu) need independent grammar
-  rules, with scoping to decl, exe, other sections.
+- Intel compiler directives need independent grammar rules, with scoping to
+  decl, exe, other sections.
 
 ### REFACTORING
 
@@ -61,10 +61,10 @@
   reasonable to keep in ppp, but the max vars bit (may occur, with a different
   name, in other directives) should be a reference into the library code.
 
-- declare() is naive. What about declaring an array with the same type as an
++ declare() is naive. What about declaring an array with the same type as an
   already-declared scalar? Need more flexibility...
 
-- It might be better to get rid of of 'sort' key in .sms file, rename 'dims' to
++ It might be better to get rid of of 'sort' key in .sms file, rename 'dims' to
   'rank', and have rank 0 => scalar, rank > 0 => array. But the value of the
   'sort' key can also be '_namelist', so that has to be dealt with somehow.
   Maybe rank => _namelist would work. In general, think about how the names
@@ -72,9 +72,9 @@
 
 ### TRANSLATION
 
-- In SMS_Serial translate, what should halo[l|u] be when dh is nil?
++ In SMS_Serial translate, what should halo[l|u] be when dh is nil?
 
-- Hardcoded '1's referring to s1, e1, etc. should be looked up from env. See
++ Hardcoded '1's referring to s1, e1, etc. should be looked up from env. See
   translate() for SMS_Declare_Decomp, SMS_Unstructured_Grid, Array_Section,
   SMS_Create_Decomp. In SMS_Declare_Decomp translate, roll out as many e{n}/s{n}
   arrays as needed for the decomposition.
@@ -83,14 +83,14 @@
 
 - Deal with derived types. Start e.g. with treating them in serial regions.
 
-- Perform sms$parallel translation implicitly.
+- Perform sms$parallel translation implicitly?
 
-- sms$halo_comp -> one-line directive bound to parallel do loop.
+- sms$halo_comp -> one-line directive bound to parallel do loop?
 
 - Consider which directives may nest in which others, and which may not. Factor
   handling of these error conditions.
 
-- Think about (and deal with) distributed parameter arrays.
++ Think about (and deal with) distributed parameter arrays. Maybe disallow them.
 
 - Currently, if an object allocated inside a serial region is also modified in a
   (not necessarily the same) serial region, it becomes an l-value eligible for
