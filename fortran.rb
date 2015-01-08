@@ -767,7 +767,7 @@ module Fortran
 
     def raw(code,rule,srcfile,dstfile,opts={})
       opts[:product]=:raw_tree
-      Translator.new.process(code,rule,srcfile,dstfile,opts)
+      Driver.new.process(code,rule,srcfile,dstfile,opts)
     end
 
     def replace_element(code,rule,node=self)
@@ -3838,7 +3838,7 @@ module Fortran
       d=File.dirname(d) unless File.directory?(d)
       unless File.directory?(d)
         $stderr.puts "Output directory '#{d}' not found"
-        raise Exceptions::TranslatorException
+        raise Exceptions::DriverException
       end
       f=envfile("#{name}",d)
       begin
@@ -3848,7 +3848,7 @@ module Fortran
         end
       rescue Exception=>ex
         $stderr.puts "Could not write module file '#{f}'"
-        raise Exceptions::TranslatorException
+        raise Exceptions::DriverException
       end
     end
 

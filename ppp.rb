@@ -1,6 +1,6 @@
 $: << File.dirname($0)
 require "version"
 version_check
-require "translator"
+require "driver"
 GC.disable
-Translator.new.go($0,ARGV)
+Driver.new.go($0,ARGV)

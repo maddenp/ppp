@@ -19,7 +19,7 @@ require "normfree"
 require "exceptions"
 require "sentinels"
 
-class Translator
+class Driver
 
   include Fortran
   include Sentinels
@@ -183,7 +183,7 @@ class Translator
         translation+="\n" unless translation[-1]=="\n"
         File.open(dstfile,'w').write(translation)
       end
-    rescue Exceptions::TranslatorException
+    rescue Exceptions::DriverException
       exit 1
     end
   end
@@ -392,7 +392,7 @@ class Translator
         $stderr.puts "#{' '*indent} Source: #{srcfile}"
       end
       $stderr.puts "PARSE FAILED"
-      fail Exceptions::TranslatorException
+      fail Exceptions::DriverException
     end
     tree.env[:global][:parsed]=true
     if conf[:debug]
@@ -471,7 +471,7 @@ class Translator
             conf[:product]=:modinfo
           else
             puts "ERROR: Unknown action '#{action}'" unless quiet
-            raise Exceptions::TranslatorException
+            raise Exceptions::DriverException
           end
           if form=="fixed"
             conf[:form]=:fixed
@@ -499,7 +499,7 @@ class Translator
           return
         rescue SystemExit=>ex
           monitor.join
-        rescue Exceptions::TranslatorException=>ex
+        rescue Exceptions::DriverException=>ex
           begin
             client.puts("\x00") # C null
             client.close

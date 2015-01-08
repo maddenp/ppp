@@ -2719,7 +2719,7 @@ module Fortran
 
 end # module Fortran
 
-class Translator
+class Driver
 
 
   def prepsrc_common(s,sms,omp)

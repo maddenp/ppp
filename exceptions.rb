@@ -1,4 +1,4 @@
 module Exceptions
-  class TranslatorException < Exception
+  class DriverException < Exception
   end
 end

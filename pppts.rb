@@ -16,8 +16,8 @@ class PPPTS
     threads=1 if debug
     die("Tests require at least one thread") unless threads>0
     exe("make")
-    require "translator"
-    t=Translator.new
+    require "driver"
+    t=Driver.new
     srvr,socket=(server_mode)?(server_start(t)):(nil)
     n=run_all(threads,socket,debug,args)
     puts "\nOK (#{n} tests)" unless @failure

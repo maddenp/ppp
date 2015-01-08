@@ -1,5 +1,5 @@
 $: << File.dirname($0)
 require "version"
 version_check
-require "translator"
-Translator.new.server(ARGV[0])
+require "driver"
+Driver.new.server(ARGV[0])
