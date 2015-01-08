@@ -318,22 +318,13 @@ module Fortran
       return cached
     end
 
-    s0, i0 = [], index
-    loop do
-      if has_terminal?(@regexps[gr = '\A[^&\\n]'] ||= Regexp.new(gr), :regexp, index)
-        r1 = true
-        @index += 1
-      else
-        terminal_parse_failure('[^&\\n]')
-        r1 = nil
-      end
-      if r1
-        s0 << r1
-      else
-        break
-      end
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A[^&\n]*")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
+      @index += match_len
+    else
+      terminal_parse_failure('"[^&\\n]*"')
+      r0 = nil
     end
-    r0 = instantiate_node(T,input, i0...index, s0)
 
     node_cache[:omp_clauses][start_index] = r0
 
@@ -660,45 +651,6 @@ module Fortran
     r0
   end
 
-  def _nt_omp_space
-    start_index = index
-    if node_cache[:omp_space].has_key?(index)
-      cached = node_cache[:omp_space][index]
-      if cached
-        node_cache[:omp_space][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    s0, i0 = [], index
-    loop do
-      if (match_len = has_terminal?(" ", false, index))
-        r1 = true
-        @index += match_len
-      else
-        terminal_parse_failure('" "')
-        r1 = nil
-      end
-      if r1
-        s0 << r1
-      else
-        break
-      end
-    end
-    r0 = instantiate_node(SyntaxNode,input, i0...index, s0)
-
-    node_cache[:omp_space][start_index] = r0
-
-    r0
-  end
-
-  module OmpTDo0
-    def omp_space
-      elements[1]
-    end
-  end
-
   def _nt_omp_t_do
     start_index = index
     if node_cache[:omp_t_do].has_key?(index)
@@ -710,36 +662,17 @@ module Fortran
       return cached
     end
 
-    i0, s0 = index, []
-    if (match_len = has_terminal?("do", false, index))
-      r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\Ado *")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure('"do"')
-      r1 = nil
-    end
-    s0 << r1
-    if r1
-      r2 = _nt_omp_space
-      s0 << r2
-    end
-    if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(OmpTDo0)
-    else
-      @index = i0
+      terminal_parse_failure('"do *"')
       r0 = nil
     end
 
     node_cache[:omp_t_do][start_index] = r0
 
     r0
-  end
-
-  module OmpTEnd0
-    def omp_space
-      elements[1]
-    end
   end
 
   def _nt_omp_t_end
@@ -753,36 +686,17 @@ module Fortran
       return cached
     end
 
-    i0, s0 = index, []
-    if (match_len = has_terminal?("end", false, index))
-      r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\Aend *")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure('"end"')
-      r1 = nil
-    end
-    s0 << r1
-    if r1
-      r2 = _nt_omp_space
-      s0 << r2
-    end
-    if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(OmpTEnd0)
-    else
-      @index = i0
+      terminal_parse_failure('"end *"')
       r0 = nil
     end
 
     node_cache[:omp_t_end][start_index] = r0
 
     r0
-  end
-
-  module OmpTParallel0
-    def omp_space
-      elements[1]
-    end
   end
 
   def _nt_omp_t_parallel
@@ -796,24 +710,11 @@ module Fortran
       return cached
     end
 
-    i0, s0 = index, []
-    if (match_len = has_terminal?("parallel", false, index))
-      r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\Aparallel *")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure('"parallel"')
-      r1 = nil
-    end
-    s0 << r1
-    if r1
-      r2 = _nt_omp_space
-      s0 << r2
-    end
-    if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(OmpTParallel0)
-    else
-      @index = i0
+      terminal_parse_failure('"parallel *"')
       r0 = nil
     end
 

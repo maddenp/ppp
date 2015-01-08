@@ -35,7 +35,7 @@ grammar Fortran
   end
 
   rule omp_clauses
-    [^&\n]* <T>
+    "[^&\n]*"ir <T>
   end
 
   rule omp_parallel_do_begin
@@ -63,20 +63,16 @@ grammar Fortran
     t_bang "$omp " <T>
   end
 
-  rule omp_space
-    " "*
-  end
-
   rule omp_t_do
-    "do" omp_space <T>
+    "do *"ir <T>
   end
 
   rule omp_t_end
-    "end" omp_space <T>
+    "end *"ir <T>
   end
 
   rule omp_t_parallel
-    "parallel" omp_space <T>
+    "parallel *"ir <T>
   end
 
   rule sms_barrier
