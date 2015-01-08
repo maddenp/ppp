@@ -1099,7 +1099,7 @@ grammar Fortran
   rule digit_string
     # F90:R402
 
-    t_digit+ <Digit>
+    "[0-9]+"ir <Digit>
   end
 
   rule dimension_stmt
@@ -2274,7 +2274,7 @@ grammar Fortran
   rule label
     # F90:R313
 
-    t_digit 1..5 &{ |e| sp_label(e[0]) } <Label>
+    "[0-9]{1,5}"ir &{ |e| sp_label(e[0]) } <Label>
   end
 
   rule label_assign
@@ -3328,7 +3328,7 @@ grammar Fortran
     # F90:R843
 
     scalar_char_constant "" <Stop_Code_Character> /
-    t_digit 1..5 <Stop_Code_Numeric>
+    "[0-9]{1,5}"ir <Stop_Code_Numeric>
   end
 
   rule stop_stmt
@@ -3536,10 +3536,6 @@ grammar Fortran
 
   rule t_delim
     "delim" <T>
-  end
-
-  rule t_digit
-    [0-9] <T>
   end
 
   rule t_dimension

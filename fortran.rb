@@ -321,7 +321,7 @@ module Fortran
   end
 
   def sp_label(label)
-    n=label.e.reduce("") { |m,x| m+"#{x}" }.to_i
+    n="#{label}".to_i
     (env[:global][:labels]||=SortedSet.new).add(n)
     true
   end
@@ -2495,12 +2495,7 @@ module Fortran
   class Derived_Typeaccess_Spec_Option < NT
   end
 
-  class Digit < NT
-
-    def str0
-      e.reduce("") { |m,x| m+="#{x}" }
-    end
-
+  class Digit < T
   end
 
   class Dimension_Stmt < Stmt
@@ -3654,12 +3649,7 @@ module Fortran
 
   end
 
-  class Label < NT
-
-    def str0
-      "#{text_value.to_i}"
-    end
-
+  class Label < T
   end
 
   class Label_Assign < Label
@@ -4765,6 +4755,10 @@ module Fortran
 
     def numeric?
       true
+    end
+
+    def str0
+      text_value
     end
 
   end

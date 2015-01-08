@@ -10858,20 +10858,12 @@ module Fortran
       return cached
     end
 
-    s0, i0 = [], index
-    loop do
-      r1 = _nt_t_digit
-      if r1
-        s0 << r1
-      else
-        break
-      end
-    end
-    if s0.empty?
-      @index = i0
-      r0 = nil
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A[0-9]+")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(Digit,input, index...(index + match_len))
+      @index += match_len
     else
-      r0 = instantiate_node(Digit,input, i0...index, s0)
+      terminal_parse_failure('"[0-9]+"')
+      r0 = nil
     end
 
     node_cache[:digit_string][start_index] = r0
@@ -22149,42 +22141,28 @@ module Fortran
     end
 
     i0, s0 = index, []
-    s1, i1 = [], index
-    loop do
-      r2 = _nt_t_digit
-      if r2
-        s1 << r2
-      else
-        break
-      end
-      if s1.size == 5
-        break
-      end
-    end
-    if s1.size < 1
-      @index = i1
-      r1 = nil
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A[0-9]{1,5}")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+      @index += match_len
     else
-      if s1.size < 5
-        terminal_failures.pop
-      end
-      r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
+      terminal_parse_failure('"[0-9]{1,5}"')
+      r1 = nil
     end
     s0 << r1
     if r1
-      i3 = index
-      r4 = lambda { |e| sp_label(e[0]) }.call(s0)
-      if !r4
+      i2 = index
+      r3 = lambda { |e| sp_label(e[0]) }.call(s0)
+      if !r3
         terminal_parse_failure("<semantic predicate>")
       end
-      if r4
-        @index = i3
-        r3 = instantiate_node(SyntaxNode,input, index...index)
+      if r3
+        @index = i2
+        r2 = instantiate_node(SyntaxNode,input, index...index)
       else
-        @index = i3
-        r3 = nil
+        @index = i2
+        r2 = nil
       end
-      s0 << r3
+      s0 << r2
     end
     if s0.last
       r0 = instantiate_node(Label,input, i0...index, s0)
@@ -31299,26 +31277,12 @@ module Fortran
       r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
-      s4, i4 = [], index
-      loop do
-        r5 = _nt_t_digit
-        if r5
-          s4 << r5
-        else
-          break
-        end
-        if s4.size == 5
-          break
-        end
-      end
-      if s4.size < 1
-        @index = i4
-        r4 = nil
+      if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A[0-9]{1,5}")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+        r4 = instantiate_node(Stop_Code_Numeric,input, index...(index + match_len))
+        @index += match_len
       else
-        if s4.size < 5
-          terminal_failures.pop
-        end
-        r4 = instantiate_node(Stop_Code_Numeric,input, i4...index, s4)
+        terminal_parse_failure('"[0-9]{1,5}"')
+        r4 = nil
       end
       if r4
         r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
@@ -32900,30 +32864,6 @@ module Fortran
     end
 
     node_cache[:t_delim][start_index] = r0
-
-    r0
-  end
-
-  def _nt_t_digit
-    start_index = index
-    if node_cache[:t_digit].has_key?(index)
-      cached = node_cache[:t_digit][index]
-      if cached
-        node_cache[:t_digit][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    if has_terminal?(@regexps[gr = '\A[0-9]'] ||= Regexp.new(gr), :regexp, index)
-      r0 = instantiate_node(T,input, index...(index + 1))
-      @index += 1
-    else
-      terminal_parse_failure('[0-9]')
-      r0 = nil
-    end
-
-    node_cache[:t_digit][start_index] = r0
 
     r0
   end
