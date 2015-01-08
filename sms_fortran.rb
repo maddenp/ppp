@@ -2646,6 +2646,22 @@ module Fortran
 
   end
 
+  class Specification_Part < NT
+
+    def translate
+      if (vars=env[:vars])
+        env[:vars].each do |var|
+          varenv=env[var]
+          # Forbid 'parameter' atrribute on distributed arrays.
+          if varenv["decomp"] and varenv["parameter"]
+            fail "Distributed array '#{var}' may not have the 'parameter' attribute"
+          end
+        end
+      end
+    end
+
+  end
+
   class Stmt_Label < NT
 
     def errmsg_parallel(in_parallel_loop)

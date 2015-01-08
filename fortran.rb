@@ -482,8 +482,10 @@ module Fortran
   end
 
   def sp_type_declaration_stmt(type_spec,attr_spec_option,entity_decl_list)
+    vars=(env[:vars]||=Set.new)
     entity_decl_list.names.each do |name|
       var="#{name}"
+      vars.add(var)
       varenv=env[var]
       redef(var) unless varenv and varenv["subprogram"]=="function"
       if varenv
