@@ -607,13 +607,6 @@ module Fortran
     r0
   end
 
-  module OmpSentinel0
-    def t_bang
-      elements[0]
-    end
-
-  end
-
   def _nt_omp_sentinel
     start_index = index
     if node_cache[:omp_sentinel].has_key?(index)
@@ -625,24 +618,11 @@ module Fortran
       return cached
     end
 
-    i0, s0 = index, []
-    r1 = _nt_t_bang
-    s0 << r1
-    if r1
-      if (match_len = has_terminal?("$omp ", false, index))
-        r2 = instantiate_node(SyntaxNode,input, index...(index + match_len))
-        @index += match_len
-      else
-        terminal_parse_failure('"$omp "')
-        r2 = nil
-      end
-      s0 << r2
-    end
-    if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(OmpSentinel0)
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A![$]omp ")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
+      @index += match_len
     else
-      @index = i0
+      terminal_parse_failure('"![$]omp "')
       r0 = nil
     end
 
@@ -945,13 +925,6 @@ module Fortran
     r0
   end
 
-  module SmsComment0
-    def t_bang
-      elements[0]
-    end
-
-  end
-
   def _nt_sms_comment
     start_index = index
     if node_cache[:sms_comment].has_key?(index)
@@ -963,33 +936,11 @@ module Fortran
       return cached
     end
 
-    i0, s0 = index, []
-    r1 = _nt_t_bang
-    s0 << r1
-    if r1
-      s2, i2 = [], index
-      loop do
-        if has_terminal?(@regexps[gr = '\A[^\\n]'] ||= Regexp.new(gr), :regexp, index)
-          r3 = true
-          @index += 1
-        else
-          terminal_parse_failure('[^\\n]')
-          r3 = nil
-        end
-        if r3
-          s2 << r3
-        else
-          break
-        end
-      end
-      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
-      s0 << r2
-    end
-    if s0.last
-      r0 = instantiate_node(SMS_Comment,input, i0...index, s0)
-      r0.extend(SmsComment0)
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A![^\n]*")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(SMS_Comment,input, index...(index + match_len))
+      @index += match_len
     else
-      @index = i0
+      terminal_parse_failure('"![^\\n]*"')
       r0 = nil
     end
 
@@ -4188,13 +4139,6 @@ module Fortran
     r0
   end
 
-  module SmsSentinel0
-    def t_bang
-      elements[0]
-    end
-
-  end
-
   def _nt_sms_sentinel
     start_index = index
     if node_cache[:sms_sentinel].has_key?(index)
@@ -4206,24 +4150,11 @@ module Fortran
       return cached
     end
 
-    i0, s0 = index, []
-    r1 = _nt_t_bang
-    s0 << r1
-    if r1
-      if (match_len = has_terminal?("sms$", false, index))
-        r2 = instantiate_node(SyntaxNode,input, index...(index + match_len))
-        @index += match_len
-      else
-        terminal_parse_failure('"sms$"')
-        r2 = nil
-      end
-      s0 << r2
-    end
-    if s0.last
-      r0 = instantiate_node(T,input, i0...index, s0)
-      r0.extend(SmsSentinel0)
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A!sms[$]")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
+      @index += match_len
     else
-      @index = i0
+      terminal_parse_failure('"!sms[$]"')
       r0 = nil
     end
 

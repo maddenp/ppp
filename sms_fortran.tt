@@ -60,7 +60,7 @@ grammar Fortran
   end
 
   rule omp_sentinel
-    t_bang "$omp " <T>
+    "![$]omp "ir <T>
   end
 
   rule omp_t_do
@@ -88,7 +88,7 @@ grammar Fortran
   end
 
   rule sms_comment
-    t_bang [^\n]* <SMS_Comment>
+    "![^\n]*"ir <SMS_Comment>
   end
 
   rule sms_compare_var
@@ -264,7 +264,7 @@ grammar Fortran
   end
 
   rule sms_sentinel
-    t_bang "sms$" <T>
+    "!sms[$]"ir <T>
   end
 
   rule sms_serial
