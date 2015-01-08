@@ -21,6 +21,9 @@
 ### OPTIMIZATION
 
 - Can serial-region parse optimization be used elsewhere? Marshal::[load/dump]?
+  This optimization consists of reusing the already-parsed subtree, prepending
+  or appending statements for pre/post actions as needed, instead of making a
+  string from the subtree, tacking on pre/post text, and reparsing.
 
 ### PARSING
 
@@ -46,7 +49,9 @@
 
 ### REFACTORING
 
-- Implement register/exchange scheme.
+- Implement register/exchange scheme. (Update 2015-01-08: This may not be
+  needed once ongoing work on halo pack/unpack work is finished, as that
+  may already require creating independent exchange calls.)
 
 - In e.g. SMS_Exchange, rename maxrank -> ppp_max_rank and sms_maxvars ->
   ppp_max_exchange_vars, first renaming the ppp_* vars in the SMS library to
@@ -65,9 +70,7 @@
 - sms$halo_comp -> one-line directive bound to parallel do loop?
 
 - Consider which directives may nest in which others, and which may not. Factor
-  handling of these error conditions.
-
-+ Think about (and deal with) distributed parameter arrays. Maybe disallow them.
+  handling of these error conditions. Some of this is already in place.
 
 - Currently, if an object allocated inside a serial region is also modified in a
   (not necessarily the same) serial region, it becomes an l-value eligible for
