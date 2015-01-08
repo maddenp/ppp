@@ -352,6 +352,7 @@ module Fortran
         tag=sms_commtag
         varenv=varenv_get(var)
         dh=varenv["decomp"]
+        ifail "No decomp defined" unless dh
         dims=varenv["dims"]
         type=code_type(var,varenv,:array)
         gllbs=code_global_lower_bounds(varenv,var,dims)

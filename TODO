@@ -56,8 +56,6 @@
 
 ### TRANSLATION
 
-+ In SMS_Serial translate, what should halo[l|u] be when dh is nil?
-
 + Hardcoded '1's referring to s1, e1, etc. should be looked up from env. See
   translate() for SMS_Declare_Decomp, SMS_Unstructured_Grid, Array_Section,
   SMS_Create_Decomp. In SMS_Declare_Decomp translate, roll out as many e{n}/s{n}
