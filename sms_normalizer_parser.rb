@@ -88,7 +88,7 @@ module Normalizer
       r0 = instantiate_node(OMP,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("@[$]omp[^\'\"\n]*")
+      terminal_parse_failure('"@[$]omp[^\\\'\\"\\n]*"')
       r0 = nil
     end
 
@@ -112,7 +112,7 @@ module Normalizer
       r0 = instantiate_node(SMS,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("@sms[$][^\'\"\n]*")
+      terminal_parse_failure('"@sms[$][^\\\'\\"\\n]*"')
       r0 = nil
     end
 

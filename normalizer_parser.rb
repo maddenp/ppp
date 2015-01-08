@@ -76,7 +76,7 @@ module Normalizer
       r0 = instantiate_node(Comment,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("(![^\n]*\n)+")
+      terminal_parse_failure('"(![^\\n]*\\n)+"')
       r0 = nil
     end
 
@@ -100,7 +100,7 @@ module Normalizer
       r0 = instantiate_node(Directive,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("@[^\n]+\n")
+      terminal_parse_failure('"@[^\\n]+\\n"')
       r0 = nil
     end
 
@@ -124,7 +124,7 @@ module Normalizer
       r0 = instantiate_node(Quoted,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("((\"[^\"]*\")|(\'[^\']*\'))+")
+      terminal_parse_failure('"((\\"[^\\"]*\\")|(\\\'[^\\\']*\\\'))+"')
       r0 = nil
     end
 
@@ -148,7 +148,7 @@ module Normalizer
       r0 = instantiate_node(Unquoted,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("[^\'\"!@]+")
+      terminal_parse_failure('"[^\\\'\\"!@]+"')
       r0 = nil
     end
 

@@ -204,6 +204,7 @@ module Fortran
         i4 = index
         r5 = _nt_t_equal
         if r5
+          @index = i4
           r4 = nil
         else
           @index = i4
@@ -523,10 +524,14 @@ module Fortran
           if r6
             i7 = index
             r8 = lambda { |e| sp_access_stmt(e[1],e[2]) }.call(s0)
+            if !r8
+              terminal_parse_failure("<semantic predicate>")
+            end
             if r8
               @index = i7
               r7 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i7
               r7 = nil
             end
             s0 << r7
@@ -826,9 +831,15 @@ module Fortran
     if r1
       i2 = index
       r3 = lambda { |e| sp_dolabel_repeat? }.call(s0)
+      if !r3
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure("<semantic predicate>", true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -1147,7 +1158,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".and.")
+      terminal_parse_failure('".and."')
       r0 = nil
     end
 
@@ -1214,10 +1225,14 @@ module Fortran
             if r7
               i8 = index
               r9 = lambda { |e| sp_allocatable_stmt(e[3]) }.call(s0)
+              if !r9
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r9
                 @index = i8
                 r8 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i8
                 r8 = nil
               end
               s0 << r8
@@ -1318,8 +1333,11 @@ module Fortran
       r3 = nil
     end
     if r3
+      @index = i2
       r2 = nil
+      terminal_parse_failure("<a sequence>", true)
     else
+      terminal_failures.pop
       @index = i2
       r2 = instantiate_node(SyntaxNode,input, index...index)
     end
@@ -1356,8 +1374,11 @@ module Fortran
         r9 = nil
       end
       if r9
+        @index = i8
         r8 = nil
+        terminal_parse_failure("<a sequence>", true)
       else
+        terminal_failures.pop
         @index = i8
         r8 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -2008,10 +2029,14 @@ module Fortran
       if r2
         i3 = index
         r4 = lambda { |e| sp_alt_return_spec(e[1]) }.call(s0)
+        if !r4
+          terminal_parse_failure("<semantic predicate>")
+        end
         if r4
           @index = i3
           r3 = instantiate_node(SyntaxNode,input, index...index)
         else
+          @index = i3
           r3 = nil
         end
         s0 << r3
@@ -2129,10 +2154,14 @@ module Fortran
                         if r12
                           i13 = index
                           r14 = lambda { |e| sp_arithmetic_if_stmt(e[5],e[7],e[9]) }.call(s0)
+                          if !r14
+                            terminal_parse_failure("<semantic predicate>")
+                          end
                           if r14
                             @index = i13
                             r13 = instantiate_node(SyntaxNode,input, index...index)
                           else
+                            @index = i13
                             r13 = nil
                           end
                           s0 << r13
@@ -2269,7 +2298,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -2587,10 +2616,14 @@ module Fortran
     if r1
       i2 = index
       r3 = lambda { |e| sp_is_array?(e[0]) }.call(s0)
+      if !r3
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r3
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i2
         r2 = nil
       end
       s0 << r2
@@ -2665,7 +2698,7 @@ module Fortran
         r3 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r3 = nil
       end
       s1 << r3
@@ -2689,7 +2722,7 @@ module Fortran
           r6 = true
           @index += match_len
         else
-          terminal_parse_failure("")
+          terminal_parse_failure('""')
           r6 = nil
         end
         s4 << r6
@@ -2713,7 +2746,7 @@ module Fortran
             r9 = true
             @index += match_len
           else
-            terminal_parse_failure("")
+            terminal_parse_failure('""')
             r9 = nil
           end
           s7 << r9
@@ -2737,7 +2770,7 @@ module Fortran
               r12 = true
               @index += match_len
             else
-              terminal_parse_failure("")
+              terminal_parse_failure('""')
               r12 = nil
             end
             s10 << r12
@@ -2789,10 +2822,14 @@ module Fortran
     if r1
       i2 = index
       r3 = lambda { |e| sp_is_array?(e[0]) }.call(s0)
+      if !r3
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r3
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i2
         r2 = nil
       end
       s0 << r2
@@ -2874,10 +2911,14 @@ module Fortran
               if r7
                 i8 = index
                 r9 = lambda { |e| sp_assign_stmt(e[2],e[4]) }.call(s0)
+                if !r9
+                  terminal_parse_failure("<semantic predicate>")
+                end
                 if r9
                   @index = i8
                   r8 = instantiate_node(SyntaxNode,input, index...index)
                 else
+                  @index = i8
                   r8 = nil
                 end
                 s0 << r8
@@ -2966,10 +3007,14 @@ module Fortran
               if r9
                 i10 = index
                 r11 = lambda { |e| sp_assigned_goto_stmt(e[2]) }.call(s0)
+                if !r11
+                  terminal_parse_failure("<semantic predicate>")
+                end
                 if r11
                   @index = i10
                   r10 = instantiate_node(SyntaxNode,input, index...index)
                 else
+                  @index = i10
                   r10 = nil
                 end
                 s0 << r10
@@ -3426,7 +3471,7 @@ module Fortran
         r3 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r3 = nil
       end
       s1 << r3
@@ -3455,7 +3500,7 @@ module Fortran
             r7 = true
             @index += match_len
           else
-            terminal_parse_failure("")
+            terminal_parse_failure('""')
             r7 = nil
           end
           s5 << r7
@@ -3546,7 +3591,7 @@ module Fortran
                         r23 = true
                         @index += match_len
                       else
-                        terminal_parse_failure("")
+                        terminal_parse_failure('""')
                         r23 = nil
                       end
                       s21 << r23
@@ -3575,7 +3620,7 @@ module Fortran
                             r27 = true
                             @index += match_len
                           else
-                            terminal_parse_failure("")
+                            terminal_parse_failure('""')
                             r27 = nil
                           end
                           s25 << r27
@@ -3964,13 +4009,14 @@ module Fortran
       r3 = true
       @index += match_len
     else
-      terminal_parse_failure("b")
+      terminal_parse_failure('"b"')
       r3 = nil
     end
     if r3
       @index = i2
       r2 = instantiate_node(SyntaxNode,input, index...index)
     else
+      @index = i2
       r2 = nil
     end
     s1 << r2
@@ -4021,13 +4067,14 @@ module Fortran
         r11 = true
         @index += match_len
       else
-        terminal_parse_failure("b")
+        terminal_parse_failure('"b"')
         r11 = nil
       end
       if r11
         @index = i10
         r10 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i10
         r10 = nil
       end
       s9 << r10
@@ -4098,7 +4145,7 @@ module Fortran
       r1 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("bn")
+      terminal_parse_failure('"bn"')
       r1 = nil
     end
     if r1
@@ -4109,7 +4156,7 @@ module Fortran
         r2 = instantiate_node(T,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("bz")
+        terminal_parse_failure('"bz"')
         r2 = nil
       end
       if r2
@@ -4183,10 +4230,14 @@ module Fortran
         if r4
           i5 = index
           r6 = lambda { |e| sp_block_data }.call(s0)
+          if !r6
+            terminal_parse_failure("<semantic predicate>")
+          end
           if r6
             @index = i5
             r5 = instantiate_node(SyntaxNode,input, index...index)
           else
+            @index = i5
             r5 = nil
           end
           s0 << r5
@@ -4232,7 +4283,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -4308,10 +4359,14 @@ module Fortran
             if r7
               i8 = index
               r9 = lambda { |e| sp_block_data_stmt }.call(s0)
+              if !r9
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r9
                 @index = i8
                 r8 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i8
                 r8 = nil
               end
               s0 << r8
@@ -4364,9 +4419,15 @@ module Fortran
     if r1
       i2 = index
       r3 = lambda { |e| sp_dolabel_repeat? }.call(s0)
+      if !r3
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure("<semantic predicate>", true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -4577,7 +4638,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -5398,6 +5459,7 @@ module Fortran
         i4 = index
         r5 = _nt_t_quotemark
         if r5
+          @index = i4
           r4 = nil
         else
           @index = i4
@@ -5519,6 +5581,7 @@ module Fortran
         i4 = index
         r5 = _nt_t_apostrophe
         if r5
+          @index = i4
           r4 = nil
         else
           @index = i4
@@ -6236,7 +6299,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -7354,7 +7417,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -7482,7 +7545,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("//")
+      terminal_parse_failure('"//"')
       r0 = nil
     end
 
@@ -8291,13 +8354,14 @@ module Fortran
                   r13 = true
                   @index += match_len
                 else
-                  terminal_parse_failure("p")
+                  terminal_parse_failure('"p"')
                   r13 = nil
                 end
                 if r13
                   @index = i12
                   r12 = instantiate_node(SyntaxNode,input, index...index)
                 else
+                  @index = i12
                   r12 = nil
                 end
                 s9 << r12
@@ -8565,13 +8629,14 @@ module Fortran
             r20 = true
             @index += match_len
           else
-            terminal_parse_failure("l")
+            terminal_parse_failure('"l"')
             r20 = nil
           end
           if r20
             @index = i19
             r19 = instantiate_node(SyntaxNode,input, index...index)
           else
+            @index = i19
             r19 = nil
           end
           s18 << r19
@@ -8600,13 +8665,14 @@ module Fortran
               r25 = true
               @index += match_len
             else
-              terminal_parse_failure("a")
+              terminal_parse_failure('"a"')
               r25 = nil
             end
             if r25
               @index = i24
               r24 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i24
               r24 = nil
             end
             s23 << r24
@@ -8663,7 +8729,7 @@ module Fortran
       r1 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("i")
+      terminal_parse_failure('"i"')
       r1 = nil
     end
     if r1
@@ -8674,7 +8740,7 @@ module Fortran
         r2 = instantiate_node(T,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("b")
+        terminal_parse_failure('"b"')
         r2 = nil
       end
       if r2
@@ -8685,7 +8751,7 @@ module Fortran
           r3 = instantiate_node(T,input, index...(index + match_len))
           @index += match_len
         else
-          terminal_parse_failure("o")
+          terminal_parse_failure('"o"')
           r3 = nil
         end
         if r3
@@ -8696,7 +8762,7 @@ module Fortran
             r4 = instantiate_node(T,input, index...(index + match_len))
             @index += match_len
           else
-            terminal_parse_failure("z")
+            terminal_parse_failure('"z"')
             r4 = nil
           end
           if r4
@@ -8772,7 +8838,7 @@ module Fortran
       r1 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("f")
+      terminal_parse_failure('"f"')
       r1 = nil
     end
     if r1
@@ -8783,7 +8849,7 @@ module Fortran
         r2 = instantiate_node(T,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("d")
+        terminal_parse_failure('"d"')
         r2 = nil
       end
       if r2
@@ -8816,7 +8882,7 @@ module Fortran
       r1 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("en")
+      terminal_parse_failure('"en"')
       r1 = nil
     end
     if r1
@@ -8827,7 +8893,7 @@ module Fortran
         r2 = instantiate_node(T,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("es")
+        terminal_parse_failure('"es"')
         r2 = nil
       end
       if r2
@@ -8838,7 +8904,7 @@ module Fortran
           r3 = instantiate_node(T,input, index...(index + match_len))
           @index += match_len
         else
-          terminal_parse_failure("e")
+          terminal_parse_failure('"e"')
           r3 = nil
         end
         if r3
@@ -8849,7 +8915,7 @@ module Fortran
             r4 = instantiate_node(T,input, index...(index + match_len))
             @index += match_len
           else
-            terminal_parse_failure("g")
+            terminal_parse_failure('"g"')
             r4 = nil
           end
           if r4
@@ -8895,13 +8961,14 @@ module Fortran
       r2 = true
       @index += match_len
     else
-      terminal_parse_failure("e")
+      terminal_parse_failure('"e"')
       r2 = nil
     end
     if r2
       @index = i1
       r1 = instantiate_node(SyntaxNode,input, index...index)
     else
+      @index = i1
       r1 = nil
     end
     s0 << r1
@@ -8959,6 +9026,7 @@ module Fortran
       i3 = index
       r4 = _nt_t_equal
       if r4
+        @index = i3
         r3 = nil
       else
         @index = i3
@@ -8984,6 +9052,7 @@ module Fortran
         i7 = index
         r8 = _nt_t_equal
         if r8
+          @index = i7
           r7 = nil
         else
           @index = i7
@@ -10141,9 +10210,15 @@ module Fortran
                   if r9
                     i10 = index
                     r11 = lambda { |e| sp_is_array?(e[0]) }.call(s8)
+                    if !r11
+                      terminal_parse_failure("<semantic predicate>")
+                    end
                     if r11
+                      @index = i10
                       r10 = nil
+                      terminal_parse_failure("<semantic predicate>", true)
                     else
+                      terminal_failures.pop
                       @index = i10
                       r10 = instantiate_node(SyntaxNode,input, index...index)
                     end
@@ -10233,10 +10308,14 @@ module Fortran
     if r1
       i2 = index
       r3 = lambda { |e| sp_default_char_variable?(e[0]) }.call(s0)
+      if !r3
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r3
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i2
         r2 = nil
       end
       s0 << r2
@@ -10334,7 +10413,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -10582,8 +10661,11 @@ module Fortran
       end
     end
     if r2
+      @index = i1
       r1 = nil
+      terminal_parse_failure("(any alternative)", true)
     else
+      terminal_failures.pop
       @index = i1
       r1 = instantiate_node(SyntaxNode,input, index...index)
     end
@@ -10662,10 +10744,14 @@ module Fortran
           if r4
             i5 = index
             r6 = lambda { |e| sp_derived_type_def(e[0]) }.call(s0)
+            if !r6
+              terminal_parse_failure("<semantic predicate>")
+            end
             if r6
               @index = i5
               r5 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i5
               r5 = nil
             end
             s0 << r5
@@ -10930,10 +11016,14 @@ module Fortran
             if r7
               i8 = index
               r9 = lambda { |e| sp_dimension_stmt(e[3]) }.call(s0)
+              if !r9
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r9
                 @index = i8
                 r8 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i8
                 r8 = nil
               end
               s0 << r8
@@ -11058,7 +11148,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -11108,10 +11198,14 @@ module Fortran
     if r2
       i3 = index
       r4 = lambda { |e| sp_dolabel_pop }.call(s1)
+      if !r4
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r4
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i3
         r3 = nil
       end
       s1 << r3
@@ -11133,10 +11227,14 @@ module Fortran
       if r6
         i7 = index
         r8 = lambda { |e| sp_dolabel_pop }.call(s5)
+        if !r8
+          terminal_parse_failure("<semantic predicate>")
+        end
         if r8
           @index = i7
           r7 = instantiate_node(SyntaxNode,input, index...index)
         else
+          @index = i7
           r7 = nil
         end
         s5 << r7
@@ -11188,7 +11286,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -11301,6 +11399,7 @@ module Fortran
     i1 = index
     r2 = _nt_do_term_action_stmt_disallowed
     if r2
+      @index = i1
       r1 = nil
     else
       @index = i1
@@ -11313,10 +11412,14 @@ module Fortran
       if r3
         i4 = index
         r5 = lambda { |e| sp_nonblock_do_end?(e[1]) }.call(s0)
+        if !r5
+          terminal_parse_failure("<semantic predicate>")
+        end
         if r5
           @index = i4
           r4 = instantiate_node(SyntaxNode,input, index...index)
         else
+          @index = i4
           r4 = nil
         end
         s0 << r4
@@ -11443,6 +11546,7 @@ module Fortran
     i1 = index
     r2 = _nt_do_term_shared_stmt_disallowed
     if r2
+      @index = i1
       r1 = nil
     else
       @index = i1
@@ -11455,10 +11559,14 @@ module Fortran
       if r3
         i4 = index
         r5 = lambda { |e| sp_nonblock_do_end?(e[1]) }.call(s0)
+        if !r5
+          terminal_parse_failure("<semantic predicate>")
+        end
         if r5
           @index = i4
           r4 = instantiate_node(SyntaxNode,input, index...index)
         else
+          @index = i4
           r4 = nil
         end
         s0 << r4
@@ -11583,7 +11691,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -11838,7 +11946,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -12130,6 +12238,7 @@ module Fortran
           i7 = index
           r8 = _nt_t_paren_l
           if r8
+            @index = i7
             r7 = nil
           else
             @index = i7
@@ -12146,8 +12255,11 @@ module Fortran
         r4 = nil
       end
       if r4
+        @index = i3
         r3 = nil
+        terminal_parse_failure("<a sequence>", true)
       else
+        terminal_failures.pop
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -13003,6 +13115,7 @@ module Fortran
         i4 = index
         r5 = _nt_end_program_stmt_disallowed
         if r5
+          @index = i4
           r4 = nil
         else
           @index = i4
@@ -13835,7 +13948,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -13949,7 +14062,7 @@ module Fortran
       r1 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".eqv.")
+      terminal_parse_failure('".eqv."')
       r1 = nil
     end
     if r1
@@ -13960,7 +14073,7 @@ module Fortran
         r2 = instantiate_node(T,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure(".neqv.")
+        terminal_parse_failure('".neqv."')
         r2 = nil
       end
       if r2
@@ -14393,7 +14506,7 @@ module Fortran
             r5 = true
             @index += match_len
           else
-            terminal_parse_failure("")
+            terminal_parse_failure('""')
             r5 = nil
           end
           s3 << r5
@@ -14460,6 +14573,7 @@ module Fortran
     i1 = index
     r2 = _nt_execution_part_disallowed
     if r2
+      @index = i1
       r1 = nil
     else
       @index = i1
@@ -14472,9 +14586,15 @@ module Fortran
       if r3
         i4 = index
         r5 = lambda { |e| sp_nonblock_do_end?(e[1]) }.call(s0)
+        if !r5
+          terminal_parse_failure("<semantic predicate>")
+        end
         if r5
+          @index = i4
           r4 = nil
+          terminal_parse_failure("<semantic predicate>", true)
         else
+          terminal_failures.pop
           @index = i4
           r4 = instantiate_node(SyntaxNode,input, index...index)
         end
@@ -15095,7 +15215,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -15295,10 +15415,14 @@ module Fortran
     if r2
       i3 = index
       r4 = lambda { |e| sp_env_pullup(e[0]) }.call(s1)
+      if !r4
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r4
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i3
         r3 = nil
       end
       s1 << r3
@@ -15320,10 +15444,14 @@ module Fortran
       if r6
         i7 = index
         r8 = lambda { |e| sp_env_pullup(e[0]) }.call(s5)
+        if !r8
+          terminal_parse_failure("<semantic predicate>")
+        end
         if r8
           @index = i7
           r7 = instantiate_node(SyntaxNode,input, index...index)
         else
+          @index = i7
           r7 = nil
         end
         s5 << r7
@@ -15726,10 +15854,14 @@ module Fortran
     if r1
       i2 = index
       r3 = lambda { |e| sp_is_function_name?(e[0]) }.call(s0)
+      if !r3
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r3
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i2
         r2 = nil
       end
       s0 << r2
@@ -15969,10 +16101,14 @@ module Fortran
                     if r13
                       i14 = index
                       r15 = lambda { |e| sp_function_stmt(e[3],e[5],e[7]) }.call(s0)
+                      if !r15
+                        terminal_parse_failure("<semantic predicate>")
+                      end
                       if r15
                         @index = i14
                         r14 = instantiate_node(SyntaxNode,input, index...index)
                       else
+                        @index = i14
                         r14 = nil
                       end
                       s0 << r14
@@ -16053,10 +16189,14 @@ module Fortran
             if r8
               i9 = index
               r10 = lambda { |e| sp_function_subprogram(e[0]) }.call(s0)
+              if !r10
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r10
                 @index = i9
                 r9 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i9
                 r9 = nil
               end
               s0 << r9
@@ -16104,7 +16244,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -16350,10 +16490,14 @@ module Fortran
           if r5
             i6 = index
             r7 = lambda { |e| sp_goto_stmt(e[2]) }.call(s0)
+            if !r7
+              terminal_parse_failure("<semantic predicate>")
+            end
             if r7
               @index = i6
               r6 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i6
               r6 = nil
             end
             s0 << r6
@@ -16534,13 +16678,14 @@ module Fortran
       r3 = true
       @index += match_len
     else
-      terminal_parse_failure("z")
+      terminal_parse_failure('"z"')
       r3 = nil
     end
     if r3
       @index = i2
       r2 = instantiate_node(SyntaxNode,input, index...index)
     else
+      @index = i2
       r2 = nil
     end
     s1 << r2
@@ -16565,13 +16710,14 @@ module Fortran
         r7 = true
         @index += match_len
       else
-        terminal_parse_failure("x")
+        terminal_parse_failure('"x"')
         r7 = nil
       end
       if r7
         @index = i6
         r6 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i6
         r6 = nil
       end
       s5 << r6
@@ -16658,13 +16804,14 @@ module Fortran
         r3 = true
         @index += match_len
       else
-        terminal_parse_failure("h")
+        terminal_parse_failure('"h"')
         r3 = nil
       end
       if r3
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i2
         r2 = nil
       end
       s0 << r2
@@ -16674,10 +16821,14 @@ module Fortran
         if r4
           i5 = index
           r6 = lambda { |e| sp_hollerith_set_length(e[0]) }.call(s0)
+          if !r6
+            terminal_parse_failure("<semantic predicate>")
+          end
           if r6
             @index = i5
             r5 = instantiate_node(SyntaxNode,input, index...index)
           else
+            @index = i5
             r5 = nil
           end
           s0 << r5
@@ -16725,10 +16876,14 @@ module Fortran
     i0, s0 = index, []
     i1 = index
     r2 = lambda { |e| sp_hollerith_reset_count }.call(s0)
+    if !r2
+      terminal_parse_failure("<semantic predicate>")
+    end
     if r2
       @index = i1
       r1 = instantiate_node(SyntaxNode,input, index...index)
     else
+      @index = i1
       r1 = nil
     end
     s0 << r1
@@ -16741,10 +16896,14 @@ module Fortran
         if r5
           i6 = index
           r7 = lambda { |e| sp_hollerith_check_count }.call(s4)
+          if !r7
+            terminal_parse_failure("<semantic predicate>")
+          end
           if r7
             @index = i6
             r6 = instantiate_node(SyntaxNode,input, index...index)
           else
+            @index = i6
             r6 = nil
           end
           s4 << r6
@@ -16868,7 +17027,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -17275,7 +17434,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -17330,6 +17489,7 @@ module Fortran
         i4 = index
         r5 = _nt_t_comma
         if r5
+          @index = i4
           r4 = nil
         else
           @index = i4
@@ -17837,10 +17997,14 @@ module Fortran
     if r1
       i2 = index
       r3 = lambda { |e| sp_dolabel_repeat? }.call(s0)
+      if !r3
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r3
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i2
         r2 = nil
       end
       s0 << r2
@@ -18043,6 +18207,7 @@ module Fortran
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i3
         r3 = nil
       end
       s1 << r3
@@ -18610,8 +18775,11 @@ module Fortran
         r3 = nil
       end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure("<a sequence>", true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -18774,10 +18942,14 @@ module Fortran
                   if r10
                     i11 = index
                     r12 = lambda { |e| sp_intent_stmt(e[3],e[6]) }.call(s0)
+                    if !r12
+                      terminal_parse_failure("<semantic predicate>")
+                    end
                     if r12
                       @index = i11
                       r11 = instantiate_node(SyntaxNode,input, index...index)
                     else
+                      @index = i11
                       r11 = nil
                     end
                     s0 << r11
@@ -18937,10 +19109,14 @@ module Fortran
         if r5
           i6 = index
           r7 = lambda { |e| sp_interface_body }.call(s1)
+          if !r7
+            terminal_parse_failure("<semantic predicate>")
+          end
           if r7
             @index = i6
             r6 = instantiate_node(SyntaxNode,input, index...index)
           else
+            @index = i6
             r6 = nil
           end
           s1 << r6
@@ -18975,10 +19151,14 @@ module Fortran
           if r12
             i13 = index
             r14 = lambda { |e| sp_interface_body }.call(s8)
+            if !r14
+              terminal_parse_failure("<semantic predicate>")
+            end
             if r14
               @index = i13
               r13 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i13
               r13 = nil
             end
             s8 << r13
@@ -19160,10 +19340,14 @@ module Fortran
     if r2
       i3 = index
       r4 = lambda { |e| sp_env_pullup(e[0]) }.call(s1)
+      if !r4
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r4
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i3
         r3 = nil
       end
       s1 << r3
@@ -19185,10 +19369,14 @@ module Fortran
       if r6
         i7 = index
         r8 = lambda { |e| sp_env_pullup(e[0]) }.call(s5)
+        if !r8
+          terminal_parse_failure("<semantic predicate>")
+        end
         if r8
           @index = i7
           r7 = instantiate_node(SyntaxNode,input, index...index)
         else
+          @index = i7
           r7 = nil
         end
         s5 << r7
@@ -19328,7 +19516,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -19600,6 +19788,7 @@ module Fortran
           i5 = index
           r6 = _nt_t_equal
           if r6
+            @index = i5
             r5 = nil
           else
             @index = i5
@@ -19609,10 +19798,14 @@ module Fortran
           if r5
             i7 = index
             r8 = lambda { |e| sp_namelist_group_name?(e[2]) }.call(s1)
+            if !r8
+              terminal_parse_failure("<semantic predicate>")
+            end
             if r8
               @index = i7
               r7 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i7
               r7 = nil
             end
             s1 << r7
@@ -19644,6 +19837,7 @@ module Fortran
             i13 = index
             r14 = _nt_t_equal
             if r14
+              @index = i13
               r13 = nil
             else
               @index = i13
@@ -19773,7 +19967,7 @@ module Fortran
                                 r36 = true
                                 @index += match_len
                               else
-                                terminal_parse_failure("")
+                                terminal_parse_failure('""')
                                 r36 = nil
                               end
                               s34 << r36
@@ -20112,6 +20306,7 @@ module Fortran
       i3 = index
       r4 = _nt_t_equal
       if r4
+        @index = i3
         r3 = nil
       else
         @index = i3
@@ -20137,6 +20332,7 @@ module Fortran
         i7 = index
         r8 = _nt_t_equal
         if r8
+          @index = i7
           r7 = nil
         else
           @index = i7
@@ -20536,10 +20732,14 @@ module Fortran
         if r3
           i4 = index
           r5 = lambda { |e| sp_io_spec_end(e[2]) }.call(s0)
+          if !r5
+            terminal_parse_failure("<semantic predicate>")
+          end
           if r5
             @index = i4
             r4 = instantiate_node(SyntaxNode,input, index...index)
           else
+            @index = i4
             r4 = nil
           end
           s0 << r4
@@ -20597,10 +20797,14 @@ module Fortran
         if r3
           i4 = index
           r5 = lambda { |e| sp_io_spec_eor(e[2]) }.call(s0)
+          if !r5
+            terminal_parse_failure("<semantic predicate>")
+          end
           if r5
             @index = i4
             r4 = instantiate_node(SyntaxNode,input, index...index)
           else
+            @index = i4
             r4 = nil
           end
           s0 << r4
@@ -20658,10 +20862,14 @@ module Fortran
         if r3
           i4 = index
           r5 = lambda { |e| sp_io_spec_err(e[2]) }.call(s0)
+          if !r5
+            terminal_parse_failure("<semantic predicate>")
+          end
           if r5
             @index = i4
             r4 = instantiate_node(SyntaxNode,input, index...index)
           else
+            @index = i4
             r4 = nil
           end
           s0 << r4
@@ -21700,7 +21908,7 @@ module Fortran
           r4 = true
           @index += match_len
         else
-          terminal_parse_failure("")
+          terminal_parse_failure('""')
           r4 = nil
         end
         s2 << r4
@@ -21724,7 +21932,7 @@ module Fortran
             r7 = true
             @index += match_len
           else
-            terminal_parse_failure("")
+            terminal_parse_failure('""')
             r7 = nil
           end
           s5 << r7
@@ -22036,16 +22244,23 @@ module Fortran
       @index = i1
       r1 = nil
     else
+      if s1.size < 5
+        terminal_failures.pop
+      end
       r1 = instantiate_node(SyntaxNode,input, i1...index, s1)
     end
     s0 << r1
     if r1
       i3 = index
       r4 = lambda { |e| sp_label(e[0]) }.call(s0)
+      if !r4
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r4
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i3
         r3 = nil
       end
       s0 << r3
@@ -22089,7 +22304,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -22133,7 +22348,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -22217,10 +22432,14 @@ module Fortran
               if r9
                 i10 = index
                 r11 = lambda { |e| sp_dolabel_push(e[3]) }.call(s0)
+                if !r11
+                  terminal_parse_failure("<semantic predicate>")
+                end
                 if r11
                   @index = i10
                   r10 = instantiate_node(SyntaxNode,input, index...index)
                 else
+                  @index = i10
                   r10 = nil
                 end
                 s0 << r10
@@ -22269,7 +22488,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -22323,10 +22542,14 @@ module Fortran
       if r2
         i4 = index
         r5 = lambda { |e| sp_label_list(e[0],e[1]) }.call(s0)
+        if !r5
+          terminal_parse_failure("<semantic predicate>")
+        end
         if r5
           @index = i4
           r4 = instantiate_node(SyntaxNode,input, index...index)
         else
+          @index = i4
           r4 = nil
         end
         s0 << r4
@@ -22412,7 +22635,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -22586,6 +22809,7 @@ module Fortran
           @index = i9
           r9 = instantiate_node(SyntaxNode,input, index...index)
         else
+          @index = i9
           r9 = nil
         end
         s7 << r9
@@ -23267,7 +23491,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -23759,10 +23983,14 @@ module Fortran
             if r9
               i10 = index
               r11 = lambda { |e| sp_main_program }.call(s0)
+              if !r11
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r11
                 @index = i10
                 r10 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i10
                 r10 = nil
               end
               s0 << r10
@@ -23849,10 +24077,14 @@ module Fortran
           if r6
             i7 = index
             r8 = lambda { |e| sp_module(e[0],e[2]) }.call(s0)
+            if !r8
+              terminal_parse_failure("<semantic predicate>")
+            end
             if r8
               @index = i7
               r7 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i7
               r7 = nil
             end
             s0 << r7
@@ -23899,7 +24131,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -24064,10 +24296,14 @@ module Fortran
           if r5
             i6 = index
             r7 = lambda { |e| sp_module_stmt }.call(s0)
+            if !r7
+              terminal_parse_failure("<semantic predicate>")
+            end
             if r7
               @index = i6
               r6 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i6
               r6 = nil
             end
             s0 << r6
@@ -24120,10 +24356,14 @@ module Fortran
     if r2
       i3 = index
       r4 = lambda { |e| sp_env_pullup(e[0]) }.call(s1)
+      if !r4
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r4
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i3
         r3 = nil
       end
       s1 << r3
@@ -24145,10 +24385,14 @@ module Fortran
       if r6
         i7 = index
         r8 = lambda { |e| sp_env_pullup(e[0]) }.call(s5)
+        if !r8
+          terminal_parse_failure("<semantic predicate>")
+        end
         if r8
           @index = i7
           r7 = instantiate_node(SyntaxNode,input, index...index)
         else
+          @index = i7
           r7 = nil
         end
         s5 << r7
@@ -24374,7 +24618,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -24555,7 +24799,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -24862,10 +25106,14 @@ module Fortran
             if r6
               i7 = index
               r8 = lambda { |e| sp_namelist_stmt(e[2],e[3]) }.call(s0)
+              if !r8
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r8
                 @index = i7
                 r7 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i7
                 r7 = nil
               end
               s0 << r7
@@ -24912,9 +25160,15 @@ module Fortran
     if r2
       i3 = index
       r4 = lambda { |e| sp_dolabel_repeat? }.call(s1)
+      if !r4
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r4
+        @index = i3
         r3 = nil
+        terminal_parse_failure("<semantic predicate>", true)
       else
+        terminal_failures.pop
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -25005,10 +25259,14 @@ module Fortran
             if r8
               i9 = index
               r10 = lambda { |e| sp_dolabel_push(:nolabel) }.call(s0)
+              if !r10
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r10
                 @index = i9
                 r9 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i9
                 r9 = nil
               end
               s0 << r9
@@ -25045,7 +25303,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".not.")
+      terminal_parse_failure('".not."')
       r0 = nil
     end
 
@@ -25225,7 +25483,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -25420,13 +25678,14 @@ module Fortran
       r3 = true
       @index += match_len
     else
-      terminal_parse_failure("o")
+      terminal_parse_failure('"o"')
       r3 = nil
     end
     if r3
       @index = i2
       r2 = instantiate_node(SyntaxNode,input, index...index)
     else
+      @index = i2
       r2 = nil
     end
     s1 << r2
@@ -25477,13 +25736,14 @@ module Fortran
         r11 = true
         @index += match_len
       else
-        terminal_parse_failure("o")
+        terminal_parse_failure('"o"')
         r11 = nil
       end
       if r11
         @index = i10
         r10 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i10
         r10 = nil
       end
       s9 << r10
@@ -25859,10 +26119,14 @@ module Fortran
             if r7
               i8 = index
               r9 = lambda { |e| sp_optional_stmt(e[3]) }.call(s0)
+              if !r9
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r9
                 @index = i8
                 r8 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i8
                 r8 = nil
               end
               s0 << r8
@@ -25899,7 +26163,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".or.")
+      terminal_parse_failure('".or."')
       r0 = nil
     end
 
@@ -26141,10 +26405,14 @@ module Fortran
               if r7
                 i8 = index
                 r9 = lambda { |e| sp_parameter_stmt(e[3]) }.call(s0)
+                if !r9
+                  terminal_parse_failure("<semantic predicate>")
+                end
                 if r9
                   @index = i8
                   r8 = instantiate_node(SyntaxNode,input, index...index)
                 else
+                  @index = i8
                   r8 = nil
                 end
                 s0 << r8
@@ -26581,7 +26849,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -26953,10 +27221,14 @@ module Fortran
             if r7
               i8 = index
               r9 = lambda { |e| sp_pointer_stmt(e[3]) }.call(s0)
+              if !r9
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r9
                 @index = i8
                 r8 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i8
                 r8 = nil
               end
               s0 << r8
@@ -27044,13 +27316,14 @@ module Fortran
       r3 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("tl")
+      terminal_parse_failure('"tl"')
       r3 = nil
     end
     if r3
       @index = i2
       r2 = instantiate_node(SyntaxNode,input, index...index)
     else
+      @index = i2
       r2 = nil
     end
     s1 << r2
@@ -27083,13 +27356,14 @@ module Fortran
         r9 = instantiate_node(SyntaxNode,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("tr")
+        terminal_parse_failure('"tr"')
         r9 = nil
       end
       if r9
         @index = i8
         r8 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i8
         r8 = nil
       end
       s7 << r8
@@ -27122,13 +27396,14 @@ module Fortran
           r15 = true
           @index += match_len
         else
-          terminal_parse_failure("t")
+          terminal_parse_failure('"t"')
           r15 = nil
         end
         if r15
           @index = i14
           r14 = instantiate_node(SyntaxNode,input, index...index)
         else
+          @index = i14
           r14 = nil
         end
         s13 << r14
@@ -27160,13 +27435,14 @@ module Fortran
               r21 = true
               @index += match_len
             else
-              terminal_parse_failure("x")
+              terminal_parse_failure('"x"')
               r21 = nil
             end
             if r21
               @index = i20
               r20 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i20
               r20 = nil
             end
             s18 << r20
@@ -27241,6 +27517,7 @@ module Fortran
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i3
         r3 = nil
       end
       s1 << r3
@@ -27403,7 +27680,7 @@ module Fortran
       r0 = instantiate_node(Power_Op,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("**")
+      terminal_parse_failure('"**"')
       r0 = nil
     end
 
@@ -27744,7 +28021,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -27876,7 +28153,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -27944,10 +28221,14 @@ module Fortran
           if r5
             i6 = index
             r7 = lambda { |e| sp_program_stmt }.call(s0)
+            if !r7
+              terminal_parse_failure("<semantic predicate>")
+            end
             if r7
               @index = i6
               r6 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i6
               r6 = nil
             end
             s0 << r6
@@ -28012,10 +28293,14 @@ module Fortran
       if r3
         i4 = index
         r5 = lambda { |e| sp_env_pullup(e[0]) }.call(s2)
+        if !r5
+          terminal_parse_failure("<semantic predicate>")
+        end
         if r5
           @index = i4
           r4 = instantiate_node(SyntaxNode,input, index...index)
         else
+          @index = i4
           r4 = nil
         end
         s2 << r4
@@ -28037,10 +28322,14 @@ module Fortran
         if r7
           i8 = index
           r9 = lambda { |e| sp_env_pullup(e[0]) }.call(s6)
+          if !r9
+            terminal_parse_failure("<semantic predicate>")
+          end
           if r9
             @index = i8
             r8 = instantiate_node(SyntaxNode,input, index...index)
           else
+            @index = i8
             r8 = nil
           end
           s6 << r8
@@ -28062,10 +28351,14 @@ module Fortran
           if r11
             i12 = index
             r13 = lambda { |e| sp_env_pullup(e[0]) }.call(s10)
+            if !r13
+              terminal_parse_failure("<semantic predicate>")
+            end
             if r13
               @index = i12
               r12 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i12
               r12 = nil
             end
             s10 << r12
@@ -28516,7 +28809,7 @@ module Fortran
       r1 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".eq.")
+      terminal_parse_failure('".eq."')
       r1 = nil
     end
     if r1
@@ -28527,7 +28820,7 @@ module Fortran
         r2 = instantiate_node(T,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("==")
+        terminal_parse_failure('"=="')
         r2 = nil
       end
       if r2
@@ -28560,7 +28853,7 @@ module Fortran
       r1 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".ge.")
+      terminal_parse_failure('".ge."')
       r1 = nil
     end
     if r1
@@ -28571,7 +28864,7 @@ module Fortran
         r2 = instantiate_node(T,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure(">=")
+        terminal_parse_failure('">="')
         r2 = nil
       end
       if r2
@@ -28604,7 +28897,7 @@ module Fortran
       r1 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".gt.")
+      terminal_parse_failure('".gt."')
       r1 = nil
     end
     if r1
@@ -28642,7 +28935,7 @@ module Fortran
       r1 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".le.")
+      terminal_parse_failure('".le."')
       r1 = nil
     end
     if r1
@@ -28653,7 +28946,7 @@ module Fortran
         r2 = instantiate_node(T,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("<=")
+        terminal_parse_failure('"<="')
         r2 = nil
       end
       if r2
@@ -28686,7 +28979,7 @@ module Fortran
       r1 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".lt.")
+      terminal_parse_failure('".lt."')
       r1 = nil
     end
     if r1
@@ -28724,7 +29017,7 @@ module Fortran
       r1 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".ne.")
+      terminal_parse_failure('".ne."')
       r1 = nil
     end
     if r1
@@ -28735,7 +29028,7 @@ module Fortran
         r2 = instantiate_node(T,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("/=")
+        terminal_parse_failure('"/="')
         r2 = nil
       end
       if r2
@@ -29050,7 +29343,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -29375,10 +29668,14 @@ module Fortran
           if r6
             i7 = index
             r8 = lambda { |e| sp_save_stmt(e[2]) }.call(s0)
+            if !r8
+              terminal_parse_failure("<semantic predicate>")
+            end
             if r8
               @index = i7
               r7 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i7
               r7 = nil
             end
             s0 << r7
@@ -29482,7 +29779,7 @@ module Fortran
         r3 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r3 = nil
       end
       s1 << r3
@@ -30046,7 +30343,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -30311,10 +30608,14 @@ module Fortran
     if r2
       i3 = index
       r4 = lambda { |e| sp_dolabel_pop }.call(s1)
+      if !r4
+        terminal_parse_failure("<semantic predicate>")
+      end
       if r4
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i3
         r3 = nil
       end
       s1 << r3
@@ -30336,10 +30637,14 @@ module Fortran
       if r6
         i7 = index
         r8 = lambda { |e| sp_dolabel_pop }.call(s5)
+        if !r8
+          terminal_parse_failure("<semantic predicate>")
+        end
         if r8
           @index = i7
           r7 = instantiate_node(SyntaxNode,input, index...index)
         else
+          @index = i7
           r7 = nil
         end
         s5 << r7
@@ -30413,7 +30718,7 @@ module Fortran
       r1 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("sp")
+      terminal_parse_failure('"sp"')
       r1 = nil
     end
     if r1
@@ -30424,7 +30729,7 @@ module Fortran
         r2 = instantiate_node(T,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("ss")
+        terminal_parse_failure('"ss"')
         r2 = nil
       end
       if r2
@@ -30435,7 +30740,7 @@ module Fortran
           r3 = instantiate_node(T,input, index...(index + match_len))
           @index += match_len
         else
-          terminal_parse_failure("s")
+          terminal_parse_failure('"s"')
           r3 = nil
         end
         if r3
@@ -30619,6 +30924,7 @@ module Fortran
       i3 = index
       r4 = _nt_significand_disallowed
       if r4
+        @index = i3
         r3 = nil
       else
         @index = i3
@@ -30791,10 +31097,14 @@ module Fortran
         if r4
           i5 = index
           r6 = lambda { |e| sp_specification_part }.call(s0)
+          if !r6
+            terminal_parse_failure("<semantic predicate>")
+          end
           if r6
             @index = i5
             r5 = instantiate_node(SyntaxNode,input, index...index)
           else
+            @index = i5
             r5 = nil
           end
           s0 << r5
@@ -31099,7 +31409,7 @@ module Fortran
         r3 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r3 = nil
       end
       s1 << r3
@@ -31131,6 +31441,9 @@ module Fortran
         @index = i4
         r4 = nil
       else
+        if s4.size < 5
+          terminal_failures.pop
+        end
         r4 = instantiate_node(Stop_Code_Numeric,input, i4...index, s4)
       end
       if r4
@@ -31236,7 +31549,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -31280,7 +31593,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -31343,10 +31656,14 @@ module Fortran
           if r4
             i5 = index
             r6 = lambda { |e| sp_structure_constructor(e[0]) }.call(s0)
+            if !r6
+              terminal_parse_failure("<semantic predicate>")
+            end
             if r6
               @index = i5
               r5 = instantiate_node(SyntaxNode,input, index...index)
             else
+              @index = i5
               r5 = nil
             end
             s0 << r5
@@ -31393,7 +31710,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -31547,10 +31864,14 @@ module Fortran
               if r9
                 i10 = index
                 r11 = lambda { |e| sp_subroutine_stmt(e[3],e[4]) }.call(s0)
+                if !r11
+                  terminal_parse_failure("<semantic predicate>")
+                end
                 if r11
                   @index = i10
                   r10 = instantiate_node(SyntaxNode,input, index...index)
                 else
+                  @index = i10
                   r10 = nil
                 end
                 s0 << r10
@@ -31628,10 +31949,14 @@ module Fortran
             if r8
               i9 = index
               r10 = lambda { |e| sp_subroutine_subprogram }.call(s0)
+              if !r10
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r10
                 @index = i9
                 r9 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i9
                 r9 = nil
               end
               s0 << r9
@@ -31679,7 +32004,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -32016,7 +32341,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("access")
+      terminal_parse_failure('"access"')
       r0 = nil
     end
 
@@ -32040,7 +32365,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("action")
+      terminal_parse_failure('"action"')
       r0 = nil
     end
 
@@ -32064,7 +32389,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("advance")
+      terminal_parse_failure('"advance"')
       r0 = nil
     end
 
@@ -32088,7 +32413,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("allocatable")
+      terminal_parse_failure('"allocatable"')
       r0 = nil
     end
 
@@ -32112,7 +32437,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("allocate")
+      terminal_parse_failure('"allocate"')
       r0 = nil
     end
 
@@ -32136,7 +32461,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("'")
+      terminal_parse_failure('"\'"')
       r0 = nil
     end
 
@@ -32164,7 +32489,7 @@ module Fortran
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("assign")
+      terminal_parse_failure('"assign"')
       r1 = nil
     end
     s0 << r1
@@ -32174,12 +32499,15 @@ module Fortran
         r3 = instantiate_node(SyntaxNode,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("ment")
+        terminal_parse_failure('"ment"')
         r3 = nil
       end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure('"ment"', true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -32213,7 +32541,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("assignment")
+      terminal_parse_failure('"assignment"')
       r0 = nil
     end
 
@@ -32237,7 +32565,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("backspace")
+      terminal_parse_failure('"backspace"')
       r0 = nil
     end
 
@@ -32261,7 +32589,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("!")
+      terminal_parse_failure('"!"')
       r0 = nil
     end
 
@@ -32309,7 +32637,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("blank")
+      terminal_parse_failure('"blank"')
       r0 = nil
     end
 
@@ -32333,7 +32661,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("block")
+      terminal_parse_failure('"block"')
       r0 = nil
     end
 
@@ -32357,7 +32685,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("call")
+      terminal_parse_failure('"call"')
       r0 = nil
     end
 
@@ -32381,7 +32709,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("case")
+      terminal_parse_failure('"case"')
       r0 = nil
     end
 
@@ -32405,7 +32733,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("character")
+      terminal_parse_failure('"character"')
       r0 = nil
     end
 
@@ -32429,7 +32757,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("close")
+      terminal_parse_failure('"close"')
       r0 = nil
     end
 
@@ -32453,7 +32781,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(":")
+      terminal_parse_failure('":"')
       r0 = nil
     end
 
@@ -32477,7 +32805,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(",")
+      terminal_parse_failure('","')
       r0 = nil
     end
 
@@ -32501,7 +32829,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("common")
+      terminal_parse_failure('"common"')
       r0 = nil
     end
 
@@ -32525,7 +32853,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("contains")
+      terminal_parse_failure('"contains"')
       r0 = nil
     end
 
@@ -32549,7 +32877,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("complex")
+      terminal_parse_failure('"complex"')
       r0 = nil
     end
 
@@ -32573,7 +32901,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("continue")
+      terminal_parse_failure('"continue"')
       r0 = nil
     end
 
@@ -32597,7 +32925,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("cycle")
+      terminal_parse_failure('"cycle"')
       r0 = nil
     end
 
@@ -32621,7 +32949,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("data")
+      terminal_parse_failure('"data"')
       r0 = nil
     end
 
@@ -32645,7 +32973,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("deallocate")
+      terminal_parse_failure('"deallocate"')
       r0 = nil
     end
 
@@ -32669,7 +32997,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("default")
+      terminal_parse_failure('"default"')
       r0 = nil
     end
 
@@ -32693,7 +33021,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("delim")
+      terminal_parse_failure('"delim"')
       r0 = nil
     end
 
@@ -32741,7 +33069,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("dimension")
+      terminal_parse_failure('"dimension"')
       r0 = nil
     end
 
@@ -32765,7 +33093,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("direct")
+      terminal_parse_failure('"direct"')
       r0 = nil
     end
 
@@ -32789,7 +33117,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("do")
+      terminal_parse_failure('"do"')
       r0 = nil
     end
 
@@ -32813,7 +33141,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".")
+      terminal_parse_failure('"."')
       r0 = nil
     end
 
@@ -32837,7 +33165,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("doubleprecision")
+      terminal_parse_failure('"doubleprecision"')
       r0 = nil
     end
 
@@ -32861,7 +33189,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("elemental")
+      terminal_parse_failure('"elemental"')
       r0 = nil
     end
 
@@ -32885,7 +33213,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("else")
+      terminal_parse_failure('"else"')
       r0 = nil
     end
 
@@ -32909,7 +33237,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("elseif")
+      terminal_parse_failure('"elseif"')
       r0 = nil
     end
 
@@ -32933,7 +33261,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("elsewhere")
+      terminal_parse_failure('"elsewhere"')
       r0 = nil
     end
 
@@ -32961,7 +33289,7 @@ module Fortran
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("end")
+      terminal_parse_failure('"end"')
       r1 = nil
     end
     s0 << r1
@@ -32969,6 +33297,7 @@ module Fortran
       i2 = index
       r3 = _nt_t_end_disallowed
       if r3
+        @index = i2
         r2 = nil
       else
         @index = i2
@@ -33011,7 +33340,7 @@ module Fortran
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("file")
+      terminal_parse_failure('"file"')
       r1 = nil
     end
     if r1
@@ -33022,7 +33351,7 @@ module Fortran
         r2 = instantiate_node(SyntaxNode,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("do")
+        terminal_parse_failure('"do"')
         r2 = nil
       end
       if r2
@@ -33033,7 +33362,7 @@ module Fortran
           r3 = instantiate_node(SyntaxNode,input, index...(index + match_len))
           @index += match_len
         else
-          terminal_parse_failure("if")
+          terminal_parse_failure('"if"')
           r3 = nil
         end
         if r3
@@ -33044,7 +33373,7 @@ module Fortran
             r4 = instantiate_node(SyntaxNode,input, index...(index + match_len))
             @index += match_len
           else
-            terminal_parse_failure("where")
+            terminal_parse_failure('"where"')
             r4 = nil
           end
           if r4
@@ -33106,7 +33435,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("enddo")
+      terminal_parse_failure('"enddo"')
       r0 = nil
     end
 
@@ -33130,7 +33459,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("endfile")
+      terminal_parse_failure('"endfile"')
       r0 = nil
     end
 
@@ -33154,7 +33483,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("endif")
+      terminal_parse_failure('"endif"')
       r0 = nil
     end
 
@@ -33178,7 +33507,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("endwhere")
+      terminal_parse_failure('"endwhere"')
       r0 = nil
     end
 
@@ -33202,7 +33531,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("entry")
+      terminal_parse_failure('"entry"')
       r0 = nil
     end
 
@@ -33226,7 +33555,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("eor")
+      terminal_parse_failure('"eor"')
       r0 = nil
     end
 
@@ -33250,7 +33579,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("=")
+      terminal_parse_failure('"="')
       r0 = nil
     end
 
@@ -33274,7 +33603,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("equivalence")
+      terminal_parse_failure('"equivalence"')
       r0 = nil
     end
 
@@ -33298,7 +33627,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("err")
+      terminal_parse_failure('"err"')
       r0 = nil
     end
 
@@ -33322,7 +33651,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("exist")
+      terminal_parse_failure('"exist"')
       r0 = nil
     end
 
@@ -33346,7 +33675,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("exit")
+      terminal_parse_failure('"exit"')
       r0 = nil
     end
 
@@ -33370,7 +33699,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("external")
+      terminal_parse_failure('"external"')
       r0 = nil
     end
 
@@ -33394,7 +33723,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".false.")
+      terminal_parse_failure('".false."')
       r0 = nil
     end
 
@@ -33418,7 +33747,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("file")
+      terminal_parse_failure('"file"')
       r0 = nil
     end
 
@@ -33442,7 +33771,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("fmt")
+      terminal_parse_failure('"fmt"')
       r0 = nil
     end
 
@@ -33470,7 +33799,7 @@ module Fortran
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("form")
+      terminal_parse_failure('"form"')
       r1 = nil
     end
     s0 << r1
@@ -33480,12 +33809,15 @@ module Fortran
         r3 = instantiate_node(SyntaxNode,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("at")
+        terminal_parse_failure('"at"')
         r3 = nil
       end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure('"at"', true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -33523,7 +33855,7 @@ module Fortran
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("format")
+      terminal_parse_failure('"format"')
       r1 = nil
     end
     s0 << r1
@@ -33533,12 +33865,15 @@ module Fortran
         r3 = instantiate_node(SyntaxNode,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("ted")
+        terminal_parse_failure('"ted"')
         r3 = nil
       end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure('"ted"', true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -33572,7 +33907,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("formatted")
+      terminal_parse_failure('"formatted"')
       r0 = nil
     end
 
@@ -33596,7 +33931,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("function")
+      terminal_parse_failure('"function"')
       r0 = nil
     end
 
@@ -33620,7 +33955,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("goto")
+      terminal_parse_failure('"goto"')
       r0 = nil
     end
 
@@ -33644,7 +33979,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(">")
+      terminal_parse_failure('">"')
       r0 = nil
     end
 
@@ -33668,7 +34003,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("if")
+      terminal_parse_failure('"if"')
       r0 = nil
     end
 
@@ -33692,7 +34027,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("implicit")
+      terminal_parse_failure('"implicit"')
       r0 = nil
     end
 
@@ -33720,7 +34055,7 @@ module Fortran
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("in")
+      terminal_parse_failure('"in"')
       r1 = nil
     end
     s0 << r1
@@ -33731,7 +34066,7 @@ module Fortran
         r4 = instantiate_node(SyntaxNode,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("out")
+        terminal_parse_failure('"out"')
         r4 = nil
       end
       if r4
@@ -33742,7 +34077,7 @@ module Fortran
           r5 = instantiate_node(SyntaxNode,input, index...(index + match_len))
           @index += match_len
         else
-          terminal_parse_failure("quire")
+          terminal_parse_failure('"quire"')
           r5 = nil
         end
         if r5
@@ -33753,7 +34088,7 @@ module Fortran
             r6 = instantiate_node(SyntaxNode,input, index...(index + match_len))
             @index += match_len
           else
-            terminal_parse_failure("teger")
+            terminal_parse_failure('"teger"')
             r6 = nil
           end
           if r6
@@ -33764,7 +34099,7 @@ module Fortran
               r7 = instantiate_node(SyntaxNode,input, index...(index + match_len))
               @index += match_len
             else
-              terminal_parse_failure("tent")
+              terminal_parse_failure('"tent"')
               r7 = nil
             end
             if r7
@@ -33775,7 +34110,7 @@ module Fortran
                 r8 = instantiate_node(SyntaxNode,input, index...(index + match_len))
                 @index += match_len
               else
-                terminal_parse_failure("trinsic")
+                terminal_parse_failure('"trinsic"')
                 r8 = nil
               end
               if r8
@@ -33790,8 +34125,11 @@ module Fortran
         end
       end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure("(any alternative)", true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -33825,7 +34163,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("inout")
+      terminal_parse_failure('"inout"')
       r0 = nil
     end
 
@@ -33849,7 +34187,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("inquire")
+      terminal_parse_failure('"inquire"')
       r0 = nil
     end
 
@@ -33873,7 +34211,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("integer")
+      terminal_parse_failure('"integer"')
       r0 = nil
     end
 
@@ -33897,7 +34235,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("intent")
+      terminal_parse_failure('"intent"')
       r0 = nil
     end
 
@@ -33921,7 +34259,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("interface")
+      terminal_parse_failure('"interface"')
       r0 = nil
     end
 
@@ -33945,7 +34283,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("intrinsic")
+      terminal_parse_failure('"intrinsic"')
       r0 = nil
     end
 
@@ -33973,7 +34311,7 @@ module Fortran
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("end")
+      terminal_parse_failure('"end"')
       r1 = nil
     end
     s0 << r1
@@ -33984,6 +34322,7 @@ module Fortran
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       else
+        @index = i2
         r2 = nil
       end
       s0 << r2
@@ -34016,7 +34355,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("iolength")
+      terminal_parse_failure('"iolength"')
       r0 = nil
     end
 
@@ -34040,7 +34379,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("iostat")
+      terminal_parse_failure('"iostat"')
       r0 = nil
     end
 
@@ -34064,7 +34403,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("kind")
+      terminal_parse_failure('"kind"')
       r0 = nil
     end
 
@@ -34088,7 +34427,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("len")
+      terminal_parse_failure('"len"')
       r0 = nil
     end
 
@@ -34136,7 +34475,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("logical")
+      terminal_parse_failure('"logical"')
       r0 = nil
     end
 
@@ -34160,7 +34499,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("<")
+      terminal_parse_failure('"<"')
       r0 = nil
     end
 
@@ -34184,7 +34523,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("-")
+      terminal_parse_failure('"-"')
       r0 = nil
     end
 
@@ -34208,7 +34547,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("module")
+      terminal_parse_failure('"module"')
       r0 = nil
     end
 
@@ -34236,7 +34575,7 @@ module Fortran
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("name")
+      terminal_parse_failure('"name"')
       r1 = nil
     end
     s0 << r1
@@ -34247,7 +34586,7 @@ module Fortran
         r4 = true
         @index += match_len
       else
-        terminal_parse_failure("d")
+        terminal_parse_failure('"d"')
         r4 = nil
       end
       if r4
@@ -34258,7 +34597,7 @@ module Fortran
           r5 = instantiate_node(SyntaxNode,input, index...(index + match_len))
           @index += match_len
         else
-          terminal_parse_failure("list")
+          terminal_parse_failure('"list"')
           r5 = nil
         end
         if r5
@@ -34270,8 +34609,11 @@ module Fortran
         end
       end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure("(any alternative)", true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -34305,7 +34647,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("named")
+      terminal_parse_failure('"named"')
       r0 = nil
     end
 
@@ -34329,7 +34671,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("namelist")
+      terminal_parse_failure('"namelist"')
       r0 = nil
     end
 
@@ -34353,7 +34695,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("\n")
+      terminal_parse_failure('"\\n"')
       r0 = nil
     end
 
@@ -34377,7 +34719,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("nextrec")
+      terminal_parse_failure('"nextrec"')
       r0 = nil
     end
 
@@ -34401,7 +34743,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("nml")
+      terminal_parse_failure('"nml"')
       r0 = nil
     end
 
@@ -34425,7 +34767,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("none")
+      terminal_parse_failure('"none"')
       r0 = nil
     end
 
@@ -34449,7 +34791,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("null")
+      terminal_parse_failure('"null"')
       r0 = nil
     end
 
@@ -34473,7 +34815,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("nullify")
+      terminal_parse_failure('"nullify"')
       r0 = nil
     end
 
@@ -34497,7 +34839,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("number")
+      terminal_parse_failure('"number"')
       r0 = nil
     end
 
@@ -34545,7 +34887,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("only")
+      terminal_parse_failure('"only"')
       r0 = nil
     end
 
@@ -34573,7 +34915,7 @@ module Fortran
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("open")
+      terminal_parse_failure('"open"')
       r1 = nil
     end
     s0 << r1
@@ -34583,12 +34925,15 @@ module Fortran
         r3 = instantiate_node(SyntaxNode,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("ed")
+        terminal_parse_failure('"ed"')
         r3 = nil
       end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure('"ed"', true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -34622,7 +34967,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("opened")
+      terminal_parse_failure('"opened"')
       r0 = nil
     end
 
@@ -34646,7 +34991,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("operator")
+      terminal_parse_failure('"operator"')
       r0 = nil
     end
 
@@ -34670,7 +35015,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("optional")
+      terminal_parse_failure('"optional"')
       r0 = nil
     end
 
@@ -34694,7 +35039,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("out")
+      terminal_parse_failure('"out"')
       r0 = nil
     end
 
@@ -34718,7 +35063,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("pad")
+      terminal_parse_failure('"pad"')
       r0 = nil
     end
 
@@ -34742,7 +35087,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("parameter")
+      terminal_parse_failure('"parameter"')
       r0 = nil
     end
 
@@ -34766,7 +35111,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("(")
+      terminal_parse_failure('"("')
       r0 = nil
     end
 
@@ -34790,7 +35135,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(")")
+      terminal_parse_failure('")"')
       r0 = nil
     end
 
@@ -34814,7 +35159,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("pause")
+      terminal_parse_failure('"pause"')
       r0 = nil
     end
 
@@ -34838,7 +35183,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("%")
+      terminal_parse_failure('"%"')
       r0 = nil
     end
 
@@ -34862,7 +35207,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("+")
+      terminal_parse_failure('"+"')
       r0 = nil
     end
 
@@ -34886,7 +35231,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("=>")
+      terminal_parse_failure('"=>"')
       r0 = nil
     end
 
@@ -34910,7 +35255,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("pointer")
+      terminal_parse_failure('"pointer"')
       r0 = nil
     end
 
@@ -34934,7 +35279,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("position")
+      terminal_parse_failure('"position"')
       r0 = nil
     end
 
@@ -34958,7 +35303,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("print")
+      terminal_parse_failure('"print"')
       r0 = nil
     end
 
@@ -34982,7 +35327,7 @@ module Fortran
       r0 = instantiate_node(Access_Spec,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("private")
+      terminal_parse_failure('"private"')
       r0 = nil
     end
 
@@ -35006,7 +35351,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("procedure")
+      terminal_parse_failure('"procedure"')
       r0 = nil
     end
 
@@ -35030,7 +35375,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("program")
+      terminal_parse_failure('"program"')
       r0 = nil
     end
 
@@ -35054,7 +35399,7 @@ module Fortran
       r0 = instantiate_node(Access_Spec,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("public")
+      terminal_parse_failure('"public"')
       r0 = nil
     end
 
@@ -35078,7 +35423,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("pure")
+      terminal_parse_failure('"pure"')
       r0 = nil
     end
 
@@ -35102,7 +35447,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("\"")
+      terminal_parse_failure('"\\""')
       r0 = nil
     end
 
@@ -35130,7 +35475,7 @@ module Fortran
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("read")
+      terminal_parse_failure('"read"')
       r1 = nil
     end
     s0 << r1
@@ -35140,12 +35485,15 @@ module Fortran
         r3 = instantiate_node(SyntaxNode,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("write")
+        terminal_parse_failure('"write"')
         r3 = nil
       end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure('"write"', true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -35179,7 +35527,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("readwrite")
+      terminal_parse_failure('"readwrite"')
       r0 = nil
     end
 
@@ -35203,7 +35551,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("real")
+      terminal_parse_failure('"real"')
       r0 = nil
     end
 
@@ -35231,7 +35579,7 @@ module Fortran
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("rec")
+      terminal_parse_failure('"rec"')
       r1 = nil
     end
     s0 << r1
@@ -35241,12 +35589,15 @@ module Fortran
         r3 = true
         @index += match_len
       else
-        terminal_parse_failure("l")
+        terminal_parse_failure('"l"')
         r3 = nil
       end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure('"l"', true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -35280,7 +35631,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("recl")
+      terminal_parse_failure('"recl"')
       r0 = nil
     end
 
@@ -35304,7 +35655,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("recursive")
+      terminal_parse_failure('"recursive"')
       r0 = nil
     end
 
@@ -35328,7 +35679,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("result")
+      terminal_parse_failure('"result"')
       r0 = nil
     end
 
@@ -35352,7 +35703,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("return")
+      terminal_parse_failure('"return"')
       r0 = nil
     end
 
@@ -35376,7 +35727,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("rewind")
+      terminal_parse_failure('"rewind"')
       r0 = nil
     end
 
@@ -35400,7 +35751,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("save")
+      terminal_parse_failure('"save"')
       r0 = nil
     end
 
@@ -35424,7 +35775,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("select")
+      terminal_parse_failure('"select"')
       r0 = nil
     end
 
@@ -35448,7 +35799,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("sequence")
+      terminal_parse_failure('"sequence"')
       r0 = nil
     end
 
@@ -35472,7 +35823,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("sequential")
+      terminal_parse_failure('"sequential"')
       r0 = nil
     end
 
@@ -35496,7 +35847,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("size")
+      terminal_parse_failure('"size"')
       r0 = nil
     end
 
@@ -35520,7 +35871,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("/")
+      terminal_parse_failure('"/"')
       r0 = nil
     end
 
@@ -35544,7 +35895,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("*")
+      terminal_parse_failure('"*"')
       r0 = nil
     end
 
@@ -35572,7 +35923,7 @@ module Fortran
       r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("stat")
+      terminal_parse_failure('"stat"')
       r1 = nil
     end
     s0 << r1
@@ -35582,12 +35933,15 @@ module Fortran
         r3 = instantiate_node(SyntaxNode,input, index...(index + match_len))
         @index += match_len
       else
-        terminal_parse_failure("us")
+        terminal_parse_failure('"us"')
         r3 = nil
       end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure('"us"', true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -35621,7 +35975,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("status")
+      terminal_parse_failure('"status"')
       r0 = nil
     end
 
@@ -35645,7 +35999,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("stop")
+      terminal_parse_failure('"stop"')
       r0 = nil
     end
 
@@ -35669,7 +36023,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("subroutine")
+      terminal_parse_failure('"subroutine"')
       r0 = nil
     end
 
@@ -35693,7 +36047,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("target")
+      terminal_parse_failure('"target"')
       r0 = nil
     end
 
@@ -35717,7 +36071,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("then")
+      terminal_parse_failure('"then"')
       r0 = nil
     end
 
@@ -35741,7 +36095,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("to")
+      terminal_parse_failure('"to"')
       r0 = nil
     end
 
@@ -35765,7 +36119,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure(".true.")
+      terminal_parse_failure('".true."')
       r0 = nil
     end
 
@@ -35789,7 +36143,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("type")
+      terminal_parse_failure('"type"')
       r0 = nil
     end
 
@@ -35813,7 +36167,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("_")
+      terminal_parse_failure('"_"')
       r0 = nil
     end
 
@@ -35837,7 +36191,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("unformatted")
+      terminal_parse_failure('"unformatted"')
       r0 = nil
     end
 
@@ -35861,7 +36215,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("unit")
+      terminal_parse_failure('"unit"')
       r0 = nil
     end
 
@@ -35885,7 +36239,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("use")
+      terminal_parse_failure('"use"')
       r0 = nil
     end
 
@@ -35909,7 +36263,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("where")
+      terminal_parse_failure('"where"')
       r0 = nil
     end
 
@@ -35933,7 +36287,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("while")
+      terminal_parse_failure('"while"')
       r0 = nil
     end
 
@@ -35957,7 +36311,7 @@ module Fortran
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("write")
+      terminal_parse_failure('"write"')
       r0 = nil
     end
 
@@ -36176,10 +36530,14 @@ module Fortran
             if r7
               i8 = index
               r9 = lambda { |e| sp_target_stmt(e[3]) }.call(s0)
+              if !r9
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r9
                 @index = i8
                 r8 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i8
                 r8 = nil
               end
               s0 << r8
@@ -36259,10 +36617,14 @@ module Fortran
             if r7
               i8 = index
               r9 = lambda { |e| sp_type_declaration_stmt(e[1],e[2],e[3]) }.call(s0)
+              if !r9
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r9
                 @index = i8
                 r8 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i8
                 r8 = nil
               end
               s0 << r8
@@ -36310,7 +36672,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -36666,7 +37028,7 @@ module Fortran
           r6 = true
           @index += match_len
         else
-          terminal_parse_failure("")
+          terminal_parse_failure('""')
           r6 = nil
         end
         s4 << r6
@@ -36708,7 +37070,7 @@ module Fortran
               r12 = true
               @index += match_len
             else
-              terminal_parse_failure("")
+              terminal_parse_failure('""')
               r12 = nil
             end
             s10 << r12
@@ -36732,7 +37094,7 @@ module Fortran
                 r15 = true
                 @index += match_len
               else
-                terminal_parse_failure("")
+                terminal_parse_failure('""')
                 r15 = nil
               end
               s13 << r15
@@ -36774,7 +37136,7 @@ module Fortran
                     r21 = true
                     @index += match_len
                   else
-                    terminal_parse_failure("")
+                    terminal_parse_failure('""')
                     r21 = nil
                   end
                   s19 << r21
@@ -36839,7 +37201,7 @@ module Fortran
                           r31 = true
                           @index += match_len
                         else
-                          terminal_parse_failure("")
+                          terminal_parse_failure('""')
                           r31 = nil
                         end
                         s29 << r31
@@ -36926,7 +37288,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -36970,7 +37332,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -37105,10 +37467,14 @@ module Fortran
             if r8
               i9 = index
               r10 = lambda { |e| sp_use_stmt(e[2],e[3]) }.call(s1)
+              if !r10
+                terminal_parse_failure("<semantic predicate>")
+              end
               if r10
                 @index = i9
                 r9 = instantiate_node(SyntaxNode,input, index...index)
               else
+                @index = i9
                 r9 = nil
               end
               s1 << r9
@@ -37165,10 +37531,14 @@ module Fortran
                     if r21
                       i22 = index
                       r23 = lambda { |e| sp_use_stmt(e[2],e[6]) }.call(s11)
+                      if !r23
+                        terminal_parse_failure("<semantic predicate>")
+                      end
                       if r23
                         @index = i22
                         r22 = instantiate_node(SyntaxNode,input, index...index)
                       else
+                        @index = i22
                         r22 = nil
                       end
                       s11 << r22
@@ -37247,8 +37617,11 @@ module Fortran
         r4 = nil
       end
       if r4
+        @index = i3
         r3 = nil
+        terminal_parse_failure('[\\(\\%]', true)
       else
+        terminal_failures.pop
         @index = i3
         r3 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -37278,8 +37651,11 @@ module Fortran
           r8 = nil
         end
         if r8
+          @index = i7
           r7 = nil
+          terminal_parse_failure('[\\(\\%]', true)
         else
+          terminal_failures.pop
           @index = i7
           r7 = instantiate_node(SyntaxNode,input, index...index)
         end
@@ -37304,7 +37680,7 @@ module Fortran
             r11 = true
             @index += match_len
           else
-            terminal_parse_failure("")
+            terminal_parse_failure('""')
             r11 = nil
           end
           s9 << r11
@@ -37358,12 +37734,15 @@ module Fortran
         r3 = true
         @index += match_len
       else
-        terminal_parse_failure("%")
+        terminal_parse_failure('"%"')
         r3 = nil
       end
       if r3
+        @index = i2
         r2 = nil
+        terminal_parse_failure('"%"', true)
       else
+        terminal_failures.pop
         @index = i2
         r2 = instantiate_node(SyntaxNode,input, index...index)
       end
@@ -37408,7 +37787,7 @@ module Fortran
         r2 = true
         @index += match_len
       else
-        terminal_parse_failure("")
+        terminal_parse_failure('""')
         r2 = nil
       end
       s0 << r2
@@ -37650,6 +38029,7 @@ module Fortran
               i7 = index
               r8 = _nt_label
               if r8
+                @index = i7
                 r7 = nil
               else
                 @index = i7
