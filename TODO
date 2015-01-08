@@ -56,11 +56,6 @@
 
 ### TRANSLATION
 
-+ Hardcoded '1's referring to s1, e1, etc. should be looked up from env. See
-  translate() for SMS_Declare_Decomp, SMS_Unstructured_Grid, Array_Section,
-  SMS_Create_Decomp. In SMS_Declare_Decomp translate, roll out as many e{n}/s{n}
-  arrays as needed for the decomposition.
-
 - Deal with structured grids.
 
 - Deal with derived types. Start e.g. with treating them in serial regions.
