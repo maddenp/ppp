@@ -1269,8 +1269,8 @@ grammar Fortran
     #
     # After normalization, line 3 reads "elseif_label". Without the negative
     # lookahead assertion, and due to the packrat nature of PEG parsers, the
-    # characters 'elseif' are irrevocably recognized using rule t_elseif, and
-    # a parse failure follows, as '_label' is then unexpected.
+    # characters "elseif" are irrevocably recognized using rule t_elseif, and
+    # a parse failure follows, as "_label" is then unexpected.
 
     label:stmt_label? !( t_else if_construct_name !t_paren_l ) t_elseif t_paren_l scalar_logical_expr t_paren_r t_then if_construct_name? t_newline <Else_If_Stmt>
   end
