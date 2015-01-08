@@ -20,8 +20,6 @@
 
 ### OPTIMIZATION
 
-+ Test/measure new case-insensitivity and regex capabilities in Treetop.
-
 + write_envfile is called by declare() whenever something is added to a module.
   This creates a lot of IO if many programmtic delcarations are performed. It
   would be better to do this once -- maybe as a post-translation walk that calls
