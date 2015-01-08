@@ -22,7 +22,7 @@ class PPPTS
     n=run_all(threads,socket,debug,args)
     puts "\nOK (#{n} tests)" unless @failure
     if srvr then srvr.raise(Interrupt); srvr.join end
-    exit((@failure)?(0):(1))
+    exit((@failure)?(1):(0))
   end
 
   def exe(cmd)
