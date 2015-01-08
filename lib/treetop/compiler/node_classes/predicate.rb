@@ -13,6 +13,7 @@ module Treetop
       end
       
       def assign_failure
+        reset_index
         super(start_index_var)
       end
       
@@ -35,9 +36,15 @@ module Treetop
     class NotPredicate < Predicate
       def when_success
         assign_failure
+	if (e = parent.atomic.expected)
+	  builder << "terminal_parse_failure(#{e}, true)"
+	end
       end
       
       def when_failure
+	if (e = parent.atomic.expected)
+	  builder << "terminal_failures.pop"
+	end
         assign_success
       end
     end

@@ -40,6 +40,10 @@ module Treetop
       def sequence_element_accessor_module_name
         sequence_element_accessor_module.module_name
       end
+
+      def expected
+	'"<a sequence>"'
+      end
     end
     
     class SequenceElementAccessorModule

@@ -2,15 +2,15 @@ module Treetop
   module Compiler
     grammar Metagrammar
       rule treetop_file
-        requires:(space? require_statement)* prefix:space? module_or_grammar suffix:space? {
+        requires:(space? require_statement)* spacing:space? module_or_grammar suffix:space? {
           def compile
-            requires.text_value + prefix.text_value + module_or_grammar.compile + suffix.text_value
+            requires.text_value + spacing.text_value + module_or_grammar.compile + suffix.text_value
           end
         }
       end
 
       rule require_statement
-        prefix:space? "require" [ \t]+ [^\n\r]+ [\n\r]
+        spacing:space? "require" [ \t]+ [^\n\r]+ [\n\r]
       end
 
       rule module_or_grammar
@@ -18,13 +18,13 @@ module Treetop
       end
 
       rule module_declaration
-        prefix:('module' space name:([A-Z] alphanumeric_char* ('::' [A-Z] alphanumeric_char*)*) space) module_contents:(module_declaration / grammar) suffix:(space 'end') {
+        module_prefix:('module' space name:([A-Z] alphanumeric_char* ('::' [A-Z] alphanumeric_char*)*) space) module_contents:(module_declaration / grammar) suffix:(space 'end') {
           def compile
-            prefix.text_value + module_contents.compile + suffix.text_value
+            module_prefix.text_value + module_contents.compile + suffix.text_value
           end
 
 	  def parser_name
-	    prefix.name.text_value+'::'+module_contents.parser_name
+	    module_prefix.name.text_value+'::'+module_contents.parser_name
 	  end
         }
       end
@@ -159,12 +159,12 @@ module Treetop
           end
         }
         /
-	prefix space? predicate_block {
+	prefix space? atomic:predicate_block {
           def compile(address, builder, parent_expression=nil)
             prefix.compile(address, builder, self)
           end
           def prefixed_expression
-            predicate_block
+            atomic
           end
           def inline_modules
             []
@@ -291,12 +291,12 @@ module Treetop
           end
         }
         /
-        prefix space? predicate_block {
+        prefix space? atomic:predicate_block {
           def compile(address, builder, parent_expression=nil)
             prefix.compile(address, builder, self)
           end
           def prefixed_expression
-            predicate_block
+            atomic
           end
           def inline_modules
             []
@@ -389,19 +389,19 @@ module Treetop
       end
 
       rule quoted_string
-        (single_quoted_string / double_quoted_string) {
+        qs:(single_quoted_string / double_quoted_string) modifiers:([ir]*) <Terminal> {
           def string
-            super.text_value
+            qs.text_value
           end
         }
       end
 
       rule double_quoted_string
-        '"' string:(!'"' ("\\\\" / '\"' / .))* '"' <Terminal>
+        '"' string:(!'"' ("\\\\" / '\"' / .))* '"'
       end
 
       rule single_quoted_string
-        "'" string:(!"'" ("\\\\" / "\\'" / .))* "'" <Terminal>
+        "'" string:(!"'" ("\\\\" / "\\'" / .))* "'"
       end
 
       rule character_class

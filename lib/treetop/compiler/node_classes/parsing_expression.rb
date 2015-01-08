@@ -141,6 +141,10 @@ module Treetop
       def on_one_line(expression)
         expression.text_value.tr("\n", ' ')
       end
+
+      def expected
+	nil # Overridden for terminal parse failures
+      end
     end
   end
 end

@@ -63,25 +63,45 @@ module Treetop
       def max
         nil
       end
+
+      def expected
+	parent_expression.atomic.expected && '"at least one "+'+parent_expression.atomic.expected
+      end
     end
 
     class OccurrenceRange < Repetition
       def compile(address, builder, parent_expression)
         super
 
-        if min.empty? || min.text_value.to_i == 0
-          assign_and_extend_result
-        else
+        if !min.empty? && min.text_value.to_i != 0
           # We got some, but fewer than we wanted. There'll be a failure reported already
           builder.if__ "#{accumulator_var}.size < #{min.text_value}" do
             reset_index
             assign_failure start_index_var
-          end
+	  end
           builder.else_ do
-            assign_and_extend_result
-          end
-        end
+	    clean_unsaturated
+	    assign_and_extend_result
+	  end
+        else
+	  clean_unsaturated
+	  assign_and_extend_result
+	end
+
         end_comment(parent_expression)
+      end
+
+      # remove the last terminal_failure if we merely failed to reach the maximum
+      def clean_unsaturated
+	if !max.empty? && max.text_value.to_i > 0
+	  builder.if_ "#{accumulator_var}.size < #{max.text_value}" do
+	    builder << 'terminal_failures.pop'  # Ignore the last failure.
+	  end
+	end
+      end
+
+      def expected
+	parent_expression.atomic.expected && "at least #{min.text_value} "+parent_expression.atomic.expected
       end
     end
 

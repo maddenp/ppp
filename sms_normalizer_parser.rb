@@ -13,7 +13,7 @@ module Normalizer
     if node_cache[:text].has_key?(index)
       cached = node_cache[:text][index]
       if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        node_cache[:text][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
@@ -24,26 +24,32 @@ module Normalizer
       i1 = index
       r2 = _nt_sms
       if r2
+        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
         r1 = r2
       else
         r3 = _nt_omp
         if r3
+          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
           r1 = r3
         else
           r4 = _nt_directive
           if r4
+            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r1 = r4
           else
             r5 = _nt_comment
             if r5
+              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
               r1 = r5
             else
               r6 = _nt_quoted
               if r6
+                r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r1 = r6
               else
                 r7 = _nt_unquoted
                 if r7
+                  r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r1 = r7
                 else
                   @index = i1
@@ -75,25 +81,25 @@ module Normalizer
     if node_cache[:omp].has_key?(index)
       cached = node_cache[:omp][index]
       if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        node_cache[:omp][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
     end
 
     i0, s0 = index, []
-    if has_terminal?("@$omp ", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 6))
-      @index += 6
+    if (match_len = has_terminal?("@$omp ", false, index))
+      r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+      @index += match_len
     else
       terminal_parse_failure("@$omp ")
       r1 = nil
     end
     s0 << r1
     if r1
-      if has_terminal?("end ", false, index)
-        r3 = instantiate_node(SyntaxNode,input, index...(index + 4))
-        @index += 4
+      if (match_len = has_terminal?("end ", false, index))
+        r3 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+        @index += match_len
       else
         terminal_parse_failure("end ")
         r3 = nil
@@ -105,9 +111,9 @@ module Normalizer
       end
       s0 << r2
       if r2
-        if has_terminal?("parallel do", false, index)
-          r4 = instantiate_node(SyntaxNode,input, index...(index + 11))
-          @index += 11
+        if (match_len = has_terminal?("parallel do", false, index))
+          r4 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+          @index += match_len
         else
           terminal_parse_failure("parallel do")
           r4 = nil
@@ -116,10 +122,11 @@ module Normalizer
         if r4
           s5, i5 = [], index
           loop do
-            if has_terminal?('\G[^\\\'\\"\\n]', true, index)
+            if has_terminal?(@regexps[gr = '\A[^\\\'\\"\\n]'] ||= Regexp.new(gr), :regexp, index)
               r6 = true
               @index += 1
             else
+              terminal_parse_failure('[^\\\'\\"\\n]')
               r6 = nil
             end
             if r6
@@ -154,49 +161,52 @@ module Normalizer
     if node_cache[:sms].has_key?(index)
       cached = node_cache[:sms][index]
       if cached
-        cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        node_cache[:sms][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
         @index = cached.interval.end
       end
       return cached
     end
 
     i0, s0 = index, []
-    if has_terminal?("@", false, index)
-      r1 = instantiate_node(SyntaxNode,input, index...(index + 1))
-      @index += 1
+    if (match_len = has_terminal?("@", false, index))
+      r1 = true
+      @index += match_len
     else
       terminal_parse_failure("@")
       r1 = nil
     end
     s0 << r1
     if r1
-      if has_terminal?('\G[sS]', true, index)
+      if has_terminal?(@regexps[gr = '\A[sS]'] ||= Regexp.new(gr), :regexp, index)
         r2 = true
         @index += 1
       else
+        terminal_parse_failure('[sS]')
         r2 = nil
       end
       s0 << r2
       if r2
-        if has_terminal?('\G[mM]', true, index)
+        if has_terminal?(@regexps[gr = '\A[mM]'] ||= Regexp.new(gr), :regexp, index)
           r3 = true
           @index += 1
         else
+          terminal_parse_failure('[mM]')
           r3 = nil
         end
         s0 << r3
         if r3
-          if has_terminal?('\G[sS]', true, index)
+          if has_terminal?(@regexps[gr = '\A[sS]'] ||= Regexp.new(gr), :regexp, index)
             r4 = true
             @index += 1
           else
+            terminal_parse_failure('[sS]')
             r4 = nil
           end
           s0 << r4
           if r4
-            if has_terminal?("$", false, index)
-              r5 = instantiate_node(SyntaxNode,input, index...(index + 1))
-              @index += 1
+            if (match_len = has_terminal?("$", false, index))
+              r5 = true
+              @index += match_len
             else
               terminal_parse_failure("$")
               r5 = nil
@@ -205,10 +215,11 @@ module Normalizer
             if r5
               s6, i6 = [], index
               loop do
-                if has_terminal?('\G[^\\\'\\"\\n]', true, index)
+                if has_terminal?(@regexps[gr = '\A[^\\\'\\"\\n]'] ||= Regexp.new(gr), :regexp, index)
                   r7 = true
                   @index += 1
                 else
+                  terminal_parse_failure('[^\\\'\\"\\n]')
                   r7 = nil
                 end
                 if r7
