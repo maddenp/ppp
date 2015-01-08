@@ -5,19 +5,19 @@ grammar Normalizer
   end
 
   rule comment
-    "!" [^\n]* "\n"+ <Comment>
+    "(![^\n]*\n)+"ir <Comment>
   end
 
   rule directive
-    "@" [^\n]+ "\n" <Directive>
+    "@[^\n]+\n"ir <Directive>
   end
 
   rule quoted
-    ( [\"] [^\"]* [\"] / [\'] [^\']* [\'] )+ <Quoted>
+    "((\"[^\"]*\")|(\'[^\']*\'))+"ir <Quoted>
   end
 
   rule unquoted
-    [^\'\"!@]+ <Unquoted>
+    "[^\'\"!@]+"ir <Unquoted>
   end
 
 end

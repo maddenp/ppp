@@ -5,11 +5,11 @@ grammar Normalizer
   end
 
   rule omp
-    "@$omp " "end "? "parallel do" [^\'\"\n]* <OMP>
+    "@[$]omp[^\'\"\n]*"ir <OMP>
   end
 
   rule sms
-    "@" [sS] [mM] [sS] "$" [^\'\"\n]* <SMS>
+    "@sms[$][^\'\"\n]*"ir <SMS>
   end
 
 end

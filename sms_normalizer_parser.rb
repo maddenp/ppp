@@ -73,9 +73,6 @@ module Normalizer
     r0
   end
 
-  module Omp0
-  end
-
   def _nt_omp
     start_index = index
     if node_cache[:omp].has_key?(index)
@@ -87,73 +84,17 @@ module Normalizer
       return cached
     end
 
-    i0, s0 = index, []
-    if (match_len = has_terminal?("@$omp ", false, index))
-      r1 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A@[$]omp[^'\"\n]*")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(OMP,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("@$omp ")
-      r1 = nil
-    end
-    s0 << r1
-    if r1
-      if (match_len = has_terminal?("end ", false, index))
-        r3 = instantiate_node(SyntaxNode,input, index...(index + match_len))
-        @index += match_len
-      else
-        terminal_parse_failure("end ")
-        r3 = nil
-      end
-      if r3
-        r2 = r3
-      else
-        r2 = instantiate_node(SyntaxNode,input, index...index)
-      end
-      s0 << r2
-      if r2
-        if (match_len = has_terminal?("parallel do", false, index))
-          r4 = instantiate_node(SyntaxNode,input, index...(index + match_len))
-          @index += match_len
-        else
-          terminal_parse_failure("parallel do")
-          r4 = nil
-        end
-        s0 << r4
-        if r4
-          s5, i5 = [], index
-          loop do
-            if has_terminal?(@regexps[gr = '\A[^\\\'\\"\\n]'] ||= Regexp.new(gr), :regexp, index)
-              r6 = true
-              @index += 1
-            else
-              terminal_parse_failure('[^\\\'\\"\\n]')
-              r6 = nil
-            end
-            if r6
-              s5 << r6
-            else
-              break
-            end
-          end
-          r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
-          s0 << r5
-        end
-      end
-    end
-    if s0.last
-      r0 = instantiate_node(OMP,input, i0...index, s0)
-      r0.extend(Omp0)
-    else
-      @index = i0
+      terminal_parse_failure("@[$]omp[^\'\"\n]*")
       r0 = nil
     end
 
     node_cache[:omp][start_index] = r0
 
     r0
-  end
-
-  module Sms0
   end
 
   def _nt_sms
@@ -167,79 +108,11 @@ module Normalizer
       return cached
     end
 
-    i0, s0 = index, []
-    if (match_len = has_terminal?("@", false, index))
-      r1 = true
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A@sms[$][^'\"\n]*")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(SMS,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure("@")
-      r1 = nil
-    end
-    s0 << r1
-    if r1
-      if has_terminal?(@regexps[gr = '\A[sS]'] ||= Regexp.new(gr), :regexp, index)
-        r2 = true
-        @index += 1
-      else
-        terminal_parse_failure('[sS]')
-        r2 = nil
-      end
-      s0 << r2
-      if r2
-        if has_terminal?(@regexps[gr = '\A[mM]'] ||= Regexp.new(gr), :regexp, index)
-          r3 = true
-          @index += 1
-        else
-          terminal_parse_failure('[mM]')
-          r3 = nil
-        end
-        s0 << r3
-        if r3
-          if has_terminal?(@regexps[gr = '\A[sS]'] ||= Regexp.new(gr), :regexp, index)
-            r4 = true
-            @index += 1
-          else
-            terminal_parse_failure('[sS]')
-            r4 = nil
-          end
-          s0 << r4
-          if r4
-            if (match_len = has_terminal?("$", false, index))
-              r5 = true
-              @index += match_len
-            else
-              terminal_parse_failure("$")
-              r5 = nil
-            end
-            s0 << r5
-            if r5
-              s6, i6 = [], index
-              loop do
-                if has_terminal?(@regexps[gr = '\A[^\\\'\\"\\n]'] ||= Regexp.new(gr), :regexp, index)
-                  r7 = true
-                  @index += 1
-                else
-                  terminal_parse_failure('[^\\\'\\"\\n]')
-                  r7 = nil
-                end
-                if r7
-                  s6 << r7
-                else
-                  break
-                end
-              end
-              r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
-              s0 << r6
-            end
-          end
-        end
-      end
-    end
-    if s0.last
-      r0 = instantiate_node(SMS,input, i0...index, s0)
-      r0.extend(Sms0)
-    else
-      @index = i0
+      terminal_parse_failure("@sms[$][^\'\"\n]*")
       r0 = nil
     end
 
