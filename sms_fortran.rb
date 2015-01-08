@@ -170,7 +170,7 @@ module Fortran
               b+=":#{s.stride}" if s.stride and "#{s.stride}"!="1"
               bounds[dim-1]=b
             elsif s.is_a?(Vector_Subscript)
-              fail "INTERNAL ERROR: in Array_Translation#translate: Please report to developers."
+              ifail "in Array_Translation#translate: Please report to developers."
             else
               bounds[dim-1]="#{s}"
             end
@@ -403,12 +403,22 @@ module Fortran
     end
 
     def declare(type,var,props={})
+      def mismatch(x,old,new)
+        ifail "Upon redeclaration of '#{var}': old #{x}=#{old}, new #{x}=#{new}"
+      end
       su=scoping_unit
+      pppvars=(su.metadata[:pppvars]||={})
       varenv=varenv_get(var,su,false)
       if varenv
-        fail "ERROR: Variable #{var} is already defined" unless varenv["pppvar"]
+        ifail "#{var} is already declared" unless varenv["pppvar"]
+        known=pppvars[var]
+        ifail "#{var} not in scoping-unit metadata" unless known
+        ktype=known[:type]
+        mismatch("type",ktype,type) unless ktype==type
+        kprops=known[:props]
+        mismatch("props",kprops,props) unless kprops==props
       else
-        varenv_del(var,su,false)
+        pppvars[var]={:type=>type,:props=>props}
         lenopt=""
         if props[:len]
           unless type=="character"
@@ -871,7 +881,7 @@ module Fortran
           elsif serial_treatment==:pppin
             sms_serial_info.rvars.add(x)
           else
-            fail "INTERNAL ERROR: Serial region namelist variable not recognized."
+            ifail "Serial region namelist variable not recognized."
           end
         end
       end
@@ -935,7 +945,7 @@ module Fortran
     def io_stmt_common(treatment=nil)
       if treatment
         unless [:in,:out].include?(treatment)
-          fail "INTERNAL ERROR: treatment '#{treatment}' neither :in nor :out"
+          ifail "Treatment '#{treatment}' neither :in nor :out"
         end
         globals=metadata[:globals]||SortedSet.new
         @serialize_io=true unless globals.empty?
@@ -2123,7 +2133,7 @@ module Fortran
           when :pppout
             schedule_out(var,sort,dh,bcasts,scatters)
           else
-            fail "INTERNAL ERROR: Unknown sms$serial treatment '#{treatment}'"
+            ifail "Unknown sms$serial treatment '#{treatment}'"
           end
         end
       end

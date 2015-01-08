@@ -80,6 +80,10 @@ module Common
     File.join(File.expand_path(d),"#{m}#{envext}")
   end
 
+  def ifail(msg)
+    fail "INTERNAL ERROR: #{msg}"
+  end
+
   def sms_halo_comp
     env[:sms_halo_comp]
   end

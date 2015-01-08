@@ -796,10 +796,10 @@ module Fortran
       oldblock.reverse.each { |x| execution_part_construct.e.insert(1,x) }
       cs=tree[0].e.reduce([]) do |m,x|
         m.push(x) if x.e[1].is_a?(Continue_Stmt)
-        fail "INTERNAL ERROR: Multiple 'continue' statements" if m.size > 1
+        ifail "Multiple 'continue' statements" if m.size > 1
         m
       end
-      fail "INTERNAL ERROR: No 'continue' statement" unless (continue=cs.first)
+      ifail "No 'continue' statement" unless (continue=cs.first)
       tree[0].e[continue.parent.e.index(continue)]=tree[1]
       tree[0].parent=parent
       block=parent.e
@@ -887,11 +887,6 @@ module Fortran
         fail "ERROR: '#{n}' not found in environment" if expected
       end
       [n,varenv]
-    end
-
-    def varenv_del(name,node=self,expected=true)
-      n,varenv=varenv_chk(name,node,expected)
-      node.env.delete(n)
     end
 
     def varenv_get(name,node=self,expected=true)

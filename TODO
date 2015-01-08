@@ -54,9 +54,6 @@
   reasonable to keep in ppp, but the max vars bit (may occur, with a different
   name, in other directives) should be a reference into the library code.
 
-+ declare() is naive. What about declaring an array with the same type as an
-  already-declared scalar? Need more flexibility...
-
 + It might be better to get rid of of 'sort' key in .sms file, rename 'dims' to
   'rank', and have rank 0 => scalar, rank > 0 => array. But the value of the
   'sort' key can also be '_namelist', so that has to be dealt with somehow.
