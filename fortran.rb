@@ -349,9 +349,6 @@ module Fortran
       end
     end
     env.merge!(fn_env)
-    # The environment has already been modified by processing the module's
-    # specification-part, part, so always write out the module file.
-    write_envfile(module_stmt.name,env)
     envpop
     @access="_"
     true
@@ -634,18 +631,18 @@ module Fortran
       ""
     end
 
-    def transform(method)
-      transform_common(method)
+    def walk(method)
+      walk_common(method)
       self
     end
 
-    def transform_common(method)
-      transform_children(method)
+    def walk_common(method)
+      walk_children(method)
       send(method) if respond_to?(method)
     end
 
-    def transform_children(method)
-      e.each { |x| x.transform_common(method) if x } if e
+    def walk_children(method)
+      e.each { |x| x.walk_common(method) if x } if e
       self
     end
 
@@ -3830,6 +3827,30 @@ module Fortran
   end
 
   class Module < Scoping_Unit
+
+    def modinfo
+      modinfo=deepcopy(env)
+      # Do not export symbol keys, which are for internal purposes only
+      modinfo.delete_if { |k,v| k.is_a?(Symbol) }
+      # Do not export info on private objects
+      modinfo.delete_if { |k,v| v["access"]=="private" }
+      d=env[:global][:dstfile]
+      d=File.dirname(d) unless File.directory?(d)
+      unless File.directory?(d)
+        $stderr.puts "Output directory '#{d}' not found"
+        raise Exceptions::TranslatorException
+      end
+      f=envfile("#{name}",d)
+      begin
+        File.delete(f) if File.exist?(f)
+        unless modinfo.empty?
+          File.open(f,"w") { |f| f.write(YAML.dump(modinfo)) }
+        end
+      rescue Exception=>ex
+        $stderr.puts "Could not write module file '#{f}'"
+        raise Exceptions::TranslatorException
+      end
+    end
 
     def name
       e[0].name

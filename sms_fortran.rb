@@ -438,9 +438,6 @@ module Fortran
           break if node==su
           node=node.parent
         end while true
-        if su.is_a?(Module)
-          write_envfile(su.name,su.envref)
-        end
       end
       var
     end

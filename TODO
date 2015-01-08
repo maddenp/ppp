@@ -20,11 +20,6 @@
 
 ### OPTIMIZATION
 
-+ write_envfile is called by declare() whenever something is added to a module.
-  This creates a lot of IO if many programmtic delcarations are performed. It
-  would be better to do this once -- maybe as a post-translation walk that calls
-  write_envfile for each module encountered.
-
 - Can serial-region parse optimization be used elsewhere? Marshal::[load/dump]?
 
 ### PARSING

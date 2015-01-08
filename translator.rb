@@ -379,9 +379,8 @@ class Translator
     n=normalize(s,conf)
     return "\n#{n}" if conf[:product]==:normalized_source
     puts "\n#{n}" if conf[:debug]
-    raw_tree=fp.parse(n,conf[:env],{:root=>root})
-    return if conf[:product]==:modinfo
-    unless raw_tree
+    tree=fp.parse(n,conf[:env],{:root=>root})
+    unless tree
       re=Regexp.new("^(.+?):in `([^\']*)'$")
       na=n.split("\n")
       na.each_index { |i| $stderr.puts "#{i+1} #{na[i]}" }
@@ -395,32 +394,37 @@ class Translator
       $stderr.puts "PARSE FAILED"
       fail Exceptions::TranslatorException
     end
-    raw_tree.env[:global][:parsed]=true
+    tree.env[:global][:parsed]=true
     if conf[:debug]
       puts "\nRAW TREE\n\n"
-      p raw_tree
+      p tree
     end
     case conf[:product]
+    when :modinfo
+      retval=nil
     when :raw_tree
-      return raw_tree
+      retval=tree
     when :raw_source
       $INDENTED=true
-      return vertspace(wrap(raw_tree.to_s))
+      raw_source=vertspace(wrap(tree.to_s))
+      retval=raw_source
     when :translated_source
-      raw_tree.transform(:adopt)
-      translated_tree=raw_tree.transform(:translate)
-      fail "TRANSLATION FAILED" unless translated_tree
+      tree.walk(:adopt)
+      tree.walk(:translate)
+      fail "TRANSLATION FAILED" unless tree
       if conf[:debug]
         puts "\nTRANSLATED TREE\n\n"
-        p translated_tree
+        p tree
       end
       $INDENTED=true
-      t=vertspace(wrap(translated_tree.to_s))
+      translated_source=vertspace(wrap(tree.to_s))
       puts "\nTRANSLATED SOURCE\n\n" if conf[:debug]
-      return t
+      retval=translated_source
     else
       fail "ERROR: Unknown product '#{conf[:product]}'"
     end
+    tree.walk(:modinfo)
+    retval
 
   end
 
