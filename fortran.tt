@@ -230,12 +230,6 @@ grammar Fortran
     t_comma allocation <Allocation_List_Pair>
   end
 
-  rule alphanumeric_character
-    # F90:R302
-
-    "[a-zA-Z0-9_]"ir <T>
-  end
-
   rule alt_return_spec
     # F90:R1214
 
@@ -610,8 +604,7 @@ grammar Fortran
   rule character
     # F90:R301
 
-    alphanumeric_character /
-    special_character
+    "[a-zA-Z0-9_ =+*/(),.':!\"%&;<>?$-]"ir <T>
   end
 
   rule close_spec
@@ -3282,12 +3275,6 @@ grammar Fortran
 
     rel_op /
     logical_op
-  end
-
-  rule special_character
-    # F90:3.1.4
-
-    [\ \=\+\-\*\/\(\)\,\.\'\:\!\"\%\&\;\<\>\?\$] <T>
   end
 
   rule specification_expr

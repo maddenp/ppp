@@ -1960,30 +1960,6 @@ module Fortran
     r0
   end
 
-  def _nt_alphanumeric_character
-    start_index = index
-    if node_cache[:alphanumeric_character].has_key?(index)
-      cached = node_cache[:alphanumeric_character][index]
-      if cached
-        node_cache[:alphanumeric_character][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A[a-zA-Z0-9_]")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
-      r0 = instantiate_node(T,input, index...(index + match_len))
-      @index += match_len
-    else
-      terminal_parse_failure('"[a-zA-Z0-9_]"')
-      r0 = nil
-    end
-
-    node_cache[:alphanumeric_character][start_index] = r0
-
-    r0
-  end
-
   module AltReturnSpec0
     def t_star
       elements[0]
@@ -5932,20 +5908,12 @@ module Fortran
       return cached
     end
 
-    i0 = index
-    r1 = _nt_alphanumeric_character
-    if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
-      r0 = r1
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A[a-zA-Z0-9_ =+*/(),.':!\"%&;<>?$-]")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
+      @index += match_len
     else
-      r2 = _nt_special_character
-      if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
-        r0 = r2
-      else
-        @index = i0
-        r0 = nil
-      end
+      terminal_parse_failure('"[a-zA-Z0-9_ =+*/(),.\':!\\"%&;<>?$-]"')
+      r0 = nil
     end
 
     node_cache[:character][start_index] = r0
@@ -30942,30 +30910,6 @@ module Fortran
     end
 
     node_cache[:significand_disallowed][start_index] = r0
-
-    r0
-  end
-
-  def _nt_special_character
-    start_index = index
-    if node_cache[:special_character].has_key?(index)
-      cached = node_cache[:special_character][index]
-      if cached
-        node_cache[:special_character][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
-        @index = cached.interval.end
-      end
-      return cached
-    end
-
-    if has_terminal?(@regexps[gr = '\A[\\ \\=\\+\\-\\*\\/\\(\\)\\,\\.\\\'\\:\\!\\"\\%\\&\\;\\<\\>\\?\\$]'] ||= Regexp.new(gr), :regexp, index)
-      r0 = instantiate_node(T,input, index...(index + 1))
-      @index += 1
-    else
-      terminal_parse_failure('[\\ \\=\\+\\-\\*\\/\\(\\)\\,\\.\\\'\\:\\!\\"\\%\\&\\;\\<\\>\\?\\$]')
-      r0 = nil
-    end
-
-    node_cache[:special_character][start_index] = r0
 
     r0
   end
