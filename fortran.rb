@@ -2462,7 +2462,7 @@ module Fortran
 
   end
 
-  class Defined_Binary_Op < NT
+  class Defined_Binary_Op < T
   end
 
   class Defined_Unary_Op < NT
@@ -3918,7 +3918,7 @@ module Fortran
 
   end
 
-  class Name < NT
+  class Name < T
 
     def derived_type?
       return false unless (my_data_ref=ancestor(Data_Ref))
@@ -3938,14 +3938,6 @@ module Fortran
 
     def name
       self
-    end
-
-    def str0
-      s="#{e[0]}"
-      if e[1]
-        s=e[1].e.reduce(s) { |m,x| s+="#{x}" }
-      end
-      s
     end
 
   end

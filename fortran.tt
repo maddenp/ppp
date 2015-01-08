@@ -233,9 +233,7 @@ grammar Fortran
   rule alphanumeric_character
     # F90:R302
 
-    t_letter /
-    t_digit /
-    t_underscore
+    "[a-zA-Z0-9_]"ir <T>
   end
 
   rule alt_return_spec
@@ -1068,7 +1066,7 @@ grammar Fortran
   rule defined_binary_op
     # F90:R724
 
-    t_dot t_letter letter_sequence t_dot <Defined_Binary_Op>
+    "[.][a-zA-Z]+[.]"ir <Defined_Binary_Op>
   end
 
   rule defined_operator
@@ -2549,7 +2547,7 @@ grammar Fortran
   rule name
     # F90:R304
 
-    t_letter alphanumeric_character* <Name>
+    "[a-zA-Z][a-zA-Z0-9_]*"ir <Name>
   end
 
   rule named_constant
@@ -3606,7 +3604,7 @@ grammar Fortran
     "do" /
     "if" /
     "where" /
-    alphanumeric_character* t_equal
+    "[a-zA-Z0-9_]*="ir
   end
 
   rule t_enddo

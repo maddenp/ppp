@@ -1971,26 +1971,12 @@ module Fortran
       return cached
     end
 
-    i0 = index
-    r1 = _nt_t_letter
-    if r1
-      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
-      r0 = r1
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A[a-zA-Z0-9_]")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
+      @index += match_len
     else
-      r2 = _nt_t_digit
-      if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
-        r0 = r2
-      else
-        r3 = _nt_t_underscore
-        if r3
-          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
-          r0 = r3
-        else
-          @index = i0
-          r0 = nil
-        end
-      end
+      terminal_parse_failure('"[a-zA-Z0-9_]"')
+      r0 = nil
     end
 
     node_cache[:alphanumeric_character][start_index] = r0
@@ -10519,24 +10505,6 @@ module Fortran
     r0
   end
 
-  module DefinedBinaryOp0
-    def t_dot1
-      elements[0]
-    end
-
-    def t_letter
-      elements[1]
-    end
-
-    def letter_sequence
-      elements[2]
-    end
-
-    def t_dot2
-      elements[3]
-    end
-  end
-
   def _nt_defined_binary_op
     start_index = index
     if node_cache[:defined_binary_op].has_key?(index)
@@ -10548,26 +10516,11 @@ module Fortran
       return cached
     end
 
-    i0, s0 = index, []
-    r1 = _nt_t_dot
-    s0 << r1
-    if r1
-      r2 = _nt_t_letter
-      s0 << r2
-      if r2
-        r3 = _nt_letter_sequence
-        s0 << r3
-        if r3
-          r4 = _nt_t_dot
-          s0 << r4
-        end
-      end
-    end
-    if s0.last
-      r0 = instantiate_node(Defined_Binary_Op,input, i0...index, s0)
-      r0.extend(DefinedBinaryOp0)
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A[.][a-zA-Z]+[.]")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(Defined_Binary_Op,input, index...(index + match_len))
+      @index += match_len
     else
-      @index = i0
+      terminal_parse_failure('"[.][a-zA-Z]+[.]"')
       r0 = nil
     end
 
@@ -24545,13 +24498,6 @@ module Fortran
     r0
   end
 
-  module Name0
-    def t_letter
-      elements[0]
-    end
-
-  end
-
   def _nt_name
     start_index = index
     if node_cache[:name].has_key?(index)
@@ -24563,27 +24509,11 @@ module Fortran
       return cached
     end
 
-    i0, s0 = index, []
-    r1 = _nt_t_letter
-    s0 << r1
-    if r1
-      s2, i2 = [], index
-      loop do
-        r3 = _nt_alphanumeric_character
-        if r3
-          s2 << r3
-        else
-          break
-        end
-      end
-      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
-      s0 << r2
-    end
-    if s0.last
-      r0 = instantiate_node(Name,input, i0...index, s0)
-      r0.extend(Name0)
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A[a-zA-Z][a-zA-Z0-9_]*")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(Name,input, index...(index + match_len))
+      @index += match_len
     else
-      @index = i0
+      terminal_parse_failure('"[a-zA-Z][a-zA-Z0-9_]*"')
       r0 = nil
     end
 
@@ -33318,12 +33248,6 @@ module Fortran
     r0
   end
 
-  module TEndDisallowed0
-    def t_equal
-      elements[1]
-    end
-  end
-
   def _nt_t_end_disallowed
     start_index = index
     if node_cache[:t_end_disallowed].has_key?(index)
@@ -33380,27 +33304,11 @@ module Fortran
             r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
             r0 = r4
           else
-            i5, s5 = index, []
-            s6, i6 = [], index
-            loop do
-              r7 = _nt_alphanumeric_character
-              if r7
-                s6 << r7
-              else
-                break
-              end
-            end
-            r6 = instantiate_node(SyntaxNode,input, i6...index, s6)
-            s5 << r6
-            if r6
-              r8 = _nt_t_equal
-              s5 << r8
-            end
-            if s5.last
-              r5 = instantiate_node(SyntaxNode,input, i5...index, s5)
-              r5.extend(TEndDisallowed0)
+            if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A[a-zA-Z0-9_]*=")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+              r5 = instantiate_node(SyntaxNode,input, index...(index + match_len))
+              @index += match_len
             else
-              @index = i5
+              terminal_parse_failure('"[a-zA-Z0-9_]*="')
               r5 = nil
             end
             if r5

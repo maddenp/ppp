@@ -1050,7 +1050,7 @@ module Fortran
 
   end
 
-  class Name < NT
+  class Name < T
 
     def globalize
       code=sms_global_name(self)
