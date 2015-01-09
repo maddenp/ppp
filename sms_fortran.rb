@@ -14,6 +14,19 @@ module Fortran
     true
   end
 
+  def sp_sms_barrier
+    nest_check("sms$barrier","sms$serial",sms_serial)
+    true
+  end
+
+  def sp_sms_comm_rank
+    true
+  end
+
+  def sp_sms_comm_size
+    true
+  end
+
   def sp_sms_distribute_begin(sms_decomp_name,sms_distribute_dims)
 
     # Do not push an environment here. The declarations that appear inside a
@@ -65,8 +78,8 @@ module Fortran
   end
 
   def sp_sms_ignore_begin
-    fail "ERROR: Already inside sms$ignore region" if sms_ignore
-    fail "ERROR: sms$ignore region may not appear inside sms$serial region" if sms_serial
+    nest_check("sms$ignore","sms$ignore",sms_ignore)
+    nest_check("sms$ignore","sms$serial",sms_serial)
     envpush(false)
     env[:sms_ignore]=true
     true
@@ -83,6 +96,7 @@ module Fortran
   end
 
   def sp_sms_parallel_begin(sms_decomp_name,sms_parallel_var_lists)
+    nest_check("sms$parallel","sms$ignore",sms_ignore)
     fail "ERROR: Already inside sms$parallel region" if sms_parallel
     envpush(false)
     env[:sms_parallel]=OpenStruct.new({:decomp=>"#{sms_decomp_name}",:vars=>sms_parallel_var_lists.vars})
@@ -100,7 +114,8 @@ module Fortran
   end
 
   def sp_sms_serial_begin
-    fail "ERROR: Already inside sms$serial region" if sms_serial
+    nest_check("sms$serial","sms$serial",sms_serial)
+    nest_check("sms$serial","sms$ignore",sms_ignore)
     envpush(false)
     env[:sms_serial]=true
     true
@@ -556,7 +571,7 @@ module Fortran
     end
 
     def omp_parallel_loop(node=self)
-      return (opl=node.ancestor(OMP_Parallel_Do))?(opl):(nil)
+      (opl=node.ancestor(OMP_Parallel_Do))?(opl):(nil)
     end
 
     def ranks
@@ -820,7 +835,7 @@ module Fortran
   class Entry_Stmt < Stmt
 
     def translate
-      fail "ERROR: 'entry' statement may not appear inside sms$serial region" if sms_serial
+      nest_check("'entry' statement","sms$serial",sms_serial)
     end
 
   end
@@ -1132,7 +1147,6 @@ module Fortran
         end
       end
 
-      # Handle to_local
       if tolocal=sms_to_local and p=tolocal["#{name}"]
         case "#{p.key}"
         when "lbound"
@@ -1147,7 +1161,9 @@ module Fortran
         code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
         replace_element(code,:expr)
       end
+
       handle_serial if sms_serial
+
     end
 
   end
@@ -1302,8 +1318,7 @@ module Fortran
   class SMS_Barrier < SMS
 
     def translate
-      fail "ERROR: sms$barrier may not appear inside sms$serial region" if sms_serial
-      fail "ERROR: sms$barrier may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
+      nest_check("sms$barrier","$omp parallel loop",omp_parallel_loop)
       use(sms_decompmod)
       code=[]
       code.push("#{self}")
@@ -1317,7 +1332,7 @@ module Fortran
   class SMS_Comm_Rank < SMS_Getter
 
     def translate
-      fail "ERROR: sms$comm_rank may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
+      nest_check("sms$comm_rank","$omp parallel loop",omp_parallel_loop)
       translate_with_options("comm rank","sms__comm_rank")
     end
 
@@ -1326,7 +1341,7 @@ module Fortran
   class SMS_Comm_Size < SMS_Getter
 
     def translate
-      fail "ERROR: sms$comm_size may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
+      nest_check("sms$comm_size","$omp parallel loop",omp_parallel_loop)
       translate_with_options("comm size","sms__comm_size")
     end
 
@@ -1816,11 +1831,6 @@ module Fortran
       "#{e[0]}#{e[1]}#{e[2]}"
     end
 
-    def translate
-      fail "ERROR: sms$parallel may not appear inside sms$serial region" if sms_serial
-      fail "ERROR: sms$parallel may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
-    end
-
   end
 
   class SMS_Parallel_Begin < SMS
@@ -1985,9 +1995,8 @@ module Fortran
 
     def translate
 
-      fail "ERROR: sms$serial may not appear inside another sms$serial region" if inside?(SMS_Serial)
-      fail "ERROR: sms$erial regions may not appear inside sms$parallel loops" if sms_parallel_loop
-      fail "ERROR: sms$serial may not appear inside OpenMPI 'parallel do' loop" if omp_parallel_loop
+      nest_check("sms$serial","$omp parallel loop",omp_parallel_loop)
+      nest_check("sms$serial","sms$parallel loop",sms_parallel_loop)
 
       serial_begin=e[0]
       oldblock=e[1]

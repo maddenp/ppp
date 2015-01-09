@@ -67,7 +67,7 @@
 
 - sms$halo_comp -> one-line directive bound to parallel do loop?
 
-- Consider which directives may nest in which others, and which may not. Factor
++ Consider which directives may nest in which others, and which may not. Factor
   handling of these error conditions. Some of this is already in place.
 
 - Currently, if an object allocated inside a serial region is also modified in a

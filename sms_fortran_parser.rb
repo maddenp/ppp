@@ -715,6 +715,7 @@ module Fortran
     def t_newline
       elements[3]
     end
+
   end
 
   def _nt_sms_barrier
@@ -745,6 +746,21 @@ module Fortran
         if r3
           r5 = _nt_t_newline
           s0 << r5
+          if r5
+            i6 = index
+            r7 = lambda { |e| sp_sms_barrier }.call(s0)
+            if !r7
+              terminal_parse_failure("<semantic predicate>")
+            end
+            if r7
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              @index = i6
+              r6 = nil
+            end
+            s0 << r6
+          end
         end
       end
     end
@@ -785,6 +801,7 @@ module Fortran
     def t_newline
       elements[6]
     end
+
   end
 
   def _nt_sms_comm_rank
@@ -824,6 +841,21 @@ module Fortran
               if r6
                 r8 = _nt_t_newline
                 s0 << r8
+                if r8
+                  i9 = index
+                  r10 = lambda { |e| sp_sms_comm_rank }.call(s0)
+                  if !r10
+                    terminal_parse_failure("<semantic predicate>")
+                  end
+                  if r10
+                    @index = i9
+                    r9 = instantiate_node(SyntaxNode,input, index...index)
+                  else
+                    @index = i9
+                    r9 = nil
+                  end
+                  s0 << r9
+                end
               end
             end
           end
@@ -867,6 +899,7 @@ module Fortran
     def t_newline
       elements[6]
     end
+
   end
 
   def _nt_sms_comm_size
@@ -906,6 +939,21 @@ module Fortran
               if r6
                 r8 = _nt_t_newline
                 s0 << r8
+                if r8
+                  i9 = index
+                  r10 = lambda { |e| sp_sms_comm_size }.call(s0)
+                  if !r10
+                    terminal_parse_failure("<semantic predicate>")
+                  end
+                  if r10
+                    @index = i9
+                    r9 = instantiate_node(SyntaxNode,input, index...index)
+                  else
+                    @index = i9
+                    r9 = nil
+                  end
+                  s0 << r9
+                end
               end
             end
           end

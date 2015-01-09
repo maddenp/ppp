@@ -68,6 +68,10 @@ module Common
     node.respond_to?(attr) && node.send(attr)
   end
 
+  def nest_check(inner,outer,cond)
+    fail "ERROR: #{inner} may not appear inside #{outer}" if cond
+  end
+
   def deepcopy(o)
     Marshal.load(Marshal.dump(o))
   end
@@ -84,28 +88,28 @@ module Common
     fail "INTERNAL ERROR: #{msg}"
   end
 
-  def sms_halo_comp
-    env[:sms_halo_comp]
+  def sms_halo_comp(node=self)
+    node.env[:sms_halo_comp]
   end
 
-  def sms_ignore
-    env[:sms_ignore]
+  def sms_ignore(node=self)
+    node.env[:sms_ignore]
   end
 
-  def sms_parallel
-    env[:sms_parallel]
+  def sms_parallel(node=self)
+    node.env[:sms_parallel]
   end
 
-  def sms_serial
-    env[:sms_serial]
+  def sms_serial(node=self)
+    node.env[:sms_serial]
   end
 
-  def sms_serial_info
-    env[:sms_serial_info]
+  def sms_serial_info(node=self)
+    node.env[:sms_serial_info]
   end
 
-  def sms_to_local
-    env[:sms_to_local]
+  def sms_to_local(node=self)
+    node.env[:sms_to_local]
   end
 
   def use_localnames(modulename)

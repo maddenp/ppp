@@ -76,15 +76,15 @@ grammar Fortran
   end
 
   rule sms_barrier
-    sms_sentinel sms_t_barrier sms_comment? t_newline <SMS_Barrier>
+    sms_sentinel sms_t_barrier sms_comment? t_newline &{ |e| sp_sms_barrier } <SMS_Barrier>
   end
 
   rule sms_comm_rank
-    sms_sentinel sms_t_comm_rank t_paren_l scalar_int_variable t_paren_r sms_comment? t_newline <SMS_Comm_Rank>
+    sms_sentinel sms_t_comm_rank t_paren_l scalar_int_variable t_paren_r sms_comment? t_newline &{ |e| sp_sms_comm_rank } <SMS_Comm_Rank>
   end
 
   rule sms_comm_size
-    sms_sentinel sms_t_comm_size t_paren_l scalar_int_variable t_paren_r sms_comment? t_newline <SMS_Comm_Size>
+    sms_sentinel sms_t_comm_size t_paren_l scalar_int_variable t_paren_r sms_comment? t_newline &{ |e| sp_sms_comm_size } <SMS_Comm_Size>
   end
 
   rule sms_comment
