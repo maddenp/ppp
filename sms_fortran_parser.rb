@@ -1029,6 +1029,7 @@ module Fortran
     def t_newline
       elements[8]
     end
+
   end
 
   def _nt_sms_compare_var
@@ -1074,6 +1075,21 @@ module Fortran
                   if r8
                     r10 = _nt_t_newline
                     s0 << r10
+                    if r10
+                      i11 = index
+                      r12 = lambda { |e| sp_sms_compare_var }.call(s0)
+                      if !r12
+                        terminal_parse_failure("<semantic predicate>")
+                      end
+                      if r12
+                        @index = i11
+                        r11 = instantiate_node(SyntaxNode,input, index...index)
+                      else
+                        @index = i11
+                        r11 = nil
+                      end
+                      s0 << r11
+                    end
                   end
                 end
               end
@@ -1139,6 +1155,7 @@ module Fortran
     def t_newline
       elements[11]
     end
+
   end
 
   def _nt_sms_create_decomp
@@ -1193,6 +1210,21 @@ module Fortran
                         if r11
                           r13 = _nt_t_newline
                           s0 << r13
+                          if r13
+                            i14 = index
+                            r15 = lambda { |e| sp_sms_create_decomp }.call(s0)
+                            if !r15
+                              terminal_parse_failure("<semantic predicate>")
+                            end
+                            if r15
+                              @index = i14
+                              r14 = instantiate_node(SyntaxNode,input, index...index)
+                            else
+                              @index = i14
+                              r14 = nil
+                            end
+                            s0 << r14
+                          end
                         end
                       end
                     end
@@ -2019,6 +2051,7 @@ module Fortran
     def t_newline
       elements[7]
     end
+
   end
 
   def _nt_sms_exchange
@@ -2083,6 +2116,21 @@ module Fortran
                 if r10
                   r12 = _nt_t_newline
                   s0 << r12
+                  if r12
+                    i13 = index
+                    r14 = lambda { |e| sp_sms_exchange }.call(s0)
+                    if !r14
+                      terminal_parse_failure("<semantic predicate>")
+                    end
+                    if r14
+                      @index = i13
+                      r13 = instantiate_node(SyntaxNode,input, index...index)
+                    else
+                      @index = i13
+                      r13 = nil
+                    end
+                    s0 << r13
+                  end
                 end
               end
             end
@@ -2137,6 +2185,7 @@ module Fortran
     def t_newline
       elements[7]
     end
+
   end
 
   def _nt_sms_exchange_begin
@@ -2201,6 +2250,21 @@ module Fortran
                 if r10
                   r12 = _nt_t_newline
                   s0 << r12
+                  if r12
+                    i13 = index
+                    r14 = lambda { |e| sp_sms_exchange_begin }.call(s0)
+                    if !r14
+                      terminal_parse_failure("<semantic predicate>")
+                    end
+                    if r14
+                      @index = i13
+                      r13 = instantiate_node(SyntaxNode,input, index...index)
+                    else
+                      @index = i13
+                      r13 = nil
+                    end
+                    s0 << r13
+                  end
                 end
               end
             end
@@ -2233,6 +2297,7 @@ module Fortran
     def t_newline
       elements[3]
     end
+
   end
 
   def _nt_sms_exchange_end
@@ -2263,6 +2328,21 @@ module Fortran
         if r3
           r5 = _nt_t_newline
           s0 << r5
+          if r5
+            i6 = index
+            r7 = lambda { |e| sp_sms_exchange_end }.call(s0)
+            if !r7
+              terminal_parse_failure("<semantic predicate>")
+            end
+            if r7
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              @index = i6
+              r6 = nil
+            end
+            s0 << r6
+          end
         end
       end
     end
@@ -4000,6 +4080,7 @@ module Fortran
     def t_newline
       elements[8]
     end
+
   end
 
   def _nt_sms_reduce
@@ -4045,6 +4126,21 @@ module Fortran
                   if r8
                     r10 = _nt_t_newline
                     s0 << r10
+                    if r10
+                      i11 = index
+                      r12 = lambda { |e| sp_sms_reduce }.call(s0)
+                      if !r12
+                        terminal_parse_failure("<semantic predicate>")
+                      end
+                      if r12
+                        @index = i11
+                        r11 = instantiate_node(SyntaxNode,input, index...index)
+                      else
+                        @index = i11
+                        r11 = nil
+                      end
+                      s0 << r11
+                    end
                   end
                 end
               end
@@ -4939,6 +5035,7 @@ module Fortran
     def t_newline
       elements[6]
     end
+
   end
 
   def _nt_sms_set_communicator
@@ -4978,6 +5075,21 @@ module Fortran
               if r6
                 r8 = _nt_t_newline
                 s0 << r8
+                if r8
+                  i9 = index
+                  r10 = lambda { |e| sp_sms_set_communicator }.call(s0)
+                  if !r10
+                    terminal_parse_failure("<semantic predicate>")
+                  end
+                  if r10
+                    @index = i9
+                    r9 = instantiate_node(SyntaxNode,input, index...index)
+                  else
+                    @index = i9
+                    r9 = nil
+                  end
+                  s0 << r9
+                end
               end
             end
           end
@@ -5009,6 +5121,7 @@ module Fortran
     def t_newline
       elements[3]
     end
+
   end
 
   def _nt_sms_start
@@ -5039,6 +5152,21 @@ module Fortran
         if r3
           r5 = _nt_t_newline
           s0 << r5
+          if r5
+            i6 = index
+            r7 = lambda { |e| sp_sms_start }.call(s0)
+            if !r7
+              terminal_parse_failure("<semantic predicate>")
+            end
+            if r7
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              @index = i6
+              r6 = nil
+            end
+            s0 << r6
+          end
         end
       end
     end
@@ -5067,6 +5195,7 @@ module Fortran
     def t_newline
       elements[4]
     end
+
   end
 
   def _nt_sms_stop
@@ -5105,6 +5234,21 @@ module Fortran
           if r5
             r7 = _nt_t_newline
             s0 << r7
+            if r7
+              i8 = index
+              r9 = lambda { |e| sp_sms_stop }.call(s0)
+              if !r9
+                terminal_parse_failure("<semantic predicate>")
+              end
+              if r9
+                @index = i8
+                r8 = instantiate_node(SyntaxNode,input, index...index)
+              else
+                @index = i8
+                r8 = nil
+              end
+              s0 << r8
+            end
           end
         end
       end
@@ -6572,6 +6716,7 @@ module Fortran
     def t_newline
       elements[6]
     end
+
   end
 
   def _nt_sms_unstructured_grid
@@ -6611,6 +6756,21 @@ module Fortran
               if r6
                 r8 = _nt_t_newline
                 s0 << r8
+                if r8
+                  i9 = index
+                  r10 = lambda { |e| sp_sms_unstructured_grid }.call(s0)
+                  if !r10
+                    terminal_parse_failure("<semantic predicate>")
+                  end
+                  if r10
+                    @index = i9
+                    r9 = instantiate_node(SyntaxNode,input, index...index)
+                  else
+                    @index = i9
+                    r9 = nil
+                  end
+                  s0 << r9
+                end
               end
             end
           end
@@ -6642,6 +6802,7 @@ module Fortran
     def t_newline
       elements[3]
     end
+
   end
 
   def _nt_sms_unstructured_print_timers
@@ -6672,6 +6833,21 @@ module Fortran
         if r3
           r5 = _nt_t_newline
           s0 << r5
+          if r5
+            i6 = index
+            r7 = lambda { |e| sp_sms_unstructured_print_timers }.call(s0)
+            if !r7
+              terminal_parse_failure("<semantic predicate>")
+            end
+            if r7
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              @index = i6
+              r6 = nil
+            end
+            s0 << r6
+          end
         end
       end
     end
@@ -7023,6 +7199,7 @@ module Fortran
     def t_newline
       elements[3]
     end
+
   end
 
   def _nt_sms_zerotimers
@@ -7053,6 +7230,21 @@ module Fortran
         if r3
           r5 = _nt_t_newline
           s0 << r5
+          if r5
+            i6 = index
+            r7 = lambda { |e| sp_sms_zerotimers }.call(s0)
+            if !r7
+              terminal_parse_failure("<semantic predicate>")
+            end
+            if r7
+              @index = i6
+              r6 = instantiate_node(SyntaxNode,input, index...index)
+            else
+              @index = i6
+              r6 = nil
+            end
+            s0 << r6
+          end
         end
       end
     end
