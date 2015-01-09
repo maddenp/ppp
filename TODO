@@ -33,27 +33,6 @@
   parsing, but move anything related to collecting information for translation
   to the data-collection walk. Also get rid of env[:global][:parsed].
 
-+ Deduce types of implicit variables. We cannot require 'implicit none'.
-
-  NOTE: SMS doesn't need this. There are only two reasons why SMS would need to
-        know the type of a variable: First, if it is a module variable, its
-        type needs to be recorded in the .sms environment-info file. But a
-        module variable only exists by virtue of being *declared* at the module
-        level, which means that it's in a type-declaration statement and so
-        has an explicit type. And, second, SMS needs to know the type of a
-        variable involved in MPI comms. But that type is determined at run time
-        via a call to sms__typeget, and an implicitly-typed variable's type
-        will be determined this way as easily as an explicitly-typed one. So,
-        for SMS purposes, ppp does not need to deduce implicit types. There may
-        be non-SMS applications of this parsing/transform system that WOULD need
-        to deduce types, but there's a hitch here, too: If a routine (or module)
-        contains a raw 'use' statement (i.e. one without an 'only' clause), it
-        will not, in general, be possible to determine whether a variable whose
-        type is unknown has an implicit type, or whether it has an explicit type
-        declared in a module that ppp has not seen. So, getting implicit type
-        treatment correct in some non-SMS tool may require better access to
-        module information that ppp requires.
-
 - In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
   label, but also labels further down in the stack? That would also be an error,
   right?
