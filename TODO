@@ -84,14 +84,10 @@
   be checked before replaying a pointer assignment on all tasks after a serial
   region.
 
-- Branching into or out of serial regions or parallel loops is prohibited, but
-  is 'goto i', where 'i' is an integer variable, already detected? If not, it
-  should be. YES, IT WORKS FINE.
-
 - When replaying label 'assign' after a serial region, is there anything to
   consider here in re: branching into / out of serial/parallel blocks? A
   complication to explicit treatment of such variables is that they have dual
-  meaning, both as typed variables and as label aliases.
+  meaning, both as typed variables and as label aliases. I SEE NO PROBLEMS.
 
 ### TREE
 
