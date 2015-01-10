@@ -952,11 +952,14 @@ module Fortran
       if (namelist_name=nml)
         nmlenv=varenv_get(namelist_name,self,expected=true)
         nmlenv["objects"].each do |x|
-          varenv=varenv_get(x,self,expected=true)
-          if serial_treatment==:pppout
+          if serial_treatment==:implicit_out
+            varenv=varenv_get(x,self,expected=true)
             sms_serial_info.lvars.add(x)
+            # A distributed-array lvar must be gathered to ensure that, if it
+            # is not completely redefined in the serial region, scattering it
+            # will restore existing values to the appropriate processors.
             sms_serial_info.rvars.add(x) if varenv["decomp"]
-          elsif serial_treatment==:pppin
+          elsif serial_treatment==:implicit_in
             sms_serial_info.rvars.add(x)
           else
             ifail "Serial region namelist variable not recognized."
@@ -1155,7 +1158,7 @@ module Fortran
 
       def handle_serial
 
-        def i_am_lvar(varenv)
+        def lvar?(varenv)
           return false if varenv["intent"]=="in"
           if inside?(Actual_Arg_Spec) # function(x,y,x) or call subroutrine(x,y,z)
             sms_serial_info.rvars.add(name)
@@ -1166,12 +1169,10 @@ module Fortran
             return true
           end
           return false if inside?(Section_Subscript_List) # array indexing
-          return true if inside?(Assignment_Stmt) and not inside?(Expr) # left side of assignment-stmt
-          return true if inside?(Io_Spec_Iostat,Allocate_Stat_Construct,Input_Item_List,Do_Variable)
-          return true if inside?(Data_Stmt_Object_List) and not inside?(Data_Implied_Do_Loop)
-          if inside?(Inquire_Spec_List)
-            return true unless inside?(External_File_Unit,Inquire_Spec_File,Io_Spec_Err)
-          end
+          return true  if inside?(Assignment_Stmt) and not inside?(Expr) # left side of assignment-stmt
+          return true  if inside?(Io_Spec_Iostat,Allocate_Stat_Construct,Input_Item_List,Do_Variable)
+          return true  if inside?(Data_Stmt_Object_List) and not inside?(Data_Implied_Do_Loop)
+          return true  if inside?(Inquire_Spec_List) and not inside?(External_File_Unit,Inquire_Spec_File,Io_Spec_Err)
           false
         end
 
@@ -1189,8 +1190,8 @@ module Fortran
             fail_allocate_msg(stat,"in") if sms_serial_info.vars_in.include?(name)
             fail_allocate_msg(stat,"out") if sms_serial_info.vars_out.include?(name)
             fail_allocate_msg(stat,"inout") if sms_serial_info.vars_inout.include?(name)
-            unless [:ignore,:ppp].include?(sms_serial_info.default)
-              fail_allocate_msg(stat,":default=#{sms_serial_info.default}")
+            unless [:ignore,:unspecified].include?(sms_serial_info.default)
+              fail_allocate_msg(stat,"default=#{sms_serial_info.default}")
             end
           end
         end
@@ -1199,17 +1200,29 @@ module Fortran
           varenv=varenv_get(name,self,expected=false)||{}
           fail_if_allocate(varenv)
           unless varenv["parameter"]
-            if i_am_lvar(varenv)
-              sms_serial_info.rvars.add(name) if varenv["decomp"]
+            if lvar?(varenv)
               sms_serial_info.lvars.add(name)
+              # A distributed-array lvar must be gathered to ensure that, if it
+              # is not completely redefined in the serial region, scattering it
+              # will restore existing values to the appropriate processors.
+              sms_serial_info.rvars.add(name) if varenv["decomp"]
             else
-              sms_serial_info.rvars.add(name) unless varenv["intent"]=="out"
+              # The following line used to end: unless varenv["intent"]=="out".
+              # The (potential) problem: According to the Fortran standard, an
+              # intent(out) variable's value becomes undefined upon routine
+              # entry, so gathering it isn't reall defined. It may be ok in
+              # practice, or it might not. We'll see. One workaround idea: Add,
+              # as the first executable statement in the routine, a statement to
+              # initialize the array with an appropriate value (i.e. not Lahey's
+              # "bad" value).
+              sms_serial_info.rvars.add(name)
             end
           end
         end
+
       end
 
-      if tolocal=sms_to_local and p=tolocal["#{name}"]
+      if (tolocal=sms_to_local) and (p=tolocal["#{name}"])
         case "#{p.key}"
         when "lbound"
           se="s#{p.dd}"
@@ -1317,7 +1330,7 @@ module Fortran
     def translate
       return if omp_parallel_loop or sms_ignore or sms_parallel_loop
       if sms_serial
-        add_serial_region_nml_vars(:pppout)
+        add_serial_region_nml_vars(:implicit_out)
       else
         io_stmt_init
         @serialize_io=false if unit.is_a?(Internal_File_Unit)
@@ -2111,7 +2124,7 @@ module Fortran
       # Merge in variables found in serial-region statements and specify their
       # control.
 
-      [[si.lvars,:pppout],[si.rvars,:pppin]].each do |vars,treatment|
+      [[si.lvars,:implicit_out],[si.rvars,:implicit_in]].each do |vars,treatment|
         vars.each { |var| commvars.add([var,treatment]) }
       end
 
@@ -2120,7 +2133,7 @@ module Fortran
       # serial region will have multiple treatment but those for which explicit
       # treatment was specified will take precedence.
 
-      priority={:ignore=>3,:inout=>2,:in=>1,:out=>1,:pppin=>0,:pppout=>0}
+      priority={:ignore=>3,:inout=>2,:in=>1,:out=>1,:implicit_in=>0,:implicit_out=>0}
       commvars.group_by { |var,treatment| var }.each do |k,v|
         top=priority[v.max_by { |var,treatment| priority[treatment] }.last]
         commvars.reject! { |var,treatment| var==k and priority[treatment]<top }
@@ -2134,8 +2147,8 @@ module Fortran
         var,treatment=var_treatment
         default=si.default
         varenv=varenv_get(var,self,false)||{}
-        if treatment==:pppin or treatment==:pppout
-          unless default==:ignore or default==:ppp
+        if treatment==:implicit_in or treatment==:implicit_out
+          unless default==:ignore or default==:unspecified
             not_in_env(var) if varenv.empty?
             fail "ERROR: Derived type '#{var}' cannot be communicated in sms$serial region" unless basetype_chk(varenv["type"])
           end
@@ -2149,12 +2162,12 @@ module Fortran
                              (dh)?(:in):(:ignore)
                            when :out
                              :out
-                           when :ppp
+                           when :unspecified
                              case treatment
-                             when :pppout
-                               :pppout
-                             when :pppin
-                               (dh)?(:pppin):(:ignore)
+                             when :implicit_out
+                               :implicit_out
+                             when :implicit_in
+                               (dh)?(:implicit_in):(:ignore)
                              end
                            else
                              fail "ERROR: Unknown sms$serial default treatment '#{default}'"
@@ -2167,8 +2180,8 @@ module Fortran
       end
 
       # Refresh the sorted set to eliminate duplicates created from applying
-      # the same default treatment to previously different :pppin and :pppout
-      # serial region variables.
+      # the same default treatment to previously different :implicit_in and
+      # :implicit_out serial-region variables.
 
       commvars=SortedSet.new(commvars)
 
@@ -2183,7 +2196,7 @@ module Fortran
       end
 
       commvars.each do |var,treatment|
-        expected=([:ignore,:pppin,:pppout].include?(treatment))?(false):(true)
+        expected=([:ignore,:implicit_in,:implicit_out].include?(treatment))?(false):(true)
         varenv=varenv_get(var,self,expected)
         dh=(varenv)?(varenv["decomp"]):(nil)
         sort=(varenv)?(varenv["sort"]):(nil)
@@ -2201,9 +2214,9 @@ module Fortran
             schedule_out(var,sort,dh,bcasts,scatters)
           when :out
             schedule_out(var,sort,dh,bcasts,scatters)
-          when :pppin
+          when :implicit_in
             schedule_in(var,gathers)
-          when :pppout
+          when :implicit_out
             schedule_out(var,sort,dh,bcasts,scatters)
           else
             ifail "Unknown sms$serial treatment '#{treatment}'"
@@ -2303,7 +2316,7 @@ module Fortran
       si.rvars=Set.new
       si.ptr=Hash.new()
       si.lbl=Hash.new()
-      si.default     = control ? "#{control.default}".to_sym : :ppp
+      si.default     = control ? "#{control.default}".to_sym : :unspecified
       si.vars_ignore = control ? control.vars_ignore         : []
       si.vars_in     = control ? control.vars_in             : []
       si.vars_inout  = control ? control.vars_inout          : []
@@ -2344,7 +2357,7 @@ module Fortran
   class SMS_Serial_Control_Option_1 < SMS
 
     def default
-      (e[1].e&&e[1].e[1].respond_to?(:treatment))?(e[1].e[1].treatment):(:ppp)
+      (e[1].e&&e[1].e[1].respond_to?(:treatment))?(e[1].e[1].treatment):(:unspecified)
     end
 
     def sms_serial_treatment_lists
@@ -2794,7 +2807,7 @@ module Fortran
     def translate
       return if omp_parallel_loop or sms_ignore or sms_parallel_loop
       if sms_serial
-        add_serial_region_nml_vars(:pppin)
+        add_serial_region_nml_vars(:implicit_in)
       else
         io_stmt_init
         function=(env["#{unit}"] and env["#{unit}"]["subprogram"]=="function")
