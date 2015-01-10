@@ -1249,17 +1249,26 @@ module Fortran
   class Nullify_Stmt < Stmt
 
     def translate
+
+      # See comment in Pointer_Assignment_Stmt#Translate.
+
       if sms_serial
-        vars=e[3].array
         new_stmt=["#{self}"]
+        si=sms_serial_info
+        update=false
+        vars=e[3].array
         vars.each do |pointer|
-          unless sms_serial_info.vars_ignore.include?("#{pointer}")
-            (sms_serial_info.ptr["#{pointer}"]||=[]).push("nullify (#{pointer})")
-            counter=sms_serial_info.ptr["#{pointer}"].length
-            new_stmt.push("sms_ptr_assign_#{pointer}=#{counter}")
-          end
+          p="#{pointer}"
+          next if si.vars_ignore.include?(p)
+          explicit_out=(si.vars_out.include?(p) or si.vars_inout.include?(p))
+          implicit_in=(si.default==:in or si.default==:ignore)
+          next if implicit_in and not explicit_out
+          update=true
+          (si.ptr[p]||=[]).push("nullify (#{p})")
+          counter=si.ptr[p].length
+          new_stmt.push("sms_ptr_assign_#{p}=#{counter}")
         end
-        replace_statement(new_stmt)
+        replace_statement(new_stmt) if update
       end
     end
 
@@ -1303,13 +1312,22 @@ module Fortran
   class Pointer_Assignment_Stmt < Stmt
 
     def translate
+
+      # Do not replay assignment if pointer var is explicitly ignored, or if
+      # default treatment is 'in' or 'ignore' and no explicit out treatment was
+      # specified for the pointer var. Otherwise, arrange for replay of pointer
+      # assignment on all tasks, after the serial region.
+
       if sms_serial
-        pointer=e[1]
-        unless sms_serial_info.vars_ignore.include?("#{pointer}")
-          (sms_serial_info.ptr["#{pointer}"]||=[]).push("#{self}")
-          counter=sms_serial_info.ptr["#{pointer}"].length
-          replace_statement("#{self}; sms__ptr_assign_#{pointer}=#{counter}")
-        end
+        p="#{e[1]}"
+        si=sms_serial_info
+        return if si.vars_ignore.include?(p)
+        explicit_out=(si.vars_out.include?(p) or si.vars_inout.include?(p))
+        implicit_in=(si.default==:in or si.default==:ignore)
+        return if implicit_in and not explicit_out
+        (si.ptr[p]||=[]).push("#{self}")
+        counter=si.ptr[p].length
+        replace_statement("#{self}; sms__ptr_assign_#{p}=#{counter}")
       end
     end
 
@@ -2311,7 +2329,7 @@ module Fortran
     end
 
     def translate
-      si=sms_serial_info=OpenStruct.new
+      si=(sms_serial_info=OpenStruct.new)
       si.lvars=Set.new
       si.rvars=Set.new
       si.ptr=Hash.new()
