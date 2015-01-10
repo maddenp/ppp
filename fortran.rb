@@ -216,12 +216,13 @@ module Fortran
   end
 
   def sp_dolabel_repeat?
-    # Report whether the top two labels on the label stack match. Some grammar
-    # rules only match when this is not the case; others require it. But if the
-    # topmost label is the symbol :nolabel, never consider that a repeat, as
-    # nonlabel versions of block-do-construct may have arbitrarily deep nesting.
-    return false if @dolabels.last==:nolabel
-    "#{@dolabels[-1]}"=="#{@dolabels[-2]}"
+    # Report whether the top label on the label stack matches any lower down.
+    # Some grammar rules only match when this is not the case; others require
+    # it. But if the topmost label is the symbol :nolabel, never consider that
+    # a repeat, as nonlabel versions of block-do-construct may have arbitrarily
+    # deep nesting.
+    return false if @dolabels.last==:nolabel or @dolabels.size < 2
+    @dolabels[0..@dolabels.size-2].include?(@dolabels.last)
   end
 
   def sp_env_pullup(node)

@@ -33,14 +33,11 @@
   parsing, but move anything related to collecting information for translation
   to the data-collection walk. Also get rid of env[:global][:parsed].
 
-- In fortran.rb's dolabel_repeat?(), consider not just the most recently pushed
-  label, but also labels further down in the stack? That would also be an error,
-  right?
-
 - In grammar class methods that return an optional element (execution_part() of
   Main_Program e.g.) check *there* for expected class vs SyntaxNode and return
   nil for the latter (i.e. the optional element is not present). This factors
-  the knowledge about the grammar into the appropriate class.
+  the knowledge about the grammar into the appropriate class. (Hint: Search for
+  'is_a?' and find logic checking for certain tree-node classes.)
 
 - Intel compiler directives need independent grammar rules, with scoping to
   decl, exe, other sections.

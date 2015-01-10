@@ -2782,21 +2782,25 @@ module Fortran
       my_serial_region=sms_serial_region
       my_parallel_loop=sms_parallel_loop
       # Handle branches via numeric labels.
-      (env[:branch_targets]["#{self}"]||[]).each do |label|
-        unless sms_serial_region(label)==my_serial_region
-          fail errmsg_serial(my_serial_region)
-        end
-        unless sms_parallel_loop(label)==my_parallel_loop
-          fail errmsg_parallel(my_parallel_loop)
+      if (bt=env[:branch_targets])
+        (bt["#{self}"]||[]).each do |label|
+          unless sms_serial_region(label)==my_serial_region
+            fail errmsg_serial(my_serial_region)
+          end
+          unless sms_parallel_loop(label)==my_parallel_loop
+            fail errmsg_parallel(my_parallel_loop)
+          end
         end
       end
       # Handle branches via assigned goto statements.
       agt=env[:assigned_goto_targets]
-      (env[:assign_map]["#{self}"]||[]).each do |var|
-        if (targets=agt[var])
-          targets.each do |target|
-            unless sms_serial_region(target)==my_serial_region
-              fail errmsg_serial(my_serial_region)
+      if (am=env[:assign_map])
+        (am["#{self}"]||[]).each do |var|
+          if (targets=agt[var])
+            targets.each do |target|
+              unless sms_serial_region(target)==my_serial_region
+                fail errmsg_serial(my_serial_region)
+              end
             end
           end
         end
