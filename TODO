@@ -91,9 +91,6 @@
   blocks? A complication to explicit treatment of such variables is that they
   have dual meaning, both as typed variables and as label aliases.
 
-+ Intent(out) variables in serial regions in subprograms are not currently
-  gathered before region entry. Is this ok? Probably not.
-
 + Consider whether this functionality is necessary: Explicit 'ignore' of serial
   region pointers will effectively ignore them; however, 'default=ignore' and 
   'default=in' will not stop their post serial region communication. (Right now,
