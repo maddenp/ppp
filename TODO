@@ -91,12 +91,6 @@
   blocks? A complication to explicit treatment of such variables is that they
   have dual meaning, both as typed variables and as label aliases.
 
-+ Consider whether this functionality is necessary: Explicit 'ignore' of serial
-  region pointers will effectively ignore them; however, 'default=ignore' and 
-  'default=in' will not stop their post serial region communication. (Right now,
-  pointer assignments will be communicated unless explicitly ignored by pointer
-  name.)
-
 ### TREE
 
 - To make all of this more useful, build an AST from the parse tree. Then, do
