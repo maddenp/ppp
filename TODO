@@ -84,11 +84,6 @@
   be checked before replaying a pointer assignment on all tasks after a serial
   region.
 
-- When replaying label 'assign' after a serial region, is there anything to
-  consider here in re: branching into / out of serial/parallel blocks? A
-  complication to explicit treatment of such variables is that they have dual
-  meaning, both as typed variables and as label aliases. I SEE NO PROBLEMS.
-
 ### TREE
 
 - To make all of this more useful, build an AST from the parse tree. Then, do
