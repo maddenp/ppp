@@ -43,7 +43,7 @@ module Fortran
     # distribute region belong to the environment belonging to the enclosing
     # scoping unit.
 
-    fail "ERROR: Already inside sms$distribute region" if @distribute
+    efail "Already inside sms$distribute region" if @distribute
     @distribute={"decomp"=>"#{sms_decomp_name}","dim"=>[]}
     sms_distribute_dims.dims.each { |x| @distribute["dim"].push(x) }
     true
@@ -69,7 +69,7 @@ module Fortran
     # Do not pop the environment stack here, because the matching 'begin' does
     # not push one.
 
-    fail "ERROR: Not inside sms$distribute region" unless @distribute
+    efail "Not inside sms$distribute region" unless @distribute
     @distribute=nil
     true
   end
@@ -80,8 +80,8 @@ module Fortran
   end
 
   def sp_sms_halo_comp_begin(halo_comp_pairs)
-    fail "ERROR: sms$halo_comp invalid outside sms$parallel region" unless sms_parallel
-    fail "ERROR: Already inside sms$halo_comp region" if sms_halo_comp
+    efail "sms$halo_comp invalid outside sms$parallel region" unless sms_parallel
+    efail "Already inside sms$halo_comp region" if sms_halo_comp
     envpush(false)
     dims={}
     dims[1]=halo_comp_pairs.e[0]
@@ -93,7 +93,7 @@ module Fortran
   end
 
   def sp_sms_halo_comp_end
-    fail "ERROR: Not inside sms$halo_comp region" unless sms_halo_comp
+    efail "Not inside sms$halo_comp region" unless sms_halo_comp
     true
   end
 
@@ -111,7 +111,7 @@ module Fortran
   end
 
   def sp_sms_ignore_end
-    fail "ERROR: Not inside sms$ignore region" unless sms_ignore
+    efail "Not inside sms$ignore region" unless sms_ignore
     true
   end
 
@@ -130,7 +130,7 @@ module Fortran
   end
 
   def sp_sms_parallel_end
-    fail "ERROR: Not inside sms$parallel region" unless sms_parallel
+    efail "Not inside sms$parallel region" unless sms_parallel
     true
   end
 
@@ -153,7 +153,7 @@ module Fortran
   end
 
   def sp_sms_serial_end
-    fail "ERROR: Not inside sms$serial region" unless sms_serial
+    efail "Not inside sms$serial region" unless sms_serial
     true
   end
 
@@ -188,7 +188,7 @@ module Fortran
   end
 
   def sp_sms_to_local_end
-    fail "ERROR: Not inside sms$to_local region" unless sms_to_local
+    efail "Not inside sms$to_local region" unless sms_to_local
     true
   end
 
@@ -231,10 +231,10 @@ module Fortran
           return if not (range=intrinsic(fn.name)) # fn is not intrinsic
           return if range==:complete               # complete array arg ok
         end
-        fail "ERROR: '#{var}' not found in environment" unless (varenv=env[var])
+        efail "'#{var}' not found in environment" unless (varenv=env[var])
         return unless varenv["decomp"]
         if defined?(range) and range==:error
-          fail "ERROR: Distributed-arrary argument '#{var}' incompatible with intrinsic procedure '#{fn.name}'"
+          efail "Distributed-arrary argument '#{var}' incompatible with intrinsic procedure '#{fn.name}'"
         end
         bounds=[]
         sl=subscript_list
@@ -358,7 +358,7 @@ module Fortran
 
     def code_decomp(dh,sort)
       unless sort==:array or sort==:scalar
-        fail "ERROR: sort must be :array or :scalar (was '#{sort}')"
+        efail "sort must be :array or :scalar (was '#{sort}')"
       end
       dh=(dh)?("#{dh}(#{dh}__nestlevel)"):("sms__not_decomposed")
       dh="(/#{dh}/)" if sort==:array
@@ -415,7 +415,7 @@ module Fortran
     end
 
     def code_local_bound(dh,dd,lu)
-      fail "ERROR: lu must be :l or :u (was '#{lu}')" unless lu==:l or lu==:u
+      efail "lu must be :l or :u (was '#{lu}')" unless lu==:l or lu==:u
       "#{dh}__local_#{lu}b(#{dd},#{dh}__nestlevel)"
     end
 
@@ -467,7 +467,7 @@ module Fortran
 
     def code_type(var,varenv,sort)
       unless sort==:array or sort==:scalar
-        fail "ERROR: sort must be :array or :scalar (was '#{sort}')"
+        efail "sort must be :array or :scalar (was '#{sort}')"
       end
       code=""
       code+="(/" if sort==:array
@@ -500,7 +500,7 @@ module Fortran
         lenopt=""
         if props[:len]
           unless type=="character"
-            fail "ERROR: 'len' property incompatible with type '#{type}'"
+            efail "'len' property incompatible with type '#{type}'"
           end
           lenopt="(len=#{props[:len]})"
         end
@@ -567,7 +567,7 @@ module Fortran
 
     def fixbound(varenv,var,dim,x)
       bound=varenv["#{x}b#{dim}"]
-      fail "ERROR: Bad upper bound: #{bound}" if bound=="_" and x==:u
+      efail "Bad upper bound: #{bound}" if bound=="_" and x==:u
       return 1 if bound=="_" and x==:l
       if ["assumed","deferred","explicit"].include?(bound)
         if (dd=decdim(varenv,dim))
@@ -748,7 +748,7 @@ module Fortran
       # environment. If not, carry on and hope for the best.
       if (varenv=varenv_get(var,self,false))
         unless varenv["sort"]=="scalar" and varenv["type"]=="integer"
-          fail "ERROR: #{description} query's argument must be an integer scalar"
+          efail "#{description} query's argument must be an integer scalar"
         end
       end
       code=[]
@@ -777,6 +777,16 @@ module Fortran
           code=code_local_bound(dh,dd,:l)+":"+code_local_bound(dh,dd,:u)
           replace_element(code,:allocate_shape_spec)
         end
+      end
+    end
+
+  end
+
+  class Allocate_Stmt < Stmt
+
+    def translate
+      if sms_serial
+        names.each { |name| sms_serial_info.allocated.add("#{name}") }
       end
     end
 
@@ -820,6 +830,16 @@ module Fortran
       return if omp_parallel_loop or sms_ignore or sms_parallel_loop or sms_serial
       io_stmt_init
       io_stmt_common
+    end
+
+  end
+
+  class Deallocate_Stmt < Stmt
+
+    def translate
+      if sms_serial
+        names.each { |name| sms_serial_info.deallocated.add("#{name}") }
+      end
     end
 
   end
@@ -1168,6 +1188,8 @@ module Fortran
             end
             return true
           end
+          return false if sms_serial_info.allocated.include?(name) # allocated in serial region
+          return false if sms_serial_info.deallocated.include?(name) # deallocated in serial region
           return false if inside?(Section_Subscript_List) # array indexing
           return true  if inside?(Assignment_Stmt) and not inside?(Expr) # left side of assignment-stmt
           return true  if inside?(Io_Spec_Iostat,Allocate_Stat_Construct,Input_Item_List,Do_Variable)
@@ -1177,22 +1199,9 @@ module Fortran
         end
 
         def fail_if_allocate(varenv)
-
-          def fail_allocate_msg(stat,comm)
-            fail "ERROR: #{stat} of '#{name}' in serial region incompatible with '#{comm}' treatment"
-          end
-
           if inside?(Allocate_Object)
-            stat="Allocation" if inside?(Allocate_Stmt)
-            stat="Deallocation" if inside?(Deallocate_Stmt)
-            fail "ERROR: #{stat} of distributed array '#{name}' in a serial region is forbidden" if varenv["decomp"]
-            return if sms_serial_info.vars_ignore.include?(name)
-            fail_allocate_msg(stat,"in") if sms_serial_info.vars_in.include?(name)
-            fail_allocate_msg(stat,"out") if sms_serial_info.vars_out.include?(name)
-            fail_allocate_msg(stat,"inout") if sms_serial_info.vars_inout.include?(name)
-            unless [:ignore,:unspecified].include?(sms_serial_info.default)
-              fail_allocate_msg(stat,"default=#{sms_serial_info.default}")
-            end
+            action=(inside?(Allocate_Stmt))?("allocated"):("deallocated")
+            efail "Distributed array '#{name}' #{action} in serial region" if varenv["decomp"]
           end
         end
 
@@ -1231,7 +1240,7 @@ module Fortran
           se="e#{p.dd}"
           halo_offset="#{halo_offsets(p.dd.to_s).up}"
         else
-          fail "ERROR: Unrecognized sms$to_local key: #{p.key}"
+          efail "Unrecognized sms$to_local key: #{p.key}"
         end
         code="#{p.dh}__#{se}(#{name},#{halo_offset},#{p.dh}__nestlevel)"
         replace_element(code,:expr)
@@ -1396,7 +1405,7 @@ module Fortran
         (1..v["dims"].to_i).each do |dim|
           ["lb","ub"].each do |lub|
             if (b=v["#{lub}#{dim}"]) and b=="explicit"
-              fail "ERROR: Static distributed array ('#{k}') not supported"
+              efail "Static distributed array ('#{k}') not supported"
             end
           end
         end
@@ -1745,20 +1754,20 @@ module Fortran
         # Derived types are not currently supported.
 
         if this.derived_type?
-          fail "ERROR: Derived type instance '#{this}' may not be exchanged"
+          efail "Derived type instance '#{this}' may not be exchanged"
         end
 
         arrdim=i+1
         var=this.name
         varenv=varenv_get(var)
         dims=varenv["dims"]
-        fail "ERROR: Scalar variable '#{var}' may not be exchanged" unless dims
+        efail "Scalar variable '#{var}' may not be exchanged" unless dims
         dh=varenv["decomp"]
-        fail "ERROR: Non-decomposed variable '#{var}' may not be exchanged" unless dh
+        efail "Non-decomposed variable '#{var}' may not be exchanged" unless dh
         sl=this.subscript_list
         unless sl.empty?
           unless sl.size==dims.to_i
-            fail "ERROR: '#{this}' subscript list must be rank #{dims}"
+            efail "'#{this}' subscript list must be rank #{dims}"
           end
         end
         (1..dims).each do |r|
@@ -2039,14 +2048,14 @@ module Fortran
       nest_check("sms$reduce","$omp parallel loop",omp_parallel_loop)
       nest_check("sms$reduce","sms$parallel loop",sms_parallel_loop)
       nvars=vars.size
-      fail "ERROR: sms$reduce supports reduction of #{sms_maxvars} variables max" if nvars>sms_maxvars
+      efail "sms$reduce supports reduction of #{sms_maxvars} variables max" if nvars>sms_maxvars
       use(sms_decompmod)
       sizes=[]
       types=[]
       nvars.times do |i|
         var=vars[i]
         varenv=varenv_get(var)
-        fail "ERROR: sms$reduce inapplicable to distributed array '#{var}'" if varenv["decomp"]
+        efail "sms$reduce inapplicable to distributed array '#{var}'" if varenv["decomp"]
         sizes.push((varenv["sort"]=="array")?("size(#{var})"):("1"))
         types.push(sms_type(var))
       end
@@ -2080,7 +2089,7 @@ module Fortran
   class SMS_Serial < SMS_Region
 
     def not_in_env(name)
-      fail "ERROR: sms$serial-region variable '#{name}' not found in environment and not ignored"
+      efail "sms$serial-region variable '#{name}' not found in environment and not ignored"
     end
 
     def str0
@@ -2094,7 +2103,7 @@ module Fortran
 
       serial_begin=e[0]
       oldblock=e[1]
-      fail "ERROR: sms$serial region contains no statements" if oldblock.e.empty?
+      efail "sms$serial region contains no statements" if oldblock.e.empty?
       serial_end=e[2]
       return if oldblock.e.empty?
       use(sms_decompmod)
@@ -2135,7 +2144,7 @@ module Fortran
       commvars.group_by { |var,treatment| var }.each do |k,v|
         if v.size>1
           t=v.map { |var,treatment| "'#{treatment}'" }.join(", ")
-          fail "ERROR: Multiple treatment (#{t}) specified for sms$serial variable '#{k}'"
+          efail "Multiple treatment (#{t}) specified for sms$serial variable '#{k}'"
         end
       end
 
@@ -2168,7 +2177,7 @@ module Fortran
         if treatment==:implicit_in or treatment==:implicit_out
           unless default==:ignore or default==:unspecified
             not_in_env(var) if varenv.empty?
-            fail "ERROR: Derived type '#{var}' cannot be communicated in sms$serial region" unless basetype_chk(varenv["type"])
+            efail "Derived type '#{var}' cannot be communicated in sms$serial region" unless basetype_chk(varenv["type"])
           end
           dh=(varenv)?(varenv["decomp"]):(nil)
           var_treatment[1]=case default
@@ -2188,11 +2197,11 @@ module Fortran
                                (dh)?(:implicit_in):(:ignore)
                              end
                            else
-                             fail "ERROR: Unknown sms$serial default treatment '#{default}'"
+                             efail "Unknown sms$serial default treatment '#{default}'"
                            end
         else
           unless treatment==:ignore or varenv.empty?
-            fail "ERROR: Derived type '#{var}' cannot be communicated in sms$serial region" unless basetype_chk(varenv["type"])
+            efail "Derived type '#{var}' cannot be communicated in sms$serial region" unless basetype_chk(varenv["type"])
           end
         end
       end
@@ -2224,10 +2233,10 @@ module Fortran
           case treatment
           when :ignore
           when :in
-            fail "ERROR: sms$serial 'in' variable '#{var}' is not decomposed" unless dh
+            efail "sms$serial 'in' variable '#{var}' is not decomposed" unless dh
             schedule_in(var,gathers)
           when :inout
-            fail "ERROR: sms$serial 'inout' variable '#{var}' is not decomposed" unless dh
+            efail "sms$serial 'inout' variable '#{var}' is not decomposed" unless dh
             schedule_in(var,gathers)
             schedule_out(var,sort,dh,bcasts,scatters)
           when :out
@@ -2330,6 +2339,8 @@ module Fortran
 
     def translate
       si=(sms_serial_info=OpenStruct.new)
+      si.allocated=Set.new
+      si.deallocated=Set.new
       si.lvars=Set.new
       si.rvars=Set.new
       si.ptr=Hash.new()
@@ -2662,8 +2673,8 @@ module Fortran
       nest_check("sms$unstructured_grid","$omp parallel loop",omp_parallel_loop)
       nest_check("sms$unstructured_grid","sms$parallel loop",sms_parallel_loop)
       var="#{e[3]}"
-      fail "ERROR: No module info found for variable '#{var}'" unless (varenv=varenv_get(var))
-      fail "ERROR: No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
+      efail "No module info found for variable '#{var}'" unless (varenv=varenv_get(var))
+      efail "No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
       use(sms_decompmod)
       code=[]
       code.push("#{self}")
@@ -2770,12 +2781,12 @@ module Fortran
 
     def errmsg_parallel(in_parallel_loop)
       io=(in_parallel_loop)?("out"):("in")
-      "ERROR: Branch to statement labeled '#{self}' from #{io}side parallel loop"
+      "Branch to statement labeled '#{self}' from #{io}side parallel loop"
     end
 
     def errmsg_serial(in_serial_region)
       io=(in_serial_region)?("out"):("in")
-      "ERROR: Branch to statement labeled '#{self}' from #{io}side serial region"
+      "Branch to statement labeled '#{self}' from #{io}side serial region"
     end
 
     def translate
@@ -2785,10 +2796,10 @@ module Fortran
       if (bt=env[:branch_targets])
         (bt["#{self}"]||[]).each do |label|
           unless sms_serial_region(label)==my_serial_region
-            fail errmsg_serial(my_serial_region)
+            efail errmsg_serial(my_serial_region)
           end
           unless sms_parallel_loop(label)==my_parallel_loop
-            fail errmsg_parallel(my_parallel_loop)
+            efail errmsg_parallel(my_parallel_loop)
           end
         end
       end

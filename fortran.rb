@@ -56,10 +56,10 @@ module Fortran
       begin
         return @modenv_cache[m]=YAML.load(File.open(f))
       rescue Exception=>ex
-        s="ERROR: #{ex.message}\n"
+        s="#{ex.message}\n"
         s+=ex.backtrace.reduce(s) { |m,x| m+="#{x}\n" }
         s+="Error reading #{f}"
-        fail s
+        efail s
       end
     end
     {}
@@ -164,7 +164,7 @@ module Fortran
 
   def sp_default_char_variable?(var)
     unless var.is_a?(Variable)
-      fail "ERROR: Unexpected node type '#{var.class}' for variable '#{var}'"
+      efail "Unexpected node type '#{var.class}' for variable '#{var}'"
     end
     varenv=env["#{var.name}"]
     if varenv and varenv["type"]=="character" and varenv["kind"]=="_"
@@ -696,7 +696,7 @@ module Fortran
       # differ between applications. It may be acceptable to simply disregard
       # a request to define an already-defined variable, in which case a single
       # method suitable for all applications could be defined here.
-      fail "ERROR: Fortran#declare not implemented"
+      efail "Fortran#declare not implemented"
     end
 
     def env
@@ -735,7 +735,7 @@ module Fortran
           return n
         end
       end
-      fail "ERROR: No unused labels available"
+      efail"No unused labels available"
     end
 
     def label_delete
@@ -887,7 +887,7 @@ module Fortran
     def varenv_chk(name,node,expected)
       n="#{name}"
       unless (varenv=node.env[n])
-        fail "ERROR: '#{n}' not found in environment" if expected
+        efail"'#{n}' not found in environment" if expected
       end
       [n,varenv]
     end
@@ -1410,7 +1410,7 @@ module Fortran
       if e[1].is_a?(Variable_Name) or e[1].is_a?(Structure_Component)
         return e[1].name
       end
-      fail "ERROR: Unexpected allocate object class '#{e[1].class}'"
+      efail"Unexpected allocate object class '#{e[1].class}'"
     end
 
     def subscript_list
@@ -2399,6 +2399,14 @@ module Fortran
 
   class Deallocate_Stmt < Stmt
 
+    def items
+      e[3].items
+    end
+
+    def names
+      e[3].names
+    end
+
     def str0
       cat_stmt
     end
@@ -3039,7 +3047,7 @@ module Fortran
   class Function_Prefix < NT
 
     def any?(o)
-      fail "ERROR: Expected string or class" unless o.is_a?(Symbol) or o.is_a?(Class)
+      efail"Expected string or class" unless o.is_a?(Symbol) or o.is_a?(Class)
       e.each do |x|
         return x if ((o.is_a?(Symbol))?("#{x}"=="#{o}"):(x.is_a?(o)))
       end

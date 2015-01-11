@@ -69,11 +69,15 @@ module Common
   end
 
   def nest_check(inner,outer,cond)
-    fail "ERROR: #{inner} may not appear inside #{outer}" if cond
+    efail "#{inner} may not appear inside #{outer}" if cond
   end
 
   def deepcopy(o)
     Marshal.load(Marshal.dump(o))
+  end
+
+  def efail(msg)
+    fail "#{msg}"
   end
 
   def envext
