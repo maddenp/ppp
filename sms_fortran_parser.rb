@@ -93,13 +93,19 @@ module Fortran
                     r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
                     r0 = r8
                   else
-                    r12 = _nt_sms_declarative
+                    r12 = _nt_f2c_directive
                     if r12
                       r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
                       r0 = r12
                     else
-                      @index = i0
-                      r0 = nil
+                      r13 = _nt_sms_declarative
+                      if r13
+                        r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
+                        r0 = r13
+                      else
+                        @index = i0
+                        r0 = nil
+                      end
                     end
                   end
                 end
@@ -144,18 +150,24 @@ module Fortran
       r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
       r2 = r3
     else
-      r4 = _nt_omp_parallel_do_begin
+      r4 = _nt_f2c_sentinel
       if r4
         r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
         r2 = r4
       else
-        r5 = _nt_omp_parallel_do_end
+        r5 = _nt_omp_parallel_do_begin
         if r5
           r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
           r2 = r5
         else
-          @index = i2
-          r2 = nil
+          r6 = _nt_omp_parallel_do_end
+          if r6
+            r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
+            r2 = r6
+          else
+            @index = i2
+            r2 = nil
+          end
         end
       end
     end
@@ -170,28 +182,28 @@ module Fortran
     end
     s0 << r1
     if r1
-      r6 = _nt_t_bang
-      s0 << r6
-      if r6
-        s7, i7 = [], index
+      r7 = _nt_t_bang
+      s0 << r7
+      if r7
+        s8, i8 = [], index
         loop do
-          r8 = _nt_character
-          if r8
-            s7 << r8
+          r9 = _nt_character
+          if r9
+            s8 << r9
           else
             break
           end
         end
-        if s7.empty?
-          @index = i7
-          r7 = nil
+        if s8.empty?
+          @index = i8
+          r8 = nil
         else
-          r7 = instantiate_node(SyntaxNode,input, i7...index, s7)
+          r8 = instantiate_node(SyntaxNode,input, i8...index, s8)
         end
-        s0 << r7
-        if r7
-          r9 = _nt_t_newline
-          s0 << r9
+        s0 << r8
+        if r8
+          r10 = _nt_t_newline
+          s0 << r10
         end
       end
     end
@@ -281,18 +293,24 @@ module Fortran
                 r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
                 r0 = r9
               else
-                r10 = _nt_sms_executable
+                r10 = _nt_f2c_directive
                 if r10
                   r10 = SyntaxNode.new(input, (index-1)...index) if r10 == true
                   r0 = r10
                 else
-                  r11 = _nt_directive
+                  r11 = _nt_sms_executable
                   if r11
                     r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
                     r0 = r11
                   else
-                    @index = i0
-                    r0 = nil
+                    r12 = _nt_directive
+                    if r12
+                      r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
+                      r0 = r12
+                    else
+                      @index = i0
+                      r0 = nil
+                    end
                   end
                 end
               end
@@ -303,6 +321,254 @@ module Fortran
     end
 
     node_cache[:executable_construct][start_index] = r0
+
+    r0
+  end
+
+  module F2cContinuation0
+    def f2c_sentinel
+      elements[0]
+    end
+
+    def f2c_continuation_char
+      elements[1]
+    end
+
+    def f2c_generic
+      elements[2]
+    end
+
+    def t_newline
+      elements[3]
+    end
+  end
+
+  def _nt_f2c_continuation
+    start_index = index
+    if node_cache[:f2c_continuation].has_key?(index)
+      cached = node_cache[:f2c_continuation][index]
+      if cached
+        node_cache[:f2c_continuation][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_f2c_sentinel
+    s0 << r1
+    if r1
+      r2 = _nt_f2c_continuation_char
+      s0 << r2
+      if r2
+        r3 = _nt_f2c_generic
+        s0 << r3
+        if r3
+          r4 = _nt_t_newline
+          s0 << r4
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(F2C_Continuation,input, i0...index, s0)
+      r0.extend(F2cContinuation0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:f2c_continuation][start_index] = r0
+
+    r0
+  end
+
+  def _nt_f2c_continuation_char
+    start_index = index
+    if node_cache[:f2c_continuation_char].has_key?(index)
+      cached = node_cache[:f2c_continuation_char][index]
+      if cached
+        node_cache[:f2c_continuation_char][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if (match_len = has_terminal?(">", false, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
+      @index += match_len
+    else
+      terminal_parse_failure('">"')
+      r0 = nil
+    end
+
+    node_cache[:f2c_continuation_char][start_index] = r0
+
+    r0
+  end
+
+  def _nt_f2c_continuations
+    start_index = index
+    if node_cache[:f2c_continuations].has_key?(index)
+      cached = node_cache[:f2c_continuations][index]
+      if cached
+        node_cache[:f2c_continuations][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    s0, i0 = [], index
+    loop do
+      r1 = _nt_f2c_continuation
+      if r1
+        s0 << r1
+      else
+        break
+      end
+    end
+    r0 = instantiate_node(F2C_Continuations,input, i0...index, s0)
+
+    node_cache[:f2c_continuations][start_index] = r0
+
+    r0
+  end
+
+  module F2cDirective0
+    def f2c_initial
+      elements[0]
+    end
+
+  end
+
+  def _nt_f2c_directive
+    start_index = index
+    if node_cache[:f2c_directive].has_key?(index)
+      cached = node_cache[:f2c_directive][index]
+      if cached
+        node_cache[:f2c_directive][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_f2c_initial
+    s0 << r1
+    if r1
+      r3 = _nt_f2c_continuations
+      if r3
+        r2 = r3
+      else
+        r2 = instantiate_node(SyntaxNode,input, index...index)
+      end
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(F2C_Directive,input, i0...index, s0)
+      r0.extend(F2cDirective0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:f2c_directive][start_index] = r0
+
+    r0
+  end
+
+  def _nt_f2c_generic
+    start_index = index
+    if node_cache[:f2c_generic].has_key?(index)
+      cached = node_cache[:f2c_generic][index]
+      if cached
+        node_cache[:f2c_generic][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A[^\n]+")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
+      @index += match_len
+    else
+      terminal_parse_failure('"[^\\n]+"')
+      r0 = nil
+    end
+
+    node_cache[:f2c_generic][start_index] = r0
+
+    r0
+  end
+
+  module F2cInitial0
+    def f2c_sentinel
+      elements[0]
+    end
+
+    def f2c_generic
+      elements[1]
+    end
+
+    def t_newline
+      elements[2]
+    end
+  end
+
+  def _nt_f2c_initial
+    start_index = index
+    if node_cache[:f2c_initial].has_key?(index)
+      cached = node_cache[:f2c_initial][index]
+      if cached
+        node_cache[:f2c_initial][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_f2c_sentinel
+    s0 << r1
+    if r1
+      r2 = _nt_f2c_generic
+      s0 << r2
+      if r2
+        r3 = _nt_t_newline
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(F2C_Initial,input, i0...index, s0)
+      r0.extend(F2cInitial0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:f2c_initial][start_index] = r0
+
+    r0
+  end
+
+  def _nt_f2c_sentinel
+    start_index = index
+    if node_cache[:f2c_sentinel].has_key?(index)
+      cached = node_cache[:f2c_sentinel][index]
+      if cached
+        node_cache[:f2c_sentinel][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if (match_len = has_terminal?("!acc$", false, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
+      @index += match_len
+    else
+      terminal_parse_failure('"!acc$"')
+      r0 = nil
+    end
+
+    node_cache[:f2c_sentinel][start_index] = r0
 
     r0
   end
@@ -618,11 +884,11 @@ module Fortran
       return cached
     end
 
-    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A![$]omp ")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+    if (match_len = has_terminal?("!$omp ", false, index))
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure('"![$]omp "')
+      terminal_parse_failure('"!$omp "')
       r0 = nil
     end
 
@@ -4294,11 +4560,11 @@ module Fortran
       return cached
     end
 
-    if (match_len = has_terminal?(@regexps['__ir__'+(gr = "\\A!sms[$]")] ||= Regexp.new(gr, Regexp::IGNORECASE), :regexp, index))
+    if (match_len = has_terminal?("!sms$", false, index))
       r0 = instantiate_node(T,input, index...(index + match_len))
       @index += match_len
     else
-      terminal_parse_failure('"!sms[$]"')
+      terminal_parse_failure('"!sms$"')
       r0 = nil
     end
 

@@ -922,6 +922,18 @@ module Fortran
 
   end
 
+  class F2C_Continuation < NT
+  end
+
+  class F2C_Continuations < NT
+  end
+
+  class F2C_Directive < NT
+  end
+
+  class F2C_Initial < NT
+  end
+
   class If_Stmt < Stmt
 
     def translate

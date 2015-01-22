@@ -2,6 +2,7 @@ module Sentinels
 
   def sentinels
     %W[
+        acc$
         $acc
         dec$
         dir$

@@ -11,6 +11,7 @@ grammar Fortran
     format_stmt /
     entry_stmt /
     stmt_function_stmt !{ |e| sp_is_array?(e[0]) } <Declaration_Construct_Stmt_Function_Stmt> /
+    f2c_directive /
     sms_declarative
   end
 
@@ -18,7 +19,7 @@ grammar Fortran
     # Note: Any "comment" not stripped out during normalization is a directive.
     # These are non-SMS directives.
 
-    !( sms_sentinel / omp_parallel_do_begin / omp_parallel_do_end ) t_bang character+ t_newline <Directive>
+    !( sms_sentinel / f2c_sentinel / omp_parallel_do_begin / omp_parallel_do_end ) t_bang character+ t_newline <Directive>
   end
 
   rule executable_construct
@@ -30,8 +31,37 @@ grammar Fortran
     if_construct /
     where_construct /
     omp_parallel_do /
+    f2c_directive /
     sms_executable /
     directive
+  end
+
+  rule f2c_continuation
+    f2c_sentinel f2c_continuation_char f2c_generic t_newline <F2C_Continuation>
+  end
+
+  rule f2c_continuation_char
+    ">" <T>
+  end
+
+  rule f2c_continuations
+    f2c_continuation* <F2C_Continuations>
+  end
+
+  rule f2c_directive
+    f2c_initial f2c_continuations? <F2C_Directive>
+  end
+
+  rule f2c_generic
+    "[^\n]+"ir <T>
+  end
+
+  rule f2c_initial
+    f2c_sentinel f2c_generic t_newline <F2C_Initial>
+  end
+    
+  rule f2c_sentinel
+    "!acc$" <T>
   end
 
   rule omp_clauses
@@ -60,7 +90,7 @@ grammar Fortran
   end
 
   rule omp_sentinel
-    "![$]omp "ir <T>
+    "!$omp " <T>
   end
 
   rule omp_t_do
@@ -264,7 +294,7 @@ grammar Fortran
   end
 
   rule sms_sentinel
-    "!sms[$]"ir <T>
+    "!sms$" <T>
   end
 
   rule sms_serial
