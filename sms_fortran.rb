@@ -883,11 +883,11 @@ module Fortran
             halo_lo=halo_offsets(dd).lo
             halo_up=halo_offsets(dd).up
             if loop_control.is_a?(Loop_Control_1)
+              use(sms_decompmod)
               code="#{dh}__s#{dd}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)"
               replace_element(code,:scalar_numeric_expr,loop_control.lb)
               code=",#{dh}__e#{dd}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)"
               replace_element(code,:loop_control_pair,loop_control.ub)
-              use(sms_decompmod)
             end
           end
           if (h=sms_halo_comp)
@@ -896,16 +896,16 @@ module Fortran
               varenv=varenv_get(do_variable)
               declare(varenv["type"],sms_sidevar)
               replace_element(sms_sidevar,:do_variable,do_variable)
-              
               if loop_control.is_a?(Loop_Control_1)
+                use(sms_decompmod)
                 outer=(inner=ancestor(Do_Construct))
                 outer=outer.ancestor(Do_Construct) while "#{outer}"=="#{inner}"
                 pointvar=outer.do_variable
                 code=",#{dh}__nedge(#{pointvar})"
                 replace_element(code,:loop_control_pair,loop_control.ub)
-                use(sms_decompmod)
+                code="#{h.sidevar}=#{dh}__permedge(#{sms_sidevar},#{pointvar})"
+                inner.body.e.unshift(raw(code,:assignment_stmt,input.srcfile,input.dstfile,{:env=>env}))
               end
-
             end
           end
         end
