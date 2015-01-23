@@ -2000,7 +2000,7 @@ module Fortran
       code.push("allocate(#{decomp}__nedge(size(#{nedge})),stat=#{sms_statusvar})")
       code.push(check_allocate("#{decomp}__nedge",sms_statusvar))
       code.push("#{decomp}__nedge=#{nedge}")
-      code.push("allocate(#{decomp}__permedge(size(#{permedge})),stat=#{sms_statusvar})")
+      code.push("allocate(#{decomp}__permedge(size(#{permedge},1),size(#{permedge},2)),stat=#{sms_statusvar})")
       code.push(check_allocate("#{decomp}__permedge",sms_statusvar))
       code.push("#{decomp}__permedge=#{permedge}")
       replace_statement(code)
