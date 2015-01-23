@@ -1982,6 +1982,14 @@ module Fortran
       e[0].do_stmt
     end
 
+    def do_variable
+      do_stmt.do_variable
+    end
+
+    def loop_control
+      do_stmt.loop_control
+    end
+
   end
 
   class Block_Do_Construct_Main < NT
@@ -2522,6 +2530,23 @@ module Fortran
   end
 
   class Do_Stmt < Stmt
+
+    def do_variable
+      e[0].do_variable
+    end
+
+    def loop_control
+      e[0].loop_control
+    end
+
+    def str0
+      "#{e[0]}"
+    end
+
+    def str1
+      strmemo
+    end
+
   end
 
   class Do_Term_Action_Stmt < Stmt
@@ -3780,8 +3805,16 @@ module Fortran
       e[1]
     end
 
+    def lb
+      e[3]
+    end
+
     def str0
       "#{ir(e[0],""," ")}#{e[1]}#{e[2]}#{e[3]}#{e[4]}#{e[5]}"
+    end
+
+    def ub
+      e[4]
     end
 
   end
@@ -4075,8 +4108,16 @@ module Fortran
       e[0].do_stmt
     end
 
+    def do_variable
+      do_stmt.do_variable
+    end
+
     def label
       e[0].label
+    end
+
+    def loop_control
+      do_stmt.loop_control
     end
 
   end

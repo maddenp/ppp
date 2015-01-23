@@ -11258,6 +11258,20 @@ module Fortran
     r0
   end
 
+  module DoStmt0
+    def label_do_stmt
+      elements[0]
+    end
+
+  end
+
+  module DoStmt1
+    def nonlabel_do_stmt
+      elements[0]
+    end
+
+  end
+
   def _nt_do_stmt
     start_index = index
     if node_cache[:do_stmt].has_key?(index)
@@ -11270,15 +11284,53 @@ module Fortran
     end
 
     i0 = index
-    r1 = _nt_label_do_stmt
+    i1, s1 = index, []
+    r2 = _nt_label_do_stmt
+    s1 << r2
+    if r2
+      if (match_len = has_terminal?("", false, index))
+        r3 = true
+        @index += match_len
+      else
+        terminal_parse_failure('""')
+        r3 = nil
+      end
+      s1 << r3
+    end
+    if s1.last
+      r1 = instantiate_node(Do_Stmt,input, i1...index, s1)
+      r1.extend(DoStmt0)
+    else
+      @index = i1
+      r1 = nil
+    end
     if r1
       r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
-      r2 = _nt_nonlabel_do_stmt
-      if r2
-        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
-        r0 = r2
+      i4, s4 = index, []
+      r5 = _nt_nonlabel_do_stmt
+      s4 << r5
+      if r5
+        if (match_len = has_terminal?("", false, index))
+          r6 = true
+          @index += match_len
+        else
+          terminal_parse_failure('""')
+          r6 = nil
+        end
+        s4 << r6
+      end
+      if s4.last
+        r4 = instantiate_node(Do_Stmt,input, i4...index, s4)
+        r4.extend(DoStmt1)
+      else
+        @index = i4
+        r4 = nil
+      end
+      if r4
+        r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
+        r0 = r4
       else
         @index = i0
         r0 = nil

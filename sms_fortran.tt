@@ -202,6 +202,7 @@ grammar Fortran
     sms_exchange_end /
     sms_exchange /
     sms_halo_comp &{ |e| sp_env_pullup(e[0]) } <SMS_Executable_SMS_Halo_Comp> /
+    sms_halo_comp_setup /
     sms_get_communicator /
     sms_ignore /
     sms_parallel &{ |e| sp_env_pullup(e[0]) } <SMS_Executable_SMS_Parallel> /
@@ -225,7 +226,7 @@ grammar Fortran
   end
 
   rule sms_halo_comp_begin
-    sms_sentinel sms_t_halo_comp t_paren_l sms_halo_comp_pairs t_paren_r sms_t_begin sms_comment? t_newline &{ |e| sp_sms_halo_comp_begin(e[3]) } <SMS_Halo_Comp_Begin>
+    sms_sentinel sms_t_halo_comp t_paren_l sms_halo_comp_pairs sms_halo_comp_sidevar_option? t_paren_r sms_t_begin sms_comment? t_newline &{ |e| sp_sms_halo_comp_begin(e[3],e[4]) } <SMS_Halo_Comp_Begin>
   end
 
   rule sms_halo_comp_end
@@ -238,6 +239,14 @@ grammar Fortran
 
   rule sms_halo_comp_pairs
     sms_halo_comp_pair (t_comma sms_halo_comp_pair)? (t_comma sms_halo_comp_pair)? <SMS_Halo_Comp_Pairs>
+  end
+
+  rule sms_halo_comp_setup
+    sms_sentinel sms_t_halo_comp_setup t_paren_l sms_decomp_name t_comma variable t_comma variable t_paren_r t_newline <SMS_Halo_Comp_Setup>
+  end
+
+  rule sms_halo_comp_sidevar_option
+    t_comma variable <SMS_Halo_Comp_Sidevar_Option>
   end
 
   rule sms_ignore
@@ -420,6 +429,10 @@ grammar Fortran
 
   rule sms_t_halo_comp
     "halo_comp" <T>
+  end
+
+  rule sms_t_halo_comp_setup
+    "halo_comp_setup" <T>
   end
 
   rule sms_t_ignore

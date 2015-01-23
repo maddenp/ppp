@@ -1149,8 +1149,8 @@ grammar Fortran
   rule do_stmt
     # F90:R818
 
-    label_do_stmt /
-    nonlabel_do_stmt
+    label_do_stmt "" <Do_Stmt> /
+    nonlabel_do_stmt "" <Do_Stmt>
   end
 
   rule do_term_action_stmt

@@ -79,16 +79,22 @@ module Fortran
     true
   end
 
-  def sp_sms_halo_comp_begin(halo_comp_pairs)
+  def sp_sms_halo_comp_begin(halo_comp_pairs,sidevar_option)
     efail "sms$halo_comp invalid outside sms$parallel region" unless sms_parallel
     efail "Already inside sms$halo_comp region" if sms_halo_comp
     envpush(false)
     dims={}
-    dims[1]=halo_comp_pairs.e[0]
-    dims[2]=halo_comp_pairs.e[1].e[1] if halo_comp_pairs.e[1].e
-    dims[3]=halo_comp_pairs.e[2].e[1] if halo_comp_pairs.e[2].e
-    env[:sms_halo_comp]={}
-    dims.each { |k,v| sms_halo_comp[k]=OpenStruct.new({:lo=>"#{v.lo}",:up=>"#{v.up}"}) }
+    dims["1"]=halo_comp_pairs.e[0]
+    dims["2"]=halo_comp_pairs.e[1].e[1] if halo_comp_pairs.e[1].e
+    dims["3"]=halo_comp_pairs.e[2].e[1] if halo_comp_pairs.e[2].e
+    halo_comp_hash={}
+    dims.each do |k,v|
+      halo_comp_hash[k]=OpenStruct.new({:lo=>"#{v.lo}",:up=>"#{v.up}"})
+    end
+    if (sidevar_option.is_a?(SMS_Halo_Comp_Sidevar_Option))
+      halo_comp_hash[:sidevar]="#{sidevar_option.sidevar}"
+    end
+    env[:sms_halo_comp]=OpenStruct.new(halo_comp_hash)
     true
   end
 
@@ -584,8 +590,9 @@ module Fortran
     def halo_offsets(dd)
       halo_lo=0
       halo_up=0
-      if halocomp=sms_halo_comp
-        offsets=halocomp[dd]
+      if (halocomp=sms_halo_comp)
+#       offsets=halocomp[dd]
+        offsets=halocomp.send("#{dd}")
         halo_lo=offsets.lo
         halo_up=offsets.up
       end
@@ -864,6 +871,7 @@ module Fortran
     def translate
       unless sms_ignore or sms_serial
         if (p=sms_parallel)
+          dh=p.decomp
           dd=nil
           [0,1,2].each do |i|
             if p.vars[i].include?("#{do_variable}")
@@ -872,15 +880,32 @@ module Fortran
             end
           end
           if dd
-            dh=p.decomp
             halo_lo=halo_offsets(dd).lo
             halo_up=halo_offsets(dd).up
             if loop_control.is_a?(Loop_Control_1)
               code="#{dh}__s#{dd}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)"
-              replace_element(code,:scalar_numeric_expr,loop_control.e[3])
+              replace_element(code,:scalar_numeric_expr,loop_control.lb)
               code=",#{dh}__e#{dd}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)"
-              replace_element(code,:loop_control_pair,loop_control.e[4])
+              replace_element(code,:loop_control_pair,loop_control.ub)
               use(sms_decompmod)
+            end
+          end
+          if (h=sms_halo_comp)
+            if "#{h.sidevar}"=="#{do_variable}"
+              sms_sidevar="sms__#{do_variable}"
+              varenv=varenv_get(do_variable)
+              declare(varenv["type"],sms_sidevar)
+              replace_element(sms_sidevar,:do_variable,do_variable)
+              
+              if loop_control.is_a?(Loop_Control_1)
+                outer=(inner=ancestor(Do_Construct))
+                outer=outer.ancestor(Do_Construct) while "#{outer}"=="#{inner}"
+                pointvar=outer.do_variable
+                code=",#{dh}__nedge(#{pointvar})"
+                replace_element(code,:loop_control_pair,loop_control.ub)
+                use(sms_decompmod)
+              end
+
             end
           end
         end
@@ -1633,33 +1658,41 @@ module Fortran
 
   class SMS_Declare_Decomp < SMS
 
+    def decomp
+      e[3]
+    end
+
     def str0
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]}#{e[7]}")
     end
 
     def translate
+      if not inside?(Module) or inside?(Function_Subprogram,Subroutine_Subprogram)
+        efail "sms$declare_decomp must appear in a module specification section"
+      end
       use("sms__module")
-      dh="#{e[3]}"
-      declare("integer","#{dh}__maxnests",{:attrs=>"parameter",:init=>"1"})
-      declare("integer","#{dh}__ppp_max_regions",{:attrs=>"parameter",:init=>"1"})
-      declare("character*32","#{dh}__decompname")
-      declare("integer","#{dh}__boundarytype",{:dims=>%W[sms__max_decomposed_dims]})
-      declare("integer","#{dh}__e1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__globalsize",  {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__halosize",    {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__ignore")
-      declare("integer","#{dh}__index")
-      declare("integer","#{dh}__local_lb",    {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__local_ub",    {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__localhalosize")
-      declare("integer","#{dh}__localsize",   {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__lowbounds",   {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
-      declare("integer","#{dh}__nestlevel")
-      declare("integer","#{dh}__nestlevels",  {:dims=>%W[#{dh}__maxnests]})
-      declare("integer","#{dh}__nregions")
-      declare("integer","#{dh}__s1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
-      declare("integer","#{dh}__upperbounds", {:dims=>%W[sms__max_decomposed_dims #{dh}__maxnests]})
-      declare("integer",dh,{:dims=>%W[1]})
+      declare("integer","#{decomp}__maxnests",{:attrs=>"parameter",:init=>"1"})
+      declare("integer","#{decomp}__ppp_max_regions",{:attrs=>"parameter",:init=>"1"})
+      declare("character*32","#{decomp}__decompname")
+      declare("integer","#{decomp}",{:dims=>%W[1]})
+      declare("integer","#{decomp}__boundarytype",{:dims=>%W[sms__max_decomposed_dims]})
+      declare("integer","#{decomp}__e1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{decomp}__globalsize",  {:dims=>%W[sms__max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__halosize",    {:dims=>%W[sms__max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__ignore")
+      declare("integer","#{decomp}__index")
+      declare("integer","#{decomp}__local_lb",    {:dims=>%W[sms__max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__local_ub",    {:dims=>%W[sms__max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__localhalosize")
+      declare("integer","#{decomp}__localsize",   {:dims=>%W[sms__max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__lowbounds",   {:dims=>%W[sms__max_decomposed_dims #{decomp}__maxnests]})
+      declare("integer","#{decomp}__nedge",{:attrs=>["allocatable"],:dims=>[":"]})
+      declare("integer","#{decomp}__nestlevel")
+      declare("integer","#{decomp}__nestlevels",  {:dims=>%W[#{decomp}__maxnests]})
+      declare("integer","#{decomp}__nregions")
+      declare("integer","#{decomp}__permedge",{:attrs=>["allocatable"],:dims=>[":",":"]})
+      declare("integer","#{decomp}__s1",{:attrs=>["allocatable"],:dims=>%W[: : :]})
+      declare("integer","#{decomp}__upperbounds", {:dims=>%W[sms__max_decomposed_dims #{decomp}__maxnests]})
     end
 
   end
@@ -1876,8 +1909,12 @@ module Fortran
 
   class SMS_Halo_Comp_Begin < SMS
 
+    def sidevar
+      (e[4].is_a?(SMS_Halo_Comp_Sidevar))?(e[4].sidevar):(nil)
+    end
+
     def str0
-      sms("#{e[2]}#{e[3]}#{e[4]} #{e[5]}")
+      sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]} #{e[6]}")
     end
 
   end
@@ -1915,6 +1952,58 @@ module Fortran
 
   end
 
+  class SMS_Halo_Comp_Setup < SMS
+
+    def decomp
+      e[3]
+    end
+
+    def nedge
+      e[5]
+    end
+
+    def permedge
+      e[7]
+    end
+
+    def translate
+
+      use(sms_decompmod)
+
+      [[nedge,1],[permedge,2]].each do |var,rank|
+        varenv=varenv_get(var)
+        unless varenv["dims"]==rank
+          efail "sms$halo_comp_setup variable '#{var}' must be rank #{rank}"
+        end
+        unless varenv["type"]=="integer"
+          efail "sms$halo_comp_setup variable '#{var}' must be type integer"
+        end
+        unless varenv["sort"]=="array"
+          efail "sms$halo_comp_setup variable '#{var}' must be an array"
+        end
+      end
+
+      code=[]
+      code.push("allocate(#{decomp}_nedge(size(#{nedge})),stat=#{sms_statusvar})")
+      code.push(check_allocate("#{decomp}_nedge",sms_statusvar))
+      code.push("#{decomp}_nedge=#{nedge}")
+      code.push("allocate(#{decomp}_permedge(size(#{permedge})),stat=#{sms_statusvar})")
+      code.push(check_allocate("#{decomp}_permedge",sms_statusvar))
+      code.push("#{decomp}_permedge=#{permedge}")
+      replace_statement(code)
+
+    end
+
+  end
+
+  class SMS_Halo_Comp_Sidevar_Option < NT
+
+    def sidevar
+      e[1]
+    end
+
+  end
+
   class SMS_Ignore < SMS_Region
 
     def translate
@@ -1942,16 +2031,32 @@ module Fortran
 
   class SMS_Parallel < SMS_Region
 
+    def decomp
+      e[0].decomp
+    end
+
     def str0
       "#{e[0]}#{e[1]}#{e[2]}"
+    end
+
+    def vars
+      e[0].vars
     end
 
   end
 
   class SMS_Parallel_Begin < SMS
 
+    def decomp
+      e[3]
+    end
+
     def str0
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}#{e[6]} #{e[7]}")
+    end
+
+    def vars
+      e[5].vars
     end
 
   end
