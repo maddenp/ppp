@@ -1997,10 +1997,10 @@ module Fortran
 
       code=[]
       code.push("#{self}")
-      code.push("allocate(#{decomp}__nedge(size(#{nedge})),stat=#{sms_statusvar})")
+      code.push("allocate(#{decomp}__nedge(lbound(#{nedge},1):ubound(#{nedge},1)),stat=#{sms_statusvar})")
       code.push(check_allocate("#{decomp}__nedge",sms_statusvar))
       code.push("#{decomp}__nedge=#{nedge}")
-      code.push("allocate(#{decomp}__permedge(size(#{permedge},1),size(#{permedge},2)),stat=#{sms_statusvar})")
+      code.push("allocate(#{decomp}__permedge(lbound(#{permedge},1):ubound(#{permedge},1),lbound(#{permedge},2):ubound(#{permedge},2)),stat=#{sms_statusvar})")
       code.push(check_allocate("#{decomp}__permedge",sms_statusvar))
       code.push("#{decomp}__permedge=#{permedge}")
       replace_statement(code)
