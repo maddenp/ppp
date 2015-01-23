@@ -591,7 +591,6 @@ module Fortran
       halo_lo=0
       halo_up=0
       if (halocomp=sms_halo_comp)
-#       offsets=halocomp[dd]
         offsets=halocomp.send("#{dd}")
         halo_lo=offsets.lo
         halo_up=offsets.up
@@ -868,44 +867,47 @@ module Fortran
 
   class Do_Stmt < Stmt
 
-    def translate
-      unless sms_ignore or sms_serial
-        if (p=sms_parallel)
-          dh=p.decomp
-          dd=nil
-          [0,1,2].each do |i|
-            if p.vars[i].include?("#{do_variable}")
-              dd=i+1
-              break
-            end
+    def do_stmt_translate
+      return if sms_ignore or sms_serial
+      if (p=sms_parallel)
+        dh=p.decomp
+        dd=nil
+        [0,1,2].each do |i|
+          if p.vars[i].include?("#{do_variable}")
+            dd=i+1
+            break
           end
-          if dd
-            halo_lo=halo_offsets(dd).lo
-            halo_up=halo_offsets(dd).up
+        end
+        if dd
+          halo_lo=halo_offsets(dd).lo
+          halo_up=halo_offsets(dd).up
+          if loop_control.is_a?(Loop_Control_1)
+            use(sms_decompmod)
+            code="#{dh}__s#{dd}(#{loop_control.lb},#{halo_lo},#{dh}__nestlevel)"
+            replace_element(code,:scalar_numeric_expr,loop_control.lb)
+            code=",#{dh}__e#{dd}(#{loop_control.ub.value},#{halo_up},#{dh}__nestlevel)"
+            replace_element(code,:loop_control_pair,loop_control.ub)
+          elsif loop_control.is_a?(Loop_Control_2)
+            ifail "Unexpected Loop_Control_2 node"
+          end
+        end
+        if (h=sms_halo_comp)
+          if "#{h.sidevar}"=="#{do_variable}"
+            sms_sidevar="sms__#{do_variable}"
+            varenv=varenv_get(do_variable)
+            declare(varenv["type"],sms_sidevar)
+            replace_element(sms_sidevar,:do_variable,do_variable)
             if loop_control.is_a?(Loop_Control_1)
               use(sms_decompmod)
-              code="#{dh}__s#{dd}(#{loop_control.e[3]},#{halo_lo},#{dh}__nestlevel)"
-              replace_element(code,:scalar_numeric_expr,loop_control.lb)
-              code=",#{dh}__e#{dd}(#{loop_control.e[4].value},#{halo_up},#{dh}__nestlevel)"
+              outer=(inner=ancestor(Do_Construct))
+              outer=outer.ancestor(Do_Construct) while "#{outer}"=="#{inner}"
+              pointvar=outer.do_variable
+              code=",#{dh}__nedge(#{pointvar})"
               replace_element(code,:loop_control_pair,loop_control.ub)
-            end
-          end
-          if (h=sms_halo_comp)
-            if "#{h.sidevar}"=="#{do_variable}"
-              sms_sidevar="sms__#{do_variable}"
-              varenv=varenv_get(do_variable)
-              declare(varenv["type"],sms_sidevar)
-              replace_element(sms_sidevar,:do_variable,do_variable)
-              if loop_control.is_a?(Loop_Control_1)
-                use(sms_decompmod)
-                outer=(inner=ancestor(Do_Construct))
-                outer=outer.ancestor(Do_Construct) while "#{outer}"=="#{inner}"
-                pointvar=outer.do_variable
-                code=",#{dh}__nedge(#{pointvar})"
-                replace_element(code,:loop_control_pair,loop_control.ub)
-                code="#{h.sidevar}=#{dh}__permedge(#{sms_sidevar},#{pointvar})"
-                inner.body.e.unshift(raw(code,:assignment_stmt,input.srcfile,input.dstfile,{:env=>env}))
-              end
+              code="#{h.sidevar}=#{dh}__permedge(#{sms_sidevar},#{pointvar})"
+              inner.body.e.unshift(raw(code,:assignment_stmt,input.srcfile,input.dstfile,{:env=>env}))
+            elsif loop_control.is_a?(Loop_Control_2)
+              ifail "Unexpected Loop_Control_2 node"
             end
           end
         end
@@ -1177,6 +1179,11 @@ module Fortran
   end
 
   class Label_Do_Stmt < Do_Stmt
+
+    def translate
+      do_stmt_translate
+    end
+
   end
 
   class Main_Program < Scoping_Unit
@@ -1290,6 +1297,11 @@ module Fortran
   end
 
   class Nonlabel_Do_Stmt < Do_Stmt
+
+    def translate
+      do_stmt_translate
+    end
+
   end
 
   class Nullify_Stmt < Stmt
