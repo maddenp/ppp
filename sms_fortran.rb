@@ -898,14 +898,27 @@ module Fortran
             declare(varenv["type"],sms_sidevar)
             replace_element(sms_sidevar,:do_variable,do_variable)
             if loop_control.is_a?(Loop_Control_1)
-              use(sms_decompmod)
-              outer=(inner=ancestor(Do_Construct))
-              outer=outer.ancestor(Do_Construct) while "#{outer}"=="#{inner}"
-              pointvar=outer.do_variable
+              # The '!sms$parallel (dh,ipn) begin' directive, in current usage,
+              # yields '[["ipn"], [], []]' for p.vars. The idea is to extract
+              # 'ipn' as the iterator variable over grid points. In its full
+              # glory, however, sms$parallel supports multipe iterator variable
+              # names in each of the 1st, 2nd and 3rd decomposed dimensions. We
+              # do the naive thing here: Expect the simplest possible usage, and
+              # give up if we see something more complicated.
+              errmsg="Unsupported sms$parallal / sms$halo_comp combination"
+              pointvar_arrays=p.vars.reject { |x| x.empty? }
+              ifail errmsg unless pointvar_arrays.size==1
+              pointvar_array=pointvar_arrays.first
+              ifail errmsg unless pointvar_array.size==1
+              pointvar=pointvar_array.first
+              # Now that we know the loop-over-points iterator variable name,
+              # proceed with code modification.
               code=",#{dh}__nedge(#{pointvar})"
               replace_element(code,:loop_control_pair,loop_control.ub)
               code="#{h.sidevar}=#{dh}__permedge(#{sms_sidevar},#{pointvar})"
-              inner.body.e.unshift(raw(code,:assignment_stmt,input.srcfile,input.dstfile,{:env=>env}))
+              sideloop=ancestor(Do_Construct)
+              sideloop.body.e.unshift(raw(code,:assignment_stmt,input.srcfile,input.dstfile,{:env=>env}))
+              use(sms_decompmod)
             elsif loop_control.is_a?(Loop_Control_2)
               ifail "Unexpected Loop_Control_2 node"
             end
