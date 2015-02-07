@@ -121,6 +121,12 @@ module Fortran
     true
   end
 
+  def sp_sms_order_grid
+    nest_check("sms$order_grid","sms$ignore",sms_ignore)
+    nest_check("sms$order_grid","sms$serial",sms_serial)
+    true
+  end
+
   def sp_sms_parallel
     envpop(false)
     true
@@ -168,6 +174,12 @@ module Fortran
     true
   end
 
+  def sp_sms_set_prox_and_proxs
+    nest_check("sms$set_prox_and_proxs","sms$ignore",sms_ignore)
+    nest_check("sms$set_prox_and_proxs","sms$serial",sms_serial)
+    true
+  end
+
   def sp_sms_start
     nest_check("sms$start","sms$serial",sms_serial)
     true
@@ -195,11 +207,6 @@ module Fortran
 
   def sp_sms_to_local_end
     efail "Not inside sms$to_local region" unless sms_to_local
-    true
-  end
-
-  def sp_sms_unstructured_grid
-    nest_check("sms$unstructured_grid","sms$serial",sms_serial)
     true
   end
 
@@ -2055,13 +2062,15 @@ module Fortran
 
   end
 
-  class SMS_Ordergrid < SMS
+  class SMS_Order_Grid < SMS
 
     def translate
+      nest_check("sms$order_grid","$omp parallel loop",omp_parallel_loop)
+      nest_check("sms$order_grid","sms$parallel loop",sms_parallel_loop)
       use(sms_decompmod)
       code=[]
       code.push("#{self}")
-      code.push("call sms__orderGrid(#{e[3..19].map { |x| x.to_s }.join})")
+      code.push("call sms__order_grid(#{e[3..19].map { |x| x.to_s }.join})")
       replace_statement(code)
     end
 
@@ -2685,6 +2694,29 @@ module Fortran
 
   end
 
+  class SMS_Set_Prox_And_Proxs < SMS
+
+    def decomp
+      e[3]
+    end
+
+    def translate
+      nest_check("sms$set_prox_and_proxs","$omp parallel loop",omp_parallel_loop)
+      nest_check("sms$set_prox_and_proxs","sms$parallel loop",sms_parallel_loop)
+      use(sms_decompmod)
+      dh=decomp
+      code=[]
+      code.push("#{self}")
+      code.push("call sms__set_prox_and_proxs(#{dh}(1),#{e[5..15].map { |x| x.to_s }.join})")
+      code.push("call sms__get_collapsed_halo_size(#{dh}(#{dh}__nestlevel),1,1,#{dh}__localhalosize,#{sms_statusvar})")
+      code.push(sms_chkstat)
+      code.push("#{dh}__s1(1,1,#{dh}__nestlevel)=#{dh}__s1(1,0,#{dh}__nestlevel)")
+      code.push("#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),1,#{dh}__nestlevel)=#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),0,#{dh}__nestlevel)+#{dh}__localhalosize")
+      replace_statement(code)
+    end
+
+  end
+
   class SMS_Start < SMS
 
     def translate
@@ -2814,31 +2846,6 @@ module Fortran
 
     def vars
       ["#{e[0]}"]+((e[1].e)?(e[1].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
-    end
-
-  end
-
-  class SMS_Unstructured_Grid < SMS
-
-    def str0
-      sms("#{e[2]}#{e[3]}#{e[4]}")
-    end
-
-    def translate
-      nest_check("sms$unstructured_grid","$omp parallel loop",omp_parallel_loop)
-      nest_check("sms$unstructured_grid","sms$parallel loop",sms_parallel_loop)
-      var="#{e[3]}"
-      efail "No module info found for variable '#{var}'" unless (varenv=varenv_get(var))
-      efail "No decomp info found for variable '#{var}'" unless (dh=varenv["decomp"])
-      use(sms_decompmod)
-      code=[]
-      code.push("#{self}")
-      code.push("call sms__unstructuredgrid(#{dh},size(#{var},1),#{var})")
-      code.push("call sms__get_collapsed_halo_size(#{dh}(#{dh}__nestlevel),1,1,#{dh}__localhalosize,#{sms_statusvar})")
-      code.push(sms_chkstat)
-      code.push("#{dh}__s1(1,1,#{dh}__nestlevel)=#{dh}__s1(1,0,#{dh}__nestlevel)")
-      code.push("#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),1,#{dh}__nestlevel)=#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),0,#{dh}__nestlevel)+#{dh}__localhalosize")
-      replace_statement(code)
     end
 
   end
