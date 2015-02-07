@@ -2055,6 +2055,18 @@ module Fortran
 
   end
 
+  class SMS_Ordergrid < SMS
+
+    def translate
+      use(sms_decompmod)
+      code=[]
+      code.push("#{self}")
+      code.push("call sms__orderGrid(#{e[3..19].map { |x| x.to_s }.join})")
+      replace_statement(code)
+    end
+
+  end
+
   class SMS_Parallel < SMS_Region
 
     def decomp

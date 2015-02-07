@@ -205,6 +205,7 @@ grammar Fortran
     sms_halo_comp_setup /
     sms_get_communicator /
     sms_ignore /
+    sms_ordergrid /
     sms_parallel &{ |e| sp_env_pullup(e[0]) } <SMS_Executable_SMS_Parallel> /
     sms_reduce /
     sms_serial &{ |e| sp_env_pullup(e[0]) } <SMS_Executable_SMS_Serial> /
@@ -259,6 +260,10 @@ grammar Fortran
 
   rule sms_ignore_end
     sms_sentinel sms_t_ignore sms_t_end sms_comment? t_newline &{ |e| sp_sms_ignore_end } <SMS_Ignore_End>
+  end
+
+  rule sms_ordergrid
+    sms_sentinel sms_t_ordergrid t_paren_l variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_paren_r t_newline <SMS_Ordergrid>
   end
 
   rule sms_parallel
@@ -457,6 +462,10 @@ grammar Fortran
 
   rule sms_t_min
     "min" <T>
+  end
+
+  rule sms_t_ordergrid
+    "ordergrid" <T>
   end
 
   rule sms_t_out
