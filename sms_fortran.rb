@@ -440,7 +440,7 @@ module Fortran
     def code_scatter(vars,iostat=nil)
       code=[]
       vars.each do |var|
-        tag=sms_commtag
+        tag="sms__scatter_tag"
         varenv=varenv_get(var)
         dh=varenv["decomp"]
         ifail "No decomp defined" unless dh
