@@ -2870,7 +2870,7 @@ module Fortran
     def vars
       def rec(list,v)
         list.vars.each do |x|
-          v[x]=OpenStruct.new({:dd=>list.idx,:key=>"#{list.key}"})
+          v["#{x}"]=OpenStruct.new({:dd=>list.idx,:key=>"#{list.key}"})
         end
       end
       v={}
@@ -2897,13 +2897,12 @@ module Fortran
       v.join(",")
     end
 
-    def vars
-      ["#{e[0]}"]+((e[1].e)?(e[1].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
-    end
-
 #   def vars
-#     [e[0]]+((e[1].e)?(e[1].e.reduce([]) { |m,x| m.push(x.e[1]) }):([]))
+#     ["#{e[0]}"]+((e[1].e)?(e[1].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
 #   end
+    def vars
+      [e[0]]+((e[1].e)?(e[1].e.reduce([]) { |m,x| m.push(x.e[1]) }):([]))
+    end
 
   end
 
