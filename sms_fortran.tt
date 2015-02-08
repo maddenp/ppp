@@ -181,16 +181,16 @@ grammar Fortran
   end
 
   rule sms_exchange
-    sms_sentinel sms_t_exchange t_paren_l variable ( t_comma variable )* t_paren_r sms_comment? t_newline &{ |e| sp_sms_exchange } <SMS_Exchange>
+    sms_sentinel sms_t_exchange t_paren_l sms_variable_list t_paren_r sms_comment? t_newline &{ |e| sp_sms_exchange } <SMS_Exchange>
   end
 
-  rule sms_exchange_begin
-    sms_sentinel sms_t_exchange_begin t_paren_l variable ( t_comma variable )* t_paren_r sms_comment? t_newline &{ |e| sp_sms_exchange_begin } <SMS_Exchange_Begin>
-  end
+# rule sms_exchange_begin
+#   sms_sentinel sms_t_exchange_begin t_paren_l variable ( t_comma variable )* t_paren_r sms_comment? t_newline &{ |e| sp_sms_exchange_begin } <SMS_Exchange_Begin>
+# end
 
-  rule sms_exchange_end
-    sms_sentinel sms_t_exchange_end sms_comment? t_newline &{ |e| sp_sms_exchange_end } <SMS_Exchange_End>
-  end
+# rule sms_exchange_end
+#   sms_sentinel sms_t_exchange_end sms_comment? t_newline &{ |e| sp_sms_exchange_end } <SMS_Exchange_End>
+# end
 
   rule sms_executable
     sms_barrier /
@@ -198,8 +198,8 @@ grammar Fortran
     sms_comm_size /
     sms_compare_var /
     sms_create_decomp /
-    sms_exchange_begin /
-    sms_exchange_end /
+#   sms_exchange_begin /
+#   sms_exchange_end /
     sms_exchange /
     sms_halo_comp &{ |e| sp_env_pullup(e[0]) } <SMS_Executable_SMS_Halo_Comp> /
     sms_halo_comp_setup /
@@ -554,7 +554,7 @@ grammar Fortran
   end
 
   rule sms_to_local_list
-    t_lt sms_distribute_dim t_comma sms_var_list t_colon sms_to_local_key t_gt <SMS_To_Local_List>
+    t_lt sms_distribute_dim t_comma sms_variable_name_list t_colon sms_to_local_key t_gt <SMS_To_Local_List>
   end
 
   rule sms_to_local_lists
@@ -574,8 +574,12 @@ grammar Fortran
     variable "" <SMS_Varlist3D_6>
   end
 
-  rule sms_var_list
-    variable_name ( t_comma variable_name )* <SMS_Var_List>
+  rule sms_variable_list
+    variable ( t_comma variable )* <SMS_Variable_List>
+  end
+
+  rule sms_variable_name_list
+    variable_name ( t_comma variable_name )* <SMS_Variable_Name_List>
   end
 
   rule sms_zerotimers

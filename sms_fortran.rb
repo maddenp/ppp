@@ -50,19 +50,20 @@ module Fortran
   end
 
   def sp_sms_exchange
+    nest_check("sms$exchange","sms$ignore",sms_ignore)
     nest_check("sms$exchange","sms$serial",sms_serial)
     true
   end
 
-  def sp_sms_exchange_begin
-    nest_check("sms$exchange_begin","sms$serial",sms_serial)
-    true
-  end
+# def sp_sms_exchange_begin
+#   nest_check("sms$exchange_begin","sms$serial",sms_serial)
+#   true
+# end
 
-  def sp_sms_exchange_end
-    nest_check("sms$exchange_end","sms$serial",sms_serial)
-    true
-  end
+# def sp_sms_exchange_end
+#   nest_check("sms$exchange_end","sms$serial",sms_serial)
+#   true
+# end
 
   def sp_sms_distribute_end
 
@@ -1778,6 +1779,9 @@ module Fortran
 
   end
 
+  class SMS_Exchange_Vars_Option < List
+  end
+
   class SMS_Exchange_Common < SMS
 
     def str0
@@ -1882,32 +1886,76 @@ module Fortran
 
   end
 
-  class SMS_Exchange_Begin < SMS_Exchange_Common
+# class SMS_Exchange_Begin < SMS_Exchange_Common
+#
+#   def translate
+#     nest_check("sms$exchange_begin","$omp parallel loop",omp_parallel_loop)
+#     nest_check("sms$exchange_begin","sms$parallel loop",sms_parallel_loop)
+#     translate_common(".true.")
+#   end
+#
+# end
 
-    def translate
-      nest_check("sms$exchange_begin","$omp parallel loop",omp_parallel_loop)
-      nest_check("sms$exchange_begin","sms$parallel loop",sms_parallel_loop)
-      translate_common(".true.")
-    end
+# class SMS_Exchange_End < SMS
+#
+#   def str0
+#     sms("")
+#   end
+#
+#   def translate
+#     nest_check("sms$exchange_end","$omp parallel loop",omp_parallel_loop)
+#     nest_check("sms$exchange_end","sms$parallel loop",sms_parallel_loop)
+#     code=[]
+#     code.push("#{self}")
+#     code.push("call sms__exchange_end")
+#     replace_statement(code)
+#   end
+#
+# end
 
-  end
+  #PM# NEW
 
-  class SMS_Exchange_End < SMS
-
-    def str0
-      sms("")
-    end
-
-    def translate
-      nest_check("sms$exchange_end","$omp parallel loop",omp_parallel_loop)
-      nest_check("sms$exchange_end","sms$parallel loop",sms_parallel_loop)
-      code=[]
-      code.push("#{self}")
-      code.push("call sms__exchange_end")
-      replace_statement(code)
-    end
-
-  end
+# class SMS_Exchange < SMS
+#
+#   def str0
+#     sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}")
+#   end
+#
+#   def vars
+#     e[3].vars
+#   end
+#
+#   def translate
+#     nest_check("sms$exchange","$omp parallel loop",omp_parallel_loop)
+#     nest_check("sms$exchange","sms$parallel loop",sms_parallel_loop)
+#     use(sms_decompmod)
+#     use("sms__exchangemodule",["sms__exchange"])
+#     code=[]
+#     code.push("#{self}")
+#     vars.each do |var|
+#       if var.derived_type?
+#         efail "Derived type instance '#{var}' may not be exchanged"
+#       end
+#       varenv=varenv_get(var.name)
+#       dims=varenv["dims"]
+#       efail "Scalar variable '#{var}' may not be exchanged" unless dims
+#       dh=varenv["decomp"]
+#       efail "Non-decomposed variable '#{var}' may not be exchanged" unless dh
+#       sl=var.subscript_list
+#       unless sl.empty? or sl.size==dims.to_i
+#         efail "'#{var}' subscript list must be rank #{dims}"
+#       end
+#       perms=(1..7).to_a.map { |x| (varenv["dim#{x}"])?(1):(0) }.join(",")
+#       overlap=".false."
+#       name="'#{var}'//char(0)"
+#       tag=sms_commtag
+#       code.push("call sms__exchange((/#{perms}/),#{overlap},#{name},#{tag},#{var})")
+#       code.push(sms_chkstat)
+#     end
+#     replace_statement(code)
+#   end
+#
+# end
 
   class SMS_Executable_SMS_Halo_Comp < SMS
   end
@@ -2836,7 +2884,12 @@ module Fortran
 
   end
 
-  class SMS_Var_List < SMS
+  class SMS_Variable_List_Common < SMS
+
+#   def each
+#     list=((e[1].e)?(e[1].e.reduce([e[0]]) { |m,x| m.push(x.e[1]) }):([e[0]]))
+#     list.each { |node| yield node }
+#   end
 
     def str0
       v=["#{e[0]}"]
@@ -2848,6 +2901,16 @@ module Fortran
       ["#{e[0]}"]+((e[1].e)?(e[1].e.reduce([]) { |m,x| m.push("#{x.e[1]}") }):([]))
     end
 
+#   def vars
+#     [e[0]]+((e[1].e)?(e[1].e.reduce([]) { |m,x| m.push(x.e[1]) }):([]))
+#   end
+
+  end
+
+  class SMS_Variable_List < SMS_Variable_List_Common
+  end
+
+  class SMS_Variable_Name_List < SMS_Variable_List_Common
   end
 
   class SMS_Unstructured_Print_Timers < SMS
