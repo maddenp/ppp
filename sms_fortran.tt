@@ -184,22 +184,12 @@ grammar Fortran
     sms_sentinel sms_t_exchange t_paren_l sms_variable_list t_paren_r sms_comment? t_newline &{ |e| sp_sms_exchange } <SMS_Exchange>
   end
 
-# rule sms_exchange_begin
-#   sms_sentinel sms_t_exchange_begin t_paren_l variable ( t_comma variable )* t_paren_r sms_comment? t_newline &{ |e| sp_sms_exchange_begin } <SMS_Exchange_Begin>
-# end
-
-# rule sms_exchange_end
-#   sms_sentinel sms_t_exchange_end sms_comment? t_newline &{ |e| sp_sms_exchange_end } <SMS_Exchange_End>
-# end
-
   rule sms_executable
     sms_barrier /
     sms_comm_rank /
     sms_comm_size /
     sms_compare_var /
     sms_create_decomp /
-#   sms_exchange_begin /
-#   sms_exchange_end /
     sms_exchange /
     sms_halo_comp &{ |e| sp_env_pullup(e[0]) } <SMS_Executable_SMS_Halo_Comp> /
     sms_halo_comp_setup /
