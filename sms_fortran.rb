@@ -1945,9 +1945,9 @@ module Fortran
         end
         perms=(1..7).to_a.map { |x| (varenv["dim#{x}"])?(1):(0) }.join(",")
         overlap=".false."
-        name="'#{var}'//char(0)"
+        name="'#{var.name}'//char(0)"
         tag=sms_commtag
-        code.push("call sms__exchange((/#{perms}/),#{overlap},#{name},#{tag},#{var})")
+        code.push("call sms__exchange((/#{perms}/),#{overlap},#{name},#{tag},#{var.name})")
         code.push(sms_chkstat)
       end
       replace_statement(code)
