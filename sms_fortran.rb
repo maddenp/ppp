@@ -1927,7 +1927,6 @@ module Fortran
       nest_check("sms$exchange","$omp parallel loop",omp_parallel_loop)
       nest_check("sms$exchange","sms$parallel loop",sms_parallel_loop)
       use(sms_decompmod)
-      use("sms__exchangemodule",["sms__exchange"])
       code=[]
       code.push("#{self}")
       vars.each do |var|
