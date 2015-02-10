@@ -1598,7 +1598,6 @@ module Fortran
         code.push("#{d}__globalsize(#{dim},#{n})=#{(g)?(g):(1)}")
         code.push("#{d}__localsize(#{dim},#{n})=0")
         code.push("#{d}__halosize(#{dim},#{n})=#{(h)?(h):(0)}")
-        code.push("#{d}__boundarytype(#{dim})=sms__nonperiodic_bdy")
         code.push("#{d}__lowbounds(#{dim},#{n})=1")
       end
       max.times do |i|
@@ -2131,6 +2130,7 @@ module Fortran
       types="(/#{types.join(",")}/)"
       code=[]
       code.push("#{self}")
+      # Supported ops: sms__op_max, sms__op_min, sms__op_sum
       code.push("call sms__reduce_#{nvars}(#{sizes},#{types},sms__op_#{op},#{sms_statusvar},#{vars.join(',')})")
       code.push(sms_chkstat)
       replace_statement(code)
