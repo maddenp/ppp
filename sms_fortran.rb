@@ -430,7 +430,6 @@ module Fortran
     def code_scatter(vars,iostat=nil)
       code=[]
       vars.each do |var|
-        tag="sms__scatter_tag"
         varenv=varenv_get(var)
         dh=varenv["decomp"]
         ifail "No decomp defined" unless dh
@@ -447,7 +446,6 @@ module Fortran
         args=[]
         args.push("#{maxrank}")
         args.push("1")
-        args.push("#{tag}")
         args.push("#{gllbs}")
         args.push("#{glubs}")
         args.push("#{gstrt}")
@@ -664,14 +662,6 @@ module Fortran
 
     def sms_chkstat
       "call sms__chkstat('#{marker}',' ',#{sms_statusvar},sms__abort_on_error,#{sms_statusvar})"
-    end
-
-    def sms_commtag
-      s=env[:global]
-      s[:tag]||=-1
-      name="sms__tag_#{s[:tag]+=1}"
-      declare("integer",name,{:attrs=>"save",:init=>"0"})
-      name
     end
 
     def sms_decompmod
@@ -1803,8 +1793,7 @@ module Fortran
         perms=(1..7).to_a.map { |x| (varenv["dim#{x}"])?(1):(0) }.join(",")
         overlap=".false."
         name="'#{var.name}'//char(0)"
-        tag=sms_commtag
-        code.push("call sms__exchange((/#{perms}/),#{overlap},#{name},#{tag},#{var.name})")
+        code.push("call sms__exchange((/#{perms}/),#{overlap},#{name},#{var.name})")
         code.push(sms_chkstat)
       end
       replace_statement(code)
