@@ -2381,6 +2381,202 @@ module Fortran
     r0
   end
 
+  module SmsExchangeBegin0
+    def sms_sentinel
+      elements[0]
+    end
+
+    def sms_t_exchange_begin
+      elements[1]
+    end
+
+    def t_paren_l
+      elements[2]
+    end
+
+    def sms_variable_list
+      elements[3]
+    end
+
+    def t_paren_r
+      elements[4]
+    end
+
+    def t_newline
+      elements[6]
+    end
+
+  end
+
+  def _nt_sms_exchange_begin
+    start_index = index
+    if node_cache[:sms_exchange_begin].has_key?(index)
+      cached = node_cache[:sms_exchange_begin][index]
+      if cached
+        node_cache[:sms_exchange_begin][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_sentinel
+    s0 << r1
+    if r1
+      r2 = _nt_sms_t_exchange_begin
+      s0 << r2
+      if r2
+        r3 = _nt_t_paren_l
+        s0 << r3
+        if r3
+          r4 = _nt_sms_variable_list
+          s0 << r4
+          if r4
+            r5 = _nt_t_paren_r
+            s0 << r5
+            if r5
+              r7 = _nt_sms_comment
+              if r7
+                r6 = r7
+              else
+                r6 = instantiate_node(SyntaxNode,input, index...index)
+              end
+              s0 << r6
+              if r6
+                r8 = _nt_t_newline
+                s0 << r8
+                if r8
+                  i9 = index
+                  r10 = lambda { |e| sp_sms_exchange_begin }.call(s0)
+                  if !r10
+                    terminal_parse_failure("<semantic predicate>")
+                  end
+                  if r10
+                    @index = i9
+                    r9 = instantiate_node(SyntaxNode,input, index...index)
+                  else
+                    @index = i9
+                    r9 = nil
+                  end
+                  s0 << r9
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Exchange_Begin,input, i0...index, s0)
+      r0.extend(SmsExchangeBegin0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_exchange_begin][start_index] = r0
+
+    r0
+  end
+
+  module SmsExchangeEnd0
+    def sms_sentinel
+      elements[0]
+    end
+
+    def sms_t_exchange_end
+      elements[1]
+    end
+
+    def t_paren_l
+      elements[2]
+    end
+
+    def sms_variable_list
+      elements[3]
+    end
+
+    def t_paren_r
+      elements[4]
+    end
+
+    def t_newline
+      elements[6]
+    end
+
+  end
+
+  def _nt_sms_exchange_end
+    start_index = index
+    if node_cache[:sms_exchange_end].has_key?(index)
+      cached = node_cache[:sms_exchange_end][index]
+      if cached
+        node_cache[:sms_exchange_end][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_sms_sentinel
+    s0 << r1
+    if r1
+      r2 = _nt_sms_t_exchange_end
+      s0 << r2
+      if r2
+        r3 = _nt_t_paren_l
+        s0 << r3
+        if r3
+          r4 = _nt_sms_variable_list
+          s0 << r4
+          if r4
+            r5 = _nt_t_paren_r
+            s0 << r5
+            if r5
+              r7 = _nt_sms_comment
+              if r7
+                r6 = r7
+              else
+                r6 = instantiate_node(SyntaxNode,input, index...index)
+              end
+              s0 << r6
+              if r6
+                r8 = _nt_t_newline
+                s0 << r8
+                if r8
+                  i9 = index
+                  r10 = lambda { |e| sp_sms_exchange_end }.call(s0)
+                  if !r10
+                    terminal_parse_failure("<semantic predicate>")
+                  end
+                  if r10
+                    @index = i9
+                    r9 = instantiate_node(SyntaxNode,input, index...index)
+                  else
+                    @index = i9
+                    r9 = nil
+                  end
+                  s0 << r9
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(SMS_Exchange_End,input, i0...index, s0)
+      r0.extend(SmsExchangeEnd0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:sms_exchange_end][start_index] = r0
+
+    r0
+  end
+
   module SmsExecutable0
     def sms_halo_comp
       elements[0]
@@ -2451,179 +2647,191 @@ module Fortran
                 r6 = SyntaxNode.new(input, (index-1)...index) if r6 == true
                 r0 = r6
               else
-                i7, s7 = index, []
-                r8 = _nt_sms_halo_comp
-                s7 << r8
-                if r8
-                  i9 = index
-                  r10 = lambda { |e| sp_env_pullup(e[0]) }.call(s7)
-                  if !r10
-                    terminal_parse_failure("<semantic predicate>")
-                  end
-                  if r10
-                    @index = i9
-                    r9 = instantiate_node(SyntaxNode,input, index...index)
-                  else
-                    @index = i9
-                    r9 = nil
-                  end
-                  s7 << r9
-                end
-                if s7.last
-                  r7 = instantiate_node(SMS_Executable_SMS_Halo_Comp,input, i7...index, s7)
-                  r7.extend(SmsExecutable0)
-                else
-                  @index = i7
-                  r7 = nil
-                end
+                r7 = _nt_sms_exchange_begin
                 if r7
                   r7 = SyntaxNode.new(input, (index-1)...index) if r7 == true
                   r0 = r7
                 else
-                  r11 = _nt_sms_halo_comp_setup
-                  if r11
-                    r11 = SyntaxNode.new(input, (index-1)...index) if r11 == true
-                    r0 = r11
+                  r8 = _nt_sms_exchange_end
+                  if r8
+                    r8 = SyntaxNode.new(input, (index-1)...index) if r8 == true
+                    r0 = r8
                   else
-                    r12 = _nt_sms_get_communicator
-                    if r12
-                      r12 = SyntaxNode.new(input, (index-1)...index) if r12 == true
-                      r0 = r12
+                    i9, s9 = index, []
+                    r10 = _nt_sms_halo_comp
+                    s9 << r10
+                    if r10
+                      i11 = index
+                      r12 = lambda { |e| sp_env_pullup(e[0]) }.call(s9)
+                      if !r12
+                        terminal_parse_failure("<semantic predicate>")
+                      end
+                      if r12
+                        @index = i11
+                        r11 = instantiate_node(SyntaxNode,input, index...index)
+                      else
+                        @index = i11
+                        r11 = nil
+                      end
+                      s9 << r11
+                    end
+                    if s9.last
+                      r9 = instantiate_node(SMS_Executable_SMS_Halo_Comp,input, i9...index, s9)
+                      r9.extend(SmsExecutable0)
                     else
-                      r13 = _nt_sms_ignore
+                      @index = i9
+                      r9 = nil
+                    end
+                    if r9
+                      r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
+                      r0 = r9
+                    else
+                      r13 = _nt_sms_halo_comp_setup
                       if r13
                         r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
                         r0 = r13
                       else
-                        r14 = _nt_sms_order_grid
+                        r14 = _nt_sms_get_communicator
                         if r14
                           r14 = SyntaxNode.new(input, (index-1)...index) if r14 == true
                           r0 = r14
                         else
-                          i15, s15 = index, []
-                          r16 = _nt_sms_parallel
-                          s15 << r16
-                          if r16
-                            i17 = index
-                            r18 = lambda { |e| sp_env_pullup(e[0]) }.call(s15)
-                            if !r18
-                              terminal_parse_failure("<semantic predicate>")
-                            end
-                            if r18
-                              @index = i17
-                              r17 = instantiate_node(SyntaxNode,input, index...index)
-                            else
-                              @index = i17
-                              r17 = nil
-                            end
-                            s15 << r17
-                          end
-                          if s15.last
-                            r15 = instantiate_node(SMS_Executable_SMS_Parallel,input, i15...index, s15)
-                            r15.extend(SmsExecutable1)
-                          else
-                            @index = i15
-                            r15 = nil
-                          end
+                          r15 = _nt_sms_ignore
                           if r15
                             r15 = SyntaxNode.new(input, (index-1)...index) if r15 == true
                             r0 = r15
                           else
-                            r19 = _nt_sms_reduce
-                            if r19
-                              r19 = SyntaxNode.new(input, (index-1)...index) if r19 == true
-                              r0 = r19
+                            r16 = _nt_sms_order_grid
+                            if r16
+                              r16 = SyntaxNode.new(input, (index-1)...index) if r16 == true
+                              r0 = r16
                             else
-                              i20, s20 = index, []
-                              r21 = _nt_sms_serial
-                              s20 << r21
-                              if r21
-                                i22 = index
-                                r23 = lambda { |e| sp_env_pullup(e[0]) }.call(s20)
-                                if !r23
+                              i17, s17 = index, []
+                              r18 = _nt_sms_parallel
+                              s17 << r18
+                              if r18
+                                i19 = index
+                                r20 = lambda { |e| sp_env_pullup(e[0]) }.call(s17)
+                                if !r20
                                   terminal_parse_failure("<semantic predicate>")
                                 end
-                                if r23
-                                  @index = i22
-                                  r22 = instantiate_node(SyntaxNode,input, index...index)
+                                if r20
+                                  @index = i19
+                                  r19 = instantiate_node(SyntaxNode,input, index...index)
                                 else
-                                  @index = i22
-                                  r22 = nil
+                                  @index = i19
+                                  r19 = nil
                                 end
-                                s20 << r22
+                                s17 << r19
                               end
-                              if s20.last
-                                r20 = instantiate_node(SMS_Executable_SMS_Serial,input, i20...index, s20)
-                                r20.extend(SmsExecutable2)
+                              if s17.last
+                                r17 = instantiate_node(SMS_Executable_SMS_Parallel,input, i17...index, s17)
+                                r17.extend(SmsExecutable1)
                               else
-                                @index = i20
-                                r20 = nil
+                                @index = i17
+                                r17 = nil
                               end
-                              if r20
-                                r20 = SyntaxNode.new(input, (index-1)...index) if r20 == true
-                                r0 = r20
+                              if r17
+                                r17 = SyntaxNode.new(input, (index-1)...index) if r17 == true
+                                r0 = r17
                               else
-                                r24 = _nt_sms_set_communicator
-                                if r24
-                                  r24 = SyntaxNode.new(input, (index-1)...index) if r24 == true
-                                  r0 = r24
+                                r21 = _nt_sms_reduce
+                                if r21
+                                  r21 = SyntaxNode.new(input, (index-1)...index) if r21 == true
+                                  r0 = r21
                                 else
-                                  r25 = _nt_sms_set_prox_and_proxs
-                                  if r25
-                                    r25 = SyntaxNode.new(input, (index-1)...index) if r25 == true
-                                    r0 = r25
+                                  i22, s22 = index, []
+                                  r23 = _nt_sms_serial
+                                  s22 << r23
+                                  if r23
+                                    i24 = index
+                                    r25 = lambda { |e| sp_env_pullup(e[0]) }.call(s22)
+                                    if !r25
+                                      terminal_parse_failure("<semantic predicate>")
+                                    end
+                                    if r25
+                                      @index = i24
+                                      r24 = instantiate_node(SyntaxNode,input, index...index)
+                                    else
+                                      @index = i24
+                                      r24 = nil
+                                    end
+                                    s22 << r24
+                                  end
+                                  if s22.last
+                                    r22 = instantiate_node(SMS_Executable_SMS_Serial,input, i22...index, s22)
+                                    r22.extend(SmsExecutable2)
                                   else
-                                    r26 = _nt_sms_start
+                                    @index = i22
+                                    r22 = nil
+                                  end
+                                  if r22
+                                    r22 = SyntaxNode.new(input, (index-1)...index) if r22 == true
+                                    r0 = r22
+                                  else
+                                    r26 = _nt_sms_set_communicator
                                     if r26
                                       r26 = SyntaxNode.new(input, (index-1)...index) if r26 == true
                                       r0 = r26
                                     else
-                                      r27 = _nt_sms_stop
+                                      r27 = _nt_sms_set_prox_and_proxs
                                       if r27
                                         r27 = SyntaxNode.new(input, (index-1)...index) if r27 == true
                                         r0 = r27
                                       else
-                                        i28, s28 = index, []
-                                        r29 = _nt_sms_to_local
-                                        s28 << r29
-                                        if r29
-                                          i30 = index
-                                          r31 = lambda { |e| sp_env_pullup(e[0]) }.call(s28)
-                                          if !r31
-                                            terminal_parse_failure("<semantic predicate>")
-                                          end
-                                          if r31
-                                            @index = i30
-                                            r30 = instantiate_node(SyntaxNode,input, index...index)
-                                          else
-                                            @index = i30
-                                            r30 = nil
-                                          end
-                                          s28 << r30
-                                        end
-                                        if s28.last
-                                          r28 = instantiate_node(SMS_Executable_SMS_To_Local,input, i28...index, s28)
-                                          r28.extend(SmsExecutable3)
-                                        else
-                                          @index = i28
-                                          r28 = nil
-                                        end
+                                        r28 = _nt_sms_start
                                         if r28
                                           r28 = SyntaxNode.new(input, (index-1)...index) if r28 == true
                                           r0 = r28
                                         else
-                                          r32 = _nt_sms_unstructured_print_timers
-                                          if r32
-                                            r32 = SyntaxNode.new(input, (index-1)...index) if r32 == true
-                                            r0 = r32
+                                          r29 = _nt_sms_stop
+                                          if r29
+                                            r29 = SyntaxNode.new(input, (index-1)...index) if r29 == true
+                                            r0 = r29
                                           else
-                                            r33 = _nt_sms_zerotimers
-                                            if r33
-                                              r33 = SyntaxNode.new(input, (index-1)...index) if r33 == true
-                                              r0 = r33
+                                            i30, s30 = index, []
+                                            r31 = _nt_sms_to_local
+                                            s30 << r31
+                                            if r31
+                                              i32 = index
+                                              r33 = lambda { |e| sp_env_pullup(e[0]) }.call(s30)
+                                              if !r33
+                                                terminal_parse_failure("<semantic predicate>")
+                                              end
+                                              if r33
+                                                @index = i32
+                                                r32 = instantiate_node(SyntaxNode,input, index...index)
+                                              else
+                                                @index = i32
+                                                r32 = nil
+                                              end
+                                              s30 << r32
+                                            end
+                                            if s30.last
+                                              r30 = instantiate_node(SMS_Executable_SMS_To_Local,input, i30...index, s30)
+                                              r30.extend(SmsExecutable3)
                                             else
-                                              @index = i0
-                                              r0 = nil
+                                              @index = i30
+                                              r30 = nil
+                                            end
+                                            if r30
+                                              r30 = SyntaxNode.new(input, (index-1)...index) if r30 == true
+                                              r0 = r30
+                                            else
+                                              r34 = _nt_sms_unstructured_print_timers
+                                              if r34
+                                                r34 = SyntaxNode.new(input, (index-1)...index) if r34 == true
+                                                r0 = r34
+                                              else
+                                                r35 = _nt_sms_zerotimers
+                                                if r35
+                                                  r35 = SyntaxNode.new(input, (index-1)...index) if r35 == true
+                                                  r0 = r35
+                                                else
+                                                  @index = i0
+                                                  r0 = nil
+                                                end
+                                              end
                                             end
                                           end
                                         end

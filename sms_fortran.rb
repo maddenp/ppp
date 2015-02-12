@@ -55,6 +55,18 @@ module Fortran
     true
   end
 
+  def sp_sms_exchange_begin
+    nest_check("sms$exchange_begin","sms$ignore",sms_ignore)
+    nest_check("sms$exchange_begin","sms$serial",sms_serial)
+    true
+  end
+
+  def sp_sms_exchange_end
+    nest_check("sms$exchange_end","sms$ignore",sms_ignore)
+    nest_check("sms$exchange_end","sms$serial",sms_serial)
+    true
+  end
+
   def sp_sms_distribute_end
 
     # Do not pop the environment stack here, because the matching 'begin' does
@@ -1761,40 +1773,76 @@ module Fortran
   class SMS_Exchange_Vars_Option < List
   end
 
-  class SMS_Exchange < SMS
+  class SMS_Exchange_Common < SMS
+
+    def check(var)
+      if var.derived_type?
+        efail "Derived type instance '#{var}' may not be exchanged"
+      end
+      varenv=varenv_get(var.name)
+      dims=varenv["dims"]
+      efail "Scalar variable '#{var}' may not be exchanged" unless dims
+      dh=varenv["decomp"]
+      efail "Non-decomposed variable '#{var}' may not be exchanged" unless dh
+      sl=var.subscript_list
+      unless sl.empty? or sl.size==dims.to_i
+        efail "'#{var}' subscript list must be rank #{dims}"
+      end
+      varenv
+    end
+
+    def pre(directive)
+      nest_check(directive,"$omp parallel loop",omp_parallel_loop)
+      nest_check(directive,"sms$parallel loop",sms_parallel_loop)
+      use(sms_decompmod)
+      code=[]
+      code.push("#{self}")
+      code
+    end
 
     def str0
       sms("#{e[2]}#{e[3]}#{e[4]}#{e[5]}")
+    end
+
+    def translate_common(suffix,overlap)
+      code=pre("sms$exchange#{suffix}")
+      vars.each do |var|
+        varenv=check(var)
+        perms=(1..7).to_a.map { |x| (varenv["dim#{x}"])?(1):(0) }.join(",")
+        code.push("call sms__exchange((/#{perms}/),#{overlap},'#{var.name}',#{var.name})")
+      end
+      replace_statement(code)
     end
 
     def vars
       e[3].vars
     end
 
+  end
+
+  class SMS_Exchange < SMS_Exchange_Common
+
     def translate
-      nest_check("sms$exchange","$omp parallel loop",omp_parallel_loop)
-      nest_check("sms$exchange","sms$parallel loop",sms_parallel_loop)
-      use(sms_decompmod)
-      code=[]
-      code.push("#{self}")
+      translate_common("",".false.")
+    end
+
+  end
+
+  class SMS_Exchange_Begin < SMS_Exchange_Common
+
+    def translate
+      translate_common("_begin",".true.")
+    end
+
+  end
+
+  class SMS_Exchange_End < SMS_Exchange_Common
+
+    def translate
+      code=pre("sms$exchange_end")
       vars.each do |var|
-        if var.derived_type?
-          efail "Derived type instance '#{var}' may not be exchanged"
-        end
-        varenv=varenv_get(var.name)
-        dims=varenv["dims"]
-        efail "Scalar variable '#{var}' may not be exchanged" unless dims
-        dh=varenv["decomp"]
-        efail "Non-decomposed variable '#{var}' may not be exchanged" unless dh
-        sl=var.subscript_list
-        unless sl.empty? or sl.size==dims.to_i
-          efail "'#{var}' subscript list must be rank #{dims}"
-        end
-        perms=(1..7).to_a.map { |x| (varenv["dim#{x}"])?(1):(0) }.join(",")
-        overlap=".false."
-        name="'#{var.name}'//char(0)"
-        code.push("call sms__exchange((/#{perms}/),#{overlap},#{name},#{var.name})")
-        code.push(sms_chkstat)
+        varenv=check(var)
+        code.push("call sms__exchange_end('#{var.name}')")
       end
       replace_statement(code)
     end
