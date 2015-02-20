@@ -2651,7 +2651,8 @@ module Fortran
       dh=decomp
       code=[]
       code.push("#{self}")
-      code.push("call sms__set_prox_and_proxs(#{dh}(1),#{e[5..15].map { |x| x.to_s }.join})")
+      code.push("call sms__set_prox_and_proxs(#{dh}(1),#{e[5..15].map { |x| x.to_s }.join},#{sms_statusvar})")
+      code.push(sms_chkstat)
       code.push("call sms__get_collapsed_halo_size(#{dh}(#{dh}__nestlevel),1,1,#{dh}__localhalosize,#{sms_statusvar})")
       code.push(sms_chkstat)
       code.push("#{dh}__s1(1,1,#{dh}__nestlevel)=#{dh}__s1(1,0,#{dh}__nestlevel)")
