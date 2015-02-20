@@ -1809,7 +1809,8 @@ module Fortran
       vars.each do |var|
         varenv=check(var)
         perms=(1..7).to_a.map { |x| (varenv["dim#{x}"])?(1):(0) }.join(",")
-        code.push("call sms__exchange((/#{perms}/),#{overlap},'#{var.name}',#{var.name})")
+        code.push("call sms__exchange((/#{perms}/),#{overlap},'#{var.name}',#{var.name},#{sms_statusvar})")
+        code.push(sms_chkstat)
       end
       replace_statement(code)
     end
@@ -1842,7 +1843,8 @@ module Fortran
       code=pre("sms$exchange_end")
       vars.each do |var|
         varenv=check(var)
-        code.push("call sms__exchange_end('#{var.name}')")
+        code.push("call sms__exchange_end('#{var.name}',#{sms_statusvar})")
+        code.push(sms_chkstat)
       end
       replace_statement(code)
     end
@@ -2010,7 +2012,8 @@ module Fortran
       use(sms_decompmod)
       code=[]
       code.push("#{self}")
-      code.push("call sms__order_grid(#{e[3..19].map { |x| x.to_s }.join})")
+      code.push("call sms__order_grid(#{e[3..19].map { |x| x.to_s }.join},#{sms_statusvar})")
+      code.push(sms_chkstat)
       replace_statement(code)
     end
 
