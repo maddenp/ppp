@@ -3033,6 +3033,12 @@ module Fortran
   class External_Subprogram_Subroutine < NT
   end
 
+  class Flush_Stmt_1 < NT
+  end
+
+  class Flush_Stmt_2 < NT
+  end
+
   class Format_Item_Data_Edit_Desc < NT
   end
 

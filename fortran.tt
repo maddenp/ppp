@@ -82,6 +82,7 @@ grammar Fortran
     end_program_stmt /
     end_subroutine_stmt /
     exit_stmt /
+    flush_stmt /
     goto_stmt /
     if_stmt /
     inquire_stmt /
@@ -1617,6 +1618,33 @@ grammar Fortran
     # F90:R906
 
     scalar_default_char_expr
+  end
+
+  rule file_unit_number
+    # F03:R902
+
+    scalar_int_expr
+  end
+
+  rule flush_spec
+    # F03:R928
+
+    file_unit_number # / more here, see F03 standard spec
+  end
+
+  rule flush_spec_list
+    flush_spec # flush_spec_list_pair* <Flush_Spec_List>
+  end
+
+# rule flush_spec_list_pair
+#   t_comma flush_spec <Flush_Spec_List_Pair>
+# end
+
+  rule flush_stmt
+    # F03:R927
+
+    label:stmt_label? t_flush file_unit_number t_newline <Flush_Stmt_1> /
+    label:stmt_label? t_flush t_paren_l flush_spec_list t_paren_r t_newline <Flush_Stmt_2>
   end
 
   rule format
@@ -3644,6 +3672,10 @@ grammar Fortran
 
   rule t_file
     "file" <T>
+  end
+
+  rule t_flush
+    "flush" <T>
   end
 
   rule t_fmt
