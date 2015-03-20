@@ -3042,66 +3042,18 @@ module Fortran
   end
 
   class Flush_Spec < NT
-
-    def err_label
-      (respond_to?(get_err_label))?(get_err_label):(nil)
-    end
-
-    def file_unit_number
-      (respond_to?(get_file_unit_number))?(get_file_unit_number):(nil)
-    end
-
-    def iomsg_var
-      (respond_to?(get_iomsg_var))?(get_iomsg):(nil)
-    end
-
-    def iostat_var
-      (respond_to?(get_iostat_var))?(get_iostat):(nil)
-    end
-
   end
 
   class Flush_Spec_Err < Flush_Spec
-
-    def get_err_label
-      e[2]
-    end
-
   end
 
   class Flush_Spec_Iomsg < Flush_Spec
-
-    def get_iomsg_var
-      e[2]
-    end
-
   end
 
   class Flush_Spec_Iostat < Flush_Spec
-
-    def get_iostat_var
-      e[2]
-    end
-
   end
 
-  class Flush_Spec_Number < Flush_Spec
-
-    def get_file_unit_number
-      e[0]
-    end
-
-  end
-
-  class Flush_Spec_Unit < Flush_Spec
-
-    def get_file_unit_number
-      e[2]
-    end
-
-  end
-
-  class Flush_Spec_List < List
+  class Flush_Spec_List < Io_Spec_List
 
     def items
       [e[0]]+e[1].e.reduce([]) { |m,x| m.push(x.item) }
@@ -3117,7 +3069,13 @@ module Fortran
 
   end
 
-  class Flush_Stmt < NT
+  class Flush_Spec_Number < Flush_Spec
+  end
+
+  class Flush_Spec_Unit < Flush_Spec
+  end
+
+  class Flush_Stmt < Io_Stmt
   end
 
   class Flush_Stmt_1 < Flush_Stmt
@@ -3497,13 +3455,13 @@ module Fortran
   class Inquire_Spec_File < NT
   end
 
-  class Inquire_Spec_Unit < NT
-  end
-
   class Inquire_Spec_List < Io_Spec_List
   end
 
   class Inquire_Spec_List_Pair < NT
+  end
+
+  class Inquire_Spec_Unit < NT
   end
 
   class Inquire_Stmt_1 < Io_Stmt

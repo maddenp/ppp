@@ -974,14 +974,6 @@ module Fortran
   class F2C_Initial < NT
   end
 
-  class Flush_Spec_Err < Flush_Spec
-
-    def translate
-      efail "FLUSH statement ERR= specifier not currently supported"
-    end
-
-  end
-
   class Flush_Spec_Iomsg < Flush_Spec
 
     def translate
@@ -990,10 +982,12 @@ module Fortran
 
   end
 
-  class Flush_Spec_Iostat < Flush_Spec
+  class Flush_Stmt < Io_Stmt
 
     def translate
-      efail "FLUSH statement IOSTAT= specifier not currently supported"
+      return if omp_parallel_loop or sms_ignore or sms_parallel_loop or sms_serial
+      io_stmt_init
+      io_stmt_common
     end
 
   end
@@ -1065,6 +1059,7 @@ module Fortran
     end
 
     def io_stmt_bcasts
+      return if @var_bcast.empty?
       @need_decompmod=true unless @var_bcast.empty?
       @code_bcast.concat(code_bcast(@var_bcast,@iostat))
     end
@@ -1130,7 +1125,9 @@ module Fortran
           ((treatment==:in)?(@var_gather):(@var_scatter)).add("#{global}")
         end
         if treatment==:out and (locals=metadata[:locals])
-          locals.each { |local| @var_bcast.add(local) if @serialize_io }
+          locals.each do |local|
+            @var_bcast.add(local) if @serialize_io
+          end
         end
       end
       unless is_a?(Print_Stmt)

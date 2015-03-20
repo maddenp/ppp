@@ -15571,7 +15571,7 @@ module Fortran
       end
     end
     if s1.last
-      r1 = instantiate_node(Flush_Spec_Err,input, i1...index, s1)
+      r1 = instantiate_node(Io_Spec_Err,input, i1...index, s1)
       r1.extend(FlushSpec0)
     else
       @index = i1
@@ -15615,7 +15615,7 @@ module Fortran
           end
         end
         if s9.last
-          r9 = instantiate_node(Flush_Spec_Iostat,input, i9...index, s9)
+          r9 = instantiate_node(Io_Spec_Iostat,input, i9...index, s9)
           r9.extend(FlushSpec2)
         else
           @index = i9
@@ -15637,7 +15637,7 @@ module Fortran
             end
           end
           if s13.last
-            r13 = instantiate_node(Flush_Spec_Unit,input, i13...index, s13)
+            r13 = instantiate_node(Io_Spec_Unit,input, i13...index, s13)
             r13.extend(FlushSpec3)
           else
             @index = i13
