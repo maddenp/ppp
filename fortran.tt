@@ -1630,7 +1630,7 @@ grammar Fortran
     # F03:R928
 
     t_err t_equal label <Io_Spec_Err> /
-    t_iomsg t_equal iomsg_variable <Flush_Spec_Iomsg> /
+    t_iomsg t_equal iomsg_variable <Io_Spec_Iomsg> /
     t_iostat t_equal scalar_int_variable <Io_Spec_Iostat> /
     t_unit t_equal file_unit_number <Io_Spec_Unit> /
     file_unit_number "" <Flush_Spec_Number>

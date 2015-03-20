@@ -15593,7 +15593,7 @@ module Fortran
         end
       end
       if s5.last
-        r5 = instantiate_node(Flush_Spec_Iomsg,input, i5...index, s5)
+        r5 = instantiate_node(Io_Spec_Iomsg,input, i5...index, s5)
         r5.extend(FlushSpec1)
       else
         @index = i5

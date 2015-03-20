@@ -164,14 +164,12 @@ module Fortran
 
   def sp_default_char_variable?(var)
     unless var.is_a?(Variable)
-      efail "Unexpected node type '#{var.class}' for variable '#{var}'"
+      ifail "Unexpected node type '#{var.class}' for variable '#{var}'"
     end
     varenv=env["#{var.name}"]
-    if varenv and varenv["type"]=="character" and varenv["kind"]=="_"
-      true
-    else
-      nil
-    end
+    return true if varenv and varenv["type"]=="character" and varenv["kind"]=="_"
+    errmsg "TKR of '#{var}' must be character default scalar"
+    nil
   end
 
   def sp_derived_type_def(derived_type_stmt)
@@ -3041,18 +3039,6 @@ module Fortran
   class External_Subprogram_Subroutine < NT
   end
 
-  class Flush_Spec < NT
-  end
-
-  class Flush_Spec_Err < Flush_Spec
-  end
-
-  class Flush_Spec_Iomsg < Flush_Spec
-  end
-
-  class Flush_Spec_Iostat < Flush_Spec
-  end
-
   class Flush_Spec_List < Io_Spec_List
 
     def items
@@ -3069,10 +3055,7 @@ module Fortran
 
   end
 
-  class Flush_Spec_Number < Flush_Spec
-  end
-
-  class Flush_Spec_Unit < Flush_Spec
+  class Flush_Spec_Number < NT
   end
 
   class Flush_Stmt < Io_Stmt
@@ -3663,6 +3646,9 @@ module Fortran
   end
 
   class Io_Spec_Formatted < Io_Spec
+  end
+
+  class Io_Spec_Iomsg < Io_Spec
   end
 
   class Io_Spec_Iostat < Io_Spec

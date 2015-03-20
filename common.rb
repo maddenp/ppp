@@ -11,6 +11,10 @@ module Common
     @@directive=Regexp.new("^\s*!((#{s}).*)",true)
   end
 
+  def errmsg(msg)
+    $stderr.puts("ERROR: #{msg}")
+  end
+
   def wrap(s,alt=nil)
 
     def directive?(s)

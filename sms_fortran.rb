@@ -974,14 +974,6 @@ module Fortran
   class F2C_Initial < NT
   end
 
-  class Flush_Spec_Iomsg < Flush_Spec
-
-    def translate
-      efail "FLUSH statement IOMSG= specifier not currently supported"
-    end
-
-  end
-
   class Flush_Stmt < Io_Stmt
 
     def translate
@@ -1032,6 +1024,14 @@ module Fortran
 
     def pppvar
       declare("logical","#{pppvar_prefix}err")
+    end
+
+  end
+
+  class Io_Spec_Iomsg < Io_Spec
+
+    def translate
+      efail "FLUSH statement IOMSG= specifier not currently supported"
     end
 
   end
