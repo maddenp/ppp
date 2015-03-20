@@ -15485,62 +15485,6 @@ module Fortran
   end
 
   module FlushSpec0
-    def t_err
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def label
-      elements[2]
-    end
-  end
-
-  module FlushSpec1
-    def t_iomsg
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def iomsg_variable
-      elements[2]
-    end
-  end
-
-  module FlushSpec2
-    def t_iostat
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def scalar_int_variable
-      elements[2]
-    end
-  end
-
-  module FlushSpec3
-    def t_unit
-      elements[0]
-    end
-
-    def t_equal
-      elements[1]
-    end
-
-    def file_unit_number
-      elements[2]
-    end
-  end
-
-  module FlushSpec4
     def file_unit_number
       elements[0]
     end
@@ -15559,117 +15503,49 @@ module Fortran
     end
 
     i0 = index
-    i1, s1 = index, []
-    r2 = _nt_t_err
-    s1 << r2
-    if r2
-      r3 = _nt_t_equal
-      s1 << r3
-      if r3
-        r4 = _nt_label
-        s1 << r4
-      end
-    end
-    if s1.last
-      r1 = instantiate_node(Io_Spec_Err,input, i1...index, s1)
-      r1.extend(FlushSpec0)
-    else
-      @index = i1
-      r1 = nil
-    end
+    r1 = _nt_io_spec_err
     if r1
       r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
       r0 = r1
     else
-      i5, s5 = index, []
-      r6 = _nt_t_iomsg
-      s5 << r6
-      if r6
-        r7 = _nt_t_equal
-        s5 << r7
-        if r7
-          r8 = _nt_iomsg_variable
-          s5 << r8
-        end
-      end
-      if s5.last
-        r5 = instantiate_node(Io_Spec_Iomsg,input, i5...index, s5)
-        r5.extend(FlushSpec1)
+      r2 = _nt_io_spec_iomsg
+      if r2
+        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
+        r0 = r2
       else
-        @index = i5
-        r5 = nil
-      end
-      if r5
-        r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
-        r0 = r5
-      else
-        i9, s9 = index, []
-        r10 = _nt_t_iostat
-        s9 << r10
-        if r10
-          r11 = _nt_t_equal
-          s9 << r11
-          if r11
-            r12 = _nt_scalar_int_variable
-            s9 << r12
-          end
-        end
-        if s9.last
-          r9 = instantiate_node(Io_Spec_Iostat,input, i9...index, s9)
-          r9.extend(FlushSpec2)
+        r3 = _nt_io_spec_iostat
+        if r3
+          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
+          r0 = r3
         else
-          @index = i9
-          r9 = nil
-        end
-        if r9
-          r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
-          r0 = r9
-        else
-          i13, s13 = index, []
-          r14 = _nt_t_unit
-          s13 << r14
-          if r14
-            r15 = _nt_t_equal
-            s13 << r15
-            if r15
-              r16 = _nt_file_unit_number
-              s13 << r16
-            end
-          end
-          if s13.last
-            r13 = instantiate_node(Io_Spec_Unit,input, i13...index, s13)
-            r13.extend(FlushSpec3)
+          r4 = _nt_io_spec_unit
+          if r4
+            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
+            r0 = r4
           else
-            @index = i13
-            r13 = nil
-          end
-          if r13
-            r13 = SyntaxNode.new(input, (index-1)...index) if r13 == true
-            r0 = r13
-          else
-            i17, s17 = index, []
-            r18 = _nt_file_unit_number
-            s17 << r18
-            if r18
+            i5, s5 = index, []
+            r6 = _nt_file_unit_number
+            s5 << r6
+            if r6
               if (match_len = has_terminal?("", false, index))
-                r19 = true
+                r7 = true
                 @index += match_len
               else
                 terminal_parse_failure('""')
-                r19 = nil
+                r7 = nil
               end
-              s17 << r19
+              s5 << r7
             end
-            if s17.last
-              r17 = instantiate_node(Flush_Spec_Number,input, i17...index, s17)
-              r17.extend(FlushSpec4)
+            if s5.last
+              r5 = instantiate_node(Flush_Spec_Number,input, i5...index, s5)
+              r5.extend(FlushSpec0)
             else
-              @index = i17
-              r17 = nil
+              @index = i5
+              r5 = nil
             end
-            if r17
-              r17 = SyntaxNode.new(input, (index-1)...index) if r17 == true
-              r0 = r17
+            if r5
+              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
+              r0 = r5
             else
               @index = i0
               r0 = nil
@@ -21473,6 +21349,55 @@ module Fortran
     end
 
     node_cache[:io_spec_formatted][start_index] = r0
+
+    r0
+  end
+
+  module IoSpecIomsg0
+    def t_iomsg
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def iomsg_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_iomsg
+    start_index = index
+    if node_cache[:io_spec_iomsg].has_key?(index)
+      cached = node_cache[:io_spec_iomsg][index]
+      if cached
+        node_cache[:io_spec_iomsg][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_iomsg
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_iomsg_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(Io_Spec_Iomsg,input, i0...index, s0)
+      r0.extend(IoSpecIomsg0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_iomsg][start_index] = r0
 
     r0
   end
