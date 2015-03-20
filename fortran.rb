@@ -3033,10 +3033,96 @@ module Fortran
   class External_Subprogram_Subroutine < NT
   end
 
+  class Flush_Spec < NT
+
+    def err_label
+      (respond_to?(get_err_label))?(get_err_label):(nil)
+    end
+
+    def file_unit_number
+      (respond_to?(get_file_unit_number))?(get_file_unit_number):(nil)
+    end
+
+    def iomsg_var
+      (respond_to?(get_iomsg_var))?(get_iomsg):(nil)
+    end
+
+    def iostat_var
+      (respond_to?(get_iostat_var))?(get_iostat):(nil)
+    end
+
+  end
+
+  class Flush_Spec_Err < Flush_Spec
+
+    def get_err_label
+      e[2]
+    end
+
+  end
+
+  class Flush_Spec_Iomsg < Flush_Spec
+
+    def get_iomsg_var
+      e[2]
+    end
+
+  end
+
+  class Flush_Spec_Iostat < Flush_Spec
+
+    def get_iostat_var
+      e[2]
+    end
+
+  end
+
+  class Flush_Spec_Number < Flush_Spec
+
+    def get_file_unit_number
+      e[0]
+    end
+
+  end
+
+  class Flush_Spec_Unit < Flush_Spec
+
+    def get_file_unit_number
+      e[2]
+    end
+
+  end
+
+  class Flush_Spec_List < List
+
+    def items
+      [e[0]]+e[1].e.reduce([]) { |m,x| m.push(x.item) }
+    end
+
+  end
+
+  class Flush_Spec_List_Pair < NT
+
+    def item
+      e[1]
+    end
+
+  end
+
   class Flush_Stmt_1 < NT
+
+    def str0
+      "#{e[1]} #{e[3]}"
+    end
+
   end
 
   class Flush_Stmt_2 < NT
+
+    def str0
+      "#{e[1]} #{e[2]}#{e[3]}#{e[4]}"
+    end
+
   end
 
   class Format_Item_Data_Edit_Desc < NT
