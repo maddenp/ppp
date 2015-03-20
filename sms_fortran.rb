@@ -974,6 +974,30 @@ module Fortran
   class F2C_Initial < NT
   end
 
+  class Flush_Spec_Err < Flush_Spec
+
+    def translate
+      efail "FLUSH statement ERR= specifier not currently supported"
+    end
+
+  end
+
+  class Flush_Spec_Iomsg < Flush_Spec
+
+    def translate
+      efail "FLUSH statement IOMSG= specifier not currently supported"
+    end
+
+  end
+
+  class Flush_Spec_Iostat < Flush_Spec
+
+    def translate
+      efail "FLUSH statement IOSTAT= specifier not currently supported"
+    end
+
+  end
+
   class If_Stmt < Stmt
 
     def translate

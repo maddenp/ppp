@@ -232,6 +232,14 @@ module Fortran
     true
   end
 
+  def sp_flush_stmt(flush_spec_list)
+    specifiers=flush_spec_list.items
+    specifiers.each do |x|
+      return false if x.is_a?(Flush_Spec_Number) and not x==specifiers.first
+    end
+    true
+  end
+
   def sp_function_stmt(function_name,dummy_arg_name_list,result_option)
     envpush
     (env["#{function_name}"]||={})["subprogram"]="function"
@@ -3109,7 +3117,10 @@ module Fortran
 
   end
 
-  class Flush_Stmt_1 < NT
+  class Flush_Stmt < NT
+  end
+
+  class Flush_Stmt_1 < Flush_Stmt
 
     def str0
       "#{e[1]} #{e[3]}"
@@ -3117,7 +3128,7 @@ module Fortran
 
   end
 
-  class Flush_Stmt_2 < NT
+  class Flush_Stmt_2 < Flush_Stmt
 
     def str0
       "#{e[1]} #{e[2]}#{e[3]}#{e[4]}"

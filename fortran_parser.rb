@@ -15814,6 +15814,7 @@ module Fortran
     def t_newline
       elements[5]
     end
+
   end
 
   def _nt_flush_stmt
@@ -15894,6 +15895,21 @@ module Fortran
               if r15
                 r16 = _nt_t_newline
                 s9 << r16
+                if r16
+                  i17 = index
+                  r18 = lambda { |e| sp_flush_stmt(e[3]) }.call(s9)
+                  if !r18
+                    terminal_parse_failure("<semantic predicate>")
+                  end
+                  if r18
+                    @index = i17
+                    r17 = instantiate_node(SyntaxNode,input, index...index)
+                  else
+                    @index = i17
+                    r17 = nil
+                  end
+                  s9 << r17
+                end
               end
             end
           end

@@ -1648,7 +1648,7 @@ grammar Fortran
     # F03:R927
 
     label:stmt_label? t_flush !t_paren_l file_unit_number t_newline <Flush_Stmt_1> /
-    label:stmt_label? t_flush t_paren_l flush_spec_list t_paren_r t_newline <Flush_Stmt_2>
+    label:stmt_label? t_flush t_paren_l flush_spec_list t_paren_r t_newline &{ |e| sp_flush_stmt(e[3]) } <Flush_Stmt_2>
   end
 
   rule format
