@@ -168,7 +168,6 @@ module Fortran
     end
     varenv=env["#{var.name}"]
     return true if varenv and varenv["type"]=="character" and varenv["kind"]=="_"
-    errmsg "TKR of '#{var}' must be character default scalar"
     nil
   end
 
