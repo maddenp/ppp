@@ -1031,6 +1031,10 @@ module Fortran
       list_item(Io_Spec_Formatted)
     end
 
+    def iomsg
+      list_item(Io_Spec_Iomsg)
+    end
+
     def iostat
       list_item(Io_Spec_Iostat)
     end
@@ -1176,6 +1180,10 @@ module Fortran
       else
         []
       end
+    end
+
+    def iomsg
+      spec_list.iomsg
     end
 
     def iostat

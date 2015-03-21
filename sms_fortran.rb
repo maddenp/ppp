@@ -1028,14 +1028,6 @@ module Fortran
 
   end
 
-  class Io_Spec_Iomsg < Io_Spec
-
-    def translate
-      efail "FLUSH statement IOMSG= specifier not currently supported"
-    end
-
-  end
-
   class Io_Stmt < NT
 
     def add_serial_region_nml_vars(serial_treatment)
@@ -1179,6 +1171,7 @@ module Fortran
         :exist,
         :form,
         :formatted,
+        :iomsg,
         :iostat,
         :name,
         :named,
@@ -1198,7 +1191,8 @@ module Fortran
         if (spec=send(x))
           var=spec.rhs
           varenv=varenv_get(var)
-          @spec_var_bcast.push(sms_bcast(var,sms_type(var),"(/1/)",1))
+          size=(varenv["type"]=="character")?("(/len(#{var})/)"):("(/1/)")
+          @spec_var_bcast.push(sms_bcast(var,sms_type(var),size,1))
           @spec_var_bcast.push(sms_chkstat)
           @need_decompmod=true
           @iostat=var if x==:iostat
