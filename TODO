@@ -54,6 +54,8 @@
   reasonable to keep in ppp, but the max vars bit (may occur, with a different
   name, in other directives) should be a reference into the library code.
 
+- Clear up 'control' vs 'treatment' in re: serial-region in/out/inout/ignore.
+
 ### TRANSLATION
 
 - All dh__* vars to sms__dh_*, for uniformity.
