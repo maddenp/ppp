@@ -167,8 +167,8 @@ module Fortran
       ifail "Unexpected node type '#{var.class}' for variable '#{var}'"
     end
     varenv=env["#{var.name}"]
-    return true if varenv and varenv["type"]=="character" and varenv["kind"]=="_"
-    nil
+    return false unless varenv and varenv["type"]=="character" and varenv["kind"]=="_"
+    true
   end
 
   def sp_derived_type_def(derived_type_stmt)
