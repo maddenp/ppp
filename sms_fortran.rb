@@ -1051,6 +1051,8 @@ module Fortran
     end
 
     def io_stmt_bcasts
+      # NB: Broadcasts for status variables (i.e. iostat et al) are handled in
+      # io_stmt_var_set_logic.
       return if @var_bcast.empty?
       @need_decompmod=true unless @var_bcast.empty?
       @code_bcast.concat(code_bcast(@var_bcast,@iostat))
