@@ -164,14 +164,11 @@ module Fortran
 
   def sp_default_char_variable?(var)
     unless var.is_a?(Variable)
-      efail "Unexpected node type '#{var.class}' for variable '#{var}'"
+      ifail "Unexpected node type '#{var.class}' for variable '#{var}'"
     end
     varenv=env["#{var.name}"]
-    if varenv and varenv["type"]=="character" and varenv["kind"]=="_"
-      true
-    else
-      nil
-    end
+    return false unless varenv and varenv["type"]=="character" and varenv["kind"]=="_"
+    true
   end
 
   def sp_derived_type_def(derived_type_stmt)
@@ -228,6 +225,14 @@ module Fortran
   def sp_env_pullup(node)
     if node.e[0].respond_to?(:envref) and (x=node.e[0].envref)
       node.envref=x
+    end
+    true
+  end
+
+  def sp_flush_stmt(flush_spec_list)
+    specifiers=flush_spec_list.items
+    specifiers.each do |x|
+      return false if x.is_a?(Flush_Spec_Number) and not x==specifiers.first
     end
     true
   end
@@ -1026,6 +1031,10 @@ module Fortran
       list_item(Io_Spec_Formatted)
     end
 
+    def iomsg
+      list_item(Io_Spec_Iomsg)
+    end
+
     def iostat
       list_item(Io_Spec_Iostat)
     end
@@ -1171,6 +1180,10 @@ module Fortran
       else
         []
       end
+    end
+
+    def iomsg
+      spec_list.iomsg
     end
 
     def iostat
@@ -3033,6 +3046,44 @@ module Fortran
   class External_Subprogram_Subroutine < NT
   end
 
+  class Flush_Spec_List < Io_Spec_List
+
+    def items
+      [e[0]]+e[1].e.reduce([]) { |m,x| m.push(x.item) }
+    end
+
+  end
+
+  class Flush_Spec_List_Pair < NT
+
+    def item
+      e[1]
+    end
+
+  end
+
+  class Flush_Spec_Number < NT
+  end
+
+  class Flush_Stmt < Io_Stmt
+  end
+
+  class Flush_Stmt_1 < Flush_Stmt
+
+    def str0
+      "#{e[1]} #{e[3]}"
+    end
+
+  end
+
+  class Flush_Stmt_2 < Flush_Stmt
+
+    def str0
+      "#{e[1]} #{e[2]}#{e[3]}#{e[4]}"
+    end
+
+  end
+
   class Format_Item_Data_Edit_Desc < NT
   end
 
@@ -3394,13 +3445,13 @@ module Fortran
   class Inquire_Spec_File < NT
   end
 
-  class Inquire_Spec_Unit < NT
-  end
-
   class Inquire_Spec_List < Io_Spec_List
   end
 
   class Inquire_Spec_List_Pair < NT
+  end
+
+  class Inquire_Spec_Unit < NT
   end
 
   class Inquire_Stmt_1 < Io_Stmt
@@ -3602,6 +3653,9 @@ module Fortran
   end
 
   class Io_Spec_Formatted < Io_Spec
+  end
+
+  class Io_Spec_Iomsg < Io_Spec
   end
 
   class Io_Spec_Iostat < Io_Spec

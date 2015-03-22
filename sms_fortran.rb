@@ -974,6 +974,16 @@ module Fortran
   class F2C_Initial < NT
   end
 
+  class Flush_Stmt < Io_Stmt
+
+    def translate
+      return if omp_parallel_loop or sms_ignore or sms_parallel_loop or sms_serial
+      io_stmt_init
+      io_stmt_common
+    end
+
+  end
+
   class If_Stmt < Stmt
 
     def translate
@@ -1041,6 +1051,9 @@ module Fortran
     end
 
     def io_stmt_bcasts
+      # NB: Broadcasts for status variables (i.e. iostat et al) are handled in
+      # io_stmt_var_set_logic.
+      return if @var_bcast.empty?
       @need_decompmod=true unless @var_bcast.empty?
       @code_bcast.concat(code_bcast(@var_bcast,@iostat))
     end
@@ -1106,7 +1119,9 @@ module Fortran
           ((treatment==:in)?(@var_gather):(@var_scatter)).add("#{global}")
         end
         if treatment==:out and (locals=metadata[:locals])
-          locals.each { |local| @var_bcast.add(local) if @serialize_io }
+          locals.each do |local|
+            @var_bcast.add(local) if @serialize_io
+          end
         end
       end
       unless is_a?(Print_Stmt)
@@ -1158,6 +1173,7 @@ module Fortran
         :exist,
         :form,
         :formatted,
+        :iomsg,
         :iostat,
         :name,
         :named,
@@ -1177,7 +1193,8 @@ module Fortran
         if (spec=send(x))
           var=spec.rhs
           varenv=varenv_get(var)
-          @spec_var_bcast.push(sms_bcast(var,sms_type(var),"(/1/)",1))
+          size=(varenv["type"]=="character")?("(/len(#{var})/)"):("(/1/)")
+          @spec_var_bcast.push(sms_bcast(var,sms_type(var),size,1))
           @spec_var_bcast.push(sms_chkstat)
           @need_decompmod=true
           @iostat=var if x==:iostat

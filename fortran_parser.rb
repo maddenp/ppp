@@ -676,93 +676,99 @@ module Fortran
                                 r14 = SyntaxNode.new(input, (index-1)...index) if r14 == true
                                 r0 = r14
                               else
-                                r15 = _nt_goto_stmt
+                                r15 = _nt_flush_stmt
                                 if r15
                                   r15 = SyntaxNode.new(input, (index-1)...index) if r15 == true
                                   r0 = r15
                                 else
-                                  r16 = _nt_if_stmt
+                                  r16 = _nt_goto_stmt
                                   if r16
                                     r16 = SyntaxNode.new(input, (index-1)...index) if r16 == true
                                     r0 = r16
                                   else
-                                    r17 = _nt_inquire_stmt
+                                    r17 = _nt_if_stmt
                                     if r17
                                       r17 = SyntaxNode.new(input, (index-1)...index) if r17 == true
                                       r0 = r17
                                     else
-                                      r18 = _nt_nullify_stmt
+                                      r18 = _nt_inquire_stmt
                                       if r18
                                         r18 = SyntaxNode.new(input, (index-1)...index) if r18 == true
                                         r0 = r18
                                       else
-                                        r19 = _nt_open_stmt
+                                        r19 = _nt_nullify_stmt
                                         if r19
                                           r19 = SyntaxNode.new(input, (index-1)...index) if r19 == true
                                           r0 = r19
                                         else
-                                          r20 = _nt_pointer_assignment_stmt
+                                          r20 = _nt_open_stmt
                                           if r20
                                             r20 = SyntaxNode.new(input, (index-1)...index) if r20 == true
                                             r0 = r20
                                           else
-                                            r21 = _nt_print_stmt
+                                            r21 = _nt_pointer_assignment_stmt
                                             if r21
                                               r21 = SyntaxNode.new(input, (index-1)...index) if r21 == true
                                               r0 = r21
                                             else
-                                              r22 = _nt_read_stmt
+                                              r22 = _nt_print_stmt
                                               if r22
                                                 r22 = SyntaxNode.new(input, (index-1)...index) if r22 == true
                                                 r0 = r22
                                               else
-                                                r23 = _nt_return_stmt
+                                                r23 = _nt_read_stmt
                                                 if r23
                                                   r23 = SyntaxNode.new(input, (index-1)...index) if r23 == true
                                                   r0 = r23
                                                 else
-                                                  r24 = _nt_rewind_stmt
+                                                  r24 = _nt_return_stmt
                                                   if r24
                                                     r24 = SyntaxNode.new(input, (index-1)...index) if r24 == true
                                                     r0 = r24
                                                   else
-                                                    r25 = _nt_stop_stmt
+                                                    r25 = _nt_rewind_stmt
                                                     if r25
                                                       r25 = SyntaxNode.new(input, (index-1)...index) if r25 == true
                                                       r0 = r25
                                                     else
-                                                      r26 = _nt_where_stmt
+                                                      r26 = _nt_stop_stmt
                                                       if r26
                                                         r26 = SyntaxNode.new(input, (index-1)...index) if r26 == true
                                                         r0 = r26
                                                       else
-                                                        r27 = _nt_write_stmt
+                                                        r27 = _nt_where_stmt
                                                         if r27
                                                           r27 = SyntaxNode.new(input, (index-1)...index) if r27 == true
                                                           r0 = r27
                                                         else
-                                                          r28 = _nt_arithmetic_if_stmt
+                                                          r28 = _nt_write_stmt
                                                           if r28
                                                             r28 = SyntaxNode.new(input, (index-1)...index) if r28 == true
                                                             r0 = r28
                                                           else
-                                                            r29 = _nt_assign_stmt
+                                                            r29 = _nt_arithmetic_if_stmt
                                                             if r29
                                                               r29 = SyntaxNode.new(input, (index-1)...index) if r29 == true
                                                               r0 = r29
                                                             else
-                                                              r30 = _nt_assigned_goto_stmt
+                                                              r30 = _nt_assign_stmt
                                                               if r30
                                                                 r30 = SyntaxNode.new(input, (index-1)...index) if r30 == true
                                                                 r0 = r30
                                                               else
-                                                                r31 = _nt_pause_stmt
+                                                                r31 = _nt_assigned_goto_stmt
                                                                 if r31
                                                                   r31 = SyntaxNode.new(input, (index-1)...index) if r31 == true
                                                                   r0 = r31
                                                                 else
-                                                                  @index = i0
-                                                                  r0 = nil
+                                                                  r32 = _nt_pause_stmt
+                                                                  if r32
+                                                                    r32 = SyntaxNode.new(input, (index-1)...index) if r32 == true
+                                                                    r0 = r32
+                                                                  else
+                                                                    @index = i0
+                                                                    r0 = nil
+                                                                  end
                                                                 end
                                                               end
                                                             end
@@ -15460,6 +15466,352 @@ module Fortran
     r0
   end
 
+  def _nt_file_unit_number
+    start_index = index
+    if node_cache[:file_unit_number].has_key?(index)
+      cached = node_cache[:file_unit_number][index]
+      if cached
+        node_cache[:file_unit_number][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    r0 = _nt_scalar_int_expr
+
+    node_cache[:file_unit_number][start_index] = r0
+
+    r0
+  end
+
+  module FlushSpec0
+    def file_unit_number
+      elements[0]
+    end
+
+  end
+
+  def _nt_flush_spec
+    start_index = index
+    if node_cache[:flush_spec].has_key?(index)
+      cached = node_cache[:flush_spec][index]
+      if cached
+        node_cache[:flush_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    r1 = _nt_io_spec_err
+    if r1
+      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
+      r0 = r1
+    else
+      r2 = _nt_io_spec_iomsg
+      if r2
+        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
+        r0 = r2
+      else
+        r3 = _nt_io_spec_iostat
+        if r3
+          r3 = SyntaxNode.new(input, (index-1)...index) if r3 == true
+          r0 = r3
+        else
+          r4 = _nt_io_spec_unit
+          if r4
+            r4 = SyntaxNode.new(input, (index-1)...index) if r4 == true
+            r0 = r4
+          else
+            i5, s5 = index, []
+            r6 = _nt_file_unit_number
+            s5 << r6
+            if r6
+              if (match_len = has_terminal?("", false, index))
+                r7 = true
+                @index += match_len
+              else
+                terminal_parse_failure('""')
+                r7 = nil
+              end
+              s5 << r7
+            end
+            if s5.last
+              r5 = instantiate_node(Flush_Spec_Number,input, i5...index, s5)
+              r5.extend(FlushSpec0)
+            else
+              @index = i5
+              r5 = nil
+            end
+            if r5
+              r5 = SyntaxNode.new(input, (index-1)...index) if r5 == true
+              r0 = r5
+            else
+              @index = i0
+              r0 = nil
+            end
+          end
+        end
+      end
+    end
+
+    node_cache[:flush_spec][start_index] = r0
+
+    r0
+  end
+
+  module FlushSpecList0
+    def flush_spec
+      elements[0]
+    end
+
+  end
+
+  def _nt_flush_spec_list
+    start_index = index
+    if node_cache[:flush_spec_list].has_key?(index)
+      cached = node_cache[:flush_spec_list][index]
+      if cached
+        node_cache[:flush_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_flush_spec
+    s0 << r1
+    if r1
+      s2, i2 = [], index
+      loop do
+        r3 = _nt_flush_spec_list_pair
+        if r3
+          s2 << r3
+        else
+          break
+        end
+      end
+      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Flush_Spec_List,input, i0...index, s0)
+      r0.extend(FlushSpecList0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:flush_spec_list][start_index] = r0
+
+    r0
+  end
+
+  module FlushSpecListPair0
+    def t_comma
+      elements[0]
+    end
+
+    def flush_spec
+      elements[1]
+    end
+  end
+
+  def _nt_flush_spec_list_pair
+    start_index = index
+    if node_cache[:flush_spec_list_pair].has_key?(index)
+      cached = node_cache[:flush_spec_list_pair][index]
+      if cached
+        node_cache[:flush_spec_list_pair][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_flush_spec
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Flush_Spec_List_Pair,input, i0...index, s0)
+      r0.extend(FlushSpecListPair0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:flush_spec_list_pair][start_index] = r0
+
+    r0
+  end
+
+  module FlushStmt0
+    def label
+      elements[0]
+    end
+
+    def t_flush
+      elements[1]
+    end
+
+    def file_unit_number
+      elements[3]
+    end
+
+    def t_newline
+      elements[4]
+    end
+  end
+
+  module FlushStmt1
+    def label
+      elements[0]
+    end
+
+    def t_flush
+      elements[1]
+    end
+
+    def t_paren_l
+      elements[2]
+    end
+
+    def flush_spec_list
+      elements[3]
+    end
+
+    def t_paren_r
+      elements[4]
+    end
+
+    def t_newline
+      elements[5]
+    end
+
+  end
+
+  def _nt_flush_stmt
+    start_index = index
+    if node_cache[:flush_stmt].has_key?(index)
+      cached = node_cache[:flush_stmt][index]
+      if cached
+        node_cache[:flush_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    i1, s1 = index, []
+    r3 = _nt_stmt_label
+    if r3
+      r2 = r3
+    else
+      r2 = instantiate_node(SyntaxNode,input, index...index)
+    end
+    s1 << r2
+    if r2
+      r4 = _nt_t_flush
+      s1 << r4
+      if r4
+        i5 = index
+        r6 = _nt_t_paren_l
+        if r6
+          @index = i5
+          r5 = nil
+        else
+          @index = i5
+          r5 = instantiate_node(SyntaxNode,input, index...index)
+        end
+        s1 << r5
+        if r5
+          r7 = _nt_file_unit_number
+          s1 << r7
+          if r7
+            r8 = _nt_t_newline
+            s1 << r8
+          end
+        end
+      end
+    end
+    if s1.last
+      r1 = instantiate_node(Flush_Stmt_1,input, i1...index, s1)
+      r1.extend(FlushStmt0)
+    else
+      @index = i1
+      r1 = nil
+    end
+    if r1
+      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
+      r0 = r1
+    else
+      i9, s9 = index, []
+      r11 = _nt_stmt_label
+      if r11
+        r10 = r11
+      else
+        r10 = instantiate_node(SyntaxNode,input, index...index)
+      end
+      s9 << r10
+      if r10
+        r12 = _nt_t_flush
+        s9 << r12
+        if r12
+          r13 = _nt_t_paren_l
+          s9 << r13
+          if r13
+            r14 = _nt_flush_spec_list
+            s9 << r14
+            if r14
+              r15 = _nt_t_paren_r
+              s9 << r15
+              if r15
+                r16 = _nt_t_newline
+                s9 << r16
+                if r16
+                  i17 = index
+                  r18 = lambda { |e| sp_flush_stmt(e[3]) }.call(s9)
+                  if !r18
+                    terminal_parse_failure("<semantic predicate>")
+                  end
+                  if r18
+                    @index = i17
+                    r17 = instantiate_node(SyntaxNode,input, index...index)
+                  else
+                    @index = i17
+                    r17 = nil
+                  end
+                  s9 << r17
+                end
+              end
+            end
+          end
+        end
+      end
+      if s9.last
+        r9 = instantiate_node(Flush_Stmt_2,input, i9...index, s9)
+        r9.extend(FlushStmt1)
+      else
+        @index = i9
+        r9 = nil
+      end
+      if r9
+        r9 = SyntaxNode.new(input, (index-1)...index) if r9 == true
+        r0 = r9
+      else
+        @index = i0
+        r0 = nil
+      end
+    end
+
+    node_cache[:flush_stmt][start_index] = r0
+
+    r0
+  end
+
   def _nt_format
     start_index = index
     if node_cache[:format].has_key?(index)
@@ -21001,6 +21353,55 @@ module Fortran
     r0
   end
 
+  module IoSpecIomsg0
+    def t_iomsg
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def iomsg_variable
+      elements[2]
+    end
+  end
+
+  def _nt_io_spec_iomsg
+    start_index = index
+    if node_cache[:io_spec_iomsg].has_key?(index)
+      cached = node_cache[:io_spec_iomsg][index]
+      if cached
+        node_cache[:io_spec_iomsg][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_iomsg
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_iomsg_variable
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(Io_Spec_Iomsg,input, i0...index, s0)
+      r0.extend(IoSpecIomsg0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:io_spec_iomsg][start_index] = r0
+
+    r0
+  end
+
   module IoSpecIostat0
     def t_iostat
       elements[0]
@@ -21920,6 +22321,24 @@ module Fortran
     end
 
     node_cache[:io_unit][start_index] = r0
+
+    r0
+  end
+
+  def _nt_iomsg_variable
+    start_index = index
+    if node_cache[:iomsg_variable].has_key?(index)
+      cached = node_cache[:iomsg_variable][index]
+      if cached
+        node_cache[:iomsg_variable][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    r0 = _nt_scalar_default_char_variable
+
+    node_cache[:iomsg_variable][start_index] = r0
 
     r0
   end
@@ -33600,6 +34019,30 @@ module Fortran
     r0
   end
 
+  def _nt_t_flush
+    start_index = index
+    if node_cache[:t_flush].has_key?(index)
+      cached = node_cache[:t_flush][index]
+      if cached
+        node_cache[:t_flush][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if (match_len = has_terminal?("flush", false, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
+      @index += match_len
+    else
+      terminal_parse_failure('"flush"')
+      r0 = nil
+    end
+
+    node_cache[:t_flush][start_index] = r0
+
+    r0
+  end
+
   def _nt_t_fmt
     start_index = index
     if node_cache[:t_fmt].has_key?(index)
@@ -34180,6 +34623,30 @@ module Fortran
     end
 
     node_cache[:t_io_control_spec_end][start_index] = r0
+
+    r0
+  end
+
+  def _nt_t_iomsg
+    start_index = index
+    if node_cache[:t_iomsg].has_key?(index)
+      cached = node_cache[:t_iomsg][index]
+      if cached
+        node_cache[:t_iomsg][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if (match_len = has_terminal?("iomsg", false, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
+      @index += match_len
+    else
+      terminal_parse_failure('"iomsg"')
+      r0 = nil
+    end
+
+    node_cache[:t_iomsg][start_index] = r0
 
     r0
   end
