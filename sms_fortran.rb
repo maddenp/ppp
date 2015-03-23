@@ -1860,7 +1860,7 @@ module Fortran
       code=pre("sms$exchange_end")
       vars.each do |var|
         varenv=check(var)
-        code.push("call sms__exchange_end('#{var.name}',#{var}#{sms_statusvar})")
+        code.push("call sms__exchange_end('#{var.name}',#{var},#{sms_statusvar})")
         code.push(sms_chkstat)
       end
       replace_statement(code)
