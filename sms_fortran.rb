@@ -342,7 +342,7 @@ module Fortran
           arg2=(sort=="scalar")?("1"):("size(#{var})")
           code.push("if (#{iostat}.eq.0) then") if iostat
           code.push(sms_bcast_char(var,arg2))
-          code.push(sms_chkstat)
+          code.push(sms_abort_on_error)
           code.push("endif") if iostat
         else
           if sort=="scalar"
@@ -355,7 +355,7 @@ module Fortran
           kind=varenv["kind"]
           code.push("if (#{iostat}.eq.0) then") if iostat
           code.push(sms_bcast(var,sms_type(var),sizes,dims))
-          code.push(sms_chkstat)
+          code.push(sms_abort_on_error)
           code.push("endif") if iostat
         end
       end
@@ -399,7 +399,7 @@ module Fortran
         args.push(sms_global_name(var))
         args.push(sms_statusvar)
         code.push("call sms__gather(#{args.join(",")})")
-        code.push(sms_chkstat)
+        code.push(sms_abort_on_error)
       end
       code
     end
@@ -466,7 +466,7 @@ module Fortran
         stmt+="if (#{iostat}.eq.0) " if iostat
         stmt+="call sms__scatter(#{args.join(",")})"
         code.push(stmt)
-        code.push(sms_chkstat)
+        code.push(sms_abort_on_error)
       end
       code
     end
@@ -656,16 +656,17 @@ module Fortran
       "call sms__abort(#{retcode},'#{msg}')"
     end
 
+    def sms_abort_on_error
+      abort_code=sms_abort(1,#{marker})
+      "if (#{sms_statusvar}.ne.0) #{abort_code}"
+    end
+
     def sms_bcast(var,type,sizes,dims)
       "call sms__bcast(#{var},#{type},#{sizes},#{dims},#{sms_statusvar})"
     end
 
     def sms_bcast_char(var,arg2)
       "call sms__bcast_char(#{var},#{arg2},#{sms_statusvar})"
-    end
-
-    def sms_chkstat
-      "call sms__chkstat('#{marker}',' ',#{sms_statusvar},sms__abort_on_error,#{sms_statusvar})"
     end
 
     def sms_commtag
@@ -1070,7 +1071,7 @@ module Fortran
           pppvar=spec.send(:pppvar)
           @spec_var_false.push("#{pppvar}=.false.")
           @spec_var_bcast.push(sms_bcast(pppvar,sms_type(pppvar),"(/1/)",1))
-          @spec_var_bcast.push(sms_chkstat)
+          @spec_var_bcast.push(sms_abort_on_error)
           @spec_var_true.push("#{label_new} #{pppvar}=.true.")
           @spec_var_goto.push("if (#{pppvar}) goto #{label_old}")
           @success_label=label_create unless @success_label
@@ -1195,7 +1196,7 @@ module Fortran
           varenv=varenv_get(var)
           size=(varenv["type"]=="character")?("(/len(#{var})/)"):("(/1/)")
           @spec_var_bcast.push(sms_bcast(var,sms_type(var),size,1))
-          @spec_var_bcast.push(sms_chkstat)
+          @spec_var_bcast.push(sms_abort_on_error)
           @need_decompmod=true
           @iostat=var if x==:iostat
         end
@@ -1505,7 +1506,7 @@ module Fortran
       code=[]
       code.push("#{self}")
       code.push("call sms__barrier(#{sms_statusvar})")
-      code.push(sms_chkstat)
+      code.push(sms_abort_on_error)
       replace_statement(code)
     end
 
@@ -1564,7 +1565,7 @@ module Fortran
       code.push("#{self}")
       code.push("if (sms__debugging_on()) then")
       code.push("call sms__compare_var(#{dh},#{var},#{type},#{glubs},#{perms},#{gllbs},#{glubs},#{gllbs},#{dims},'#{var}',#{str},#{sms_statusvar})")
-      code.push(sms_chkstat)
+      code.push(sms_abort_on_error)
       code.push("endif")
       replace_statement(code)
     end
@@ -1653,7 +1654,7 @@ module Fortran
         sms_statusvar
       ]
       code.push("call sms__create_decomp(#{args.join(',')})")
-      code.push(sms_chkstat)
+      code.push(sms_abort_on_error)
       code.push("do #{d}__index=0,0")
       args=[
         "#{d}(#{n})",
@@ -1667,7 +1668,7 @@ module Fortran
         sms_statusvar
       ]
       code.push("call sms__loops_op(#{args.join(',')})")
-      code.push(sms_chkstat)
+      code.push(sms_abort_on_error)
       code.push("end do")
       replace_statement(code)
     end
@@ -1875,7 +1876,7 @@ module Fortran
       tag=sms_commtag
       vars=(1..sms_maxvars).reduce([]) { |m,x| m.push((x>nvars)?("sms__x#{x}"):("#{v[x-1].name}")) }.join(",")
       code.push("call sms__exchange(#{nvars},#{tag},#{gllbs},#{glubs},#{strts},#{stops},#{perms},#{dcmps},#{types},#{names},#{sms_statusvar},#{overlap},#{vars})")
-      code.push(sms_chkstat)
+      code.push(sms_abort_on_error)
       replace_statement(code)
 
     end
@@ -2224,7 +2225,7 @@ module Fortran
       code=[]
       code.push("#{self}")
       code.push("call sms__reduce_#{nvars}(#{sizes},#{types},sms__op_#{op},#{sms_statusvar},#{vars.join(',')})")
-      code.push(sms_chkstat)
+      code.push(sms_abort_on_error)
       replace_statement(code)
     end
 
@@ -2684,7 +2685,7 @@ module Fortran
       code=[]
       code.push("#{self}")
       code.push("call sms__set_communicator(#{e[3]},#{sms_statusvar})")
-      code.push(sms_chkstat)
+      code.push(sms_abort_on_error)
       replace_statement(code)
     end
 
@@ -2699,7 +2700,7 @@ module Fortran
       code=[]
       code.push("#{self}")
       code.push("call sms__start(#{sms_statusvar})")
-      code.push(sms_chkstat)
+      code.push(sms_abort_on_error)
       replace_statement(code)
     end
 
@@ -2840,7 +2841,7 @@ module Fortran
       code.push("#{self}")
       code.push("call sms__unstructuredgrid(#{dh},size(#{var},1),#{var})")
       code.push("call sms__get_collapsed_halo_size(#{dh}(#{dh}__nestlevel),1,1,#{dh}__localhalosize,#{sms_statusvar})")
-      code.push(sms_chkstat)
+      code.push(sms_abort_on_error)
       code.push("#{dh}__s1(1,1,#{dh}__nestlevel)=#{dh}__s1(1,0,#{dh}__nestlevel)")
       code.push("#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),1,#{dh}__nestlevel)=#{dh}__e1(#{dh}__globalsize(1,#{dh}__nestlevel),0,#{dh}__nestlevel)+#{dh}__localhalosize")
       replace_statement(code)
