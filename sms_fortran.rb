@@ -657,8 +657,7 @@ module Fortran
     end
 
     def sms_abort_on_error
-      abort_code=sms_abort(1,#{marker})
-      "if (#{sms_statusvar}.ne.0) #{abort_code}"
+      "if (#{sms_statusvar}.ne.0) #{sms_abort(1)}"
     end
 
     def sms_bcast(var,type,sizes,dims)
