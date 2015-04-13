@@ -202,7 +202,7 @@ int main (int argc,char **argv)
   {
     if (c=='\0') break;
     ++bytesread;
-    if (!modinfo) write(fd,&c,1);
+    if (!modinfo) status=write(fd,&c,1);
   }
   if (!modinfo) close(fd);
 
