@@ -631,7 +631,7 @@ module Fortran
       s[:marker]||=0
       m=(s[:marker]+=1)
       f=File.basename(env[:global][:dstfile])
-      "#{f} marker #{m}"
+      "See \"marker #{m}\" in #{f}"
     end
 
     def maxrank
@@ -723,13 +723,16 @@ module Fortran
       "sms__status"
     end
 
-    def sms_stop(comm)
+    def sms_stop(comm=nil)
       use(sms_decompmod)
+      code=[]
       if comm
-        "call sms__stop(#{comm})"
+        code.push("call sms__stop(#{sms_statusvar},#{comm})")
       else
-        "call sms__stop"
+        code.push("call sms__stop(#{sms_statusvar})")
       end
+      code.push(sms_abort_on_error)
+      code.join("\n")
     end
 
     def sms_type(var)
