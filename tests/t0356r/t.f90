@@ -9,9 +9,9 @@ program t
   flush (lun)
   flush (unit=6)
   flush (unit=lun)
-  flush (iostat=stat)
-  flush (iomsg=msg)
-  flush (err=99)
+  flush (6,iostat=stat)
+  flush (iomsg=msg,unit=6)
+  flush (err=99,unit=6)
   flush (unit=6,iostat=stat,iomsg=msg)
 99 continue
 end program t
