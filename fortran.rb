@@ -2351,7 +2351,14 @@ module Fortran
     end
 
     def name
-      rightmost.name
+
+      # If the current node represents a derived-type reference, return "self"
+      # as the name, because it will *not* be present as a key in the
+      # environment. To properly treat derived types, the environment will
+      # probably need to contain a subordinate hash-of-hashes structure for
+      # information on derived type variables.
+
+      (derived_type?)?(self):(e[0].name)
     end
 
     def part_ref
