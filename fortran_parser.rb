@@ -681,93 +681,99 @@ module Fortran
                                   r15 = SyntaxNode.new(input, (index-1)...index) if r15 == true
                                   r0 = r15
                                 else
-                                  r16 = _nt_goto_stmt
+                                  r16 = _nt_forall_stmt
                                   if r16
                                     r16 = SyntaxNode.new(input, (index-1)...index) if r16 == true
                                     r0 = r16
                                   else
-                                    r17 = _nt_if_stmt
+                                    r17 = _nt_goto_stmt
                                     if r17
                                       r17 = SyntaxNode.new(input, (index-1)...index) if r17 == true
                                       r0 = r17
                                     else
-                                      r18 = _nt_inquire_stmt
+                                      r18 = _nt_if_stmt
                                       if r18
                                         r18 = SyntaxNode.new(input, (index-1)...index) if r18 == true
                                         r0 = r18
                                       else
-                                        r19 = _nt_nullify_stmt
+                                        r19 = _nt_inquire_stmt
                                         if r19
                                           r19 = SyntaxNode.new(input, (index-1)...index) if r19 == true
                                           r0 = r19
                                         else
-                                          r20 = _nt_open_stmt
+                                          r20 = _nt_nullify_stmt
                                           if r20
                                             r20 = SyntaxNode.new(input, (index-1)...index) if r20 == true
                                             r0 = r20
                                           else
-                                            r21 = _nt_pointer_assignment_stmt
+                                            r21 = _nt_open_stmt
                                             if r21
                                               r21 = SyntaxNode.new(input, (index-1)...index) if r21 == true
                                               r0 = r21
                                             else
-                                              r22 = _nt_print_stmt
+                                              r22 = _nt_pointer_assignment_stmt
                                               if r22
                                                 r22 = SyntaxNode.new(input, (index-1)...index) if r22 == true
                                                 r0 = r22
                                               else
-                                                r23 = _nt_read_stmt
+                                                r23 = _nt_print_stmt
                                                 if r23
                                                   r23 = SyntaxNode.new(input, (index-1)...index) if r23 == true
                                                   r0 = r23
                                                 else
-                                                  r24 = _nt_return_stmt
+                                                  r24 = _nt_read_stmt
                                                   if r24
                                                     r24 = SyntaxNode.new(input, (index-1)...index) if r24 == true
                                                     r0 = r24
                                                   else
-                                                    r25 = _nt_rewind_stmt
+                                                    r25 = _nt_return_stmt
                                                     if r25
                                                       r25 = SyntaxNode.new(input, (index-1)...index) if r25 == true
                                                       r0 = r25
                                                     else
-                                                      r26 = _nt_stop_stmt
+                                                      r26 = _nt_rewind_stmt
                                                       if r26
                                                         r26 = SyntaxNode.new(input, (index-1)...index) if r26 == true
                                                         r0 = r26
                                                       else
-                                                        r27 = _nt_where_stmt
+                                                        r27 = _nt_stop_stmt
                                                         if r27
                                                           r27 = SyntaxNode.new(input, (index-1)...index) if r27 == true
                                                           r0 = r27
                                                         else
-                                                          r28 = _nt_write_stmt
+                                                          r28 = _nt_where_stmt
                                                           if r28
                                                             r28 = SyntaxNode.new(input, (index-1)...index) if r28 == true
                                                             r0 = r28
                                                           else
-                                                            r29 = _nt_arithmetic_if_stmt
+                                                            r29 = _nt_write_stmt
                                                             if r29
                                                               r29 = SyntaxNode.new(input, (index-1)...index) if r29 == true
                                                               r0 = r29
                                                             else
-                                                              r30 = _nt_assign_stmt
+                                                              r30 = _nt_arithmetic_if_stmt
                                                               if r30
                                                                 r30 = SyntaxNode.new(input, (index-1)...index) if r30 == true
                                                                 r0 = r30
                                                               else
-                                                                r31 = _nt_assigned_goto_stmt
+                                                                r31 = _nt_assign_stmt
                                                                 if r31
                                                                   r31 = SyntaxNode.new(input, (index-1)...index) if r31 == true
                                                                   r0 = r31
                                                                 else
-                                                                  r32 = _nt_pause_stmt
+                                                                  r32 = _nt_assigned_goto_stmt
                                                                   if r32
                                                                     r32 = SyntaxNode.new(input, (index-1)...index) if r32 == true
                                                                     r0 = r32
                                                                   else
-                                                                    @index = i0
-                                                                    r0 = nil
+                                                                    r33 = _nt_pause_stmt
+                                                                    if r33
+                                                                      r33 = SyntaxNode.new(input, (index-1)...index) if r33 == true
+                                                                      r0 = r33
+                                                                    else
+                                                                      @index = i0
+                                                                      r0 = nil
+                                                                    end
                                                                   end
                                                                 end
                                                               end
@@ -15812,6 +15818,468 @@ module Fortran
     r0
   end
 
+  def _nt_forall_assignment_stmt
+    start_index = index
+    if node_cache[:forall_assignment_stmt].has_key?(index)
+      cached = node_cache[:forall_assignment_stmt][index]
+      if cached
+        node_cache[:forall_assignment_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0 = index
+    r1 = _nt_forall_specific_assignment_stmt
+    if r1
+      r1 = SyntaxNode.new(input, (index-1)...index) if r1 == true
+      r0 = r1
+    else
+      r2 = _nt_forall_specific_pointer_assignment_stmt
+      if r2
+        r2 = SyntaxNode.new(input, (index-1)...index) if r2 == true
+        r0 = r2
+      else
+        @index = i0
+        r0 = nil
+      end
+    end
+
+    node_cache[:forall_assignment_stmt][start_index] = r0
+
+    r0
+  end
+
+  module ForallHeader0
+    def t_paren_l
+      elements[0]
+    end
+
+    def forall_triplet_spec_list
+      elements[1]
+    end
+
+    def t_paren_r
+      elements[3]
+    end
+  end
+
+  def _nt_forall_header
+    start_index = index
+    if node_cache[:forall_header].has_key?(index)
+      cached = node_cache[:forall_header][index]
+      if cached
+        node_cache[:forall_header][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_paren_l
+    s0 << r1
+    if r1
+      r2 = _nt_forall_triplet_spec_list
+      s0 << r2
+      if r2
+        r4 = _nt_scalar_mask_expr_option
+        if r4
+          r3 = r4
+        else
+          r3 = instantiate_node(SyntaxNode,input, index...index)
+        end
+        s0 << r3
+        if r3
+          r5 = _nt_t_paren_r
+          s0 << r5
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(Forall_Header,input, i0...index, s0)
+      r0.extend(ForallHeader0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:forall_header][start_index] = r0
+
+    r0
+  end
+
+  module ForallSpecificAssignmentStmt0
+    def variable
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def expr
+      elements[2]
+    end
+  end
+
+  def _nt_forall_specific_assignment_stmt
+    start_index = index
+    if node_cache[:forall_specific_assignment_stmt].has_key?(index)
+      cached = node_cache[:forall_specific_assignment_stmt][index]
+      if cached
+        node_cache[:forall_specific_assignment_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_variable
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_expr
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(Forall_Specific_Assignment_Stmt,input, i0...index, s0)
+      r0.extend(ForallSpecificAssignmentStmt0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:forall_specific_assignment_stmt][start_index] = r0
+
+    r0
+  end
+
+  module ForallSpecificPointerAssignmentStmt0
+    def pointer_object
+      elements[0]
+    end
+
+    def t_point
+      elements[1]
+    end
+
+    def target
+      elements[2]
+    end
+  end
+
+  def _nt_forall_specific_pointer_assignment_stmt
+    start_index = index
+    if node_cache[:forall_specific_pointer_assignment_stmt].has_key?(index)
+      cached = node_cache[:forall_specific_pointer_assignment_stmt][index]
+      if cached
+        node_cache[:forall_specific_pointer_assignment_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_pointer_object
+    s0 << r1
+    if r1
+      r2 = _nt_t_point
+      s0 << r2
+      if r2
+        r3 = _nt_target
+        s0 << r3
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(Forall_Specific_Pointer_Assignment_Stmt,input, i0...index, s0)
+      r0.extend(ForallSpecificPointerAssignmentStmt0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:forall_specific_pointer_assignment_stmt][start_index] = r0
+
+    r0
+  end
+
+  module ForallStmt0
+    def label
+      elements[0]
+    end
+
+    def t_forall
+      elements[1]
+    end
+
+    def forall_header
+      elements[2]
+    end
+
+    def forall_assignment_stmt
+      elements[3]
+    end
+
+    def t_newline
+      elements[4]
+    end
+  end
+
+  def _nt_forall_stmt
+    start_index = index
+    if node_cache[:forall_stmt].has_key?(index)
+      cached = node_cache[:forall_stmt][index]
+      if cached
+        node_cache[:forall_stmt][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r2 = _nt_stmt_label
+    if r2
+      r1 = r2
+    else
+      r1 = instantiate_node(SyntaxNode,input, index...index)
+    end
+    s0 << r1
+    if r1
+      r3 = _nt_t_forall
+      s0 << r3
+      if r3
+        r4 = _nt_forall_header
+        s0 << r4
+        if r4
+          r5 = _nt_forall_assignment_stmt
+          s0 << r5
+          if r5
+            r6 = _nt_t_newline
+            s0 << r6
+          end
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(Forall_Stmt,input, i0...index, s0)
+      r0.extend(ForallStmt0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:forall_stmt][start_index] = r0
+
+    r0
+  end
+
+  module ForallTripletSpec0
+    def index_name
+      elements[0]
+    end
+
+    def t_equal
+      elements[1]
+    end
+
+    def subscript1
+      elements[2]
+    end
+
+    def t_colon
+      elements[3]
+    end
+
+    def subscript2
+      elements[4]
+    end
+
+  end
+
+  def _nt_forall_triplet_spec
+    start_index = index
+    if node_cache[:forall_triplet_spec].has_key?(index)
+      cached = node_cache[:forall_triplet_spec][index]
+      if cached
+        node_cache[:forall_triplet_spec][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_index_name
+    s0 << r1
+    if r1
+      r2 = _nt_t_equal
+      s0 << r2
+      if r2
+        r3 = _nt_subscript
+        s0 << r3
+        if r3
+          r4 = _nt_t_colon
+          s0 << r4
+          if r4
+            r5 = _nt_subscript
+            s0 << r5
+            if r5
+              r7 = _nt_forall_triplet_spec_stride_option
+              if r7
+                r6 = r7
+              else
+                r6 = instantiate_node(SyntaxNode,input, index...index)
+              end
+              s0 << r6
+            end
+          end
+        end
+      end
+    end
+    if s0.last
+      r0 = instantiate_node(Forall_Triplet_Spec,input, i0...index, s0)
+      r0.extend(ForallTripletSpec0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:forall_triplet_spec][start_index] = r0
+
+    r0
+  end
+
+  module ForallTripletSpecList0
+    def forall_triplet_spec
+      elements[0]
+    end
+
+  end
+
+  def _nt_forall_triplet_spec_list
+    start_index = index
+    if node_cache[:forall_triplet_spec_list].has_key?(index)
+      cached = node_cache[:forall_triplet_spec_list][index]
+      if cached
+        node_cache[:forall_triplet_spec_list][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_forall_triplet_spec
+    s0 << r1
+    if r1
+      s2, i2 = [], index
+      loop do
+        r3 = _nt_forall_triplet_spec_list_option
+        if r3
+          s2 << r3
+        else
+          break
+        end
+      end
+      r2 = instantiate_node(SyntaxNode,input, i2...index, s2)
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Forall_Triplet_Spec_List,input, i0...index, s0)
+      r0.extend(ForallTripletSpecList0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:forall_triplet_spec_list][start_index] = r0
+
+    r0
+  end
+
+  module ForallTripletSpecListOption0
+    def t_comma
+      elements[0]
+    end
+
+    def forall_triplet_spec
+      elements[1]
+    end
+  end
+
+  def _nt_forall_triplet_spec_list_option
+    start_index = index
+    if node_cache[:forall_triplet_spec_list_option].has_key?(index)
+      cached = node_cache[:forall_triplet_spec_list_option][index]
+      if cached
+        node_cache[:forall_triplet_spec_list_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_forall_triplet_spec
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Forall_Triplet_Spec_List_Option,input, i0...index, s0)
+      r0.extend(ForallTripletSpecListOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:forall_triplet_spec_list_option][start_index] = r0
+
+    r0
+  end
+
+  module ForallTripletSpecStrideOption0
+    def t_colon
+      elements[0]
+    end
+
+    def stride
+      elements[1]
+    end
+  end
+
+  def _nt_forall_triplet_spec_stride_option
+    start_index = index
+    if node_cache[:forall_triplet_spec_stride_option].has_key?(index)
+      cached = node_cache[:forall_triplet_spec_stride_option][index]
+      if cached
+        node_cache[:forall_triplet_spec_stride_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_colon
+    s0 << r1
+    if r1
+      r2 = _nt_stride
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Forall_Triplet_Spec_Stride_Option,input, i0...index, s0)
+      r0.extend(ForallTripletSpecStrideOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:forall_triplet_spec_stride_option][start_index] = r0
+
+    r0
+  end
+
   def _nt_format
     start_index = index
     if node_cache[:format].has_key?(index)
@@ -18183,6 +18651,24 @@ module Fortran
     end
 
     node_cache[:implicit_stmt][start_index] = r0
+
+    r0
+  end
+
+  def _nt_index_name
+    start_index = index
+    if node_cache[:index_name].has_key?(index)
+      cached = node_cache[:index_name][index]
+      if cached
+        node_cache[:index_name][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    r0 = _nt_name
+
+    node_cache[:index_name][start_index] = r0
 
     r0
   end
@@ -30610,6 +31096,65 @@ module Fortran
     r0
   end
 
+  def _nt_scalar_mask_expr
+    start_index = index
+    if node_cache[:scalar_mask_expr].has_key?(index)
+      cached = node_cache[:scalar_mask_expr][index]
+      if cached
+        node_cache[:scalar_mask_expr][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    r0 = _nt_mask_expr
+
+    node_cache[:scalar_mask_expr][start_index] = r0
+
+    r0
+  end
+
+  module ScalarMaskExprOption0
+    def t_comma
+      elements[0]
+    end
+
+    def scalar_mask_expr
+      elements[1]
+    end
+  end
+
+  def _nt_scalar_mask_expr_option
+    start_index = index
+    if node_cache[:scalar_mask_expr_option].has_key?(index)
+      cached = node_cache[:scalar_mask_expr_option][index]
+      if cached
+        node_cache[:scalar_mask_expr_option][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    i0, s0 = index, []
+    r1 = _nt_t_comma
+    s0 << r1
+    if r1
+      r2 = _nt_scalar_mask_expr
+      s0 << r2
+    end
+    if s0.last
+      r0 = instantiate_node(Scalar_Mask_Expr_Option,input, i0...index, s0)
+      r0.extend(ScalarMaskExprOption0)
+    else
+      @index = i0
+      r0 = nil
+    end
+
+    node_cache[:scalar_mask_expr_option][start_index] = r0
+
+    r0
+  end
+
   def _nt_scalar_numeric_expr
     start_index = index
     if node_cache[:scalar_numeric_expr].has_key?(index)
@@ -34039,6 +34584,30 @@ module Fortran
     end
 
     node_cache[:t_flush][start_index] = r0
+
+    r0
+  end
+
+  def _nt_t_forall
+    start_index = index
+    if node_cache[:t_forall].has_key?(index)
+      cached = node_cache[:t_forall][index]
+      if cached
+        node_cache[:t_forall][index] = cached = SyntaxNode.new(input, index...(index + 1)) if cached == true
+        @index = cached.interval.end
+      end
+      return cached
+    end
+
+    if (match_len = has_terminal?("forall", false, index))
+      r0 = instantiate_node(T,input, index...(index + match_len))
+      @index += match_len
+    else
+      terminal_parse_failure('"forall"')
+      r0 = nil
+    end
+
+    node_cache[:t_forall][start_index] = r0
 
     r0
   end

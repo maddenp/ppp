@@ -83,6 +83,7 @@ grammar Fortran
     end_subroutine_stmt /
     exit_stmt /
     flush_stmt /
+    forall_stmt /
     goto_stmt /
     if_stmt /
     inquire_stmt /
@@ -1651,6 +1652,49 @@ grammar Fortran
     label:stmt_label? t_flush t_paren_l flush_spec_list t_paren_r t_newline &{ |e| sp_flush_stmt(e[3]) } <Flush_Stmt_2>
   end
 
+  rule forall_assignment_stmt
+    # F95:R752
+
+    forall_specific_assignment_stmt /
+    forall_specific_pointer_assignment_stmt
+  end
+
+  rule forall_header
+    # F95:R749
+
+    t_paren_l forall_triplet_spec_list scalar_mask_expr_option? t_paren_r <Forall_Header>
+  end
+
+  rule forall_specific_assignment_stmt
+    variable t_equal expr <Forall_Specific_Assignment_Stmt>
+  end
+
+  rule forall_specific_pointer_assignment_stmt
+    pointer_object t_point target <Forall_Specific_Pointer_Assignment_Stmt>
+  end
+
+  rule forall_stmt
+    # F95:R748
+
+    label:stmt_label? t_forall forall_header forall_assignment_stmt t_newline <Forall_Stmt>
+  end
+
+  rule forall_triplet_spec
+   index_name t_equal subscript t_colon subscript forall_triplet_spec_stride_option? <Forall_Triplet_Spec>
+  end
+
+  rule forall_triplet_spec_list
+    forall_triplet_spec forall_triplet_spec_list_option* <Forall_Triplet_Spec_List>
+  end
+
+  rule forall_triplet_spec_list_option
+    t_comma forall_triplet_spec <Forall_Triplet_Spec_List_Option>
+  end
+  
+  rule forall_triplet_spec_stride_option
+    t_colon stride <Forall_Triplet_Spec_Stride_Option>
+  end
+
   rule format
     # F90:R913
 
@@ -1885,6 +1929,10 @@ grammar Fortran
 
     label:stmt_label? t_implicit t_none t_newline <Implicit_None_Stmt> /
     label:stmt_label? t_implicit implicit_spec_list t_newline <Implicit_Stmt>
+  end
+
+  rule index_name
+    name
   end
 
   rule initialization
@@ -3210,6 +3258,14 @@ grammar Fortran
     initialization_expr
   end
 
+  rule scalar_mask_expr
+    mask_expr
+  end
+
+  rule scalar_mask_expr_option
+    t_comma scalar_mask_expr <Scalar_Mask_Expr_Option>
+  end
+
   rule scalar_numeric_expr
     # Multiple users (not explicitly defined)
 
@@ -3690,6 +3746,10 @@ grammar Fortran
 
   rule t_flush
     "flush" <T>
+  end
+
+  rule t_forall
+    "forall" <T>
   end
 
   rule t_fmt

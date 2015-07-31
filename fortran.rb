@@ -3091,6 +3091,30 @@ module Fortran
 
   end
 
+  class Forall_Header < NT
+  end
+
+  class Forall_Specific_Assignment_Stmt < NT
+  end
+
+  class Forall_Specific_Pointer_Assignment_Stmt < NT
+  end
+
+  class Forall_Stmt < Stmt
+  end
+
+  class Forall_Triplet_Spec < NT
+  end
+
+  class Forall_Triplet_Spec_List < List
+  end
+
+  class Forall_Triplet_Spec_List_Option < NT
+  end
+
+  class Forall_Triplet_Spec_Stride_Option < NT
+  end
+
   class Format_Item_Data_Edit_Desc < NT
   end
 
@@ -4760,6 +4784,9 @@ module Fortran
       e[1].name
     end
 
+  end
+
+  class Scalar_Mask_Expr_Option < NT
   end
 
   class Scalar_Variable_Name < Variable_Name
