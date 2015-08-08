@@ -9,7 +9,7 @@ sms_fortran_parser.rb: fortran_parser.rb
 sms_normalizer_parser.rb: normalizer_parser.rb
 
 %_parser.rb: %.tt lib
-	RUBYLIB=lib tt -o $@ $<
+	RUBYLIB=lib ./tt -o $@ $<
 
 $(CLIENT): $(CLIENT).c
 	gcc -Wall $^ -lm -o $@
