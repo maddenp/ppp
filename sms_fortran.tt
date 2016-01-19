@@ -263,7 +263,7 @@ grammar Fortran
   end
 
   rule sms_order_grid
-    sms_sentinel sms_t_order_grid t_paren_l variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_paren_r t_newline &{ |e| sp_sms_order_grid } <SMS_Order_Grid>
+    sms_sentinel sms_t_order_grid t_paren_l variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_comma variable_name t_paren_r t_newline &{ |e| sp_sms_order_grid } <SMS_Order_Grid>
   end
 
   rule sms_parallel

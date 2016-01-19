@@ -2029,7 +2029,7 @@ module Fortran
       use(sms_decompmod)
       code=[]
       code.push("#{self}")
-      code.push("call sms__order_grid(#{e[3..19].map { |x| x.to_s }.join},#{sms_statusvar})")
+      code.push("call sms__order_grid(#{e[3..13].map { |x| x.to_s }.join},#{sms_statusvar})")
       code.push(sms_chkstat)
       replace_statement(code)
     end

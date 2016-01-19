@@ -3798,36 +3798,12 @@ module Fortran
       elements[13]
     end
 
-    def t_comma6
+    def t_paren_r
       elements[14]
     end
 
-    def variable_name7
-      elements[15]
-    end
-
-    def t_comma7
-      elements[16]
-    end
-
-    def variable_name8
-      elements[17]
-    end
-
-    def t_comma8
-      elements[18]
-    end
-
-    def variable_name9
-      elements[19]
-    end
-
-    def t_paren_r
-      elements[20]
-    end
-
     def t_newline
-      elements[21]
+      elements[15]
     end
 
   end
@@ -3886,49 +3862,25 @@ module Fortran
                               r14 = _nt_variable_name
                               s0 << r14
                               if r14
-                                r15 = _nt_t_comma
+                                r15 = _nt_t_paren_r
                                 s0 << r15
                                 if r15
-                                  r16 = _nt_variable_name
+                                  r16 = _nt_t_newline
                                   s0 << r16
                                   if r16
-                                    r17 = _nt_t_comma
-                                    s0 << r17
-                                    if r17
-                                      r18 = _nt_variable_name
-                                      s0 << r18
-                                      if r18
-                                        r19 = _nt_t_comma
-                                        s0 << r19
-                                        if r19
-                                          r20 = _nt_variable_name
-                                          s0 << r20
-                                          if r20
-                                            r21 = _nt_t_paren_r
-                                            s0 << r21
-                                            if r21
-                                              r22 = _nt_t_newline
-                                              s0 << r22
-                                              if r22
-                                                i23 = index
-                                                r24 = lambda { |e| sp_sms_order_grid }.call(s0)
-                                                if !r24
-                                                  terminal_parse_failure("<semantic predicate>")
-                                                end
-                                                if r24
-                                                  @index = i23
-                                                  r23 = instantiate_node(SyntaxNode,input, index...index)
-                                                else
-                                                  @index = i23
-                                                  r23 = nil
-                                                end
-                                                s0 << r23
-                                              end
-                                            end
-                                          end
-                                        end
-                                      end
+                                    i17 = index
+                                    r18 = lambda { |e| sp_sms_order_grid }.call(s0)
+                                    if !r18
+                                      terminal_parse_failure("<semantic predicate>")
                                     end
+                                    if r18
+                                      @index = i17
+                                      r17 = instantiate_node(SyntaxNode,input, index...index)
+                                    else
+                                      @index = i17
+                                      r17 = nil
+                                    end
+                                    s0 << r17
                                   end
                                 end
                               end
