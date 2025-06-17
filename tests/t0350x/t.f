@@ -43,7 +43,7 @@ ccomment
       e n d p r o g r a m  t
 
       s u b r o u t i n e  s ( c )
-      i n t e g e r  c ( 1 )
+      i n t e g e r  c
       p r 
      *i n
      *t * , c

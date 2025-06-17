@@ -15,6 +15,6 @@ program t
 end program t
 
 subroutine s(c)
-  integer,intent(in)::c(1)
+  integer,intent(in)::c
   print *,c
 end subroutine s

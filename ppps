@@ -13,9 +13,9 @@ tool=$(echo $b | sed 's/s$//')
 
 test -n "$SMS__JAVA" && java="$SMS__JAVA" || java="java"
 test -n "$SMS__RUBY" &&  mri="$SMS__RUBY" ||  mri="ruby"
-jruby="$java -Djruby.compile.invokedynamic=true -Djruby.compile.mode=OFF -jar $d/jruby.jar"
+jruby="$java -Djruby.compile.invokedynamic=true -Djruby.compile.mode=OFF -jar $d/jruby.jar" # last tested: Java 21 + JRuby 10
 
-engine="$mri" # mri or jruby
+engine="$jruby" # set to either $mri or $jruby
 
 # Command-line arguments
 
